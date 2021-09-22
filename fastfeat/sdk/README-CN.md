@@ -2,72 +2,8 @@
 
 该包可以方便的获取特征的具体值，下面是使用方法：
 
-```go
-package FastFeatAdapter
-
-import (
-	"context"
-	"fmt"
-	"log"
-
-	"gitlab.pri.ibanyu.com/server/fastfeat/pub.git/FastFeatAdapter"
-	. "gitlab.pri.ibanyu.com/server/fastfeat/pub.git/idl/grpc/fastfeat"
-
-	"gitlab.pri.ibanyu.com/server/fastfeat/pub.git/sdk"
-)
-
-func ExampleGetOnlineFeatures() {
-	response, err := FastFeatAdapter.GetOnlineFeatures(context.Background(), &GetOnlineFeaturesRequest{
-		EntityKey:    "user_id:3132393327",
-		FeatureNames: []string{sdk.FeatureV1UserStreamKol, sdk.FeatureV1UserStreamIsNewUserBeforeTimestamp, sdk.FeatureV1UserStreamIsNewUserBeforeTimestamp},
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	userLastClick5PostId, err := response.FeatureValue(sdk.FeatureV1UserStreamClickedPostidWdw5TpeIntArr).StringArray()
-	if err != nil {
-		if err == sdk.FastFeatEmptyValue {
-			fmt.Printf("feature %s not found\n", sdk.FeatureV1UserStreamClickedPostidWdw5TpeIntArr)
-		} else {
-			panic(err)
-		}
-	} else {
-		fmt.Printf("feature %s value: %v", sdk.FeatureV1UserStreamClickedPostidWdw5TpeIntArr, userLastClick5PostId)
-	}
-
-	kolValue, err := response.FeatureValue(sdk.FeatureV1UserStreamKol).Int64()
-	if err != nil {
-		if err == sdk.FastFeatEmptyValue {
-			log.Printf("feature %s not found", sdk.FeatureV1UserStreamKol)
-		} else {
-			panic(err)
-		}
-	} else {
-		fmt.Printf("feature %s value: %d\n", sdk.FeatureV1UserStreamKol, kolValue)
-	}
-
-
-	isNewUserValue, err := response.FeatureValue(sdk.FeatureV1UserStreamIsNewUserBeforeTimestamp).Bool()
-	if err != nil {
-		if err == sdk.FastFeatEmptyValue {
-			log.Printf("feature %s not found", sdk.FeatureV1UserStreamIsNewUserBeforeTimestamp)
-		} else {
-			panic(err)
-		}
-	} else {
-		fmt.Printf("feature %s value: %t\n", sdk.FeatureV1UserStreamIsNewUserBeforeTimestamp, isNewUserValue)
-	}
-
-	// Output:
-	// feature v1:user:stream:clicked_postid_wdw_5_tpe_int_arr not found
-	// feature v1:user:stream:kol not found
-	// feature v1:user:stream:is_new_user_before_timestamp value: false
-}
-```
-
-
 # sdk 包的 api 文档
+
 ### type OnlineFetaturesResponses 
 ```go
 type OnlineFetaturesResponses map[string]FeatureValue
