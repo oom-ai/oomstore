@@ -1,7 +1,3 @@
-# sdk 包使用方式
-
-该包可以方便的获取特征的具体值，下面是使用方法：
-
 # sdk 包的 api 文档
 
 ### type OnlineFetaturesResponses 
