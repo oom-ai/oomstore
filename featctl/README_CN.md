@@ -152,5 +152,6 @@ make image-push
 - [x] `featctl create feature`
 - [x] `featctl set`
 - [x] `featctl describe`
-- [ ] `featctl get revisions`
-- [ ] `featctl get features`
+- [ ] `featctl get feature`
+- [ ] `featctl list revisions`
+- [ ] `featctl list features`
