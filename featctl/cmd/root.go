@@ -26,7 +26,7 @@ var dbOption database.Option
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "featctl",
-	Short:   "a cli tool lets you control the feature registry.",
+	Short:   "a cli tool lets you control the feature store.",
 	Version: version.String(),
 }
 
