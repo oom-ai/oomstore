@@ -1,6 +1,6 @@
 module github.com/onestore-ai/onestore
 
-go 1.17
+go 1.16
 
 require (
 	github.com/adrg/xdg v0.3.4
