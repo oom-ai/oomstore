@@ -17,7 +17,7 @@ build:
 	@go build -o $(OUT)featctl -ldflags "-s -w \
 		-X $$(go list -m)/version.Version=$(VERSION) \
 		-X $$(go list -m)/version.Commit=$(COMMIT) \
-		-X $$(go list -m)/version.Built=$$(date -Iseconds)"
+		-X $$(go list -m)/version.Built=$$(date -u +%FT%T+00:00)"
 
 .PHONY: test
 test:
