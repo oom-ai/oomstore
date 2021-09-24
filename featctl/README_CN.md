@@ -4,6 +4,12 @@
 
 ## Usage
 
+**初始化特征仓库**
+
+```
+$ featctl init
+```
+
 **查看特征详情**
 ```
 $ featctl describe --group batch_device --name price
@@ -30,8 +36,8 @@ Usage:
 
 Examples:
 
-1. featctl query -g user_info -n gender,city -k 1,2,3 
-2. featctl query -g user_info -n gender,'user name' -k 1,2,3 
+1. featctl query -g user_info -n gender,city -k 1,2,3
+2. featctl query -g user_info -n gender,'user name' -k 1,2,3
 
 
 Flags:
@@ -41,7 +47,7 @@ Flags:
   -n, --name strings      feature names
   -r, --revision string   revision
 
-$ featctl query -g batch_180d_userinfo -n gender,city -k 24031290,24036534,24039010 
+$ featctl query -g batch_180d_userinfo -n gender,city -k 24031290,24036534,24039010
 entity_key,sex,city
 24031290,0,上海
 24036534,1,泰安
