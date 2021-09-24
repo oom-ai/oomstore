@@ -41,7 +41,7 @@ Flags:
   -n, --name strings      feature names
   -r, --revision string   revision
 
-$ featctl query --group batch_180d_userinfo -k 24031290,24036534,24039010 -n sex,city
+$ featctl query -g batch_180d_userinfo -n gender,city -k 24031290,24036534,24039010 
 entity_key,sex,city
 24031290,0,上海
 24036534,1,泰安
