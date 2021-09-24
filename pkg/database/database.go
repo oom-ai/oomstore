@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
 type DB struct {
@@ -20,8 +21,8 @@ type Option struct {
 	DbName string
 }
 
-func Open(option *Option) (*DB, error) {
-	db, err := sql.Open(
+func Open(option *Option) (*sqlx.DB, error) {
+	db, err := sqlx.Open(
 		"mysql",
 		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 			option.User,
@@ -30,7 +31,7 @@ func Open(option *Option) (*DB, error) {
 			option.Port,
 			option.DbName),
 	)
-	return &DB{db}, err
+	return db, err
 }
 
 func (db *DB) TableExists(ctx context.Context, table string) (bool, error) {
