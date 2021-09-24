@@ -31,27 +31,33 @@ func Run(ctx context.Context, option *Option) {
 	}
 	defer db.Close()
 
-	queryFeatureAndPrintToStdout(ctx, db, option)
+	if err := queryFeatureAndPrintToStdout(ctx, db, option); err != nil {
+		log.Fatal(err)
+	}
 }
 
-func queryFeatureAndPrintToStdout(ctx context.Context, db *database.DB, option *Option) {
-	entityTableMapFeatures := getEntityTableMapFeatures(ctx, db, option)
+func queryFeatureAndPrintToStdout(ctx context.Context, db *database.DB, option *Option) error {
+	entityTableMapFeatures, err := getEntityTableMapFeatures(ctx, db, option)
+	if err != nil {
+		return err
+	}
 
 	w := csv.NewWriter(os.Stdout)
 	for entityTable, featureNames := range entityTableMapFeatures {
 		if err := readOneTableToCsv(ctx, db, entityTable, option.Entitykeys, featureNames, w); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
+	return nil
 }
 
-func getEntityTableMapFeatures(ctx context.Context, db *database.DB, op *Option) map[string][]string {
+func getEntityTableMapFeatures(ctx context.Context, db *database.DB, op *Option) (map[string][]string, error) {
 	mp := make(map[string][]string)
 
 	if op.Revision != "" {
 		entityTable := op.Group + "_" + op.Revision
 		mp[entityTable] = op.FeatureNames
-		return mp
+		return mp, nil
 	}
 
 	for _, featureName := range op.FeatureNames {
@@ -62,10 +68,10 @@ func getEntityTableMapFeatures(ctx context.Context, db *database.DB, op *Option)
 				mp[entityTable] = []string{featureName}
 			}
 		} else {
-			log.Printf("cannot find entity table for group=%s, featurename=%s, err: %v", op.Group, featureName, err)
+			return nil, fmt.Errorf("cannot find entity table for group=%s, featurename=%s, err: %v", op.Group, featureName, err)
 		}
 	}
-	return mp
+	return mp, nil
 }
 
 func getEntityTable(ctx context.Context, db *database.DB, group, featurename string) (string, error) {
@@ -81,7 +87,8 @@ func getEntityTable(ctx context.Context, db *database.DB, group, featurename str
 	}
 }
 
-func readOneTableToCsv(ctx context.Context, db *database.DB, tableName string, entityKeys []string, featureNames []string, w *csv.Writer) error {
+func readOneTableToCsv(ctx context.Context, db *database.DB, tableName string,
+	entityKeys []string, featureNames []string, w *csv.Writer) error {
 	sql := fmt.Sprintf("select entity_key, %s from %s", strings.Join(featureNames, ", "), tableName)
 	if len(entityKeys) > 0 {
 		sql += fmt.Sprintf(" where entity_key in (%s)", strings.Join(entityKeys, ", "))
@@ -89,7 +96,7 @@ func readOneTableToCsv(ctx context.Context, db *database.DB, tableName string, e
 
 	rows, err := db.QueryContext(ctx, sql)
 	if err != nil {
-		log.Fatalf("failed connecting feature store: %v", err)
+		return fmt.Errorf("failed connecting feature store: %v", err)
 	}
 	defer rows.Close()
 
