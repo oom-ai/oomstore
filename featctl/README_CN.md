@@ -4,6 +4,12 @@
 
 ## Usage
 
+**初始化特征仓库**
+
+```
+$ featctl init
+```
+
 **查看特征详情**
 ```
 $ featctl describe --group batch_device --name price
