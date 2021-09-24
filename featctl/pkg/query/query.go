@@ -68,15 +68,15 @@ func getEntityTableMapFeatures(ctx context.Context, db *database.DB, opt *Option
 				mp[entityTable] = []string{featureName}
 			}
 		} else {
-			return nil, fmt.Errorf("cannot find entity table for group=%s, featurename=%s, err: %v", opt.Group, featureName, err)
+			return nil, fmt.Errorf("cannot find entity table for group=%s, featureName=%s, err: %v", opt.Group, featureName, err)
 		}
 	}
 	return mp, nil
 }
 
-func getEntityTable(ctx context.Context, db *database.DB, group, featurename string) (string, error) {
+func getEntityTable(ctx context.Context, db *database.DB, group, featureName string) (string, error) {
 	var revision string
-	err := db.QueryRowContext(ctx, `select fc.revision from feature_config as fc where fc.group = ? and fc.name = ?`, group, featurename).Scan(&revision)
+	err := db.QueryRowContext(ctx, `select fc.revision from feature_config as fc where fc.group = ? and fc.name = ?`, group, featureName).Scan(&revision)
 	switch {
 	case err == sql.ErrNoRows:
 		return "", nil
