@@ -30,8 +30,8 @@ Usage:
 
 Examples:
 
-1. featctl query --group user_info -k 1,2,3 -n sex,city
-2. featctl query --group user_info -k 1,2,3 -n sex,'user name'
+1. featctl query -g user_info -n gender,city -k 1,2,3 
+2. featctl query -g user_info -n gender,'user name' -k 1,2,3 
 
 
 Flags:

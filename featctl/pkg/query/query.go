@@ -38,8 +38,8 @@ func queryFeatureAndPrintToStdout(ctx context.Context, db *database.DB, option *
 	entityTableMapFeatures := getEntityTableMapFeatures(ctx, db, option)
 
 	w := csv.NewWriter(os.Stdout)
-	for entityTable, featurenames := range entityTableMapFeatures {
-		if err := readOneTableToCsv(ctx, db, entityTable, option.Entitykeys, featurenames, w); err != nil {
+	for entityTable, featureNames := range entityTableMapFeatures {
+		if err := readOneTableToCsv(ctx, db, entityTable, option.Entitykeys, featureNames, w); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -54,15 +54,15 @@ func getEntityTableMapFeatures(ctx context.Context, db *database.DB, op *Option)
 		return mp
 	}
 
-	for _, featurename := range op.FeatureNames {
-		if entityTable, err := getEntityTable(ctx, db, op.Group, featurename); err == nil && entityTable != "" {
+	for _, featureName := range op.FeatureNames {
+		if entityTable, err := getEntityTable(ctx, db, op.Group, featureName); err == nil && entityTable != "" {
 			if v, ok := mp[entityTable]; ok {
-				mp[entityTable] = append(v, featurename)
+				mp[entityTable] = append(v, featureName)
 			} else {
-				mp[entityTable] = []string{featurename}
+				mp[entityTable] = []string{featureName}
 			}
 		} else {
-			log.Printf("cannot find entity table for group=%s, featurename=%s, err: %v", op.Group, featurename, err)
+			log.Printf("cannot find entity table for group=%s, featurename=%s, err: %v", op.Group, featureName, err)
 		}
 	}
 	return mp
@@ -81,10 +81,10 @@ func getEntityTable(ctx context.Context, db *database.DB, group, featurename str
 	}
 }
 
-func readOneTableToCsv(ctx context.Context, db *database.DB, tablename string, entitykeys []string, featurenames []string, w *csv.Writer) error {
-	sql := fmt.Sprintf("select entity_key, %s from %s", strings.Join(featurenames, ", "), tablename)
-	if len(entitykeys) > 0 {
-		sql += fmt.Sprintf(" where entity_key in (%s)", strings.Join(entitykeys, ", "))
+func readOneTableToCsv(ctx context.Context, db *database.DB, tableName string, entityKeys []string, featureNames []string, w *csv.Writer) error {
+	sql := fmt.Sprintf("select entity_key, %s from %s", strings.Join(featureNames, ", "), tableName)
+	if len(entityKeys) > 0 {
+		sql += fmt.Sprintf(" where entity_key in (%s)", strings.Join(entityKeys, ", "))
 	}
 
 	rows, err := db.QueryContext(ctx, sql)
