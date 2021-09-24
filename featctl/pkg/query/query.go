@@ -125,10 +125,10 @@ func resolveDataFromRows(rows *sql.Rows, w *csv.Writer) error {
 		if err != nil {
 			return err
 		}
-		for idx, name := range columns {
-			_ = name
-			value := *(values[idx].(*interface{}))
-			record[idx] = cast.ToString(value)
+
+		for i := 0; i < len(columns); i++ {
+			value := *(values[i].(*interface{}))
+			record[i] = cast.ToString(value)
 		}
 
 		w.Write(record)
