@@ -22,7 +22,7 @@ ModifyTime:     2021-09-13T18:58:34Z
 **点查询特征值**
 
 ```
-$ featctl query -h                                                
+$ featctl query -h
 query feature values
 
 Usage:
@@ -30,20 +30,22 @@ Usage:
 
 Examples:
 
-1. featctl query --group user_info -n sex,city
-2. featctl query --group user_info -n sex,'user name'
+1. featctl query --group user_info -k 1,2,3 -n sex,city
+2. featctl query --group user_info -k 1,2,3 -n sex,'user name'
 
-$ featctl query --group user_info -n sex,city|head -n 10 
+
+Flags:
+  -g, --group string      feature group
+  -h, --help              help for query
+  -k, --key strings       entity keys
+  -n, --name strings      feature names
+  -r, --revision string   revision
+
+$ featctl query --group batch_180d_userinfo -k 24031290,24036534,24039010 -n sex,city
 entity_key,sex,city
 24031290,0,上海
-24031670,2,葫芦岛
-24031710,2,
-24036005,0,焦作
 24036534,1,泰安
 24039010,2,
-24039308,2,深圳
-24044851,1,恩施土家族苗族自治州
-24045270,2,泰安
 ```
 
 **导出特征组**

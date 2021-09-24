@@ -15,8 +15,8 @@ var queryCmd = &cobra.Command{
 	Use:   "query",
 	Short: "query feature values",
 	Example: `
-1. featctl query --group user_info -n sex,city
-2. featctl query --group user_info -n sex,'user name'
+1. featctl query --group user_info -k 1,2,3 -n sex,city
+2. featctl query --group user_info -k 1,2,3 -n sex,'user name'
 `,
 	PreRun: func(cmd *cobra.Command, args []string) {
 		queryOpt.DBOption = dbOption
@@ -46,5 +46,7 @@ func init() {
 
 	// https://pkg.go.dev/github.com/spf13/pflag#StringSlice
 	flags.StringSliceVarP(&queryOpt.Entitykeys, "key", "k", nil, "entity keys")
+	_ = queryCmd.MarkFlagRequired("key")
+
 	flags.StringSliceVarP(&queryOpt.FeatureNames, "name", "n", nil, "feature names")
 }
