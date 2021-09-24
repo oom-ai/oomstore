@@ -12,7 +12,7 @@ type Option struct {
 	DBOption database.Option
 }
 
-func create_database(ctx context.Context, dbo *database.Option) error {
+func createDatabase(ctx context.Context, dbo *database.Option) error {
 	db, err := database.OpenWith(dbo.Host, dbo.Port, dbo.User, dbo.Pass, "")
 	if err != nil {
 		return err
@@ -22,7 +22,7 @@ func create_database(ctx context.Context, dbo *database.Option) error {
 	return err
 }
 
-func create_feature_revision_table(ctx context.Context, db *database.DB) error {
+func createFeatureRevisionTable(ctx context.Context, db *database.DB) error {
 	schema :=
 		"CREATE TABLE feature_revision (" +
 			"  `group`       VARCHAR(32)  NOT     NULL," +
@@ -37,7 +37,7 @@ func create_feature_revision_table(ctx context.Context, db *database.DB) error {
 	return err
 }
 
-func create_feature_config_table(ctx context.Context, db *database.DB) error {
+func createFeatureConfigTable(ctx context.Context, db *database.DB) error {
 	schema :=
 		"CREATE TABLE feature_config (" +
 			"  `group`			 VARCHAR(128) NOT NULL," +
@@ -57,7 +57,7 @@ func create_feature_config_table(ctx context.Context, db *database.DB) error {
 }
 
 func Init(ctx context.Context, option *Option) {
-	if err := create_database(ctx, &option.DBOption); err != nil {
+	if err := createDatabase(ctx, &option.DBOption); err != nil {
 		log.Fatalf("failed creating database: %v", err)
 	}
 
@@ -67,11 +67,11 @@ func Init(ctx context.Context, option *Option) {
 	}
 	defer db.Close()
 
-	if err := create_feature_config_table(ctx, db); err != nil {
+	if err := createFeatureConfigTable(ctx, db); err != nil {
 		log.Fatalf("failed initializing feature store: %v", err)
 	}
 
-	if err := create_feature_revision_table(ctx, db); err != nil {
+	if err := createFeatureRevisionTable(ctx, db); err != nil {
 		log.Fatalf("failed initializing feature store: %v", err)
 	}
 
