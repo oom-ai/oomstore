@@ -49,16 +49,12 @@ func init() {
 	pFlags := rootCmd.PersistentFlags()
 	pFlags.StringVar(&cfgFile, "config", defaultCfgFile, "config file")
 
-	pFlags.StringVarP(&dbOption.Host, "host", "H", "", "feature store database host")
-	pFlags.StringVarP(&dbOption.Port, "port", "P", "", "feature store database port")
-	pFlags.StringVarP(&dbOption.User, "user", "u", "", "feature store database user")
+	pFlags.StringVarP(&dbOption.Host, "host", "H", "127.0.0.1", "feature store database host")
+	pFlags.StringVarP(&dbOption.Port, "port", "P", "4000", "feature store database port")
+	pFlags.StringVarP(&dbOption.User, "user", "u", "root", "feature store database user")
 	pFlags.StringVarP(&dbOption.Pass, "pass", "p", "", "feature store database pass")
 	pFlags.StringVarP(&dbOption.DbName, "database", "d", "aiinfra", "feature store database name")
 
-	_ = rootCmd.MarkPersistentFlagRequired("host")
-	_ = rootCmd.MarkPersistentFlagRequired("port")
-	_ = rootCmd.MarkPersistentFlagRequired("user")
-	_ = rootCmd.MarkPersistentFlagRequired("pass")
 	rootCmd.SetVersionTemplate(`{{printf "%s\n" .Version}}`)
 }
 
