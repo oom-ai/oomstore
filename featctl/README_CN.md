@@ -19,6 +19,35 @@ CreateTime:     2021-09-10T15:20:43Z
 ModifyTime:     2021-09-13T18:58:34Z
 ```
 
+**点查询特征值**
+
+```
+$ featctl query -h
+query feature values
+
+Usage:
+  featctl query [flags]
+
+Examples:
+
+1. featctl query -g user_info -n gender,city -k 1,2,3 
+2. featctl query -g user_info -n gender,'user name' -k 1,2,3 
+
+
+Flags:
+  -g, --group string      feature group
+  -h, --help              help for query
+  -k, --key strings       entity keys
+  -n, --name strings      feature names
+  -r, --revision string   revision
+
+$ featctl query -g batch_180d_userinfo -n gender,city -k 24031290,24036534,24039010 
+entity_key,sex,city
+24031290,0,上海
+24036534,1,泰安
+24039010,2,
+```
+
 **导出特征组**
 
 - 将特征组 `batch_180d_userinfo` 的全部特征下载到 `/tmp/featctl/users.csv` ：
