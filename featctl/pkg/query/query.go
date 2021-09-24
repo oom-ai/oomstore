@@ -77,7 +77,7 @@ func getEntityTable(ctx context.Context, db *database.DB, group, featurename str
 	case err != nil:
 		return "", err
 	default:
-		return strings.Join([]string{group, revision}, "_"), nil
+		return group + "_" + revision, nil
 	}
 }
 
