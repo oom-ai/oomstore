@@ -21,14 +21,18 @@ type Option struct {
 }
 
 func Open(option *Option) (*DB, error) {
+	return OpenWith(option.Host, option.Port, option.User, option.Pass, option.DbName)
+}
+
+func OpenWith(host, port, user, pass, dbName string) (*DB, error) {
 	db, err := sql.Open(
 		"mysql",
 		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
-			option.User,
-			option.Pass,
-			option.Host,
-			option.Port,
-			option.DbName),
+			user,
+			pass,
+			host,
+			port,
+			dbName),
 	)
 	return &DB{db}, err
 }
