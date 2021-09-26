@@ -110,8 +110,17 @@ featctl export --group device --output-file device-exported.csv
 $ featctl list feature --group device
 Name,Group,Revision,Status,Category,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
 price,device,20210909,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
-city,device,20210908,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
-age,device,20210908,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+city,device,20210908,disabled,batch,int(11),城市,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+age,device,20210908,disabled,batch,int(11),年龄,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+```
+
+**列举特征组的历史版本**
+```sh
+$ featctl list revision --group device
+Group,Revision,Source,Description,CreateTime,ModifyTime
+device,20210909,batch_device_20210909,定时导入,2021-09-09T15:20:43Z,2021-09-09T15:20:43Z
+device,20210908,batch_device_20210908,手动触发,2021-09-08T15:20:43Z,2021-09-08T15:20:43Z
+device,20210907,batch_device_20210907,定时导入,2021-09-07T15:20:43Z,2021-09-07T15:20:43Z
 ```
 
 ## Config
