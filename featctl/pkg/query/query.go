@@ -9,9 +9,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/spf13/cast"
 
-	"github.com/onestore-ai/onestore/featctl/pkg/database"
+	"github.com/onestore-ai/onestore/pkg/database"
 )
 
 type Option struct {
@@ -34,7 +35,7 @@ func Run(ctx context.Context, opt *Option) {
 	}
 }
 
-func queryFeatureAndPrintToStdout(ctx context.Context, db *database.DB, opt *Option) error {
+func queryFeatureAndPrintToStdout(ctx context.Context, db *sqlx.DB, opt *Option) error {
 	entityTableMapFeatures, err := getEntityTableMapFeatures(ctx, db, opt)
 	if err != nil {
 		return err
@@ -51,7 +52,7 @@ func queryFeatureAndPrintToStdout(ctx context.Context, db *database.DB, opt *Opt
 	return nil
 }
 
-func getEntityTableMapFeatures(ctx context.Context, db *database.DB, opt *Option) (map[string][]string, error) {
+func getEntityTableMapFeatures(ctx context.Context, db *sqlx.DB, opt *Option) (map[string][]string, error) {
 	mp := make(map[string][]string)
 
 	if opt.Revision != "" {
@@ -74,7 +75,7 @@ func getEntityTableMapFeatures(ctx context.Context, db *database.DB, opt *Option
 	return mp, nil
 }
 
-func getEntityTable(ctx context.Context, db *database.DB, group, featureName string) (string, error) {
+func getEntityTable(ctx context.Context, db *sqlx.DB, group, featureName string) (string, error) {
 	var revision string
 	err := db.QueryRowContext(ctx, `select fc.revision from feature_config as fc where fc.group = ? and fc.name = ?`, group, featureName).Scan(&revision)
 	switch {
@@ -87,14 +88,18 @@ func getEntityTable(ctx context.Context, db *database.DB, group, featureName str
 	}
 }
 
-func readOneTableToCsv(ctx context.Context, db *database.DB, tableName string,
+func readOneTableToCsv(ctx context.Context, db *sqlx.DB, tableName string,
 	entityKeys []string, featureNames []string, w *csv.Writer, isFirstPrint bool) error {
-	sql := fmt.Sprintf("select entity_key, %s from %s", strings.Join(featureNames, ", "), tableName)
-	if len(entityKeys) > 0 {
-		sql += fmt.Sprintf(" where entity_key in (%s)", strings.Join(entityKeys, ", "))
+	// https://jmoiron.github.io/sqlx/#inQueries
+	sql, args, err := sqlx.In(
+		fmt.Sprintf("select entity_key, %s from %s where entity_key in (?);", strings.Join(featureNames, ", "), tableName),
+		entityKeys,
+	)
+	if err != nil {
+		return err
 	}
 
-	rows, err := db.QueryContext(ctx, sql)
+	rows, err := db.QueryContext(ctx, sql, args...)
 	if err != nil {
 		return fmt.Errorf("failed connecting feature store: %v", err)
 	}
