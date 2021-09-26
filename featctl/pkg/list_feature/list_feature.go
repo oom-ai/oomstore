@@ -40,12 +40,12 @@ func featureConfigTitle() string {
 		",")
 }
 
-func buildSqlxDBOption(option database2.Option) *database.Option{
+func buildSqlxDBOption(option database2.Option) *database.Option {
 	return &database.Option{
-		Host: option.Host,
-		Port: option.Port,
-		User: option.User,
-		Pass: option.Pass,
+		Host:   option.Host,
+		Port:   option.Port,
+		User:   option.User,
+		Pass:   option.Pass,
 		DbName: option.DbName,
 	}
 }
