@@ -11,8 +11,8 @@ var listFeatureOpt list_feature.Option
 
 // listFeatureCmd represents the list feature command
 var listFeatureCmd = &cobra.Command{
-	Use:   "list_feature feature",
-	Short: "list_feature all existing features given a specific group",
+	Use:   "feature",
+	Short: "list all existing features given a specific group",
 	Run: func(cmd *cobra.Command, args []string) {
 		listFeatureOpt.DBOption = dbOption
 		list_feature.ListFeature(context.Background(), &listFeatureOpt)
@@ -20,7 +20,7 @@ var listFeatureCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(listFeatureCmd)
+	listCmd.AddCommand(listFeatureCmd)
 
 	flags := listFeatureCmd.Flags()
 
