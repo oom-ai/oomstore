@@ -25,5 +25,4 @@ func init() {
 	flags := listFeatureCmd.Flags()
 
 	flags.StringVarP(&listFeatureOpt.Group, "group", "g", "", "feature group")
-	_ = listFeatureCmd.MarkFlagRequired("group")
 }
