@@ -91,7 +91,13 @@ func readOneTableToCsv(ctx context.Context, db *database.DB, tableName string,
 	entityKeys []string, featureNames []string, w *csv.Writer, isFirstPrint bool) error {
 	sql := fmt.Sprintf("select entity_key, %s from %s", strings.Join(featureNames, ", "), tableName)
 	if len(entityKeys) > 0 {
-		sql += fmt.Sprintf(" where entity_key in (%s)", strings.Join(entityKeys, ", "))
+		sql += fmt.Sprintf(" where entity_key in (%s)", strings.Join(
+			func(s []string) []string {
+				for i := range entityKeys {
+					entityKeys[i] = fmt.Sprintf("'%s'", entityKeys[i])
+				}
+				return entityKeys
+			}(entityKeys), ", "))
 	}
 
 	rows, err := db.QueryContext(ctx, sql)
