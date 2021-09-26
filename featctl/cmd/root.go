@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/onestore-ai/onestore/featctl/pkg/database"
-	databasex "github.com/onestore-ai/onestore/pkg/database"
+	database2 "github.com/onestore-ai/onestore/pkg/database"
 	"github.com/onestore-ai/onestore/version"
 )
 
@@ -23,7 +23,7 @@ const (
 var cfgFile string
 var defaultCfgFile = filepath.Join(xdg.ConfigHome, "featctl", "config.yaml")
 var dbOption database.Option
-var sqlxDbOption databasex.Option
+var sqlxDbOption database2.Option
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -99,8 +99,8 @@ func bindViperFlags(cmd *cobra.Command) {
 	})
 }
 
-func buildSqlxDBOption(option database.Option) databasex.Option {
-	return databasex.Option{
+func buildSqlxDBOption(option database.Option) database2.Option {
+	return database2.Option{
 		Host:   option.Host,
 		Port:   option.Port,
 		User:   option.User,
