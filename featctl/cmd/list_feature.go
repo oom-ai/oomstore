@@ -14,7 +14,7 @@ var listFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "list all existing features given a specific group",
 	Run: func(cmd *cobra.Command, args []string) {
-		listFeatureOpt.DBOption = dbOption
+		listFeatureOpt.DBOption = sqlxDbOption
 		list_feature.ListFeature(context.Background(), &listFeatureOpt)
 	},
 }

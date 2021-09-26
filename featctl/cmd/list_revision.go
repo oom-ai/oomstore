@@ -14,7 +14,7 @@ var listRevisionCmd = &cobra.Command{
 	Use:   "revision",
 	Short: "list historical revisions given a specific group",
 	Run: func(cmd *cobra.Command, args []string) {
-		listRevisionOpt.DBOption = dbOption
+		listRevisionOpt.DBOption = sqlxDbOption
 		list_revision.ListRevision(context.Background(), &listRevisionOpt)
 	},
 }
