@@ -30,6 +30,15 @@ func ListFeatureConfigByGroup(db *sqlx.DB, group string) ([]FeatureConfig, error
 	return features, nil
 }
 
+func ListFeatureConfig(db *sqlx.DB) ([]FeatureConfig, error) {
+	query := `SELECT * FROM feature_config`
+	features := make([]FeatureConfig, 0)
+	if err := db.Select(&features, query); err != nil {
+		return nil, err
+	}
+	return features, nil
+}
+
 func (r *FeatureConfig) String() string {
 	return strings.Join([]string{
 		fmt.Sprintf("Name:           %s", r.Name),
