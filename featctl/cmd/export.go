@@ -27,7 +27,7 @@ func init() {
 	flags := exportCmd.Flags()
 
 	flags.StringVarP(&exportOpt.Group, "group", "g", "", "feature group")
-	flags.StringArrayVarP(&exportOpt.Features, "name", "n", nil, "feature name")
+	flags.StringSliceVarP(&exportOpt.Features, "name", "n", nil, "feature name")
 	flags.StringVarP(&exportOpt.OutputFile, "output-file", "o", "", "output file")
 	_ = exportCmd.MarkFlagRequired("group")
 	_ = exportCmd.MarkFlagRequired("output-file")
