@@ -33,15 +33,21 @@ func getSourceTableName(ctx context.Context, db *database.DB, group string) (str
 	return source, nil
 }
 
-func downloadFeatures(ctx context.Context, option *Option, tableName string) error {
-	dbo := option.DBOption
-	fields := strings.Join(option.Features, ",")
-	if fields == "" {
+func downloadFeatures(ctx context.Context, opt *Option, tableName string) error {
+	dbo := opt.DBOption
+	fields := strings.Join(opt.Features, ",")
+
+	if len(opt.Features) == 0 {
+		// download all fields by default
 		fields = "*"
+	} else if !containsField(opt.Features, "*") && !containsField(opt.Features, "entity_key") {
+		// make sure the field `entity_key` is included
+		fields = "entity_key," + fields
 	}
+
 	fullTableName := fmt.Sprintf("%s.%s", dbo.DbName, tableName)
 	sql := fmt.Sprintf("select %s from %s", fields, fullTableName)
-	tmpdir := option.OutputFile + ".tmp"
+	tmpdir := opt.OutputFile + ".tmp"
 
 	// download data using tidb-dumpling
 	// https://docs.pingcap.com/zh/tidb/v4.0/dumpling-overview
@@ -71,7 +77,7 @@ func downloadFeatures(ctx context.Context, option *Option, tableName string) err
 	cmd = exec.CommandContext(ctx,
 		"sh",
 		"-c",
-		fmt.Sprintf("mv %s/*.csv %s", tmpdir, option.OutputFile),
+		fmt.Sprintf("mv %s/*.csv %s", tmpdir, opt.OutputFile),
 	)
 	cmdOutput, err = cmd.CombinedOutput()
 	fmt.Println(string(cmdOutput))
@@ -103,4 +109,14 @@ func Export(ctx context.Context, option *Option) {
 	}
 
 	log.Println("succeeded.")
+}
+
+func containsField(fields []string, target string) bool {
+	target = strings.TrimSpace(target)
+	for _, s := range fields {
+		if strings.TrimSpace(s) == target {
+			return true
+		}
+	}
+	return false
 }
