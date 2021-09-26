@@ -24,9 +24,17 @@ func ListFeature(ctx context.Context, option *Option) {
 	}
 	defer db.Close()
 
-	features, err := database.ListFeatureConfigByGroup(db, option.Group)
-	if err != nil {
-		log.Fatalf("failed listing feature configs in group %s: %v", option.Group, err)
+	var features []database.FeatureConfig
+	if option.Group == "" {
+		features, err = database.ListFeatureConfig(db)
+		if err != nil {
+			log.Fatalf("failed listing feature configs: %v", err)
+		}
+	} else {
+		features, err = database.ListFeatureConfigByGroup(db, option.Group)
+		if err != nil {
+			log.Fatalf("failed listing feature configs in group %s: %v", option.Group, err)
+		}
 	}
 
 	fmt.Println(featureConfigTitle())
