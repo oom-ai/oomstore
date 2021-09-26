@@ -22,8 +22,6 @@ type Option struct {
 	DBOption     database.Option
 }
 
-var firstPrint = true
-
 func Run(ctx context.Context, opt *Option) {
 	db, err := database.Open(&opt.DBOption)
 	if err != nil {
@@ -42,11 +40,13 @@ func queryFeatureAndPrintToStdout(ctx context.Context, db *database.DB, opt *Opt
 		return err
 	}
 
+	isFirstPrint := true
 	w := csv.NewWriter(os.Stdout)
 	for entityTable, featureNames := range entityTableMapFeatures {
-		if err := readOneTableToCsv(ctx, db, entityTable, opt.Entitykeys, featureNames, w); err != nil {
+		if err := readOneTableToCsv(ctx, db, entityTable, opt.Entitykeys, featureNames, w, isFirstPrint); err != nil {
 			return err
 		}
+		isFirstPrint = false
 	}
 	return nil
 }
@@ -88,7 +88,7 @@ func getEntityTable(ctx context.Context, db *database.DB, group, featureName str
 }
 
 func readOneTableToCsv(ctx context.Context, db *database.DB, tableName string,
-	entityKeys []string, featureNames []string, w *csv.Writer) error {
+	entityKeys []string, featureNames []string, w *csv.Writer, isFirstPrint bool) error {
 	sql := fmt.Sprintf("select entity_key, %s from %s", strings.Join(featureNames, ", "), tableName)
 	if len(entityKeys) > 0 {
 		sql += fmt.Sprintf(" where entity_key in (%s)", strings.Join(entityKeys, ", "))
@@ -100,10 +100,10 @@ func readOneTableToCsv(ctx context.Context, db *database.DB, tableName string,
 	}
 	defer rows.Close()
 
-	return resolveDataFromRows(rows, w)
+	return resolveDataFromRows(rows, w, isFirstPrint)
 }
 
-func resolveDataFromRows(rows *sql.Rows, w *csv.Writer) error {
+func resolveDataFromRows(rows *sql.Rows, w *csv.Writer, isFirstPrint bool) error {
 	if rows == nil {
 		return fmt.Errorf("rows can't be nil")
 	}
@@ -112,14 +112,11 @@ func resolveDataFromRows(rows *sql.Rows, w *csv.Writer) error {
 		return err
 	}
 	length := len(columns)
-
-	record := make([]string, length, length)
-	if firstPrint {
-		for i, column := range columns {
-			record[i] = column
+	if isFirstPrint {
+		// print csv file headers
+		if err = w.Write(columns); err != nil {
+			return err
 		}
-		w.Write(record)
-		firstPrint = false
 	}
 	//unnecessary to put below into rows.Next loop,reduce allocating
 	values := make([]interface{}, length)
@@ -127,6 +124,7 @@ func resolveDataFromRows(rows *sql.Rows, w *csv.Writer) error {
 		values[i] = new(interface{})
 	}
 
+	record := make([]string, length)
 	for rows.Next() {
 		err = rows.Scan(values...)
 		if err != nil {
@@ -138,7 +136,9 @@ func resolveDataFromRows(rows *sql.Rows, w *csv.Writer) error {
 			record[i] = cast.ToString(value)
 		}
 
-		w.Write(record)
+		if err = w.Write(record); err != nil {
+			return err
+		}
 	}
 	w.Flush()
 	return nil
