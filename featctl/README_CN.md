@@ -12,7 +12,7 @@ $ featctl init
 
 **导入特征组**
 
-下面展示如何将 `device.csv` 导入特征组 `batch_device`。
+下面展示如何将 `device.csv` 导入特征组 `device`。
 
 首先，准备样例数据和 schema 模板。
 
@@ -35,7 +35,7 @@ CREATE TABLE {{TABLE_NAME}} (
     brand      VARCHAR(16) COMMENT '设备厂商',
     model      VARCHAR(32) COMMENT '设备型号',
     price      INT         COMMENT '设备价格'
-) SHARD_ROW_ID_BITS = 4 PRE_SPLIT_REGIONS = 3;
+);
 EOF
 ```
 
@@ -43,7 +43,7 @@ EOF
 
 ```sh
 featctl import \
-    --group batch_device \
+    --group device \
     --revision 20210909 \
     --schema-template schema-template.sql \
     --input-file device.csv \
@@ -54,9 +54,9 @@ featctl import \
 
 **查看特征详情**
 ```
-$ featctl describe --group batch_device --name price
+$ featctl describe --group device --name price
 Name:           price
-Group:          batch_device
+Group:          device
 Revision:       20210909
 Status:         disabled
 Category:       batch
@@ -71,7 +71,7 @@ ModifyTime:     2021-09-13T18:58:34Z
 ```sh
 featctl create feature \
     --name price \
-    --group batch_device \
+    --group device \
     --category batch \
     --revision 20210909 \
     --revisions-limit 3 \
@@ -83,15 +83,15 @@ featctl create feature \
 # 启用特征并将其版本指定为 20210909
 featctl set \
     --name price \
-    --group batch_device \
+    --group device \
     --revision 20210909 \
     --status "enabled"
 ```
 
-**点查询特征值**
+**查询特征值**
 
 ```
-$ featctl query -g batch_device -n brand,price -k a9f0d6af575bb7e427fde2dcc81adbed,134d9facd06ff355bf53846c0407d4f4
+$ featctl query -g device -n brand,price -k a9f0d6af575bb7e427fde2dcc81adbed,134d9facd06ff355bf53846c0407d4f4
 entity_key,brand,price
 a9f0d6af575bb7e427fde2dcc81adbed,小米,3999
 134d9facd06ff355bf53846c0407d4f4,华为,5299
@@ -99,19 +99,19 @@ a9f0d6af575bb7e427fde2dcc81adbed,小米,3999
 
 **导出特征组**
 
-将特征组 `batch_device` 的全部特征下载到 `/tmp/featctl/device-exported.csv`。
+将特征组 `device` 的全部特征下载到 `/tmp/featctl/device-exported.csv`。
 
 ```sh
-featctl export --group batch_device --output-file device-exported.csv
+featctl export --group device --output-file device-exported.csv
 ```
 
 **列举特征配置**
 ```sh
-$ featctl list feature --group batch_device
+$ featctl list feature --group device
 Name,Group,Revision,Status,Category,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
-price,batch_device,20210909,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
-city,batch_device,20210908,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
-age,batch_device,20210908,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+price,device,20210909,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+city,device,20210908,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+age,device,20210908,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
 ```
 
 ## Config
@@ -174,11 +174,12 @@ make image-push
 
 ## TODO
 
+- [x] `featctl init`
 - [x] `featctl export`
 - [x] `featctl import`
 - [x] `featctl create feature`
 - [x] `featctl set`
 - [x] `featctl describe`
-- [ ] `featctl get feature`
+- [x] `featctl query`
+- [x] `featctl list features`
 - [ ] `featctl list revisions`
-- [ ] `featctl list features`
