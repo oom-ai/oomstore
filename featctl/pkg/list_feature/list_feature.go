@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	database2 "github.com/onestore-ai/onestore/featctl/pkg/database"
+	"github.com/onestore-ai/onestore/featctl/pkg/utils"
 	"github.com/onestore-ai/onestore/pkg/database"
 )
 
@@ -16,7 +17,7 @@ type Option struct {
 }
 
 func ListFeature(ctx context.Context, option *Option) {
-	sqlxDBOption := buildSqlxDBOption(option.DBOption)
+	sqlxDBOption := utils.BuildSqlxDBOption(option.DBOption)
 	db, err := database.Open(sqlxDBOption)
 	if err != nil {
 		log.Fatalf("failed connecting feature store: %v", err)
@@ -38,14 +39,4 @@ func featureConfigTitle() string {
 	return strings.Join([]string{
 		"Name", "Group", "Revision", "Status", "Category", "ValueType", "Description", "RevisionsLimit", "CreateTime", "ModifyTime"},
 		",")
-}
-
-func buildSqlxDBOption(option database2.Option) *database.Option {
-	return &database.Option{
-		Host:   option.Host,
-		Port:   option.Port,
-		User:   option.User,
-		Pass:   option.Pass,
-		DbName: option.DbName,
-	}
 }
