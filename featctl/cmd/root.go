@@ -53,7 +53,7 @@ func init() {
 	pFlags.StringVarP(&dbOption.Port, "port", "P", "4000", "feature store database port")
 	pFlags.StringVarP(&dbOption.User, "user", "u", "root", "feature store database user")
 	pFlags.StringVarP(&dbOption.Pass, "pass", "p", "", "feature store database pass")
-	pFlags.StringVarP(&dbOption.DbName, "database", "d", "aiinfra", "feature store database name")
+	pFlags.StringVarP(&dbOption.DbName, "database", "d", "onestore", "feature store database name")
 
 	rootCmd.SetVersionTemplate(`{{printf "%s\n" .Version}}`)
 }
