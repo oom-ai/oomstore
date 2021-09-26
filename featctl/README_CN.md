@@ -107,7 +107,7 @@ featctl export --group device --output-file device-exported.csv
 
 **列举特征配置**
 ```sh
-$ featctl list feature --group device
+$ featctl list feature --group devicee
 Name,Group,Revision,Status,Category,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
 price,device,20210909,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
 city,device,20210908,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
