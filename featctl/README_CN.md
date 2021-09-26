@@ -105,6 +105,15 @@ a9f0d6af575bb7e427fde2dcc81adbed,小米,3999
 featctl export --group batch_device --output-file device-exported.csv
 ```
 
+**列举特征配置**
+```sh
+$ featctl list feature --group batch_device
+Name,Group,Revision,Status,Category,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
+price,batch_device,20210909,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+city,batch_device,20210908,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+age,batch_device,20210908,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+```
+
 ## Config
 
 featctl 默认读取 `$XDG_CONFIG_HOME/featctl/config.yaml` 作为配置文件（可通过 `--config` 手动指定）：
