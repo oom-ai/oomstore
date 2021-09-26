@@ -19,7 +19,7 @@ var queryCmd = &cobra.Command{
 2. featctl query -g user_info -n gender,'user name' -k 1,2,3
 `,
 	PreRun: func(cmd *cobra.Command, args []string) {
-		queryOpt.DBOption = dbOption
+		queryOpt.DBOption = sqlxDbOption
 
 		featurenames := make([]string, 0, cap(queryOpt.FeatureNames))
 		for _, name := range queryOpt.FeatureNames {

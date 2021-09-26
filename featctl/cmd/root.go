@@ -7,12 +7,13 @@ import (
 	"strings"
 
 	"github.com/adrg/xdg"
-	"github.com/onestore-ai/onestore/featctl/pkg/database"
-	"github.com/onestore-ai/onestore/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-
 	"github.com/spf13/viper"
+
+	"github.com/onestore-ai/onestore/featctl/pkg/database"
+	databasex "github.com/onestore-ai/onestore/pkg/database"
+	"github.com/onestore-ai/onestore/version"
 )
 
 const (
@@ -22,6 +23,7 @@ const (
 var cfgFile string
 var defaultCfgFile = filepath.Join(xdg.ConfigHome, "featctl", "config.yaml")
 var dbOption database.Option
+var sqlxDbOption databasex.Option
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -45,6 +47,10 @@ func init() {
 		Use:    "no-help",
 		Hidden: true,
 	})
+
+	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		sqlxDbOption = buildSqlxDBOption(dbOption)
+	}
 
 	pFlags := rootCmd.PersistentFlags()
 	pFlags.StringVar(&cfgFile, "config", defaultCfgFile, "config file")
@@ -91,4 +97,14 @@ func bindViperFlags(cmd *cobra.Command) {
 			}
 		}
 	})
+}
+
+func buildSqlxDBOption(option database.Option) databasex.Option {
+	return databasex.Option{
+		Host:   option.Host,
+		Port:   option.Port,
+		User:   option.User,
+		Pass:   option.Pass,
+		DbName: option.DbName,
+	}
 }
