@@ -111,7 +111,12 @@ $ featctl list feature --group device
 Name,Group,Revision,Status,Category,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
 price,device,20210909,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
 city,device,20210908,disabled,batch,int(11),城市,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
-age,device,20210908,disabled,batch,int(11),年龄,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+
+$ featctl list feature
+Name,Group,Revision,Status,Category,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
+price,device,20210909,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+city,device,20210908,disabled,batch,int(11),城市,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+age,user,20210908,disabled,batch,int(11),年龄,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
 ```
 
 **列举特征组的历史版本**
