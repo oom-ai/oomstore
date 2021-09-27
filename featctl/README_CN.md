@@ -123,9 +123,9 @@ age,user,20210908,disabled,batch,int(11),年龄,3,2021-09-10T15:20:43Z,2021-09-1
 ```sh
 $ featctl list revision --group device
 Group,Revision,Source,Description,CreateTime,ModifyTime
-device,20210909,batch_device_20210909,定时导入,2021-09-09T15:20:43Z,2021-09-09T15:20:43Z
-device,20210908,batch_device_20210908,手动触发,2021-09-08T15:20:43Z,2021-09-08T15:20:43Z
-device,20210907,batch_device_20210907,定时导入,2021-09-07T15:20:43Z,2021-09-07T15:20:43Z
+device,20210909,device_20210909,定时导入,2021-09-09T15:20:43Z,2021-09-09T15:20:43Z
+device,20210908,device_20210908,手动触发,2021-09-08T15:20:43Z,2021-09-08T15:20:43Z
+device,20210907,device_20210907,定时导入,2021-09-07T15:20:43Z,2021-09-07T15:20:43Z
 ```
 
 ## Config
@@ -196,4 +196,4 @@ make image-push
 - [x] `featctl describe`
 - [x] `featctl query`
 - [x] `featctl list features`
-- [ ] `featctl list revisions`
+- [x] `featctl list revisions`
