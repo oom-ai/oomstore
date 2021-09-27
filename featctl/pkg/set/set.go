@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/onestore-ai/onestore/featctl/pkg/database"
+	"github.com/onestore-ai/onestore/pkg/database"
 )
 
 type Option struct {
@@ -28,7 +28,7 @@ type Option struct {
 	DBOption database.Option
 }
 
-func updateFeature(ctx context.Context, db *database.DB, option *Option) error {
+func updateFeature(ctx context.Context, db database.DB, option *Option) error {
 	updated := 0
 	for _, item := range []struct {
 		field     string
@@ -58,14 +58,14 @@ func updateFeature(ctx context.Context, db *database.DB, option *Option) error {
 	return nil
 }
 
-func validateOptions(ctx context.Context, db *database.DB, option *Option) error {
+func validateOptions(ctx context.Context, db database.DB, option *Option) error {
 	if option.RevisionChanged {
 		return requireRevisionExists(ctx, db, option.Group, option.Revision)
 	}
 	return nil
 }
 
-func requireRevisionExists(ctx context.Context, db *database.DB, group string, revision string) error {
+func requireRevisionExists(ctx context.Context, db database.DB, group string, revision string) error {
 	err := db.QueryRowContext(ctx,
 		"select revision from feature_revision where `group` = ? and revision = ?",
 		group, revision).Scan(&revision)
