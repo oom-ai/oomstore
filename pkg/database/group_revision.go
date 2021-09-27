@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -18,9 +17,9 @@ type GroupRevision struct {
 }
 
 func ListGroupRevisionByGroup(db *sqlx.DB, group string) ([]GroupRevision, error) {
-	query := fmt.Sprintf(`SELECT * FROM feature_revision AS fr WHERE fr.group = '%s'`, group)
+	query := "SELECT * FROM feature_revision AS fr WHERE fr.group = ?"
 	revisions := make([]GroupRevision, 0)
-	if err := db.Select(&revisions, query); err != nil {
+	if err := db.Select(&revisions, query, group); err != nil {
 		return nil, err
 	}
 	return revisions, nil

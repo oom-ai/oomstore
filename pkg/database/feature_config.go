@@ -31,9 +31,9 @@ func ListFeatureConfig(db *sqlx.DB) ([]FeatureConfig, error) {
 }
 
 func ListFeatureConfigByGroup(db *sqlx.DB, group string) ([]FeatureConfig, error) {
-	query := fmt.Sprintf(`SELECT * FROM feature_config AS fc WHERE fc.group = '%s'`, group)
+	query := "SELECT * FROM feature_config AS fc WHERE fc.group = ?"
 	features := make([]FeatureConfig, 0)
-	if err := db.Select(&features, query); err != nil {
+	if err := db.Select(&features, query, group); err != nil {
 		return nil, err
 	}
 	return features, nil
