@@ -23,6 +23,10 @@ build:
 test:
 	@go test ./...
 
+.PHONY: integration-test
+integration-test: build
+	@./test/test.sh
+
 .PHONY: lint
 lint:
 	@golangci-lint run
