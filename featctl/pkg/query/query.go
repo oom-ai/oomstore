@@ -35,7 +35,7 @@ func Run(ctx context.Context, opt *Option) {
 	}
 }
 
-func queryFeatureAndPrintToStdout(ctx context.Context, db database.DB, opt *Option) error {
+func queryFeatureAndPrintToStdout(ctx context.Context, db *database.DB, opt *Option) error {
 	entityTableMapFeatures, err := getEntityTableMapFeatures(ctx, db, opt)
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func queryFeatureAndPrintToStdout(ctx context.Context, db database.DB, opt *Opti
 	return nil
 }
 
-func getEntityTableMapFeatures(ctx context.Context, db database.DB, opt *Option) (map[string][]string, error) {
+func getEntityTableMapFeatures(ctx context.Context, db *database.DB, opt *Option) (map[string][]string, error) {
 	mp := make(map[string][]string)
 
 	if opt.Revision != "" {
@@ -75,7 +75,7 @@ func getEntityTableMapFeatures(ctx context.Context, db database.DB, opt *Option)
 	return mp, nil
 }
 
-func getEntityTable(ctx context.Context, db database.DB, group, featureName string) (string, error) {
+func getEntityTable(ctx context.Context, db *database.DB, group, featureName string) (string, error) {
 	var revision string
 	err := db.QueryRowContext(ctx, `select fc.revision from feature_config as fc where fc.group = ? and fc.name = ?`, group, featureName).Scan(&revision)
 	switch {
@@ -88,7 +88,7 @@ func getEntityTable(ctx context.Context, db database.DB, group, featureName stri
 	}
 }
 
-func readOneTableToCsv(ctx context.Context, db database.DB, tableName string,
+func readOneTableToCsv(ctx context.Context, db *database.DB, tableName string,
 	entityKeys []string, featureNames []string, w *csv.Writer, isFirstPrint bool) error {
 	// https://jmoiron.github.io/sqlx/#inQueries
 	sql, args, err := sqlx.In(
