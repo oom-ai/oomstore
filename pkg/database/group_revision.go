@@ -3,8 +3,6 @@ package database
 import (
 	"strings"
 	"time"
-
-	"github.com/jmoiron/sqlx"
 )
 
 type GroupRevision struct {
@@ -16,7 +14,7 @@ type GroupRevision struct {
 	ModifyTime  time.Time `db:"modify_time"`
 }
 
-func ListGroupRevisionByGroup(db *sqlx.DB, group string) ([]GroupRevision, error) {
+func ListGroupRevisionByGroup(db DB, group string) ([]GroupRevision, error) {
 	query := "SELECT * FROM feature_revision AS fr WHERE fr.group = ?"
 	revisions := make([]GroupRevision, 0)
 	if err := db.Select(&revisions, query, group); err != nil {
