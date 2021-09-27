@@ -14,7 +14,7 @@ var describeCmd = &cobra.Command{
 	Use:   "describe",
 	Short: "show details of a specific feature",
 	Run: func(cmd *cobra.Command, args []string) {
-		describeOpt.DBOption = dbOption
+		describeOpt.DBOption = sqlxDbOption
 		describe.Run(context.Background(), &describeOpt)
 	},
 }
