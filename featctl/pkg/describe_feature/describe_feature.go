@@ -22,7 +22,7 @@ func Run(ctx context.Context, option *Option) {
 	}
 	defer db.Close()
 
-	record, err := database.GetFeatureConfig(ctx, db, option.Group, option.Name)
+	record, err := db.GetFeatureConfig(ctx, option.Group, option.Name)
 	if err != nil {
 		log.Fatalf("failed querying feature config, group_name=%s, feature_name=%s: %v", option.Group, option.Name, err)
 	}
