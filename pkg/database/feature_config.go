@@ -61,6 +61,15 @@ func GetEntityTable(ctx context.Context, db *DB, group, featureName string) (str
 	}
 }
 
+func UpdateFeatureConfig(ctx context.Context, db *DB, field string, value interface{}, group, name string) (sql.Result, error) {
+	return db.ExecContext(ctx,
+		fmt.Sprintf("update feature_config set %s = ? where `group` = ? and name = ?", field),
+		value,
+		group,
+		name,
+	)
+}
+
 func RegisterFeatureConfig(ctx context.Context, db *DB, config FeatureConfig) error {
 	_, err := db.ExecContext(ctx,
 		"insert into"+

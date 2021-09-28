@@ -2,7 +2,6 @@ package update_feature
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 
@@ -41,9 +40,11 @@ func updateFeature(ctx context.Context, db *database.DB, option *Option) error {
 		{"description", option.Description, option.DescriptionChanged},
 	} {
 		if item.condition {
-			_, err := db.ExecContext(ctx,
-				fmt.Sprintf("update feature_config set %s = ?", item.field)+
-					" where `group` = ? and name = ?", item.value, option.Group, option.Name)
+			_, err := database.UpdateFeatureConfig(ctx, db, item.field, item.value,
+				// where clause
+				option.Group,
+				option.Name,
+			)
 			if err != nil {
 				return err
 			}
@@ -60,19 +61,9 @@ func updateFeature(ctx context.Context, db *database.DB, option *Option) error {
 
 func validateOptions(ctx context.Context, db *database.DB, option *Option) error {
 	if option.RevisionChanged {
-		return requireRevisionExists(ctx, db, option.Group, option.Revision)
+		return database.RevisionExists(ctx, db, option.Group, option.Revision)
 	}
 	return nil
-}
-
-func requireRevisionExists(ctx context.Context, db *database.DB, group string, revision string) error {
-	err := db.GetContext(ctx, &revision,
-		"select revision from feature_revision where `group` = ? and revision = ?",
-		group, revision)
-	if err == sql.ErrNoRows {
-		return fmt.Errorf("revision '%s' not found int feature group '%s'", revision, group)
-	}
-	return err
 }
 
 func Run(ctx context.Context, option *Option) {
