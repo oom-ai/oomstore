@@ -1,4 +1,4 @@
-package describe
+package describe_feature
 
 import (
 	"context"
