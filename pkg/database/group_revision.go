@@ -65,6 +65,21 @@ func GetFeatureValueType(ctx context.Context, db *DB, config *FeatureConfig) (st
 	return column.Type, nil
 }
 
+func GetLatestEntityTable(ctx context.Context, db *DB, group string) (string, error) {
+	var source string
+	err := db.QueryRowContext(ctx,
+		"select source from feature_revision"+
+			" where `group` = ?"+
+			" order by revision desc"+
+			" limit 1", group).
+		Scan(&source)
+	if err != nil {
+		return "", err
+	}
+	return source, nil
+
+}
+
 func RegisterRevision(ctx context.Context, db *DB, group, revision, tableName, description string) error {
 	_, err := db.ExecContext(ctx,
 		"insert into feature_revision(`group`, revision, source, description) values(?, ?, ?, ?)",
