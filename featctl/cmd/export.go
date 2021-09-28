@@ -16,7 +16,7 @@ var exportCmd = &cobra.Command{
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		exportOpt.DBOption = dbOption
+		exportOpt.DBOption = sqlxDbOption
 		export.Export(ctx, &exportOpt)
 	},
 }

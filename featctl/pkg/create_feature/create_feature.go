@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/onestore-ai/onestore/featctl/pkg/database"
+	"github.com/onestore-ai/onestore/pkg/database"
 )
 
 type Option struct {

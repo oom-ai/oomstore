@@ -15,7 +15,7 @@ var importCmd = &cobra.Command{
 	Short: "import feature data from a csv file",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		importOpt.DBOption = dbOption
+		importOpt.DBOption = sqlxDbOption
 		_import.Import(ctx, &importOpt)
 	},
 }
