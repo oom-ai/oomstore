@@ -42,9 +42,7 @@ func RevisionExists(ctx context.Context, db *DB, group, revision string) error {
 
 func getSourceTableNameByGroupAndRevision(ctx context.Context, db *DB, group string, revision string) (string, error) {
 	var source string
-	err := db.QueryRowContext(ctx,
-		"select source from feature_revision where `group` = ? and revision = ?",
-		group, revision).Scan(&source)
+	err := db.GetContext(ctx, &source, "select source from feature_revision where `group` = ? and revision = ?", group, revision)
 	if err == sql.ErrNoRows {
 		return "", fmt.Errorf("revision not found: %s", revision)
 	}
@@ -67,12 +65,7 @@ func GetFeatureValueType(ctx context.Context, db *DB, config *FeatureConfig) (st
 
 func GetLatestEntityTable(ctx context.Context, db *DB, group string) (string, error) {
 	var source string
-	err := db.QueryRowContext(ctx,
-		"select source from feature_revision"+
-			" where `group` = ?"+
-			" order by revision desc"+
-			" limit 1", group).
-		Scan(&source)
+	err := db.GetContext(ctx, &source, "select source from feature_revision where `group` = ? order by revision desc limit 1", group)
 	if err != nil {
 		return "", err
 	}

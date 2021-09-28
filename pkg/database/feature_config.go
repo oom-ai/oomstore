@@ -50,7 +50,7 @@ func (db *DB) GetFeatureConfig(ctx context.Context, groupName, featureName strin
 
 func GetEntityTable(ctx context.Context, db *DB, group, featureName string) (string, error) {
 	var revision string
-	err := db.QueryRowContext(ctx, `select fc.revision from feature_config as fc where fc.group = ? and fc.name = ?`, group, featureName).Scan(&revision)
+	err := db.GetContext(ctx, &revision, `select fc.revision from feature_config as fc where fc.group = ? and fc.name = ?`, group, featureName)
 	switch {
 	case err == sql.ErrNoRows:
 		return "", nil
