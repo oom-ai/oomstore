@@ -4,11 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
-	"os/exec"
-	"strconv"
 	"strings"
 
+	"github.com/joho/sqltocsv"
 	"github.com/onestore-ai/onestore/pkg/database"
 )
 
@@ -33,7 +31,7 @@ func getSourceTableName(ctx context.Context, db *database.DB, group string) (str
 	return source, nil
 }
 
-func downloadFeatures(ctx context.Context, opt *Option, tableName string) error {
+func downloadFeatures(ctx context.Context, db *database.DB, opt *Option, tableName string) error {
 	dbo := opt.DBOption
 	fields := strings.Join(opt.Features, ",")
 
@@ -46,47 +44,17 @@ func downloadFeatures(ctx context.Context, opt *Option, tableName string) error 
 	}
 
 	fullTableName := fmt.Sprintf("%s.%s", dbo.DbName, tableName)
-	sql := fmt.Sprintf("select %s from %s", fields, fullTableName)
-	tmpdir := opt.OutputFile + ".tmp"
+	query := fmt.Sprintf("select %s from %s", fields, fullTableName)
 
-	// download data using tidb-dumpling
-	// https://docs.pingcap.com/zh/tidb/v4.0/dumpling-overview
-	cmd := exec.CommandContext(ctx,
-		"dumpling",
-		"-h", dbo.Host,
-		"-P", dbo.Port,
-		"-u", dbo.User,
-		"-p", dbo.Pass,
-		"-T", fullTableName,
-		"-o", tmpdir,
-		"--filetype", "csv",
-		"--escape-backslash=false",
-		"--consistency", "none",
-		"--tidb-mem-quota-query", strconv.Itoa(512*1024*1024), // 512M
-		"--params", "tidb_distsql_scan_concurrency=1", // lowest scan concurrency
-		"--sql", sql,
-	)
+	return dumpCSV(ctx, db, opt.OutputFile, query)
+}
 
-	cmdOutput, err := cmd.CombinedOutput()
-	fmt.Println(string(cmdOutput))
+func dumpCSV(ctx context.Context, db *database.DB, file string, query string, args ...interface{}) error {
+	rows, err := db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
-
-	// move csv file to the specified location
-	cmd = exec.CommandContext(ctx,
-		"sh",
-		"-c",
-		fmt.Sprintf("mv %s/*.csv %s", tmpdir, opt.OutputFile),
-	)
-	cmdOutput, err = cmd.CombinedOutput()
-	fmt.Println(string(cmdOutput))
-	if err != nil {
-		return err
-	}
-
-	// remove temporary directory
-	return os.RemoveAll(tmpdir)
+	return sqltocsv.WriteFile(file, rows)
 }
 
 func Export(ctx context.Context, option *Option) {
@@ -104,7 +72,7 @@ func Export(ctx context.Context, option *Option) {
 	}
 
 	log.Println("downloading features ...")
-	if err = downloadFeatures(ctx, option, sourceTableName); err != nil {
+	if err = downloadFeatures(ctx, db, option, sourceTableName); err != nil {
 		log.Fatalf("failed downloading features: %v", err)
 	}
 
