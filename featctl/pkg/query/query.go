@@ -77,7 +77,7 @@ func getEntityTableMapFeatures(ctx context.Context, db *database.DB, opt *Option
 
 func getEntityTable(ctx context.Context, db *database.DB, group, featureName string) (string, error) {
 	var revision string
-	err := db.QueryRowContext(ctx, `select fc.revision from feature_config as fc where fc.group = ? and fc.name = ?`, group, featureName).Scan(&revision)
+	err := db.GetContext(ctx, &revision, `select fc.revision from feature_config as fc where fc.group = ? and fc.name = ?`, group, featureName)
 	switch {
 	case err == sql.ErrNoRows:
 		return "", nil

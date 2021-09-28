@@ -59,7 +59,7 @@ func (db *DB) ColumnInfo(ctx context.Context, table string, column string) (Colu
 
 func (db *DB) TableExists(ctx context.Context, table string) (bool, error) {
 	var result string
-	err := db.QueryRowContext(ctx, `show tables like ?`, table).Scan(&result)
+	err := db.GetContext(ctx, &result, `show tables like ?`, table)
 	switch {
 	case err == sql.ErrNoRows:
 		return false, nil
