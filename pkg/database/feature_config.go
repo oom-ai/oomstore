@@ -20,19 +20,19 @@ type FeatureConfig struct {
 	ModifyTime     time.Time `db:"modify_time"`
 }
 
-func ListFeatureConfig(db *DB) ([]FeatureConfig, error) {
+func ListFeatureConfig(ctx context.Context, db *DB) ([]FeatureConfig, error) {
 	query := `SELECT * FROM feature_config`
 	features := make([]FeatureConfig, 0)
-	if err := db.Select(&features, query); err != nil {
+	if err := db.SelectContext(ctx, &features, query); err != nil {
 		return nil, err
 	}
 	return features, nil
 }
 
-func ListFeatureConfigByGroup(db *DB, group string) ([]FeatureConfig, error) {
+func ListFeatureConfigByGroup(ctx context.Context, db *DB, group string) ([]FeatureConfig, error) {
 	query := "SELECT * FROM feature_config AS fc WHERE fc.group = ?"
 	features := make([]FeatureConfig, 0)
-	if err := db.Select(&features, query, group); err != nil {
+	if err := db.SelectContext(ctx, &features, query, group); err != nil {
 		return nil, err
 	}
 	return features, nil
