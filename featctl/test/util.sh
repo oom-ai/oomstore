@@ -76,7 +76,7 @@ execute_sql() {
 }
 
 init_store() {
-    info "initilaize feature store"
+    info "initialize feature store"
 
     # create test user
     execute_sql "CREATE USER IF NOT EXISTS 'test'@'%' IDENTIFIED BY 'test'"
@@ -85,6 +85,6 @@ init_store() {
     # destroy database
     execute_sql 'drop database if exists onestore'
 
-    # initilaize feature store
+    # initialize feature store
     featctl init
 }
