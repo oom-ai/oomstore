@@ -9,7 +9,6 @@ import (
 
 var registerFeatureOpt register_feature.Option
 
-// featureCmd represents the feature command
 var registerFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "register a new feature",

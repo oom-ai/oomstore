@@ -10,7 +10,6 @@ import (
 
 var queryOpt query.Option
 
-// queryCmd represents the query command
 var queryCmd = &cobra.Command{
 	Use:   "query",
 	Short: "query feature values",

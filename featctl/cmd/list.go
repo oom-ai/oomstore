@@ -6,7 +6,7 @@ import (
 
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "list resources from cli",
+	Short: "list resources",
 }
 
 func init() {

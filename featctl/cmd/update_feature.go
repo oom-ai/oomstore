@@ -9,7 +9,6 @@ import (
 
 var updateFeatureOpt update_feature.Option
 
-// updateFeatureCmd represents the updateFeature command
 var updateFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "update a specified feature",
