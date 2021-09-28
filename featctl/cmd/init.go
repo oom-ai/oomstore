@@ -14,7 +14,7 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "initialize the feature store",
 	Run: func(cmd *cobra.Command, args []string) {
-		initOpt.DBOption = dbOption
+		initOpt.DBOption = sqlxDbOption
 		_init.Init(context.Background(), &initOpt)
 	},
 }
