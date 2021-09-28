@@ -19,12 +19,7 @@ type Option struct {
 
 func getSourceTableName(ctx context.Context, db *database.DB, group string) (string, error) {
 	var source string
-	err := db.QueryRowContext(ctx,
-		"select source from feature_revision"+
-			" where `group` = ?"+
-			" order by revision desc"+
-			" limit 1", group).
-		Scan(&source)
+	err := db.GetContext(ctx, &source, "select source from feature_revision where `group` = ? order by revision desc limit 1", group)
 	if err != nil {
 		return "", err
 	}

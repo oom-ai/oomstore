@@ -40,9 +40,9 @@ func registerFeatureConfig(ctx context.Context, db *database.DB, option *Option)
 
 func getSourceTableName(ctx context.Context, db *database.DB, group string, revision string) (string, error) {
 	var source string
-	err := db.QueryRowContext(ctx,
+	err := db.GetContext(ctx, &source,
 		"select source from feature_revision where `group` = ? and revision = ?",
-		group, revision).Scan(&source)
+		group, revision)
 	if err == sql.ErrNoRows {
 		return "", fmt.Errorf("revision not found: %s", revision)
 	}
