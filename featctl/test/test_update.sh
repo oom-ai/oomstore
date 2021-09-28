@@ -16,5 +16,5 @@ Name,Revision
 price,v2
 model,v1
 '
-actual=$(featctl list feature | xsv select Name,Revision)
+actual=$(featctl list feature | cut -d ',' -f 1,3)
 assert_eq "$case" "$expected" "$actual"

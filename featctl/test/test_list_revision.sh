@@ -12,5 +12,5 @@ Group,Revision,Source,Description
 device,v1,device_v1,test data
 '
 actual=$(featctl list revision --group device)
-ignore_time() { xsv select 1-4 <<<"$1"; }
+ignore_time() { cut -d ',' -f 1-4 <<<"$1"; }
 assert_eq "$case" "$(ignore_time "$expected")" "$(ignore_time "$actual")"
