@@ -60,7 +60,12 @@ func Import(ctx context.Context, option *Option) {
 	}
 
 	log.Println("registering revision ...")
-	if err = registerRevision(ctx, db, option); err != nil {
+	if err := database.RegisterRevision(ctx, db,
+		option.Group,
+		option.Revision,
+		genTableName(option),
+		option.Description,
+	); err != nil {
 		log.Fatalf("failed registering revision: %v\n", err)
 	}
 

@@ -64,3 +64,13 @@ func GetFeatureValueType(ctx context.Context, db *DB, config *FeatureConfig) (st
 
 	return column.Type, nil
 }
+
+func RegisterRevision(ctx context.Context, db *DB, group, revision, tableName, description string) error {
+	_, err := db.ExecContext(ctx,
+		"insert into feature_revision(`group`, revision, source, description) values(?, ?, ?, ?)",
+		group,
+		revision,
+		tableName,
+		description)
+	return err
+}
