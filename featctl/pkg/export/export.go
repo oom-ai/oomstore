@@ -17,15 +17,6 @@ type Option struct {
 	DBOption   database.Option
 }
 
-func getSourceTableName(ctx context.Context, db *database.DB, group string) (string, error) {
-	var source string
-	err := db.GetContext(ctx, &source, "select source from feature_revision where `group` = ? order by revision desc limit 1", group)
-	if err != nil {
-		return "", err
-	}
-	return source, nil
-}
-
 func downloadFeatures(ctx context.Context, db *database.DB, opt *Option, tableName string) error {
 	dbo := opt.DBOption
 	fields := strings.Join(opt.Features, ",")
@@ -61,7 +52,7 @@ func Export(ctx context.Context, option *Option) {
 	defer db.Close()
 
 	log.Println("retrieving source table ...")
-	sourceTableName, err := getSourceTableName(ctx, db, option.Group)
+	sourceTableName, err := database.GetLatestEntityTable(ctx, db, option.Group)
 	if err != nil {
 		log.Fatalf("failed retrieving source table: %v", err)
 	}

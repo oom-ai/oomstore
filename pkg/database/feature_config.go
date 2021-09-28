@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strings"
 	"time"
@@ -45,6 +46,45 @@ func (db *DB) GetFeatureConfig(ctx context.Context, groupName, featureName strin
 		return nil, err
 	}
 	return &feature, nil
+}
+
+func GetEntityTable(ctx context.Context, db *DB, group, featureName string) (string, error) {
+	var revision string
+	err := db.QueryRowContext(ctx, `select fc.revision from feature_config as fc where fc.group = ? and fc.name = ?`, group, featureName).Scan(&revision)
+	switch {
+	case err == sql.ErrNoRows:
+		return "", nil
+	case err != nil:
+		return "", err
+	default:
+		return group + "_" + revision, nil
+	}
+}
+
+func UpdateFeatureConfig(ctx context.Context, db *DB, field string, value interface{}, group, name string) (sql.Result, error) {
+	return db.ExecContext(ctx,
+		fmt.Sprintf("update feature_config set %s = ? where `group` = ? and name = ?", field),
+		value,
+		group,
+		name,
+	)
+}
+
+func RegisterFeatureConfig(ctx context.Context, db *DB, config FeatureConfig) error {
+	_, err := db.ExecContext(ctx,
+		"insert into"+
+			" feature_config(name, `group`, category, value_type, revision, revisions_limit, status, description)"+
+			" values(?, ?, ?, ?, ?, ?, ?, ?)",
+		config.Name,
+		config.Group,
+		config.Category,
+		config.ValueType,
+		config.Revision,
+		config.RevisionsLimit,
+		config.Status,
+		config.Description,
+	)
+	return err
 }
 
 func (r *FeatureConfig) String() string {
