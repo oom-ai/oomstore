@@ -66,9 +66,9 @@ func validateOptions(ctx context.Context, db *database.DB, option *Option) error
 }
 
 func requireRevisionExists(ctx context.Context, db *database.DB, group string, revision string) error {
-	err := db.QueryRowContext(ctx,
+	err := db.GetContext(ctx, &revision,
 		"select revision from feature_revision where `group` = ? and revision = ?",
-		group, revision).Scan(&revision)
+		group, revision)
 	if err == sql.ErrNoRows {
 		return fmt.Errorf("revision '%s' not found int feature group '%s'", revision, group)
 	}
