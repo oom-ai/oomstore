@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strings"
 	"time"
@@ -45,6 +46,19 @@ func (db *DB) GetFeatureConfig(ctx context.Context, groupName, featureName strin
 		return nil, err
 	}
 	return &feature, nil
+}
+
+func GetEntityTable(ctx context.Context, db *DB, group, featureName string) (string, error) {
+	var revision string
+	err := db.QueryRowContext(ctx, `select fc.revision from feature_config as fc where fc.group = ? and fc.name = ?`, group, featureName).Scan(&revision)
+	switch {
+	case err == sql.ErrNoRows:
+		return "", nil
+	case err != nil:
+		return "", err
+	default:
+		return group + "_" + revision, nil
+	}
 }
 
 func (r *FeatureConfig) String() string {
