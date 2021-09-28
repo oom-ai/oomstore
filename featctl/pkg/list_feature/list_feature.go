@@ -23,12 +23,12 @@ func ListFeature(ctx context.Context, option *Option) {
 
 	var features []database.FeatureConfig
 	if option.Group == "" {
-		features, err = database.ListFeatureConfig(ctx, db)
+		features, err = db.ListFeatureConfig(ctx)
 		if err != nil {
 			log.Fatalf("failed listing feature configs: %v", err)
 		}
 	} else {
-		features, err = database.ListFeatureConfigByGroup(ctx, db, option.Group)
+		features, err = db.ListFeatureConfigByGroup(ctx, option.Group)
 		if err != nil {
 			log.Fatalf("failed listing feature configs in group %s: %v", option.Group, err)
 		}
