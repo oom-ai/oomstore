@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -28,4 +30,29 @@ func (r *GroupRevision) OneLineString() string {
 	return strings.Join([]string{
 		r.Group, r.Revision, r.Source, r.Description, r.CreateTime.Format(time.RFC3339), r.ModifyTime.Format(time.RFC3339)},
 		",")
+}
+
+func getSourceTableNameByGroupAndRevision(ctx context.Context, db *DB, group string, revision string) (string, error) {
+	var source string
+	err := db.QueryRowContext(ctx,
+		"select source from feature_revision where `group` = ? and revision = ?",
+		group, revision).Scan(&source)
+	if err == sql.ErrNoRows {
+		return "", fmt.Errorf("revision not found: %s", revision)
+	}
+	return source, err
+}
+
+func GetFeatureValueType(ctx context.Context, db *DB, config *FeatureConfig) (string, error) {
+	sourceTable, err := getSourceTableNameByGroupAndRevision(ctx, db, config.Group, config.Revision)
+	if err != nil {
+		return "", fmt.Errorf("failed fetching source table: %v", err)
+	}
+
+	column, err := db.ColumnInfo(ctx, sourceTable, config.Name)
+	if err != nil {
+		return "", fmt.Errorf("failed fetching source column: %v", err)
+	}
+
+	return column.Type, nil
 }
