@@ -9,7 +9,6 @@ import (
 
 var exportOpt export.Option
 
-// exportCmd represents the export command
 var exportCmd = &cobra.Command{
 	Use:   "export",
 	Short: "export a group of features",

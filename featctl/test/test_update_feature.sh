@@ -10,7 +10,7 @@ case='featctl update works'
 # import v2 data
 import_sample v2
 # update active revision to v2
-featctl set -g device -n price --revision v2
+featctl update feature -g device -n price --revision v2
 expected='
 Name,Revision
 price,v2

@@ -1,4 +1,4 @@
-package set
+package update_feature
 
 import (
 	"context"
@@ -75,7 +75,7 @@ func requireRevisionExists(ctx context.Context, db *database.DB, group string, r
 	return err
 }
 
-func Set(ctx context.Context, option *Option) {
+func Run(ctx context.Context, option *Option) {
 	db, err := database.Open(&option.DBOption)
 	if err != nil {
 		log.Fatalf("failed connecting feature store: %v", err)

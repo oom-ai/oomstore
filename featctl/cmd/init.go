@@ -9,7 +9,6 @@ import (
 
 var initOpt _init.Option
 
-// initCmd represents the init command
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "initialize the feature store",

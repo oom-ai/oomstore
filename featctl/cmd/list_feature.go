@@ -9,7 +9,6 @@ import (
 
 var listFeatureOpt list_feature.Option
 
-// listFeatureCmd represents the list feature command
 var listFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "list all existing features given a specific group",
