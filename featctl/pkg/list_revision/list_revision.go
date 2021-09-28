@@ -21,7 +21,7 @@ func ListRevision(ctx context.Context, option *Option) {
 	}
 	defer db.Close()
 
-	revisions, err := database.ListGroupRevisionByGroup(ctx, db, option.Group)
+	revisions, err := db.ListGroupRevisionByGroup(ctx, option.Group)
 	if err != nil {
 		log.Fatalf("failed listing revisions for group %s: %v", option.Group, err)
 	}

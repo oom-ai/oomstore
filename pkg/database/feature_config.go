@@ -20,7 +20,7 @@ type FeatureConfig struct {
 	ModifyTime     time.Time `db:"modify_time"`
 }
 
-func ListFeatureConfig(ctx context.Context, db *DB) ([]FeatureConfig, error) {
+func (db *DB) ListFeatureConfig(ctx context.Context) ([]FeatureConfig, error) {
 	query := `SELECT * FROM feature_config`
 	features := make([]FeatureConfig, 0)
 	if err := db.SelectContext(ctx, &features, query); err != nil {
@@ -29,7 +29,7 @@ func ListFeatureConfig(ctx context.Context, db *DB) ([]FeatureConfig, error) {
 	return features, nil
 }
 
-func ListFeatureConfigByGroup(ctx context.Context, db *DB, group string) ([]FeatureConfig, error) {
+func (db *DB) ListFeatureConfigByGroup(ctx context.Context, group string) ([]FeatureConfig, error) {
 	query := "SELECT * FROM feature_config AS fc WHERE fc.group = ?"
 	features := make([]FeatureConfig, 0)
 	if err := db.SelectContext(ctx, &features, query, group); err != nil {
@@ -38,7 +38,7 @@ func ListFeatureConfigByGroup(ctx context.Context, db *DB, group string) ([]Feat
 	return features, nil
 }
 
-func GetFeatureConfig(ctx context.Context, db *DB, groupName, featureName string) (*FeatureConfig, error) {
+func (db *DB) GetFeatureConfig(ctx context.Context, groupName, featureName string) (*FeatureConfig, error) {
 	var feature FeatureConfig
 	query := `SELECT * FROM feature_config AS fc WHERE fc.group = ? AND fc.name = ?`
 	if err := db.GetContext(ctx, &feature, query, groupName, featureName); err != nil {
