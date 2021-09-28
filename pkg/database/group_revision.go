@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"strings"
 	"time"
 )
@@ -14,10 +15,10 @@ type GroupRevision struct {
 	ModifyTime  time.Time `db:"modify_time"`
 }
 
-func ListGroupRevisionByGroup(db *DB, group string) ([]GroupRevision, error) {
+func ListGroupRevisionByGroup(ctx context.Context, db *DB, group string) ([]GroupRevision, error) {
 	query := "SELECT * FROM feature_revision AS fr WHERE fr.group = ?"
 	revisions := make([]GroupRevision, 0)
-	if err := db.Select(&revisions, query, group); err != nil {
+	if err := db.SelectContext(ctx, &revisions, query, group); err != nil {
 		return nil, err
 	}
 	return revisions, nil
