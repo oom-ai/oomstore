@@ -61,6 +61,23 @@ func GetEntityTable(ctx context.Context, db *DB, group, featureName string) (str
 	}
 }
 
+func RegisterFeatureConfig(ctx context.Context, db *DB, config FeatureConfig) error {
+	_, err := db.ExecContext(ctx,
+		"insert into"+
+			" feature_config(name, `group`, category, value_type, revision, revisions_limit, status, description)"+
+			" values(?, ?, ?, ?, ?, ?, ?, ?)",
+		config.Name,
+		config.Group,
+		config.Category,
+		config.ValueType,
+		config.Revision,
+		config.RevisionsLimit,
+		config.Status,
+		config.Description,
+	)
+	return err
+}
+
 func (r *FeatureConfig) String() string {
 	return strings.Join([]string{
 		fmt.Sprintf("Name:           %s", r.Name),
