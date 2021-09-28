@@ -19,7 +19,7 @@ type FeatureConfig struct {
 	ModifyTime     time.Time `db:"modify_time"`
 }
 
-func ListFeatureConfig(db DB) ([]FeatureConfig, error) {
+func ListFeatureConfig(db *DB) ([]FeatureConfig, error) {
 	query := `SELECT * FROM feature_config`
 	features := make([]FeatureConfig, 0)
 	if err := db.Select(&features, query); err != nil {
@@ -28,7 +28,7 @@ func ListFeatureConfig(db DB) ([]FeatureConfig, error) {
 	return features, nil
 }
 
-func ListFeatureConfigByGroup(db DB, group string) ([]FeatureConfig, error) {
+func ListFeatureConfigByGroup(db *DB, group string) ([]FeatureConfig, error) {
 	query := "SELECT * FROM feature_config AS fc WHERE fc.group = ?"
 	features := make([]FeatureConfig, 0)
 	if err := db.Select(&features, query, group); err != nil {
@@ -37,7 +37,7 @@ func ListFeatureConfigByGroup(db DB, group string) ([]FeatureConfig, error) {
 	return features, nil
 }
 
-func GetFeatureConfig(db DB, groupName, featureName string) (*FeatureConfig, error) {
+func GetFeatureConfig(db *DB, groupName, featureName string) (*FeatureConfig, error) {
 	query := fmt.Sprintf(`SELECT * FROM feature_config AS fc WHERE fc.group = '%s' AND fc.name = '%s'`, groupName, featureName)
 	var feature FeatureConfig
 	if err := db.Select(&feature, query); err != nil {

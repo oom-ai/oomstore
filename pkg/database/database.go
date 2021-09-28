@@ -21,7 +21,7 @@ type Option struct {
 	DbName string
 }
 
-func Open(option *Option) (DB, error) {
+func Open(option *Option) (*DB, error) {
 	db, err := sqlx.Open(
 		"mysql",
 		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
@@ -31,7 +31,7 @@ func Open(option *Option) (DB, error) {
 			option.Port,
 			option.DbName),
 	)
-	return DB{db}, err
+	return &DB{db}, err
 }
 
 type Column struct {
