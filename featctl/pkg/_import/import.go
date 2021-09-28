@@ -154,7 +154,11 @@ func prepareLightningFiles(option *Option) error {
 	}
 
 	// data file
-	if err := os.Symlink(filepath.Join("..", option.InputOption.FilePath), pathData); err != nil {
+	pathInputFileRel, err := filepath.Rel(filepath.Dir(pathData), option.InputOption.FilePath)
+	if err != nil {
+		return err
+	}
+	if err := os.Symlink(pathInputFileRel, pathData); err != nil {
 		return err
 	}
 
