@@ -32,6 +32,14 @@ func (r *GroupRevision) OneLineString() string {
 		",")
 }
 
+func RevisionExists(ctx context.Context, db *DB, group, revision string) error {
+	_, err := getSourceTableNameByGroupAndRevision(ctx, db, group, revision)
+	if err == sql.ErrNoRows {
+		return fmt.Errorf("revision '%s' not found int feature group '%s'", revision, group)
+	}
+	return err
+}
+
 func getSourceTableNameByGroupAndRevision(ctx context.Context, db *DB, group string, revision string) (string, error) {
 	var source string
 	err := db.QueryRowContext(ctx,
