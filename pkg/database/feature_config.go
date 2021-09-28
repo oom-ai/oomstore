@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -37,10 +38,10 @@ func ListFeatureConfigByGroup(db *DB, group string) ([]FeatureConfig, error) {
 	return features, nil
 }
 
-func GetFeatureConfig(db *DB, groupName, featureName string) (*FeatureConfig, error) {
-	query := fmt.Sprintf(`SELECT * FROM feature_config AS fc WHERE fc.group = '%s' AND fc.name = '%s'`, groupName, featureName)
+func GetFeatureConfig(ctx context.Context, db *DB, groupName, featureName string) (*FeatureConfig, error) {
 	var feature FeatureConfig
-	if err := db.Select(&feature, query); err != nil {
+	query := `SELECT * FROM feature_config AS fc WHERE fc.group = ? AND fc.name = ?`
+	if err := db.GetContext(ctx, &feature, query, groupName, featureName); err != nil {
 		return nil, err
 	}
 	return &feature, nil
