@@ -54,7 +54,7 @@ featctl import \
 
 **查看特征详情**
 ```
-$ featctl describe --group device --name price
+$ featctl describe feature --group device --name price
 Name:           price
 Group:          device
 Revision:       20210909
@@ -69,7 +69,7 @@ ModifyTime:     2021-09-13T18:58:34Z
 
 **创建特征配置**
 ```sh
-featctl create feature \
+featctl register feature \
     --name price \
     --group device \
     --category batch \
@@ -81,7 +81,7 @@ featctl create feature \
 **修改特征配置**
 ```sh
 # 启用特征并将其版本指定为 20210909
-featctl set \
+featctl update feature \
     --name price \
     --group device \
     --revision 20210909 \
@@ -189,11 +189,11 @@ make image-push
 ## TODO
 
 - [x] `featctl init`
+- [x] `featctl query`
 - [x] `featctl export`
 - [x] `featctl import`
-- [x] `featctl create feature`
-- [x] `featctl set`
-- [x] `featctl describe`
-- [x] `featctl query`
-- [x] `featctl list features`
-- [x] `featctl list revisions`
+- [x] `featctl list feature`
+- [x] `featctl list revision`
+- [x] `featctl register feature`
+- [x] `featctl describe feature`
+- [x] `featctl update   feature`
