@@ -50,6 +50,8 @@ assert_eq() {
 import_sample() {
     local revision=$1
     info "import sample data $revision"
+    trap 'command rm -rf -- lightning.* *.tmp' EXIT INT TERM HUP
+
     featctl import \
     --group device \
     --revision "$revision" \
@@ -57,8 +59,6 @@ import_sample() {
     --input-file device.csv \
     --has-header \
     --description 'test data' &>/dev/null
-
-    rm -rf -- lightning.* *.tmp
 }
 
 # register features in sample data with specified revision
