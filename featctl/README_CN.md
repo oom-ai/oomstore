@@ -149,7 +149,7 @@ pass: <password>
 export PATH="$PATH:/path/to/tidb-toolkit/bin"
 ```
 
-对于 MacOS 用户，手动编译 dumpling 和 tidb-lightning 后，放在 ~/softwares/tidb-toolkit 下，随后将它们添加到环境变量 `PATH` 中，同上。注意，需要使用 `chmod +x` 赋予执行权限。
+对于 MacOS 用户，手动编译 tidb-lightning 后，放在 ~/softwares/tidb-toolkit 下，随后将它们添加到环境变量 `PATH` 中，同上。注意，需要使用 `chmod +x` 赋予执行权限。
 
 生产环境建议采用容器的方式运行，docker 镜像已经打包好了依赖：
 

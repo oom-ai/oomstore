@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"os"
 
 	"github.com/onestore-ai/onestore/featctl/pkg/export"
 	"github.com/spf13/cobra"
@@ -25,9 +26,9 @@ func init() {
 
 	flags := exportCmd.Flags()
 
+	os.Stdout.Name()
 	flags.StringVarP(&exportOpt.Group, "group", "g", "", "feature group")
 	flags.StringSliceVarP(&exportOpt.Features, "name", "n", nil, "feature name")
-	flags.StringVarP(&exportOpt.OutputFile, "output-file", "o", "", "output file")
+	flags.StringVarP(&exportOpt.OutputFile, "output-file", "o", os.Stdout.Name(), "output file")
 	_ = exportCmd.MarkFlagRequired("group")
-	_ = exportCmd.MarkFlagRequired("output-file")
 }
