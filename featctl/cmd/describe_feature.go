@@ -9,7 +9,6 @@ import (
 
 var describeFeatureOpt describe_feature.Option
 
-// describeCmd represents the describe command
 var describeFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "show details of a specific feature",

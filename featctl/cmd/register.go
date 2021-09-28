@@ -4,10 +4,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// registerCmd represents the register command
 var registerCmd = &cobra.Command{
 	Use:   "register",
-	Short: "register a resource from cli",
+	Short: "register a resource",
 }
 
 func init() {

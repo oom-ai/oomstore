@@ -9,7 +9,6 @@ import (
 
 var listRevisionOpt list_revision.Option
 
-// listRevisionCmd represents the list revision command
 var listRevisionCmd = &cobra.Command{
 	Use:   "revision",
 	Short: "list historical revisions given a specific group",

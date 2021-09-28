@@ -9,7 +9,6 @@ import (
 
 var importOpt _import.Option
 
-// importCmd represents the import command
 var importCmd = &cobra.Command{
 	Use:   "import",
 	Short: "import feature data from a csv file",
@@ -40,8 +39,6 @@ func init() {
 	flags.StringVar(&importOpt.Description, "description", "", "revision description")
 	_ = importCmd.MarkFlagRequired("description")
 
-	// csv config, default RFC 4180
-	// https://docs.pingcap.com/tidb/v4.0/migrate-from-csv-using-tidb-lightning#csv
 	flags.StringVar(&importOpt.InputOption.Separator, "separator", ",", "specify field delimiter")
 	flags.StringVar(&importOpt.InputOption.Delimiter, "delimiter", "\"", "specify quoting delimiter")
 	flags.BoolVar(&importOpt.InputOption.HasHeader, "has-header", false, "indicate that the input has header row")
