@@ -19,7 +19,7 @@ var setCmd = &cobra.Command{
 		setOpt.DescriptionChanged = flags.Changed("description")
 		setOpt.StatusChanged = flags.Changed("status")
 		setOpt.RevisionsLimitChanged = flags.Changed("revisions-limit")
-		setOpt.DBOption = sqlxDbOption
+		setOpt.DBOption = dbOption
 
 		if setOpt.StatusChanged {
 			if err := validateStatus(setOpt.Status); err != nil {

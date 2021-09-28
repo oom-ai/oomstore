@@ -24,7 +24,7 @@ var createFeatureCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		createFeatureOpt.DBOption = sqlxDbOption
+		createFeatureOpt.DBOption = dbOption
 		create_feature.Create(ctx, &createFeatureOpt)
 	},
 }
