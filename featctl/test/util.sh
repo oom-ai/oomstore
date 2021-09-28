@@ -65,9 +65,9 @@ register_features() {
     local revision=$1
     info "register features with revision: $revision"
     # register feature price
-    featctl create feature --group device --category batch --revision "$revision" --name price --description 'device average price'
+    featctl register feature --group device --category batch --revision "$revision" --name price --description 'device average price'
     # register feature model
-    featctl create feature --group device --category batch --revision "$revision" --name model --description 'device model name'
+    featctl register feature --group device --category batch --revision "$revision" --name model --description 'device model name'
 }
 
 execute_sql() {

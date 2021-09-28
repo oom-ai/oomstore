@@ -1,4 +1,4 @@
-package create_feature
+package register_feature
 
 import (
 	"context"
@@ -21,7 +21,7 @@ type Option struct {
 	DBOption       database.Option
 }
 
-func createFeatureConfig(ctx context.Context, db *database.DB, option *Option) error {
+func registerFeatureConfig(ctx context.Context, db *database.DB, option *Option) error {
 	_, err := db.ExecContext(ctx,
 		"insert into"+
 			" feature_config(name, `group`, category, value_type, revision, revisions_limit, status, description)"+
@@ -63,7 +63,7 @@ func getValueType(ctx context.Context, db *database.DB, option *Option) (string,
 	return column.Type, nil
 }
 
-func Create(ctx context.Context, option *Option) {
+func Run(ctx context.Context, option *Option) {
 	db, err := database.Open(&option.DBOption)
 	if err != nil {
 		log.Fatalf("failed connecting feature store: %v", err)
@@ -77,9 +77,9 @@ func Create(ctx context.Context, option *Option) {
 	}
 	option.ValueType = valueType
 
-	log.Println("creating new feature...")
-	if err = createFeatureConfig(ctx, db, option); err != nil {
-		log.Fatalf("error creating new feature: %v", err)
+	log.Println("registering new feature...")
+	if err = registerFeatureConfig(ctx, db, option); err != nil {
+		log.Fatalf("failed registering a new feature: %v", err)
 	}
 
 	log.Println("succeeded.")
