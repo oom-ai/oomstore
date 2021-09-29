@@ -17,4 +17,4 @@ price,v2
 model,v1
 '
 actual=$(featctl list feature | cut -d ',' -f 1,3)
-assert_eq "$case" "$expected" "$actual"
+assert_eq "$case" "$(sort <<<"$expected")" "$(sort <<< "$actual")"
