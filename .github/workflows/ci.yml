@@ -5,7 +5,6 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
     - uses: actions/setup-go@v2
       with:
         go-version: '1.16'
@@ -14,4 +13,29 @@ jobs:
         curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
         sh -s -- -b $(go env GOPATH)/bin v1.42.1
     - uses: actions/setup-python@v2
+    - uses: actions/checkout@v2
     - uses: pre-commit/action@v2.0.3
+
+  integration-test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        ports:
+          - 4000:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=5s
+          --health-timeout=2s
+          --health-retries=3
+    steps:
+    - uses: actions/setup-go@v2
+      with:
+        go-version: '1.16'
+    - uses: actions/checkout@v2
+    - name: Run featctl integration tests
+      run: |
+        cd featctl
+        make integration-test
