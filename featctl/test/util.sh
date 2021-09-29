@@ -57,8 +57,7 @@ import_sample() {
     --revision "$revision" \
     --schema-template schema.sql \
     --input-file device.csv \
-    --has-header \
-    --description 'test data' &>/dev/null
+    --description 'test data'
 }
 
 # register features in sample data with specified revision
