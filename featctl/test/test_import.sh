@@ -12,10 +12,7 @@ featctl import \
     --revision v2 \
     --schema-template "$(pwd)/schema.sql" \
     --input-file "$(pwd)/device.csv" \
-    --has-header \
-    --description 'test data' &>/dev/null
+    --description 'test data'
 actual=$?
 expected=0
 assert_eq "$case" "$expected" "$actual"
-
-rm -rf -- lightning.* *.tmp
