@@ -13,4 +13,4 @@ model,device,v1,disabled,batch,varchar(32),device model name,3,2021-09-27T08:24:
 '
 actual=$(featctl list feature)
 ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }
-assert_eq "$case" "$(ignore_time "$expected")" "$(ignore_time "$actual")"
+assert_eq "$case" "$(ignore_time "$expected" | sort)" "$(ignore_time "$actual" | sort)"

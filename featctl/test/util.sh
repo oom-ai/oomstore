@@ -50,7 +50,6 @@ assert_eq() {
 import_sample() {
     local revision=$1
     info "import sample data $revision"
-    trap 'command rm -rf -- lightning.* *.tmp' EXIT INT TERM HUP
 
     featctl import \
     --group device \

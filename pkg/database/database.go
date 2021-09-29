@@ -49,7 +49,7 @@ type Column struct {
 
 func (db *DB) ColumnInfo(ctx context.Context, table string, column string) (Column, error) {
 	var result Column
-	err := db.QueryRowContext(ctx, fmt.Sprintf("show columns from `%s` like ?", table), column).
+	err := db.QueryRowContext(ctx, fmt.Sprintf("show columns from `%s` like '%s'", table, column)).
 		Scan(&result.Field, &result.Type, &result.Null, &result.Key, &result.Default, &result.Extra)
 	if err == sql.ErrNoRows {
 		return result, fmt.Errorf("column '%s' not found in table '%s'", column, table)
@@ -59,7 +59,7 @@ func (db *DB) ColumnInfo(ctx context.Context, table string, column string) (Colu
 
 func (db *DB) TableExists(ctx context.Context, table string) (bool, error) {
 	var result string
-	err := db.GetContext(ctx, &result, `show tables like ?`, table)
+	err := db.GetContext(ctx, &result, fmt.Sprintf(`show tables like '%s'`, table))
 	switch {
 	case err == sql.ErrNoRows:
 		return false, nil
