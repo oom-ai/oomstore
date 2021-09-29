@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PATH="$SDIR/../build:$HOME/bin:$PATH"
+PATH="$SDIR/../build:$PATH"
 
 info() { printf "$(date +'%Y/%m/%d %H:%M:%S') [info] %s\n" "$*" >&2; }
 erro() { printf "$(date +'%Y/%m/%d %H:%M:%S') %b[erro]%b %s\n" '\e[0;31m\033[1m' '\e[0m' "$*" >&2; }
 
-BLD=$(tput bold)
-RST=$(tput sgr0)
-GRN=$(tput setaf 2)
-YLW=$(tput setaf 3)
+BLD=$(tput bold    2>/dev/null || true)
+RST=$(tput sgr0    2>/dev/null || true)
+GRN=$(tput setaf 2 2>/dev/null || true)
+YLW=$(tput setaf 3 2>/dev/null || true)
 
 export FEATCTL_HOST=127.0.0.1
 export FEATCTL_PORT=4000
