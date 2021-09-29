@@ -15,7 +15,7 @@ var importCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		importOpt.DBOption = dbOption
-		_import.Import(ctx, &importOpt)
+		_import.Run(ctx, &importOpt)
 	},
 }
 
@@ -41,8 +41,5 @@ func init() {
 
 	flags.StringVar(&importOpt.InputOption.Separator, "separator", ",", "specify field delimiter")
 	flags.StringVar(&importOpt.InputOption.Delimiter, "delimiter", "\"", "specify quoting delimiter")
-	flags.BoolVar(&importOpt.InputOption.HasHeader, "has-header", false, "indicate that the input has header row")
-	flags.StringVar(&importOpt.InputOption.NullLiteral, "null-literal", "\\N", "null value literal")
-	flags.BoolVar(&importOpt.InputOption.BackslashEscape, "backslash-escape", false, "whether to interpret backslash")
-	flags.BoolVar(&importOpt.InputOption.TrimLastSeparator, "trim-last-separator", false, "whether to trim the last separator")
+	flags.BoolVar(&importOpt.InputOption.NoHeader, "no-header", false, "indicate that the input has no header row")
 }

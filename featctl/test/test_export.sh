@@ -19,6 +19,6 @@ expected='entity_key,price
 9,4500
 '
 trap 'command rm -rf price.csv' EXIT INT TERM HUP
-featctl export -g device -n price --output-file price.csv &>/dev/null
+featctl export -g device -n price --output-file price.csv
 actual=$(cat price.csv)
 assert_eq "$case" "$expected" "$actual"
