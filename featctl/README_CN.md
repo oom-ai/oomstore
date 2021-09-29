@@ -47,7 +47,6 @@ featctl import \
     --revision 20210909 \
     --schema-template schema-template.sql \
     --input-file device.csv \
-    --has-header \
     --separator "," \
     --description "test import"
 ```
@@ -140,24 +139,6 @@ pass: <password>
 ```
 
 如果没有提供配置文件，也可以在执行命令时手动指定以上参数。
-
-## Dependency
-
-对于 Linux 用户，下载并压缩 [tidb-toolkit-v4.0.13](https://download.pingcap.org/tidb-toolkit-v4.0.13-linux-amd64.tar.gz)，将其中的 `bin` 目录添加到环境变量 `PATH` 中：
-
-```sh
-export PATH="$PATH:/path/to/tidb-toolkit/bin"
-```
-
-对于 MacOS 用户，手动编译 tidb-lightning 后，放在 ~/softwares/tidb-toolkit 下，随后将它们添加到环境变量 `PATH` 中，同上。注意，需要使用 `chmod +x` 赋予执行权限。
-
-生产环境建议采用容器的方式运行，docker 镜像已经打包好了依赖：
-
-```sh
-docker run --rm aiinfra/featctl:latest sh -c 'featctl ...'
-```
-
-如果需要和宿主机交换文件，可以将宿主机目录挂载到容器的 `/work` 目录。
 
 ## Development
 
