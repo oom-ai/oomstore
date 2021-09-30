@@ -6,18 +6,30 @@ on:
       - main
 
 jobs:
-  pre-commit:
+  lint:
     runs-on: ubuntu-latest
+    env:
+      golangci-lint-version: 'v1.42.1'
     steps:
+    - uses: actions/checkout@v2
     - uses: actions/setup-go@v2
       with:
         go-version: '1.16'
+    - name: Cache golangci-lint
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-golangci-lint
+      with:
+        path: ~/bin/golangci-lint
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.golangci-lint-version }}
     - name: Install golangci-lint
       run: |
+        echo ~/bin >> $GITHUB_PATH
+        ~/bin/golangci-lint --version && exit 0
+        mkdir -p ~/bin
         curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
-        sh -s -- -b $(go env GOPATH)/bin v1.42.1
+        sh -s -- -b ~/bin ${{ env.golangci-lint-version }}
     - uses: actions/setup-python@v2
-    - uses: actions/checkout@v2
     - uses: pre-commit/action@v2.0.3
 
   test:
@@ -35,10 +47,10 @@ jobs:
           --health-timeout=2s
           --health-retries=3
     steps:
+    - uses: actions/checkout@v2
     - uses: actions/setup-go@v2
       with:
         go-version: '1.16'
-    - uses: actions/checkout@v2
     - name: Run unit tests
       run: make test
     - name: Run integration tests
