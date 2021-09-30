@@ -29,6 +29,6 @@ func init() {
 	os.Stdout.Name()
 	flags.StringVarP(&exportOpt.Group, "group", "g", "", "feature group")
 	flags.StringSliceVarP(&exportOpt.Features, "name", "n", nil, "feature name")
-	flags.StringVarP(&exportOpt.OutputFile, "output-file", "o", os.Stdout.Name(), "output file")
+	flags.UintVarP(&exportOpt.Limit, "limit", "l", 0, "max records to export")
 	_ = exportCmd.MarkFlagRequired("group")
 }

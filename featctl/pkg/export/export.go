@@ -3,7 +3,9 @@ package export
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/joho/sqltocsv"
@@ -11,10 +13,10 @@ import (
 )
 
 type Option struct {
-	Group      string
-	Features   []string
-	OutputFile string
-	DBOption   database.Option
+	Group    string
+	Features []string
+	Limit    uint
+	DBOption database.Option
 }
 
 func downloadFeatures(ctx context.Context, db *database.DB, opt *Option, tableName string) error {
@@ -31,16 +33,19 @@ func downloadFeatures(ctx context.Context, db *database.DB, opt *Option, tableNa
 
 	fullTableName := fmt.Sprintf("%s.%s", dbo.DbName, tableName)
 	query := fmt.Sprintf("select %s from %s", fields, fullTableName)
+	if opt.Limit > 0 {
+		query += fmt.Sprintf(" LIMIT %d", opt.Limit)
+	}
 
-	return dumpCSV(ctx, db, opt.OutputFile, query)
+	return dumpCSV(ctx, db, os.Stdout, query)
 }
 
-func dumpCSV(ctx context.Context, db *database.DB, file string, query string, args ...interface{}) error {
+func dumpCSV(ctx context.Context, db *database.DB, w io.Writer, query string, args ...interface{}) error {
 	rows, err := db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
-	return sqltocsv.WriteFile(file, rows)
+	return sqltocsv.Write(w, rows)
 }
 
 func Export(ctx context.Context, option *Option) {
