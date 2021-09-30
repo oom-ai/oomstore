@@ -2,8 +2,8 @@ VERSION = $(shell (git describe --tags --abbrev=0 2>/dev/null || echo '0.0.0') |
 COMMIT = $(shell git rev-parse --short HEAD)
 
 OUT = build/
-export GOPROXY = direct
-export CGO_ENABLED = 0
+# export GOPROXY = direct
+# export CGO_ENABLED = 0
 
 .DEFAULT_GOAL := build
 
@@ -17,11 +17,15 @@ build: featctl
 
 .PHONY: featctl
 featctl:
-	$(MAKE) -C featctl
+	$(MAKE) -C featctl build
 
 .PHONY: test
 test:
 	@go test ./...
+
+.PHONY: integration-test
+integration-test:
+	$(MAKE) -C featctl integration-test
 
 .PHONY: lint
 lint:
@@ -29,4 +33,4 @@ lint:
 
 .PHONY: clean
 clean:
-	@rm -rf build
+	$(MAKE) -C featctl clean
