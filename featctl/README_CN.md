@@ -98,13 +98,12 @@ a9f0d6af575bb7e427fde2dcc81adbed,小米,3999
 
 **导出特征组**
 
-将特征组 `device` 的全部特征下载到 `/tmp/featctl/device-exported.csv`。
-
 ```sh
-featctl export --group device --output-file device-exported.csv
+featctl export --group device
 ```
 
 **列举特征配置**
+
 ```sh
 $ featctl list feature --group device
 Name,Group,Revision,Status,Category,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
