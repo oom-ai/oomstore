@@ -2,8 +2,6 @@ VERSION = $(shell (git describe --tags --abbrev=0 2>/dev/null || echo '0.0.0') |
 COMMIT = $(shell git rev-parse --short HEAD)
 
 OUT = build/
-export GOPROXY = direct
-export CGO_ENABLED = 0
 
 .DEFAULT_GOAL := build
 
