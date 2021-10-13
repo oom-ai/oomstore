@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
@@ -13,4 +15,32 @@ func (db *DB) GetFeature(ctx context.Context, featureName string) (*types.Featur
 		return nil, err
 	}
 	return &feature, nil
+}
+
+func (db *DB) ListFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.Feature, error) {
+	query := "SELECT * FROM feature"
+	cond, args := buildListFeatureCond(opt)
+	if len(cond) > 0 {
+		query = fmt.Sprintf("%s WHERE %s", query, cond)
+	}
+
+	features := make([]*types.Feature, 0)
+	if err := db.SelectContext(ctx, &features, query, args); err != nil {
+		return nil, err
+	}
+	return features, nil
+}
+
+func buildListFeatureCond(opt types.ListFeatureOpt) (string, []string) {
+	cond := make([]string, 0)
+	args := make([]string, 0)
+	if opt.EntityName != nil {
+		cond = append(cond, "entity_name = ?")
+		args = append(args, *opt.EntityName)
+	}
+	if opt.GroupName != nil {
+		cond = append(cond, "group_name = ?")
+		args = append(args, *opt.GroupName)
+	}
+	return strings.Join(cond, " AND "), args
 }
