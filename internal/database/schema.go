@@ -3,9 +3,10 @@ package database
 var META_SCHEMAS = map[string]string{
 	"feature": `
 		CREATE TABLE feature (
-			name       VARCHAR(32) NOT NULL COMMENT 'feature name',
-			group_name VARCHAR(32) NOT NULL COMMENT 'feature group name',
-			value_type VARCHAR(16) NOT NULL COMMENT 'sql data type of feature value',
+			name        VARCHAR(32) NOT NULL COMMENT 'feature name',
+			group_name  VARCHAR(32) NOT NULL COMMENT 'feature group name',
+			entity_name VARCHAR(32) NOT NULL COMMENT 'feature entity name',
+			value_type  VARCHAR(16) NOT NULL COMMENT 'sql data type of feature value',
 
 			description VARCHAR(128) DEFAULT NULL COMMENT 'feature description',
 			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
