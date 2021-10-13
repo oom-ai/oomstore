@@ -7,3 +7,8 @@ type OneStoreOpt struct {
 	Pass      string
 	Workspace string
 }
+
+type ListFeatureOpt struct {
+	EntityName *string
+	GroupName  *string
+}

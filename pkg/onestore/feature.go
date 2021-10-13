@@ -14,3 +14,11 @@ func (s *OneStore) GetFeature(ctx context.Context, featureName string) (*types.F
 	}
 	return feature, nil
 }
+
+func (s *OneStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.Feature, error) {
+	features, err := s.db.ListFeature(ctx, opt)
+	if err != nil {
+		return nil, err
+	}
+	return features, nil
+}
