@@ -29,3 +29,14 @@ type Revision struct {
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
 }
+
+type FeatureGroup struct {
+	Name        string    `db:"name"`
+	EntityName  string    `db:"entity_name"`
+	Revision    int64     `db:"revision"`
+	Category    string    `db:"category"`
+	DataTable   string    `db:"data_table"`
+	Description string    `db:"description"`
+	CreateTime  time.Time `db:"create_time"`
+	ModifyTime  time.Time `db:"modify_time"`
+}
