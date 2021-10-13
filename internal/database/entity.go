@@ -8,13 +8,13 @@ import (
 
 func (db *DB) CreateEntity(ctx context.Context, entityName, description string) error {
 	_, err := db.ExecContext(ctx,
-		"insert into entity(name, description) values(?, ?)",
+		"insert into feature_entity(name, description) values(?, ?)",
 		entityName, description)
 	return err
 }
 
 func (db *DB) ListEntity(ctx context.Context) ([]types.Entity, error) {
-	query := "select name, description, create_time, modify_time from entity"
+	query := "select name, description, create_time, modify_time from feature_entity"
 	entities := make([]types.Entity, 0)
 
 	if err := db.SelectContext(ctx, &entities, query); err != nil {
