@@ -19,3 +19,13 @@ type Feature struct {
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
 }
+
+type Revision struct {
+	Revision  string `db:"revision"`
+	GroupName string `db:"group_name"`
+	DataTable string `db:"data_table"`
+
+	Description string    `db:"description"`
+	CreateTime  time.Time `db:"create_time"`
+	ModifyTime  time.Time `db:"modify_time"`
+}
