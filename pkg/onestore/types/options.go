@@ -24,3 +24,10 @@ type CreateGroupOpt struct {
 	Category    string
 	Description string
 }
+
+type CreateBatchFeatureOpt struct {
+	FeatureName string
+	GroupName   string
+	ValueType   string
+	Description string
+}
