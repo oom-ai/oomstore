@@ -17,3 +17,12 @@ func (s *OneStore) CreateEntity(ctx context.Context, entityName, description str
 		Description: description,
 	}, nil
 }
+
+// ListEntity: get all entity
+func (s *OneStore) ListEntity(ctx context.Context) ([]types.Entity, error) {
+	entities, err := s.db.ListEntity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return entities, nil
+}
