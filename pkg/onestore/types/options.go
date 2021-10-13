@@ -17,3 +17,10 @@ type UpdateFeatureOpt struct {
 	FeatureName    string
 	NewDescription string
 }
+
+type CreateGroupOpt struct {
+	Name        string
+	EntityName  string
+	Category    string
+	Description string
+}
