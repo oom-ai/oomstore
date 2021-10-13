@@ -8,6 +8,20 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
+type CreateFeatureOpt struct {
+	FeatureName string
+	GroupName   string
+	EntityName  string
+	ValueType   string
+	Description string
+}
+
+func (db *DB) CreateFeature(ctx context.Context, opt CreateFeatureOpt) error {
+	query := "INSERT INTO entity(name, group_name, entity_name, value_type, description) VALUES (?, ?, ?, ?, ?)"
+	_, err := db.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.EntityName, opt.ValueType, opt.Description)
+	return err
+}
+
 func (db *DB) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
 	var feature types.Feature
 	query := `SELECT * FROM feature WHERE name = ?`
