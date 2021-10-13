@@ -21,7 +21,7 @@ type Option struct {
 	DbName string
 }
 
-func Open(option *Option) (*DB, error) {
+func Open(option Option) (*DB, error) {
 	return OpenWith(option.Host, option.Port, option.User, option.Pass, option.DbName)
 }
 
