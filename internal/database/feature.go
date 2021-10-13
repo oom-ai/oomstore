@@ -31,6 +31,12 @@ func (db *DB) ListFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*typ
 	return features, nil
 }
 
+func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
+	query := "UPDATE feature SET description = ? WHERE name = ?"
+	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName)
+	return err
+}
+
 func buildListFeatureCond(opt types.ListFeatureOpt) (string, []string) {
 	cond := make([]string, 0)
 	args := make([]string, 0)
