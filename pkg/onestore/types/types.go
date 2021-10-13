@@ -40,3 +40,8 @@ type FeatureGroup struct {
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
 }
+
+const (
+	BatchFeatureCategory  = "batch"
+	StreamFeatureCategory = "stream"
+)
