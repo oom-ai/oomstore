@@ -13,9 +13,9 @@ func (db *DB) CreateEntity(ctx context.Context, entityName, description string) 
 	return err
 }
 
-func (db *DB) ListEntity(ctx context.Context) ([]types.Entity, error) {
+func (db *DB) ListEntity(ctx context.Context) ([]*types.Entity, error) {
 	query := "select name, description, create_time, modify_time from feature_entity"
-	entities := make([]types.Entity, 0)
+	entities := make([]*types.Entity, 0)
 
 	if err := db.SelectContext(ctx, &entities, query); err != nil {
 		return nil, err
