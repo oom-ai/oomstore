@@ -12,3 +12,8 @@ type ListFeatureOpt struct {
 	EntityName *string
 	GroupName  *string
 }
+
+type UpdateFeatureOpt struct {
+	FeatureName    string
+	NewDescription string
+}

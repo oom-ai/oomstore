@@ -22,3 +22,7 @@ func (s *OneStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) ([
 	}
 	return features, nil
 }
+
+func (s *OneStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
+	return s.db.UpdateFeature(ctx, opt)
+}
