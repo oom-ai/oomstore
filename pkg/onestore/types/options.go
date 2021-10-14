@@ -18,7 +18,7 @@ type UpdateFeatureOpt struct {
 	NewDescription string
 }
 
-type CreateGroupOpt struct {
+type CreateFeatureGroupOpt struct {
 	Name        string
 	EntityName  string
 	Category    string
