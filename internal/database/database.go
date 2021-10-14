@@ -71,7 +71,7 @@ func (db *DB) TableExists(ctx context.Context, table string) (bool, error) {
 	}
 }
 
-type WalkFunc = func(values []interface{}) error
+type WalkFunc = func(slice []interface{}) error
 
 func (db *DB) WalkTable(ctx context.Context, table string, fields []string, limit *uint64, walkFunc WalkFunc) error {
 	marks := []string{}
@@ -94,11 +94,11 @@ func (db *DB) WalkTable(ctx context.Context, table string, fields []string, limi
 
 func walkRows(rows *sqlx.Rows, walkFunc WalkFunc) error {
 	for rows.Next() {
-		record, err := rows.SliceScan()
+		slice, err := rows.SliceScan()
 		if err != nil {
 			return err
 		}
-		if err := walkFunc(record); err != nil {
+		if err := walkFunc(slice); err != nil {
 			return err
 		}
 	}
