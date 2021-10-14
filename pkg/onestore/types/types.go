@@ -35,7 +35,7 @@ type RichFeature struct {
 }
 
 type Revision struct {
-	Revision  string `db:"revision"`
+	Revision  int64  `db:"revision"`
 	GroupName string `db:"group_name"`
 	DataTable string `db:"data_table"`
 
