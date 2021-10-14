@@ -82,10 +82,12 @@ func (db *DB) WalkTable(ctx context.Context, table string, fields []string, limi
 	if limit != nil {
 		query += fmt.Sprintf(" LIMIT %d", limit)
 	}
+
 	rows, err := db.QueryxContext(ctx, query, fields)
 	if err != nil {
 		return err
 	}
+	defer rows.Close()
 
 	return walkRows(rows, walkFunc)
 }
