@@ -30,7 +30,7 @@ func (s *OneStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt
 }
 
 func (s *OneStore) CreateBatchFeature(ctx context.Context, opt types.CreateBatchFeatureOpt) (*types.Feature, error) {
-	group, err := s.db.GetGroup(ctx, opt.GroupName)
+	group, err := s.db.GetFeatureGroup(ctx, opt.GroupName)
 	if err != nil {
 		return nil, err
 	}
