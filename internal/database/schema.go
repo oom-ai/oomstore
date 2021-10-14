@@ -5,7 +5,6 @@ var META_SCHEMAS = map[string]string{
 		CREATE TABLE feature (
 			name        VARCHAR(32) NOT NULL COMMENT 'feature name',
 			group_name  VARCHAR(32) NOT NULL COMMENT 'feature group name',
-			entity_name VARCHAR(32) NOT NULL COMMENT 'feature entity name',
 			value_type  VARCHAR(16) NOT NULL COMMENT 'sql data type of feature value',
 
 			description VARCHAR(128) DEFAULT NULL COMMENT 'feature description',
