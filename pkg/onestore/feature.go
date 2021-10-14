@@ -17,9 +17,13 @@ func (s *OneStore) GetFeature(ctx context.Context, featureName string) (*types.F
 }
 
 func (s *OneStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.Feature, error) {
-	features, err := s.db.ListFeature(ctx, opt)
+	richFeatures, err := s.db.ListRichFeature(ctx, opt)
 	if err != nil {
 		return nil, err
+	}
+	features := make([]*types.Feature, 0, len(richFeatures))
+	for _, rf := range richFeatures {
+		features = append(features, rf.ToFeature())
 	}
 	return features, nil
 }
