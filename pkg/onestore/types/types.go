@@ -3,30 +3,25 @@ package types
 import "time"
 
 type Entity struct {
-	Name        string `db:"name"`
-	Description string `db:"description"`
+	Name string `db:"name"`
 
-	CreateTime time.Time `db:"create_time"`
-	ModifyTime time.Time `db:"modify_time"`
+	Description string    `db:"description"`
+	CreateTime  time.Time `db:"create_time"`
+	ModifyTime  time.Time `db:"modify_time"`
 }
 
 type Feature struct {
-	Name        string    `db:"name"`
-	GroupName   string    `db:"group_name"`
-	ValueType   string    `db:"value_type"`
+	Name      string `db:"name"`
+	GroupName string `db:"group_name"`
+	ValueType string `db:"value_type"`
+
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
 }
 
 type RichFeature struct {
-	Name        string    `db:"name"`
-	GroupName   string    `db:"group_name"`
-	ValueType   string    `db:"value_type"`
-	Description string    `db:"description"`
-	CreateTime  time.Time `db:"create_time"`
-	ModifyTime  time.Time `db:"modify_time"`
-
+	Feature
 	EntityName string `db:"entity_name"`
 	Category   string `db:"category"`
 	Revision   int64  `db:"revision"`
@@ -44,11 +39,12 @@ type Revision struct {
 }
 
 type FeatureGroup struct {
-	Name        string    `db:"name"`
-	EntityName  string    `db:"entity_name"`
-	Revision    int64     `db:"revision"`
-	Category    string    `db:"category"`
-	DataTable   string    `db:"data_table"`
+	Name       string `db:"name"`
+	EntityName string `db:"entity_name"`
+	Revision   int64  `db:"revision"`
+	Category   string `db:"category"`
+	DataTable  string `db:"data_table"`
+
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
