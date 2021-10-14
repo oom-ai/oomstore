@@ -49,4 +49,13 @@ var META_SCHEMAS = map[string]string{
 			PRIMARY KEY pk(group_name, revision)
 		);
 		`,
+	"rich_feature": `
+        	CREATE VIEW rich_feature AS
+			SELECT
+				f.name, f.group_name, f.value_type, f.description, f.create_time, f.modify_time,
+				fg.entity_name, fg.category, fg.revision, fg.data_table
+			FROM feature AS f
+			LEFT JOIN feature_group AS fg
+			ON f.group_name = fg.name;
+	`,
 }
