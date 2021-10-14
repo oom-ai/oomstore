@@ -47,3 +47,8 @@ type CreateBatchFeatureOpt struct {
 	ValueType   string
 	Description string
 }
+
+type GetOnlineFeatureValuesOpt struct {
+	FeatureNames []string
+	EntityKeys   []string
+}
