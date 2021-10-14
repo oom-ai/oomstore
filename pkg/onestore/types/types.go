@@ -54,3 +54,10 @@ const (
 	BatchFeatureCategory  = "batch"
 	StreamFeatureCategory = "stream"
 )
+
+func (rf *RichFeature) ToFeature() *Feature {
+	if rf == nil {
+		return nil
+	}
+	return &rf.Feature
+}
