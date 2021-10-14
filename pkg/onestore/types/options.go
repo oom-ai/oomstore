@@ -41,11 +41,16 @@ type WalkFeatureValuesOpt struct {
 	WalkFeatureValuesFunc WalkFeatureValuesFunc
 }
 
-type CreateBatchFeatureOpt struct {
-	FeatureName string
+type ImportBatchFeaturesOpt struct {
 	GroupName   string
-	ValueType   string
 	Description string
+	DataSource  LocalFileDataSourceOpt
+}
+
+type LocalFileDataSourceOpt struct {
+	FilePath  string
+	Separator string
+	Delimiter string
 }
 
 type GetOnlineFeatureValuesOpt struct {
