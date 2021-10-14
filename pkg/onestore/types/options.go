@@ -32,7 +32,7 @@ type CreateFeatureGroupOpt struct {
 	Description string
 }
 
-type WalkFeatureValuesFunc = func(values []interface{}) error
+type WalkFeatureValuesFunc = func(key string, values []interface{}) error
 
 type WalkFeatureValuesOpt struct {
 	FeatureGroup          FeatureGroup
