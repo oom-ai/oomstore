@@ -25,6 +25,15 @@ type CreateFeatureGroupOpt struct {
 	Description string
 }
 
+type WalkFeatureValuesFunc = func(values []interface{}) error
+
+type WalkFeatureValuesOpt struct {
+	FeatureGroup          FeatureGroup
+	FeatureNames          []string
+	Limit                 *uint64
+	WalkFeatureValuesFunc WalkFeatureValuesFunc
+}
+
 type CreateBatchFeatureOpt struct {
 	FeatureName string
 	GroupName   string

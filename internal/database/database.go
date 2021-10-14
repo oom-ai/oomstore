@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -68,4 +69,36 @@ func (db *DB) TableExists(ctx context.Context, table string) (bool, error) {
 	default:
 		return true, nil
 	}
+}
+
+type WalkFunc = func(values []interface{}) error
+
+func (db *DB) WalkTable(ctx context.Context, table string, fields []string, limit *uint64, walkFunc WalkFunc) error {
+	marks := []string{}
+	for range fields {
+		marks = append(marks, "?")
+	}
+	query := fmt.Sprintf("select %s from %s", strings.Join(marks, ","), table)
+	if limit != nil {
+		query += fmt.Sprintf(" LIMIT %d", limit)
+	}
+	rows, err := db.QueryxContext(ctx, query, fields)
+	if err != nil {
+		return err
+	}
+
+	return walkRows(rows, walkFunc)
+}
+
+func walkRows(rows *sqlx.Rows, walkFunc WalkFunc) error {
+	for rows.Next() {
+		record, err := rows.SliceScan()
+		if err != nil {
+			return err
+		}
+		if err := walkFunc(record); err != nil {
+			return err
+		}
+	}
+	return nil
 }
