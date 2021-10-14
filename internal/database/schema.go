@@ -18,7 +18,7 @@ var META_SCHEMAS = map[string]string{
 		CREATE TABLE feature_group (
 			name        VARCHAR(32) NOT     NULL COMMENT 'group name',
 			entity_name VARCHAR(32) NOT     NULL COMMENT 'group entity field name',
-			revision    INT         DEFAULT NULL COMMENT 'group online point-in-time epoch seconds',
+			revision    BIGINT      DEFAULT NULL COMMENT 'group online point-in-time epoch seconds',
 			category    VARCHAR(16) NOT     NULL COMMENT 'group category: batch / stream',
 			data_table  VARCHAR(32) DEFAULT NULL COMMENT 'feature data table name',
 
@@ -41,7 +41,7 @@ var META_SCHEMAS = map[string]string{
 	"feature_group_revision": `
 		CREATE TABLE feature_group_revision (
 			group_name  VARCHAR(32) NOT NULL COMMENT 'group name',
-			revision    INT         NOT NULL COMMENT 'group data point-in-time epoch seconds',
+			revision    BIGINT      NOT NULL COMMENT 'group data point-in-time epoch seconds',
 			data_table  VARCHAR(32) NOT NULL COMMENT 'feature data table name',
 
 			description VARCHAR(64) DEFAULT NULL COMMENT 'group description',
