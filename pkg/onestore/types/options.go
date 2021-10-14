@@ -8,6 +8,13 @@ type OneStoreOpt struct {
 	Workspace string
 }
 
+type CreateFeatureOpt struct {
+	FeatureName string
+	GroupName   string
+	ValueType   string
+	Description string
+}
+
 type ListFeatureOpt struct {
 	EntityName *string
 	GroupName  *string
