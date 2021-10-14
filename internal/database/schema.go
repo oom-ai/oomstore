@@ -30,7 +30,7 @@ var META_SCHEMAS = map[string]string{
 		`,
 	"feature_entity": `
 		CREATE TABLE feature_entity (
-			name        VARCHAR(32) NOT     NULL COMMENT 'feature enitty name',
+			name        VARCHAR(32) NOT     NULL COMMENT 'feature entity name',
 
 			description VARCHAR(64) DEFAULT NULL COMMENT 'feature entity description',
 			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
