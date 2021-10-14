@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
@@ -29,4 +30,18 @@ func (db *DB) GetRichFeatures(ctx context.Context, featureNames []string) ([]*ty
 		return nil, err
 	}
 	return richFeatures, nil
+}
+
+func (db *DB) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error) {
+	query := "SELECT * FROM rich_feature"
+	cond, args := buildListFeatureCond(opt)
+	if len(cond) > 0 {
+		query = fmt.Sprintf("%s WHERE %s", query, cond)
+	}
+
+	features := make([]*types.RichFeature, 0)
+	if err := db.SelectContext(ctx, &features, query, args); err != nil {
+		return nil, err
+	}
+	return features, nil
 }
