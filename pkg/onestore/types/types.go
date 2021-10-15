@@ -8,7 +8,8 @@ const (
 )
 
 type Entity struct {
-	Name string `db:"name"`
+	Name   string `db:"name"`
+	Length int    `db:"length"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
