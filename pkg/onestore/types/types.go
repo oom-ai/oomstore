@@ -2,6 +2,11 @@ package types
 
 import "time"
 
+const (
+	BatchFeatureCategory  = "batch"
+	StreamFeatureCategory = "stream"
+)
+
 type Entity struct {
 	Name string `db:"name"`
 
@@ -50,14 +55,27 @@ type FeatureGroup struct {
 	ModifyTime  time.Time `db:"modify_time"`
 }
 
-const (
-	BatchFeatureCategory  = "batch"
-	StreamFeatureCategory = "stream"
-)
-
 func (rf *RichFeature) ToFeature() *Feature {
 	if rf == nil {
 		return nil
 	}
 	return &rf.Feature
+}
+
+type FeatureKV struct {
+	FeatureName  string
+	FeatureValue interface{}
+}
+
+func NewFeatureKV(name string, value interface{}) FeatureKV {
+	return FeatureKV{
+		FeatureName:  name,
+		FeatureValue: value,
+	}
+}
+
+type FeatureDataSet map[string][]FeatureKV
+
+func NewFeatureDataSet() FeatureDataSet {
+	return make(map[string][]FeatureKV)
 }
