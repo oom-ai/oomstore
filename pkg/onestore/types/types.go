@@ -9,7 +9,7 @@ const (
 
 type Entity struct {
 	Name   string `db:"name"`
-	Length uint   `db:"length"`
+	Length int    `db:"length"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
