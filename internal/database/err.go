@@ -26,6 +26,7 @@ package database
 
 import "github.com/go-sql-driver/mysql"
 
+// Copy from https://github.com/VividCortex/mysqlerr/blob/master/mysqlerr.go
 const (
 	ER_HASHCHK                                                                       = 1000 // OBSOLETE_ER_HASHCHK
 	ER_NISAMCHK                                                                      = 1001 // OBSOLETE_ER_NISAMCHK
