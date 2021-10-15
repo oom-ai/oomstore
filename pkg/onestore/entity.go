@@ -7,14 +7,15 @@ import (
 )
 
 // CreateEntity create an entity in the store
-func (s *OneStore) CreateEntity(ctx context.Context, entityName, description string) (*types.Entity, error) {
-	if err := s.db.CreateEntity(ctx, entityName, description); err != nil {
+func (s *OneStore) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) (*types.Entity, error) {
+	if err := s.db.CreateEntity(ctx, opt); err != nil {
 		return nil, err
 	}
 
 	return &types.Entity{
-		Name:        entityName,
-		Description: description,
+		Name:        opt.Name,
+		Length:      opt.Length,
+		Description: opt.Description,
 	}, nil
 }
 
