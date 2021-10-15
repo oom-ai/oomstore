@@ -11,6 +11,11 @@ import (
 func (db *DB) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt) error {
 	query := "INSERT INTO feature(name, group_name, value_type, description) VALUES (?, ?, ?, ?)"
 	_, err := db.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.ValueType, opt.Description)
+	if err != nil {
+		if errNumber := GetErrNumber(err); errNumber == ER_DUP_ENTRY {
+			return fmt.Errorf("feature %s already exist", opt.FeatureName)
+		}
+	}
 	return err
 }
 
