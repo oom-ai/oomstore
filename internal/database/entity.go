@@ -12,6 +12,15 @@ func (db *DB) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) error
 	return err
 }
 
+func (db *DB) GetEntity(ctx context.Context, name string) (*types.Entity, error) {
+	var entity types.Entity
+	query := "select * from feature_entity where name = ?"
+	if err := db.GetContext(ctx, &entity, query, name); err != nil {
+		return nil, err
+	}
+	return &entity, nil
+}
+
 func (db *DB) ListEntity(ctx context.Context) ([]*types.Entity, error) {
 	query := "select * from feature_entity"
 	entities := make([]*types.Entity, 0)
