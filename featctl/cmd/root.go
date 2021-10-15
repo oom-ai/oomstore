@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/onestore-ai/onestore/pkg/database"
+	"github.com/onestore-ai/onestore/pkg/onestore/types"
 	"github.com/onestore-ai/onestore/version"
 )
 
@@ -21,7 +22,10 @@ const (
 
 var cfgFile string
 var defaultCfgFile = filepath.Join(xdg.ConfigHome, "featctl", "config.yaml")
+
+// deprecating, use oneStoreOpt instead
 var dbOption database.Option
+var oneStoreOpt types.OneStoreOpt
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -49,11 +53,11 @@ func init() {
 	pFlags := rootCmd.PersistentFlags()
 	pFlags.StringVar(&cfgFile, "config", defaultCfgFile, "config file")
 
-	pFlags.StringVarP(&dbOption.Host, "host", "H", "127.0.0.1", "feature store database host")
-	pFlags.StringVarP(&dbOption.Port, "port", "P", "4000", "feature store database port")
-	pFlags.StringVarP(&dbOption.User, "user", "u", "root", "feature store database user")
-	pFlags.StringVarP(&dbOption.Pass, "pass", "p", "", "feature store database pass")
-	pFlags.StringVarP(&dbOption.DbName, "database", "d", "onestore", "feature store database name")
+	pFlags.StringVarP(&oneStoreOpt.Host, "host", "H", "127.0.0.1", "feature store database host")
+	pFlags.StringVarP(&oneStoreOpt.Port, "port", "P", "4000", "feature store database port")
+	pFlags.StringVarP(&oneStoreOpt.User, "user", "u", "root", "feature store database user")
+	pFlags.StringVarP(&oneStoreOpt.Pass, "pass", "p", "", "feature store database pass")
+	pFlags.StringVarP(&oneStoreOpt.Workspace, "workspace", "w", "onestore", "feature store workspace name")
 
 	rootCmd.SetVersionTemplate(`{{printf "%s\n" .Version}}`)
 }
