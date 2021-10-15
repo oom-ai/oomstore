@@ -17,10 +17,10 @@ import (
 )
 
 const CREATE_DATA_TABLE = "CREATE TABLE {{TABLE_NAME}} (\n" +
-	"`{{ENTITY_NAME}}` VARCHAR(32) COMMENT 'entity key' PRIMARY KEY,\n" +
+	"`{{ENTITY_NAME}}` VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY COMMENT 'entity key',\n" +
 	"{{COLUMN_DEFS}});"
 
-func buildFeatureGroupSchema(columns []*types.Feature) string {
+func buildFeatureDataTableSchema(tableName string, entity *types.Entity, columns []*types.Feature) string {
 	// sort to ensure the schema looks consistent
 	sort.Slice(columns, func(i, j int) bool {
 		return columns[i].Name < columns[j].Name
@@ -30,7 +30,13 @@ func buildFeatureGroupSchema(columns []*types.Feature) string {
 		columnDef := fmt.Sprintf("`%s` %s COMMENT '%s'", column.Name, column.ValueType, column.Description)
 		columnDefs = append(columnDefs, columnDef)
 	}
-	return strings.ReplaceAll(CREATE_DATA_TABLE, "{{COLUMN_DEFS}}", strings.Join(columnDefs, ",\n"))
+
+	// fill schema template
+	schema := strings.ReplaceAll(CREATE_DATA_TABLE, "{{TABLE_NAME}}", tableName)
+	schema = strings.ReplaceAll(schema, "{{ENTITY_NAME}}", entity.Name)
+	schema = strings.ReplaceAll(schema, "{{ENTITY_LENGTH}}", strconv.Itoa(entity.Length))
+	schema = strings.ReplaceAll(schema, "{{COLUMN_DEFS}}", strings.Join(columnDefs, ",\n"))
+	return schema
 }
 
 func getCsvHeader(filePath string) ([]string, error) {
@@ -102,14 +108,16 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	}
 
 	// create the data table
-	schema := buildFeatureGroupSchema(columns)
-	group, err := s.db.GetFeatureGroup(ctx, opt.GroupName)
+	group, err := s.GetFeatureGroup(ctx, opt.GroupName)
+	if err != nil {
+		return err
+	}
+	entity, err := s.GetEntity(ctx, group.EntityName)
 	if err != nil {
 		return err
 	}
 	tmpTableName := opt.GroupName + "_" + strconv.Itoa(rand.Intn(100000))
-	schema = strings.ReplaceAll(schema, "{{TABLE_NAME}}", tmpTableName)
-	schema = strings.ReplaceAll(schema, "{{ENTITY_NAME}}", group.EntityName)
+	schema := buildFeatureDataTableSchema(tmpTableName, entity, columns)
 	_, err = s.db.ExecContext(ctx, schema)
 	if err != nil {
 		return err
