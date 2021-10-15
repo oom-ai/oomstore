@@ -12,7 +12,7 @@ type TxFn func(*sql.Tx) error
 
 // WithTransaction creates a new transaction and handles rollback/commit based on the
 // error object returned by the `TxFn`
-func WithTransaction(db *DB, fn TxFn) (err error) {
+func (db *DB) WithTransaction(fn TxFn) (err error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return
