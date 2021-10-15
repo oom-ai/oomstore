@@ -14,7 +14,7 @@ $ featctl init
 
 下面展示如何将 `device.csv` 导入特征组 `device`。
 
-首先，准备样例数据和 schema 模板。
+首先，准备样例数据。
 
 ```sh
 #!/usr/bin/env bash
@@ -28,15 +28,6 @@ a9f0d6af575bb7e427fde2dcc81adbed,小米,MIX3,3999
 134d9facd06ff355bf53846c0407d4f4,华为,P40,5299
 0c66da7c680c4c44f33cb34881f1b104,苹果,IPHONE11,4999
 EOF
-
-cat <<-EOF > schema-template.sql
-CREATE TABLE {{TABLE_NAME}} (
-    entity_key VARCHAR(32) COMMENT '设备ID' PRIMARY KEY,
-    brand      VARCHAR(16) COMMENT '设备厂商',
-    model      VARCHAR(32) COMMENT '设备型号',
-    price      INT         COMMENT '设备价格'
-);
-EOF
 ```
 
 随后，执行导入。
@@ -44,8 +35,6 @@ EOF
 ```sh
 featctl import \
     --group device \
-    --revision 20210909 \
-    --schema-template schema-template.sql \
     --input-file device.csv \
     --separator "," \
     --description "test import"
