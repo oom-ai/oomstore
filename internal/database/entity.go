@@ -6,10 +6,9 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) CreateEntity(ctx context.Context, entityName, description string) error {
-	_, err := db.ExecContext(ctx,
-		"insert into feature_entity(name, description) values(?, ?)",
-		entityName, description)
+func (db *DB) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) error {
+	query := "insert into feature_entity(name, length, description) values(?, ?, ?)"
+	_, err := db.ExecContext(ctx, query, opt.Name, opt.Length, opt.Description)
 	return err
 }
 
