@@ -133,7 +133,7 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	ts := time.Now().Unix()
 
 	// in a txn, rename the data table, insert into feature_group_revision, update feature_group
-	err = database.WithTransaction(s.db, func(tx *sql.Tx) error {
+	err = s.db.WithTransaction(func(tx *sql.Tx) error {
 		finalTableName := opt.GroupName + "_" + strconv.FormatInt(ts, 10)
 		rename := fmt.Sprintf("RENAME `%s` TO `%s`", tmpTableName, finalTableName)
 		if _, err = tx.ExecContext(ctx, rename); err != nil {
