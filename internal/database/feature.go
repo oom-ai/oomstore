@@ -3,12 +3,33 @@ package database
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"strings"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
+func (db *DB) validateDataType(ctx context.Context, dataType string) error {
+	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Intn(100000))
+	return db.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS `%s`", tmpTableName)); err != nil {
+			return err
+		}
+		if _, err := tx.ExecContext(ctx, fmt.Sprintf("CREATE TABLE %s (a %s)", tmpTableName, dataType)); err != nil {
+			return err
+		}
+		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE `%s`", tmpTableName)); err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
 func (db *DB) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt) error {
+	if err := db.validateDataType(ctx, opt.ValueType); err != nil {
+		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
+	}
 	query := "INSERT INTO feature(name, group_name, value_type, description) VALUES (?, ?, ?, ?)"
 	_, err := db.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.ValueType, opt.Description)
 	if err != nil {
