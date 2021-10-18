@@ -2,34 +2,25 @@ package cmd
 
 import (
 	"context"
+	"log"
 
-	"github.com/onestore-ai/onestore/featctl/pkg/update_feature"
+	"github.com/onestore-ai/onestore/pkg/onestore/types"
 	"github.com/spf13/cobra"
 )
 
-var updateFeatureOpt update_feature.Option
+var updateFeatureOpt types.UpdateFeatureOpt
 
 var updateFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "update a specified feature",
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		flags := cmd.Flags()
-		updateFeatureOpt.RevisionChanged = flags.Changed("revision")
-		updateFeatureOpt.DescriptionChanged = flags.Changed("description")
-		updateFeatureOpt.StatusChanged = flags.Changed("status")
-		updateFeatureOpt.RevisionsLimitChanged = flags.Changed("revisions-limit")
-		updateFeatureOpt.DBOption = dbOption
-
-		if updateFeatureOpt.StatusChanged {
-			if err := validateStatus(updateFeatureOpt.Status); err != nil {
-				return err
-			}
-		}
-		return nil
-	},
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		update_feature.Run(ctx, &updateFeatureOpt)
+		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		updateFeatureOpt.FeatureName = args[0]
+		if err := oneStore.UpdateFeature(ctx, updateFeatureOpt); err != nil {
+			log.Fatalf("failed updating feature %s, err %v\n", updateFeatureOpt.FeatureName, err)
+		}
 	},
 }
 
@@ -38,14 +29,6 @@ func init() {
 
 	flags := updateFeatureCmd.Flags()
 
-	flags.StringVarP(&updateFeatureOpt.Group, "group", "g", "", "feature group")
-	_ = updateFeatureCmd.MarkFlagRequired("group")
-
-	flags.StringVarP(&updateFeatureOpt.Name, "name", "n", "", "feature name")
-	_ = updateFeatureCmd.MarkFlagRequired("name")
-
-	flags.StringVar(&updateFeatureOpt.Revision, "revision", "", "current revision")
-	flags.StringVar(&updateFeatureOpt.Description, "description", "", "feature description")
-	flags.StringVarP(&updateFeatureOpt.Status, "status", "s", "", "feature status")
-	flags.IntVar(&updateFeatureOpt.RevisionsLimit, "revisions-limit", 0, "feature history revisions limit")
+	flags.StringVarP(&updateFeatureOpt.NewDescription, "description", "d", "", "new feature description")
+	_ = updateFeatureCmd.MarkFlagRequired("description")
 }

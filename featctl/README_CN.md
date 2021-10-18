@@ -119,12 +119,8 @@ featctl update entity device \
 
 **修改特征配置**
 ```sh
-# 启用特征并将其版本指定为 20210909
-featctl update feature \
-    --name price \
-    --group device \
-    --revision 20210909 \
-    --status "enabled"
+featctl update feature price\
+    --description "phone price"
 ```
 
 **查询特征值**
