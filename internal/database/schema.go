@@ -11,7 +11,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
 			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
 			PRIMARY KEY pk(name)
-		);
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 		`,
 	"feature_group": `
 		CREATE TABLE feature_group (
@@ -25,7 +25,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
 			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
 			PRIMARY KEY pk(name)
-		);
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 		`,
 	"feature_entity": `
 		CREATE TABLE feature_entity (
@@ -36,7 +36,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
 			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
 			PRIMARY KEY pk(name)
-		);
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 		`,
 	"feature_group_revision": `
 		CREATE TABLE feature_group_revision (
@@ -48,7 +48,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 			create_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
 			modify_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
 			PRIMARY KEY pk(group_name, revision)
-		);
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 		`,
 }
 
