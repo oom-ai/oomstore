@@ -46,27 +46,22 @@ assert_eq() {
   fi
 }
 
-# import sample data with specified revision
+# import sample data
 import_sample() {
-    local revision=$1
-    info "import sample data $revision"
-
+    info "import sample data..."
     featctl import \
-    --group device \
-    --revision "$revision" \
-    --schema-template schema.sql \
+    --group phone \
+    --separator "," \
     --input-file device.csv \
     --description 'test data'
 }
 
-# register features in sample data with specified revision
+# register features for the sample data
 register_features() {
-    local revision=$1
-    info "register features with revision: $revision"
-    # register feature price
-    featctl register feature --group device --category batch --revision "$revision" --name price --description 'device average price'
-    # register feature model
-    featctl register feature --group device --category batch --revision "$revision" --name model --description 'device model name'
+    featctl register entity device --length 32
+    featctl register group phone --entity device
+    featctl register batch-feature price --value-type "int"
+    featctl register batch-feature model --value-type "varchar(32)"
 }
 
 execute_sql() {
