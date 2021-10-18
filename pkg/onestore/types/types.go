@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -112,5 +113,25 @@ func (e *Entity) String() string {
 		fmt.Sprintf("Description:   %s", e.Description),
 		fmt.Sprintf("CreateTime:    %s", e.CreateTime.Format(time.RFC3339)),
 		fmt.Sprintf("ModifyTime:    %s", e.ModifyTime.Format(time.RFC3339)),
+	}, "\n")
+}
+
+func (fg *FeatureGroup) String() string {
+	revision := "NULL"
+	dataTable := "NULL"
+	if fg.Revision != nil {
+		revision = strconv.Itoa(int(*fg.Revision))
+	}
+	if fg.DataTable != nil {
+		dataTable = *fg.DataTable
+	}
+	return strings.Join([]string{
+		fmt.Sprintf("Name:          %s", fg.Name),
+		fmt.Sprintf("Entity:        %s", fg.EntityName),
+		fmt.Sprintf("Description:   %s", fg.Description),
+		fmt.Sprintf("Revision:      %s", revision),
+		fmt.Sprintf("DataTable:     %s", dataTable),
+		fmt.Sprintf("CreateTime:    %s", fg.CreateTime.Format(time.RFC3339)),
+		fmt.Sprintf("ModifyTime:    %s", fg.ModifyTime.Format(time.RFC3339)),
 	}, "\n")
 }
