@@ -2,30 +2,28 @@ package cmd
 
 import (
 	"context"
+	"fmt"
+	"log"
 
-	"github.com/onestore-ai/onestore/featctl/pkg/describe_feature"
 	"github.com/spf13/cobra"
 )
-
-var describeFeatureOpt describe_feature.Option
 
 var describeFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "show details of a specific feature",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		describeFeatureOpt.DBOption = dbOption
-		describe_feature.Run(context.Background(), &describeFeatureOpt)
+		ctx := context.Background()
+		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		featureName := args[0]
+		richFeature, err := oneStore.GetRichFeature(ctx, featureName)
+		if err != nil {
+			log.Fatalf("failed getting feature %s, err %v\n", featureName, err)
+		}
+		fmt.Println(richFeature.String())
 	},
 }
 
 func init() {
 	describeCmd.AddCommand(describeFeatureCmd)
-
-	flags := describeFeatureCmd.Flags()
-
-	flags.StringVarP(&describeFeatureOpt.Group, "group", "g", "", "feature group")
-	_ = describeFeatureCmd.MarkFlagRequired("group")
-
-	flags.StringVarP(&describeFeatureOpt.Name, "name", "n", "", "feature name")
-	_ = describeFeatureCmd.MarkFlagRequired("name")
 }
