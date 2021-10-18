@@ -63,3 +63,13 @@ type GetOnlineFeatureValuesOpt struct {
 	FeatureNames []string
 	EntityKeys   []string
 }
+
+type EntityRow struct {
+	EntityKey string
+	UnixTime  int64
+}
+
+type GetHistoricalFeatureValuesOpt struct {
+	FeatureNames []string
+	EntityRows   []EntityRow
+}
