@@ -38,7 +38,7 @@ set -euo pipefail
 mkdir -p /tmp/featctl && cd /tmp/featctl
 
 cat <<-EOF > device.csv
-entity_key,brand,model,price
+device,brand,model,price
 a9f0d6af575bb7e427fde2dcc81adbed,小米,MIX3,3999
 134d9facd06ff355bf53846c0407d4f4,华为,P40,5299
 0c66da7c680c4c44f33cb34881f1b104,苹果,IPHONE11,4999

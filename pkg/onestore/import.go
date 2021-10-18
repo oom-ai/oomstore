@@ -91,23 +91,7 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return err
 	}
 
-	// make sure csv data source has all defined columns
-	header, err := getCsvHeader(opt.DataSource.FilePath)
-	if err != nil {
-		return err
-	}
-	if hasDup(header) {
-		return fmt.Errorf("csv data source has duplicated columns: %v", header)
-	}
-	var columnNames []string
-	for _, column := range columns {
-		columnNames = append(columnNames, column.Name)
-	}
-	if !stringSliceEqual(header, columnNames) {
-		return fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
-	}
-
-	// create the data table
+	// get entity info
 	group, err := s.GetFeatureGroup(ctx, opt.GroupName)
 	if err != nil {
 		return err
@@ -116,6 +100,24 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	if err != nil {
 		return err
 	}
+
+	// make sure csv data source has all defined columns
+	header, err := getCsvHeader(opt.DataSource.FilePath)
+	if err != nil {
+		return err
+	}
+	if hasDup(header) {
+		return fmt.Errorf("csv data source has duplicated columns: %v", header)
+	}
+	columnNames := []string{entity.Name}
+	for _, column := range columns {
+		columnNames = append(columnNames, column.Name)
+	}
+	if !stringSliceEqual(header, columnNames) {
+		return fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
+	}
+
+	// create the data table
 	tmpTableName := opt.GroupName + "_" + strconv.Itoa(rand.Intn(100000))
 	schema := buildFeatureDataTableSchema(tmpTableName, entity, columns)
 	_, err = s.db.ExecContext(ctx, schema)
