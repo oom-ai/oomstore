@@ -77,3 +77,8 @@ type UpdateEntityOpt struct {
 	EntityName     string
 	NewDescription string
 }
+
+type UpdateFeatureGroupOpt struct {
+	GroupName      string
+	NewDescription string
+}
