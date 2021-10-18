@@ -22,7 +22,7 @@ featctl register group device_baseinfo --entity device --description "设备基�
 
 **注册特征**
 ```sh
-featctl register feature model --group device --value-type "varchar(30)" --description 'phone model'
+featctl register batch-feature model --group device --value-type "varchar(30)" --description 'phone model'
 ```
 
 **导入批特征数据**
