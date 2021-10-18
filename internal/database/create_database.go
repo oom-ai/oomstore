@@ -33,7 +33,15 @@ func CreateDatabase(ctx context.Context, opt Option) (err error) {
 		return
 	}
 
-	for _, schema := range META_SCHEMAS {
+	// create meta tables
+	for _, schema := range META_TABLE_SCHEMAS {
+		if _, err = tx.ExecContext(ctx, schema); err != nil {
+			return
+		}
+	}
+
+	// create meta views
+	for _, schema := range META_VIEW_SCHEMAS {
 		if _, err = tx.ExecContext(ctx, schema); err != nil {
 			return
 		}
