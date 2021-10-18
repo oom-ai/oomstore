@@ -6,7 +6,7 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (s *OneStore) CreateGroup(ctx context.Context, opt types.CreateFeatureGroupOpt) error {
+func (s *OneStore) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt) error {
 	return s.db.CreateFeatureGroup(ctx, opt)
 }
 
