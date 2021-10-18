@@ -25,6 +25,12 @@ type UpdateFeatureOpt struct {
 	NewDescription string
 }
 
+type CreateEntityOpt struct {
+	Name        string
+	Length      int
+	Description string
+}
+
 type CreateFeatureGroupOpt struct {
 	Name        string
 	EntityName  string
