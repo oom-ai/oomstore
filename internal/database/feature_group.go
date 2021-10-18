@@ -46,6 +46,13 @@ func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*type
 		return nil, err
 	}
 	return groups, nil
+
+}
+
+func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
+	query := "UPDATE feature_group SET description = ? WHERE name = ?"
+	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.GroupName)
+	return err
 }
 
 func UpdateFeatureGroupRevision(ctx context.Context, tx *sqlx.Tx, revision int64, dataTable string, groupName string) error {
