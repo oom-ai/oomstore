@@ -10,6 +10,9 @@ import (
 )
 
 func (db *DB) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt, category string) error {
+	if category != types.BatchFeatureCategory && category != types.StreamFeatureCategory {
+		return fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", category)
+	}
 	query := "insert into feature_group(name, entity_name, category, description) values(?, ?, ?, ?)"
 	_, err := db.ExecContext(ctx, query, opt.Name, opt.EntityName, category, opt.Description)
 	return err
