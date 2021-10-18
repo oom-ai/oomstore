@@ -149,3 +149,23 @@ func (fg *FeatureGroup) String() string {
 		fmt.Sprintf("ModifyTime:    %s", fg.ModifyTime.Format(time.RFC3339)),
 	}, "\n")
 }
+
+func RichFeatureCsvHeader() string {
+	return strings.Join([]string{"Name", "Group", "Entity", "Category", "ValueType", "Description", "Revision", "DataTable", "CreateTime", "ModifyTime"}, ",")
+}
+
+func (r *RichFeature) ToCsvRecord() string {
+	var revision, dataTable string
+	if r.Revision == nil {
+		revision = ""
+	} else {
+		revision = strconv.FormatInt(*r.Revision, 10)
+	}
+	if r.DataTable == nil {
+		dataTable = ""
+	} else {
+		dataTable = *r.DataTable
+	}
+
+	return strings.Join([]string{r.Name, r.GroupName, r.EntityName, r.Category, r.ValueType, r.Description, revision, dataTable, r.CreateTime.Format(time.RFC3339), r.ModifyTime.Format(time.RFC3339)}, ",")
+}
