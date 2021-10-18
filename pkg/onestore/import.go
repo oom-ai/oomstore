@@ -148,7 +148,7 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		}
 
 		// update feature_group table
-		if err = database.UpdateFeatureGroup(ctx, tx, ts, finalTableName, opt.GroupName); err != nil {
+		if err = database.UpdateFeatureGroupRevision(ctx, tx, ts, finalTableName, opt.GroupName); err != nil {
 			return err
 		}
 
