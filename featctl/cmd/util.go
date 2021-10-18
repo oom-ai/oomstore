@@ -1,7 +1,12 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"log"
+
+	"github.com/onestore-ai/onestore/pkg/onestore"
+	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
 var validCategories = []string{
@@ -36,4 +41,12 @@ func validateCategory(value string) error {
 
 func validateStatus(value string) error {
 	return validateEnum("status", value, validStatus)
+}
+
+func mustOpenOneStore(ctx context.Context, opt types.OneStoreOpt) *onestore.OneStore {
+	store, err := onestore.Open(ctx, oneStoreOpt)
+	if err != nil {
+		log.Fatalf("failed opening OneStore: %v", err)
+	}
+	return store
 }
