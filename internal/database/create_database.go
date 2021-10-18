@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 )
 
@@ -17,35 +18,24 @@ func CreateDatabase(ctx context.Context, opt Option) (err error) {
 
 	// Use translation to guarantee the following operations be executed
 	// on the same connection: http://go-database-sql.org/modifying.html
-	tx, err := db.BeginTx(ctx, nil)
-	if err != nil {
-		return
-	}
-	defer func() {
-		if err != nil {
-			_ = tx.Rollback()
-			return
+	return db.WithTransaction(func(t *sql.Tx) error {
+		if _, err = t.ExecContext(ctx, fmt.Sprintf("USE `%s`", opt.DbName)); err != nil {
+			return err
 		}
-		err = tx.Commit()
-	}()
-
-	if _, err = tx.ExecContext(ctx, fmt.Sprintf("USE `%s`", opt.DbName)); err != nil {
-		return
-	}
-
-	// create meta tables
-	for _, schema := range META_TABLE_SCHEMAS {
-		if _, err = tx.ExecContext(ctx, schema); err != nil {
-			return
+		// create meta tables
+		for _, schema := range META_TABLE_SCHEMAS {
+			if _, err = t.ExecContext(ctx, schema); err != nil {
+				return err
+			}
 		}
-	}
 
-	// create meta views
-	for _, schema := range META_VIEW_SCHEMAS {
-		if _, err = tx.ExecContext(ctx, schema); err != nil {
-			return
+		// create meta views
+		for _, schema := range META_VIEW_SCHEMAS {
+			if _, err = t.ExecContext(ctx, schema); err != nil {
+				return err
+			}
 		}
-	}
 
-	return
+		return nil
+	})
 }
