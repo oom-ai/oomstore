@@ -94,7 +94,7 @@ func (rf *RichFeature) String() string {
 	var revision, dataTable string
 
 	if rf.Revision == nil {
-		revision = "NULL"
+		revision = "<NULL>"
 	} else {
 		revision = fmt.Sprint(*rf.Revision)
 	}
