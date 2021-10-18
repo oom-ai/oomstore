@@ -19,4 +19,9 @@ func (s *OneStore) GetFeatureGroup(ctx context.Context, groupName string) (*type
 
 func (s *OneStore) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
 	return s.db.ListFeatureGroup(ctx, entityName)
+
+}
+
+func (s *OneStore) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
+	return s.db.UpdateFeatureGroup(ctx, opt)
 }
