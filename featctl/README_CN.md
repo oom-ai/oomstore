@@ -20,6 +20,11 @@ featctl register entity device --length 32 --description "设备信息"
 featctl register group device_baseinfo --entity device --description "设备基础信息"
 ```
 
+**注册特征**
+```sh
+featctl register feature model --group device --value-type "varchar(30)" --description 'phone model'
+```
+
 **导入批特征数据**
 
 下面展示如何将 `device.csv` 导入特征组 `device`。
