@@ -65,6 +65,14 @@ CreateTime:     2021-09-10T15:20:43Z
 ModifyTime:     2021-09-13T18:58:34Z
 ```
 
+**列举实体**
+```
+$ featctl list entity
+Name,Length,Description,CreateTime,ModifyTime
+device,32,"registered device",2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+user,48,"registered user",2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+```
+
 **查看特征组详情**
 ```
 $ featctl describe group device_info
