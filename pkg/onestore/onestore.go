@@ -28,6 +28,10 @@ func Create(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 	return Open(ctx, opt)
 }
 
+func (s *OneStore) Close() error {
+	return s.db.Close()
+}
+
 func toDatabaseOption(opt *types.OneStoreOpt) database.Option {
 	return database.Option{
 		Host:   opt.Host,
