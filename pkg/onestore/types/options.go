@@ -72,3 +72,8 @@ type GetHistoricalFeatureValuesOpt struct {
 	FeatureNames []string
 	EntityRows   []EntityRow
 }
+
+type UpdateEntityOpt struct {
+	EntityName     string
+	NewDescription string
+}

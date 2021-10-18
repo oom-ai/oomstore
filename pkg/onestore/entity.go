@@ -22,3 +22,7 @@ func (s *OneStore) GetEntity(ctx context.Context, name string) (*types.Entity, e
 func (s *OneStore) ListEntity(ctx context.Context) ([]*types.Entity, error) {
 	return s.db.ListEntity(ctx)
 }
+
+func (s *OneStore) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) error {
+	return s.db.UpdateEntity(ctx, opt)
+}
