@@ -3,14 +3,11 @@ SDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd) && cd "$SDIR" || exit 1
 source ./util.sh
 
 init_store
-import_sample v1
-register_features v1
+register_features
 
 case='featctl import using absolute path'
 featctl import \
-    --group device \
-    --revision v2 \
-    --schema-template "$(pwd)/schema.sql" \
+    --group phone \
     --input-file "$(pwd)/device.csv" \
     --description 'test data'
 actual=$?

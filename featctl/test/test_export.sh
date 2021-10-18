@@ -3,8 +3,8 @@ SDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd) && cd "$SDIR" || exit 1
 source ./util.sh
 
 init_store
-import_sample v1
-register_features v1
+register_features
+import_sample
 
 case='featctl export all'
 expected='entity_key,price
