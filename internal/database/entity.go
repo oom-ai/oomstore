@@ -30,3 +30,9 @@ func (db *DB) ListEntity(ctx context.Context) ([]*types.Entity, error) {
 	}
 	return entities, nil
 }
+
+func (db *DB) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) error {
+	query := "UPDATE entity SET description = ? WHERE name = ?"
+	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.EntityName)
+	return err
+}
