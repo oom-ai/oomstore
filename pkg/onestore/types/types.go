@@ -1,6 +1,10 @@
 package types
 
-import "time"
+import (
+	"fmt"
+	"strings"
+	"time"
+)
 
 const (
 	BatchFeatureCategory  = "batch"
@@ -84,4 +88,19 @@ func NewFeatureDataSet() FeatureDataSet {
 type EntityRowWithFeatures struct {
 	EntityRow
 	FeatureValues []FeatureKV
+}
+
+func (rf *RichFeature) String() string {
+	return strings.Join([]string{
+		fmt.Sprintf("Name:          %s", rf.Name),
+		fmt.Sprintf("Group:         %s", rf.GroupName),
+		fmt.Sprintf("Entity:        %s", rf.EntityName),
+		fmt.Sprintf("Category:      %s", rf.Category),
+		fmt.Sprintf("ValueType:     %s", rf.ValueType),
+		fmt.Sprintf("Description:   %s", rf.Description),
+		fmt.Sprintf("Revision:      %d", rf.Revision),
+		fmt.Sprintf("DataTable:     %s", rf.DataTable),
+		fmt.Sprintf("CreateTime:    %s", rf.CreateTime.Format(time.RFC3339)),
+		fmt.Sprintf("ModifyTime:    %s", rf.ModifyTime.Format(time.RFC3339)),
+	}, "\n")
 }
