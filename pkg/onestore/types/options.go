@@ -34,7 +34,6 @@ type CreateEntityOpt struct {
 type CreateFeatureGroupOpt struct {
 	Name        string
 	EntityName  string
-	Category    string
 	Description string
 }
 
