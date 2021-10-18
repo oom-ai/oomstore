@@ -117,36 +117,38 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
-	// create the data table
-	tmpTableName := opt.GroupName + "_" + strconv.Itoa(rand.Intn(100000))
-	schema := buildFeatureDataTableSchema(tmpTableName, entity, columns)
-	_, err = s.db.ExecContext(ctx, schema)
-	if err != nil {
-		return err
-	}
-
-	// populate the data table
-	err = s.db.LoadLocalFile(ctx, opt.DataSource.FilePath, tmpTableName, opt.DataSource.Separator, opt.DataSource.Delimiter, header)
-	if err != nil {
-		return err
-	}
-
-	// now get a timestamp
-	ts := time.Now().Unix()
-
-	// in a txn, rename the data table, insert into feature_group_revision, update feature_group
 	err = s.db.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+		// create the data table
+		tmpTableName := opt.GroupName + "_" + strconv.Itoa(rand.Intn(100000))
+		schema := buildFeatureDataTableSchema(tmpTableName, entity, columns)
+		_, err = s.db.ExecContext(ctx, schema)
+		if err != nil {
+			return err
+		}
+
+		// populate the data table
+		err = s.db.LoadLocalFile(ctx, opt.DataSource.FilePath, tmpTableName, opt.DataSource.Separator, opt.DataSource.Delimiter, header)
+		if err != nil {
+			return err
+		}
+
+		// now get a timestamp
+		ts := time.Now().Unix()
+
+		// rename
 		finalTableName := opt.GroupName + "_" + strconv.FormatInt(ts, 10)
-		rename := fmt.Sprintf("RENAME `%s` TO `%s`", tmpTableName, finalTableName)
+		rename := fmt.Sprintf("RENAME TABLE `%s` TO `%s`", tmpTableName, finalTableName)
 		if _, err = tx.ExecContext(ctx, rename); err != nil {
 			return err
 		}
 
+		// insert into feature_group_revision table
 		if err = database.InsertRevision(ctx, tx, opt.GroupName, ts, finalTableName, opt.Description); err != nil {
 			return err
 		}
 
-		if err = database.UpdateFeatureGroup(ctx, tx, opt.GroupName, ts, finalTableName); err != nil {
+		// update feature_group table
+		if err = database.UpdateFeatureGroup(ctx, tx, ts, finalTableName, opt.GroupName); err != nil {
 			return err
 		}
 
