@@ -2,7 +2,6 @@ package onestore
 
 import (
 	"context"
-	"database/sql"
 	"encoding/csv"
 	"fmt"
 	"math/rand"
@@ -12,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
@@ -133,7 +133,7 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	ts := time.Now().Unix()
 
 	// in a txn, rename the data table, insert into feature_group_revision, update feature_group
-	err = s.db.WithTransaction(ctx, func(ctx context.Context, tx *sql.Tx) error {
+	err = s.db.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		finalTableName := opt.GroupName + "_" + strconv.FormatInt(ts, 10)
 		rename := fmt.Sprintf("RENAME `%s` TO `%s`", tmpTableName, finalTableName)
 		if _, err = tx.ExecContext(ctx, rename); err != nil {

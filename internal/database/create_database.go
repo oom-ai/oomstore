@@ -2,8 +2,9 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
+
+	"github.com/jmoiron/sqlx"
 )
 
 func CreateDatabase(ctx context.Context, opt Option) (err error) {
@@ -18,7 +19,7 @@ func CreateDatabase(ctx context.Context, opt Option) (err error) {
 
 	// Use translation to guarantee the following operations be executed
 	// on the same connection: http://go-database-sql.org/modifying.html
-	return db.WithTransaction(ctx, func(ctx context.Context, tx *sql.Tx) error {
+	return db.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		if _, err = tx.ExecContext(ctx, fmt.Sprintf("USE `%s`", opt.DbName)); err != nil {
 			return err
 		}
