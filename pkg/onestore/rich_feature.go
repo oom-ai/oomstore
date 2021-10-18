@@ -14,3 +14,11 @@ func (s *OneStore) GetRichFeature(ctx context.Context, featureName string) (*typ
 	}
 	return feature, nil
 }
+
+func (s *OneStore) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error) {
+	features, err := s.db.ListRichFeature(ctx, opt)
+	if err != nil {
+		return nil, err
+	}
+	return features, nil
+}
