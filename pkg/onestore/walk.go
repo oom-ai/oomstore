@@ -33,7 +33,11 @@ func (s *OneStore) WalkFeatureValues(ctx context.Context, opt types.WalkFeatureV
 	fields = append([]string{opt.FeatureGroup.EntityName}, fields...)
 
 	table := opt.FeatureGroup.DataTable
-	return s.db.WalkTable(ctx, table, fields, opt.Limit, func(slice []interface{}) error {
+	if table == nil {
+		return fmt.Errorf("feature group '%s' data source not set", opt.FeatureGroup.Name)
+	}
+
+	return s.db.WalkTable(ctx, *table, fields, opt.Limit, func(slice []interface{}) error {
 		if len(slice) < 1 {
 			return fmt.Errorf("empty row")
 		}
