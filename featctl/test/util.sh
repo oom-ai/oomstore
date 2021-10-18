@@ -60,8 +60,8 @@ import_sample() {
 register_features() {
     featctl register entity device --length 32
     featctl register group phone --entity device
-    featctl register batch-feature price --value-type "int"
-    featctl register batch-feature model --value-type "varchar(32)"
+    featctl register batch-feature price --group phone --value-type "int"
+    featctl register batch-feature model --group phone --value-type "varchar(32)"
 }
 
 execute_sql() {
