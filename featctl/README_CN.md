@@ -111,6 +111,12 @@ featctl register feature \
     --description "设备价格"
 ```
 
+**修改实体配置**
+```sh
+featctl update entity device \
+    --description "registered device"
+```
+
 **修改特征配置**
 ```sh
 # 启用特征并将其版本指定为 20210909
