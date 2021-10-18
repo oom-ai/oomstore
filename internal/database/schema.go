@@ -7,7 +7,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 			group_name  VARCHAR(32) NOT NULL COMMENT 'feature group name',
 			value_type  VARCHAR(16) NOT NULL COMMENT 'sql data type of feature value',
 
-			description VARCHAR(128) DEFAULT NULL COMMENT 'feature description',
+			description VARCHAR(128) DEFAULT "" COMMENT 'feature description',
 			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
 			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
 			PRIMARY KEY pk(name)
@@ -21,7 +21,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 			category    VARCHAR(16) NOT     NULL COMMENT 'group category: batch / stream',
 			data_table  VARCHAR(64) DEFAULT NULL COMMENT 'feature data table name',
 
-			description VARCHAR(64) DEFAULT NULL COMMENT 'group description',
+			description VARCHAR(64) DEFAULT "" COMMENT 'group description',
 			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
 			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
 			PRIMARY KEY pk(name)
@@ -32,7 +32,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 			name    VARCHAR(32) NOT NULL COMMENT 'feature entity name',
 			length	SMALLINT    NOT NULL COMMENT 'feature entity value max length',
 
-			description VARCHAR(64) DEFAULT NULL COMMENT 'feature entity description',
+			description VARCHAR(64) DEFAULT "" COMMENT 'feature entity description',
 			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
 			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
 			PRIMARY KEY pk(name)
@@ -44,7 +44,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 			revision    BIGINT      NOT NULL COMMENT 'group data point-in-time epoch seconds',
 			data_table  VARCHAR(64) NOT NULL COMMENT 'feature data table name',
 
-			description VARCHAR(64) DEFAULT NULL COMMENT 'group description',
+			description VARCHAR(64) DEFAULT "" COMMENT 'group description',
 			create_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
 			modify_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
 			PRIMARY KEY pk(group_name, revision)
