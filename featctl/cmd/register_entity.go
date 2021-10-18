@@ -15,6 +15,7 @@ var registerEntityCmd = &cobra.Command{
 	Short: "register a new entity",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		registerEntityOpt.Name = args[0]
 		ctx := context.Background()
 		onestore := mustOpenOneStore(ctx, oneStoreOpt)
 		if _, err := onestore.CreateEntity(ctx, registerEntityOpt); err != nil {
