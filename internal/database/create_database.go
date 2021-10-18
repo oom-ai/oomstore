@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 )
 
 func CreateDatabase(ctx context.Context, opt Option) (err error) {
@@ -10,7 +11,7 @@ func CreateDatabase(ctx context.Context, opt Option) (err error) {
 		return
 	}
 	defer db.Close()
-	if _, err = db.ExecContext(ctx, "CREATE DATABASE ?", opt.DbName); err != nil {
+	if _, err = db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE `%s`", opt.DbName)); err != nil {
 		return
 	}
 
@@ -28,7 +29,7 @@ func CreateDatabase(ctx context.Context, opt Option) (err error) {
 		err = tx.Commit()
 	}()
 
-	if _, err = tx.ExecContext(ctx, "USE ?", opt.DbName); err != nil {
+	if _, err = tx.ExecContext(ctx, fmt.Sprintf("USE `%s`", opt.DbName)); err != nil {
 		return
 	}
 
