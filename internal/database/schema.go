@@ -1,6 +1,6 @@
 package database
 
-var META_SCHEMAS = map[string]string{
+var META_TABLE_SCHEMAS = map[string]string{
 	"feature": `
 		CREATE TABLE feature (
 			name        VARCHAR(32) NOT NULL COMMENT 'feature name',
@@ -50,6 +50,9 @@ var META_SCHEMAS = map[string]string{
 			PRIMARY KEY pk(group_name, revision)
 		);
 		`,
+}
+
+var META_VIEW_SCHEMAS = map[string]string{
 	"rich_feature": `
         	CREATE VIEW rich_feature AS
 			SELECT
