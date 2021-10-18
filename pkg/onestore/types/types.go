@@ -33,10 +33,10 @@ type Feature struct {
 
 type RichFeature struct {
 	Feature
-	EntityName string `db:"entity_name"`
-	Category   string `db:"category"`
-	Revision   int64  `db:"revision"`
-	DataTable  string `db:"data_table"`
+	EntityName string  `db:"entity_name"`
+	Category   string  `db:"category"`
+	Revision   *int64  `db:"revision"`
+	DataTable  *string `db:"data_table"`
 }
 
 type Revision struct {
@@ -92,6 +92,20 @@ type EntityRowWithFeatures struct {
 }
 
 func (rf *RichFeature) String() string {
+	var revision, dataTable string
+
+	if rf.Revision == nil {
+		revision = "<NULL>"
+	} else {
+		revision = fmt.Sprint(*rf.Revision)
+	}
+
+	if rf.DataTable == nil {
+		dataTable = "<NULL>"
+	} else {
+		dataTable = *rf.DataTable
+	}
+
 	return strings.Join([]string{
 		fmt.Sprintf("Name:          %s", rf.Name),
 		fmt.Sprintf("Group:         %s", rf.GroupName),
@@ -99,8 +113,8 @@ func (rf *RichFeature) String() string {
 		fmt.Sprintf("Category:      %s", rf.Category),
 		fmt.Sprintf("ValueType:     %s", rf.ValueType),
 		fmt.Sprintf("Description:   %s", rf.Description),
-		fmt.Sprintf("Revision:      %d", rf.Revision),
-		fmt.Sprintf("DataTable:     %s", rf.DataTable),
+		fmt.Sprintf("Revision:      %s", revision),
+		fmt.Sprintf("DataTable:     %s", dataTable),
 		fmt.Sprintf("CreateTime:    %s", rf.CreateTime.Format(time.RFC3339)),
 		fmt.Sprintf("ModifyTime:    %s", rf.ModifyTime.Format(time.RFC3339)),
 	}, "\n")

@@ -69,10 +69,14 @@ func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.GetOnlin
 func buildDataTableMap(features []*types.RichFeature) map[string][]string {
 	dataTableMap := make(map[string][]string)
 	for _, f := range features {
-		if _, ok := dataTableMap[f.DataTable]; !ok {
-			dataTableMap[f.DataTable] = make([]string, 0)
+		if f.DataTable == nil {
+			continue
 		}
-		dataTableMap[f.DataTable] = append(dataTableMap[f.DataTable], f.Name)
+		dataTable := *f.DataTable
+		if _, ok := dataTableMap[dataTable]; !ok {
+			dataTableMap[dataTable] = make([]string, 0)
+		}
+		dataTableMap[dataTable] = append(dataTableMap[dataTable], f.Name)
 	}
 	return dataTableMap
 }
@@ -81,8 +85,12 @@ func buildDataTableMap(features []*types.RichFeature) map[string][]string {
 func buildEntityNameMap(features []*types.RichFeature) map[string]string {
 	entityNameMap := make(map[string]string)
 	for _, f := range features {
-		if _, ok := entityNameMap[f.DataTable]; !ok {
-			entityNameMap[f.DataTable] = f.EntityName
+		if f.DataTable == nil {
+			continue
+		}
+		dataTable := *f.DataTable
+		if _, ok := entityNameMap[dataTable]; !ok {
+			entityNameMap[dataTable] = f.EntityName
 		}
 	}
 	return entityNameMap
@@ -92,10 +100,14 @@ func buildEntityNameMap(features []*types.RichFeature) map[string]string {
 func buildDataTableToFeaturesMap(features []*types.RichFeature) map[string][]*types.RichFeature {
 	dataTableToFeaturesMap := make(map[string][]*types.RichFeature)
 	for _, f := range features {
-		if _, ok := dataTableToFeaturesMap[f.DataTable]; !ok {
-			dataTableToFeaturesMap[f.DataTable] = make([]*types.RichFeature, 0)
+		if f.DataTable == nil {
+			continue
 		}
-		dataTableToFeaturesMap[f.DataTable] = append(dataTableToFeaturesMap[f.DataTable], f)
+		dataTable := *f.DataTable
+		if _, ok := dataTableToFeaturesMap[dataTable]; !ok {
+			dataTableToFeaturesMap[dataTable] = make([]*types.RichFeature, 0)
+		}
+		dataTableToFeaturesMap[dataTable] = append(dataTableToFeaturesMap[dataTable], f)
 	}
 	return dataTableToFeaturesMap
 }
