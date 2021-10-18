@@ -2,19 +2,31 @@ package cmd
 
 import (
 	"context"
+	"fmt"
+	"log"
 
-	"github.com/onestore-ai/onestore/featctl/pkg/list_feature"
+	"github.com/onestore-ai/onestore/pkg/onestore/types"
 	"github.com/spf13/cobra"
 )
 
-var listFeatureOpt list_feature.Option
+var listFeatureOpt types.ListFeatureOpt
 
 var listFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "list all existing features given a specific group",
 	Run: func(cmd *cobra.Command, args []string) {
-		listFeatureOpt.DBOption = dbOption
-		list_feature.ListFeature(context.Background(), &listFeatureOpt)
+		ctx := context.Background()
+		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		features, err := oneStore.ListRichFeature(ctx, listFeatureOpt)
+		if err != nil {
+			log.Fatalf("failed listing features given option %v, error %v\n", listFeatureOpt, err)
+		}
+
+		// print csv to stdout
+		fmt.Println(types.RichFeatureCsvHeader())
+		for _, feature := range features {
+			fmt.Println(feature.ToCsvRecord())
+		}
 	},
 }
 
@@ -23,5 +35,6 @@ func init() {
 
 	flags := listFeatureCmd.Flags()
 
-	flags.StringVarP(&listFeatureOpt.Group, "group", "g", "", "feature group")
+	flags.StringVarP(listFeatureOpt.EntityName, "entity", "e", "", "entity")
+	flags.StringVarP(listFeatureOpt.GroupName, "group", "g", "", "feature group")
 }
