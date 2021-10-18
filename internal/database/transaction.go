@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 )
 
@@ -8,12 +9,12 @@ import (
 
 // A Txfn is a function that will be called with an initialized `Transaction` object
 // that can be used for executing statements and queries against a database.
-type TxFn func(*sql.Tx) error
+type TxFn func(ctx context.Context, tx *sql.Tx) error
 
 // WithTransaction creates a new transaction and handles rollback/commit based on the
 // error object returned by the `TxFn`
-func (db *DB) WithTransaction(fn TxFn) (err error) {
-	tx, err := db.Begin()
+func (db *DB) WithTransaction(ctx context.Context, fn TxFn) (err error) {
+	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return
 	}
@@ -32,5 +33,5 @@ func (db *DB) WithTransaction(fn TxFn) (err error) {
 		}
 	}()
 
-	return fn(tx)
+	return fn(ctx, tx)
 }
