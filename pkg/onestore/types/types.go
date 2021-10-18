@@ -80,3 +80,8 @@ type FeatureDataSet map[string][]FeatureKV
 func NewFeatureDataSet() FeatureDataSet {
 	return make(map[string][]FeatureKV)
 }
+
+type EntityRowWithFeatures struct {
+	EntityRow
+	FeatureValues []FeatureKV
+}
