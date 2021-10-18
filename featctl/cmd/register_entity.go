@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"context"
+	"log"
 
-	"github.com/onestore-ai/onestore/pkg/onestore"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 	"github.com/spf13/cobra"
 )
@@ -14,14 +14,12 @@ var registerEntityCmd = &cobra.Command{
 	Use:   "entity",
 	Short: "register a new entity",
 	Args:  cobra.ExactArgs(1),
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		onestore, err := onestore.Open(ctx, oneStoreOpt)
-		if err != nil {
-			return err
+		onestore := mustOpenOneStore(ctx, oneStoreOpt)
+		if _, err := onestore.CreateEntity(ctx, registerEntityOpt); err != nil {
+			log.Fatalf("failed registering new entity: %v\n", err)
 		}
-		_, err = onestore.CreateEntity(ctx, registerEntityOpt)
-		return err
 	},
 }
 
