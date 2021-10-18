@@ -52,5 +52,5 @@ func entityCsvRecord(entity *types.Entity) (string, error) {
 	if err := w.Write([]string{entity.Name, strconv.Itoa(entity.Length), entity.Description, entity.CreateTime.Format(time.RFC3339), entity.ModifyTime.Format(time.RFC3339)}); err != nil {
 		return "", err
 	}
-	return string(buf.Bytes()), nil
+	return buf.String(), nil
 }
