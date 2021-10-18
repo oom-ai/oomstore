@@ -40,6 +40,16 @@ featctl import \
     --description "test import"
 ```
 
+**查看实体详情**
+```
+$ featctl describe entity device
+Name:           device
+Value length:   32
+Description:    device
+CreateTime:     2021-09-10T15:20:43Z
+ModifyTime:     2021-09-13T18:58:34Z
+```
+
 **查看特征详情**
 ```
 $ featctl describe feature price
