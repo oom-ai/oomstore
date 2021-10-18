@@ -10,7 +10,17 @@
 $ featctl init
 ```
 
-**导入特征组**
+**注册特征实体**
+```sh
+featctl register entity device --length 32 --description "设备信息"
+```
+
+**注册特征组**
+```sh
+featctl register group device_baseinfo --entity device --description "设备基础信息"
+```
+
+**导入批特征数据**
 
 下面展示如何将 `device.csv` 导入特征组 `device`。
 
@@ -74,11 +84,6 @@ featctl register feature \
     --revision 20210909 \
     --revisions-limit 3 \
     --description "设备价格"
-```
-
-**注册特征实体**
-```sh
-featctl register entity device --length 32 --description "设备信息"
 ```
 
 **修改特征配置**
