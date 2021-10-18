@@ -9,10 +9,9 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt) error {
-	_, err := db.ExecContext(ctx,
-		"insert into feature_group(name, entity_name, category, description) values(?, ?, ?, ?)",
-		opt.Name, opt.EntityName, opt.Category, opt.Description)
+func (db *DB) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt, category string) error {
+	query := "insert into feature_group(name, entity_name, category, description) values(?, ?, ?, ?)"
+	_, err := db.ExecContext(ctx, query, opt.Name, opt.EntityName, category, opt.Description)
 	return err
 }
 

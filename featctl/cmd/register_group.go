@@ -18,7 +18,7 @@ var registerGroupCmd = &cobra.Command{
 		registerGroupOpt.Name = args[0]
 		ctx := context.Background()
 		onestore := mustOpenOneStore(ctx, oneStoreOpt)
-		if err := onestore.CreateFeatureGroup(ctx, registerGroupOpt); err != nil {
+		if _, err := onestore.CreateFeatureGroup(ctx, registerGroupOpt); err != nil {
 			log.Fatalf("failed registering new group: %v\n", err)
 		}
 	},
@@ -31,9 +31,6 @@ func init() {
 
 	flags.StringVarP(&registerGroupOpt.EntityName, "entity", "e", "", "entity name")
 	_ = registerGroupCmd.MarkFlagRequired("entity")
-
-	flags.StringVar(&registerGroupOpt.Category, "category", "", "group category")
-	_ = registerGroupCmd.MarkFlagRequired("category")
 
 	flags.StringVarP(&registerGroupOpt.Description, "description", "d", "", "group description")
 }
