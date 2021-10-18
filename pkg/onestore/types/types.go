@@ -100,7 +100,7 @@ func (rf *RichFeature) String() string {
 	}
 
 	if rf.DataTable == nil {
-		dataTable = "NULL"
+		dataTable = "<NULL>"
 	} else {
 		dataTable = *rf.DataTable
 	}
