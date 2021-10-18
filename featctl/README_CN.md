@@ -55,7 +55,19 @@ featctl import \
 $ featctl describe entity device
 Name:           device
 Value length:   32
-Description:    device
+Description:    registered device
+CreateTime:     2021-09-10T15:20:43Z
+ModifyTime:     2021-09-13T18:58:34Z
+```
+
+**查看特征组详情**
+```
+$ featctl describe group device_info
+Name:           device_info
+Entity:         device
+Description:    device basic info
+Revision:       1634486400
+DataTable:      batch_device_info_1634486400
 CreateTime:     2021-09-10T15:20:43Z
 ModifyTime:     2021-09-13T18:58:34Z
 ```
