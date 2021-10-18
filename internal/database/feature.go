@@ -59,7 +59,7 @@ func (db *DB) ListFeature(ctx context.Context, groupName *string) ([]*types.Feat
 	}
 
 	features := make([]*types.Feature, 0)
-	if err := db.SelectContext(ctx, &features, query, args); err != nil {
+	if err := db.SelectContext(ctx, &features, query, args...); err != nil {
 		return nil, err
 	}
 	return features, nil
@@ -71,9 +71,9 @@ func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) err
 	return err
 }
 
-func buildListFeatureCond(opt types.ListFeatureOpt) (string, []string) {
+func buildListFeatureCond(opt types.ListFeatureOpt) (string, []interface{}) {
 	cond := make([]string, 0)
-	args := make([]string, 0)
+	args := make([]interface{}, 0)
 	if opt.EntityName != nil {
 		cond = append(cond, "entity_name = ?")
 		args = append(args, *opt.EntityName)
