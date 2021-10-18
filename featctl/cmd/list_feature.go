@@ -35,6 +35,6 @@ func init() {
 
 	flags := listFeatureCmd.Flags()
 
-	flags.StringVarP(listFeatureOpt.EntityName, "entity", "e", "", "entity")
-	flags.StringVarP(listFeatureOpt.GroupName, "group", "g", "", "feature group")
+	listFeatureOpt.EntityName = flags.StringP("entity", "e", "", "entity")
+	listFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
 }
