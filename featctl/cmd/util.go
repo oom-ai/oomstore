@@ -9,11 +9,6 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-var validCategories = []string{
-	"batch",
-	"stream",
-}
-
 var validStatus = []string{
 	"enabled",
 	"disabled",
@@ -33,10 +28,6 @@ func validateEnum(name string, value string, possibleValues []string) error {
 		return fmt.Errorf("invalid %s: '%s', should be one of %v", name, value, possibleValues)
 	}
 	return nil
-}
-
-func validateCategory(value string) error {
-	return validateEnum("category", value, validCategories)
 }
 
 func validateStatus(value string) error {
