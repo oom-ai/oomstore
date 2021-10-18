@@ -40,7 +40,7 @@ func (db *DB) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]
 	}
 
 	features := make([]*types.RichFeature, 0)
-	if err := db.SelectContext(ctx, &features, query, args); err != nil {
+	if err := db.SelectContext(ctx, &features, query, args...); err != nil {
 		return nil, err
 	}
 	return features, nil
