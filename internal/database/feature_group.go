@@ -48,8 +48,8 @@ func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*type
 	return groups, nil
 }
 
-func UpdateFeatureGroup(ctx context.Context, tx *sqlx.Tx, groupName string, revision int64, dataTable string) error {
-	cmd := "UPDATE feature_group SET revision = ? AND data_table = ? WHERE name = ?"
+func UpdateFeatureGroup(ctx context.Context, tx *sqlx.Tx, revision int64, dataTable string, groupName string) error {
+	cmd := "UPDATE feature_group SET revision = ?, data_table = ? WHERE name = ?"
 	_, err := tx.ExecContext(ctx, cmd, revision, dataTable, groupName)
 	return err
 }

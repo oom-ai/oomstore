@@ -20,6 +20,11 @@ featctl register entity device --length 32 --description "设备信息"
 featctl register group device_baseinfo --entity device --description "设备基础信息"
 ```
 
+**列举特征组**
+```sh
+featctl list group --entity=device
+```
+
 **注册特征**
 ```sh
 featctl register batch-feature model --group device --value-type "varchar(30)" --description 'phone model'
@@ -38,7 +43,7 @@ set -euo pipefail
 mkdir -p /tmp/featctl && cd /tmp/featctl
 
 cat <<-EOF > device.csv
-entity_key,brand,model,price
+device,brand,model,price
 a9f0d6af575bb7e427fde2dcc81adbed,小米,MIX3,3999
 134d9facd06ff355bf53846c0407d4f4,华为,P40,5299
 0c66da7c680c4c44f33cb34881f1b104,苹果,IPHONE11,4999
@@ -111,14 +116,16 @@ featctl register feature \
     --description "设备价格"
 ```
 
+**修改实体配置**
+```sh
+featctl update entity device \
+    --description "registered device"
+```
+
 **修改特征配置**
 ```sh
-# 启用特征并将其版本指定为 20210909
-featctl update feature \
-    --name price \
-    --group device \
-    --revision 20210909 \
-    --status "enabled"
+featctl update feature price\
+    --description "phone price"
 ```
 
 **查询特征值**

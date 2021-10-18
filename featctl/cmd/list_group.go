@@ -13,7 +13,7 @@ import (
 )
 
 type listFeatureGroupOption struct {
-	Entity *string
+	EntityName *string
 }
 
 var listFeatureGroupOpt listFeatureGroupOption
@@ -21,16 +21,21 @@ var listFeatureGroupOpt listFeatureGroupOption
 var listFeatureGroupCmd = &cobra.Command{
 	Use:   "group",
 	Short: "list group by entity",
+	Example: `1. featctl list group
+2. featctl list group --entity=device
+`,
+	PreRun: func(cmd *cobra.Command, args []string) {
+		if !cmd.Flags().Changed("entity") {
+			listFeatureGroupOpt.EntityName = nil
+		}
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 
 		store := mustOpenOneStore(ctx, oneStoreOpt)
 		defer store.Close()
 
-		if !cmd.Flags().Changed("entity") {
-			listFeatureGroupOpt.Entity = nil
-		}
-		groups, err := store.ListFeatureGroup(ctx, listFeatureGroupOpt.Entity)
+		groups, err := store.ListFeatureGroup(ctx, listFeatureGroupOpt.EntityName)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -45,7 +50,7 @@ func init() {
 
 	flags := listFeatureGroupCmd.Flags()
 
-	listFeatureGroupOpt.Entity = flags.StringP("entity", "", "", "use to filter groups")
+	listFeatureGroupOpt.EntityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
 func printFeatureGroups(featureGroups []*types.FeatureGroup) error {
@@ -56,12 +61,12 @@ func printFeatureGroups(featureGroups []*types.FeatureGroup) error {
 	}
 
 	for _, g := range featureGroups {
-		revision := "NULL"
+		revision := ""
 		if g.Revision != nil {
 			revision = strconv.FormatInt(*g.Revision, 10)
 		}
 
-		dataTable := "NULL"
+		dataTable := ""
 		if g.DataTable != nil {
 			dataTable = *g.DataTable
 		}
