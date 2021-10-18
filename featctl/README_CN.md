@@ -42,15 +42,15 @@ featctl import \
 
 **查看特征详情**
 ```
-$ featctl describe feature --group device --name price
+$ featctl describe feature price
 Name:           price
-Group:          device
-Revision:       20210909
-Status:         disabled
+Group:          device_info
+Entity:         device
 Category:       batch
 ValueType:      int(11)
 Description:    设备价格
-RevisionsLimit: 3
+Revision:       1634486400
+DataTable:      batch_device_info_1634486400
 CreateTime:     2021-09-10T15:20:43Z
 ModifyTime:     2021-09-13T18:58:34Z
 ```
