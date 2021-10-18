@@ -87,3 +87,67 @@ func buildEntityNameMap(features []*types.RichFeature) map[string]string {
 	}
 	return entityNameMap
 }
+
+// key: data_table, value: slice of features
+func buildDataTableToFeaturesMap(features []*types.RichFeature) map[string][]*types.RichFeature {
+	dataTableToFeaturesMap := make(map[string][]*types.RichFeature)
+	for _, f := range features {
+		if _, ok := dataTableToFeaturesMap[f.DataTable]; !ok {
+			dataTableToFeaturesMap[f.DataTable] = make([]*types.RichFeature, 0)
+		}
+		dataTableToFeaturesMap[f.DataTable] = append(dataTableToFeaturesMap[f.DataTable], f)
+	}
+	return dataTableToFeaturesMap
+}
+
+// GetHistoricalFeatureValues gets point-in-time feature values for each entity row;
+// currently, this API only supports batch features.
+func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.GetHistoricalFeatureValuesOpt) ([]*types.EntityRowWithFeatures, error) {
+	features, err := s.db.GetRichFeatures(ctx, opt.FeatureNames)
+	if err != nil {
+		return nil, err
+	}
+	batchFeatures := make([]*types.RichFeature, 0)
+	for _, f := range features {
+		if f.Category == types.BatchFeatureCategory {
+			batchFeatures = append(batchFeatures, f)
+		}
+	}
+	// data_table -> []features
+	dataTableToFeaturesMap := buildDataTableToFeaturesMap(batchFeatures)
+
+	entityDataMap := make(map[string]database.RowMap)
+	for _, richFeatures := range dataTableToFeaturesMap {
+		featureValues, err := s.db.GetPointInTimeFeatureValues(ctx, richFeatures, opt.EntityRows)
+		if err != nil {
+			return nil, err
+		}
+		for key, m := range featureValues {
+			for fn, fv := range m {
+				entityDataMap[key][fn] = fv
+			}
+		}
+	}
+
+	entityDataSet := make([]*types.EntityRowWithFeatures, 0, len(entityDataMap))
+	for _, rowMap := range entityDataMap {
+		entityKey := rowMap["entity_key"]
+		unixTime := rowMap["unix_time"]
+		delete(rowMap, "entity_key")
+		delete(rowMap, "unix_time")
+
+		featureValues := make([]types.FeatureKV, 0, len(rowMap))
+		for fn, fv := range rowMap {
+			featureValues = append(featureValues, types.NewFeatureKV(fn, fv))
+		}
+		entityDataSet = append(entityDataSet, &types.EntityRowWithFeatures{
+			EntityRow: types.EntityRow{
+				EntityKey: entityKey.(string),
+				UnixTime:  unixTime.(int64),
+			},
+			FeatureValues: featureValues,
+		})
+	}
+
+	return entityDataSet, nil
+}
