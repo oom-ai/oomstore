@@ -123,7 +123,7 @@ func (rf *RichFeature) String() string {
 func (e *Entity) String() string {
 	return strings.Join([]string{
 		fmt.Sprintf("Name:          %s", e.Name),
-		fmt.Sprintf("Value length:  %d", e.Length),
+		fmt.Sprintf("Length:        %d", e.Length),
 		fmt.Sprintf("Description:   %s", e.Description),
 		fmt.Sprintf("CreateTime:    %s", e.CreateTime.Format(time.RFC3339)),
 		fmt.Sprintf("ModifyTime:    %s", e.ModifyTime.Format(time.RFC3339)),
