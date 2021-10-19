@@ -24,7 +24,7 @@ func (s *OneStore) WalkFeatureValues(ctx context.Context, opt types.WalkFeatureV
 	} else {
 		for _, field := range fields {
 			if !contains(allFeatureNames, field) {
-				return fmt.Errorf("feature '%s' not exist", field)
+				return fmt.Errorf("feature '%s' does not exist", field)
 			}
 		}
 	}
