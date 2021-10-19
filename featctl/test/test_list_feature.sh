@@ -7,10 +7,10 @@ register_features
 import_sample
 
 case='featctl list feature works'
-expected='Name,Group,Revision,Status,Category,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
-price,device,v1,disabled,batch,int(11),device average price,3,2021-09-27T08:24:26Z,2021-09-27T08:24:26Z
-model,device,v1,disabled,batch,varchar(32),device model name,3,2021-09-27T08:24:26Z,2021-09-27T08:24:26Z
+expected='Name,Group,Entity,Category,ValueType,Description,Revision,DataTable,CreateTime,ModifyTime
+model,phone,device,batch,varchar(32),,1634626568,phone_1634626568,2021-10-19T06:56:07Z,2021-10-19T06:56:07Z
+price,phone,device,batch,int,,1634626568,phone_1634626568,2021-10-19T06:56:07Z,2021-10-19T06:56:07Z
 '
 actual=$(featctl list feature)
-ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }
+ignore_time() { cut -d ',' -f 1-6 <<<"$1"; }
 assert_eq "$case" "$(ignore_time "$expected" | sort)" "$(ignore_time "$actual" | sort)"
