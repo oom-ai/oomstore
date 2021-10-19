@@ -122,6 +122,12 @@ featctl update entity device \
     --description "registered device"
 ```
 
+**修改特征组配置**
+```sh
+featctl update group device_info\
+    --description "device basic info"
+```
+
 **修改特征配置**
 ```sh
 featctl update feature price\
