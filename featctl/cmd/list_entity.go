@@ -32,7 +32,7 @@ var listEntityCmd = &cobra.Command{
 			if err != nil {
 				log.Fatalf("failed writing entity %s, error %v\n", entity.Name, err)
 			}
-			fmt.Println(recordStr)
+			fmt.Print(recordStr)
 		}
 	},
 }
@@ -52,5 +52,6 @@ func entityCsvRecord(entity *types.Entity) (string, error) {
 	if err := w.Write([]string{entity.Name, strconv.Itoa(entity.Length), entity.Description, entity.CreateTime.Format(time.RFC3339), entity.ModifyTime.Format(time.RFC3339)}); err != nil {
 		return "", err
 	}
+	w.Flush()
 	return buf.String(), nil
 }
