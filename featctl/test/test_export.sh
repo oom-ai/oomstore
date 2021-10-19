@@ -7,7 +7,7 @@ register_features
 import_sample
 
 case='featctl export all'
-expected='entity_key,price
+expected='device,price
 1,3999
 2,5299
 3,3999
@@ -18,16 +18,16 @@ expected='entity_key,price
 8,6500
 9,4500
 '
-actual=$(featctl export -g device -n price)
+actual=$(featctl export phone --select price)
 assert_eq "$case" "$expected" "$actual"
 
 case='featctl export with limit'
-expected='entity_key,price
+expected='device,price
 1,3999
 2,5299
 3,3999
 4,1999
 5,999
 '
-actual=$(featctl export -g device -n price --limit 5)
+actual=$(featctl export phone --select price --limit 5)
 assert_eq "$case" "$expected" "$actual"
