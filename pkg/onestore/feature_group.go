@@ -16,3 +16,7 @@ func (s *OneStore) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatu
 func (s *OneStore) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
 	return s.db.GetFeatureGroup(ctx, groupName)
 }
+
+func (s *OneStore) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
+	return s.db.ListFeatureGroup(ctx, entityName)
+}

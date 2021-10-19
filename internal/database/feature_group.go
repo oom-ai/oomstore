@@ -30,6 +30,24 @@ func (db *DB) GetFeatureGroup(ctx context.Context, groupName string) (*types.Fea
 	return &group, nil
 }
 
+func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
+	var cond []interface{}
+	query := "SELECT * FROM feature_group"
+	if entityName != nil {
+		query = query + " WHERE entity_name = ?"
+		cond = append(cond, *entityName)
+	}
+
+	var groups []*types.FeatureGroup
+	if err := db.SelectContext(ctx, &groups, query, cond...); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return groups, nil
+}
+
 func UpdateFeatureGroup(ctx context.Context, tx *sqlx.Tx, revision int64, dataTable string, groupName string) error {
 	cmd := "UPDATE feature_group SET revision = ?, data_table = ? WHERE name = ?"
 	_, err := tx.ExecContext(ctx, cmd, revision, dataTable, groupName)
