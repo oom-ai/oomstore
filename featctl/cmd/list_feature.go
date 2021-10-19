@@ -14,6 +14,14 @@ var listFeatureOpt types.ListFeatureOpt
 var listFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "list all existing features given a specific group",
+	PreRun: func(cmd *cobra.Command, args []string) {
+		if !cmd.Flags().Changed("entity") {
+			listFeatureOpt.EntityName = nil
+		}
+		if !cmd.Flags().Changed("group") {
+			listFeatureOpt.GroupName = nil
+		}
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
