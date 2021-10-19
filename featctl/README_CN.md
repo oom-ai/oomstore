@@ -20,6 +20,11 @@ featctl register entity device --length 32 --description "设备信息"
 featctl register group device_baseinfo --entity device --description "设备基础信息"
 ```
 
+**列举特征组**
+```sh
+featctl list group --entity=device
+```
+
 **注册特征**
 ```sh
 featctl register batch-feature model --group device --value-type "varchar(30)" --description 'phone model'
