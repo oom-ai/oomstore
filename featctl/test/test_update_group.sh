@@ -6,20 +6,17 @@ init_store
 register_features
 import_sample
 
-case='featctl update feature works'
-featctl update feature price --description "new description"
+case='featctl update group works'
+featctl update group phone --description "new description"
 expected='
-Name:          price
-Group:         phone
+Name:          phone
 Entity:        device
-Category:      batch
-ValueType:     int
 Description:   new description
 Revision:
 DataTable:
 CreateTime:
 ModifyTime:
 '
-actual=$(featctl describe feature price)
+actual=$(featctl describe group phone)
 ignore() { grep -Ev '^(CreateTime|ModifyTime|Revision|DataTable)' <<<"$1"; }
 assert_eq "$case" "$(ignore "$expected")" "$(ignore "$actual")"
