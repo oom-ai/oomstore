@@ -4,6 +4,10 @@ source ./util.sh
 
 init_store
 register_features
+
+# clean up the tmp file
+trap 'command rm -rf entity_rows.csv' EXIT INT TERM HUP
+
 before_unix_time=$(date +%s)
 echo "1,${before_unix_time}" >> entity_rows.csv
 echo "2,${before_unix_time}" >> entity_rows.csv
@@ -28,4 +32,3 @@ actual=$(featctl join historical-features \
     )
 
 assert_eq "$case" "$expected" "$actual"
-rm entity_rows.csv
