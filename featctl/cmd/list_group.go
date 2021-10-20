@@ -20,9 +20,9 @@ var listFeatureGroupOpt listFeatureGroupOption
 
 var listFeatureGroupCmd = &cobra.Command{
 	Use:   "group",
-	Short: "list group by entity",
+	Short: "list feature groups",
 	Example: `1. featctl list group
-2. featctl list group --entity=device
+2. featctl list group --entity device
 `,
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
@@ -31,11 +31,10 @@ var listFeatureGroupCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
+		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		defer oneStore.Close()
 
-		store := mustOpenOneStore(ctx, oneStoreOpt)
-		defer store.Close()
-
-		groups, err := store.ListFeatureGroup(ctx, listFeatureGroupOpt.EntityName)
+		groups, err := oneStore.ListFeatureGroup(ctx, listFeatureGroupOpt.EntityName)
 		if err != nil {
 			log.Fatal(err)
 		}

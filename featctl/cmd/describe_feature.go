@@ -15,6 +15,8 @@ var describeFeatureCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		defer oneStore.Close()
+
 		featureName := args[0]
 		richFeature, err := oneStore.GetRichFeature(ctx, featureName)
 		if err != nil {

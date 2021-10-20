@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// var registerFeatureOpt register_feature.Option
 var registerBatchFeatureOpt types.CreateFeatureOpt
 
 var registerBatchFeatureCmd = &cobra.Command{
@@ -16,12 +15,15 @@ var registerBatchFeatureCmd = &cobra.Command{
 	Short:   "register a new batch feature",
 	Example: `featctl register feature model --group device --value-type "varchar(30)" --description 'phone model'`,
 	Args:    cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	PreRun: func(cmd *cobra.Command, args []string) {
 		registerBatchFeatureOpt.FeatureName = args[0]
-
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		store := mustOpenOneStore(ctx, oneStoreOpt)
-		if _, err := store.CreateBatchFeature(ctx, registerBatchFeatureOpt); err != nil {
+		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		defer oneStore.Close()
+
+		if _, err := oneStore.CreateBatchFeature(ctx, registerBatchFeatureOpt); err != nil {
 			log.Fatal(err)
 		}
 	},

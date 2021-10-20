@@ -18,16 +18,12 @@ var getOnlineFeaturesOpt types.GetOnlineFeatureValuesOpt
 var getOnlineFeaturesCmd = &cobra.Command{
 	Use:   "online-features",
 	Short: "get online feature values",
-	Args:  cobra.MinimumNArgs(1),
-	PreRun: func(cmd *cobra.Command, args []string) {
-		getOnlineFeaturesOpt.FeatureNames = args
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		store := mustOpenOneStore(ctx, oneStoreOpt)
-		defer store.Close()
+		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		defer oneStore.Close()
 
-		featureValueMap, err := store.GetOnlineFeatureValues(ctx, getOnlineFeaturesOpt)
+		featureValueMap, err := oneStore.GetOnlineFeatureValues(ctx, getOnlineFeaturesOpt)
 		if err != nil {
 			log.Fatalf("failed getting online features: %v", err)
 		}
@@ -56,4 +52,7 @@ func init() {
 
 	flags.StringVarP(&getOnlineFeaturesOpt.EntityKey, "entity-key", "k", "", "entity keys")
 	_ = getOnlineFeaturesCmd.MarkFlagRequired("entity")
+
+	flags.StringSliceVar(&getOnlineFeaturesOpt.FeatureNames, "feature", nil, "feature names")
+	_ = getOnlineFeaturesCmd.MarkFlagRequired("feature")
 }

@@ -14,11 +14,15 @@ var registerGroupCmd = &cobra.Command{
 	Use:   "group",
 	Short: "register a new feature group",
 	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	PreRun: func(cmd *cobra.Command, args []string) {
 		registerGroupOpt.Name = args[0]
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		onestore := mustOpenOneStore(ctx, oneStoreOpt)
-		if _, err := onestore.CreateFeatureGroup(ctx, registerGroupOpt); err != nil {
+		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		defer oneStore.Close()
+
+		if _, err := oneStore.CreateFeatureGroup(ctx, registerGroupOpt); err != nil {
 			log.Fatalf("failed registering new group: %v\n", err)
 		}
 	},
