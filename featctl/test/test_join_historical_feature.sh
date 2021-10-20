@@ -17,7 +17,7 @@ after_unix_time=$(date +%s)
 echo "1,${after_unix_time}" >> entity_rows.csv
 echo "2,${after_unix_time}" >> entity_rows.csv
 
-case='featctl join historical-features'
+case='featctl join historical-feature'
 expected="
 entity_key,unix_time,model,price
 1,${before_unix_time},,
@@ -26,7 +26,7 @@ entity_key,unix_time,model,price
 2,${after_unix_time},huawei-p40,5299
 "
 
-actual=$(featctl join historical-features \
+actual=$(featctl join historical-feature \
     --feature model,price \
     --input-file entity_rows.csv \
     )
