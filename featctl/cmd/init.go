@@ -18,7 +18,7 @@ var initOpt initOption
 
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "initialize the feature store",
+	Short: "initialize a feature store",
 	Run: func(cmd *cobra.Command, args []string) {
 		initOpt.OneStoreOpt = oneStoreOpt
 		if _, err := onestore.Create(context.Background(), initOpt.OneStoreOpt); err != nil {

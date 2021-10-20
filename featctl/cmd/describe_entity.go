@@ -15,6 +15,8 @@ var describeEntityCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		defer oneStore.Close()
+
 		entityName := args[0]
 		entity, err := oneStore.GetEntity(ctx, entityName)
 		if err != nil {

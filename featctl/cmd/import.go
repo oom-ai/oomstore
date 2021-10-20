@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 
-	"github.com/onestore-ai/onestore/pkg/onestore"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 	"github.com/spf13/cobra"
 )
@@ -16,10 +15,7 @@ var importCmd = &cobra.Command{
 	Short: "import feature data from a csv file",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore, err := onestore.Open(ctx, oneStoreOpt)
-		if err != nil {
-			log.Fatalf("failed connecting OneStore: %v", err)
-		}
+		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
 		defer oneStore.Close()
 
 		log.Println("importing features ...")

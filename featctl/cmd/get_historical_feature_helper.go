@@ -1,24 +1,23 @@
-package export
+package cmd
 
 import (
 	"context"
 	"encoding/csv"
 	"os"
 
-	"github.com/spf13/cast"
-
 	"github.com/onestore-ai/onestore/pkg/onestore"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/spf13/cast"
 )
 
-type ExportOpt struct {
+type getHistoricalFeatureOption struct {
 	GroupName     string
 	GroupRevision *int64
 	FeatureNames  []string
 	Limit         *uint64
 }
 
-func Export(ctx context.Context, store *onestore.OneStore, opt ExportOpt) error {
+func getHistoricalFeature(ctx context.Context, store *onestore.OneStore, opt getHistoricalFeatureOption) error {
 	group, err := store.GetFeatureGroup(ctx, opt.GroupName)
 	if err != nil {
 		return err

@@ -15,6 +15,8 @@ var describeGroupCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		defer oneStore.Close()
+
 		groupName := args[0]
 		group, err := oneStore.GetFeatureGroup(ctx, groupName)
 		if err != nil {

@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"github.com/onestore-ai/onestore/pkg/database"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 	"github.com/onestore-ai/onestore/version"
 )
@@ -23,8 +22,6 @@ const (
 var cfgFile string
 var defaultCfgFile = filepath.Join(xdg.ConfigHome, "featctl", "config.yaml")
 
-// deprecating, use oneStoreOpt instead
-var dbOption database.Option
 var oneStoreOpt types.OneStoreOpt
 
 // rootCmd represents the base command when called without any subcommands
