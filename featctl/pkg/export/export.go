@@ -3,9 +3,9 @@ package export
 import (
 	"context"
 	"encoding/csv"
-	"fmt"
 	"os"
-	"time"
+
+	"github.com/spf13/cast"
 
 	"github.com/onestore-ai/onestore/pkg/onestore"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
@@ -42,17 +42,7 @@ func Export(ctx context.Context, store *onestore.OneStore, opt ExportOpt) error 
 			headerRow = false
 		}
 		record := []string{key}
-		for _, value := range values {
-			if value == nil {
-				record = append(record, "")
-			} else if bytes, ok := value.([]byte); ok {
-				record = append(record, string(bytes))
-			} else if f, ok := value.(float64); ok {
-				record = append(record, fmt.Sprintf("%f", f))
-			} else if t, ok := value.(time.Time); ok {
-				record = append(record, t.Format(time.RFC3339))
-			}
-		}
+		record = append(record, cast.ToStringSlice(values)...)
 		return w.Write(record)
 	}
 	err = store.WalkFeatureValues(ctx, walkOpt)
