@@ -14,10 +14,14 @@ var updateGroupCmd = &cobra.Command{
 	Use:   "group",
 	Short: "update a specified group",
 	Args:  cobra.ExactArgs(1),
+	PreRun: func(cmd *cobra.Command, args []string) {
+		updateGroupOpt.GroupName = args[0]
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		updateGroupOpt.GroupName = args[0]
+		defer oneStore.Close()
+
 		if err := oneStore.UpdateFeatureGroup(ctx, updateGroupOpt); err != nil {
 			log.Fatalf("failed updating group %s, err %v\n", updateGroupOpt.GroupName, err)
 		}
