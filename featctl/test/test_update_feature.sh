@@ -7,14 +7,20 @@ register_features
 import_sample
 
 case='featctl update works'
-# import v2 data
-import_sample v2
 # update active revision to v2
-featctl update feature -g device -n price --revision v2
+featctl update feature price --description "new description"
 expected='
-Name,Revision
-price,v2
-model,v1
+Name:          price
+Group:         phone
+Entity:        device
+Category:      batch
+ValueType:     int
+Description:   new description
+Revision:
+DataTable:
+CreateTime:
+ModifyTime:
 '
-actual=$(featctl list feature | cut -d ',' -f 1,3)
-assert_eq "$case" "$(sort <<<"$expected")" "$(sort <<< "$actual")"
+actual=$(featctl describe feature price)
+ignore() { grep -Ev '^(CreateTime|ModifyTime|Revision|DataTable)' <<<"$1"; }
+assert_eq "$case" "$(ignore "$expected")" "$(ignore "$actual")"
