@@ -64,8 +64,8 @@ type GetOnlineFeatureValuesOpt struct {
 }
 
 type EntityRow struct {
-	EntityKey string
-	UnixTime  int64
+	EntityKey string `db:"entity_key"`
+	UnixTime  int64  `db:"unix_time"`
 }
 
 type GetHistoricalFeatureValuesOpt struct {
