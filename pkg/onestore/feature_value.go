@@ -8,7 +8,69 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
+func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (types.FeatureValueMap, error) {
+	m := make(map[string]interface{})
+
+	features, err := s.db.GetRichFeatures(ctx, opt.FeatureNames)
+	if err != nil {
+		return m, err
+	}
+	features = filterAvailableFeatures(features)
+	if len(features) == 0 {
+		return m, nil
+	}
+
+	entityName, err := getEntityName(features)
+	if err != nil || entityName == nil {
+		return m, err
+	}
+	dataTables := getDataTables(features)
+
+	for dataTable, featureNames := range dataTables {
+		featureValues, err := s.db.GetFeatureValues(ctx, dataTable, *entityName, opt.EntityValue, featureNames)
+		if err != nil {
+			return m, err
+		}
+		for featureName, featureValue := range featureValues {
+			m[featureName] = featureValue
+		}
+	}
+	return m, nil
+}
+
+func filterAvailableFeatures(features []*types.RichFeature) (rs []*types.RichFeature) {
+	for _, f := range features {
+		if f.DataTable != nil {
+			rs = append(rs, f)
+		}
+	}
+	return
+}
+
+func getDataTables(features []*types.RichFeature) map[string][]string {
+	dataTableMap := make(map[string][]string)
+	for _, f := range features {
+		dataTable := *f.DataTable
+		dataTableMap[dataTable] = append(dataTableMap[dataTable], f.Name)
+	}
+	return dataTableMap
+}
+
+func getEntityName(features []*types.RichFeature) (*string, error) {
+	m := make(map[string]string)
+	for _, f := range features {
+		m[f.EntityName] = f.Name
+	}
+	if len(m) > 1 {
+		return nil, fmt.Errorf("inconsistent entity type: %v", m)
+	}
+	for entityName := range m {
+		return &entityName, nil
+	}
+	return nil, nil
+}
+
+func (s *OneStore) GetOnlineFeatureValuesWithMultiEntityValues(ctx context.Context, opt types.GetOnlineFeatureValuesWithMultiEntityValuesOpt) (*types.FeatureDataSet, error) {
 	features, err := s.db.GetRichFeatures(ctx, opt.FeatureNames)
 	if err != nil {
 		return nil, err
@@ -37,15 +99,15 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 		if !ok {
 			return nil, fmt.Errorf("missing entity_name for table %s", dataTable)
 		}
-		featureValues, err := s.db.GetFeatureValues(ctx, dataTable, entityName, entityKeys, featureNames)
+		featureValues, err := s.db.GetFeatureValuesWithMultiEntityValues(ctx, dataTable, entityName, entityKeys, featureNames)
 		if err != nil {
 			return nil, err
 		}
 		for entityKey, m := range featureValues {
+			if featureValueMap[entityKey] == nil {
+				featureValueMap[entityKey] = make(map[string]interface{})
+			}
 			for fn, fv := range m {
-				if featureValueMap[entityKey] == nil {
-					featureValueMap[entityKey] = make(map[string]interface{})
-				}
 				featureValueMap[entityKey][fn] = fv
 			}
 		}
@@ -53,7 +115,7 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
-func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.GetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
+func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.GetOnlineFeatureValuesWithMultiEntityValuesOpt) (*types.FeatureDataSet, error) {
 	fds := types.NewFeatureDataSet()
 	for _, entityKey := range opt.EntityKeys {
 		fds[entityKey] = make([]types.FeatureKV, 0)
