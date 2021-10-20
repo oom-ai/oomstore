@@ -31,6 +31,6 @@ func init() {
 	flags.StringVar(&joinHistoricalFeaturesOpt.InputFilePath, "input-file", "", "file path of training label data set")
 	_ = joinHistoricalFeaturesCmd.MarkFlagRequired("input-file")
 
-	flags.StringSliceVar(&joinHistoricalFeaturesOpt.FeatureNames, "feature-names", nil, "feature names")
-	_ = joinHistoricalFeaturesCmd.MarkFlagRequired("feature-names")
+	flags.StringSliceVar(&joinHistoricalFeaturesOpt.FeatureNames, "feature", nil, "feature names")
+	_ = joinHistoricalFeaturesCmd.MarkFlagRequired("feature")
 }

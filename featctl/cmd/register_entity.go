@@ -14,11 +14,15 @@ var registerEntityCmd = &cobra.Command{
 	Use:   "entity",
 	Short: "register a new entity",
 	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	PreRun: func(cmd *cobra.Command, args []string) {
 		registerEntityOpt.Name = args[0]
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		onestore := mustOpenOneStore(ctx, oneStoreOpt)
-		if _, err := onestore.CreateEntity(ctx, registerEntityOpt); err != nil {
+		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		defer oneStore.Close()
+
+		if _, err := oneStore.CreateEntity(ctx, registerEntityOpt); err != nil {
 			log.Fatalf("failed registering new entity: %v\n", err)
 		}
 	},

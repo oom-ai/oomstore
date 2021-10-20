@@ -22,7 +22,6 @@ const (
 var cfgFile string
 var defaultCfgFile = filepath.Join(xdg.ConfigHome, "featctl", "config.yaml")
 
-// deprecating, use oneStoreOpt instead
 var oneStoreOpt types.OneStoreOpt
 
 // rootCmd represents the base command when called without any subcommands

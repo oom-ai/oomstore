@@ -6,7 +6,7 @@ init_store
 register_features
 import_sample
 
-case='featctl export all'
+case='get all'
 expected='device,price
 1,3999
 2,5299
@@ -18,10 +18,10 @@ expected='device,price
 8,6500
 9,4500
 '
-actual=$(featctl export phone --select price)
+actual=$(featctl get historical-feature --group phone --feature price)
 assert_eq "$case" "$expected" "$actual"
 
-case='featctl export with limit'
+case='get with limit'
 expected='device,price
 1,3999
 2,5299
@@ -29,5 +29,5 @@ expected='device,price
 4,1999
 5,999
 '
-actual=$(featctl export phone --select price --limit 5)
+actual=$(featctl get historical-feature --group phone --feature price --limit 5)
 assert_eq "$case" "$expected" "$actual"

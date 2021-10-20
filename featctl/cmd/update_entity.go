@@ -14,10 +14,14 @@ var updateEntityCmd = &cobra.Command{
 	Use:   "entity",
 	Short: "update a specified entity",
 	Args:  cobra.ExactArgs(1),
+	PreRun: func(cmd *cobra.Command, args []string) {
+		updateEntityOpt.EntityName = args[0]
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		updateEntityOpt.EntityName = args[0]
+		defer oneStore.Close()
+
 		if err := oneStore.UpdateEntity(ctx, updateEntityOpt); err != nil {
 			log.Fatalf("failed updating entity %s, err %v\n", updateEntityOpt.EntityName, err)
 		}

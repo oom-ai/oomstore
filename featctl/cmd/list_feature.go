@@ -25,6 +25,8 @@ var listFeatureCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		defer oneStore.Close()
+
 		features, err := oneStore.ListRichFeature(ctx, listFeatureOpt)
 		if err != nil {
 			log.Fatalf("failed listing features given option %v, error %v\n", listFeatureOpt, err)

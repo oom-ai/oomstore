@@ -18,6 +18,8 @@ var listEntityCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
+		defer oneStore.Close()
+
 		entities, err := oneStore.ListEntity(ctx)
 		if err != nil {
 			log.Fatalf("failed listing entities, error %v\n", err)
