@@ -12,15 +12,20 @@ import (
 
 type RowMap = map[string]interface{}
 
-// response: map[entity_key]map[feature_name]feature_value
-func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName string, entityKeys, featureNames []string) (map[string]RowMap, error) {
-	marks := []string{}
-	for range featureNames {
-		marks = append(marks, "?")
-	}
+func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entityKey string, featureNames []string) (RowMap, error) {
+	query := fmt.Sprintf("SELECT `%s`,%s FROM %s WHERE `%s` = ?", entityName, strings.Join(featureNames, ","), dataTable, entityName)
+	rs := make(RowMap)
 
-	query := fmt.Sprintf("SELECT ?, %s FROM %s WHERE ? in (?);", strings.Join(marks, ","), dataTable)
-	sql, args, err := sqlx.In(query, entityName, featureNames, entityKeys)
+	if err := db.QueryRowxContext(ctx, query, entityKey).MapScan(rs); err != nil {
+		return nil, err
+	}
+	return rs, nil
+}
+
+// response: map[entity_key]map[feature_name]feature_value
+func (db *DB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, dataTable, entityName string, entityKeys, featureNames []string) (map[string]RowMap, error) {
+	query := fmt.Sprintf("SELECT `%s`, %s FROM %s WHERE `%s` in (?);", entityName, strings.Join(featureNames, ","), dataTable, entityName)
+	sql, args, err := sqlx.In(query, entityKeys)
 	if err != nil {
 		return nil, err
 	}

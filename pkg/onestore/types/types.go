@@ -80,6 +80,8 @@ func NewFeatureKV(name string, value interface{}) FeatureKV {
 	}
 }
 
+type FeatureValueMap map[string]interface{}
+
 type FeatureDataSet map[string][]FeatureKV
 
 func NewFeatureDataSet() FeatureDataSet {
