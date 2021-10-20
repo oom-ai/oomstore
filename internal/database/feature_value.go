@@ -7,6 +7,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/spf13/cast"
 )
 
 type RowMap = map[string]interface{}
@@ -50,7 +51,7 @@ func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]
 			return nil, fmt.Errorf("missing column %s", entityName)
 		}
 		delete(rowMap, entityName)
-		featureValueMap[string(entityKey.([]byte))] = rowMap
+		featureValueMap[cast.ToString(entityKey)] = rowMap
 	}
 	return featureValueMap, nil
 }
@@ -87,7 +88,7 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 	rangeQuery := `
 		SELECT
 			revision AS min_revision,
-			LEAD(revision, 1, ~0) OVER w AS max_revision,
+			LEAD(revision, 1, ~0 >> 1) OVER w AS max_revision,
 			data_table
 		FROM feature_group_revision
 		WHERE group_name = ?
@@ -95,9 +96,9 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 	`
 
 	var ranges []struct {
-		MinRevision int64
-		MaxRevision int64
-		DataTable   string
+		MinRevision int64  `db:"min_revision"`
+		MaxRevision int64  `db:"max_revision"`
+		DataTable   string `db:"data_table"`
 	}
 	if tmpErr := db.SelectContext(ctx, &ranges, rangeQuery, groupName); tmpErr != nil {
 		return nil, tmpErr
@@ -105,11 +106,12 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 
 	// Step 2: iterate each table range, get result
 	joinQuery := `
-		INSERT INTO entity_df_with_features(Coalesce(l.entity_key + "," + l.unix_time) AS key, l.entity_key, l.unix_time, %s)
+		INSERT INTO %s(unique_key, l.entity_key, l.unix_time, %s)
 		SELECT
+			CONCAT(l.entity_key, ",", l.unix_time) AS unique_key,
 			l.entity_key, l.unix_time,
 			%s
-		FROM entity_df AS l
+		FROM %s AS l
 		LEFT JOIN %s AS r
 		ON l.entity_key = r.%s
 		WHERE l.unix_time >= ? AND l.unix_time < ?;
@@ -117,21 +119,21 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 	featureNamesStr := buildFeatureNameStr(features)
 
 	for _, r := range ranges {
-		_, tmpErr := db.ExecContext(ctx, fmt.Sprintf(joinQuery, featureNamesStr, featureNamesStr, r.DataTable, entityName), r.MinRevision, r.MaxRevision)
+		_, tmpErr := db.ExecContext(ctx, fmt.Sprintf(joinQuery, entityDfWithFeatureName, featureNamesStr, featureNamesStr, entityDfName, r.DataTable, entityName), r.MinRevision, r.MaxRevision)
 		if tmpErr != nil {
 			return nil, tmpErr
 		}
 	}
 
 	// Step 3: get rows from entity_df_with_features table
-	resultQuery := `SELECT * FROM entity_df_with_features`
+	resultQuery := fmt.Sprintf(`SELECT * FROM %s`, entityDfWithFeatureName)
 	rows, tmpErr := db.QueryxContext(ctx, resultQuery)
 	if tmpErr != nil {
 		return nil, tmpErr
 	}
 	defer rows.Close()
 
-	dataMap, err = getFeatureValueMapFromRows(rows, "key")
+	dataMap, err = getFeatureValueMapFromRows(rows, "unique_key")
 	return dataMap, err
 }
 
