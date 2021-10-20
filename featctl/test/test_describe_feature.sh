@@ -13,7 +13,7 @@ Group:         phone
 Entity:        device
 Category:      batch
 ValueType:     int
-Description:   
+Description:
 Revision:
 DataTable:
 CreateTime:
