@@ -43,6 +43,9 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 		}
 		for entityKey, m := range featureValues {
 			for fn, fv := range m {
+				if featureValueMap[entityKey] == nil {
+					featureValueMap[entityKey] = make(map[string]interface{})
+				}
 				featureValueMap[entityKey][fn] = fv
 			}
 		}
