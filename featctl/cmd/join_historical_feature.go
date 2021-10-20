@@ -7,30 +7,30 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var joinHistoricalFeaturesOpt JoinHistoricalFeaturesOpt
+var joinHistoricalFeatureOpt JoinHistoricalFeaturesOpt
 
-var joinHistoricalFeaturesCmd = &cobra.Command{
-	Use:   "historical-features",
+var joinHistoricalFeatureCmd = &cobra.Command{
+	Use:   "historical-feature",
 	Short: "join training label data set with historical feature values",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
 		defer oneStore.Close()
 
-		if err := joinHistoricalFeatures(ctx, oneStore, joinHistoricalFeaturesOpt); err != nil {
+		if err := joinHistoricalFeatures(ctx, oneStore, joinHistoricalFeatureOpt); err != nil {
 			log.Fatalf("failed joining historical features: %v\n", err)
 		}
 	},
 }
 
 func init() {
-	joinCmd.AddCommand(joinHistoricalFeaturesCmd)
+	joinCmd.AddCommand(joinHistoricalFeatureCmd)
 
-	flags := joinHistoricalFeaturesCmd.Flags()
+	flags := joinHistoricalFeatureCmd.Flags()
 
-	flags.StringVar(&joinHistoricalFeaturesOpt.InputFilePath, "input-file", "", "file path of training label data set")
-	_ = joinHistoricalFeaturesCmd.MarkFlagRequired("input-file")
+	flags.StringVar(&joinHistoricalFeatureOpt.InputFilePath, "input-file", "", "file path of training label data set")
+	_ = joinHistoricalFeatureCmd.MarkFlagRequired("input-file")
 
-	flags.StringSliceVar(&joinHistoricalFeaturesOpt.FeatureNames, "feature", nil, "feature names")
-	_ = joinHistoricalFeaturesCmd.MarkFlagRequired("feature")
+	flags.StringSliceVar(&joinHistoricalFeatureOpt.FeatureNames, "feature", nil, "feature names")
+	_ = joinHistoricalFeatureCmd.MarkFlagRequired("feature")
 }

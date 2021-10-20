@@ -13,17 +13,17 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-var getOnlineFeaturesOpt types.GetOnlineFeatureValuesOpt
+var getOnlineFeatureOpt types.GetOnlineFeatureValuesOpt
 
-var getOnlineFeaturesCmd = &cobra.Command{
-	Use:   "online-features",
+var getOnlineFeatureCmd = &cobra.Command{
+	Use:   "online-feature",
 	Short: "get online feature values",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
 		defer oneStore.Close()
 
-		featureValueMap, err := oneStore.GetOnlineFeatureValues(ctx, getOnlineFeaturesOpt)
+		featureValueMap, err := oneStore.GetOnlineFeatureValues(ctx, getOnlineFeatureOpt)
 		if err != nil {
 			log.Fatalf("failed getting online features: %v", err)
 		}
@@ -46,13 +46,13 @@ var getOnlineFeaturesCmd = &cobra.Command{
 }
 
 func init() {
-	getCmd.AddCommand(getOnlineFeaturesCmd)
+	getCmd.AddCommand(getOnlineFeatureCmd)
 
-	flags := getOnlineFeaturesCmd.Flags()
+	flags := getOnlineFeatureCmd.Flags()
 
-	flags.StringVarP(&getOnlineFeaturesOpt.EntityKey, "entity-key", "k", "", "entity keys")
-	_ = getOnlineFeaturesCmd.MarkFlagRequired("entity")
+	flags.StringVarP(&getOnlineFeatureOpt.EntityKey, "entity-key", "k", "", "entity keys")
+	_ = getOnlineFeatureCmd.MarkFlagRequired("entity")
 
-	flags.StringSliceVar(&getOnlineFeaturesOpt.FeatureNames, "feature", nil, "feature names")
-	_ = getOnlineFeaturesCmd.MarkFlagRequired("feature")
+	flags.StringSliceVar(&getOnlineFeatureOpt.FeatureNames, "feature", nil, "feature names")
+	_ = getOnlineFeatureCmd.MarkFlagRequired("feature")
 }
