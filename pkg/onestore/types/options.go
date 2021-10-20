@@ -60,10 +60,10 @@ type LocalFileDataSourceOpt struct {
 
 type GetOnlineFeatureValuesOpt struct {
 	FeatureNames []string
-	EntityValue  string
+	EntityKey    string
 }
 
-type GetOnlineFeatureValuesWithMultiEntityValuesOpt struct {
+type GetOnlineFeatureValuesWithMultiEntityKeysOpt struct {
 	FeatureNames []string
 	EntityKeys   []string
 }
