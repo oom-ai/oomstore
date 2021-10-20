@@ -49,6 +49,7 @@ assert_eq() {
 # register features for the sample data
 register_features() {
     featctl register entity device --length 32
+    featctl register entity user --length 64 --description "all users"
     featctl register group phone --entity device
     featctl register batch-feature price --group phone --value-type "int"
     featctl register batch-feature model --group phone --value-type "varchar(32)"
