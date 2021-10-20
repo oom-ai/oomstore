@@ -11,8 +11,18 @@ import (
 
 type RowMap = map[string]interface{}
 
+func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entityValue string, featureNames []string) (RowMap, error) {
+	query := fmt.Sprintf("SELECT `%s`,%s FROM %s WHERE `%s` = ?", entityName, strings.Join(featureNames, ","), dataTable, entityName)
+	rs := make(RowMap)
+
+	if err := db.QueryRowxContext(ctx, query, entityValue).MapScan(rs); err != nil {
+		return nil, err
+	}
+	return rs, nil
+}
+
 // response: map[entity_key]map[feature_name]feature_value
-func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName string, entityKeys, featureNames []string) (map[string]RowMap, error) {
+func (db *DB) GetFeatureValuesWithMultiEntityValues(ctx context.Context, dataTable, entityName string, entityKeys, featureNames []string) (map[string]RowMap, error) {
 	query := fmt.Sprintf("SELECT `%s`, %s FROM %s WHERE `%s` in (?);", entityName, strings.Join(featureNames, ","), dataTable, entityName)
 	sql, args, err := sqlx.In(query, entityKeys)
 	if err != nil {
