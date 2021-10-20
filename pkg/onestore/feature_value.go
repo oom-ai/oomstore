@@ -30,7 +30,7 @@ func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 	dataTables := getDataTables(features)
 
 	for dataTable, featureNames := range dataTables {
-		featureValues, err := s.db.GetFeatureValues(ctx, dataTable, *entityName, opt.EntityValue, featureNames)
+		featureValues, err := s.db.GetFeatureValues(ctx, dataTable, *entityName, opt.EntityKey, featureNames)
 		if err != nil {
 			return m, err
 		}
@@ -73,7 +73,7 @@ func getEntityName(features []*types.RichFeature) (*string, error) {
 	return nil, nil
 }
 
-func (s *OneStore) GetOnlineFeatureValuesWithMultiEntityValues(ctx context.Context, opt types.GetOnlineFeatureValuesWithMultiEntityValuesOpt) (*types.FeatureDataSet, error) {
+func (s *OneStore) GetOnlineFeatureValuesWithMultiEntityKeys(ctx context.Context, opt types.GetOnlineFeatureValuesWithMultiEntityKeysOpt) (*types.FeatureDataSet, error) {
 	features, err := s.db.GetRichFeatures(ctx, opt.FeatureNames)
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 		if !ok {
 			return nil, fmt.Errorf("missing entity_name for table %s", dataTable)
 		}
-		featureValues, err := s.db.GetFeatureValuesWithMultiEntityValues(ctx, dataTable, entityName, entityKeys, featureNames)
+		featureValues, err := s.db.GetFeatureValuesWithMultiEntityKeys(ctx, dataTable, entityName, entityKeys, featureNames)
 		if err != nil {
 			return nil, err
 		}
@@ -118,7 +118,7 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
-func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.GetOnlineFeatureValuesWithMultiEntityValuesOpt) (*types.FeatureDataSet, error) {
+func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.GetOnlineFeatureValuesWithMultiEntityKeysOpt) (*types.FeatureDataSet, error) {
 	fds := types.NewFeatureDataSet()
 	for _, entityKey := range opt.EntityKeys {
 		fds[entityKey] = make([]types.FeatureKV, 0)
