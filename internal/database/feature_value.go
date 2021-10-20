@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -80,15 +81,15 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 	}()
 
 	// Step 1: get table ranges
-	rangeQuery := `
+	rangeQuery := fmt.Sprintf(`
 		SELECT
 			revision AS min_revision,
-			LEAD(revision, 1, ~0 >> 1) OVER w AS max_revision,
+			LEAD(revision, 1, %d) OVER w AS max_revision,
 			data_table
 		FROM feature_group_revision
 		WHERE group_name = ?
 		WINDOW w AS (ORDER BY revision);
-	`
+	`, math.MaxInt64)
 
 	var ranges []struct {
 		MinRevision int64  `db:"min_revision"`
