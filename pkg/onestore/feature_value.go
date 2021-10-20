@@ -3,9 +3,12 @@ package onestore
 import (
 	"context"
 	"fmt"
+	"sort"
+	"strconv"
 
 	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/spf13/cast"
 )
 
 func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (types.FeatureValueMap, error) {
@@ -200,8 +203,20 @@ func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 			return nil, err
 		}
 		for key, m := range featureValues {
+			if _, ok := entityDataMap[key]; !ok {
+				entityDataMap[key] = make(database.RowMap)
+			}
 			for fn, fv := range m {
 				entityDataMap[key][fn] = fv
+			}
+		}
+	}
+	for _, entity := range opt.EntityRows {
+		key := entity.EntityKey + "," + strconv.Itoa(int(entity.UnixTime))
+		if _, ok := entityDataMap[key]; !ok {
+			entityDataMap[key] = database.RowMap{
+				"entity_key": entity.EntityKey,
+				"unix_time":  entity.UnixTime,
 			}
 		}
 	}
@@ -210,21 +225,28 @@ func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 	for _, rowMap := range entityDataMap {
 		entityKey := rowMap["entity_key"]
 		unixTime := rowMap["unix_time"]
-		delete(rowMap, "entity_key")
-		delete(rowMap, "unix_time")
+		unixTimeInt, err := castToInt64(unixTime)
+		if err != nil {
+			return nil, err
+		}
 
 		featureValues := make([]types.FeatureKV, 0, len(rowMap))
-		for fn, fv := range rowMap {
-			featureValues = append(featureValues, types.NewFeatureKV(fn, fv))
+		for _, fn := range opt.FeatureNames {
+			featureValues = append(featureValues, types.NewFeatureKV(fn, rowMap[fn]))
 		}
 		entityDataSet = append(entityDataSet, &types.EntityRowWithFeatures{
 			EntityRow: types.EntityRow{
-				EntityKey: entityKey.(string),
-				UnixTime:  unixTime.(int64),
+				EntityKey: cast.ToString(entityKey),
+				UnixTime:  unixTimeInt,
 			},
 			FeatureValues: featureValues,
 		})
 	}
-
+	sort.Slice(entityDataSet, func(i, j int) bool {
+		if entityDataSet[i].EntityKey == entityDataSet[j].EntityKey {
+			return entityDataSet[i].UnixTime < entityDataSet[j].UnixTime
+		}
+		return entityDataSet[i].EntityKey < entityDataSet[j].EntityKey
+	})
 	return entityDataSet, nil
 }
