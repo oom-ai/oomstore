@@ -13,13 +13,8 @@ type RowMap = map[string]interface{}
 
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName string, entityKeys, featureNames []string) (map[string]RowMap, error) {
-	marks := []string{}
-	for range featureNames {
-		marks = append(marks, "?")
-	}
-
-	query := fmt.Sprintf("SELECT ?, %s FROM %s WHERE ? in (?);", strings.Join(marks, ","), dataTable)
-	sql, args, err := sqlx.In(query, entityName, featureNames, entityKeys)
+	query := fmt.Sprintf("SELECT `%s`, %s FROM %s WHERE `%s` in (?);", entityName, strings.Join(featureNames, ","), dataTable, entityName)
+	sql, args, err := sqlx.In(query, entityKeys)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +40,7 @@ func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]
 			return nil, fmt.Errorf("missing column %s", entityName)
 		}
 		delete(rowMap, entityName)
-		featureValueMap[entityKey.(string)] = rowMap
+		featureValueMap[string(entityKey.([]byte))] = rowMap
 	}
 	return featureValueMap, nil
 }
