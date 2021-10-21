@@ -66,7 +66,7 @@ func (db *DB) ListFeature(ctx context.Context, groupName *string) ([]*types.Feat
 }
 
 func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
-	query := "UPDATE feature SET description = ? WHERE name = ?"
+	query := "UPDATE feature SET description = $1 WHERE name = $2"
 	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName)
 	return err
 }
@@ -74,12 +74,15 @@ func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) err
 func buildListFeatureCond(opt types.ListFeatureOpt) (string, []interface{}) {
 	cond := make([]string, 0)
 	args := make([]interface{}, 0)
+	var id int
 	if opt.EntityName != nil {
-		cond = append(cond, "entity_name = ?")
+		id++
+		cond = append(cond, fmt.Sprintf("entity_name = $%d", id))
 		args = append(args, *opt.EntityName)
 	}
 	if opt.GroupName != nil {
-		cond = append(cond, "group_name = ?")
+		id++
+		cond = append(cond, fmt.Sprintf("group_name = $%d", id))
 		args = append(args, *opt.GroupName)
 	}
 	return strings.Join(cond, " AND "), args
