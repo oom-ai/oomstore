@@ -66,7 +66,7 @@ import_sample() {
 }
 
 execute_sql() {
-    PGPASSWORD=postgres psql -h localhost -U postgres -c "$1"
+    PGPASSWORD=postgres psql -h localhost -U postgres -c "$1" >/dev/null
 }
 
 init_store() {
