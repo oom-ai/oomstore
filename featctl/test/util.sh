@@ -60,7 +60,7 @@ import_sample() {
     info "import sample data..."
     featctl import \
     --group phone \
-    --separator "," \
+    --delimiter "," \
     --input-file device.csv \
     --description 'test data'
 }
