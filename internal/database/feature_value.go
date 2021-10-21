@@ -14,7 +14,7 @@ import (
 type RowMap = map[string]interface{}
 
 func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entityKey string, featureNames []string) (RowMap, error) {
-	query := fmt.Sprintf("SELECT `%s`,%s FROM %s WHERE `%s` = ?", entityName, strings.Join(featureNames, ","), dataTable, entityName)
+	query := fmt.Sprintf(`SELECT "%s",%s FROM %s WHERE "%s" = $1`, entityName, strings.Join(featureNames, ","), dataTable, entityName)
 	rs := make(RowMap)
 
 	if err := db.QueryRowxContext(ctx, query, entityKey).MapScan(rs); err != nil {
@@ -25,7 +25,7 @@ func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entit
 
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, dataTable, entityName string, entityKeys, featureNames []string) (map[string]RowMap, error) {
-	query := fmt.Sprintf("SELECT `%s`, %s FROM %s WHERE `%s` in (?);", entityName, strings.Join(featureNames, ","), dataTable, entityName)
+	query := fmt.Sprintf(`SELECT "%s", %s FROM %s WHERE "%s" in (?);`, entityName, strings.Join(featureNames, ","), dataTable, entityName)
 	sql, args, err := sqlx.In(query, entityKeys)
 	if err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 			LEAD(revision, 1, %d) OVER w AS max_revision,
 			data_table
 		FROM feature_group_revision
-		WHERE group_name = ?
+		WHERE group_name = $1
 		WINDOW w AS (ORDER BY revision);
 	`, math.MaxInt64)
 
@@ -115,7 +115,7 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 		FROM %s AS l
 		LEFT JOIN %s AS r
 		ON l.entity_key = r.%s
-		WHERE l.unix_time >= ? AND l.unix_time < ?;
+		WHERE l.unix_time >= $1 AND l.unix_time < $2;
 	`
 	featureNamesStr := buildFeatureNameStr(features)
 
