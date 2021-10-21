@@ -7,14 +7,14 @@ import (
 )
 
 func (db *DB) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) error {
-	query := "insert into feature_entity(name, length, description) values(?, ?, ?)"
+	query := "insert into feature_entity(name, length, description) values($1, $2, $3)"
 	_, err := db.ExecContext(ctx, query, opt.Name, opt.Length, opt.Description)
 	return err
 }
 
 func (db *DB) GetEntity(ctx context.Context, name string) (*types.Entity, error) {
 	var entity types.Entity
-	query := "select * from feature_entity where name = ?"
+	query := "select * from feature_entity where name = $1"
 	if err := db.GetContext(ctx, &entity, query, name); err != nil {
 		return nil, err
 	}
