@@ -13,14 +13,14 @@ func (db *DB) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGro
 	if category != types.BatchFeatureCategory && category != types.StreamFeatureCategory {
 		return fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", category)
 	}
-	query := "insert into feature_group(name, entity_name, category, description) values(?, ?, ?, ?)"
+	query := "insert into feature_group(name, entity_name, category, description) values($1, $2, $3, $4)"
 	_, err := db.ExecContext(ctx, query, opt.Name, opt.EntityName, category, opt.Description)
 	return err
 }
 
 func (db *DB) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
 	var group types.FeatureGroup
-	query := `SELECT * FROM feature_group WHERE name = ?`
+	query := `SELECT * FROM feature_group WHERE name = $1`
 	if err := db.GetContext(ctx, &group, query, groupName); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("group %s does not exist", groupName)
