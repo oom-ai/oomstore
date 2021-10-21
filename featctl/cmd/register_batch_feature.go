@@ -24,7 +24,7 @@ var registerBatchFeatureCmd = &cobra.Command{
 		defer oneStore.Close()
 
 		if _, err := oneStore.CreateBatchFeature(ctx, registerBatchFeatureOpt); err != nil {
-			log.Fatal(err)
+			log.Fatalf("failed registering new feature: %v\n", err)
 		}
 	},
 }

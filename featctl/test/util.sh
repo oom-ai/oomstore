@@ -12,9 +12,9 @@ GRN=$(tput setaf 2 2>/dev/null || true)
 YLW=$(tput setaf 3 2>/dev/null || true)
 
 export FEATCTL_HOST=127.0.0.1
-export FEATCTL_PORT=4000
-export FEATCTL_USER=test
-export FEATCTL_PASS=test
+export FEATCTL_PORT=5432
+export FEATCTL_USER=postgres
+export FEATCTL_PASS=postgres
 
 trim() {
     local var="$*"
@@ -66,15 +66,11 @@ import_sample() {
 }
 
 execute_sql() {
-    mysql -h 127.0.0.1 -u root -P 4000 -e "$1"
+    PGPASSWORD=postgres psql -h localhost -U postgres -c "$1"
 }
 
 init_store() {
     info "initialize feature store"
-
-    # create test user
-    execute_sql "CREATE USER IF NOT EXISTS 'test'@'%' IDENTIFIED BY 'test'"
-    execute_sql "GRANT ALL PRIVILEGES ON *.* TO 'test'@'%' WITH GRANT OPTION"
 
     # destroy database
     execute_sql 'drop database if exists onestore'
