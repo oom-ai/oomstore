@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+
+	_ "github.com/lib/pq"
 )
 
 type DB struct {
@@ -28,8 +29,8 @@ func Open(option Option) (*DB, error) {
 
 func OpenWith(host, port, user, pass, dbName string) (*DB, error) {
 	db, err := sqlx.Open(
-		"mysql",
-		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		"postgres",
+		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 			user,
 			pass,
 			host,

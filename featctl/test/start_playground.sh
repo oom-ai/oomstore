@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 docker run --rm -d --name onestore \
-    -e MYSQL_ALLOW_EMPTY_PASSWORD=1 \
-    -p 4000:3306 \
-    mysql:5.7 >/dev/null
+    -e POSTGRES_PASSWORD=postgres \
+    -e POSTGRES_USER=postgres \
+    -p 5432:5432 \
+    postgres:14.0-alpine >/dev/null
 
 docker logs -f onestore
