@@ -51,7 +51,7 @@ func init() {
 	pFlags.StringVar(&cfgFile, "config", defaultCfgFile, "config file")
 
 	pFlags.StringVarP(&oneStoreOpt.Host, "host", "H", "127.0.0.1", "feature store database host")
-	pFlags.StringVarP(&oneStoreOpt.Port, "port", "P", "4000", "feature store database port")
+	pFlags.StringVarP(&oneStoreOpt.Port, "port", "P", "5432", "feature store database port")
 	pFlags.StringVarP(&oneStoreOpt.User, "user", "u", "root", "feature store database user")
 	pFlags.StringVarP(&oneStoreOpt.Pass, "pass", "p", "", "feature store database pass")
 	pFlags.StringVarP(&oneStoreOpt.Workspace, "workspace", "w", "onestore", "feature store workspace name")
