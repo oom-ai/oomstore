@@ -89,11 +89,10 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 	rangeQuery := fmt.Sprintf(`
 		SELECT
 			revision AS min_revision,
-			LEAD(revision, 1, %d) OVER w AS max_revision,
+			LEAD(revision, 1, %d) OVER (ORDER BY revision) AS max_revision,
 			data_table
 		FROM feature_group_revision
 		WHERE group_name = $1
-		WINDOW w AS (ORDER BY revision);
 	`, math.MaxInt64)
 
 	var ranges []struct {
@@ -107,10 +106,11 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 
 	// Step 2: iterate each table range, get result
 	joinQuery := `
-		INSERT INTO %s(unique_key, l.entity_key, l.unix_time, %s)
+		INSERT INTO %s(unique_key, entity_key, unix_time, %s)
 		SELECT
-			CONCAT(l.entity_key, ",", l.unix_time) AS unique_key,
-			l.entity_key, l.unix_time,
+			CONCAT(l.entity_key, ',', l.unix_time) AS unique_key,
+			l.entity_key AS entity_key,
+			l.unix_time AS unix_time,
 			%s
 		FROM %s AS l
 		LEFT JOIN %s AS r
@@ -118,7 +118,6 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 		WHERE l.unix_time >= $1 AND l.unix_time < $2;
 	`
 	featureNamesStr := buildFeatureNameStr(features)
-
 	for _, r := range ranges {
 		_, tmpErr := db.ExecContext(ctx, fmt.Sprintf(joinQuery, entityDfWithFeatureName, featureNamesStr, featureNamesStr, entityDfName, r.DataTable, entityName), r.MinRevision, r.MaxRevision)
 		if tmpErr != nil {
