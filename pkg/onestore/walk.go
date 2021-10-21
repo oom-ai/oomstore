@@ -41,7 +41,7 @@ func (s *OneStore) WalkFeatureValues(ctx context.Context, opt types.WalkFeatureV
 		if len(slice) < 1 {
 			return fmt.Errorf("empty row")
 		}
-		key := string(slice[0].([]byte))
+		key := slice[0].(string)
 		return opt.WalkFeatureValuesFunc(fields, key, slice[1:])
 	})
 }
