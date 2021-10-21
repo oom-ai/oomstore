@@ -21,13 +21,13 @@ func (db *DB) createTableEntityDfWithFeatures(ctx context.Context, features []*t
 			entity_key  VARCHAR(%d) NOT NULL,
 			unix_time   BIGINT NOT NULL,
 			%s,
-			PRIMARY KEY pk(entity_key, unix_time)
+			PRIMARY KEY (entity_key, unix_time)
 		);
 	`
 
 	var columnDefs []string
 	for _, f := range features {
-		columnDefs = append(columnDefs, fmt.Sprintf("`%s` %s COMMENT '%s'", f.Name, f.ValueType, f.Description))
+		columnDefs = append(columnDefs, fmt.Sprintf(`"%s" %s`, f.Name, f.ValueType))
 	}
 	// unique_key = entity_key,unix_time; length of unique_key = entity.Length + 9
 	schema = fmt.Sprintf(schema, tableName, entity.Length+10, entity.Length, strings.Join(columnDefs, ",\n"))
@@ -45,7 +45,7 @@ func (db *DB) createAndImportTableEntityDf(ctx context.Context, entityRows []typ
 		CREATE TABLE %s (
 			entity_key  VARCHAR(%d) NOT NULL,
 			unix_time   BIGINT NOT NULL,
-			PRIMARY KEY pk(entity_key, unix_time)
+			PRIMARY KEY (entity_key, unix_time)
 		);
 	`, tableName, entity.Length)
 	if _, err := db.ExecContext(ctx, schema); err != nil {
