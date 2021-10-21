@@ -21,6 +21,7 @@ var TRIGGER_TEMPLATE = `
 var META_TABLE_SCHEMAS = map[string]string{
 	"feature": `
 		CREATE TABLE feature (
+			id          SERIAL,
 			name        VARCHAR(32) NOT NULL,
 			group_name  VARCHAR(32) NOT NULL,
 			value_type  VARCHAR(16) NOT NULL,
@@ -53,6 +54,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 		`,
 	"feature_entity": `
 		CREATE TABLE feature_entity (
+			id      SERIAL,
 			name    VARCHAR(32) NOT NULL,
 			length	SMALLINT    NOT NULL,
 
@@ -66,6 +68,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 		`,
 	"feature_group_revision": `
 		CREATE TABLE feature_group_revision (
+			id          SERIAL,
 			group_name  VARCHAR(32) NOT NULL,
 			revision    BIGINT      NOT NULL,
 			data_table  VARCHAR(64) NOT NULL,

@@ -13,6 +13,7 @@ const (
 )
 
 type Entity struct {
+	ID     int64  `db:"id"`
 	Name   string `db:"name"`
 	Length int    `db:"length"`
 
@@ -22,6 +23,7 @@ type Entity struct {
 }
 
 type Feature struct {
+	ID        int64  `db:"id"`
 	Name      string `db:"name"`
 	GroupName string `db:"group_name"`
 	ValueType string `db:"value_type"`
@@ -50,6 +52,7 @@ type Revision struct {
 }
 
 type FeatureGroup struct {
+	ID         int64   `db:"id"`
 	Name       string  `db:"name"`
 	EntityName string  `db:"entity_name"`
 	Revision   *int64  `db:"revision"`
