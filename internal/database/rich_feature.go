@@ -10,7 +10,7 @@ import (
 
 func (db *DB) GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error) {
 	var richFeature types.RichFeature
-	query := `SELECT * FROM rich_feature WHERE name = ?`
+	query := `SELECT * FROM rich_feature WHERE name = $1`
 	if err := db.GetContext(ctx, &richFeature, query, featureName); err != nil {
 		return nil, err
 	}
