@@ -23,6 +23,7 @@ func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter,
 		if err != nil {
 			return err
 		}
+		defer dataFile.Close()
 
 		reader := csv.NewReader(dataFile)
 		reader.Comma = []rune(delimiter)[0]
