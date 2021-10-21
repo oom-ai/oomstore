@@ -13,6 +13,7 @@ const (
 )
 
 type Entity struct {
+	ID     int16  `db:"id"`
 	Name   string `db:"name"`
 	Length int    `db:"length"`
 
@@ -22,6 +23,7 @@ type Entity struct {
 }
 
 type Feature struct {
+	ID        int16  `db:"id"`
 	Name      string `db:"name"`
 	GroupName string `db:"group_name"`
 	ValueType string `db:"value_type"`
@@ -39,22 +41,24 @@ type RichFeature struct {
 	DataTable  *string `db:"data_table"`
 }
 
-type Revision struct {
-	Revision  int64  `db:"revision"`
-	GroupName string `db:"group_name"`
-	DataTable string `db:"data_table"`
+type FeatureGroup struct {
+	ID         int16   `db:"id"`
+	Name       string  `db:"name"`
+	EntityName string  `db:"entity_name"`
+	Revision   *int64  `db:"revision"`
+	Category   string  `db:"category"`
+	DataTable  *string `db:"data_table"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
 }
 
-type FeatureGroup struct {
-	Name       string  `db:"name"`
-	EntityName string  `db:"entity_name"`
-	Revision   *int64  `db:"revision"`
-	Category   string  `db:"category"`
-	DataTable  *string `db:"data_table"`
+type Revision struct {
+	ID        int32  `db:"id"`
+	Revision  int64  `db:"revision"`
+	GroupName string `db:"group_name"`
+	DataTable string `db:"data_table"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`

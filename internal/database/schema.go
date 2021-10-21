@@ -21,6 +21,7 @@ var TRIGGER_TEMPLATE = `
 var META_TABLE_SCHEMAS = map[string]string{
 	"feature": `
 		CREATE TABLE feature (
+			id          SERIAL2 UNIQUE,
 			name        VARCHAR(32) NOT NULL,
 			group_name  VARCHAR(32) NOT NULL,
 			value_type  VARCHAR(16) NOT NULL,
@@ -35,6 +36,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 		`,
 	"feature_group": `
 		CREATE TABLE feature_group (
+			id          SERIAL2 UNIQUE,
 			name        VARCHAR(32) NOT     NULL,
 			entity_name VARCHAR(32) NOT     NULL,
 			revision    BIGINT      DEFAULT NULL,
@@ -53,6 +55,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 		`,
 	"feature_entity": `
 		CREATE TABLE feature_entity (
+			id      SERIAL2 UNIQUE,
 			name    VARCHAR(32) NOT NULL,
 			length	SMALLINT    NOT NULL,
 
@@ -66,6 +69,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 		`,
 	"feature_group_revision": `
 		CREATE TABLE feature_group_revision (
+			id          SERIAL UNIQUE,
 			group_name  VARCHAR(32) NOT NULL,
 			revision    BIGINT      NOT NULL,
 			data_table  VARCHAR(64) NOT NULL,
@@ -85,7 +89,7 @@ var META_VIEW_SCHEMAS = map[string]string{
 	"rich_feature": `
         	CREATE VIEW rich_feature AS
 			SELECT
-				f.name, f.group_name, f.value_type, f.description, f.create_time, f.modify_time,
+				f.id, f.name, f.group_name, f.value_type, f.description, f.create_time, f.modify_time,
 				fg.entity_name, fg.category, fg.revision, fg.data_table
 			FROM feature AS f
 			LEFT JOIN feature_group AS fg
