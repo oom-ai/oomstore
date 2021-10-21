@@ -4,11 +4,18 @@ import (
 	"context"
 
 	"github.com/onestore-ai/onestore/internal/database"
+	"github.com/onestore-ai/onestore/internal/database/metadata"
+	"github.com/onestore-ai/onestore/internal/database/offline"
+	"github.com/onestore-ai/onestore/internal/database/online"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
 type OneStore struct {
 	db *database.DB
+
+	online   online.Store
+	offline  offline.Store
+	metadata metadata.Store
 }
 
 func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
@@ -17,7 +24,7 @@ func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 		return nil, err
 	}
 
-	return &OneStore{db}, nil
+	return &OneStore{db: db}, nil
 }
 
 func Create(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
