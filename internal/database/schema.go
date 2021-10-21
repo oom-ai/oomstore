@@ -1,54 +1,83 @@
 package database
 
+var DB_FUNCTIONS = []string{
+	`
+	CREATE OR REPLACE FUNCTION update_modify_time() RETURNS trigger AS $$
+		BEGIN
+			NEW.modify_time = NOW();
+			RETURN NEW;
+		END;
+	$$ LANGUAGE plpgsql;
+	`,
+}
+
+var TRIGGER_TEMPLATE = `
+	CREATE TRIGGER {{TABLE_NAME}}_update_modify_time
+	BEFORE UPDATE ON {{TABLE_NAME}}
+	FOR EACH ROW
+	EXECUTE PROCEDURE update_modify_time();
+`
+
 var META_TABLE_SCHEMAS = map[string]string{
 	"feature": `
 		CREATE TABLE feature (
-			name        VARCHAR(32) NOT NULL COMMENT 'feature name',
-			group_name  VARCHAR(32) NOT NULL COMMENT 'feature group name',
-			value_type  VARCHAR(16) NOT NULL COMMENT 'sql data type of feature value',
+			name        VARCHAR(32) NOT NULL,
+			group_name  VARCHAR(32) NOT NULL,
+			value_type  VARCHAR(16) NOT NULL,
 
-			description VARCHAR(128) DEFAULT "" COMMENT 'feature description',
-			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
-			PRIMARY KEY pk(name)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+			description VARCHAR(128) DEFAULT '',
+			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+			PRIMARY KEY (name)
+		);
+		COMMENT ON COLUMN feature.value_type IS 'sql data type of feature value';
 		`,
 	"feature_group": `
 		CREATE TABLE feature_group (
-			name        VARCHAR(32) NOT     NULL COMMENT 'group name',
-			entity_name VARCHAR(32) NOT     NULL COMMENT 'group entity field name',
-			revision    BIGINT      DEFAULT NULL COMMENT 'group online point-in-time epoch seconds',
-			category    VARCHAR(16) NOT     NULL COMMENT 'group category: batch / stream',
-			data_table  VARCHAR(64) DEFAULT NULL COMMENT 'feature data table name',
+			name        VARCHAR(32) NOT     NULL,
+			entity_name VARCHAR(32) NOT     NULL,
+			revision    BIGINT      DEFAULT NULL,
+			category    VARCHAR(16) NOT     NULL,
+			data_table  VARCHAR(64) DEFAULT NULL,
 
-			description VARCHAR(64) DEFAULT "" COMMENT 'group description',
-			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
-			PRIMARY KEY pk(name)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+			description VARCHAR(64) DEFAULT '',
+			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+			PRIMARY KEY (name)
+		);
+		COMMENT ON COLUMN feature_group.revision   IS 'group online point-in-time epoch seconds';
+		COMMENT ON COLUMN feature_group.category   IS 'group category: batch, stream ...';
+		COMMENT ON COLUMN feature_group.data_table IS 'feature data table name';
 		`,
 	"feature_entity": `
 		CREATE TABLE feature_entity (
-			name    VARCHAR(32) NOT NULL COMMENT 'feature entity name',
-			length	SMALLINT    NOT NULL COMMENT 'feature entity value max length',
+			name    VARCHAR(32) NOT NULL,
+			length	SMALLINT    NOT NULL,
 
-			description VARCHAR(64) DEFAULT "" COMMENT 'feature entity description',
-			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
-			PRIMARY KEY pk(name)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+			description VARCHAR(64) DEFAULT '',
+			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+			PRIMARY KEY (name)
+		);
+		COMMENT ON COLUMN feature_entity.length IS 'feature entity value max length';
 		`,
 	"feature_group_revision": `
 		CREATE TABLE feature_group_revision (
-			group_name  VARCHAR(32) NOT NULL COMMENT 'group name',
-			revision    BIGINT      NOT NULL COMMENT 'group data point-in-time epoch seconds',
-			data_table  VARCHAR(64) NOT NULL COMMENT 'feature data table name',
+			group_name  VARCHAR(32) NOT NULL,
+			revision    BIGINT      NOT NULL,
+			data_table  VARCHAR(64) NOT NULL,
 
-			description VARCHAR(64) DEFAULT "" COMMENT 'group description',
-			create_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-			modify_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modify time',
-			PRIMARY KEY pk(group_name, revision)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+			description VARCHAR(64) DEFAULT '',
+			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			modify_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+			PRIMARY KEY (group_name, revision)
+		);
+		COMMENT ON COLUMN feature_group_revision.revision   IS 'group data point-in-time epoch seconds';
+		COMMENT ON COLUMN feature_group_revision.data_table IS 'feature data table name';
 		`,
 }
 
