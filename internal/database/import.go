@@ -10,8 +10,7 @@ import (
 	"github.com/lib/pq"
 )
 
-// TODO: parameter `quote` is not been used currently
-func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter, quote string, header []string) error {
+func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter string, header []string) error {
 	return db.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		stmt, err := tx.PreparexContext(ctx, pq.CopyIn(tableName, header...))
 		if err != nil {
