@@ -40,6 +40,6 @@ func init() {
 
 	flags.StringVar(&importOpt.DataSource.FilePath, "input-file", "", "input csv file")
 	_ = importCmd.MarkFlagRequired("input-file")
-	flags.StringVar(&importOpt.DataSource.Separator, "separator", ",", "specify field delimiter")
-	flags.StringVar(&importOpt.DataSource.Delimiter, "delimiter", "\"", "specify quoting delimiter")
+	flags.StringVar(&importOpt.DataSource.Delimiter, "delimiter", ",", "specify field delimiter")
+	flags.StringVar(&importOpt.DataSource.Quote, "quote", "\"", "specify quoting character")
 }

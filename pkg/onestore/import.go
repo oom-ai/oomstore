@@ -17,7 +17,7 @@ import (
 )
 
 const CREATE_DATA_TABLE = "CREATE TABLE {{TABLE_NAME}} (\n" +
-	"`{{ENTITY_NAME}}` VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY COMMENT 'entity key',\n" +
+	"{{ENTITY_NAME}} VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY,\n" +
 	"{{COLUMN_DEFS}});"
 
 func buildFeatureDataTableSchema(tableName string, entity *types.Entity, columns []*types.Feature) string {
@@ -27,7 +27,7 @@ func buildFeatureDataTableSchema(tableName string, entity *types.Entity, columns
 	})
 	var columnDefs []string
 	for _, column := range columns {
-		columnDef := fmt.Sprintf("`%s` %s COMMENT '%s'", column.Name, column.ValueType, column.Description)
+		columnDef := fmt.Sprintf("%s %s", column.Name, column.ValueType)
 		columnDefs = append(columnDefs, columnDef)
 	}
 
@@ -127,7 +127,7 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		}
 
 		// populate the data table
-		err = s.db.LoadLocalFile(ctx, opt.DataSource.FilePath, tmpTableName, opt.DataSource.Separator, opt.DataSource.Delimiter, header)
+		err = s.db.LoadLocalFile(ctx, opt.DataSource.FilePath, tmpTableName, opt.DataSource.Delimiter, opt.DataSource.Quote, header)
 		if err != nil {
 			return err
 		}
@@ -137,7 +137,7 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 
 		// rename
 		finalTableName := opt.GroupName + "_" + strconv.FormatInt(ts, 10)
-		rename := fmt.Sprintf("RENAME TABLE `%s` TO `%s`", tmpTableName, finalTableName)
+		rename := fmt.Sprintf("ALTER TABLE %s RENAME TO %s", tmpTableName, finalTableName)
 		if _, err = tx.ExecContext(ctx, rename); err != nil {
 			return err
 		}

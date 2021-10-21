@@ -23,7 +23,7 @@ func (db *DB) ListRevision(ctx context.Context, groupName *string) ([]*types.Rev
 }
 
 func InsertRevision(ctx context.Context, tx *sqlx.Tx, groupName string, revision int64, dataTable string, description string) error {
-	cmd := "INSERT INTO feature_group_revision(group_name, revision, data_table, description) VALUES (?, ?, ?, ?)"
+	cmd := "INSERT INTO feature_group_revision(group_name, revision, data_table, description) VALUES ($1, $2, $3, $4)"
 	_, err := tx.ExecContext(ctx, cmd, groupName, revision, dataTable, description)
 	return err
 }
