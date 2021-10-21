@@ -127,7 +127,7 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		}
 
 		// populate the data table
-		err = s.db.LoadLocalFile(ctx, opt.DataSource.FilePath, tmpTableName, opt.DataSource.Delimiter, opt.DataSource.Quote, header)
+		err = s.db.LoadLocalFile(ctx, opt.DataSource.FilePath, tmpTableName, opt.DataSource.Delimiter, header)
 		if err != nil {
 			return err
 		}
