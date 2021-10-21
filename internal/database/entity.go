@@ -32,7 +32,7 @@ func (db *DB) ListEntity(ctx context.Context) ([]*types.Entity, error) {
 }
 
 func (db *DB) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) error {
-	query := "UPDATE feature_entity SET description = ? WHERE name = ?"
+	query := "UPDATE feature_entity SET description = $1 WHERE name = $2"
 	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.EntityName)
 	return err
 }
