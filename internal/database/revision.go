@@ -11,7 +11,7 @@ func (db *DB) ListRevision(ctx context.Context, groupName *string) ([]*types.Rev
 	query := "SELECT * FROM feature_group_revision"
 	var cond []interface{}
 	if groupName != nil {
-		query += " WHERE group_name = ?"
+		query += " WHERE group_name = $1"
 		cond = append(cond, *groupName)
 	}
 	revisions := make([]*types.Revision, 0)

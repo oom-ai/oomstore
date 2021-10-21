@@ -34,7 +34,7 @@ func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*type
 	var cond []interface{}
 	query := "SELECT * FROM feature_group"
 	if entityName != nil {
-		query = query + " WHERE entity_name = ?"
+		query = query + " WHERE entity_name = $1"
 		cond = append(cond, *entityName)
 	}
 
@@ -50,7 +50,7 @@ func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*type
 }
 
 func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
-	query := "UPDATE feature_group SET description = ? WHERE name = ?"
+	query := "UPDATE feature_group SET description = $1 WHERE name = $2"
 	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.GroupName)
 	return err
 }
