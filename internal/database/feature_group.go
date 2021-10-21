@@ -56,7 +56,7 @@ func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGro
 }
 
 func UpdateFeatureGroupRevision(ctx context.Context, tx *sqlx.Tx, revision int64, dataTable string, groupName string) error {
-	cmd := "UPDATE feature_group SET revision = ?, data_table = ? WHERE name = ?"
+	cmd := "UPDATE feature_group SET revision = $1, data_table = $2 WHERE name = $3"
 	_, err := tx.ExecContext(ctx, cmd, revision, dataTable, groupName)
 	return err
 }

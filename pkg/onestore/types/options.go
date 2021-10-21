@@ -54,8 +54,8 @@ type ImportBatchFeaturesOpt struct {
 
 type LocalFileDataSourceOpt struct {
 	FilePath  string
-	Separator string
 	Delimiter string
+	Quote     string
 }
 
 type GetOnlineFeatureValuesOpt struct {
