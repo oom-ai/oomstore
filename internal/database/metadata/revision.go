@@ -7,7 +7,7 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error) {
+func (db *PostgresDB) ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error) {
 	query := "SELECT * FROM feature_group_revision"
 	var cond []interface{}
 	if groupName != nil {

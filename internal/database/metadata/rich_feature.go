@@ -8,7 +8,7 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error) {
+func (db *PostgresDB) GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error) {
 	var richFeature types.RichFeature
 	query := "SELECT * FROM rich_feature WHERE name = $1"
 	if err := db.GetContext(ctx, &richFeature, query, featureName); err != nil {
@@ -17,7 +17,7 @@ func (db *DB) GetRichFeature(ctx context.Context, featureName string) (*types.Ri
 	return &richFeature, nil
 }
 
-func (db *DB) GetRichFeatures(ctx context.Context, featureNames []string) ([]*types.RichFeature, error) {
+func (db *PostgresDB) GetRichFeatures(ctx context.Context, featureNames []string) ([]*types.RichFeature, error) {
 	query := "SELECT * FROM rich_feature WHERE name IN (?)"
 	sql, args, err := sqlx.In(query, featureNames)
 	if err != nil {
@@ -32,7 +32,7 @@ func (db *DB) GetRichFeatures(ctx context.Context, featureNames []string) ([]*ty
 	return richFeatures, nil
 }
 
-func (db *DB) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error) {
+func (db *PostgresDB) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error) {
 	query := "SELECT * FROM rich_feature"
 	cond, args := buildListFeatureCond(opt)
 	if len(cond) > 0 {
