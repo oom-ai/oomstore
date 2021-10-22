@@ -22,6 +22,11 @@ type Store interface {
 	GetFeature(ctx context.Context, featureName string) (*types.Feature, error)
 	ListFeature(ctx context.Context, groupName *string) ([]*types.Feature, error)
 	UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error
+
+	// rich feature
+	GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error)
+	GetRichFeatures(ctx context.Context, featureNames []string) ([]*types.RichFeature, error)
+	ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error)
 }
 
 type DB struct {
