@@ -29,6 +29,8 @@ type Store interface {
 	ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error)
 }
 
+var _ Store = &DB{}
+
 type DB struct {
 	*sqlx.DB
 }
