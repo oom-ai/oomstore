@@ -34,10 +34,21 @@ func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 	if err != nil {
 		return nil, err
 	}
+	metadata, err := metadata.Open(metadata.Option{
+		Host:   opt.Host,
+		Port:   opt.Port,
+		User:   opt.User,
+		Pass:   opt.Pass,
+		DbName: opt.Workspace,
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	return &OneStore{
-		db:     db,
-		online: onlineStore,
+		db:       db,
+		online:   onlineStore,
+		metadata: metadata,
 	}, nil
 }
 
