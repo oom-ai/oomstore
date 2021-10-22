@@ -14,7 +14,7 @@ type TxFn func(ctx context.Context, tx *sqlx.Tx) error
 
 // WithTransaction creates a new transaction and handles rollback/commit based on the
 // error object returned by the `TxFn`
-func (db *DB) WithTransaction(ctx context.Context, fn TxFn) (err error) {
+func (db *PostgresDB) WithTransaction(ctx context.Context, fn TxFn) (err error) {
 	tx, err := db.BeginTxx(ctx, nil)
 	if err != nil {
 		return

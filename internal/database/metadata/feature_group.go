@@ -9,7 +9,7 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt, category string) error {
+func (db *PostgresDB) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt, category string) error {
 	if category != types.BatchFeatureCategory && category != types.StreamFeatureCategory {
 		return fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", category)
 	}
@@ -18,7 +18,7 @@ func (db *DB) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGro
 	return err
 }
 
-func (db *DB) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
+func (db *PostgresDB) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
 	var group types.FeatureGroup
 	query := `SELECT * FROM feature_group WHERE name = $1`
 	if err := db.GetContext(ctx, &group, query, groupName); err != nil {
@@ -30,7 +30,7 @@ func (db *DB) GetFeatureGroup(ctx context.Context, groupName string) (*types.Fea
 	return &group, nil
 }
 
-func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
+func (db *PostgresDB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
 	var cond []interface{}
 	query := "SELECT * FROM feature_group"
 	if entityName != nil {
@@ -49,7 +49,7 @@ func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*type
 
 }
 
-func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
+func (db *PostgresDB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
 	query := "UPDATE feature_group SET description = $1 WHERE name = $2"
 	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.GroupName)
 	return err
