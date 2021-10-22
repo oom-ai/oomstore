@@ -52,7 +52,7 @@ type Revision struct {
 }
 
 type FeatureGroup struct {
-	ID         int64   `db:"id"`
+	ID         int32   `db:"id"`
 	Name       string  `db:"name"`
 	EntityName string  `db:"entity_name"`
 	Revision   *int64  `db:"revision"`
