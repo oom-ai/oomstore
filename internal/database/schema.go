@@ -21,7 +21,7 @@ var TRIGGER_TEMPLATE = `
 var META_TABLE_SCHEMAS = map[string]string{
 	"feature": `
 		CREATE TABLE feature (
-			id          SERIAL,
+			id          SERIAL2 UNIQE,
 			name        VARCHAR(32) NOT NULL,
 			group_name  VARCHAR(32) NOT NULL,
 			value_type  VARCHAR(16) NOT NULL,
