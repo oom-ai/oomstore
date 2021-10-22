@@ -86,7 +86,7 @@ func stringSliceEqual(a, b []string) bool {
 
 func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) error {
 	// get columns of the group
-	columns, err := s.db.ListFeature(ctx, &opt.GroupName)
+	columns, err := s.metadata.ListFeature(ctx, &opt.GroupName)
 	if err != nil {
 		return err
 	}
