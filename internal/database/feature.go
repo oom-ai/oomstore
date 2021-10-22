@@ -6,7 +6,9 @@ import (
 	"math/rand"
 	"strings"
 
+	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -33,8 +35,10 @@ func (db *DB) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt) err
 	query := "INSERT INTO feature(name, group_name, value_type, description) VALUES ($1, $2, $3, $4)"
 	_, err := db.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.ValueType, opt.Description)
 	if err != nil {
-		if errNumber := GetErrNumber(err); errNumber == ER_DUP_ENTRY {
-			return fmt.Errorf("feature %s already exist", opt.FeatureName)
+		if e2, ok := err.(*pq.Error); ok {
+			if e2.Code == pgerrcode.DuplicateColumn {
+				return fmt.Errorf("feature %s already exist", opt.FeatureName)
+			}
 		}
 	}
 	return err
