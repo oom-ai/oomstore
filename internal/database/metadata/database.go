@@ -11,11 +11,17 @@ import (
 )
 
 type Store interface {
+	// entity
 	CreateEntity(ctx context.Context, opt types.CreateEntityOpt) error
 	GetEntity(ctx context.Context, name string) (*types.Entity, error)
 	ListEntity(ctx context.Context) ([]*types.Entity, error)
 	UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) error
-	// TODO: add all metadata methods
+
+	// feature
+	CreateFeature(ctx context.Context, opt types.CreateFeatureOpt) error
+	GetFeature(ctx context.Context, featureName string) (*types.Feature, error)
+	ListFeature(ctx context.Context, groupName *string) ([]*types.Feature, error)
+	UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error
 }
 
 type DB struct {
