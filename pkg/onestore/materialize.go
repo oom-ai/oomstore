@@ -31,7 +31,7 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
-	if err := s.online.LoadFeatureValuesStream(ctx, stream, features, revision); err != nil {
+	if err := s.online.SinkFeatureValuesStream(ctx, stream, features, revision); err != nil {
 		return err
 	}
 
