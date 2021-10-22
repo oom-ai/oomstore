@@ -9,7 +9,7 @@ import (
 
 // GetFeature: get feature by featureName
 func (s *OneStore) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
-	feature, err := s.db.GetFeature(ctx, featureName)
+	feature, err := s.metadata.GetFeature(ctx, featureName)
 	if err != nil {
 		return nil, err
 	}
@@ -17,7 +17,7 @@ func (s *OneStore) GetFeature(ctx context.Context, featureName string) (*types.F
 }
 
 func (s *OneStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.Feature, error) {
-	richFeatures, err := s.db.ListRichFeature(ctx, opt)
+	richFeatures, err := s.metadata.ListRichFeature(ctx, opt)
 	if err != nil {
 		return nil, err
 	}
@@ -29,19 +29,19 @@ func (s *OneStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) ([
 }
 
 func (s *OneStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
-	return s.db.UpdateFeature(ctx, opt)
+	return s.metadata.UpdateFeature(ctx, opt)
 }
 
 func (s *OneStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatureOpt) (*types.Feature, error) {
-	group, err := s.db.GetFeatureGroup(ctx, opt.GroupName)
+	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupName)
 	if err != nil {
 		return nil, err
 	}
 	if group.Category != types.BatchFeatureCategory {
 		return nil, fmt.Errorf("expected batch feature group, got %s feature group", group.Category)
 	}
-	if err := s.db.CreateFeature(ctx, opt); err != nil {
+	if err := s.metadata.CreateFeature(ctx, opt); err != nil {
 		return nil, err
 	}
-	return s.db.GetFeature(ctx, opt.FeatureName)
+	return s.metadata.GetFeature(ctx, opt.FeatureName)
 }
