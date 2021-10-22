@@ -27,6 +27,12 @@ type Store interface {
 	GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error)
 	GetRichFeatures(ctx context.Context, featureNames []string) ([]*types.RichFeature, error)
 	ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error)
+
+	// feature group
+	CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt, category string) error
+	GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error)
+	ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error)
+	UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error
 }
 
 var _ Store = &DB{}
