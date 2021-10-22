@@ -69,38 +69,6 @@ func OpenWith(host, port, user, pass, dbName string) (*DB, error) {
 	return &DB{db}, err
 }
 
-type Column struct {
-	Field   string
-	Type    string
-	Null    string
-	Key     string
-	Default *string
-	Extra   string
-}
-
-func (db *DB) ColumnInfo(ctx context.Context, table string, column string) (Column, error) {
-	var result Column
-	err := db.QueryRowContext(ctx, fmt.Sprintf(`show columns from "%s" like "%s"`, table, column)).
-		Scan(&result.Field, &result.Type, &result.Null, &result.Key, &result.Default, &result.Extra)
-	if err == sql.ErrNoRows {
-		return result, fmt.Errorf(`column "%s" not found in table "%s"`, column, table)
-	}
-	return result, err
-}
-
-func (db *DB) TableExists(ctx context.Context, table string) (bool, error) {
-	var result string
-	err := db.GetContext(ctx, &result, fmt.Sprintf(`show tables like "%s"`, table))
-	switch {
-	case err == sql.ErrNoRows:
-		return false, nil
-	case err != nil:
-		return false, err
-	default:
-		return true, nil
-	}
-}
-
 type WalkFunc = func(slice []interface{}) error
 
 func (db *DB) WalkTable(ctx context.Context, table string, fields []string, limit *uint64, walkFunc WalkFunc) error {
