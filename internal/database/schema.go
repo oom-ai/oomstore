@@ -54,7 +54,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 		`,
 	"feature_entity": `
 		CREATE TABLE feature_entity (
-			id      SERIAL,
+			id      SERIAL2 UNIQE,
 			name    VARCHAR(32) NOT NULL,
 			length	SMALLINT    NOT NULL,
 
