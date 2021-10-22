@@ -2,7 +2,6 @@ package metadata
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"strings"
 
@@ -38,9 +37,9 @@ type Store interface {
 	ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error)
 }
 
-var _ Store = &DB{}
+var _ Store = &PostgresDB{}
 
-type DB struct {
+type PostgresDB struct {
 	*sqlx.DB
 }
 
@@ -52,11 +51,11 @@ type Option struct {
 	DbName string
 }
 
-func Open(option Option) (*DB, error) {
+func Open(option Option) (Store, error) {
 	return OpenWith(option.Host, option.Port, option.User, option.Pass, option.DbName)
 }
 
-func OpenWith(host, port, user, pass, dbName string) (*DB, error) {
+func OpenWith(host, port, user, pass, dbName string) (Store, error) {
 	db, err := sqlx.Open(
 		"postgres",
 		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
@@ -66,12 +65,12 @@ func OpenWith(host, port, user, pass, dbName string) (*DB, error) {
 			port,
 			dbName),
 	)
-	return &DB{db}, err
+	return &PostgresDB{db}, err
 }
 
 type WalkFunc = func(slice []interface{}) error
 
-func (db *DB) WalkTable(ctx context.Context, table string, fields []string, limit *uint64, walkFunc WalkFunc) error {
+func (db *PostgresDB) WalkTable(ctx context.Context, table string, fields []string, limit *uint64, walkFunc WalkFunc) error {
 	query := fmt.Sprintf("select %s from %s", strings.Join(fields, ","), table)
 	if limit != nil {
 		query += fmt.Sprintf(" LIMIT %d", *limit)
