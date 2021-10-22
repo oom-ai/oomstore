@@ -7,21 +7,21 @@ import (
 )
 
 func (s *OneStore) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt) (*types.FeatureGroup, error) {
-	if err := s.db.CreateFeatureGroup(ctx, opt, types.BatchFeatureCategory); err != nil {
+	if err := s.metadata.CreateFeatureGroup(ctx, opt, types.BatchFeatureCategory); err != nil {
 		return nil, err
 	}
 	return s.GetFeatureGroup(ctx, opt.Name)
 }
 
 func (s *OneStore) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
-	return s.db.GetFeatureGroup(ctx, groupName)
+	return s.metadata.GetFeatureGroup(ctx, groupName)
 }
 
 func (s *OneStore) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
-	return s.db.ListFeatureGroup(ctx, entityName)
+	return s.metadata.ListFeatureGroup(ctx, entityName)
 
 }
 
 func (s *OneStore) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
-	return s.db.UpdateFeatureGroup(ctx, opt)
+	return s.metadata.UpdateFeatureGroup(ctx, opt)
 }
