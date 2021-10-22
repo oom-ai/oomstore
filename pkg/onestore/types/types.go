@@ -13,7 +13,7 @@ const (
 )
 
 type Entity struct {
-	ID     int64  `db:"id"`
+	ID     int16  `db:"id"`
 	Name   string `db:"name"`
 	Length int    `db:"length"`
 
