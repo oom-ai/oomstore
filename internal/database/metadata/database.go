@@ -33,6 +33,9 @@ type Store interface {
 	GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error)
 	ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error)
 	UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error
+
+	// revision
+	ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error)
 }
 
 var _ Store = &DB{}
