@@ -86,3 +86,15 @@ type UpdateFeatureGroupOpt struct {
 	GroupName      string
 	NewDescription string
 }
+
+type MaterializeOpt struct {
+	GroupName     string
+	GroupRevision int64
+}
+
+type GetFeatureValuesStreamOpt struct {
+	GroupName    string
+	Revision     int64
+	FeatureNames []string
+	Limit        *uint64
+}
