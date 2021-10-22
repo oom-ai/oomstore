@@ -23,7 +23,7 @@ type Entity struct {
 }
 
 type Feature struct {
-	ID        int64  `db:"id"`
+	ID        int16  `db:"id"`
 	Name      string `db:"name"`
 	GroupName string `db:"group_name"`
 	ValueType string `db:"value_type"`
