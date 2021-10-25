@@ -14,7 +14,7 @@ import (
 func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (types.FeatureValueMap, error) {
 	m := make(map[string]interface{})
 
-	features, err := s.db.GetRichFeatures(ctx, opt.FeatureNames)
+	features, err := s.metadata.GetRichFeatures(ctx, opt.FeatureNames)
 	if err != nil {
 		return m, err
 	}
@@ -74,7 +74,7 @@ func getEntityName(features []*types.RichFeature) (*string, error) {
 }
 
 func (s *OneStore) GetOnlineFeatureValuesWithMultiEntityKeys(ctx context.Context, opt types.GetOnlineFeatureValuesWithMultiEntityKeysOpt) (*types.FeatureDataSet, error) {
-	features, err := s.db.GetRichFeatures(ctx, opt.FeatureNames)
+	features, err := s.metadata.GetRichFeatures(ctx, opt.FeatureNames)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +183,7 @@ func buildDataTableToFeaturesMap(features []*types.RichFeature) map[string][]*ty
 // GetHistoricalFeatureValues gets point-in-time feature values for each entity row;
 // currently, this API only supports batch features.
 func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.GetHistoricalFeatureValuesOpt) ([]*types.EntityRowWithFeatures, error) {
-	features, err := s.db.GetRichFeatures(ctx, opt.FeatureNames)
+	features, err := s.metadata.GetRichFeatures(ctx, opt.FeatureNames)
 	if err != nil {
 		return nil, err
 	}
