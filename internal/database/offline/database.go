@@ -12,6 +12,7 @@ import (
 type Store interface {
 	GetPointInTimeFeatureValues(ctx context.Context, entity *types.Entity, revisionRanges []*types.RevisionRange, features []*types.RichFeature, entityRows []types.EntityRow) (dataMap map[string]database.RowMap, err error)
 	GetFeatureValuesStream(ctx context.Context, opt types.GetFeatureValuesStreamOpt) (<-chan []interface{}, error)
+	LoadLocalFile(ctx context.Context, filePath, tableName, delimiter string, header []string) error
 }
 
 var _ Store = &postgres.DB{}
