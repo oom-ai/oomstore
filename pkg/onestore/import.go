@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/onestore-ai/onestore/internal/database"
+	"github.com/onestore-ai/onestore/internal/database/metadata"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -143,12 +143,12 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		}
 
 		// insert into feature_group_revision table
-		if err = database.InsertRevision(ctx, tx, opt.GroupName, ts, finalTableName, opt.Description); err != nil {
+		if err = metadata.InsertRevision(ctx, tx, opt.GroupName, ts, finalTableName, opt.Description); err != nil {
 			return err
 		}
 
 		// update feature_group table
-		if err = database.UpdateFeatureGroupRevision(ctx, tx, ts, finalTableName, opt.GroupName); err != nil {
+		if err = metadata.UpdateFeatureGroupRevision(ctx, tx, ts, finalTableName, opt.GroupName); err != nil {
 			return err
 		}
 
