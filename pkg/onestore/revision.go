@@ -11,5 +11,5 @@ func (s *OneStore) ListRevision(ctx context.Context, groupName *string) ([]*type
 }
 
 func (s *OneStore) GetRevision(ctx context.Context, groupName string, revision int64) (*types.Revision, error) {
-	return s.db.GetRevision(ctx, groupName, revision)
+	return s.metadata.GetRevision(ctx, groupName, revision)
 }
