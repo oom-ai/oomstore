@@ -25,7 +25,7 @@ func Open(option *types.PostgresDbOpt) (*DB, error) {
 	return OpenWith(option.Host, option.Port, option.User, option.Pass, option.Database)
 }
 
-func OpenWith(host string, port, user, pass, dbName string) (*DB, error) {
+func OpenWith(host, port, user, pass, dbName string) (*DB, error) {
 	db, err := sqlx.Open(
 		"postgres",
 		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
