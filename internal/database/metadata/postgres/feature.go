@@ -9,12 +9,13 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
 func (db *DB) validateDataType(ctx context.Context, dataType string) error {
 	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Intn(100000))
-	return db.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+	return database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", tmpTableName)); err != nil {
 			return err
 		}
