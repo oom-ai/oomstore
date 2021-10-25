@@ -198,7 +198,18 @@ func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 
 	entityDataMap := make(map[string]database.RowMap)
 	for _, richFeatures := range dataTableToFeaturesMap {
-		featureValues, err := s.db.GetPointInTimeFeatureValues(ctx, richFeatures, opt.EntityRows)
+		if len(richFeatures) == 0 {
+			continue
+		}
+		revisionRanges, err := s.metadata.BuildRevisionRanges(ctx, richFeatures[0].GroupName)
+		if err != nil {
+			return nil, err
+		}
+		entity, err := s.metadata.GetEntity(ctx, richFeatures[0].EntityName)
+		if err != nil {
+			return nil, err
+		}
+		featureValues, err := s.db.GetPointInTimeFeatureValues(ctx, entity, revisionRanges, richFeatures, opt.EntityRows)
 		if err != nil {
 			return nil, err
 		}
