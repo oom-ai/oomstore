@@ -58,11 +58,11 @@ type CreateFeatureGroupOpt struct {
 
 type WalkFeatureValuesFunc = func(header []string, key string, values []interface{}) error
 
-type WalkFeatureValuesOpt struct {
-	FeatureGroup          FeatureGroup
-	FeatureNames          []string
-	Limit                 *uint64
-	WalkFeatureValuesFunc WalkFeatureValuesFunc
+type ExportFeatureValuesOpt struct {
+	GroupName     string
+	GroupRevision *int64
+	FeatureNames  []string
+	Limit         *uint64
 }
 
 type ImportBatchFeaturesOpt struct {
