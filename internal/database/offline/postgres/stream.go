@@ -9,7 +9,8 @@ import (
 )
 
 func (db *DB) GetFeatureValuesStream(ctx context.Context, opt types.GetFeatureValuesStreamOpt) (<-chan *types.RawFeatureValueRecord, error) {
-	query := fmt.Sprintf("select %s from %s", strings.Join(opt.FeatureNames, ","), opt.FeatureNames)
+	fields := append([]string{opt.EntityName}, opt.FeatureNames...)
+	query := fmt.Sprintf("select %s from %s", strings.Join(fields, ","), opt.DataTable)
 	if opt.Limit != nil {
 		query += fmt.Sprintf(" LIMIT %d", *opt.Limit)
 	}
