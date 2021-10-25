@@ -175,3 +175,9 @@ func (r *RichFeature) ToCsvRecord() string {
 
 	return strings.Join([]string{r.Name, r.GroupName, r.EntityName, r.Category, r.ValueType, r.Description, revision, dataTable, r.CreateTime.Format(time.RFC3339), r.ModifyTime.Format(time.RFC3339)}, ",")
 }
+
+type RevisionRange struct {
+	MinRevision int64  `db:"min_revision"`
+	MaxRevision int64  `db:"max_revision"`
+	DataTable   string `db:"data_table"`
+}

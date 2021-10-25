@@ -35,6 +35,7 @@ type Store interface {
 
 	// revision
 	ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error)
+	BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error)
 }
 
 var _ Store = &PostgresDB{}
