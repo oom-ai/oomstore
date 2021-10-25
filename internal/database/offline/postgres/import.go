@@ -1,4 +1,4 @@
-package database
+package postgres
 
 import (
 	"context"
@@ -8,10 +8,11 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"github.com/onestore-ai/onestore/internal/database"
 )
 
 func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter string, header []string) error {
-	return db.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+	return database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		stmt, err := tx.PreparexContext(ctx, pq.CopyIn(tableName, header...))
 		if err != nil {
 			return err
