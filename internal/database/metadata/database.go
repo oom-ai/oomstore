@@ -3,9 +3,8 @@ package metadata
 import (
 	"context"
 	"fmt"
-	"strings"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/onestore-ai/onestore/internal/database/metadata/postgres"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -39,63 +38,13 @@ type Store interface {
 	BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error)
 }
 
-var _ Store = &PostgresDB{}
+var _ Store = &postgres.DB{}
 
-type PostgresDB struct {
-	*sqlx.DB
-}
-
-type Option struct {
-	Host   string
-	Port   string
-	User   string
-	Pass   string
-	DbName string
-}
-
-func Open(option Option) (Store, error) {
-	return OpenWith(option.Host, option.Port, option.User, option.Pass, option.DbName)
-}
-
-func OpenWith(host, port, user, pass, dbName string) (Store, error) {
-	db, err := sqlx.Open(
-		"postgres",
-		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-			user,
-			pass,
-			host,
-			port,
-			dbName),
-	)
-	return &PostgresDB{db}, err
-}
-
-type WalkFunc = func(slice []interface{}) error
-
-func (db *PostgresDB) WalkTable(ctx context.Context, table string, fields []string, limit *uint64, walkFunc WalkFunc) error {
-	query := fmt.Sprintf("select %s from %s", strings.Join(fields, ","), table)
-	if limit != nil {
-		query += fmt.Sprintf(" LIMIT %d", *limit)
+func Open(opt types.MetaStoreOpt) (Store, error) {
+	switch opt.Backend {
+	case types.POSTGRES:
+		return postgres.Open(opt.PostgresDbOpt)
+	default:
+		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
-
-	rows, err := db.QueryxContext(ctx, query)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	return walkRows(rows, walkFunc)
-}
-
-func walkRows(rows *sqlx.Rows, walkFunc WalkFunc) error {
-	for rows.Next() {
-		slice, err := rows.SliceScan()
-		if err != nil {
-			return err
-		}
-		if err := walkFunc(slice); err != nil {
-			return err
-		}
-	}
-	return nil
 }
