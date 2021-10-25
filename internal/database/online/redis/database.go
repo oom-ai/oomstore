@@ -4,10 +4,7 @@ import (
 	"fmt"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/onestore-ai/onestore/internal/database/online"
 )
-
-var _ online.Store = &DB{}
 
 const PipelineBatchSize = 10
 const SeralizeIntBase = 36
