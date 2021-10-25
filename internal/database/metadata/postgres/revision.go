@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -33,10 +34,22 @@ func (db *DB) GetRevision(ctx context.Context, groupName string, revision int64)
 	return &rs, nil
 }
 
-func InsertRevision(ctx context.Context, tx *sqlx.Tx, groupName string, revision int64, dataTable string, description string) error {
-	cmd := "INSERT INTO feature_group_revision(group_name, revision, data_table, description) VALUES ($1, $2, $3, $4)"
-	_, err := tx.ExecContext(ctx, cmd, groupName, revision, dataTable, description)
-	return err
+func (db *DB) InsertRevision(ctx context.Context, opt types.InsertRevisionOpt) error {
+	return database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+		query := "INSERT INTO feature_group_revision(group_name, revision, data_table, description) VALUES ($1, $2, $3, $4)"
+		_, err := tx.ExecContext(ctx, query, opt.GroupName, opt.Revision, opt.DataTable, opt.Description)
+		if err != nil {
+			return err
+		}
+
+		if opt.UpdateGroupInfo {
+			query := "UPDATE feature_group SET revision = $1, data_table = $2 WHERE name = $3"
+			if _, err := tx.ExecContext(ctx, query, opt.Revision, opt.DataTable, opt.GroupName); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func (db *DB) BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error) {
