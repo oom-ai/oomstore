@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"fmt"
-	"math"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -57,15 +56,13 @@ func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]
 	return featureValueMap, nil
 }
 
-func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types.RichFeature, entityRows []types.EntityRow) (dataMap map[string]RowMap, err error) {
+func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, entity *types.Entity, revisionRanges []*types.RevisionRange, features []*types.RichFeature, entityRows []types.EntityRow) (dataMap map[string]RowMap, err error) {
 	if len(features) == 0 {
 		return make(map[string]RowMap), nil
 	}
-	groupName := features[0].GroupName
-	entityName := features[0].EntityName
 
 	// Step 0: prepare temporary tables
-	entityDfWithFeatureName, tmpErr := db.createTableEntityDfWithFeatures(ctx, features, entityName)
+	entityDfWithFeatureName, tmpErr := db.createTableEntityDfWithFeatures(ctx, features, entity)
 	if tmpErr != nil {
 		return nil, tmpErr
 	}
@@ -75,7 +72,7 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 		}
 	}()
 
-	entityDfName, tmpErr := db.createAndImportTableEntityDf(ctx, entityRows, entityName)
+	entityDfName, tmpErr := db.createAndImportTableEntityDf(ctx, entityRows, entity)
 	if tmpErr != nil {
 		return nil, tmpErr
 	}
@@ -85,26 +82,7 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 		}
 	}()
 
-	// Step 1: get table ranges
-	rangeQuery := fmt.Sprintf(`
-		SELECT
-			revision AS min_revision,
-			LEAD(revision, 1, %d) OVER (ORDER BY revision) AS max_revision,
-			data_table
-		FROM feature_group_revision
-		WHERE group_name = $1
-	`, math.MaxInt64)
-
-	var ranges []struct {
-		MinRevision int64  `db:"min_revision"`
-		MaxRevision int64  `db:"max_revision"`
-		DataTable   string `db:"data_table"`
-	}
-	if tmpErr := db.SelectContext(ctx, &ranges, rangeQuery, groupName); tmpErr != nil {
-		return nil, tmpErr
-	}
-
-	// Step 2: iterate each table range, get result
+	// Step 1: iterate each table range, get result
 	joinQuery := `
 		INSERT INTO %s(unique_key, entity_key, unix_time, %s)
 		SELECT
@@ -118,14 +96,14 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, features []*types
 		WHERE l.unix_time >= $1 AND l.unix_time < $2;
 	`
 	featureNamesStr := buildFeatureNameStr(features)
-	for _, r := range ranges {
-		_, tmpErr := db.ExecContext(ctx, fmt.Sprintf(joinQuery, entityDfWithFeatureName, featureNamesStr, featureNamesStr, entityDfName, r.DataTable, entityName), r.MinRevision, r.MaxRevision)
+	for _, r := range revisionRanges {
+		_, tmpErr := db.ExecContext(ctx, fmt.Sprintf(joinQuery, entityDfWithFeatureName, featureNamesStr, featureNamesStr, entityDfName, r.DataTable, entity.Name), r.MinRevision, r.MaxRevision)
 		if tmpErr != nil {
 			return nil, tmpErr
 		}
 	}
 
-	// Step 3: get rows from entity_df_with_features table
+	// Step 2: get rows from entity_df_with_features table
 	resultQuery := fmt.Sprintf(`SELECT * FROM %s`, entityDfWithFeatureName)
 	rows, tmpErr := db.QueryxContext(ctx, resultQuery)
 	if tmpErr != nil {
