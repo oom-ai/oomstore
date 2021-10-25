@@ -19,28 +19,18 @@ type OneStore struct {
 }
 
 func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
+	optV2 := opt.ToOneStoreOptV2()
+
 	db, err := database.Open(toDatabaseOption(&opt))
 	if err != nil {
 		return nil, err
 	}
 
-	onlineStore, err := online.OpenPostgresDB(online.OnlineStoreOpt{
-		Host:     opt.Host,
-		Port:     opt.Port,
-		User:     opt.User,
-		Pass:     opt.Pass,
-		Database: opt.Workspace,
-	})
+	onlineStore, err := online.Open(optV2.OnlineStoreOpt)
 	if err != nil {
 		return nil, err
 	}
-	metadata, err := metadata.Open(metadata.Option{
-		Host:   opt.Host,
-		Port:   opt.Port,
-		User:   opt.User,
-		Pass:   opt.Pass,
-		DbName: opt.Workspace,
-	})
+	metadata, err := metadata.Open(optV2.MetaStoreOpt)
 	if err != nil {
 		return nil, err
 	}

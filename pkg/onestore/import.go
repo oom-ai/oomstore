@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/onestore-ai/onestore/internal/database/metadata"
+	"github.com/onestore-ai/onestore/internal/database/metadata/postgres"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -117,6 +117,7 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
+	// FIXME: move this into db layer
 	err = s.db.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tmpTableName := opt.GroupName + "_" + strconv.Itoa(rand.Intn(100000))
@@ -143,12 +144,14 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		}
 
 		// insert into feature_group_revision table
-		if err = metadata.InsertRevision(ctx, tx, opt.GroupName, ts, finalTableName, opt.Description); err != nil {
+		// FIXME: move this into db layer
+		if err = postgres.InsertRevision(ctx, tx, opt.GroupName, ts, finalTableName, opt.Description); err != nil {
 			return err
 		}
 
 		// update feature_group table
-		if err = metadata.UpdateFeatureGroupRevision(ctx, tx, ts, finalTableName, opt.GroupName); err != nil {
+		// FIXME: move this into db layer
+		if err = postgres.UpdateFeatureGroupRevision(ctx, tx, ts, finalTableName, opt.GroupName); err != nil {
 			return err
 		}
 

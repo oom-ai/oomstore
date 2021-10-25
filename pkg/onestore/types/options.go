@@ -8,6 +8,25 @@ type OneStoreOpt struct {
 	Workspace string
 }
 
+func (opt *OneStoreOpt) ToOneStoreOptV2() *OneStoreOptV2 {
+	if opt == nil {
+		return nil
+	}
+
+	postgresOpt := PostgresDbOpt{
+		Host:     opt.Host,
+		Port:     opt.Port,
+		User:     opt.User,
+		Pass:     opt.Pass,
+		Database: opt.Workspace,
+	}
+	return &OneStoreOptV2{
+		MetaStoreOpt:    MetaStoreOpt{PostgresDbOpt: &postgresOpt},
+		OnlineStoreOpt:  OnlineStoreOpt{PostgresDbOpt: &postgresOpt},
+		OfflineStoreOpt: OfflineStoreOpt{PostgresDbOpt: &postgresOpt},
+	}
+}
+
 type CreateFeatureOpt struct {
 	FeatureName string
 	GroupName   string
