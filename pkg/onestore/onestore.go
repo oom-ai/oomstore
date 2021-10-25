@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/internal/database/metadata"
 	"github.com/onestore-ai/onestore/internal/database/offline"
 	"github.com/onestore-ai/onestore/internal/database/online"
@@ -63,14 +62,4 @@ func (s *OneStore) Close() error {
 		return fmt.Errorf("failed closing store: %v", errs)
 	}
 	return nil
-}
-
-func toDatabaseOption(opt *types.OneStoreOpt) database.Option {
-	return database.Option{
-		Host:   opt.Host,
-		Port:   opt.Port,
-		User:   opt.User,
-		Pass:   opt.Pass,
-		DbName: opt.Workspace,
-	}
 }
