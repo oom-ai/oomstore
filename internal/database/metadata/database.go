@@ -37,6 +37,7 @@ type Store interface {
 	ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error)
 	GetRevision(ctx context.Context, groupName string, revision int64) (*types.Revision, error)
 	BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error)
+	InsertRevision(ctx context.Context, opt types.InsertRevisionOpt) error
 
 	io.Closer
 }
