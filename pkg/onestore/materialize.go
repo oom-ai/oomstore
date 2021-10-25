@@ -17,6 +17,11 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		featureNames = append(featureNames, f.Name)
 	}
 
+	revision, err := s.GetRevision(ctx, opt.GroupName, opt.GroupRevision)
+	if err != nil {
+		return err
+	}
+
 	stream, err := s.offline.GetFeatureValuesStream(ctx, types.GetFeatureValuesStreamOpt{
 		GroupName:    opt.GroupName,
 		Revision:     opt.GroupRevision,
@@ -26,14 +31,5 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
-	revision, err := s.GetRevision(ctx, opt.GroupName, opt.GroupRevision)
-	if err != nil {
-		return err
-	}
-
-	if err := s.online.SinkFeatureValuesStream(ctx, stream, features, revision); err != nil {
-		return err
-	}
-
-	return nil
+	return s.online.SinkFeatureValuesStream(ctx, stream, features, revision)
 }
