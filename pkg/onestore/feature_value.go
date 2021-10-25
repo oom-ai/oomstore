@@ -30,7 +30,7 @@ func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 	dataTables := getDataTables(features)
 
 	for dataTable, featureNames := range dataTables {
-		featureValues, err := s.db.GetFeatureValues(ctx, dataTable, *entityName, opt.EntityKey, featureNames)
+		featureValues, err := s.online.GetFeatureValues(ctx, dataTable, *entityName, opt.EntityKey, featureNames)
 		if err != nil {
 			return m, err
 		}
@@ -102,7 +102,7 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 		if !ok {
 			return nil, fmt.Errorf("missing entity_name for table %s", dataTable)
 		}
-		featureValues, err := s.db.GetFeatureValuesWithMultiEntityKeys(ctx, dataTable, entityName, entityKeys, featureNames)
+		featureValues, err := s.online.GetFeatureValuesWithMultiEntityKeys(ctx, dataTable, entityName, entityKeys, featureNames)
 		if err != nil {
 			return nil, err
 		}
