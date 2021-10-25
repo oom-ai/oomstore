@@ -43,19 +43,45 @@ func (s *OneStore) GetOnlineFeatureValuesWithMultiEntityKeys(ctx context.Context
 	if err != nil {
 		return nil, err
 	}
+	features = filterAvailableFeatures(features)
+	if len(features) == 0 {
+		return nil, nil
+	}
 
-	// data_table -> []feature_name
-	dataTableMap := buildDataTableMap(features)
-	// data_table -> entity_name
-	entityNameMap := buildEntityNameMap(features)
+	entityName, err := getEntityName(features)
+	if err != nil || entityName == nil {
+		return nil, err
+	}
+	dataTables := getDataTables(features)
 
 	// entity_key -> feature_name -> feature_value
-	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, dataTableMap, entityNameMap)
+	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, dataTables, *entityName)
 	if err != nil {
 		return nil, err
 	}
 
 	return buildFeatureDataSet(featureValueMap, opt)
+}
+
+func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, dataTableMap map[string][]string, entityName string) (map[string]database.RowMap, error) {
+	// entity_key -> types.RecordMap
+	featureValueMap := make(map[string]database.RowMap)
+
+	for dataTable, featureNames := range dataTableMap {
+		featureValues, err := s.online.GetFeatureValuesWithMultiEntityKeys(ctx, dataTable, entityName, entityKeys, featureNames)
+		if err != nil {
+			return nil, err
+		}
+		for entityKey, m := range featureValues {
+			if featureValueMap[entityKey] == nil {
+				featureValueMap[entityKey] = make(map[string]interface{})
+			}
+			for fn, fv := range m {
+				featureValueMap[entityKey][fn] = fv
+			}
+		}
+	}
+	return featureValueMap, nil
 }
 
 func filterAvailableFeatures(features []*types.RichFeature) (rs []*types.RichFeature) {
@@ -90,31 +116,6 @@ func getEntityName(features []*types.RichFeature) (*string, error) {
 	return nil, nil
 }
 
-func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, dataTableMap map[string][]string, entityNameMap map[string]string) (map[string]database.RowMap, error) {
-	// entity_key -> types.RecordMap
-	featureValueMap := make(map[string]database.RowMap)
-
-	for dataTable, featureNames := range dataTableMap {
-		entityName, ok := entityNameMap[dataTable]
-		if !ok {
-			return nil, fmt.Errorf("missing entity_name for table %s", dataTable)
-		}
-		featureValues, err := s.online.GetFeatureValuesWithMultiEntityKeys(ctx, dataTable, entityName, entityKeys, featureNames)
-		if err != nil {
-			return nil, err
-		}
-		for entityKey, m := range featureValues {
-			if featureValueMap[entityKey] == nil {
-				featureValueMap[entityKey] = make(map[string]interface{})
-			}
-			for fn, fv := range m {
-				featureValueMap[entityKey][fn] = fv
-			}
-		}
-	}
-	return featureValueMap, nil
-}
-
 func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.GetOnlineFeatureValuesWithMultiEntityKeysOpt) (*types.FeatureDataSet, error) {
 	fds := types.NewFeatureDataSet()
 	for _, entityKey := range opt.EntityKeys {
@@ -128,37 +129,6 @@ func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.GetOnlin
 		}
 	}
 	return &fds, nil
-}
-
-// key: data_table, value: slice of feature_names
-func buildDataTableMap(features []*types.RichFeature) map[string][]string {
-	dataTableMap := make(map[string][]string)
-	for _, f := range features {
-		if f.DataTable == nil {
-			continue
-		}
-		dataTable := *f.DataTable
-		if _, ok := dataTableMap[dataTable]; !ok {
-			dataTableMap[dataTable] = make([]string, 0)
-		}
-		dataTableMap[dataTable] = append(dataTableMap[dataTable], f.Name)
-	}
-	return dataTableMap
-}
-
-// key: data_table, value: entity_name
-func buildEntityNameMap(features []*types.RichFeature) map[string]string {
-	entityNameMap := make(map[string]string)
-	for _, f := range features {
-		if f.DataTable == nil {
-			continue
-		}
-		dataTable := *f.DataTable
-		if _, ok := entityNameMap[dataTable]; !ok {
-			entityNameMap[dataTable] = f.EntityName
-		}
-	}
-	return entityNameMap
 }
 
 // key: data_table, value: slice of features
