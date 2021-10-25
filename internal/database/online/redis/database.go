@@ -1,4 +1,4 @@
-package online
+package redis
 
 import (
 	"context"
@@ -12,40 +12,40 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-var _ online.Store = &RedisDB{}
+var _ online.Store = &DB{}
 
 const PipelineBatchSize = 10
 const SeralizeIntBase = 36
 
-type RedisDB struct {
+type DB struct {
 	*redis.Client
 }
 
-type RedisDBOpt struct {
+type RedisOpt struct {
 	Host string
 	Port int
 	Pass string
 	DB   int
 }
 
-func OpenRedisStore(opt *RedisDBOpt) *RedisDB {
+func Open(opt *RedisOpt) *DB {
 	redisOpt := redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", opt.Host, opt.Port),
 		Password: opt.Pass,
 		DB:       opt.DB,
 	}
-	return &RedisDB{redis.NewClient(&redisOpt)}
+	return &DB{redis.NewClient(&redisOpt)}
 }
 
-func (s *RedisDB) GetFeatureValues(ctx context.Context, dataTable, entityName, entityKey string, featureNames []string) (database.RowMap, error) {
+func (s *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entityKey string, featureNames []string) (database.RowMap, error) {
 	panic("unimplemented")
 }
 
-func (s *RedisDB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, dataTable, entityName string, entityKeys, featureNames []string) (map[string]database.RowMap, error) {
+func (s *DB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, dataTable, entityName string, entityKeys, featureNames []string) (map[string]database.RowMap, error) {
 	panic("unimplemented")
 }
 
-func (s *RedisDB) SinkFeatureValuesStream(ctx context.Context, stream <-chan []interface{}, features []*types.Feature, revision *types.Revision) error {
+func (s *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan []interface{}, features []*types.Feature, revision *types.Revision) error {
 	var seq int64
 	pipe := s.Pipeline()
 	defer pipe.Close()
