@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/internal/database/metadata/postgres"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
@@ -118,7 +119,7 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	}
 
 	// FIXME: move this into db layer
-	err = s.db.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+	err = database.WithTransaction(s.db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tmpTableName := opt.GroupName + "_" + strconv.Itoa(rand.Intn(100000))
 		schema := buildFeatureDataTableSchema(tmpTableName, entity, columns)
