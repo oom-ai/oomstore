@@ -51,3 +51,12 @@ func Open(opt types.MetaStoreOpt) (Store, error) {
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
 }
+
+func CreateDatabase(ctx context.Context, opt types.MetaStoreOpt) error {
+	switch opt.Backend {
+	case types.POSTGRES:
+		return postgres.CreateDatabase(ctx, *opt.PostgresDbOpt)
+	default:
+		return fmt.Errorf("unsupported backend: %s", opt.Backend)
+	}
+}
