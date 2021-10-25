@@ -1,4 +1,4 @@
-package metadata
+package postgres
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *PostgresDB) ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error) {
+func (db *DB) ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error) {
 	query := "SELECT * FROM feature_group_revision"
 	var cond []interface{}
 	if groupName != nil {
@@ -24,7 +24,7 @@ func (db *PostgresDB) ListRevision(ctx context.Context, groupName *string) ([]*t
 	return revisions, nil
 }
 
-func (db *PostgresDB) GetRevision(ctx context.Context, groupName string, revision int64) (*types.Revision, error) {
+func (db *DB) GetRevision(ctx context.Context, groupName string, revision int64) (*types.Revision, error) {
 	query := "SELECT * FROM feature_group_revision WHERE group_name = $1 and revision = $2"
 	var rs types.Revision
 	if err := db.GetContext(ctx, rs, query, groupName, revision); err != nil {
@@ -39,7 +39,7 @@ func InsertRevision(ctx context.Context, tx *sqlx.Tx, groupName string, revision
 	return err
 }
 
-func (db *PostgresDB) BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error) {
+func (db *DB) BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error) {
 	query := fmt.Sprintf(`
 		SELECT
 			revision AS min_revision,
