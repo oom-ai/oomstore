@@ -7,6 +7,11 @@ import (
 )
 
 func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) error {
+	group, err := s.GetFeatureGroup(ctx, opt.GroupName)
+	if err != nil {
+		return err
+	}
+
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{GroupName: &opt.GroupName})
 	if err != nil {
 		return err
@@ -23,8 +28,8 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 	}
 
 	stream, err := s.offline.GetFeatureValuesStream(ctx, types.GetFeatureValuesStreamOpt{
-		GroupName:    opt.GroupName,
-		Revision:     opt.GroupRevision,
+		DataTable:    revision.DataTable,
+		EntityName:   group.EntityName,
 		FeatureNames: featureNames,
 	})
 	if err != nil {
