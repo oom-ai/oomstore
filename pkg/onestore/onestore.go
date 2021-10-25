@@ -30,7 +30,7 @@ func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	metadata, err := metadata.Open(optV2.MetaStoreOpt)
+	metadataStore, err := metadata.Open(optV2.MetaStoreOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 	return &OneStore{
 		db:       db,
 		online:   onlineStore,
-		metadata: metadata,
+		metadata: metadataStore,
 	}, nil
 }
 
