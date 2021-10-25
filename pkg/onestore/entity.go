@@ -8,21 +8,21 @@ import (
 
 // CreateEntity create an entity in the store
 func (s *OneStore) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) (*types.Entity, error) {
-	if err := s.db.CreateEntity(ctx, opt); err != nil {
+	if err := s.metadata.CreateEntity(ctx, opt); err != nil {
 		return nil, err
 	}
 	return s.GetEntity(ctx, opt.Name)
 }
 
 func (s *OneStore) GetEntity(ctx context.Context, name string) (*types.Entity, error) {
-	return s.db.GetEntity(ctx, name)
+	return s.metadata.GetEntity(ctx, name)
 }
 
 // ListEntity: get all entity
 func (s *OneStore) ListEntity(ctx context.Context) ([]*types.Entity, error) {
-	return s.db.ListEntity(ctx)
+	return s.metadata.ListEntity(ctx)
 }
 
 func (s *OneStore) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) error {
-	return s.db.UpdateEntity(ctx, opt)
+	return s.metadata.UpdateEntity(ctx, opt)
 }
