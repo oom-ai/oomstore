@@ -3,6 +3,7 @@ package metadata
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/onestore-ai/onestore/internal/database/metadata/postgres"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
@@ -36,6 +37,8 @@ type Store interface {
 	ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error)
 	GetRevision(ctx context.Context, groupName string, revision int64) (*types.Revision, error)
 	BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error)
+
+	io.Closer
 }
 
 var _ Store = &postgres.DB{}

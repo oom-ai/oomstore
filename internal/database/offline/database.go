@@ -3,6 +3,7 @@ package offline
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/internal/database/offline/postgres"
@@ -13,6 +14,8 @@ type Store interface {
 	GetPointInTimeFeatureValues(ctx context.Context, entity *types.Entity, revisionRanges []*types.RevisionRange, features []*types.RichFeature, entityRows []types.EntityRow) (dataMap map[string]database.RowMap, err error)
 	LoadLocalFile(ctx context.Context, filePath, tableName, delimiter string, header []string) error
 	GetFeatureValuesStream(ctx context.Context, opt types.GetFeatureValuesStreamOpt) (<-chan *types.RawFeatureValueRecord, error)
+
+	io.Closer
 }
 
 var _ Store = &postgres.DB{}

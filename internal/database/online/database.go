@@ -3,6 +3,7 @@ package online
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/internal/database/online/postgres"
@@ -14,6 +15,8 @@ type Store interface {
 	GetFeatureValues(ctx context.Context, dataTable, entityName, entityKey string, featureNames []string) (database.RowMap, error)
 	GetFeatureValuesWithMultiEntityKeys(ctx context.Context, dataTable, entityName string, entityKeys, featureNames []string) (map[string]database.RowMap, error)
 	SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.RawFeatureValueRecord, features []*types.Feature, revision *types.Revision) error
+
+	io.Closer
 }
 
 var _ Store = &postgres.DB{}
