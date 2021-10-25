@@ -4,10 +4,11 @@ import (
 	"context"
 	"log"
 
+	"github.com/onestore-ai/onestore/pkg/onestore/types"
 	"github.com/spf13/cobra"
 )
 
-var getHistoricalFeatureOpt getHistoricalFeatureOption
+var getHistoricalFeatureOpt types.ExportFeatureValuesOpt
 
 var getHistoricalFeatureCmd = &cobra.Command{
 	Use:   "historical-feature",

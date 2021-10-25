@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/jmoiron/sqlx"
 
@@ -72,34 +71,4 @@ func (db *DB) TableExists(ctx context.Context, table string) (bool, error) {
 	default:
 		return true, nil
 	}
-}
-
-type WalkFunc = func(slice []interface{}) error
-
-func (db *DB) WalkTable(ctx context.Context, table string, fields []string, limit *uint64, walkFunc WalkFunc) error {
-	query := fmt.Sprintf("select %s from %s", strings.Join(fields, ","), table)
-	if limit != nil {
-		query += fmt.Sprintf(" LIMIT %d", *limit)
-	}
-
-	rows, err := db.QueryxContext(ctx, query)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	return walkRows(rows, walkFunc)
-}
-
-func walkRows(rows *sqlx.Rows, walkFunc WalkFunc) error {
-	for rows.Next() {
-		slice, err := rows.SliceScan()
-		if err != nil {
-			return err
-		}
-		if err := walkFunc(slice); err != nil {
-			return err
-		}
-	}
-	return nil
 }
