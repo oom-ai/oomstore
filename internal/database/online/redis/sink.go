@@ -9,9 +9,9 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (s *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.RawFeatureValueRecord, features []*types.Feature, revision *types.Revision) error {
+func (db *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.RawFeatureValueRecord, features []*types.Feature, revision *types.Revision) error {
 	var seq int64
-	pipe := s.Pipeline()
+	pipe := db.Pipeline()
 	defer pipe.Close()
 
 	for item := range stream {
