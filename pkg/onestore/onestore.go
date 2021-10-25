@@ -24,7 +24,21 @@ func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 		return nil, err
 	}
 
-	return &OneStore{db: db}, nil
+	onlineStore, err := online.OpenPostgresDB(online.OnlineStoreOpt{
+		Host:     opt.Host,
+		Port:     opt.Port,
+		User:     opt.User,
+		Pass:     opt.Pass,
+		Database: opt.Workspace,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &OneStore{
+		db:     db,
+		online: onlineStore,
+	}, nil
 }
 
 func Create(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
