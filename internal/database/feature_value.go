@@ -12,33 +12,6 @@ import (
 
 type RowMap = map[string]interface{}
 
-func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entityKey string, featureNames []string) (RowMap, error) {
-	query := fmt.Sprintf(`SELECT "%s",%s FROM %s WHERE "%s" = $1`, entityName, strings.Join(featureNames, ","), dataTable, entityName)
-	rs := make(RowMap)
-
-	if err := db.QueryRowxContext(ctx, query, entityKey).MapScan(rs); err != nil {
-		return nil, err
-	}
-	return rs, nil
-}
-
-// response: map[entity_key]map[feature_name]feature_value
-func (db *DB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, dataTable, entityName string, entityKeys, featureNames []string) (map[string]RowMap, error) {
-	query := fmt.Sprintf(`SELECT "%s", %s FROM %s WHERE "%s" in (?);`, entityName, strings.Join(featureNames, ","), dataTable, entityName)
-	sql, args, err := sqlx.In(query, entityKeys)
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := db.QueryxContext(ctx, db.Rebind(sql), args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	return getFeatureValueMapFromRows(rows, entityName)
-}
-
 func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]RowMap, error) {
 	featureValueMap := make(map[string]RowMap)
 	for rows.Next() {
