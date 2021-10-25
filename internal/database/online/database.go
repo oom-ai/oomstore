@@ -2,6 +2,7 @@ package online
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/internal/database/online/postgres"
@@ -18,19 +19,13 @@ type Store interface {
 var _ Store = &postgres.DB{}
 var _ Store = &redis.DB{}
 
-type OnlineStoreOpt struct {
-	Host     string
-	Port     string
-	User     string
-	Pass     string
-	Database string
-}
-
-func OpenPostgresDB(opt OnlineStoreOpt) (*postgres.DB, error) {
-	return postgres.OpenWith(opt.Host, opt.Port, opt.User, opt.Pass, opt.Database)
-}
-
-// TODO: implement OpenRedisDB
-func OpenRedisDB(opt OnlineStoreOpt) (*redis.DB, error) {
-	return nil, nil
+func Open(opt types.OnlineStoreOpt) (Store, error) {
+	switch opt.Backend {
+	case types.POSTGRES:
+		return postgres.Open(opt.PostgresDbOpt)
+	case types.REDIS:
+		return redis.Open(opt.RedisDbOpt), nil
+	default:
+		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
+	}
 }

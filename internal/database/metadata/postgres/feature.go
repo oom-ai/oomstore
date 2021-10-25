@@ -1,4 +1,4 @@
-package metadata
+package postgres
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *PostgresDB) validateDataType(ctx context.Context, dataType string) error {
+func (db *DB) validateDataType(ctx context.Context, dataType string) error {
 	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Intn(100000))
 	return db.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", tmpTableName)); err != nil {
@@ -28,7 +28,7 @@ func (db *PostgresDB) validateDataType(ctx context.Context, dataType string) err
 	})
 }
 
-func (db *PostgresDB) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt) error {
+func (db *DB) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt) error {
 	if err := db.validateDataType(ctx, opt.ValueType); err != nil {
 		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
 	}
@@ -44,7 +44,7 @@ func (db *PostgresDB) CreateFeature(ctx context.Context, opt types.CreateFeature
 	return err
 }
 
-func (db *PostgresDB) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
+func (db *DB) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
 	var feature types.Feature
 	query := `SELECT * FROM feature WHERE name = $1`
 	if err := db.GetContext(ctx, &feature, query, featureName); err != nil {
@@ -53,7 +53,7 @@ func (db *PostgresDB) GetFeature(ctx context.Context, featureName string) (*type
 	return &feature, nil
 }
 
-func (db *PostgresDB) ListFeature(ctx context.Context, groupName *string) ([]*types.Feature, error) {
+func (db *DB) ListFeature(ctx context.Context, groupName *string) ([]*types.Feature, error) {
 	query := "SELECT * FROM feature"
 	cond, args := buildListFeatureCond(types.ListFeatureOpt{
 		GroupName: groupName,
@@ -69,7 +69,7 @@ func (db *PostgresDB) ListFeature(ctx context.Context, groupName *string) ([]*ty
 	return features, nil
 }
 
-func (db *PostgresDB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
+func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
 	query := "UPDATE feature SET description = $1 WHERE name = $2"
 	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName)
 	return err
