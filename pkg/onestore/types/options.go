@@ -112,8 +112,7 @@ type MaterializeOpt struct {
 }
 
 type GetFeatureValuesStreamOpt struct {
-	GroupName    string
-	Revision     int64
+	DataTable    string
 	FeatureNames []string
 	Limit        *uint64
 }

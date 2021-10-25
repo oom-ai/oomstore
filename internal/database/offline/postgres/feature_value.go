@@ -12,10 +12,6 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) GetFeatureValuesStream(ctx context.Context, opt types.GetFeatureValuesStreamOpt) (<-chan []interface{}, error) {
-	panic("not implemented")
-}
-
 func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, entity *types.Entity,
 	revisionRanges []*types.RevisionRange, features []*types.RichFeature, entityRows []types.EntityRow) (dataMap map[string]database.RowMap, err error) {
 	if len(features) == 0 {
