@@ -11,14 +11,6 @@ type DB struct {
 	*sqlx.DB
 }
 
-type Option struct {
-	Host   string
-	Port   string
-	User   string
-	Pass   string
-	DbName string
-}
-
 func Open(option *types.PostgresDbOpt) (*DB, error) {
 	return OpenWith(option.Host, option.Port, option.User, option.Pass, option.Database)
 }
