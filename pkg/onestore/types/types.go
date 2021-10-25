@@ -181,3 +181,8 @@ type RevisionRange struct {
 	MaxRevision int64  `db:"max_revision"`
 	DataTable   string `db:"data_table"`
 }
+
+type RawFeatureValueRecord struct {
+	Record []interface{}
+	Error  error
+}

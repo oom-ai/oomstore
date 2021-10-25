@@ -9,14 +9,18 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (s *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan []interface{}, features []*types.Feature, revision *types.Revision) error {
+func (s *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.RawFeatureValueRecord, features []*types.Feature, revision *types.Revision) error {
 	var seq int64
 	pipe := s.Pipeline()
 	defer pipe.Close()
 
-	for row := range stream {
-		if len(row) != len(features)+1 {
-			return fmt.Errorf("field count not matched, expected %d, got %d", len(features)+1, len(row))
+	for item := range stream {
+		if item.Error != nil {
+			return item.Error
+		}
+		record := item.Record
+		if len(record) != len(features)+1 {
+			return fmt.Errorf("field count not matched, expected %d, got %d", len(features)+1, len(record))
 		}
 
 		revisionId, err := Seralize(revision.ID)
@@ -24,12 +28,12 @@ func (s *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan []interf
 			return err
 		}
 
-		entityKey, err := Seralize(row[0])
+		entityKey, err := Seralize(record[0])
 		if err != nil {
 			return err
 		}
 
-		values := row[1:]
+		values := record[1:]
 		featureValues := make(map[string]string)
 		for i := range features {
 			// omit nil feature value
