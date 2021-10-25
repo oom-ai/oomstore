@@ -23,8 +23,7 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 	}
 
 	stream, err := s.offline.GetFeatureValuesStream(ctx, types.GetFeatureValuesStreamOpt{
-		GroupName:    opt.GroupName,
-		Revision:     opt.GroupRevision,
+		DataTable:    revision.DataTable,
 		FeatureNames: featureNames,
 	})
 	if err != nil {
