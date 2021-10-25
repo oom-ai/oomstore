@@ -50,7 +50,8 @@ func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 }
 
 func Create(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
-	if err := database.CreateDatabase(ctx, toDatabaseOption(&opt)); err != nil {
+	optV2 := opt.ToOneStoreOptV2()
+	if err := metadata.CreateDatabase(ctx, optV2.MetaStoreOpt); err != nil {
 		return nil, err
 	}
 
