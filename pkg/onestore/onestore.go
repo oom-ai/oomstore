@@ -2,6 +2,8 @@ package onestore
 
 import (
 	"context"
+	"fmt"
+	"io"
 
 	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/internal/database/metadata"
@@ -56,7 +58,18 @@ func Create(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 }
 
 func (s *OneStore) Close() error {
-	return s.db.Close()
+	errs := []error{}
+
+	for _, closer := range []io.Closer{s.db, s.online, s.offline, s.metadata} {
+		if err := closer.Close(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if len(errs) != 0 {
+		return fmt.Errorf("failed closing store: %v", errs)
+	}
+	return nil
 }
 
 func toDatabaseOption(opt *types.OneStoreOpt) database.Option {
