@@ -103,7 +103,11 @@ func Seralize(i interface{}) (string, error) {
 	case time.Time:
 		return Seralize(s.UnixMilli())
 	case bool:
-		return strconv.FormatBool(s), nil
+		if s {
+			return "1", nil
+		} else {
+			return "0", nil
+		}
 
 	default:
 		return "", fmt.Errorf("unable to seralize %#v of type %T to string", i, i)
