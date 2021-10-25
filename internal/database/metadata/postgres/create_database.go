@@ -1,4 +1,4 @@
-package database
+package postgres
 
 import (
 	"context"
@@ -6,24 +6,26 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/onestore-ai/onestore/internal/database"
+	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func CreateDatabase(ctx context.Context, opt Option) (err error) {
+func CreateDatabase(ctx context.Context, opt types.PostgresDbOpt) (err error) {
 	db, err := OpenWith(opt.Host, opt.Port, opt.User, opt.Pass, "")
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	if _, err = db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", opt.DbName)); err != nil {
+	if _, err = db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", opt.Database)); err != nil {
 		return
 	}
 
 	return createMetaSchemas(ctx, opt)
 }
 
-func createMetaSchemas(ctx context.Context, opt Option) (err error) {
-	db, err := Open(opt)
+func createMetaSchemas(ctx context.Context, opt types.PostgresDbOpt) (err error) {
+	db, err := Open(&opt)
 	if err != nil {
 		return
 	}
@@ -31,7 +33,7 @@ func createMetaSchemas(ctx context.Context, opt Option) (err error) {
 
 	// Use translation to guarantee the following operations be executed
 	// on the same connection: http://go-database-sql.org/modifying.html
-	return db.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+	return database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create database functions
 		for _, fn := range DB_FUNCTIONS {
 			if _, err = tx.ExecContext(ctx, fn); err != nil {
