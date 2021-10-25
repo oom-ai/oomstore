@@ -117,3 +117,11 @@ type GetFeatureValuesStreamOpt struct {
 	FeatureNames []string
 	Limit        *uint64
 }
+
+type InsertRevisionOpt struct {
+	Revision        int64
+	GroupName       string
+	DataTable       string
+	Description     string
+	UpdateGroupInfo bool
+}
