@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entityKey string, featureNames []string) (database.RowMap, error) {
+func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entityKey string, revisionId int32, featureNames []string) (database.RowMap, error) {
 	query := fmt.Sprintf(`SELECT "%s",%s FROM %s WHERE "%s" = $1`, entityName, strings.Join(featureNames, ","), dataTable, entityName)
 	rs := make(database.RowMap)
 
@@ -21,7 +21,7 @@ func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entit
 }
 
 // response: map[entity_key]map[feature_name]feature_value
-func (db *DB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, dataTable, entityName string, entityKeys, featureNames []string) (map[string]database.RowMap, error) {
+func (db *DB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, dataTable, entityName string, revisionId int32, entityKeys, featureNames []string) (map[string]database.RowMap, error) {
 	query := fmt.Sprintf(`SELECT "%s", %s FROM %s WHERE "%s" in (?);`, entityName, strings.Join(featureNames, ","), dataTable, entityName)
 	sql, args, err := sqlx.In(query, entityKeys)
 	if err != nil {
