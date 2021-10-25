@@ -4,41 +4,10 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"math/rand"
 	"os"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
 
-	"github.com/jmoiron/sqlx"
-	"github.com/onestore-ai/onestore/internal/database"
-	"github.com/onestore-ai/onestore/internal/database/metadata/postgres"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
-
-const CREATE_DATA_TABLE = "CREATE TABLE {{TABLE_NAME}} (\n" +
-	"{{ENTITY_NAME}} VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY,\n" +
-	"{{COLUMN_DEFS}});"
-
-func buildFeatureDataTableSchema(tableName string, entity *types.Entity, columns []*types.Feature) string {
-	// sort to ensure the schema looks consistent
-	sort.Slice(columns, func(i, j int) bool {
-		return columns[i].Name < columns[j].Name
-	})
-	var columnDefs []string
-	for _, column := range columns {
-		columnDef := fmt.Sprintf("%s %s", column.Name, column.ValueType)
-		columnDefs = append(columnDefs, columnDef)
-	}
-
-	// fill schema template
-	schema := strings.ReplaceAll(CREATE_DATA_TABLE, "{{TABLE_NAME}}", tableName)
-	schema = strings.ReplaceAll(schema, "{{ENTITY_NAME}}", entity.Name)
-	schema = strings.ReplaceAll(schema, "{{ENTITY_LENGTH}}", strconv.Itoa(entity.Length))
-	schema = strings.ReplaceAll(schema, "{{COLUMN_DEFS}}", strings.Join(columnDefs, ",\n"))
-	return schema
-}
 
 func getCsvHeader(filePath string) ([]string, error) {
 	f, err := os.Open(filePath)
@@ -118,46 +87,16 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
-	// FIXME: move this into db layer
-	err = database.WithTransaction(s.db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
-		// create the data table
-		tmpTableName := opt.GroupName + "_" + strconv.Itoa(rand.Intn(100000))
-		schema := buildFeatureDataTableSchema(tmpTableName, entity, columns)
-		_, err = s.db.ExecContext(ctx, schema)
-		if err != nil {
-			return err
-		}
+	revision, dataTable, err := s.offline.ImportBatchFeatures(ctx, opt, entity, columns, header)
+	if err != nil {
+		return err
+	}
 
-		// populate the data table
-		err = s.offline.LoadLocalFile(ctx, opt.DataSource.FilePath, tmpTableName, opt.DataSource.Delimiter, header)
-		if err != nil {
-			return err
-		}
-
-		// now get a timestamp
-		ts := time.Now().Unix()
-
-		// rename
-		finalTableName := opt.GroupName + "_" + strconv.FormatInt(ts, 10)
-		rename := fmt.Sprintf("ALTER TABLE %s RENAME TO %s", tmpTableName, finalTableName)
-		if _, err = tx.ExecContext(ctx, rename); err != nil {
-			return err
-		}
-
-		// insert into feature_group_revision table
-		// FIXME: move this into db layer
-		if err = postgres.InsertRevision(ctx, tx, opt.GroupName, ts, finalTableName, opt.Description); err != nil {
-			return err
-		}
-
-		// update feature_group table
-		// FIXME: move this into db layer
-		if err = postgres.UpdateFeatureGroupRevision(ctx, tx, ts, finalTableName, opt.GroupName); err != nil {
-			return err
-		}
-
-		return nil
+	return s.metadata.InsertRevision(ctx, types.InsertRevisionOpt{
+		Revision:        revision,
+		GroupName:       opt.GroupName,
+		DataTable:       dataTable,
+		Description:     opt.Description,
+		UpdateGroupInfo: true,
 	})
-
-	return err
 }
