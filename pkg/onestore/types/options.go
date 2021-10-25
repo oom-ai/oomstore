@@ -21,9 +21,9 @@ func (opt *OneStoreOpt) ToOneStoreOptV2() *OneStoreOptV2 {
 		Database: opt.Workspace,
 	}
 	return &OneStoreOptV2{
-		MetaStoreOpt:    MetaStoreOpt{PostgresDbOpt: &postgresOpt},
-		OnlineStoreOpt:  OnlineStoreOpt{PostgresDbOpt: &postgresOpt},
-		OfflineStoreOpt: OfflineStoreOpt{PostgresDbOpt: &postgresOpt},
+		MetaStoreOpt:    MetaStoreOpt{PostgresDbOpt: &postgresOpt, Backend: POSTGRES},
+		OnlineStoreOpt:  OnlineStoreOpt{PostgresDbOpt: &postgresOpt, Backend: POSTGRES},
+		OfflineStoreOpt: OfflineStoreOpt{PostgresDbOpt: &postgresOpt, Backend: POSTGRES},
 	}
 }
 
