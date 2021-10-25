@@ -1,4 +1,4 @@
-package database
+package postgres
 
 var DB_FUNCTIONS = []string{
 	`
