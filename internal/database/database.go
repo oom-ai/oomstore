@@ -11,6 +11,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type RowMap = map[string]interface{}
+
 type DB struct {
 	*sqlx.DB
 }
