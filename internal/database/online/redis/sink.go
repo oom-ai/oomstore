@@ -21,35 +21,32 @@ func (db *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.
 			return fmt.Errorf("field count not matched, expected %d, got %d", len(features)+1, len(record))
 		}
 
-		revisionId, err := Seralize(revision.ID)
+		entityKey, values := record[0], record[1:]
+
+		key, err := SerializeRedisKey(revision.ID, entityKey)
 		if err != nil {
 			return err
 		}
 
-		entityKey, err := Seralize(record[0])
-		if err != nil {
-			return err
-		}
-
-		values := record[1:]
 		featureValues := make(map[string]string)
 		for i := range features {
 			// omit nil feature value
 			if values[i] == nil {
 				continue
 			}
-			featureValue, err := Seralize(values[i])
+			featureValue, err := SerializeByTag(values[i], features[i].ValueType)
 			if err != nil {
 				return err
 			}
 
-			featureId, err := Seralize(features[i].ID)
+			featureId, err := SerializeByValue(features[i].ID)
 			if err != nil {
 				return err
 			}
 			featureValues[featureId] = featureValue
 		}
-		pipe.HSet(ctx, fmt.Sprintf("%s:%s", revisionId, entityKey), featureValues)
+
+		pipe.HSet(ctx, key, featureValues)
 
 		seq++
 		if seq%PipelineBatchSize == 0 {
