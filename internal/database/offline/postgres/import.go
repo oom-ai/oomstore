@@ -7,9 +7,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
-	"sort"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -17,30 +15,6 @@ import (
 	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
-
-const CREATE_DATA_TABLE = `CREATE TABLE {{TABLE_NAME}} (
-	{{ENTITY_NAME}} VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY,
-	{{COLUMN_DEFS}});
-`
-
-func buildFeatureDataTableSchema(tableName string, entity *types.Entity, columns []*types.Feature) string {
-	// sort to ensure the schema looks consistent
-	sort.Slice(columns, func(i, j int) bool {
-		return columns[i].Name < columns[j].Name
-	})
-	var columnDefs []string
-	for _, column := range columns {
-		columnDef := fmt.Sprintf("%s %s", column.Name, column.ValueType)
-		columnDefs = append(columnDefs, columnDef)
-	}
-
-	// fill schema template
-	schema := strings.ReplaceAll(CREATE_DATA_TABLE, "{{TABLE_NAME}}", tableName)
-	schema = strings.ReplaceAll(schema, "{{ENTITY_NAME}}", entity.Name)
-	schema = strings.ReplaceAll(schema, "{{ENTITY_LENGTH}}", strconv.Itoa(entity.Length))
-	schema = strings.ReplaceAll(schema, "{{COLUMN_DEFS}}", strings.Join(columnDefs, ",\n"))
-	return schema
-}
 
 func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter string, header []string) error {
 	return database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
@@ -94,7 +68,7 @@ func (db *DB) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeat
 	err := database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tmpTableName := opt.GroupName + "_" + strconv.Itoa(rand.Int())
-		schema := buildFeatureDataTableSchema(tmpTableName, entity, features)
+		schema := database.BuildFeatureDataTableSchema(tmpTableName, entity, features)
 		_, err := db.ExecContext(ctx, schema)
 		if err != nil {
 			return err
