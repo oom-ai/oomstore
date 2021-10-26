@@ -4,11 +4,11 @@ import "github.com/onestore-ai/onestore/pkg/onestore/types"
 import "strings"
 import "fmt"
 
-func (db *DB) GetValueType(dbDataType string) (string, error) {
-	return GetValueType(dbDataType)
+func (db *DB) ValueTypeTag(dbDataType string) (string, error) {
+	return ValueTypeTag(dbDataType)
 }
 
-func GetValueType(sqlType string) (string, error) {
+func ValueTypeTag(sqlType string) (string, error) {
 	var s = sqlType
 	if pos := strings.Index(sqlType, "("); pos != -1 {
 		s = s[:pos]
