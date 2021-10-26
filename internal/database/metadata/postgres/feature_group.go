@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -55,8 +54,8 @@ func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGro
 	return err
 }
 
-func UpdateFeatureGroupRevision(ctx context.Context, tx *sqlx.Tx, revision int64, dataTable string, groupName string) error {
+func (db *DB) UpdateFeatureGroupRevision(ctx context.Context, revision int64, dataTable string, groupName string) error {
 	cmd := "UPDATE feature_group SET revision = $1, data_table = $2 WHERE name = $3"
-	_, err := tx.ExecContext(ctx, cmd, revision, dataTable, groupName)
+	_, err := db.ExecContext(ctx, cmd, revision, dataTable, groupName)
 	return err
 }
