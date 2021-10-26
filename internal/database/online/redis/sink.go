@@ -66,3 +66,7 @@ func (db *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.
 	}
 	return nil
 }
+
+func (db *DB) DeprecateFeatureValues(ctx context.Context, tableName string) error {
+	panic("implement me")
+}
