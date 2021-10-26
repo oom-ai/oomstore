@@ -7,23 +7,32 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/onestore-ai/onestore/internal/database"
+	"github.com/onestore-ai/onestore/pkg/onestore/types"
 	"github.com/spf13/cast"
 )
 
-func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entityKey string, revisionId int32, featureNames []string) (database.RowMap, error) {
-	query := fmt.Sprintf(`SELECT "%s",%s FROM %s WHERE "%s" = $1`, entityName, strings.Join(featureNames, ","), dataTable, entityName)
+func (db *DB) GetFeatureValues(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error) {
+	featureNames := []string{}
+	for _, f := range opt.Features {
+		featureNames = append(featureNames, f.Name)
+	}
+	query := fmt.Sprintf(`SELECT "%s",%s FROM %s WHERE "%s" = $1`, opt.EntityName, strings.Join(featureNames, ","), opt.DataTable, opt.EntityName)
 	rs := make(database.RowMap)
 
-	if err := db.QueryRowxContext(ctx, query, entityKey).MapScan(rs); err != nil {
+	if err := db.QueryRowxContext(ctx, query, opt.EntityKey).MapScan(rs); err != nil {
 		return nil, err
 	}
 	return rs, nil
 }
 
 // response: map[entity_key]map[feature_name]feature_value
-func (db *DB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, dataTable, entityName string, revisionId int32, entityKeys, featureNames []string) (map[string]database.RowMap, error) {
-	query := fmt.Sprintf(`SELECT "%s", %s FROM %s WHERE "%s" in (?);`, entityName, strings.Join(featureNames, ","), dataTable, entityName)
-	sql, args, err := sqlx.In(query, entityKeys)
+func (db *DB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, opt types.GetFeatureValuesWithMultiEntityKeysOpt) (map[string]database.RowMap, error) {
+	featureNames := []string{}
+	for _, f := range opt.Features {
+		featureNames = append(featureNames, f.Name)
+	}
+	query := fmt.Sprintf(`SELECT "%s", %s FROM %s WHERE "%s" in (?);`, opt.EntityName, strings.Join(featureNames, ","), opt.DataTable, opt.EntityName)
+	sql, args, err := sqlx.In(query, opt.EntityKeys)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +43,7 @@ func (db *DB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, dataTable
 	}
 	defer rows.Close()
 
-	return getFeatureValueMapFromRows(rows, entityName)
+	return getFeatureValueMapFromRows(rows, opt.EntityName)
 }
 
 func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]database.RowMap, error) {
