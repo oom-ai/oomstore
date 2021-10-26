@@ -5,20 +5,27 @@ import (
 	"fmt"
 
 	"github.com/onestore-ai/onestore/internal/database"
-	"github.com/spf13/cast"
 )
 
 func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entityKey string, revisionId int32, featureNames []string) (database.RowMap, error) {
 	rowMap := make(database.RowMap)
-	key := fmt.Sprintf("%d:%s", revisionId, entityKey)
+
+	revisionIdStr, err := Seralize(revisionId)
+	if err != nil {
+		return rowMap, err
+	}
+	entityKeyStr, err := Seralize(entityKey)
+	if err != nil {
+		return rowMap, err
+	}
+	key := fmt.Sprintf("%s:%s", revisionIdStr, entityKeyStr)
 
 	values, err := db.HMGet(ctx, key, featureNames...).Result()
 	if err != nil {
 		return rowMap, err
 	}
-
 	for i, v := range values {
-		rowMap[featureNames[i]] = cast.ToString(v)
+		rowMap[featureNames[i]] = v
 	}
 	return rowMap, nil
 }
