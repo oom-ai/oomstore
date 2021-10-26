@@ -21,10 +21,11 @@ var TRIGGER_TEMPLATE = `
 var META_TABLE_SCHEMAS = map[string]string{
 	"feature": `
 		CREATE TABLE feature (
-			id          SERIAL2 UNIQUE,
-			name        VARCHAR(32) NOT NULL,
-			group_name  VARCHAR(32) NOT NULL,
-			value_type  VARCHAR(16) NOT NULL,
+			id            SERIAL2 UNIQUE,
+			name          VARCHAR(32) NOT NULL,
+			group_name    VARCHAR(32) NOT NULL,
+			db_value_type VARCHAR(32) NOT NULL,
+			value_type    VARCHAR(16) NOT NULL,
 
 			description VARCHAR(128) DEFAULT '',
 			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -32,7 +33,8 @@ var META_TABLE_SCHEMAS = map[string]string{
 
 			PRIMARY KEY (name)
 		);
-		COMMENT ON COLUMN feature.value_type IS 'sql data type of feature value';
+		COMMENT ON COLUMN feature.value_type    IS 'data type of feature value';
+		COMMENT ON COLUMN feature.db_value_type IS 'database data type of feature value';
 		`,
 	"feature_group": `
 		CREATE TABLE feature_group (
@@ -89,7 +91,7 @@ var META_VIEW_SCHEMAS = map[string]string{
 	"rich_feature": `
         	CREATE VIEW rich_feature AS
 			SELECT
-				f.id, f.name, f.group_name, f.value_type, f.description, f.create_time, f.modify_time,
+				f.id, f.name, f.group_name, f.db_value_type, f.value_type, f.description, f.create_time, f.modify_time,
 				fg.entity_name, fg.category, fg.revision, fg.data_table
 			FROM feature AS f
 			LEFT JOIN feature_group AS fg

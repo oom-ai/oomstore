@@ -15,6 +15,7 @@ type Store interface {
 	GetFeatureValuesStream(ctx context.Context, opt types.GetFeatureValuesStreamOpt) (<-chan *types.RawFeatureValueRecord, error)
 	ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt, entity *types.Entity, features []*types.Feature, header []string) (int64, string, error)
 
+	ValueTypeTag(dbValueType string) (string, error)
 	io.Closer
 }
 

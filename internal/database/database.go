@@ -23,7 +23,7 @@ func BuildFeatureDataTableSchema(tableName string, entity *types.Entity, columns
 	})
 	var columnDefs []string
 	for _, column := range columns {
-		columnDef := fmt.Sprintf("%s %s", column.Name, column.ValueType)
+		columnDef := fmt.Sprintf("%s %s", column.Name, column.DBValueType)
 		columnDefs = append(columnDefs, columnDef)
 	}
 

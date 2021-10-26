@@ -29,12 +29,12 @@ func (db *DB) validateDataType(ctx context.Context, dataType string) error {
 	})
 }
 
-func (db *DB) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt) error {
-	if err := db.validateDataType(ctx, opt.ValueType); err != nil {
+func (db *DB) CreateFeature(ctx context.Context, opt types.DBCreateFeatureOpt) error {
+	if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
 		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
 	}
-	query := "INSERT INTO feature(name, group_name, value_type, description) VALUES ($1, $2, $3, $4)"
-	_, err := db.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.ValueType, opt.Description)
+	query := "INSERT INTO feature(name, group_name, db_value_type, value_type, description) VALUES ($1, $2, $3, $4, $5)"
+	_, err := db.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.DBValueType, opt.ValueType, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.DuplicateColumn {
