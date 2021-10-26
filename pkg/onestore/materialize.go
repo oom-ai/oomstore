@@ -12,6 +12,11 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
+	entity, err := s.GetEntity(ctx, group.EntityName)
+	if err != nil {
+		return err
+	}
+
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{GroupName: &opt.GroupName})
 	if err != nil {
 		return err
@@ -36,5 +41,5 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
-	return s.online.SinkFeatureValuesStream(ctx, stream, features, revision)
+	return s.online.SinkFeatureValuesStream(ctx, stream, features, revision, entity)
 }
