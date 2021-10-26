@@ -119,9 +119,8 @@ type GetFeatureValuesStreamOpt struct {
 }
 
 type InsertRevisionOpt struct {
-	Revision        int64
-	GroupName       string
-	DataTable       string
-	Description     string
-	UpdateGroupInfo bool
+	Revision    int64
+	GroupName   string
+	DataTable   string
+	Description string
 }

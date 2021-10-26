@@ -93,10 +93,9 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	}
 
 	return s.metadata.InsertRevision(ctx, types.InsertRevisionOpt{
-		Revision:        revision,
-		GroupName:       opt.GroupName,
-		DataTable:       dataTable,
-		Description:     opt.Description,
-		UpdateGroupInfo: true,
+		Revision:    revision,
+		GroupName:   opt.GroupName,
+		DataTable:   dataTable,
+		Description: opt.Description,
 	})
 }
