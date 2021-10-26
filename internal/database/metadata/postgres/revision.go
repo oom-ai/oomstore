@@ -34,6 +34,21 @@ func (db *DB) GetRevision(ctx context.Context, groupName string, revision int64)
 	return &rs, nil
 }
 
+func (db *DB) GetRevisionsByDataTables(ctx context.Context, dataTables []string) ([]*types.Revision, error) {
+	query := "SELECT * FROM feature_group_revision WHERE data_table IN (?)"
+	sql, args, err := sqlx.In(query, dataTables)
+	if err != nil {
+		return nil, err
+	}
+
+	revisions := make([]*types.Revision, 0)
+	err = db.SelectContext(ctx, &revisions, db.Rebind(sql), args...)
+	if err != nil {
+		return nil, err
+	}
+	return revisions, nil
+}
+
 func (db *DB) InsertRevision(ctx context.Context, opt types.InsertRevisionOpt) error {
 	return database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		query := "INSERT INTO feature_group_revision(group_name, revision, data_table, description) VALUES ($1, $2, $3, $4)"
