@@ -66,6 +66,10 @@ type Revision struct {
 	ModifyTime  time.Time `db:"modify_time"`
 }
 
+func (r *Revision) GetOnlineBatchTableName() string {
+	return fmt.Sprintf("batch_%d", r.ID)
+}
+
 func (rf *RichFeature) ToFeature() *Feature {
 	if rf == nil {
 		return nil

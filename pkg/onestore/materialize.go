@@ -44,5 +44,10 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 	if err = s.online.SinkFeatureValuesStream(ctx, stream, features, revision, entity); err != nil {
 		return err
 	}
-	return s.metadata.UpdateFeatureGroupRevision(ctx, revision.Revision, revision.DataTable, revision.GroupName)
+
+	if err = s.metadata.UpdateFeatureGroupRevision(ctx, revision.Revision, revision.DataTable, revision.GroupName); err != nil {
+		return err
+	}
+
+	return s.online.DeprecateFeatureValues(ctx, revision.GetOnlineBatchTableName())
 }

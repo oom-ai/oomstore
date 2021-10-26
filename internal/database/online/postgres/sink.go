@@ -58,16 +58,20 @@ func (db *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.
 		}
 
 		// rename the tmp table to final table
-		finalTableName := revision.GroupName
-		query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, finalTableName)
-		if _, err := db.ExecContext(ctx, query); err != nil {
-			return err
-		}
+		finalTableName := revision.GetOnlineBatchTableName()
 		rename := fmt.Sprintf("ALTER TABLE %s RENAME TO %s", tmpTableName, finalTableName)
 		_, err = tx.ExecContext(ctx, rename)
 		return err
 	})
 	return err
+}
+
+func (db *DB) DeprecateFeatureValues(ctx context.Context, tableName string) error {
+	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
+	if _, err := db.ExecContext(ctx, query); err != nil {
+		return err
+	}
+	return nil
 }
 
 func getColumns(entity types.Entity, features []*types.Feature) []string {
