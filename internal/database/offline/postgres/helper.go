@@ -23,7 +23,7 @@ func (db *DB) createTableEntityDfWithFeatures(ctx context.Context, features []*t
 
 	var columnDefs []string
 	for _, f := range features {
-		columnDefs = append(columnDefs, fmt.Sprintf(`"%s" %s`, f.Name, f.ValueType))
+		columnDefs = append(columnDefs, fmt.Sprintf(`"%s" %s`, f.Name, f.DBValueType))
 	}
 	// unique_key = entity_key,unix_time; length of unique_key = entity.Length + 9
 	schema = fmt.Sprintf(schema, tableName, entity.Length+10, entity.Length, strings.Join(columnDefs, ",\n"))
