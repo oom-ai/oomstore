@@ -129,3 +129,19 @@ type InsertRevisionOpt struct {
 	DataTable   string
 	Description string
 }
+
+type GetFeatureValuesOpt struct {
+	DataTable  string
+	EntityName string
+	RevisionId int32
+	EntityKey  string
+	Features   []*Feature
+}
+
+type GetFeatureValuesWithMultiEntityKeysOpt struct {
+	DataTable  string
+	EntityName string
+	RevisionId int32
+	EntityKeys []string
+	Features   []*Feature
+}
