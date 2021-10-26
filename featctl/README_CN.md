@@ -27,7 +27,7 @@ featctl list group --entity=device
 
 **注册特征**
 ```sh
-featctl register batch-feature model --group device --value-type "varchar(30)" --description 'phone model'
+featctl register batch-feature model --group device --db-value-type "varchar(30)" --description 'phone model'
 ```
 
 **导入批特征数据**
@@ -97,7 +97,8 @@ Name:           price
 Group:          device_info
 Entity:         device
 Category:       batch
-ValueType:      int(11)
+DBValueType:    int(11)
+ValueType:      int32
 Description:    设备价格
 Revision:       1634486400
 DataTable:      batch_device_info_1634486400
@@ -153,15 +154,15 @@ featctl export --group device
 
 ```sh
 $ featctl list feature --group device
-Name,Group,Revision,Status,Category,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
-price,device,20210909,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
-city,device,20210908,disabled,batch,int(11),城市,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+Name,Group,Revision,Status,Category,DBValueType,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
+price,device,20210909,disabled,batch,int(11),int32,设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+city,device,20210908,disabled,batch,int(11),int32,城市,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
 
 $ featctl list feature
-Name,Group,Revision,Status,Category,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
-price,device,20210909,disabled,batch,int(11),设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
-city,device,20210908,disabled,batch,int(11),城市,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
-age,user,20210908,disabled,batch,int(11),年龄,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+Name,Group,Revision,Status,Category,DBValueType,ValueType,Description,RevisionsLimit,CreateTime,ModifyTime
+price,device,20210909,disabled,batch,int(11),int32,设备价格,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+city,device,20210908,disabled,batch,int(11),int32,城市,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
+age,user,20210908,disabled,batch,int(11),int32,年龄,3,2021-09-10T15:20:43Z,2021-09-13T18:58:34Z
 ```
 
 **列举特征组的历史版本**
