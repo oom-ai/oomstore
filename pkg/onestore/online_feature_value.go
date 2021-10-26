@@ -25,9 +25,20 @@ func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 		return m, err
 	}
 	dataTables := getDataTables(features)
+	revisionIds, err := s.getRevisionIds(ctx, dataTables)
+	if err != nil {
+		return m, err
+	}
 
 	for dataTable, featureNames := range dataTables {
-		featureValues, err := s.online.GetFeatureValues(ctx, dataTable, *entityName, opt.EntityKey, featureNames)
+		if len(featureNames) == 0 {
+			continue
+		}
+		revisionId, ok := revisionIds[dataTable]
+		if !ok {
+			continue
+		}
+		featureValues, err := s.online.GetFeatureValues(ctx, dataTable, *entityName, opt.EntityKey, revisionId, featureNames)
 		if err != nil {
 			return m, err
 		}
@@ -53,9 +64,13 @@ func (s *OneStore) GetOnlineFeatureValuesWithMultiEntityKeys(ctx context.Context
 		return nil, err
 	}
 	dataTables := getDataTables(features)
+	revisionIds, err := s.getRevisionIds(ctx, dataTables)
+	if err != nil {
+		return nil, err
+	}
 
 	// entity_key -> feature_name -> feature_value
-	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, dataTables, *entityName)
+	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, dataTables, revisionIds, *entityName)
 	if err != nil {
 		return nil, err
 	}
@@ -63,12 +78,19 @@ func (s *OneStore) GetOnlineFeatureValuesWithMultiEntityKeys(ctx context.Context
 	return buildFeatureDataSet(featureValueMap, opt)
 }
 
-func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, dataTableMap map[string][]string, entityName string) (map[string]database.RowMap, error) {
+func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, dataTableMap map[string][]string, revisionIds map[string]int32, entityName string) (map[string]database.RowMap, error) {
 	// entity_key -> types.RecordMap
 	featureValueMap := make(map[string]database.RowMap)
 
 	for dataTable, featureNames := range dataTableMap {
-		featureValues, err := s.online.GetFeatureValuesWithMultiEntityKeys(ctx, dataTable, entityName, entityKeys, featureNames)
+		if len(featureNames) == 0 {
+			continue
+		}
+		revisionId, ok := revisionIds[dataTable]
+		if !ok {
+			continue
+		}
+		featureValues, err := s.online.GetFeatureValuesWithMultiEntityKeys(ctx, dataTable, entityName, revisionId, entityKeys, featureNames)
 		if err != nil {
 			return nil, err
 		}
@@ -84,6 +106,21 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
+func (s *OneStore) getRevisionIds(ctx context.Context, dataTables map[string][]string) (map[string]int32, error) {
+	dataTableSlice := make([]string, 0, len(dataTables))
+	for dataTable := range dataTables {
+		dataTableSlice = append(dataTableSlice, dataTable)
+	}
+	revisions, err := s.metadata.GetRevisionsByDataTables(ctx, dataTableSlice)
+	if err != nil {
+		return nil, nil
+	}
+	revisionMap := make(map[string]int32)
+	for _, revision := range revisions {
+		revisionMap[revision.DataTable] = revision.ID
+	}
+	return revisionMap, nil
+}
 func filterAvailableFeatures(features []*types.RichFeature) (rs []*types.RichFeature) {
 	for _, f := range features {
 		if f.DataTable != nil {
