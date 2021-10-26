@@ -17,7 +17,7 @@ type Store interface {
 	UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) error
 
 	// feature
-	CreateFeature(ctx context.Context, opt types.CreateFeatureOpt) error
+	CreateFeature(ctx context.Context, opt types.DBCreateFeatureOpt) error
 	GetFeature(ctx context.Context, featureName string) (*types.Feature, error)
 	ListFeature(ctx context.Context, groupName *string) ([]*types.Feature, error)
 	UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error

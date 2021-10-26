@@ -37,7 +37,7 @@ func init() {
 	flags.StringVarP(&registerBatchFeatureOpt.GroupName, "group", "g", "", "feature group")
 	_ = registerBatchFeatureCmd.MarkFlagRequired("group")
 
-	flags.StringVarP(&registerBatchFeatureOpt.ValueType, "value-type", "", "", "feature value type")
+	flags.StringVarP(&registerBatchFeatureOpt.DBValueType, "value-type", "", "", "feature value type")
 	_ = registerBatchFeatureCmd.MarkFlagRequired("value-type")
 
 	flags.StringVar(&registerBatchFeatureOpt.Description, "description", "", "feature description")

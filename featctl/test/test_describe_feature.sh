@@ -12,7 +12,8 @@ Name:          price
 Group:         phone
 Entity:        device
 Category:      batch
-ValueType:     int
+DBValueType:   int
+ValueType:     int32
 Description:
 Revision:
 DataTable:

@@ -30,8 +30,13 @@ func (opt *OneStoreOpt) ToOneStoreOptV2() *OneStoreOptV2 {
 type CreateFeatureOpt struct {
 	FeatureName string
 	GroupName   string
-	ValueType   string
+	DBValueType string
 	Description string
+}
+
+type DBCreateFeatureOpt struct {
+	CreateFeatureOpt
+	ValueType string
 }
 
 type ListFeatureOpt struct {

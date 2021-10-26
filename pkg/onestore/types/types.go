@@ -23,10 +23,11 @@ type Entity struct {
 }
 
 type Feature struct {
-	ID        int16  `db:"id"`
-	Name      string `db:"name"`
-	GroupName string `db:"group_name"`
-	ValueType string `db:"value_type"`
+	ID          int16  `db:"id"`
+	Name        string `db:"name"`
+	GroupName   string `db:"group_name"`
+	ValueType   string `db:"value_type"`
+	DBValueType string `db:"db_value_type"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
@@ -117,6 +118,7 @@ func (rf *RichFeature) String() string {
 		fmt.Sprintf("Group:         %s", rf.GroupName),
 		fmt.Sprintf("Entity:        %s", rf.EntityName),
 		fmt.Sprintf("Category:      %s", rf.Category),
+		fmt.Sprintf("DBValueType:   %s", rf.DBValueType),
 		fmt.Sprintf("ValueType:     %s", rf.ValueType),
 		fmt.Sprintf("Description:   %s", rf.Description),
 		fmt.Sprintf("Revision:      %s", revision),
@@ -157,7 +159,7 @@ func (fg *FeatureGroup) String() string {
 }
 
 func RichFeatureCsvHeader() string {
-	return strings.Join([]string{"Name", "Group", "Entity", "Category", "ValueType", "Description", "Revision", "DataTable", "CreateTime", "ModifyTime"}, ",")
+	return strings.Join([]string{"Name", "Group", "Entity", "Category", "DBValueType", "ValueType", "Description", "Revision", "DataTable", "CreateTime", "ModifyTime"}, ",")
 }
 
 func (r *RichFeature) ToCsvRecord() string {
@@ -173,7 +175,7 @@ func (r *RichFeature) ToCsvRecord() string {
 		dataTable = *r.DataTable
 	}
 
-	return strings.Join([]string{r.Name, r.GroupName, r.EntityName, r.Category, r.ValueType, r.Description, revision, dataTable, r.CreateTime.Format(time.RFC3339), r.ModifyTime.Format(time.RFC3339)}, ",")
+	return strings.Join([]string{r.Name, r.GroupName, r.EntityName, r.Category, r.DBValueType, r.ValueType, r.Description, revision, dataTable, r.CreateTime.Format(time.RFC3339), r.ModifyTime.Format(time.RFC3339)}, ",")
 }
 
 type RevisionRange struct {

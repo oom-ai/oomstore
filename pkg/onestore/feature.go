@@ -33,6 +33,10 @@ func (s *OneStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt
 }
 
 func (s *OneStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatureOpt) (*types.Feature, error) {
+	valueType, err := s.offline.GetValueType(opt.DBValueType)
+	if err != nil {
+		return nil, err
+	}
 	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupName)
 	if err != nil {
 		return nil, err
@@ -40,7 +44,10 @@ func (s *OneStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatu
 	if group.Category != types.BatchFeatureCategory {
 		return nil, fmt.Errorf("expected batch feature group, got %s feature group", group.Category)
 	}
-	if err := s.metadata.CreateFeature(ctx, opt); err != nil {
+	if err := s.metadata.CreateFeature(ctx, types.DBCreateFeatureOpt{
+		CreateFeatureOpt: opt,
+		ValueType:        valueType,
+	}); err != nil {
 		return nil, err
 	}
 	return s.metadata.GetFeature(ctx, opt.FeatureName)
