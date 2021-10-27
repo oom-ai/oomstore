@@ -64,7 +64,7 @@ func getOnlineBatchTableName(revision *types.Revision) string {
 	return fmt.Sprintf("batch_%d", revision.ID)
 }
 
-func (db *DB) PurgeRevision(ctx context.Context, revision *types.Revision) error {
+func (db *DB) Purge(ctx context.Context, revision *types.Revision) error {
 	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, getOnlineBatchTableName(revision))
 	if _, err := db.ExecContext(ctx, query); err != nil {
 		return err
