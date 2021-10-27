@@ -18,10 +18,6 @@ const (
 
 func (db *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.RawFeatureValueRecord, features []*types.Feature, revision *types.Revision, entity *types.Entity) error {
 	columns := getColumns(*entity, features)
-	valueFlags := make([]string, 0, PostgresBatchSize)
-	for i := 0; i < PostgresBatchSize; i++ {
-		valueFlags = append(valueFlags, "(?)")
-	}
 	err := database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tmpTableName := revision.GroupName + "_" + strconv.Itoa(rand.Int())
@@ -44,17 +40,15 @@ func (db *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.
 			records = append(records, record)
 
 			if len(records) == PostgresBatchSize {
-				query, args, err := sqlx.In(
-					fmt.Sprintf("INSERT INTO %s (%s) VALUES IN %s", tmpTableName, strings.Join(columns, ","), strings.Join(valueFlags, ",")),
-					records...)
-				if err != nil {
-					return err
-				}
-				if _, err := db.Exec(query, args...); err != nil {
+				if err := db.insertRecordsToTable(ctx, tmpTableName, records, columns); err != nil {
 					return err
 				}
 				records = make([]interface{}, 0, PostgresBatchSize)
 			}
+		}
+
+		if err := db.insertRecordsToTable(ctx, tmpTableName, records, columns); err != nil {
+			return err
 		}
 
 		// rename the tmp table to final table
@@ -85,4 +79,26 @@ func getColumns(entity types.Entity, features []*types.Feature) []string {
 		columns = append(columns, f.Name)
 	}
 	return columns
+}
+
+func (db *DB) insertRecordsToTable(ctx context.Context, tableName string, records []interface{}, columns []string) error {
+	if len(records) == 0 {
+		return nil
+	}
+	valueFlags := make([]string, 0, PostgresBatchSize)
+	for i := 0; i < len(records); i++ {
+		valueFlags = append(valueFlags, "(?)")
+	}
+
+	query, args, err := sqlx.In(
+		fmt.Sprintf("INSERT INTO %s (%s) VALUES %s", tableName, strings.Join(columns, ","), strings.Join(valueFlags, ",")),
+		records...)
+	if err != nil {
+		return err
+	}
+
+	if _, err := db.ExecContext(ctx, db.Rebind(query), args...); err != nil {
+		return err
+	}
+	return nil
 }
