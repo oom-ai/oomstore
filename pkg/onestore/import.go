@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
+	"github.com/onestore-ai/onestore/internal/database/metadata"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -93,7 +93,7 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return err
 	}
 
-	return s.metadata.InsertRevision(ctx, dbtypes.InsertRevisionOpt{
+	return s.metadata.InsertRevision(ctx, metadata.InsertRevisionOpt{
 		Revision:    revision,
 		GroupName:   opt.GroupName,
 		DataTable:   dataTable,
