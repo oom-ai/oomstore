@@ -12,8 +12,8 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, entity *types.Entity,
-	revisionRanges []*types.RevisionRange, features []*types.RichFeature, entityRows []types.EntityRow) (dataMap map[string]database.RowMap, err error) {
+func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, entity *types.Entity, entityRows []types.EntityRow,
+	revisionRanges []*types.RevisionRange, features []*types.RichFeature) (dataMap map[string]database.RowMap, err error) {
 	if len(features) == 0 {
 		return make(map[string]database.RowMap), nil
 	}

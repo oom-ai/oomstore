@@ -39,7 +39,7 @@ func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 		if err != nil {
 			return nil, err
 		}
-		featureValues, err := s.offline.GetPointInTimeFeatureValues(ctx, entity, revisionRanges, richFeatures, opt.EntityRows)
+		featureValues, err := s.offline.GetPointInTimeFeatureValues(ctx, entity, opt.EntityRows, revisionRanges, richFeatures)
 		if err != nil {
 			return nil, err
 		}
