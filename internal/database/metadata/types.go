@@ -7,6 +7,11 @@ type CreateFeatureOpt struct {
 	ValueType string
 }
 
+type CreateFeatureGroupOpt struct {
+	types.CreateFeatureGroupOpt
+	Category string
+}
+
 type InsertRevisionOpt struct {
 	Revision    int64
 	GroupName   string

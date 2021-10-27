@@ -5,15 +5,16 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/onestore-ai/onestore/internal/database/metadata"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt, category string) error {
-	if category != types.BatchFeatureCategory && category != types.StreamFeatureCategory {
-		return fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", category)
+func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) error {
+	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
+		return fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", opt.Category)
 	}
 	query := "insert into feature_group(name, entity_name, category, description) values($1, $2, $3, $4)"
-	_, err := db.ExecContext(ctx, query, opt.Name, opt.EntityName, category, opt.Description)
+	_, err := db.ExecContext(ctx, query, opt.Name, opt.EntityName, opt.Category, opt.Description)
 	return err
 }
 

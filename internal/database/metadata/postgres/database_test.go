@@ -164,11 +164,14 @@ func TestFeature(t *testing.T) {
 		Description: "description",
 	}))
 
-	assert.Nil(t, store.CreateFeatureGroup(context.Background(), types.CreateFeatureGroupOpt{
-		Name:        "device",
-		EntityName:  "device",
-		Description: "description",
-	}, "batch"))
+	assert.Nil(t, store.CreateFeatureGroup(context.Background(), metadata.CreateFeatureGroupOpt{
+		CreateFeatureGroupOpt: types.CreateFeatureGroupOpt{
+			Name:        "device",
+			EntityName:  "device",
+			Description: "description",
+		},
+		Category: types.BatchFeatureCategory,
+	}))
 
 	phoneOpt := metadata.CreateFeatureOpt{
 		CreateFeatureOpt: types.CreateFeatureOpt{
@@ -272,11 +275,14 @@ func TestRichFeature(t *testing.T) {
 		Length:      32,
 		Description: "description",
 	}))
-	assert.Nil(t, store.CreateFeatureGroup(context.Background(), types.CreateFeatureGroupOpt{
-		Name:        "device",
-		EntityName:  "device",
-		Description: "description",
-	}, "batch"))
+	assert.Nil(t, store.CreateFeatureGroup(context.Background(), metadata.CreateFeatureGroupOpt{
+		CreateFeatureGroupOpt: types.CreateFeatureGroupOpt{
+			Name:        "device",
+			EntityName:  "device",
+			Description: "description",
+		},
+		Category: types.BatchFeatureCategory,
+	}))
 	assert.Nil(t, store.CreateFeature(context.Background(), phoneOpt))
 	assert.Nil(t, store.CreateFeature(context.Background(), priceOpt))
 
