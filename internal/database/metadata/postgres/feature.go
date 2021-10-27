@@ -15,7 +15,7 @@ import (
 )
 
 func (db *DB) validateDataType(ctx context.Context, dataType string) error {
-	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Intn(100000))
+	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Int())
 	return database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", tmpTableName)); err != nil {
 			return err
