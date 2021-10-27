@@ -2,35 +2,20 @@ package database
 
 import (
 	"fmt"
-	"sort"
-	"strconv"
-	"strings"
 
+	"github.com/onestore-ai/onestore/internal/database/online"
+	onlinePG "github.com/onestore-ai/onestore/internal/database/online/postgres"
+	onlineRedis "github.com/onestore-ai/onestore/internal/database/online/redis"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-type RowMap = map[string]interface{}
-
-const CREATE_DATA_TABLE = `CREATE TABLE {{TABLE_NAME}} (
-	{{ENTITY_NAME}} VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY,
-	{{COLUMN_DEFS}});
-`
-
-func BuildFeatureDataTableSchema(tableName string, entity *types.Entity, columns []*types.Feature) string {
-	// sort to ensure the schema looks consistent
-	sort.Slice(columns, func(i, j int) bool {
-		return columns[i].Name < columns[j].Name
-	})
-	var columnDefs []string
-	for _, column := range columns {
-		columnDef := fmt.Sprintf("%s %s", column.Name, column.DBValueType)
-		columnDefs = append(columnDefs, columnDef)
+func OpenOnlineStore(opt types.OnlineStoreOpt) (online.Store, error) {
+	switch opt.Backend {
+	case types.POSTGRES:
+		return onlinePG.Open(opt.PostgresDbOpt)
+	case types.REDIS:
+		return onlineRedis.Open(opt.RedisDbOpt), nil
+	default:
+		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
-
-	// fill schema template
-	schema := strings.ReplaceAll(CREATE_DATA_TABLE, "{{TABLE_NAME}}", tableName)
-	schema = strings.ReplaceAll(schema, "{{ENTITY_NAME}}", entity.Name)
-	schema = strings.ReplaceAll(schema, "{{ENTITY_LENGTH}}", strconv.Itoa(entity.Length))
-	schema = strings.ReplaceAll(schema, "{{COLUMN_DEFS}}", strings.Join(columnDefs, ",\n"))
-	return schema
 }

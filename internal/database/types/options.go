@@ -2,14 +2,6 @@ package options
 
 import "github.com/onestore-ai/onestore/pkg/onestore/types"
 
-type MultiGetOnlineFeatureValuesOpt struct {
-	DataTable  string
-	EntityName string
-	RevisionId int32
-	EntityKeys []string
-	Features   []*types.Feature
-}
-
 type CreateFeatureOpt struct {
 	types.CreateFeatureOpt
 	ValueType string

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/onestore-ai/onestore/internal/database/online"
 	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
@@ -46,7 +47,13 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
-	if err = s.online.Import(ctx, stream, features, revision, entity); err != nil {
+	err = s.online.Import(ctx, online.ImportOpt{
+		Features: features,
+		Revision: revision,
+		Entity:   entity,
+		Stream:   stream,
+	})
+	if err != nil {
 		return err
 	}
 

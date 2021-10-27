@@ -8,14 +8,14 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/cast"
 
-	"github.com/onestore-ai/onestore/internal/database"
+	"github.com/onestore-ai/onestore/internal/database/dbutil"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
 func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, entity *types.Entity, entityRows []types.EntityRow,
-	revisionRanges []*types.RevisionRange, features []*types.RichFeature) (dataMap map[string]database.RowMap, err error) {
+	revisionRanges []*types.RevisionRange, features []*types.RichFeature) (dataMap map[string]dbutil.RowMap, err error) {
 	if len(features) == 0 {
-		return make(map[string]database.RowMap), nil
+		return make(map[string]dbutil.RowMap), nil
 	}
 
 	// Step 0: prepare temporary tables
@@ -80,10 +80,10 @@ func buildFeatureNameStr(features []*types.RichFeature) string {
 	return strings.Join(featureNames, ", ")
 }
 
-func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]database.RowMap, error) {
-	featureValueMap := make(map[string]database.RowMap)
+func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]dbutil.RowMap, error) {
+	featureValueMap := make(map[string]dbutil.RowMap)
 	for rows.Next() {
-		rowMap := make(database.RowMap)
+		rowMap := make(dbutil.RowMap)
 		if err := rows.MapScan(rowMap); err != nil {
 			return nil, err
 		}

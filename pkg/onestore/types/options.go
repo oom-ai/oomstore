@@ -103,11 +103,3 @@ type MaterializeOpt struct {
 	GroupName     string
 	GroupRevision *int64
 }
-
-type GetFeatureValuesOpt struct {
-	DataTable  string
-	EntityName string
-	RevisionId int32
-	EntityKey  string
-	Features   []*Feature
-}

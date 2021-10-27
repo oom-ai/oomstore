@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/onestore-ai/onestore/internal/database"
+	"github.com/onestore-ai/onestore/internal/database/dbutil"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 	"github.com/spf13/cast"
 )
@@ -26,7 +26,7 @@ func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 	// group_name -> []features
 	featureGroups := buildGroupToFeaturesMap(batchFeatures)
 
-	entityDataMap := make(map[string]database.RowMap)
+	entityDataMap := make(map[string]dbutil.RowMap)
 	for _, richFeatures := range featureGroups {
 		if len(richFeatures) == 0 {
 			continue
@@ -45,7 +45,7 @@ func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 		}
 		for key, m := range featureValues {
 			if _, ok := entityDataMap[key]; !ok {
-				entityDataMap[key] = make(database.RowMap)
+				entityDataMap[key] = make(dbutil.RowMap)
 			}
 			for fn, fv := range m {
 				entityDataMap[key][fn] = fv
@@ -55,7 +55,7 @@ func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 	for _, entity := range opt.EntityRows {
 		key := entity.EntityKey + "," + strconv.Itoa(int(entity.UnixTime))
 		if _, ok := entityDataMap[key]; !ok {
-			entityDataMap[key] = database.RowMap{
+			entityDataMap[key] = dbutil.RowMap{
 				"entity_key": entity.EntityKey,
 				"unix_time":  entity.UnixTime,
 			}
