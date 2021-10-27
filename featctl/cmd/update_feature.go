@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -19,10 +19,10 @@ var updateFeatureCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
-		if err := oneStore.UpdateFeature(ctx, updateFeatureOpt); err != nil {
+		if err := oomStore.UpdateFeature(ctx, updateFeatureOpt); err != nil {
 			log.Fatalf("failed updating feature %s, err %v\n", updateFeatureOpt.FeatureName, err)
 		}
 	},

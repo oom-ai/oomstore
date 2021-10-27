@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan *types.RawFeatureValueRecord, error) {

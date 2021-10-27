@@ -1,14 +1,14 @@
-package onestore
+package oomstore
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (s *OneStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeatureValuesOpt) ([]string, <-chan *types.RawFeatureValueRecord, error) {
+func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeatureValuesOpt) ([]string, <-chan *types.RawFeatureValueRecord, error) {
 	group, err := s.GetFeatureGroup(ctx, opt.GroupName)
 	if err != nil {
 		return nil, nil, err

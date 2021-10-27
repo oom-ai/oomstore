@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/preset/postgres"
 )
@@ -28,7 +28,7 @@ func init() {
 		Port:     strconv.Itoa(postgresContainer.DefaultPort()),
 		User:     "test",
 		Pass:     "test",
-		Database: "onestore",
+		Database: "oomstore",
 	}
 
 	go func() {

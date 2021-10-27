@@ -1,6 +1,6 @@
 package offline
 
-import "github.com/oom-ai/oomstore/pkg/onestore/types"
+import "github.com/oom-ai/oomstore/pkg/oomstore/types"
 
 type ExportOpt struct {
 	DataTable    string

@@ -1,4 +1,4 @@
-package onestore
+package oomstore
 
 import (
 	"strconv"

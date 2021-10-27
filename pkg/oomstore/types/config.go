@@ -7,7 +7,7 @@ const (
 	REDIS    BackendType = "redis"
 )
 
-type OneStoreOptV2 struct {
+type OomStoreOptV2 struct {
 	MetaStoreOpt    MetaStoreOpt
 	OfflineStoreOpt OfflineStoreOpt
 	OnlineStoreOpt  OnlineStoreOpt

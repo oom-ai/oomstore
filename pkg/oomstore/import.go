@@ -1,4 +1,4 @@
-package onestore
+package oomstore
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func getCsvHeader(filePath string) ([]string, error) {
@@ -56,7 +56,7 @@ func stringSliceEqual(a, b []string) bool {
 	return true
 }
 
-func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) error {
+func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) error {
 	// get columns of the group
 	columns, err := s.metadata.ListFeature(ctx, &opt.GroupName)
 	if err != nil {

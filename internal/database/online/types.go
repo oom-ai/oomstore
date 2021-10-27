@@ -1,6 +1,6 @@
 package online
 
-import "github.com/oom-ai/oomstore/pkg/onestore/types"
+import "github.com/oom-ai/oomstore/pkg/oomstore/types"
 
 type GetOpt struct {
 	DataTable  string

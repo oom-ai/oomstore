@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/version"
 )
 
@@ -22,7 +22,7 @@ const (
 var cfgFile string
 var defaultCfgFile = filepath.Join(xdg.ConfigHome, "featctl", "config.yaml")
 
-var oneStoreOpt types.OneStoreOpt
+var oomStoreOpt types.OomStoreOpt
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -50,11 +50,11 @@ func init() {
 	pFlags := rootCmd.PersistentFlags()
 	pFlags.StringVar(&cfgFile, "config", defaultCfgFile, "config file")
 
-	pFlags.StringVarP(&oneStoreOpt.Host, "host", "H", "127.0.0.1", "feature store database host")
-	pFlags.StringVarP(&oneStoreOpt.Port, "port", "P", "5432", "feature store database port")
-	pFlags.StringVarP(&oneStoreOpt.User, "user", "u", "root", "feature store database user")
-	pFlags.StringVarP(&oneStoreOpt.Pass, "pass", "p", "", "feature store database pass")
-	pFlags.StringVarP(&oneStoreOpt.Workspace, "workspace", "w", "onestore", "feature store workspace name")
+	pFlags.StringVarP(&oomStoreOpt.Host, "host", "H", "127.0.0.1", "feature store database host")
+	pFlags.StringVarP(&oomStoreOpt.Port, "port", "P", "5432", "feature store database port")
+	pFlags.StringVarP(&oomStoreOpt.User, "user", "u", "root", "feature store database user")
+	pFlags.StringVarP(&oomStoreOpt.Pass, "pass", "p", "", "feature store database pass")
+	pFlags.StringVarP(&oomStoreOpt.Workspace, "workspace", "w", "oomstore", "feature store workspace name")
 
 	rootCmd.SetVersionTemplate(`{{printf "%s\n" .Version}}`)
 }

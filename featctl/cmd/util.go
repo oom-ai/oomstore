@@ -4,14 +4,14 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/pkg/onestore"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func mustOpenOneStore(ctx context.Context, opt types.OneStoreOpt) *onestore.OneStore {
-	store, err := onestore.Open(ctx, oneStoreOpt)
+func mustOpenOomStore(ctx context.Context, opt types.OomStoreOpt) *oomstore.OomStore {
+	store, err := oomstore.Open(ctx, oomStoreOpt)
 	if err != nil {
-		log.Fatalf("failed opening OneStore: %v", err)
+		log.Fatalf("failed opening OomStore: %v", err)
 	}
 	return store
 }

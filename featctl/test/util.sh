@@ -79,7 +79,7 @@ init_store() {
     info "initialize feature store"
 
     # destroy database
-    execute_sql 'drop database if exists onestore'
+    execute_sql 'drop database if exists oomstore'
 
     # initialize feature store
     featctl init

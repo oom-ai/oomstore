@@ -1,6 +1,6 @@
 package types
 
-type OneStoreOpt struct {
+type OomStoreOpt struct {
 	Host      string
 	Port      string
 	User      string
@@ -8,7 +8,7 @@ type OneStoreOpt struct {
 	Workspace string
 }
 
-func (opt *OneStoreOpt) ToOneStoreOptV2() *OneStoreOptV2 {
+func (opt *OomStoreOpt) ToOomStoreOptV2() *OomStoreOptV2 {
 	if opt == nil {
 		return nil
 	}
@@ -20,7 +20,7 @@ func (opt *OneStoreOpt) ToOneStoreOptV2() *OneStoreOptV2 {
 		Pass:     opt.Pass,
 		Database: opt.Workspace,
 	}
-	return &OneStoreOptV2{
+	return &OomStoreOptV2{
 		MetaStoreOpt:    MetaStoreOpt{PostgresDbOpt: &postgresOpt, Backend: POSTGRES},
 		OnlineStoreOpt:  OnlineStoreOpt{PostgresDbOpt: &postgresOpt, Backend: POSTGRES},
 		OfflineStoreOpt: OfflineStoreOpt{PostgresDbOpt: &postgresOpt, Backend: POSTGRES},

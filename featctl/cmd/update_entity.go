@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -19,10 +19,10 @@ var updateEntityCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
-		if err := oneStore.UpdateEntity(ctx, updateEntityOpt); err != nil {
+		if err := oomStore.UpdateEntity(ctx, updateEntityOpt); err != nil {
 			log.Fatalf("failed updating entity %s, err %v\n", updateEntityOpt.EntityName, err)
 		}
 	},
