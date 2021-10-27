@@ -3,6 +3,7 @@ package onestore
 import (
 	"context"
 
+	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -32,7 +33,7 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
-	stream, err := s.offline.GetFeatureValuesStream(ctx, types.GetFeatureValuesStreamOpt{
+	stream, err := s.offline.GetFeatureValuesStream(ctx, dbtypes.GetFeatureValuesStreamOpt{
 		DataTable:    revision.DataTable,
 		EntityName:   group.EntityName,
 		FeatureNames: featureNames,

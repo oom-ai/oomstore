@@ -34,11 +34,6 @@ type CreateFeatureOpt struct {
 	Description string
 }
 
-type DBCreateFeatureOpt struct {
-	CreateFeatureOpt
-	ValueType string
-}
-
 type ListFeatureOpt struct {
 	EntityName *string
 	GroupName  *string
@@ -60,8 +55,6 @@ type CreateFeatureGroupOpt struct {
 	EntityName  string
 	Description string
 }
-
-type WalkFeatureValuesFunc = func(header []string, key string, values []interface{}) error
 
 type ExportFeatureValuesOpt struct {
 	GroupName     string
@@ -91,11 +84,6 @@ type MultiGetOnlineFeatureValuesOpt struct {
 	EntityKeys   []string
 }
 
-type EntityRow struct {
-	EntityKey string `db:"entity_key"`
-	UnixTime  int64  `db:"unix_time"`
-}
-
 type GetHistoricalFeatureValuesOpt struct {
 	FeatureNames []string
 	EntityRows   []EntityRow
@@ -116,32 +104,10 @@ type MaterializeOpt struct {
 	GroupRevision int64
 }
 
-type GetFeatureValuesStreamOpt struct {
-	DataTable    string
-	EntityName   string
-	FeatureNames []string
-	Limit        *uint64
-}
-
-type InsertRevisionOpt struct {
-	Revision    int64
-	GroupName   string
-	DataTable   string
-	Description string
-}
-
 type GetFeatureValuesOpt struct {
 	DataTable  string
 	EntityName string
 	RevisionId int32
 	EntityKey  string
-	Features   []*Feature
-}
-
-type DBMultiGetOnlineFeatureValuesOpt struct {
-	DataTable  string
-	EntityName string
-	RevisionId int32
-	EntityKeys []string
 	Features   []*Feature
 }
