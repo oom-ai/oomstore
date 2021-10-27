@@ -98,7 +98,7 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 			continue
 		}
 
-		featureValues, err := s.online.MultiGetOnlineFeatureValues(ctx, dbtypes.MultiGetOnlineFeatureValuesOpt{
+		featureValues, err := s.online.MultiGet(ctx, dbtypes.MultiGetOnlineFeatureValuesOpt{
 			DataTable:  dataTable,
 			EntityName: entityName,
 			RevisionId: revisionId,

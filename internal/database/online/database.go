@@ -14,7 +14,7 @@ import (
 
 type Store interface {
 	Get(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error)
-	MultiGetOnlineFeatureValues(ctx context.Context, opt dbtypes.MultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error)
+	MultiGet(ctx context.Context, opt dbtypes.MultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error)
 	SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.RawFeatureValueRecord, features []*types.Feature, revision *types.Revision, entity *types.Entity) error
 	PurgeRevision(ctx context.Context, revision *types.Revision) error
 	io.Closer
