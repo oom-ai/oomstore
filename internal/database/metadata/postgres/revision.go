@@ -55,6 +55,15 @@ func (db *DB) InsertRevision(ctx context.Context, opt dbtypes.InsertRevisionOpt)
 	return err
 }
 
+func (db *DB) GetLatestRevision(ctx context.Context, groupName string) (*types.Revision, error) {
+	query := "SELECT * FROM feature_group_revision WHERE group_name = $1 ORDER BY create_time DESC LIMIT 1"
+	var revision types.Revision
+	if err := db.GetContext(ctx, &revision, query, groupName); err != nil {
+		return nil, err
+	}
+	return &revision, nil
+}
+
 func (db *DB) BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error) {
 	query := fmt.Sprintf(`
 		SELECT
