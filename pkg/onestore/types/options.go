@@ -86,7 +86,7 @@ type GetOnlineFeatureValuesOpt struct {
 	EntityKey    string
 }
 
-type GetOnlineFeatureValuesWithMultiEntityKeysOpt struct {
+type MultiGetOnlineFeatureValuesOpt struct {
 	FeatureNames []string
 	EntityKeys   []string
 }
@@ -138,7 +138,7 @@ type GetFeatureValuesOpt struct {
 	Features   []*Feature
 }
 
-type GetFeatureValuesWithMultiEntityKeysOpt struct {
+type DBMultiGetOnlineFeatureValuesOpt struct {
 	DataTable  string
 	EntityName string
 	RevisionId int32

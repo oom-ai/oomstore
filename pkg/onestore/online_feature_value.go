@@ -38,14 +38,13 @@ func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 		if !ok {
 			continue
 		}
-		opt := types.GetFeatureValuesOpt{
+		featureValues, err := s.online.GetFeatureValues(ctx, types.GetFeatureValuesOpt{
 			DataTable:  dataTable,
 			EntityName: *entityName,
 			RevisionId: revisionId,
 			EntityKey:  opt.EntityKey,
 			Features:   features,
-		}
-		featureValues, err := s.online.GetFeatureValues(ctx, opt)
+		})
 		if err != nil {
 			return m, err
 		}
@@ -56,7 +55,7 @@ func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 	return m, nil
 }
 
-func (s *OneStore) GetOnlineFeatureValuesWithMultiEntityKeys(ctx context.Context, opt types.GetOnlineFeatureValuesWithMultiEntityKeysOpt) (*types.FeatureDataSet, error) {
+func (s *OneStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
 	features, err := s.metadata.GetRichFeatures(ctx, opt.FeatureNames)
 	if err != nil {
 		return nil, err
@@ -98,14 +97,13 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 			continue
 		}
 
-		opt := types.GetFeatureValuesWithMultiEntityKeysOpt{
+		featureValues, err := s.online.MultiGetOnlineFeatureValues(ctx, types.DBMultiGetOnlineFeatureValuesOpt{
 			DataTable:  dataTable,
 			EntityName: entityName,
 			RevisionId: revisionId,
 			EntityKeys: entityKeys,
 			Features:   features,
-		}
-		featureValues, err := s.online.GetFeatureValuesWithMultiEntityKeys(ctx, opt)
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -168,7 +166,7 @@ func getEntityName(features []*types.RichFeature) (*string, error) {
 	return nil, nil
 }
 
-func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.GetOnlineFeatureValuesWithMultiEntityKeysOpt) (*types.FeatureDataSet, error) {
+func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.MultiGetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
 	fds := types.NewFeatureDataSet()
 	for _, entityKey := range opt.EntityKeys {
 		fds[entityKey] = make([]types.FeatureKV, 0)

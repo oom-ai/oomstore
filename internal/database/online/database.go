@@ -13,7 +13,7 @@ import (
 
 type Store interface {
 	GetFeatureValues(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error)
-	GetFeatureValuesWithMultiEntityKeys(ctx context.Context, opt types.GetFeatureValuesWithMultiEntityKeysOpt) (map[string]database.RowMap, error)
+	MultiGetOnlineFeatureValues(ctx context.Context, opt types.DBMultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error)
 	SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.RawFeatureValueRecord, features []*types.Feature, revision *types.Revision, entity *types.Entity) error
 
 	io.Closer
