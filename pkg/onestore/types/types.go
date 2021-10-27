@@ -43,12 +43,13 @@ type RichFeature struct {
 }
 
 type FeatureGroup struct {
-	ID         int16   `db:"id"`
-	Name       string  `db:"name"`
-	EntityName string  `db:"entity_name"`
-	Revision   *int64  `db:"revision"`
-	Category   string  `db:"category"`
-	DataTable  *string `db:"data_table"`
+	ID               int16   `db:"id"`
+	Name             string  `db:"name"`
+	EntityName       string  `db:"entity_name"`
+	Revision         *int64  `db:"revision"`
+	OnlineRevisionID *int32  `db:"online_revision_id"`
+	Category         string  `db:"category"`
+	DataTable        *string `db:"data_table"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
