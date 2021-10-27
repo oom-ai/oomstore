@@ -45,7 +45,7 @@ func SerializeByTag(i interface{}, typeTag string) (s string, err error) {
 	case types.BYTE_ARRAY:
 		return string(i.([]byte)), nil
 	default:
-		return "", fmt.Errorf("unable to seralize %#v of type %T", i, i)
+		return "", fmt.Errorf("unable to seralize %#v of type %T to string", i, i)
 	}
 }
 
@@ -94,6 +94,59 @@ func SerializeByValue(i interface{}) (string, error) {
 
 	default:
 		return "", fmt.Errorf("unable to seralize %#v of type %T to string", i, i)
+	}
+}
+
+func DeserializeByTag(i interface{}, typeTag string) (interface{}, error) {
+	if i == nil {
+		return nil, nil
+	}
+
+	s, ok := i.(string)
+	if !ok {
+		return nil, fmt.Errorf("not a string or nil: %v", i)
+	}
+
+	switch typeTag {
+	case types.STRING:
+		return s, nil
+
+	case types.INT8:
+		x, err := strconv.ParseInt(s, SeralizeIntBase, 8)
+		return int8(x), err
+	case types.INT16:
+		x, err := strconv.ParseInt(s, SeralizeIntBase, 16)
+		return int16(x), err
+	case types.INT32:
+		x, err := strconv.ParseInt(s, SeralizeIntBase, 32)
+		return int32(x), err
+	case types.INT64:
+		x, err := strconv.ParseInt(s, SeralizeIntBase, 64)
+		return x, err
+
+	case types.FLOAT32:
+		x, err := strconv.ParseFloat(s, 32)
+		return float32(x), err
+	case types.FLOAT64:
+		x, err := strconv.ParseFloat(s, 64)
+		return x, err
+
+	case types.BOOL:
+		if s == "1" {
+			return true, nil
+		} else if s == "0" {
+			return false, nil
+		} else {
+			return nil, fmt.Errorf("invalid bool value: %s", s)
+		}
+	case types.TIME:
+		x, err := strconv.ParseInt(s, SeralizeIntBase, 64)
+		return time.UnixMilli(x), err
+
+	case types.BYTE_ARRAY:
+		return []byte(s), nil
+	default:
+		return "", fmt.Errorf("unsupported type tag: %s", typeTag)
 	}
 }
 

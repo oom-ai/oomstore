@@ -4,31 +4,51 @@ import (
 	"context"
 
 	"github.com/onestore-ai/onestore/internal/database"
+	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) GetFeatureValues(ctx context.Context, dataTable, entityName, entityKey string, revisionId int32, featureNames []string) (database.RowMap, error) {
+func (db *DB) GetFeatureValues(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error) {
+	key, err := SerializeRedisKey(opt.RevisionId, opt.EntityKey)
+	if err != nil {
+		return nil, err
+	}
+
+	featureIds := []string{}
+	for _, f := range opt.Features {
+		id, err := SerializeByValue(f.ID)
+		if err != nil {
+			return nil, err
+		}
+		featureIds = append(featureIds, id)
+	}
+
+	values, err := db.HMGet(ctx, key, featureIds...).Result()
+	if err != nil {
+		return nil, err
+	}
+
 	rowMap := make(database.RowMap)
-
-	key, err := SerializeRedisKey(revisionId, entityKey)
-	if err != nil {
-		return rowMap, err
-	}
-
-	values, err := db.HMGet(ctx, key, featureNames...).Result()
-	if err != nil {
-		return rowMap, err
-	}
 	for i, v := range values {
-		rowMap[featureNames[i]] = v
+		typedValue, err := DeserializeByTag(v, opt.Features[i].ValueType)
+		if err != nil {
+			return nil, err
+		}
+		rowMap[opt.Features[i].Name] = typedValue
 	}
 	return rowMap, nil
 }
 
 // response: map[entity_key]map[feature_name]feature_value
-func (db *DB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, dataTable, entityName string, revisionId int32, entityKeys, featureNames []string) (map[string]database.RowMap, error) {
+func (db *DB) MultiGetOnlineFeatureValues(ctx context.Context, opt types.DBMultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error) {
 	res := make(map[string]database.RowMap)
-	for _, entityKey := range entityKeys {
-		rowMap, err := db.GetFeatureValues(ctx, dataTable, entityName, entityKey, revisionId, featureNames)
+	for _, entityKey := range opt.EntityKeys {
+		rowMap, err := db.GetFeatureValues(ctx, types.GetFeatureValuesOpt{
+			DataTable:  opt.DataTable,
+			EntityName: opt.EntityName,
+			RevisionId: opt.RevisionId,
+			EntityKey:  entityKey,
+			Features:   opt.Features,
+		})
 		if err != nil {
 			return res, err
 		}

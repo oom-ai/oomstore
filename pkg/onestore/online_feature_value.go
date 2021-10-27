@@ -30,15 +30,21 @@ func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 		return m, err
 	}
 
-	for dataTable, featureNames := range dataTables {
-		if len(featureNames) == 0 {
+	for dataTable, features := range dataTables {
+		if len(features) == 0 {
 			continue
 		}
 		revisionId, ok := revisionIds[dataTable]
 		if !ok {
 			continue
 		}
-		featureValues, err := s.online.GetFeatureValues(ctx, dataTable, *entityName, opt.EntityKey, revisionId, featureNames)
+		featureValues, err := s.online.GetFeatureValues(ctx, types.GetFeatureValuesOpt{
+			DataTable:  dataTable,
+			EntityName: *entityName,
+			RevisionId: revisionId,
+			EntityKey:  opt.EntityKey,
+			Features:   features,
+		})
 		if err != nil {
 			return m, err
 		}
@@ -49,7 +55,7 @@ func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 	return m, nil
 }
 
-func (s *OneStore) GetOnlineFeatureValuesWithMultiEntityKeys(ctx context.Context, opt types.GetOnlineFeatureValuesWithMultiEntityKeysOpt) (*types.FeatureDataSet, error) {
+func (s *OneStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
 	features, err := s.metadata.GetRichFeatures(ctx, opt.FeatureNames)
 	if err != nil {
 		return nil, err
@@ -78,19 +84,26 @@ func (s *OneStore) GetOnlineFeatureValuesWithMultiEntityKeys(ctx context.Context
 	return buildFeatureDataSet(featureValueMap, opt)
 }
 
-func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, dataTableMap map[string][]string, revisionIds map[string]int32, entityName string) (map[string]database.RowMap, error) {
+func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, dataTableMap map[string][]*types.Feature, revisionIds map[string]int32, entityName string) (map[string]database.RowMap, error) {
 	// entity_key -> types.RecordMap
 	featureValueMap := make(map[string]database.RowMap)
 
-	for dataTable, featureNames := range dataTableMap {
-		if len(featureNames) == 0 {
+	for dataTable, features := range dataTableMap {
+		if len(features) == 0 {
 			continue
 		}
 		revisionId, ok := revisionIds[dataTable]
 		if !ok {
 			continue
 		}
-		featureValues, err := s.online.GetFeatureValuesWithMultiEntityKeys(ctx, dataTable, entityName, revisionId, entityKeys, featureNames)
+
+		featureValues, err := s.online.MultiGetOnlineFeatureValues(ctx, types.DBMultiGetOnlineFeatureValuesOpt{
+			DataTable:  dataTable,
+			EntityName: entityName,
+			RevisionId: revisionId,
+			EntityKeys: entityKeys,
+			Features:   features,
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -106,7 +119,7 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
-func (s *OneStore) getRevisionIds(ctx context.Context, dataTables map[string][]string) (map[string]int32, error) {
+func (s *OneStore) getRevisionIds(ctx context.Context, dataTables map[string][]*types.Feature) (map[string]int32, error) {
 	dataTableSlice := make([]string, 0, len(dataTables))
 	for dataTable := range dataTables {
 		dataTableSlice = append(dataTableSlice, dataTable)
@@ -130,11 +143,11 @@ func filterAvailableFeatures(features []*types.RichFeature) (rs []*types.RichFea
 	return
 }
 
-func getDataTables(features []*types.RichFeature) map[string][]string {
-	dataTableMap := make(map[string][]string)
+func getDataTables(features []*types.RichFeature) map[string][]*types.Feature {
+	dataTableMap := make(map[string][]*types.Feature)
 	for _, f := range features {
 		dataTable := *f.DataTable
-		dataTableMap[dataTable] = append(dataTableMap[dataTable], f.Name)
+		dataTableMap[dataTable] = append(dataTableMap[dataTable], f.ToFeature())
 	}
 	return dataTableMap
 }
@@ -153,7 +166,7 @@ func getEntityName(features []*types.RichFeature) (*string, error) {
 	return nil, nil
 }
 
-func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.GetOnlineFeatureValuesWithMultiEntityKeysOpt) (*types.FeatureDataSet, error) {
+func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.MultiGetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
 	fds := types.NewFeatureDataSet()
 	for _, entityKey := range opt.EntityKeys {
 		fds[entityKey] = make([]types.FeatureKV, 0)
