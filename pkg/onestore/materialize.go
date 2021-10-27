@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/onestore-ai/onestore/internal/database/offline"
 	"github.com/onestore-ai/onestore/internal/database/online"
-	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -38,7 +38,7 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return fmt.Errorf("online store already in the latest revision")
 	}
 
-	stream, err := s.offline.GetFeatureValuesStream(ctx, dbtypes.GetFeatureValuesStreamOpt{
+	stream, err := s.offline.GetFeatureValuesStream(ctx, offline.GetFeatureValuesStreamOpt{
 		DataTable:    revision.DataTable,
 		EntityName:   group.EntityName,
 		FeatureNames: featureNames,

@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 
-	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -16,7 +15,7 @@ type Store interface {
 	UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) error
 
 	// feature
-	CreateFeature(ctx context.Context, opt dbtypes.CreateFeatureOpt) error
+	CreateFeature(ctx context.Context, opt CreateFeatureOpt) error
 	GetFeature(ctx context.Context, featureName string) (*types.Feature, error)
 	ListFeature(ctx context.Context, groupName *string) ([]*types.Feature, error)
 	UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error
@@ -39,7 +38,7 @@ type Store interface {
 	GetRevisionsByDataTables(ctx context.Context, dataTables []string) ([]*types.Revision, error)
 	GetLatestRevision(ctx context.Context, groupName string) (*types.Revision, error)
 	BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error)
-	InsertRevision(ctx context.Context, opt dbtypes.InsertRevisionOpt) error
+	InsertRevision(ctx context.Context, opt InsertRevisionOpt) error
 
 	io.Closer
 }

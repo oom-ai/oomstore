@@ -10,7 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/onestore-ai/onestore/internal/database/dbutil"
-	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
+	"github.com/onestore-ai/onestore/internal/database/metadata"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -30,7 +30,7 @@ func (db *DB) validateDataType(ctx context.Context, dataType string) error {
 	})
 }
 
-func (db *DB) CreateFeature(ctx context.Context, opt dbtypes.CreateFeatureOpt) error {
+func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) error {
 	if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
 		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
 	}
