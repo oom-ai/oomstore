@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/onestore-ai/onestore/internal/database/metadata"
+	"github.com/onestore-ai/onestore/internal/database/offline"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -88,7 +89,12 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
-	revision, dataTable, err := s.offline.ImportBatchFeatures(ctx, opt, entity, columns, header)
+	revision, dataTable, err := s.offline.ImportBatchFeatures(ctx, offline.ImportBatchFeaturesOpt{
+		ImportBatchFeaturesOpt: opt,
+		Entity:                 entity,
+		Features:               columns,
+		Header:                 header,
+	})
 	if err != nil {
 		return err
 	}
