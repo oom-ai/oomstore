@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
@@ -49,9 +50,33 @@ func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*type
 }
 
 func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
-	query := "UPDATE feature_group SET description = $1 WHERE name = $2"
-	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.GroupName)
+	cond, args := buildUpdateFeatureGroupCond(opt)
+	query := fmt.Sprintf("UPDATE feature_group SET %s WHERE name = $%d", strings.Join(cond, ","), len(cond)+1)
+	_, err := db.ExecContext(ctx, query, args...)
 	return err
+}
+
+func buildUpdateFeatureGroupCond(opt types.UpdateFeatureGroupOpt) ([]string, []interface{}) {
+	cond := make([]string, 0)
+	args := make([]interface{}, 0)
+	var id int
+	if opt.Description != nil {
+		id++
+		cond = append(cond, fmt.Sprintf("description = $%d", id))
+		args = append(args, *opt.Description)
+	}
+	if opt.Revision != nil {
+		id++
+		cond = append(cond, fmt.Sprintf("revision = $%d", id))
+		args = append(args, *opt.Revision)
+	}
+	if opt.DataTable != nil {
+		id++
+		cond = append(cond, fmt.Sprintf("data_table = $%d", id))
+		args = append(args, *opt.DataTable)
+	}
+	args = append(args, opt.GroupName)
+	return cond, args
 }
 
 func (db *DB) UpdateFeatureGroupRevision(ctx context.Context, revision int64, dataTable string, groupName string) error {
