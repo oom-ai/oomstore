@@ -13,7 +13,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/onestore-ai/onestore/internal/database/dbutil"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/onestore-ai/onestore/internal/database/offline"
 )
 
 func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter string, header []string) error {
@@ -62,20 +62,20 @@ func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter 
 	})
 }
 
-func (db *DB) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt, entity *types.Entity, features []*types.Feature, header []string) (int64, string, error) {
+func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, string, error) {
 	var revision int64
 	var finalTableName string
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tmpTableName := opt.GroupName + "_" + strconv.Itoa(rand.Int())
-		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, entity, features)
+		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, opt.Entity, opt.Features)
 		_, err := db.ExecContext(ctx, schema)
 		if err != nil {
 			return err
 		}
 
 		// populate the data table
-		err = db.LoadLocalFile(ctx, opt.DataSource.FilePath, tmpTableName, opt.DataSource.Delimiter, header)
+		err = db.LoadLocalFile(ctx, opt.DataSource.FilePath, tmpTableName, opt.DataSource.Delimiter, opt.Header)
 		if err != nil {
 			return err
 		}

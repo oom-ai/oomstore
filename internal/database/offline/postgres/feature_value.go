@@ -9,17 +9,17 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/onestore-ai/onestore/internal/database/dbutil"
+	"github.com/onestore-ai/onestore/internal/database/offline"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, entity *types.Entity, entityRows []types.EntityRow,
-	revisionRanges []*types.RevisionRange, features []*types.RichFeature) (dataMap map[string]dbutil.RowMap, err error) {
-	if len(features) == 0 {
+func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (dataMap map[string]dbutil.RowMap, err error) {
+	if len(opt.Features) == 0 {
 		return make(map[string]dbutil.RowMap), nil
 	}
 
 	// Step 0: prepare temporary tables
-	entityDfWithFeatureName, tmpErr := db.createTableEntityDfWithFeatures(ctx, features, entity)
+	entityDfWithFeatureName, tmpErr := db.createTableEntityDfWithFeatures(ctx, opt.Features, opt.Entity)
 	if tmpErr != nil {
 		return nil, tmpErr
 	}
@@ -29,7 +29,7 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, entity *types.Ent
 		}
 	}()
 
-	entityDfName, tmpErr := db.createAndImportTableEntityDf(ctx, entityRows, entity)
+	entityDfName, tmpErr := db.createAndImportTableEntityDf(ctx, opt.EntityRows, opt.Entity)
 	if tmpErr != nil {
 		return nil, tmpErr
 	}
@@ -52,9 +52,9 @@ func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, entity *types.Ent
 		ON l.entity_key = r.%s
 		WHERE l.unix_time >= $1 AND l.unix_time < $2;
 	`
-	featureNamesStr := buildFeatureNameStr(features)
-	for _, r := range revisionRanges {
-		_, tmpErr := db.ExecContext(ctx, fmt.Sprintf(joinQuery, entityDfWithFeatureName, featureNamesStr, featureNamesStr, entityDfName, r.DataTable, entity.Name), r.MinRevision, r.MaxRevision)
+	featureNamesStr := buildFeatureNameStr(opt.Features)
+	for _, r := range opt.RevisionRanges {
+		_, tmpErr := db.ExecContext(ctx, fmt.Sprintf(joinQuery, entityDfWithFeatureName, featureNamesStr, featureNamesStr, entityDfName, r.DataTable, opt.Entity.Name), r.MinRevision, r.MaxRevision)
 		if tmpErr != nil {
 			return nil, tmpErr
 		}

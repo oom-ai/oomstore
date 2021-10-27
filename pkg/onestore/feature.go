@@ -34,7 +34,7 @@ func (s *OneStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt
 }
 
 func (s *OneStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatureOpt) (*types.Feature, error) {
-	valueType, err := s.offline.ValueTypeTag(opt.DBValueType)
+	valueType, err := s.offline.TypeTag(opt.DBValueType)
 	if err != nil {
 		return nil, err
 	}

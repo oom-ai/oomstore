@@ -7,18 +7,18 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) ValueTypeTag(dbDataType string) (string, error) {
-	return ValueTypeTag(dbDataType)
+func (db *DB) TypeTag(dbType string) (string, error) {
+	return TypeTag(dbType)
 }
 
-func ValueTypeTag(sqlType string) (string, error) {
-	var s = sqlType
-	if pos := strings.Index(sqlType, "("); pos != -1 {
+func TypeTag(dbType string) (string, error) {
+	var s = dbType
+	if pos := strings.Index(dbType, "("); pos != -1 {
 		s = s[:pos]
 	}
 	s = strings.TrimSpace(strings.ToLower(s))
 	if t, ok := typeMap[s]; !ok {
-		return "", fmt.Errorf("unsupported sql type: %s", sqlType)
+		return "", fmt.Errorf("unsupported sql type: %s", dbType)
 	} else {
 		return t, nil
 	}
