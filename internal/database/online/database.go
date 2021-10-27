@@ -8,12 +8,13 @@ import (
 	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/internal/database/online/postgres"
 	"github.com/onestore-ai/onestore/internal/database/online/redis"
+	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
 type Store interface {
 	GetFeatureValues(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error)
-	MultiGetOnlineFeatureValues(ctx context.Context, opt types.DBMultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error)
+	MultiGetOnlineFeatureValues(ctx context.Context, opt dbtypes.MultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error)
 	SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.RawFeatureValueRecord, features []*types.Feature, revision *types.Revision, entity *types.Entity) error
 	DeprecateFeatureValues(ctx context.Context, tableName string) error
 	io.Closer

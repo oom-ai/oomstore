@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/onestore-ai/onestore/internal/database"
+	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -39,7 +40,7 @@ func (db *DB) GetFeatureValues(ctx context.Context, opt types.GetFeatureValuesOp
 }
 
 // response: map[entity_key]map[feature_name]feature_value
-func (db *DB) MultiGetOnlineFeatureValues(ctx context.Context, opt types.DBMultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error) {
+func (db *DB) MultiGetOnlineFeatureValues(ctx context.Context, opt dbtypes.MultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error) {
 	res := make(map[string]database.RowMap)
 	for _, entityKey := range opt.EntityKeys {
 		rowMap, err := db.GetFeatureValues(ctx, types.GetFeatureValuesOpt{
