@@ -2,6 +2,7 @@ package onestore
 
 import (
 	"context"
+	"fmt"
 
 	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
@@ -28,9 +29,12 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		featureNames = append(featureNames, f.Name)
 	}
 
-	revision, err := s.GetRevision(ctx, opt.GroupName, opt.GroupRevision)
+	revision, err := s.getMaterializeRevision(ctx, opt)
 	if err != nil {
 		return err
+	}
+	if group.Revision != nil && *group.Revision == revision.Revision {
+		return fmt.Errorf("online store already in the latest revision")
 	}
 
 	stream, err := s.offline.GetFeatureValuesStream(ctx, dbtypes.GetFeatureValuesStreamOpt{
@@ -46,9 +50,27 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
+	var previousRevision *types.Revision
+	if group.Revision != nil {
+		previousRevision, err = s.GetRevision(ctx, group.Name, *group.Revision)
+		if err != nil {
+			return err
+		}
+	}
+
 	if err = s.metadata.UpdateFeatureGroupRevision(ctx, revision.Revision, revision.DataTable, revision.GroupName); err != nil {
 		return err
 	}
 
-	return s.online.PurgeRevision(ctx, revision)
+	if previousRevision != nil {
+		return s.online.PurgeRevision(ctx, revision)
+	}
+	return nil
+}
+
+func (s *OneStore) getMaterializeRevision(ctx context.Context, opt types.MaterializeOpt) (*types.Revision, error) {
+	if opt.GroupRevision != nil {
+		return s.GetRevision(ctx, opt.GroupName, *opt.GroupRevision)
+	}
+	return s.metadata.GetLatestRevision(ctx, opt.GroupName)
 }
