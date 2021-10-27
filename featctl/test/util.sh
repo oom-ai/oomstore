@@ -57,12 +57,18 @@ register_features() {
 
 # import sample data
 import_sample() {
-    info "import sample data..."
+    info "import sample data to offline store..."
     featctl import \
     --group phone \
     --delimiter "," \
     --input-file device.csv \
     --description 'test data'
+}
+
+# materialize feature values from offline store to online store
+materialize() {
+    info "materialize sample data to online store..."
+    featctl materialize phone
 }
 
 execute_sql() {
