@@ -2,11 +2,9 @@ package offline
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	"github.com/onestore-ai/onestore/internal/database/dbutil"
-	"github.com/onestore-ai/onestore/internal/database/offline/postgres"
 	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
@@ -18,15 +16,4 @@ type Store interface {
 
 	ValueTypeTag(dbValueType string) (string, error)
 	io.Closer
-}
-
-var _ Store = &postgres.DB{}
-
-func Open(opt types.OfflineStoreOpt) (Store, error) {
-	switch opt.Backend {
-	case types.POSTGRES:
-		return postgres.Open(opt.PostgresDbOpt)
-	default:
-		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
-	}
 }
