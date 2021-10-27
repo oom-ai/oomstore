@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/onestore-ai/onestore/internal/database/metadata"
 	"github.com/onestore-ai/onestore/internal/database/test"
-	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -170,7 +170,7 @@ func TestFeature(t *testing.T) {
 		Description: "description",
 	}, "batch"))
 
-	phoneOpt := dbtypes.CreateFeatureOpt{
+	phoneOpt := metadata.CreateFeatureOpt{
 		CreateFeatureOpt: types.CreateFeatureOpt{
 			FeatureName: "phone",
 			GroupName:   "device",
@@ -180,7 +180,7 @@ func TestFeature(t *testing.T) {
 		ValueType: "string",
 	}
 
-	priceOpt := dbtypes.CreateFeatureOpt{
+	priceOpt := metadata.CreateFeatureOpt{
 		CreateFeatureOpt: types.CreateFeatureOpt{
 			FeatureName: "price",
 			GroupName:   "device",
@@ -248,7 +248,7 @@ func TestRichFeature(t *testing.T) {
 	}
 	defer store.Close()
 
-	phoneOpt := dbtypes.CreateFeatureOpt{
+	phoneOpt := metadata.CreateFeatureOpt{
 		CreateFeatureOpt: types.CreateFeatureOpt{
 			FeatureName: "phone",
 			GroupName:   "device",
@@ -257,7 +257,7 @@ func TestRichFeature(t *testing.T) {
 		},
 		ValueType: "string",
 	}
-	priceOpt := dbtypes.CreateFeatureOpt{
+	priceOpt := metadata.CreateFeatureOpt{
 		CreateFeatureOpt: types.CreateFeatureOpt{
 			FeatureName: "price",
 			GroupName:   "device",

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
+	"github.com/onestore-ai/onestore/internal/database/offline"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -49,7 +49,7 @@ func (s *OneStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 		}
 	}
 
-	stream, err := s.offline.GetFeatureValuesStream(ctx, dbtypes.GetFeatureValuesStreamOpt{
+	stream, err := s.offline.GetFeatureValuesStream(ctx, offline.GetFeatureValuesStreamOpt{
 		DataTable:    dataTable,
 		EntityName:   group.EntityName,
 		FeatureNames: featureNames,

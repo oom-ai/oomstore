@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/internal/database/metadata"
 	"github.com/onestore-ai/onestore/internal/database/offline"
 	"github.com/onestore-ai/onestore/internal/database/online"
@@ -20,15 +21,15 @@ type OneStore struct {
 func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 	optV2 := opt.ToOneStoreOptV2()
 
-	onlineStore, err := online.Open(optV2.OnlineStoreOpt)
+	onlineStore, err := database.OpenOnlineStore(optV2.OnlineStoreOpt)
 	if err != nil {
 		return nil, err
 	}
-	offlineStore, err := offline.Open(optV2.OfflineStoreOpt)
+	offlineStore, err := database.OpenOfflineStore(optV2.OfflineStoreOpt)
 	if err != nil {
 		return nil, err
 	}
-	metadataStore, err := metadata.Open(optV2.MetaStoreOpt)
+	metadataStore, err := database.OpenMetadataStore(optV2.MetaStoreOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +43,7 @@ func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 
 func Create(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 	optV2 := opt.ToOneStoreOptV2()
-	if err := metadata.CreateDatabase(ctx, optV2.MetaStoreOpt); err != nil {
+	if err := database.CreateMetadataDatabase(ctx, optV2.MetaStoreOpt); err != nil {
 		return nil, err
 	}
 

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/onestore-ai/onestore/internal/database"
+	"github.com/onestore-ai/onestore/internal/database/dbutil"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -33,7 +33,7 @@ func createMetaSchemas(ctx context.Context, opt types.PostgresDbOpt) (err error)
 
 	// Use translation to guarantee the following operations be executed
 	// on the same connection: http://go-database-sql.org/modifying.html
-	return database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create database functions
 		for _, fn := range DB_FUNCTIONS {
 			if _, err = tx.ExecContext(ctx, fn); err != nil {
