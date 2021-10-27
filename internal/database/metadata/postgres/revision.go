@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/jmoiron/sqlx"
+	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -48,7 +49,7 @@ func (db *DB) GetRevisionsByDataTables(ctx context.Context, dataTables []string)
 	return revisions, nil
 }
 
-func (db *DB) InsertRevision(ctx context.Context, opt types.InsertRevisionOpt) error {
+func (db *DB) InsertRevision(ctx context.Context, opt dbtypes.InsertRevisionOpt) error {
 	query := "INSERT INTO feature_group_revision(group_name, revision, data_table, description) VALUES ($1, $2, $3, $4)"
 	_, err := db.ExecContext(ctx, query, opt.GroupName, opt.Revision, opt.DataTable, opt.Description)
 	return err

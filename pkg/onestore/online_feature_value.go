@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/onestore-ai/onestore/internal/database"
+	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -97,7 +98,7 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 			continue
 		}
 
-		featureValues, err := s.online.MultiGetOnlineFeatureValues(ctx, types.DBMultiGetOnlineFeatureValuesOpt{
+		featureValues, err := s.online.MultiGetOnlineFeatureValues(ctx, dbtypes.MultiGetOnlineFeatureValuesOpt{
 			DataTable:  dataTable,
 			EntityName: entityName,
 			RevisionId: revisionId,
