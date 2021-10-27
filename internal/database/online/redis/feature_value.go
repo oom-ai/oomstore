@@ -3,12 +3,11 @@ package redis
 import (
 	"context"
 
-	"github.com/onestore-ai/onestore/internal/database"
-	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/onestore-ai/onestore/internal/database/dbutil"
+	"github.com/onestore-ai/onestore/internal/database/online"
 )
 
-func (db *DB) Get(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error) {
+func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
 	key, err := SerializeRedisKey(opt.RevisionId, opt.EntityKey)
 	if err != nil {
 		return nil, err
@@ -28,7 +27,7 @@ func (db *DB) Get(ctx context.Context, opt types.GetFeatureValuesOpt) (database.
 		return nil, err
 	}
 
-	rowMap := make(database.RowMap)
+	rowMap := make(dbutil.RowMap)
 	for i, v := range values {
 		typedValue, err := DeserializeByTag(v, opt.Features[i].ValueType)
 		if err != nil {
@@ -40,10 +39,10 @@ func (db *DB) Get(ctx context.Context, opt types.GetFeatureValuesOpt) (database.
 }
 
 // response: map[entity_key]map[feature_name]feature_value
-func (db *DB) MultiGet(ctx context.Context, opt dbtypes.MultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error) {
-	res := make(map[string]database.RowMap)
+func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
+	res := make(map[string]dbutil.RowMap)
 	for _, entityKey := range opt.EntityKeys {
-		rowMap, err := db.Get(ctx, types.GetFeatureValuesOpt{
+		rowMap, err := db.Get(ctx, online.GetOpt{
 			DataTable:  opt.DataTable,
 			EntityName: opt.EntityName,
 			RevisionId: opt.RevisionId,

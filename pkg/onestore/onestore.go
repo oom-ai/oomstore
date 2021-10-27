@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/onestore-ai/onestore/internal/database"
 	"github.com/onestore-ai/onestore/internal/database/metadata"
 	"github.com/onestore-ai/onestore/internal/database/offline"
 	"github.com/onestore-ai/onestore/internal/database/online"
@@ -20,7 +21,7 @@ type OneStore struct {
 func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 	optV2 := opt.ToOneStoreOptV2()
 
-	onlineStore, err := online.Open(optV2.OnlineStoreOpt)
+	onlineStore, err := database.OpenOnlineStore(optV2.OnlineStoreOpt)
 	if err != nil {
 		return nil, err
 	}

@@ -6,19 +6,18 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/onestore-ai/onestore/internal/database"
-	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/onestore-ai/onestore/internal/database/dbutil"
+	"github.com/onestore-ai/onestore/internal/database/online"
 	"github.com/spf13/cast"
 )
 
-func (db *DB) Get(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error) {
+func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
 	featureNames := []string{}
 	for _, f := range opt.Features {
 		featureNames = append(featureNames, f.Name)
 	}
 	query := fmt.Sprintf(`SELECT "%s",%s FROM %s WHERE "%s" = $1`, opt.EntityName, strings.Join(featureNames, ","), opt.DataTable, opt.EntityName)
-	rs := make(database.RowMap)
+	rs := make(dbutil.RowMap)
 
 	if err := db.QueryRowxContext(ctx, query, opt.EntityKey).MapScan(rs); err != nil {
 		return nil, err
@@ -27,7 +26,7 @@ func (db *DB) Get(ctx context.Context, opt types.GetFeatureValuesOpt) (database.
 }
 
 // response: map[entity_key]map[feature_name]feature_value
-func (db *DB) MultiGet(ctx context.Context, opt dbtypes.MultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error) {
+func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
 	featureNames := []string{}
 	for _, f := range opt.Features {
 		featureNames = append(featureNames, f.Name)
@@ -47,10 +46,10 @@ func (db *DB) MultiGet(ctx context.Context, opt dbtypes.MultiGetOnlineFeatureVal
 	return getFeatureValueMapFromRows(rows, opt.EntityName)
 }
 
-func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]database.RowMap, error) {
-	featureValueMap := make(map[string]database.RowMap)
+func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]dbutil.RowMap, error) {
+	featureValueMap := make(map[string]dbutil.RowMap)
 	for rows.Next() {
-		rowMap := make(database.RowMap)
+		rowMap := make(dbutil.RowMap)
 		if err := rows.MapScan(rowMap); err != nil {
 			return nil, err
 		}

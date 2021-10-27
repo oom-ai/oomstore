@@ -12,12 +12,12 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"github.com/onestore-ai/onestore/internal/database"
+	"github.com/onestore-ai/onestore/internal/database/dbutil"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
 func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter string, header []string) error {
-	return database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		stmt, err := tx.PreparexContext(ctx, pq.CopyIn(tableName, header...))
 		if err != nil {
 			return err
@@ -65,10 +65,10 @@ func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter 
 func (db *DB) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt, entity *types.Entity, features []*types.Feature, header []string) (int64, string, error) {
 	var revision int64
 	var finalTableName string
-	err := database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tmpTableName := opt.GroupName + "_" + strconv.Itoa(rand.Int())
-		schema := database.BuildFeatureDataTableSchema(tmpTableName, entity, features)
+		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, entity, features)
 		_, err := db.ExecContext(ctx, schema)
 		if err != nil {
 			return err
