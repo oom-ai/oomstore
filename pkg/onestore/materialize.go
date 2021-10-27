@@ -46,7 +46,7 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
-	if err = s.online.SinkFeatureValuesStream(ctx, stream, features, revision, entity); err != nil {
+	if err = s.online.Import(ctx, stream, features, revision, entity); err != nil {
 		return err
 	}
 
