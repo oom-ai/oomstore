@@ -26,7 +26,7 @@ func (db *DB) GetFeatureValues(ctx context.Context, opt types.GetFeatureValuesOp
 }
 
 // response: map[entity_key]map[feature_name]feature_value
-func (db *DB) GetFeatureValuesWithMultiEntityKeys(ctx context.Context, opt types.GetFeatureValuesWithMultiEntityKeysOpt) (map[string]database.RowMap, error) {
+func (db *DB) MultiGetOnlineFeatureValues(ctx context.Context, opt types.DBMultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error) {
 	featureNames := []string{}
 	for _, f := range opt.Features {
 		featureNames = append(featureNames, f.Name)
