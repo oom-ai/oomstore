@@ -9,14 +9,14 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"github.com/onestore-ai/onestore/internal/database"
-	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
+	"github.com/onestore-ai/onestore/internal/database/dbutil"
+	"github.com/onestore-ai/onestore/internal/database/metadata"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
 func (db *DB) validateDataType(ctx context.Context, dataType string) error {
 	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Int())
-	return database.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", tmpTableName)); err != nil {
 			return err
 		}
@@ -30,7 +30,7 @@ func (db *DB) validateDataType(ctx context.Context, dataType string) error {
 	})
 }
 
-func (db *DB) CreateFeature(ctx context.Context, opt dbtypes.CreateFeatureOpt) error {
+func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) error {
 	if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
 		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
 	}

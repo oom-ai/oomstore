@@ -4,42 +4,43 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/onestore-ai/onestore/internal/database/online"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.RawFeatureValueRecord, features []*types.Feature, revision *types.Revision, entity *types.Entity) error {
+func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	var seq int64
 	pipe := db.Pipeline()
 	defer pipe.Close()
 
-	for item := range stream {
+	for item := range opt.Stream {
 		if item.Error != nil {
 			return item.Error
 		}
 		record := item.Record
-		if len(record) != len(features)+1 {
-			return fmt.Errorf("field count not matched, expected %d, got %d", len(features)+1, len(record))
+		if len(record) != len(opt.Features)+1 {
+			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
 		}
 
 		entityKey, values := record[0], record[1:]
 
-		key, err := SerializeRedisKey(revision.ID, entityKey)
+		key, err := SerializeRedisKey(opt.Revision.ID, entityKey)
 		if err != nil {
 			return err
 		}
 
 		featureValues := make(map[string]string)
-		for i := range features {
+		for i := range opt.Features {
 			// omit nil feature value
 			if values[i] == nil {
 				continue
 			}
-			featureValue, err := SerializeByTag(values[i], features[i].ValueType)
+			featureValue, err := SerializeByTag(values[i], opt.Features[i].ValueType)
 			if err != nil {
 				return err
 			}
 
-			featureId, err := SerializeByValue(features[i].ID)
+			featureId, err := SerializeByValue(opt.Features[i].ID)
 			if err != nil {
 				return err
 			}
@@ -64,7 +65,7 @@ func (db *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.
 	return nil
 }
 
-func (db *DB) PurgeRevision(ctx context.Context, revision *types.Revision) error {
+func (db *DB) Purge(ctx context.Context, revision *types.Revision) error {
 	prefix, err := SerializeByValue(revision.ID)
 	if err != nil {
 		return nil

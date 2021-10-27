@@ -4,11 +4,14 @@ import (
 	"fmt"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/onestore-ai/onestore/internal/database/online"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
 const PipelineBatchSize = 10
 const SeralizeIntBase = 36
+
+var _ online.Store = &DB{}
 
 type DB struct {
 	*redis.Client
