@@ -181,19 +181,3 @@ func buildFeatureDataSet(valueMap map[string]database.RowMap, opt types.MultiGet
 	}
 	return &fds, nil
 }
-
-// key: data_table, value: slice of features
-func buildDataTableToFeaturesMap(features []*types.RichFeature) map[string][]*types.RichFeature {
-	dataTableToFeaturesMap := make(map[string][]*types.RichFeature)
-	for _, f := range features {
-		if f.DataTable == nil {
-			continue
-		}
-		dataTable := *f.DataTable
-		if _, ok := dataTableToFeaturesMap[dataTable]; !ok {
-			dataTableToFeaturesMap[dataTable] = make([]*types.RichFeature, 0)
-		}
-		dataTableToFeaturesMap[dataTable] = append(dataTableToFeaturesMap[dataTable], f)
-	}
-	return dataTableToFeaturesMap
-}
