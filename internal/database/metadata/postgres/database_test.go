@@ -9,7 +9,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/test"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func initDB(t *testing.T) {
@@ -25,7 +25,7 @@ func initDB(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, err := store.ExecContext(context.Background(), "drop database if exists onestore"); err != nil {
+	if _, err := store.ExecContext(context.Background(), "drop database if exists oomstore"); err != nil {
 		t.Fatal(err)
 	}
 	store.Close()

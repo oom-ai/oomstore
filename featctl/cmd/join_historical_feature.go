@@ -14,10 +14,10 @@ var joinHistoricalFeatureCmd = &cobra.Command{
 	Short: "join training label data set with historical feature values",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
-		if err := joinHistoricalFeatures(ctx, oneStore, joinHistoricalFeatureOpt); err != nil {
+		if err := joinHistoricalFeatures(ctx, oomStore, joinHistoricalFeatureOpt); err != nil {
 			log.Fatalf("failed joining historical features: %v\n", err)
 		}
 	},

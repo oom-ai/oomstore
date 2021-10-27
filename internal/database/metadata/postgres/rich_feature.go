@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error) {

@@ -7,7 +7,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 var _ metadata.Store = &DB{}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {

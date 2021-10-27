@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -17,10 +17,10 @@ var listEntityCmd = &cobra.Command{
 	Short: "list all existing entities",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
-		entities, err := oneStore.ListEntity(ctx)
+		entities, err := oomStore.ListEntity(ctx)
 		if err != nil {
 			log.Fatalf("failed listing entities, error %v\n", err)
 		}

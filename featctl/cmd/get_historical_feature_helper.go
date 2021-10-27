@@ -5,12 +5,12 @@ import (
 	"encoding/csv"
 	"os"
 
-	"github.com/oom-ai/oomstore/pkg/onestore"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cast"
 )
 
-func getHistoricalFeature(ctx context.Context, store *onestore.OneStore, opt types.ExportFeatureValuesOpt) error {
+func getHistoricalFeature(ctx context.Context, store *oomstore.OomStore, opt types.ExportFeatureValuesOpt) error {
 	fields, stream, err := store.ExportFeatureValues(ctx, opt)
 	if err != nil {
 		return err

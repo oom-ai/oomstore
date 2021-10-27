@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	metadataPG "github.com/oom-ai/oomstore/internal/database/metadata/postgres"

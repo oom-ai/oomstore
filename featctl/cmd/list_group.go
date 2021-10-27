@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -31,10 +31,10 @@ var listFeatureGroupCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
-		groups, err := oneStore.ListFeatureGroup(ctx, listFeatureGroupOpt.EntityName)
+		groups, err := oomStore.ListFeatureGroup(ctx, listFeatureGroupOpt.EntityName)
 		if err != nil {
 			log.Fatal(err)
 		}

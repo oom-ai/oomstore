@@ -7,8 +7,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/oom-ai/oomstore/pkg/onestore"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cast"
 )
 
@@ -17,7 +17,7 @@ type JoinHistoricalFeaturesOpt struct {
 	FeatureNames  []string
 }
 
-func joinHistoricalFeatures(ctx context.Context, store *onestore.OneStore, opt JoinHistoricalFeaturesOpt) error {
+func joinHistoricalFeatures(ctx context.Context, store *oomstore.OomStore, opt JoinHistoricalFeaturesOpt) error {
 	entityRows, err := getEntityRowsFromInputFile(opt.InputFilePath)
 	if err != nil {
 		return err

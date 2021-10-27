@@ -1,6 +1,6 @@
 package metadata
 
-import "github.com/oom-ai/oomstore/pkg/onestore/types"
+import "github.com/oom-ai/oomstore/pkg/oomstore/types"
 
 type CreateFeatureOpt struct {
 	types.CreateFeatureOpt

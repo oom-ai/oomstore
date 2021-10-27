@@ -1,4 +1,4 @@
-package onestore
+package oomstore
 
 import (
 	"context"
@@ -6,10 +6,10 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) error {
+func (s *OomStore) Materialize(ctx context.Context, opt types.MaterializeOpt) error {
 	group, err := s.GetFeatureGroup(ctx, opt.GroupName)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 	return nil
 }
 
-func (s *OneStore) getMaterializeRevision(ctx context.Context, opt types.MaterializeOpt) (*types.Revision, error) {
+func (s *OomStore) getMaterializeRevision(ctx context.Context, opt types.MaterializeOpt) (*types.Revision, error) {
 	if opt.GroupRevision != nil {
 		return s.GetRevision(ctx, opt.GroupName, *opt.GroupRevision)
 	}

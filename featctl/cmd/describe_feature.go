@@ -14,11 +14,11 @@ var describeFeatureCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
 		featureName := args[0]
-		richFeature, err := oneStore.GetRichFeature(ctx, featureName)
+		richFeature, err := oomStore.GetRichFeature(ctx, featureName)
 		if err != nil {
 			log.Fatalf("failed getting feature %s, err %v\n", featureName, err)
 		}

@@ -14,11 +14,11 @@ var describeEntityCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
 		entityName := args[0]
-		entity, err := oneStore.GetEntity(ctx, entityName)
+		entity, err := oomStore.GetEntity(ctx, entityName)
 		if err != nil {
 			log.Fatalf("failed getting entity %s, err %v\n", entityName, err)
 		}

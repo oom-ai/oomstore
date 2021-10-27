@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -15,11 +15,11 @@ var importCmd = &cobra.Command{
 	Short: "import feature data from a csv file",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
 		log.Println("importing features ...")
-		if err := oneStore.ImportBatchFeatures(ctx, importOpt); err != nil {
+		if err := oomStore.ImportBatchFeatures(ctx, importOpt); err != nil {
 			log.Fatalf("failed importing features: %v\n", err)
 		}
 

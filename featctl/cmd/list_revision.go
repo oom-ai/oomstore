@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -28,10 +28,10 @@ var listRevisionCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
-		revisions, err := oneStore.ListRevision(ctx, listRevisionOpt.GroupName)
+		revisions, err := oomStore.ListRevision(ctx, listRevisionOpt.GroupName)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -19,10 +19,10 @@ var updateGroupCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
-		if err := oneStore.UpdateFeatureGroup(ctx, updateGroupOpt); err != nil {
+		if err := oomStore.UpdateFeatureGroup(ctx, updateGroupOpt); err != nil {
 			log.Fatalf("failed updating group %s, err %v\n", updateGroupOpt.GroupName, err)
 		}
 	},

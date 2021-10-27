@@ -1,4 +1,4 @@
-package onestore
+package oomstore
 
 import (
 	"context"
@@ -6,10 +6,10 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (types.FeatureValueMap, error) {
+func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (types.FeatureValueMap, error) {
 	m := make(map[string]interface{})
 
 	features, err := s.metadata.GetRichFeatures(ctx, opt.FeatureNames)
@@ -56,7 +56,7 @@ func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 	return m, nil
 }
 
-func (s *OneStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
+func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
 	features, err := s.metadata.GetRichFeatures(ctx, opt.FeatureNames)
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func (s *OneStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	return buildFeatureDataSet(featureValueMap, opt)
 }
 
-func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, dataTableMap map[string][]*types.Feature, revisionIds map[string]int32, entityName string) (map[string]dbutil.RowMap, error) {
+func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, dataTableMap map[string][]*types.Feature, revisionIds map[string]int32, entityName string) (map[string]dbutil.RowMap, error) {
 	// entity_key -> types.RecordMap
 	featureValueMap := make(map[string]dbutil.RowMap)
 
@@ -120,7 +120,7 @@ func (s *OneStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
-func (s *OneStore) getRevisionIds(ctx context.Context, dataTables map[string][]*types.Feature) (map[string]int32, error) {
+func (s *OomStore) getRevisionIds(ctx context.Context, dataTables map[string][]*types.Feature) (map[string]int32, error) {
 	dataTableSlice := make([]string, 0, len(dataTables))
 	for dataTable := range dataTables {
 		dataTableSlice = append(dataTableSlice, dataTable)

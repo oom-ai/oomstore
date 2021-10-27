@@ -1,13 +1,13 @@
-package onestore
+package oomstore
 
 import (
 	"context"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 // GetFeature: get richFeature by featureName
-func (s *OneStore) GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error) {
+func (s *OomStore) GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error) {
 	feature, err := s.metadata.GetRichFeature(ctx, featureName)
 	if err != nil {
 		return nil, err
@@ -15,7 +15,7 @@ func (s *OneStore) GetRichFeature(ctx context.Context, featureName string) (*typ
 	return feature, nil
 }
 
-func (s *OneStore) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error) {
+func (s *OomStore) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error) {
 	features, err := s.metadata.ListRichFeature(ctx, opt)
 	if err != nil {
 		return nil, err

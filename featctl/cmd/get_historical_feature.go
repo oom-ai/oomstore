@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -23,10 +23,10 @@ var getHistoricalFeatureCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
-		if err := getHistoricalFeature(ctx, oneStore, getHistoricalFeatureOpt); err != nil {
+		if err := getHistoricalFeature(ctx, oomStore, getHistoricalFeatureOpt); err != nil {
 			log.Fatalf("failed exporting features: %v\n", err)
 		}
 	},

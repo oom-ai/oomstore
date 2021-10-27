@@ -14,11 +14,11 @@ var describeGroupCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
 		groupName := args[0]
-		group, err := oneStore.GetFeatureGroup(ctx, groupName)
+		group, err := oomStore.GetFeatureGroup(ctx, groupName)
 		if err != nil {
 			log.Fatalf("failed getting group %s, err %v\n", groupName, err)
 		}

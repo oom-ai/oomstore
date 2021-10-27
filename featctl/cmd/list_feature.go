@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -24,10 +24,10 @@ var listFeatureCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
-		features, err := oneStore.ListRichFeature(ctx, listFeatureOpt)
+		features, err := oomStore.ListRichFeature(ctx, listFeatureOpt)
 		if err != nil {
 			log.Fatalf("failed listing features given option %v, error %v\n", listFeatureOpt, err)
 		}

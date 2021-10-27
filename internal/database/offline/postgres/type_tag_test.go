@@ -3,7 +3,7 @@ package postgres
 import (
 	"testing"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func TestValueTypeTag(t *testing.T) {

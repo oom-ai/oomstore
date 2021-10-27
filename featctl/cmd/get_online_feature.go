@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 
-	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 var getOnlineFeatureOpt types.GetOnlineFeatureValuesOpt
@@ -20,10 +20,10 @@ var getOnlineFeatureCmd = &cobra.Command{
 	Short: "get online feature values",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oneStore := mustOpenOneStore(ctx, oneStoreOpt)
-		defer oneStore.Close()
+		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		defer oomStore.Close()
 
-		featureValueMap, err := oneStore.GetOnlineFeatureValues(ctx, getOnlineFeatureOpt)
+		featureValueMap, err := oomStore.GetOnlineFeatureValues(ctx, getOnlineFeatureOpt)
 		if err != nil {
 			log.Fatalf("failed getting online features: %v", err)
 		}
