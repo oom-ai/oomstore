@@ -77,7 +77,7 @@ func buildFeatureNameStr(features []*types.RichFeature) string {
 	for _, f := range features {
 		featureNames = append(featureNames, f.Name)
 	}
-	return strings.Join(featureNames, " ,")
+	return strings.Join(featureNames, ", ")
 }
 
 func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]database.RowMap, error) {
