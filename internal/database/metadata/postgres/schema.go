@@ -98,4 +98,13 @@ var META_VIEW_SCHEMAS = map[string]string{
 			LEFT JOIN feature_group AS fg
 			ON f.group_name = fg.name;
 	`,
+	"rich_feature_group": `
+        	CREATE VIEW rich_feature_group AS
+			SELECT
+				fg.id, fg.name, fg.entity_name, fg.category, fg.online_revision_id, fg.description, fg.create_time, fg.modify_time,
+				fgr.revision, fgr.data_table
+			FROM feature_group AS fg
+			LEFT JOIN feature_group_revision AS fgr
+			ON fg.online_revision_id = fgr.id;
+	`,
 }
