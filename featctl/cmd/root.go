@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
-	"github.com/onestore-ai/onestore/version"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/version"
 )
 
 const (

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onestore-ai/onestore/internal/database/offline"
-	"github.com/onestore-ai/onestore/internal/database/online"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) error {

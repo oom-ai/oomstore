@@ -6,8 +6,8 @@ import (
 	"math"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/onestore-ai/onestore/internal/database/metadata"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 func (db *DB) ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error) {

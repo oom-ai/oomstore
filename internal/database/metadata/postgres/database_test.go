@@ -7,9 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/onestore-ai/onestore/internal/database/metadata"
-	"github.com/onestore-ai/onestore/internal/database/test"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/test"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 func initDB(t *testing.T) {

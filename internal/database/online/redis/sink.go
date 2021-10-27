@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onestore-ai/onestore/internal/database/online"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {

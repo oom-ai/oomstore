@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 var getOnlineFeatureOpt types.GetOnlineFeatureValuesOpt

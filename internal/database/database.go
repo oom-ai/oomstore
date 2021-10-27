@@ -4,17 +4,17 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 
-	"github.com/onestore-ai/onestore/internal/database/metadata"
-	metadataPG "github.com/onestore-ai/onestore/internal/database/metadata/postgres"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	metadataPG "github.com/oom-ai/oomstore/internal/database/metadata/postgres"
 
-	"github.com/onestore-ai/onestore/internal/database/offline"
-	offlinePG "github.com/onestore-ai/onestore/internal/database/offline/postgres"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	offlinePG "github.com/oom-ai/oomstore/internal/database/offline/postgres"
 
-	"github.com/onestore-ai/onestore/internal/database/online"
-	onlinePG "github.com/onestore-ai/onestore/internal/database/online/postgres"
-	onlineRedis "github.com/onestore-ai/onestore/internal/database/online/redis"
+	"github.com/oom-ai/oomstore/internal/database/online"
+	onlinePG "github.com/oom-ai/oomstore/internal/database/online/postgres"
+	onlineRedis "github.com/oom-ai/oomstore/internal/database/online/redis"
 )
 
 func OpenOnlineStore(opt types.OnlineStoreOpt) (online.Store, error) {

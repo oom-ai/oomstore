@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/onestore-ai/onestore/internal/database/metadata"
-	"github.com/onestore-ai/onestore/internal/database/offline"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 func getCsvHeader(filePath string) ([]string, error) {

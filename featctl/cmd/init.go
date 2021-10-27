@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/onestore-ai/onestore/pkg/onestore"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/onestore"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 type initOption struct {

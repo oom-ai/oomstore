@@ -5,8 +5,8 @@ import (
 	"encoding/csv"
 	"os"
 
-	"github.com/onestore-ai/onestore/pkg/onestore"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/onestore"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 	"github.com/spf13/cast"
 )
 

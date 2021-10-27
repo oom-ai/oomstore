@@ -1,4 +1,4 @@
-module github.com/onestore-ai/onestore
+module github.com/oom-ai/oomstore
 
 go 1.17
 

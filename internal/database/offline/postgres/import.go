@@ -12,8 +12,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"github.com/onestore-ai/onestore/internal/database/dbutil"
-	"github.com/onestore-ai/onestore/internal/database/offline"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/offline"
 )
 
 func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter string, header []string) error {

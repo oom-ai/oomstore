@@ -1,6 +1,6 @@
 package main
 
-import "github.com/onestore-ai/onestore/featctl/cmd"
+import "github.com/oom-ai/oomstore/featctl/cmd"
 
 func main() {
 	cmd.Execute()

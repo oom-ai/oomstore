@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/onestore-ai/onestore/internal/database/dbutil"
-	"github.com/onestore-ai/onestore/internal/database/online"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 const (
