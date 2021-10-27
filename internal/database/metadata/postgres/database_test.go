@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/onestore-ai/onestore/internal/database/test"
+	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -145,5 +146,95 @@ func TestEntity(t *testing.T) {
 			t.Error(err)
 		}
 		assert.Equal(t, 2, len(entitys))
+	}
+}
+
+func TestFeature(t *testing.T) {
+	initDB(t)
+
+	store, err := Open(&test.PostgresDbopt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+
+	assert.Nil(t, store.CreateEntity(context.Background(), types.CreateEntityOpt{
+		Name:        "device",
+		Length:      32,
+		Description: "description",
+	}))
+
+	assert.Nil(t, store.CreateFeatureGroup(context.Background(), types.CreateFeatureGroupOpt{
+		Name:        "device",
+		EntityName:  "device",
+		Description: "description",
+	}, "batch"))
+
+	phoneOpt := dbtypes.CreateFeatureOpt{
+		CreateFeatureOpt: types.CreateFeatureOpt{
+			FeatureName: "phone",
+			GroupName:   "device",
+			DBValueType: "varchar(16)",
+			Description: "description",
+		},
+		ValueType: "string",
+	}
+
+	priceOpt := dbtypes.CreateFeatureOpt{
+		CreateFeatureOpt: types.CreateFeatureOpt{
+			FeatureName: "price",
+			GroupName:   "device",
+			DBValueType: "varchar(16)",
+			Description: "description",
+		},
+		ValueType: "string",
+	}
+
+	// test CreateFeature
+	{
+		errOpt := priceOpt
+		errOpt.DBValueType = "varchar(16"
+		assert.NotNil(t, store.CreateFeature(context.Background(), errOpt))
+
+		assert.Nil(t, store.CreateFeature(context.Background(), phoneOpt))
+		assert.Nil(t, store.CreateFeature(context.Background(), priceOpt))
+	}
+
+	// test GetFeature
+	{
+		feature, err := store.GetFeature(context.Background(), phoneOpt.FeatureName)
+		assert.Nil(t, err)
+
+		assert.Equal(t, phoneOpt.FeatureName, feature.Name)
+		assert.Equal(t, phoneOpt.GroupName, feature.GroupName)
+		assert.Equal(t, phoneOpt.DBValueType, feature.DBValueType)
+		assert.Equal(t, phoneOpt.ValueType, feature.ValueType)
+		assert.Equal(t, phoneOpt.Description, feature.Description)
+
+	}
+
+	// testUpdateFeature
+	{
+		assert.Nil(t, store.UpdateFeature(context.Background(), types.UpdateFeatureOpt{
+			FeatureName:    phoneOpt.FeatureName,
+			NewDescription: "new description",
+		}))
+
+		feature, err := store.GetFeature(context.Background(), phoneOpt.FeatureName)
+		assert.Nil(t, err)
+		assert.Equal(t, "new description", feature.Description)
+	}
+
+	// test ListFeature
+	{
+		invalidGroupName := "invalid_group_name"
+		features, err := store.ListFeature(context.Background(), &invalidGroupName)
+		assert.Nil(t, err)
+		assert.Equal(t, 0, len(features))
+
+		groupName := "device"
+		features, err = store.ListFeature(context.Background(), &groupName)
+		assert.Nil(t, err)
+		assert.Equal(t, 2, len(features))
 	}
 }
