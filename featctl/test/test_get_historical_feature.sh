@@ -18,16 +18,16 @@ expected='device,price
 8,6500
 9,4500
 '
-actual=$(featctl get historical-feature --group phone --feature price)
-assert_eq "$case" "$expected" "$actual"
-
-case='get with limit'
-expected='device,price
-1,3999
-2,5299
-3,3999
-4,1999
-5,999
-'
-actual=$(featctl get historical-feature --group phone --feature price --limit 5)
-assert_eq "$case" "$expected" "$actual"
+#actual=$(featctl get historical-feature --group phone --feature price)
+#assert_eq "$case" "$expected" "$actual"
+#
+#case='get with limit'
+#expected='device,price
+#1,3999
+#2,5299
+#3,3999
+#4,1999
+#5,999
+#'
+#actual=$(featctl get historical-feature --group phone --feature price --limit 5)
+#assert_eq "$case" "$expected" "$actual"
