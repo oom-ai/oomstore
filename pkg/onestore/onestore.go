@@ -25,7 +25,7 @@ func Open(ctx context.Context, opt types.OneStoreOpt) (*OneStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	offlineStore, err := offline.Open(optV2.OfflineStoreOpt)
+	offlineStore, err := database.OpenOfflineStore(optV2.OfflineStoreOpt)
 	if err != nil {
 		return nil, err
 	}
