@@ -3,7 +3,7 @@ package onestore
 import (
 	"context"
 
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 // GetFeature: get richFeature by featureName

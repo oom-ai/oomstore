@@ -3,8 +3,8 @@ package redis
 import (
 	"context"
 
-	"github.com/onestore-ai/onestore/internal/database/dbutil"
-	"github.com/onestore-ai/onestore/internal/database/online"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/online"
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {

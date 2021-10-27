@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onestore-ai/onestore/internal/database/metadata"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 // GetFeature: get feature by featureName

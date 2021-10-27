@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"strings"
 
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 func (db *DB) createTableEntityDfWithFeatures(ctx context.Context, features []*types.RichFeature, entity *types.Entity) (string, error) {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/onestore-ai/onestore/internal/database/offline"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan *types.RawFeatureValueRecord, error) {

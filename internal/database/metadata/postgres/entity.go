@@ -3,7 +3,7 @@ package postgres
 import (
 	"context"
 
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 func (db *DB) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) error {

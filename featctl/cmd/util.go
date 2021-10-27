@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/onestore-ai/onestore/pkg/onestore"
-	"github.com/onestore-ai/onestore/pkg/onestore/types"
+	"github.com/oom-ai/oomstore/pkg/onestore"
+	"github.com/oom-ai/oomstore/pkg/onestore/types"
 )
 
 func mustOpenOneStore(ctx context.Context, opt types.OneStoreOpt) *onestore.OneStore {
