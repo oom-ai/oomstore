@@ -65,7 +65,11 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		}
 	}
 
-	if err = s.metadata.UpdateFeatureGroupRevision(ctx, revision.Revision, revision.DataTable, revision.GroupName); err != nil {
+	if err = s.metadata.UpdateFeatureGroup(ctx, types.UpdateFeatureGroupOpt{
+		GroupName: group.Name,
+		Revision:  &revision.Revision,
+		DataTable: &revision.DataTable,
+	}); err != nil {
 		return err
 	}
 
