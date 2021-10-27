@@ -64,6 +64,27 @@ func (db *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.
 	return nil
 }
 
-func (db *DB) DeprecateFeatureValues(ctx context.Context, tableName string) error {
-	panic("implement me")
+func (db *DB) PurgeRevision(ctx context.Context, revision *types.Revision) error {
+	prefix, err := SerializeByValue(revision.ID)
+	if err != nil {
+		return nil
+	}
+	pattern := prefix + ":*"
+
+	var cursor uint64
+	for {
+		keys, cursor, err := db.Scan(ctx, cursor, pattern, PipelineBatchSize).Result()
+		if err != nil {
+			return err
+		}
+
+		if _, err = db.Del(ctx, keys...).Result(); err != nil {
+			return err
+		}
+
+		if cursor == 0 {
+			break
+		}
+	}
+	return nil
 }

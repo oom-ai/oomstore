@@ -58,7 +58,7 @@ func (db *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.
 		}
 
 		// rename the tmp table to final table
-		finalTableName := revision.GetOnlineBatchTableName()
+		finalTableName := getOnlineBatchTableName(revision)
 		rename := fmt.Sprintf("ALTER TABLE %s RENAME TO %s", tmpTableName, finalTableName)
 		_, err = tx.ExecContext(ctx, rename)
 		return err
@@ -66,8 +66,12 @@ func (db *DB) SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.
 	return err
 }
 
-func (db *DB) DeprecateFeatureValues(ctx context.Context, tableName string) error {
-	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
+func getOnlineBatchTableName(revision *types.Revision) string {
+	return fmt.Sprintf("batch_%d", revision.ID)
+}
+
+func (db *DB) PurgeRevision(ctx context.Context, revision *types.Revision) error {
+	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, getOnlineBatchTableName(revision))
 	if _, err := db.ExecContext(ctx, query); err != nil {
 		return err
 	}
