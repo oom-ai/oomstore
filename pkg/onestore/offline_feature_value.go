@@ -23,11 +23,11 @@ func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 			batchFeatures = append(batchFeatures, f)
 		}
 	}
-	// data_table -> []features
-	dataTableToFeaturesMap := buildDataTableToFeaturesMap(batchFeatures)
+	// group_name -> []features
+	featureGroups := buildGroupToFeaturesMap(batchFeatures)
 
 	entityDataMap := make(map[string]database.RowMap)
-	for _, richFeatures := range dataTableToFeaturesMap {
+	for _, richFeatures := range featureGroups {
 		if len(richFeatures) == 0 {
 			continue
 		}
@@ -90,4 +90,16 @@ func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 		return entityDataSet[i].EntityKey < entityDataSet[j].EntityKey
 	})
 	return entityDataSet, nil
+}
+
+// key: group_name, value: slice of features
+func buildGroupToFeaturesMap(features []*types.RichFeature) map[string][]*types.RichFeature {
+	groups := make(map[string][]*types.RichFeature)
+	for _, f := range features {
+		if _, ok := groups[f.GroupName]; !ok {
+			groups[f.GroupName] = make([]*types.RichFeature, 0)
+		}
+		groups[f.GroupName] = append(groups[f.GroupName], f)
+	}
+	return groups
 }
