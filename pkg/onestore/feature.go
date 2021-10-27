@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
@@ -44,7 +45,7 @@ func (s *OneStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatu
 	if group.Category != types.BatchFeatureCategory {
 		return nil, fmt.Errorf("expected batch feature group, got %s feature group", group.Category)
 	}
-	if err := s.metadata.CreateFeature(ctx, types.DBCreateFeatureOpt{
+	if err := s.metadata.CreateFeature(ctx, dbtypes.CreateFeatureOpt{
 		CreateFeatureOpt: opt,
 		ValueType:        valueType,
 	}); err != nil {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/onestore-ai/onestore/internal/database"
+	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 	"github.com/spf13/cast"
 )
@@ -26,7 +27,7 @@ func (db *DB) GetFeatureValues(ctx context.Context, opt types.GetFeatureValuesOp
 }
 
 // response: map[entity_key]map[feature_name]feature_value
-func (db *DB) MultiGetOnlineFeatureValues(ctx context.Context, opt types.DBMultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error) {
+func (db *DB) MultiGetOnlineFeatureValues(ctx context.Context, opt dbtypes.MultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error) {
 	featureNames := []string{}
 	for _, f := range opt.Features {
 		featureNames = append(featureNames, f.Name)

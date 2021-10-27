@@ -192,3 +192,8 @@ type RawFeatureValueRecord struct {
 	Record []interface{}
 	Error  error
 }
+
+type EntityRow struct {
+	EntityKey string `db:"entity_key"`
+	UnixTime  int64  `db:"unix_time"`
+}
