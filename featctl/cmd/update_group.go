@@ -33,6 +33,6 @@ func init() {
 
 	flags := updateGroupCmd.Flags()
 
-	flags.StringVarP(&updateGroupOpt.NewDescription, "description", "d", "", "new group description")
+	updateGroupOpt.Description = flags.StringP("description", "d", "", "new group description")
 	_ = updateGroupCmd.MarkFlagRequired("description")
 }
