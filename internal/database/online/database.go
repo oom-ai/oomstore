@@ -16,7 +16,7 @@ type Store interface {
 	GetFeatureValues(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error)
 	MultiGetOnlineFeatureValues(ctx context.Context, opt dbtypes.MultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error)
 	SinkFeatureValuesStream(ctx context.Context, stream <-chan *types.RawFeatureValueRecord, features []*types.Feature, revision *types.Revision, entity *types.Entity) error
-	DeprecateFeatureValues(ctx context.Context, tableName string) error
+	PurgeRevision(ctx context.Context, revision *types.Revision) error
 	io.Closer
 }
 
