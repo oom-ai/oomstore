@@ -39,7 +39,7 @@ func (s *OneStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 		if !ok {
 			continue
 		}
-		featureValues, err := s.online.GetFeatureValues(ctx, types.GetFeatureValuesOpt{
+		featureValues, err := s.online.Get(ctx, types.GetFeatureValuesOpt{
 			DataTable:  dataTable,
 			EntityName: *entityName,
 			RevisionId: revisionId,

@@ -8,7 +8,7 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) GetFeatureValues(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error) {
+func (db *DB) Get(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error) {
 	key, err := SerializeRedisKey(opt.RevisionId, opt.EntityKey)
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func (db *DB) GetFeatureValues(ctx context.Context, opt types.GetFeatureValuesOp
 func (db *DB) MultiGetOnlineFeatureValues(ctx context.Context, opt dbtypes.MultiGetOnlineFeatureValuesOpt) (map[string]database.RowMap, error) {
 	res := make(map[string]database.RowMap)
 	for _, entityKey := range opt.EntityKeys {
-		rowMap, err := db.GetFeatureValues(ctx, types.GetFeatureValuesOpt{
+		rowMap, err := db.Get(ctx, types.GetFeatureValuesOpt{
 			DataTable:  opt.DataTable,
 			EntityName: opt.EntityName,
 			RevisionId: opt.RevisionId,

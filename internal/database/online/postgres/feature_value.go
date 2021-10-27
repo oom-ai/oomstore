@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-func (db *DB) GetFeatureValues(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error) {
+func (db *DB) Get(ctx context.Context, opt types.GetFeatureValuesOpt) (database.RowMap, error) {
 	featureNames := []string{}
 	for _, f := range opt.Features {
 		featureNames = append(featureNames, f.Name)
