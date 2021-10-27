@@ -2,10 +2,8 @@ package metadata
 
 import (
 	"context"
-	"fmt"
 	"io"
 
-	"github.com/onestore-ai/onestore/internal/database/metadata/postgres"
 	dbtypes "github.com/onestore-ai/onestore/internal/database/types"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
@@ -44,24 +42,4 @@ type Store interface {
 	InsertRevision(ctx context.Context, opt dbtypes.InsertRevisionOpt) error
 
 	io.Closer
-}
-
-var _ Store = &postgres.DB{}
-
-func Open(opt types.MetaStoreOpt) (Store, error) {
-	switch opt.Backend {
-	case types.POSTGRES:
-		return postgres.Open(opt.PostgresDbOpt)
-	default:
-		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
-	}
-}
-
-func CreateDatabase(ctx context.Context, opt types.MetaStoreOpt) error {
-	switch opt.Backend {
-	case types.POSTGRES:
-		return postgres.CreateDatabase(ctx, *opt.PostgresDbOpt)
-	default:
-		return fmt.Errorf("unsupported backend: %s", opt.Backend)
-	}
 }
