@@ -1,8 +1,11 @@
 package postgres
 
-import "github.com/onestore-ai/onestore/pkg/onestore/types"
-import "strings"
-import "fmt"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/onestore-ai/onestore/pkg/onestore/types"
+)
 
 func (db *DB) ValueTypeTag(dbDataType string) (string, error) {
 	return ValueTypeTag(dbDataType)
