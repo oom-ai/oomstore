@@ -89,7 +89,7 @@ func (s *OneStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
-	revision, dataTable, err := s.offline.ImportBatchFeatures(ctx, offline.ImportBatchFeaturesOpt{
+	revision, dataTable, err := s.offline.Import(ctx, offline.ImportOpt{
 		ImportBatchFeaturesOpt: opt,
 		Entity:                 entity,
 		Features:               columns,

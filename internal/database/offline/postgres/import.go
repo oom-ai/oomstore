@@ -62,7 +62,7 @@ func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter 
 	})
 }
 
-func (db *DB) ImportBatchFeatures(ctx context.Context, opt offline.ImportBatchFeaturesOpt) (int64, string, error) {
+func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, string, error) {
 	var revision int64
 	var finalTableName string
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {

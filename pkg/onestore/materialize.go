@@ -38,7 +38,7 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return fmt.Errorf("online store already in the latest revision")
 	}
 
-	stream, err := s.offline.GetFeatureValuesStream(ctx, offline.GetFeatureValuesStreamOpt{
+	stream, err := s.offline.Export(ctx, offline.ExportOpt{
 		DataTable:    revision.DataTable,
 		EntityName:   group.EntityName,
 		FeatureNames: featureNames,
