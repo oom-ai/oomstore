@@ -63,7 +63,7 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 	}
 
 	if previousRevision != nil {
-		return s.online.PurgeRevision(ctx, revision)
+		return s.online.Purge(ctx, revision)
 	}
 	return nil
 }

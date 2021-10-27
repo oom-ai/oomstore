@@ -64,7 +64,7 @@ func (db *DB) Import(ctx context.Context, stream <-chan *types.RawFeatureValueRe
 	return nil
 }
 
-func (db *DB) PurgeRevision(ctx context.Context, revision *types.Revision) error {
+func (db *DB) Purge(ctx context.Context, revision *types.Revision) error {
 	prefix, err := SerializeByValue(revision.ID)
 	if err != nil {
 		return nil
