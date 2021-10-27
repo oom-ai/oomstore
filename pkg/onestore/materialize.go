@@ -50,5 +50,5 @@ func (s *OneStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
-	return s.online.DeprecateFeatureValues(ctx, revision.GetOnlineBatchTableName())
+	return s.online.PurgeRevision(ctx, revision)
 }
