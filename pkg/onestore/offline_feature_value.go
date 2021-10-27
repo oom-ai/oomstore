@@ -40,13 +40,12 @@ func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 		if err != nil {
 			return nil, err
 		}
-		featureValues, err := s.offline.GetPointInTimeFeatureValues(ctx,
-			offline.GetPointInTimeFeatureValuesOpt{
-				Entity:         entity,
-				EntityRows:     opt.EntityRows,
-				RevisionRanges: revisionRanges,
-				Features:       richFeatures,
-			})
+		featureValues, err := s.offline.Join(ctx, offline.JoinOpt{
+			Entity:         entity,
+			EntityRows:     opt.EntityRows,
+			RevisionRanges: revisionRanges,
+			Features:       richFeatures,
+		})
 		if err != nil {
 			return nil, err
 		}

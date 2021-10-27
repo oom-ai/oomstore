@@ -49,7 +49,7 @@ func (s *OneStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 		}
 	}
 
-	stream, err := s.offline.GetFeatureValuesStream(ctx, offline.GetFeatureValuesStreamOpt{
+	stream, err := s.offline.Export(ctx, offline.ExportOpt{
 		DataTable:    dataTable,
 		EntityName:   group.EntityName,
 		FeatureNames: featureNames,

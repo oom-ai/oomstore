@@ -13,7 +13,7 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) GetPointInTimeFeatureValues(ctx context.Context, opt offline.GetPointInTimeFeatureValuesOpt) (dataMap map[string]dbutil.RowMap, err error) {
+func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (dataMap map[string]dbutil.RowMap, err error) {
 	if len(opt.Features) == 0 {
 		return make(map[string]dbutil.RowMap), nil
 	}

@@ -9,7 +9,7 @@ import (
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 )
 
-func (db *DB) GetFeatureValuesStream(ctx context.Context, opt offline.GetFeatureValuesStreamOpt) (<-chan *types.RawFeatureValueRecord, error) {
+func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan *types.RawFeatureValueRecord, error) {
 	fields := append([]string{opt.EntityName}, opt.FeatureNames...)
 	query := fmt.Sprintf("select %s from %s", strings.Join(fields, ","), opt.DataTable)
 	if opt.Limit != nil {
