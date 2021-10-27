@@ -5,6 +5,7 @@ source ./util.sh
 init_store
 register_features
 import_sample
+materialize
 
 case="query single feature"
 expected='

@@ -101,7 +101,7 @@ type UpdateFeatureGroupOpt struct {
 
 type MaterializeOpt struct {
 	GroupName     string
-	GroupRevision int64
+	GroupRevision *int64
 }
 
 type GetFeatureValuesOpt struct {
