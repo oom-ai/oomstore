@@ -12,7 +12,7 @@ import (
 )
 
 type Store interface {
-	GetPointInTimeFeatureValues(ctx context.Context, entity *types.Entity, revisionRanges []*types.RevisionRange, features []*types.RichFeature, entityRows []types.EntityRow) (dataMap map[string]database.RowMap, err error)
+	GetPointInTimeFeatureValues(ctx context.Context, entity *types.Entity, entityRows []types.EntityRow, revisionRanges []*types.RevisionRange, features []*types.RichFeature) (dataMap map[string]database.RowMap, err error)
 	GetFeatureValuesStream(ctx context.Context, opt dbtypes.GetFeatureValuesStreamOpt) (<-chan *types.RawFeatureValueRecord, error)
 	ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt, entity *types.Entity, features []*types.Feature, header []string) (int64, string, error)
 
