@@ -78,9 +78,3 @@ func buildUpdateFeatureGroupCond(opt types.UpdateFeatureGroupOpt) ([]string, []i
 	args = append(args, opt.GroupName)
 	return cond, args
 }
-
-func (db *DB) UpdateFeatureGroupRevision(ctx context.Context, revision int64, dataTable string, groupName string) error {
-	cmd := "UPDATE feature_group SET revision = $1, data_table = $2 WHERE name = $3"
-	_, err := db.ExecContext(ctx, cmd, revision, dataTable, groupName)
-	return err
-}
