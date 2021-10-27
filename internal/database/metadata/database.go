@@ -26,7 +26,7 @@ type Store interface {
 	ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error)
 
 	// feature group
-	CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt, category string) error
+	CreateFeatureGroup(ctx context.Context, opt CreateFeatureGroupOpt) error
 	GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error)
 	ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error)
 	UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error
