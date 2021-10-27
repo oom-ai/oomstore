@@ -9,10 +9,10 @@ import (
 )
 
 type Store interface {
-	GetPointInTimeFeatureValues(ctx context.Context, entity *types.Entity, entityRows []types.EntityRow, revisionRanges []*types.RevisionRange, features []*types.RichFeature) (dataMap map[string]dbutil.RowMap, err error)
-	GetFeatureValuesStream(ctx context.Context, opt GetFeatureValuesStreamOpt) (<-chan *types.RawFeatureValueRecord, error)
-	ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt, entity *types.Entity, features []*types.Feature, header []string) (int64, string, error)
+	Join(ctx context.Context, opt JoinOpt) (map[string]dbutil.RowMap, error)
+	Export(ctx context.Context, opt ExportOpt) (<-chan *types.RawFeatureValueRecord, error)
+	Import(ctx context.Context, opt ImportOpt) (int64, string, error)
 
-	ValueTypeTag(dbValueType string) (string, error)
+	TypeTag(dbType string) (string, error)
 	io.Closer
 }

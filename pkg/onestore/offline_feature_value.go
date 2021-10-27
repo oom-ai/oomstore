@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/onestore-ai/onestore/internal/database/dbutil"
+	"github.com/onestore-ai/onestore/internal/database/offline"
 	"github.com/onestore-ai/onestore/pkg/onestore/types"
 	"github.com/spf13/cast"
 )
@@ -39,7 +40,12 @@ func (s *OneStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 		if err != nil {
 			return nil, err
 		}
-		featureValues, err := s.offline.GetPointInTimeFeatureValues(ctx, entity, opt.EntityRows, revisionRanges, richFeatures)
+		featureValues, err := s.offline.Join(ctx, offline.JoinOpt{
+			Entity:         entity,
+			EntityRows:     opt.EntityRows,
+			RevisionRanges: revisionRanges,
+			Features:       richFeatures,
+		})
 		if err != nil {
 			return nil, err
 		}

@@ -28,7 +28,7 @@ func TestValueTypeTag(t *testing.T) {
 			types.TIME,
 		},
 	} {
-		actual, err := ValueTypeTag(tt.input)
+		actual, err := TypeTag(tt.input)
 		if err != nil {
 			t.Fatal(err)
 		}
