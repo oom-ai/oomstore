@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -28,7 +30,7 @@ func (db *DB) ListRevision(ctx context.Context, groupName *string) ([]*types.Rev
 func (db *DB) GetRevision(ctx context.Context, groupName string, revision int64) (*types.Revision, error) {
 	query := "SELECT * FROM feature_group_revision WHERE group_name = $1 and revision = $2"
 	var rs types.Revision
-	if err := db.GetContext(ctx, rs, query, groupName, revision); err != nil {
+	if err := db.GetContext(ctx, &rs, query, groupName, revision); err != nil {
 		return nil, err
 	}
 	return &rs, nil
@@ -52,6 +54,14 @@ func (db *DB) GetRevisionsByDataTables(ctx context.Context, dataTables []string)
 func (db *DB) InsertRevision(ctx context.Context, opt metadata.InsertRevisionOpt) error {
 	query := "INSERT INTO feature_group_revision(group_name, revision, data_table, description) VALUES ($1, $2, $3, $4)"
 	_, err := db.ExecContext(ctx, query, opt.GroupName, opt.Revision, opt.DataTable, opt.Description)
+	if err != nil {
+		if e2, ok := err.(*pq.Error); ok {
+			if e2.Code == pgerrcode.DuplicateColumn {
+				return fmt.Errorf("revision %v already exist", opt.Revision)
+
+			}
+		}
+	}
 	return err
 }
 
