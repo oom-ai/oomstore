@@ -12,10 +12,7 @@ import (
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
-	featureNames := []string{}
-	for _, f := range opt.Features {
-		featureNames = append(featureNames, f.Name)
-	}
+	featureNames := opt.FeatureList.Names()
 	query := fmt.Sprintf(`SELECT "%s",%s FROM %s WHERE "%s" = $1`, opt.EntityName, strings.Join(featureNames, ","), opt.DataTable, opt.EntityName)
 	rs := make(dbutil.RowMap)
 
@@ -27,10 +24,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
-	featureNames := []string{}
-	for _, f := range opt.Features {
-		featureNames = append(featureNames, f.Name)
-	}
+	featureNames := opt.FeatureList.Names()
 	query := fmt.Sprintf(`SELECT "%s", %s FROM %s WHERE "%s" in (?);`, opt.EntityName, strings.Join(featureNames, ","), opt.DataTable, opt.EntityName)
 	sql, args, err := sqlx.In(query, opt.EntityKeys)
 	if err != nil {

@@ -25,11 +25,6 @@ func (s *OomStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
-	featureNames := []string{}
-	for _, f := range features {
-		featureNames = append(featureNames, f.Name)
-	}
-
 	revision, err := s.getMaterializeRevision(ctx, opt)
 	if err != nil {
 		return err
@@ -41,7 +36,7 @@ func (s *OomStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 	stream, err := s.offline.Export(ctx, offline.ExportOpt{
 		DataTable:    revision.DataTable,
 		EntityName:   group.EntityName,
-		FeatureNames: featureNames,
+		FeatureNames: features.Names(),
 	})
 	if err != nil {
 		return err

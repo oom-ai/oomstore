@@ -17,16 +17,12 @@ func (s *OomStore) GetFeature(ctx context.Context, featureName string) (*types.F
 	return feature, nil
 }
 
-func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.Feature, error) {
+func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
 	richFeatures, err := s.metadata.ListRichFeature(ctx, opt)
 	if err != nil {
 		return nil, err
 	}
-	features := make([]*types.Feature, 0, len(richFeatures))
-	for _, rf := range richFeatures {
-		features = append(features, rf.ToFeature())
-	}
-	return features, nil
+	return richFeatures.ToFeatureList(), nil
 }
 
 func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
