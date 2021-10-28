@@ -35,8 +35,9 @@ type CreateFeatureOpt struct {
 }
 
 type ListFeatureOpt struct {
-	EntityName *string
-	GroupName  *string
+	EntityName   *string
+	GroupName    *string
+	FeatureNames []string
 }
 
 type UpdateFeatureOpt struct {
