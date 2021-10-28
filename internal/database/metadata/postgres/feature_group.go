@@ -19,35 +19,53 @@ func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeature
 	return err
 }
 
-func (db *DB) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
-	var group types.FeatureGroup
-	query := `SELECT * FROM feature_group WHERE name = $1`
-	if err := db.GetContext(ctx, &group, query, groupName); err != nil {
+func (db *DB) getFeatureGroup(ctx context.Context, groupName string, source string, group interface{}) error {
+	query := fmt.Sprintf(`SELECT * FROM "%s" WHERE name = $1`, source)
+	if err := db.GetContext(ctx, group, query, groupName); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("group %s does not exist", groupName)
+			return fmt.Errorf("group %s does not exist", groupName)
 		}
-		return nil, err
+		return err
 	}
-	return &group, nil
+	return nil
 }
 
-func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
+func (db *DB) listFeatureGroup(ctx context.Context, entityName *string, source string, groups interface{}) error {
 	var cond []interface{}
-	query := "SELECT * FROM feature_group"
+	query := fmt.Sprintf("SELECT * FROM %s", source)
 	if entityName != nil {
 		query = query + " WHERE entity_name = $1"
 		cond = append(cond, *entityName)
 	}
 
-	var groups []*types.FeatureGroup
-	if err := db.SelectContext(ctx, &groups, query, cond...); err != nil {
+	if err := db.SelectContext(ctx, groups, query, cond...); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil
+			return nil
 		}
-		return nil, err
+		return err
 	}
-	return groups, nil
+	return nil
+}
 
+func (db *DB) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
+	var group types.FeatureGroup
+	return &group, db.getFeatureGroup(ctx, groupName, "feature_group", &group)
+}
+
+func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
+	var groups []*types.FeatureGroup
+	return groups, db.listFeatureGroup(ctx, entityName, "feature_group", &groups)
+}
+
+func (db *DB) GetRichFeatureGroup(ctx context.Context, groupName string) (*types.RichFeatureGroup, error) {
+	var group types.RichFeatureGroup
+	return &group, db.getFeatureGroup(ctx, groupName, "rich_feature_group", &group)
+
+}
+
+func (db *DB) ListRichFeatureGroup(ctx context.Context, entityName *string) ([]*types.RichFeatureGroup, error) {
+	var groups []*types.RichFeatureGroup
+	return groups, db.listFeatureGroup(ctx, entityName, "rich_feature_group", &groups)
 }
 
 func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
