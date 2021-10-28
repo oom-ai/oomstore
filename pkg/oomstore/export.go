@@ -9,17 +9,17 @@ import (
 )
 
 func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeatureValuesOpt) ([]string, <-chan *types.RawFeatureValueRecord, error) {
-	group, err := s.GetFeatureGroup(ctx, opt.GroupName)
+	group, err := s.metadata.GetRichFeatureGroup(ctx, opt.GroupName)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dataTable string
 	if opt.GroupRevision == nil {
-		if group.DataTable == nil {
+		if group.OfflineDataTable == nil {
 			return nil, nil, fmt.Errorf("feature group '%s' data source not set", opt.GroupName)
 		}
-		dataTable = *group.DataTable
+		dataTable = *group.OfflineDataTable
 	} else {
 		revision, err := s.GetRevision(ctx, opt.GroupName, *opt.GroupRevision)
 		if err != nil {
