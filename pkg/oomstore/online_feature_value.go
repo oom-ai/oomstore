@@ -25,24 +25,15 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 	if err != nil || entityName == nil {
 		return m, err
 	}
-	dataTables := getDataTables(features)
-	revisionIds, err := s.getRevisionIds(ctx, dataTables)
-	if err != nil {
-		return m, err
-	}
+	featureMap := groupFeaturesByRevisionId(features)
 
-	for dataTable, features := range dataTables {
+	for onlineRevisionId, features := range featureMap {
 		if len(features) == 0 {
 			continue
 		}
-		revisionId, ok := revisionIds[dataTable]
-		if !ok {
-			continue
-		}
 		featureValues, err := s.online.Get(ctx, online.GetOpt{
-			DataTable:   dataTable,
 			EntityName:  *entityName,
-			RevisionId:  revisionId,
+			RevisionId:  onlineRevisionId,
 			EntityKey:   opt.EntityKey,
 			FeatureList: features.ToFeatureList(),
 		})
@@ -70,14 +61,10 @@ func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	if err != nil || entityName == nil {
 		return nil, err
 	}
-	dataTables := getDataTables(features)
-	revisionIds, err := s.getRevisionIds(ctx, dataTables)
-	if err != nil {
-		return nil, err
-	}
+	featureMap := groupFeaturesByRevisionId(features)
 
 	// entity_key -> feature_name -> feature_value
-	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, dataTables, revisionIds, *entityName)
+	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, featureMap, *entityName)
 	if err != nil {
 		return nil, err
 	}
@@ -85,23 +72,17 @@ func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	return buildFeatureDataSet(featureValueMap, opt)
 }
 
-func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, dataTableMap map[string]types.RichFeatureList, revisionIds map[string]int32, entityName string) (map[string]dbutil.RowMap, error) {
+func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int32]types.RichFeatureList, entityName string) (map[string]dbutil.RowMap, error) {
 	// entity_key -> types.RecordMap
 	featureValueMap := make(map[string]dbutil.RowMap)
 
-	for dataTable, features := range dataTableMap {
+	for onlineRevisionId, features := range featureMap {
 		if len(features) == 0 {
 			continue
 		}
-		revisionId, ok := revisionIds[dataTable]
-		if !ok {
-			continue
-		}
-
 		featureValues, err := s.online.MultiGet(ctx, online.MultiGetOpt{
-			DataTable:   dataTable,
 			EntityName:  entityName,
-			RevisionId:  revisionId,
+			RevisionId:  onlineRevisionId,
 			EntityKeys:  entityKeys,
 			FeatureList: features.ToFeatureList(),
 		})
@@ -120,37 +101,24 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
-func (s *OomStore) getRevisionIds(ctx context.Context, dataTables map[string]types.RichFeatureList) (map[string]int32, error) {
-	dataTableSlice := make([]string, 0, len(dataTables))
-	for dataTable := range dataTables {
-		dataTableSlice = append(dataTableSlice, dataTable)
-	}
-	revisions, err := s.metadata.GetRevisionsByDataTables(ctx, dataTableSlice)
-	if err != nil {
-		return nil, nil
-	}
-	revisionMap := make(map[string]int32)
-	for _, revision := range revisions {
-		revisionMap[revision.DataTable] = revision.ID
-	}
-	return revisionMap, nil
-}
 func filterAvailableFeatures(features types.RichFeatureList) (rs types.RichFeatureList) {
 	for _, f := range features {
-		if f.DataTable != nil {
+		if f.OnlineRevisionID != nil {
 			rs = append(rs, f)
 		}
 	}
 	return
 }
 
-func getDataTables(features types.RichFeatureList) map[string]types.RichFeatureList {
-	dataTableMap := make(map[string]types.RichFeatureList)
+func groupFeaturesByRevisionId(features types.RichFeatureList) map[int32]types.RichFeatureList {
+	featureMap := make(map[int32]types.RichFeatureList)
 	for _, f := range features {
-		dataTable := *f.DataTable
-		dataTableMap[dataTable] = append(dataTableMap[dataTable], f)
+		if f.OnlineRevisionID == nil {
+			continue
+		}
+		featureMap[*f.OnlineRevisionID] = append(featureMap[*f.OnlineRevisionID], f)
 	}
-	return dataTableMap
+	return featureMap
 }
 
 func getEntityName(features types.RichFeatureList) (*string, error) {

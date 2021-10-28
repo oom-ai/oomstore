@@ -41,10 +41,8 @@ var META_TABLE_SCHEMAS = map[string]string{
 			id               	SERIAL2 UNIQUE,
 			name             	VARCHAR(32) NOT     NULL,
 			entity_name 		VARCHAR(32) NOT     NULL,
-			revision            BIGINT      DEFAULT NULL,
 			online_revision_id 	INT      	DEFAULT NULL,
 			category    		VARCHAR(16) NOT     NULL,
-			data_table  VARCHAR(64) DEFAULT NULL,
 
 			description VARCHAR(64) DEFAULT '',
 			create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -52,9 +50,8 @@ var META_TABLE_SCHEMAS = map[string]string{
 
 			PRIMARY KEY (name)
 		);
-		COMMENT ON COLUMN feature_group.revision   IS 'group online point-in-time epoch seconds';
+		COMMENT ON COLUMN feature_group.online_revision_id IS 'group online point-in-time epoch seconds';
 		COMMENT ON COLUMN feature_group.category   IS 'group category: batch, stream ...';
-		COMMENT ON COLUMN feature_group.data_table IS 'feature data table name';
 		`,
 	"feature_entity": `
 		CREATE TABLE feature_entity (
@@ -102,7 +99,7 @@ var META_VIEW_SCHEMAS = map[string]string{
 			FROM
 			(SELECT
 				f.*,
-				fg.entity_name, fg.category, fg.revision, fg.data_table, fg.online_revision_id
+				fg.entity_name, fg.category, fg.online_revision_id
 			FROM feature AS f
 			LEFT JOIN feature_group AS fg
 			ON f.group_name = fg.name) AS tmp

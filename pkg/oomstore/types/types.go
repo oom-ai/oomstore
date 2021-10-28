@@ -2,7 +2,6 @@ package types
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -23,13 +22,11 @@ type Entity struct {
 }
 
 type FeatureGroup struct {
-	ID               int16   `db:"id"`
-	Name             string  `db:"name"`
-	EntityName       string  `db:"entity_name"`
-	Revision         *int64  `db:"revision"`
-	OnlineRevisionID *int32  `db:"online_revision_id"`
-	Category         string  `db:"category"`
-	DataTable        *string `db:"data_table"`
+	ID               int16  `db:"id"`
+	Name             string `db:"name"`
+	EntityName       string `db:"entity_name"`
+	OnlineRevisionID *int32 `db:"online_revision_id"`
+	Category         string `db:"category"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
@@ -77,26 +74,6 @@ func NewFeatureDataSet() FeatureDataSet {
 type EntityRowWithFeatures struct {
 	EntityRow
 	FeatureValues []FeatureKV
-}
-
-func (fg *FeatureGroup) String() string {
-	revision := "NULL"
-	dataTable := "NULL"
-	if fg.Revision != nil {
-		revision = strconv.Itoa(int(*fg.Revision))
-	}
-	if fg.DataTable != nil {
-		dataTable = *fg.DataTable
-	}
-	return strings.Join([]string{
-		fmt.Sprintf("Name:          %s", fg.Name),
-		fmt.Sprintf("Entity:        %s", fg.EntityName),
-		fmt.Sprintf("Description:   %s", fg.Description),
-		fmt.Sprintf("Revision:      %s", revision),
-		fmt.Sprintf("DataTable:     %s", dataTable),
-		fmt.Sprintf("CreateTime:    %s", fg.CreateTime.Format(time.RFC3339)),
-		fmt.Sprintf("ModifyTime:    %s", fg.ModifyTime.Format(time.RFC3339)),
-	}, "\n")
 }
 
 func (rfg *RichFeatureGroup) String() string {

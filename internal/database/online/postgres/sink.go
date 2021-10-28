@@ -53,7 +53,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		}
 
 		// rename the tmp table to final table
-		finalTableName := getOnlineBatchTableName(opt.Revision)
+		finalTableName := getOnlineBatchTableName(opt.Revision.ID)
 		rename := fmt.Sprintf("ALTER TABLE %s RENAME TO %s", tmpTableName, finalTableName)
 		_, err = tx.ExecContext(ctx, rename)
 		return err
@@ -61,12 +61,12 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	return err
 }
 
-func getOnlineBatchTableName(revision *types.Revision) string {
-	return fmt.Sprintf("batch_%d", revision.ID)
+func getOnlineBatchTableName(revisionId int32) string {
+	return fmt.Sprintf("batch_%d", revisionId)
 }
 
 func (db *DB) Purge(ctx context.Context, revision *types.Revision) error {
-	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, getOnlineBatchTableName(revision))
+	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, getOnlineBatchTableName(revision.ID))
 	if _, err := db.ExecContext(ctx, query); err != nil {
 		return err
 	}

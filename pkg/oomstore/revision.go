@@ -3,6 +3,7 @@ package oomstore
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -11,5 +12,8 @@ func (s *OomStore) ListRevision(ctx context.Context, groupName *string) ([]*type
 }
 
 func (s *OomStore) GetRevision(ctx context.Context, groupName string, revision int64) (*types.Revision, error) {
-	return s.metadata.GetRevision(ctx, groupName, revision)
+	return s.metadata.GetRevision(ctx, metadata.GetRevisionOpt{
+		GroupName: &groupName,
+		Revision:  &revision,
+	})
 }

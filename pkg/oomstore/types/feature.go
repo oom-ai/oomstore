@@ -20,10 +20,8 @@ type Feature struct {
 
 type RichFeature struct {
 	Feature
-	EntityName string  `db:"entity_name"`
-	Category   string  `db:"category"`
-	Revision   *int64  `db:"revision"`
-	DataTable  *string `db:"data_table"`
+	EntityName string `db:"entity_name"`
+	Category   string `db:"category"`
 
 	OnlineRevisionID *int32  `db:"online_revision_id"`
 	OnlineRevision   *int64  `db:"online_revision"`

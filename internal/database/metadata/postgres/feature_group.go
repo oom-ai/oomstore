@@ -84,15 +84,10 @@ func buildUpdateFeatureGroupCond(opt types.UpdateFeatureGroupOpt) ([]string, []i
 		cond = append(cond, fmt.Sprintf("description = $%d", id))
 		args = append(args, *opt.Description)
 	}
-	if opt.Revision != nil {
+	if opt.OnlineRevisionId != nil {
 		id++
-		cond = append(cond, fmt.Sprintf("revision = $%d", id))
-		args = append(args, *opt.Revision)
-	}
-	if opt.DataTable != nil {
-		id++
-		cond = append(cond, fmt.Sprintf("data_table = $%d", id))
-		args = append(args, *opt.DataTable)
+		cond = append(cond, fmt.Sprintf("online_revision_id = $%d", id))
+		args = append(args, *opt.OnlineRevisionId)
 	}
 	args = append(args, opt.GroupName)
 	return cond, args
