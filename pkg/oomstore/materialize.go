@@ -29,7 +29,7 @@ func (s *OomStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 	if err != nil {
 		return err
 	}
-	if group.Revision != nil && *group.Revision == revision.Revision {
+	if group.OnlineRevisionID != nil && *group.OnlineRevisionID == revision.ID {
 		return fmt.Errorf("online store already in the latest revision")
 	}
 
