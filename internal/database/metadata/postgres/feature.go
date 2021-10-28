@@ -22,7 +22,7 @@ func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) 
 	_, err := db.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.DBValueType, opt.ValueType, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
-			if e2.Code == pgerrcode.DuplicateColumn {
+			if e2.Code == pgerrcode.UniqueViolation {
 				return fmt.Errorf("feature %s already exist", opt.FeatureName)
 			}
 		}
@@ -73,6 +73,9 @@ func buildListFeatureCond(opt types.ListFeatureOpt) (string, []interface{}, erro
 		args = append(args, *opt.GroupName)
 	}
 	if opt.FeatureNames != nil {
+		if len(opt.FeatureNames) == 0 {
+			return "1 = 0", nil, nil
+		}
 		s, inArgs, err := sqlx.In("name IN (?)", opt.FeatureNames)
 		if err != nil {
 			return "", nil, err
@@ -80,7 +83,7 @@ func buildListFeatureCond(opt types.ListFeatureOpt) (string, []interface{}, erro
 		cond = append(cond, s)
 		args = append(args, inArgs...)
 	}
-	return strings.Join(cond, " ADN "), args, nil
+	return strings.Join(cond, " AND "), args, nil
 }
 
 func (db *DB) validateDataType(ctx context.Context, dataType string) error {

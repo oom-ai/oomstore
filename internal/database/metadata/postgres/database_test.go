@@ -175,29 +175,9 @@ func TestListEntity(t *testing.T) {
 	assert.Equal(t, 2, len(entitys))
 }
 
-func TestFeature(t *testing.T) {
-	initDB(t)
-
-	store, err := Open(&test.PostgresDbopt)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer store.Close()
-
-	assert.Nil(t, store.CreateEntity(context.Background(), types.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "description",
-	}))
-
-	assert.Nil(t, store.CreateFeatureGroup(context.Background(), metadata.CreateFeatureGroupOpt{
-		CreateFeatureGroupOpt: types.CreateFeatureGroupOpt{
-			Name:        "device",
-			EntityName:  "device",
-			Description: "description",
-		},
-		Category: types.BatchFeatureCategory,
-	}))
+func TestCreateFeature(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
 
 	phoneOpt := metadata.CreateFeatureOpt{
 		CreateFeatureOpt: types.CreateFeatureOpt{
@@ -209,63 +189,155 @@ func TestFeature(t *testing.T) {
 		ValueType: "string",
 	}
 
-	priceOpt := metadata.CreateFeatureOpt{
+	assert.Nil(t, db.CreateFeature(context.Background(), phoneOpt))
+	assert.Equal(t, db.CreateFeature(context.Background(), phoneOpt), fmt.Errorf("feature phone already exist"))
+}
+
+func TestGetFeature(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
+
+	feature, err := db.GetFeature(context.Background(), "invalid_feature_name")
+	assert.NotNil(t, err)
+	assert.Nil(t, feature)
+
+	assert.Nil(t, db.CreateFeatureGroup(context.Background(), metadata.CreateFeatureGroupOpt{
+		CreateFeatureGroupOpt: types.CreateFeatureGroupOpt{
+			Name:        "device",
+			EntityName:  "device",
+			Description: "description",
+		},
+		Category: types.BatchFeatureCategory,
+	}))
+	assert.Nil(t, db.CreateFeature(context.Background(), metadata.CreateFeatureOpt{
 		CreateFeatureOpt: types.CreateFeatureOpt{
-			FeatureName: "price",
+			FeatureName: "phone",
 			GroupName:   "device",
 			DBValueType: "varchar(16)",
 			Description: "description",
 		},
 		ValueType: "string",
+	}))
+
+	feature, err = db.GetFeature(context.Background(), "phone")
+	assert.Nil(t, err)
+	assert.Equal(t, "phone", feature.Name)
+	assert.Equal(t, "device", feature.GroupName)
+	assert.Equal(t, "varchar(16)", feature.DBValueType)
+	assert.Equal(t, "description", feature.Description)
+}
+
+func TestListFeature(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
+
+	features, err := db.ListFeature(context.Background(), types.ListFeatureOpt{})
+	assert.Nil(t, err)
+	assert.Equal(t, 0, features.Len())
+
+	assert.Nil(t, db.CreateEntity(context.Background(), types.CreateEntityOpt{
+		Name:        "device",
+		Length:      32,
+		Description: "description",
+	}))
+
+	assert.Nil(t, db.CreateFeatureGroup(context.Background(), metadata.CreateFeatureGroupOpt{
+		CreateFeatureGroupOpt: types.CreateFeatureGroupOpt{
+			Name:        "device_baseinfo",
+			EntityName:  "device",
+			Description: "description",
+		},
+		Category: types.BatchFeatureCategory,
+	}))
+
+	assert.Nil(t, db.CreateFeature(context.Background(), metadata.CreateFeatureOpt{
+		CreateFeatureOpt: types.CreateFeatureOpt{
+			FeatureName: "phone",
+			GroupName:   "device_baseinfo",
+			DBValueType: "varchar(16)",
+			Description: "description",
+		},
+		ValueType: "string",
+	}))
+
+	features, err = db.ListFeature(context.Background(), types.ListFeatureOpt{})
+	assert.Nil(t, err)
+	assert.Equal(t, 1, features.Len())
+
+	features, err = db.ListFeature(context.Background(), types.ListFeatureOpt{
+		FeatureNames: []string{"phone", "model"},
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, 1, features.Len())
+
+	entityName := "invalid_entity_name"
+	features, err = db.ListFeature(context.Background(), types.ListFeatureOpt{
+		EntityName:   &entityName,
+		FeatureNames: []string{"phone", "model"},
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, 0, features.Len())
+
+	entityName = "device"
+	features, err = db.ListFeature(context.Background(), types.ListFeatureOpt{
+		EntityName:   &entityName,
+		FeatureNames: []string{},
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(features))
+
+	entityName = "device"
+	features, err = db.ListFeature(context.Background(), types.ListFeatureOpt{
+		EntityName: &entityName,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(features))
+}
+
+func TestUpdateFeatuer(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
+
+	assert.Nil(t, db.UpdateFeature(context.Background(), types.UpdateFeatureOpt{
+		FeatureName: "invalid_feature_name",
+	}))
+
+	assert.Nil(t, db.CreateEntity(context.Background(), types.CreateEntityOpt{
+		Name:        "device",
+		Length:      32,
+		Description: "description",
+	}))
+	assert.Nil(t, db.CreateFeatureGroup(context.Background(), metadata.CreateFeatureGroupOpt{
+		CreateFeatureGroupOpt: types.CreateFeatureGroupOpt{
+			Name:        "device_baseinfo",
+			EntityName:  "device",
+			Description: "description",
+		},
+		Category: types.BatchFeatureCategory,
+	}))
+
+	phoneOpt := metadata.CreateFeatureOpt{
+		CreateFeatureOpt: types.CreateFeatureOpt{
+			FeatureName: "phone",
+			GroupName:   "device_baseinfo",
+			DBValueType: "varchar(16)",
+			Description: "description",
+		},
+		ValueType: "string",
 	}
+	assert.Nil(t, db.CreateFeature(context.Background(), phoneOpt))
 
-	// test CreateFeature
-	{
-		errOpt := priceOpt
-		errOpt.DBValueType = "varchar(16"
-		assert.NotNil(t, store.CreateFeature(context.Background(), errOpt))
+	assert.Nil(t, db.UpdateFeature(context.Background(), types.UpdateFeatureOpt{
+		FeatureName:    phoneOpt.FeatureName,
+		NewDescription: "new description",
+	}))
 
-		assert.Nil(t, store.CreateFeature(context.Background(), phoneOpt))
-		assert.Nil(t, store.CreateFeature(context.Background(), priceOpt))
-	}
-
-	// test GetFeature
-	{
-		feature, err := store.GetFeature(context.Background(), phoneOpt.FeatureName)
-		assert.Nil(t, err)
-
-		assert.Equal(t, phoneOpt.FeatureName, feature.Name)
-		assert.Equal(t, phoneOpt.GroupName, feature.GroupName)
-		assert.Equal(t, phoneOpt.DBValueType, feature.DBValueType)
-		assert.Equal(t, phoneOpt.ValueType, feature.ValueType)
-		assert.Equal(t, phoneOpt.Description, feature.Description)
-		assert.Equal(t, "batch", feature.Category)
-	}
-
-	// testUpdateFeature
-	{
-		assert.Nil(t, store.UpdateFeature(context.Background(), types.UpdateFeatureOpt{
-			FeatureName:    phoneOpt.FeatureName,
-			NewDescription: "new description",
-		}))
-
-		feature, err := store.GetFeature(context.Background(), phoneOpt.FeatureName)
-		assert.Nil(t, err)
-		assert.Equal(t, "new description", feature.Description)
-	}
-
-	// test ListFeature
-	{
-		invalidGroupName := "invalid_group_name"
-		features, err := store.ListFeature(context.Background(), types.ListFeatureOpt{GroupName: &invalidGroupName})
-		assert.Nil(t, err)
-		assert.Equal(t, 0, len(features))
-
-		groupName := "device"
-		features, err = store.ListFeature(context.Background(), types.ListFeatureOpt{GroupName: &groupName})
-		assert.Nil(t, err)
-		assert.Equal(t, 2, len(features))
-	}
+	feature, err := db.GetFeature(context.Background(), "phone")
+	assert.Nil(t, err)
+	assert.Equal(t, "phone", feature.Name)
+	assert.Equal(t, "device_baseinfo", feature.GroupName)
+	assert.Equal(t, "varchar(16)", feature.DBValueType)
+	assert.Equal(t, "new description", feature.Description)
 }
 
 func TestFeatureGroup(t *testing.T) {
