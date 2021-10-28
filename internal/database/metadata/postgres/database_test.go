@@ -231,12 +231,12 @@ func TestFeature(t *testing.T) {
 	// test ListFeature
 	{
 		invalidGroupName := "invalid_group_name"
-		features, err := store.ListFeature(context.Background(), &invalidGroupName)
+		features, err := store.ListFeature(context.Background(), types.ListFeatureOpt{GroupName: &invalidGroupName})
 		assert.Nil(t, err)
 		assert.Equal(t, 0, len(features))
 
 		groupName := "device"
-		features, err = store.ListFeature(context.Background(), &groupName)
+		features, err = store.ListFeature(context.Background(), types.ListFeatureOpt{GroupName: &groupName})
 		assert.Nil(t, err)
 		assert.Equal(t, 2, len(features))
 	}

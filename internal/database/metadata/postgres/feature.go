@@ -48,24 +48,34 @@ func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) 
 
 func (db *DB) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
 	var feature types.Feature
-	query := `SELECT * FROM feature WHERE name = $1`
-	if err := db.GetContext(ctx, &feature, query, featureName); err != nil {
-		return nil, err
-	}
-	return &feature, nil
+	return &feature, db.getFeature(ctx, featureName, "feature", &feature)
 }
 
-func (db *DB) ListFeature(ctx context.Context, groupName *string) (types.FeatureList, error) {
-	query := "SELECT * FROM feature"
-	cond, args := buildListFeatureCond(types.ListFeatureOpt{
-		GroupName: groupName,
-	})
-	if len(cond) > 0 {
-		query = fmt.Sprintf("%s WHERE %s", query, cond)
+func (db *DB) GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error) {
+	var feature types.RichFeature
+	return &feature, db.getFeature(ctx, featureName, "rich_feature", &feature)
+}
+
+func (db *DB) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
+	features := types.FeatureList{}
+	return features, db.listFeature(ctx, opt, "feature", &features)
+}
+
+func (db *DB) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) (types.RichFeatureList, error) {
+	features := types.RichFeatureList{}
+	return features, db.listFeature(ctx, opt, "rich_feature", &features)
+}
+
+func (db *DB) GetRichFeatures(ctx context.Context, featureNames []string) (types.RichFeatureList, error) {
+	query := "SELECT * FROM rich_feature WHERE name IN (?)"
+	sql, args, err := sqlx.In(query, featureNames)
+	if err != nil {
+		return nil, err
 	}
 
-	features := types.FeatureList{}
-	if err := db.SelectContext(ctx, &features, query, args...); err != nil {
+	features := types.RichFeatureList{}
+	err = db.SelectContext(ctx, &features, db.Rebind(sql), args...)
+	if err != nil {
 		return nil, err
 	}
 	return features, nil
@@ -75,6 +85,21 @@ func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) err
 	query := "UPDATE feature SET description = $1 WHERE name = $2"
 	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName)
 	return err
+}
+
+func (db *DB) getFeature(ctx context.Context, featureName string, source string, feature interface{}) error {
+	query := fmt.Sprintf(`SELECT * FROM "%s" WHERE name = $1`, source)
+	return db.GetContext(ctx, feature, query, featureName)
+}
+
+func (db *DB) listFeature(ctx context.Context, opt types.ListFeatureOpt, source string, features interface{}) error {
+	query := fmt.Sprintf(`SELECT * FROM "%s"`, source)
+	cond, args := buildListFeatureCond(opt)
+	if len(cond) > 0 {
+		query = fmt.Sprintf("%s WHERE %s", query, cond)
+	}
+
+	return db.SelectContext(ctx, features, query, args...)
 }
 
 func buildListFeatureCond(opt types.ListFeatureOpt) (string, []interface{}) {
