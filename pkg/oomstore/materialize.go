@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -53,8 +54,10 @@ func (s *OomStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 	}
 
 	var previousRevision *types.Revision
-	if group.Revision != nil {
-		previousRevision, err = s.GetRevision(ctx, group.Name, *group.Revision)
+	if group.OnlineRevisionID != nil {
+		previousRevision, err = s.metadata.GetRevision(ctx, metadata.GetRevisionOpt{
+			RevisionId: group.OnlineRevisionID,
+		})
 		if err != nil {
 			return err
 		}
