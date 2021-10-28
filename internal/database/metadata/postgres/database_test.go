@@ -318,3 +318,81 @@ func TestRichFeature(t *testing.T) {
 		assert.Equal(t, 2, len(features))
 	}
 }
+
+func TestFeatureGroup(t *testing.T) {
+	initDB(t)
+
+	store, err := Open(&test.PostgresDbopt)
+	assert.Nil(t, err)
+	defer store.Close()
+
+	assert.Nil(t, store.CreateEntity(context.Background(), types.CreateEntityOpt{
+		Name:        "device",
+		Length:      32,
+		Description: "description",
+	}))
+
+	baseInfoFg := metadata.CreateFeatureGroupOpt{
+		CreateFeatureGroupOpt: types.CreateFeatureGroupOpt{
+			Name:        "deviec_baseinfo",
+			EntityName:  "device",
+			Description: "description",
+		},
+		Category: types.BatchFeatureCategory,
+	}
+
+	infoFg := metadata.CreateFeatureGroupOpt{
+		CreateFeatureGroupOpt: types.CreateFeatureGroupOpt{
+			Name:        "deviec_info",
+			EntityName:  "device",
+			Description: "description",
+		},
+		Category: types.BatchFeatureCategory,
+	}
+
+	// test CreateFeatureGroup
+	{
+		errFg := baseInfoFg
+		errFg.Category = "invalid-category"
+		assert.NotNil(t, store.CreateFeatureGroup(context.Background(), errFg))
+		assert.Nil(t, store.CreateFeatureGroup(context.Background(), baseInfoFg))
+		assert.Nil(t, store.CreateFeatureGroup(context.Background(), infoFg))
+	}
+
+	// test GetFeatureGroup
+	{
+		fg, err := store.GetFeatureGroup(context.Background(), baseInfoFg.Name)
+		assert.Nil(t, err)
+
+		assert.Equal(t, baseInfoFg.Category, fg.Category)
+		assert.Equal(t, baseInfoFg.EntityName, fg.EntityName)
+		assert.Equal(t, baseInfoFg.Description, fg.Description)
+		assert.Equal(t, baseInfoFg.Category, fg.Category)
+	}
+
+	// test UpdateFeatureGroup
+	{
+		description := "new description"
+		revision := int64(20211028)
+		assert.Nil(t, store.UpdateFeatureGroup(context.Background(), types.UpdateFeatureGroupOpt{
+			GroupName:   baseInfoFg.Name,
+			Description: &description,
+			Revision:    &revision,
+		}))
+
+		fg, err := store.GetFeatureGroup(context.Background(), baseInfoFg.Name)
+		assert.Nil(t, err)
+
+		assert.Equal(t, "new description", fg.Description)
+		assert.Equal(t, revision, *fg.Revision)
+	}
+
+	// test ListFeatureGroup
+	{
+		entityName := "device"
+		fgs, err := store.ListFeatureGroup(context.Background(), &entityName)
+		assert.Nil(t, err)
+
+		assert.Equal(t, 2, len(fgs))
+	}
+}
