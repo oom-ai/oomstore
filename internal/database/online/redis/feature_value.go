@@ -43,7 +43,6 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	res := make(map[string]dbutil.RowMap)
 	for _, entityKey := range opt.EntityKeys {
 		rowMap, err := db.Get(ctx, online.GetOpt{
-			DataTable:   opt.DataTable,
 			EntityName:  opt.EntityName,
 			RevisionId:  opt.RevisionId,
 			EntityKey:   entityKey,
