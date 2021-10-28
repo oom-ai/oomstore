@@ -14,22 +14,6 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) validateDataType(ctx context.Context, dataType string) error {
-	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Int())
-	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
-		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", tmpTableName)); err != nil {
-			return err
-		}
-		if _, err := tx.ExecContext(ctx, fmt.Sprintf("CREATE TABLE %s (a %s)", tmpTableName, dataType)); err != nil {
-			return err
-		}
-		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE %s", tmpTableName)); err != nil {
-			return err
-		}
-		return nil
-	})
-}
-
 func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) error {
 	if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
 		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
@@ -66,21 +50,6 @@ func (db *DB) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) (ty
 	return features, db.listFeature(ctx, opt, "rich_feature", &features)
 }
 
-func (db *DB) GetRichFeatures(ctx context.Context, featureNames []string) (types.RichFeatureList, error) {
-	query := "SELECT * FROM rich_feature WHERE name IN (?)"
-	sql, args, err := sqlx.In(query, featureNames)
-	if err != nil {
-		return nil, err
-	}
-
-	features := types.RichFeatureList{}
-	err = db.SelectContext(ctx, &features, db.Rebind(sql), args...)
-	if err != nil {
-		return nil, err
-	}
-	return features, nil
-}
-
 func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
 	query := "UPDATE feature SET description = $1 WHERE name = $2"
 	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName)
@@ -94,27 +63,50 @@ func (db *DB) getFeature(ctx context.Context, featureName string, source string,
 
 func (db *DB) listFeature(ctx context.Context, opt types.ListFeatureOpt, source string, features interface{}) error {
 	query := fmt.Sprintf(`SELECT * FROM "%s"`, source)
-	cond, args := buildListFeatureCond(opt)
+	cond, args, err := buildListFeatureCond(opt)
+	if err != nil {
+		return err
+	}
 	if len(cond) > 0 {
 		query = fmt.Sprintf("%s WHERE %s", query, cond)
 	}
-
-	return db.SelectContext(ctx, features, query, args...)
+	return db.SelectContext(ctx, features, db.Rebind(query), args...)
 }
 
-func buildListFeatureCond(opt types.ListFeatureOpt) (string, []interface{}) {
+func buildListFeatureCond(opt types.ListFeatureOpt) (string, []interface{}, error) {
 	cond := make([]string, 0)
 	args := make([]interface{}, 0)
-	var id int
 	if opt.EntityName != nil {
-		id++
-		cond = append(cond, fmt.Sprintf("entity_name = $%d", id))
+		cond = append(cond, "entity_name = ?")
 		args = append(args, *opt.EntityName)
 	}
 	if opt.GroupName != nil {
-		id++
-		cond = append(cond, fmt.Sprintf("group_name = $%d", id))
+		cond = append(cond, "group_name = ?")
 		args = append(args, *opt.GroupName)
 	}
-	return strings.Join(cond, " AND "), args
+	if opt.FeatureNames != nil {
+		s, inArgs, err := sqlx.In("name IN (?)", opt.FeatureNames)
+		if err != nil {
+			return "", nil, err
+		}
+		cond = append(cond, s)
+		args = append(args, inArgs...)
+	}
+	return strings.Join(cond, " ADN "), args, nil
+}
+
+func (db *DB) validateDataType(ctx context.Context, dataType string) error {
+	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Int())
+	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", tmpTableName)); err != nil {
+			return err
+		}
+		if _, err := tx.ExecContext(ctx, fmt.Sprintf("CREATE TABLE %s (a %s)", tmpTableName, dataType)); err != nil {
+			return err
+		}
+		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE %s", tmpTableName)); err != nil {
+			return err
+		}
+		return nil
+	})
 }

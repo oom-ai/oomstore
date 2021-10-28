@@ -12,7 +12,7 @@ import (
 func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (types.FeatureValueMap, error) {
 	m := make(map[string]interface{})
 
-	features, err := s.metadata.GetRichFeatures(ctx, opt.FeatureNames)
+	features, err := s.metadata.ListRichFeature(ctx, types.ListFeatureOpt{FeatureNames: opt.FeatureNames})
 	if err != nil {
 		return m, err
 	}
@@ -57,7 +57,7 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 }
 
 func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
-	features, err := s.metadata.GetRichFeatures(ctx, opt.FeatureNames)
+	features, err := s.metadata.ListRichFeature(ctx, types.ListFeatureOpt{FeatureNames: opt.FeatureNames})
 	if err != nil {
 		return nil, err
 	}

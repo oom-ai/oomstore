@@ -302,14 +302,6 @@ func TestRichFeature(t *testing.T) {
 		assert.Nil(t, feature.DataTable)
 	}
 
-	// test GetRichFeatures
-	{
-		features, err := store.GetRichFeatures(context.Background(), []string{phoneOpt.FeatureName, priceOpt.FeatureName})
-		assert.Nil(t, err)
-
-		assert.Equal(t, 2, len(features))
-	}
-
 	// test ListRichFeatuer
 	{
 		groupName := "device"
