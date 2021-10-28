@@ -24,6 +24,11 @@ type RichFeature struct {
 	Category   string  `db:"category"`
 	Revision   *int64  `db:"revision"`
 	DataTable  *string `db:"data_table"`
+
+	OnlineRevisionID *int32  `db:"online_revision_id"`
+	OnlineRevision   *int64  `db:"online_revision"`
+	OfflineRevision  *int64  `db:"offline_revision"`
+	OfflineDataTable *string `db:"offline_data_table"`
 }
 
 type FeatureList []*Feature
@@ -90,31 +95,54 @@ func (rf *RichFeature) AsFeature() *Feature {
 }
 
 func (rf *RichFeature) String() string {
-	var revision, dataTable string
+	onlineRevision := "<NULL>"
+	offlineRevision := "<NULL>"
+	offlineDataTable := "<NULL>"
 
-	if rf.Revision == nil {
-		revision = "<NULL>"
-	} else {
-		revision = fmt.Sprint(*rf.Revision)
+	if rf.OnlineRevision != nil {
+		onlineRevision = fmt.Sprint(*rf.OnlineRevision)
 	}
-
-	if rf.DataTable == nil {
-		dataTable = "<NULL>"
-	} else {
-		dataTable = *rf.DataTable
+	if rf.OfflineRevision != nil {
+		offlineRevision = fmt.Sprint(*rf.OfflineRevision)
+	}
+	if rf.OfflineDataTable == nil {
+		offlineDataTable = *rf.OfflineDataTable
 	}
 
 	return strings.Join([]string{
-		fmt.Sprintf("Name:          %s", rf.Name),
-		fmt.Sprintf("Group:         %s", rf.GroupName),
-		fmt.Sprintf("Entity:        %s", rf.EntityName),
-		fmt.Sprintf("Category:      %s", rf.Category),
-		fmt.Sprintf("DBValueType:   %s", rf.DBValueType),
-		fmt.Sprintf("ValueType:     %s", rf.ValueType),
-		fmt.Sprintf("Description:   %s", rf.Description),
-		fmt.Sprintf("Revision:      %s", revision),
-		fmt.Sprintf("DataTable:     %s", dataTable),
-		fmt.Sprintf("CreateTime:    %s", rf.CreateTime.Format(time.RFC3339)),
-		fmt.Sprintf("ModifyTime:    %s", rf.ModifyTime.Format(time.RFC3339)),
+		fmt.Sprintf("Name:                     %s", rf.Name),
+		fmt.Sprintf("Group:                    %s", rf.GroupName),
+		fmt.Sprintf("Entity:                   %s", rf.EntityName),
+		fmt.Sprintf("Category:                 %s", rf.Category),
+		fmt.Sprintf("DBValueType:              %s", rf.DBValueType),
+		fmt.Sprintf("ValueType:                %s", rf.ValueType),
+		fmt.Sprintf("Description:              %s", rf.Description),
+		fmt.Sprintf("Online Revision:          %s", onlineRevision),
+		fmt.Sprintf("Offline Latest Revision:  %s", offlineRevision),
+		fmt.Sprintf("Offline Latest DataTable:  %s", offlineDataTable),
+		fmt.Sprintf("CreateTime:               %s", rf.CreateTime.Format(time.RFC3339)),
+		fmt.Sprintf("ModifyTime:               %s", rf.ModifyTime.Format(time.RFC3339)),
 	}, "\n")
+}
+
+func RichFeatureCsvHeader() string {
+	return strings.Join([]string{"Name", "Group", "Entity", "Category", "DBValueType", "ValueType", "Description", "OnlineRevision", "OfflineLatestRevision", "OfflineLatestDataTable", "CreateTime", "ModifyTime"}, ",")
+}
+
+func (rf *RichFeature) ToCsvRecord() string {
+	onlineRevision := "<NULL>"
+	offlineRevision := "<NULL>"
+	offlineDataTable := "<NULL>"
+
+	if rf.OnlineRevision != nil {
+		onlineRevision = fmt.Sprint(*rf.OnlineRevision)
+	}
+	if rf.OfflineRevision != nil {
+		offlineRevision = fmt.Sprint(*rf.OfflineRevision)
+	}
+	if rf.OfflineDataTable == nil {
+		offlineDataTable = *rf.OfflineDataTable
+	}
+
+	return strings.Join([]string{rf.Name, rf.GroupName, rf.EntityName, rf.Category, rf.DBValueType, rf.ValueType, rf.Description, onlineRevision, offlineRevision, offlineDataTable, rf.CreateTime.Format(time.RFC3339), rf.ModifyTime.Format(time.RFC3339)}, ",")
 }
