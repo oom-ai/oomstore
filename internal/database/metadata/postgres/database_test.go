@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"sort"
 	"testing"
 
@@ -33,6 +35,16 @@ func initDB(t *testing.T) {
 	if err := CreateDatabase(context.Background(), test.PostgresDbopt); err != nil {
 		t.Fatal(err)
 	}
+}
+
+func initAndOpenDB(t *testing.T) *DB {
+	initDB(t)
+
+	db, err := Open(&test.PostgresDbopt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return db
 }
 
 func TestCreateDatabase(t *testing.T) {
@@ -73,80 +85,94 @@ ORDER BY table_name;`); err != nil {
 	assert.Equal(t, wantTables, tables)
 }
 
-func TestEntity(t *testing.T) {
-	initDB(t)
+func TestCreateEntity(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
 
-	store, err := Open(&test.PostgresDbopt)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer store.Close()
-
-	deviceEntity := types.Entity{
+	assert.Nil(t, db.CreateEntity(context.Background(), types.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
 		Description: "description",
-	}
-	userEntity := types.Entity{
-		Name:        "user",
-		Length:      64,
+	}))
+
+	assert.Equal(t, db.CreateEntity(context.Background(), types.CreateEntityOpt{
+		Name:        "device",
+		Length:      32,
 		Description: "description",
-	}
+	}), fmt.Errorf("entity device already exist!"))
+}
 
-	// test CreateEntity
-	{
-		if err := store.CreateEntity(context.Background(), types.CreateEntityOpt{
-			Name:        deviceEntity.Name,
-			Length:      deviceEntity.Length,
-			Description: deviceEntity.Description,
-		}); err != nil {
-			t.Error(err)
-		}
+func TestGetEntity(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
 
-		if err := store.CreateEntity(context.Background(), types.CreateEntityOpt{
-			Name:        userEntity.Name,
-			Length:      userEntity.Length,
-			Description: userEntity.Description,
-		}); err != nil {
-			t.Error(err)
-		}
-	}
+	assert.Nil(t, db.CreateEntity(context.Background(), types.CreateEntityOpt{
+		Name:        "device",
+		Length:      32,
+		Description: "description",
+	}))
 
-	// test GetEntity
-	{
-		entity, err := store.GetEntity(context.Background(), "device")
-		if err != nil {
-			t.Error(err)
-		}
-		assert.Equal(t, deviceEntity.Name, entity.Name)
-		assert.Equal(t, deviceEntity.Length, entity.Length)
-		assert.Equal(t, deviceEntity.Description, entity.Description)
-	}
+	entity, err := db.GetEntity(context.Background(), "device")
+	assert.Nil(t, err)
+	assert.Equal(t, "device", entity.Name)
+	assert.Equal(t, 32, entity.Length)
+	assert.Equal(t, "description", entity.Description)
 
-	// test UpdateEntity
-	{
-		if err := store.UpdateEntity(context.Background(), types.UpdateEntityOpt{
-			EntityName:     "user",
-			NewDescription: "new description",
-		}); err != nil {
-			t.Error(err)
-		}
+	entity, err = db.GetEntity(context.Background(), "invalid_entity_name")
+	assert.Equal(t, err, sql.ErrNoRows)
+	assert.Nil(t, entity)
+}
 
-		entity, err := store.GetEntity(context.Background(), "user")
-		if err != nil {
-			t.Error(err)
-		}
-		assert.Equal(t, "new description", entity.Description)
-	}
+func TestUpdateEntity(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
 
-	// test ListEntity
-	{
-		entitys, err := store.ListEntity(context.Background())
-		if err != nil {
-			t.Error(err)
-		}
-		assert.Equal(t, 2, len(entitys))
-	}
+	assert.Nil(t, db.CreateEntity(context.Background(), types.CreateEntityOpt{
+		Name:        "device",
+		Length:      32,
+		Description: "description",
+	}))
+
+	assert.Nil(t, db.UpdateEntity(context.Background(), types.UpdateEntityOpt{
+		EntityName:     "device",
+		NewDescription: "new description",
+	}))
+
+	entity, err := db.GetEntity(context.Background(), "device")
+	assert.Nil(t, err)
+	assert.Equal(t, entity.Description, "new description")
+
+	assert.Nil(t, db.UpdateEntity(context.Background(), types.UpdateEntityOpt{
+		EntityName:     "invalid_entity_name",
+		NewDescription: "new description",
+	}))
+}
+
+func TestListEntity(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
+
+	entitys, err := db.ListEntity(context.Background())
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(entitys))
+
+	assert.Nil(t, db.CreateEntity(context.Background(), types.CreateEntityOpt{
+		Name:        "device",
+		Length:      32,
+		Description: "description",
+	}))
+	entitys, err = db.ListEntity(context.Background())
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(entitys))
+
+	assert.Nil(t, db.CreateEntity(context.Background(), types.CreateEntityOpt{
+		Name:        "user",
+		Length:      16,
+		Description: "description",
+	}))
+	entitys, err = db.ListEntity(context.Background())
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(entitys))
 }
 
 func TestFeature(t *testing.T) {
