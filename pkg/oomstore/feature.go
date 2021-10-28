@@ -12,16 +12,8 @@ func (s *OomStore) GetFeature(ctx context.Context, featureName string) (*types.F
 	return s.metadata.GetFeature(ctx, featureName)
 }
 
-func (s *OomStore) GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error) {
-	return s.metadata.GetRichFeature(ctx, featureName)
-}
-
 func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
 	return s.metadata.ListFeature(ctx, opt)
-}
-
-func (s *OomStore) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) (types.RichFeatureList, error) {
-	return s.metadata.ListRichFeature(ctx, opt)
 }
 
 func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
