@@ -388,3 +388,80 @@ func TestFeatureGroup(t *testing.T) {
 		assert.Equal(t, 2, len(fgs))
 	}
 }
+
+func TestRevision(t *testing.T) {
+	initDB(t)
+
+	store, err := Open(&test.PostgresDbopt)
+	assert.Nil(t, err)
+	defer store.Close()
+
+	assert.Nil(t, store.CreateEntity(context.Background(), types.CreateEntityOpt{
+		Name:        "device",
+		Length:      32,
+		Description: "description",
+	}))
+
+	assert.Nil(t, store.CreateFeatureGroup(context.Background(), metadata.CreateFeatureGroupOpt{
+		CreateFeatureGroupOpt: types.CreateFeatureGroupOpt{
+			Name:        "deviec_baseinfo",
+			EntityName:  "device",
+			Description: "description",
+		},
+		Category: types.BatchFeatureCategory,
+	}))
+
+	opt1 := metadata.InsertRevisionOpt{
+		GroupName:   "device_baseinfo",
+		Revision:    20211028,
+		DataTable:   "device_bastinfo_20211028",
+		Description: "description",
+	}
+
+	opt2 := metadata.InsertRevisionOpt{
+		GroupName:   "device_baseinfo",
+		Revision:    20211029,
+		DataTable:   "device_bastinfo_20211029",
+		Description: "description",
+	}
+
+	// test InsertRevision
+	{
+		assert.Nil(t, store.InsertRevision(context.Background(), opt1))
+		assert.Nil(t, store.InsertRevision(context.Background(), opt2))
+	}
+
+	// test GetRevision and GetRevisionsByDataTables
+	{
+		revision, err := store.GetRevision(context.Background(), opt1.GroupName, opt1.Revision)
+		assert.Nil(t, err)
+
+		assert.Equal(t, opt1.GroupName, revision.GroupName)
+		assert.Equal(t, opt1.Revision, revision.Revision)
+		assert.Equal(t, opt1.DataTable, revision.DataTable)
+		assert.Equal(t, opt1.Description, revision.Description)
+
+		revision, err = store.GetRevision(context.Background(), "invalid group name", 0)
+		assert.NotNil(t, err)
+		assert.Nil(t, revision)
+
+		revisios, err := store.GetRevisionsByDataTables(context.Background(),
+			[]string{"device_bastinfo_20211028", "device_bastinfo_20211029"})
+		assert.Nil(t, err)
+
+		assert.Equal(t, 2, len(revisios))
+	}
+
+	// test ListRevision
+	{
+		revisions, err := store.ListRevision(context.Background(), nil)
+		assert.Nil(t, err)
+		assert.Equal(t, 2, len(revisions))
+
+		groupName := "device_baseinfo"
+		revisions, err = store.ListRevision(context.Background(), &groupName)
+		assert.Nil(t, err)
+		assert.Equal(t, 2, len(revisions))
+	}
+
+}
