@@ -8,21 +8,20 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-// GetFeature: get feature by featureName
 func (s *OomStore) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
-	feature, err := s.metadata.GetFeature(ctx, featureName)
-	if err != nil {
-		return nil, err
-	}
-	return feature, nil
+	return s.metadata.GetFeature(ctx, featureName)
+}
+
+func (s *OomStore) GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error) {
+	return s.metadata.GetRichFeature(ctx, featureName)
 }
 
 func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
-	richFeatures, err := s.metadata.ListRichFeature(ctx, opt)
-	if err != nil {
-		return nil, err
-	}
-	return richFeatures.ToFeatureList(), nil
+	return s.metadata.ListFeature(ctx, opt)
+}
+
+func (s *OomStore) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) (types.RichFeatureList, error) {
+	return s.metadata.ListRichFeature(ctx, opt)
 }
 
 func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {

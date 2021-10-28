@@ -58,7 +58,8 @@ func stringSliceEqual(a, b []string) bool {
 
 func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) error {
 	// get columns of the group
-	features, err := s.metadata.ListFeature(ctx, &opt.GroupName)
+	features, err := s.metadata.ListFeature(ctx, types.ListFeatureOpt{GroupName: &opt.GroupName})
+
 	if err != nil {
 		return err
 	}

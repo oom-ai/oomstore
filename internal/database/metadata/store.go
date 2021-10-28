@@ -17,7 +17,7 @@ type Store interface {
 	// feature
 	CreateFeature(ctx context.Context, opt CreateFeatureOpt) error
 	GetFeature(ctx context.Context, featureName string) (*types.Feature, error)
-	ListFeature(ctx context.Context, groupName *string) (types.FeatureList, error)
+	ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error)
 	UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error
 
 	// rich feature
