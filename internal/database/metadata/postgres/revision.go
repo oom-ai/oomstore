@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"strings"
 
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
@@ -27,10 +28,29 @@ func (db *DB) ListRevision(ctx context.Context, groupName *string) ([]*types.Rev
 	return revisions, nil
 }
 
-func (db *DB) GetRevision(ctx context.Context, groupName string, revision int64) (*types.Revision, error) {
-	query := "SELECT * FROM feature_group_revision WHERE group_name = $1 and revision = $2"
+func (db *DB) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*types.Revision, error) {
+	cond := make([]string, 0)
+	args := make([]interface{}, 0)
+	var id int
+	if opt.GroupName != nil {
+		id++
+		cond = append(cond, fmt.Sprintf("group_name = $%d", id))
+		args = append(args, *opt.GroupName)
+	}
+	if opt.Revision != nil {
+		id++
+		cond = append(cond, fmt.Sprintf("revision = $%d", id))
+		args = append(args, *opt.Revision)
+	}
+	if opt.RevisionId != nil {
+		id++
+		cond = append(cond, fmt.Sprintf("id = $%d", id))
+		args = append(args, *opt.RevisionId)
+	}
+
+	query := fmt.Sprintf("SELECT * FROM feature_group_revision WHERE %s", strings.Join(cond, " AND "))
 	var rs types.Revision
-	if err := db.GetContext(ctx, &rs, query, groupName, revision); err != nil {
+	if err := db.GetContext(ctx, &rs, query, args...); err != nil {
 		return nil, err
 	}
 	return &rs, nil
