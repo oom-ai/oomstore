@@ -297,9 +297,6 @@ func TestRichFeature(t *testing.T) {
 		assert.Equal(t, phoneOpt.ValueType, feature.ValueType)
 		assert.Equal(t, phoneOpt.Description, feature.Description)
 		assert.Equal(t, "batch", feature.Category)
-
-		assert.Nil(t, feature.Revision)
-		assert.Nil(t, feature.DataTable)
 	}
 
 	// test ListRichFeatuer
@@ -365,18 +362,18 @@ func TestFeatureGroup(t *testing.T) {
 	// test UpdateFeatureGroup
 	{
 		description := "new description"
-		revision := int64(20211028)
+		revisionId := int32(2)
 		assert.Nil(t, store.UpdateFeatureGroup(context.Background(), types.UpdateFeatureGroupOpt{
-			GroupName:   baseInfoFg.Name,
-			Description: &description,
-			Revision:    &revision,
+			GroupName:        baseInfoFg.Name,
+			Description:      &description,
+			OnlineRevisionId: &revisionId,
 		}))
 
 		fg, err := store.GetFeatureGroup(context.Background(), baseInfoFg.Name)
 		assert.Nil(t, err)
 
 		assert.Equal(t, "new description", fg.Description)
-		assert.Equal(t, revision, *fg.Revision)
+		assert.Equal(t, revisionId, *fg.OnlineRevisionID)
 	}
 
 	// test ListFeatureGroup
@@ -433,7 +430,10 @@ func TestRevision(t *testing.T) {
 
 	// test GetRevision and GetRevisionsByDataTables
 	{
-		revision, err := store.GetRevision(context.Background(), opt1.GroupName, opt1.Revision)
+		revision, err := store.GetRevision(context.Background(), metadata.GetRevisionOpt{
+			GroupName: &opt1.GroupName,
+			Revision:  &opt1.Revision,
+		})
 		assert.Nil(t, err)
 
 		assert.Equal(t, opt1.GroupName, revision.GroupName)
@@ -441,7 +441,12 @@ func TestRevision(t *testing.T) {
 		assert.Equal(t, opt1.DataTable, revision.DataTable)
 		assert.Equal(t, opt1.Description, revision.Description)
 
-		revision, err = store.GetRevision(context.Background(), "invalid group name", 0)
+		invalidGroupName := "invalid group name"
+		invalidRevision := int64(0)
+		revision, err = store.GetRevision(context.Background(), metadata.GetRevisionOpt{
+			GroupName: &invalidGroupName,
+			Revision:  &invalidRevision,
+		})
 		assert.NotNil(t, err)
 		assert.Nil(t, revision)
 
