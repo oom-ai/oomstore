@@ -9,18 +9,19 @@ import_sample
 case='featctl update feature works'
 featctl update feature price --description "new description"
 expected='
-Name:          price
-Group:         phone
-Entity:        device
-Category:      batch
-DBValueType:   int
-ValueType:     int32
-Description:   new description
-Revision:
-DataTable:
+Name:                     price
+Group:                    phone
+Entity:                   device
+Category:                 batch
+DBValueType:              int
+ValueType:                int32
+Description:              new description
+Online Revision:          <NULL>
+Offline Latest Revision:  <NULL>
+Offline Latest DataTable: <NULL>
 CreateTime:
 ModifyTime:
 '
 actual=$(featctl describe feature price)
-ignore() { grep -Ev '^(CreateTime|ModifyTime|Revision|DataTable)' <<<"$1"; }
+ignore() { grep -Ev '^(CreateTime|ModifyTime|Online Revision|Offline Latest Revision|Offline Latest DataTable)' <<<"$1"; }
 assert_eq "$case" "$(ignore "$expected")" "$(ignore "$actual")"

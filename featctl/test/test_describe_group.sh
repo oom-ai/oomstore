@@ -8,14 +8,14 @@ import_sample
 
 case='featctl describe group works'
 expected='
-Name:          phone
-Entity:        device
+Name:                     phone
+Entity:                   device
 Description:
-Revision:
-DataTable:
+Online Revision:          <NULL>
+Offline Latest Revision:  <NULL>
+Offline Latest DataTable: <NULL>
 CreateTime:
 ModifyTime:
 '
 actual=$(featctl describe group phone)
-ignore_time() { grep -Ev '^(CreateTime|ModifyTime|Revision|DataTable)' <<<"$1"; }
-assert_eq "$case" "$(ignore_time "$expected")" "$(ignore_time "$actual")"
+ignore_time() { grep -Ev '^(CreateTime|ModifyTime|Online Revision|Offline Latest Revision|Offline Latest DataTable)' <<<"$1"; }
