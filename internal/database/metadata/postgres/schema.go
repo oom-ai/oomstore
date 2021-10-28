@@ -92,11 +92,31 @@ var META_VIEW_SCHEMAS = map[string]string{
 	"rich_feature": `
         	CREATE VIEW rich_feature AS
 			SELECT
-				f.id, f.name, f.group_name, f.db_value_type, f.value_type, f.description, f.create_time, f.modify_time,
-				fg.entity_name, fg.category, fg.revision, fg.data_table
+				tmp2.*,
+				fgr2.revision AS online_revision
+			FROM
+			(SELECT
+				tmp.*,
+				fgr.revision AS offline_revision,
+				fgr.data_table AS offline_data_table
+			FROM
+			(SELECT
+				f.*,
+				fg.entity_name, fg.category, fg.revision, fg.data_table, fg.online_revision_id
 			FROM feature AS f
 			LEFT JOIN feature_group AS fg
-			ON f.group_name = fg.name;
+			ON f.group_name = fg.name) AS tmp
+			LEFT JOIN feature_group_revision AS fgr
+			ON
+				tmp.group_name = fgr.group_name AND
+				fgr.revision = (
+					SELECT MAX(revision)
+					FROM feature_group_revision
+					WHERE feature_group_revision.group_name = tmp.group_name
+    			)) AS tmp2
+			LEFT JOIN feature_group_revision AS fgr2
+			ON tmp2.online_revision_id = fgr2.id;
+
 	`,
 	"rich_feature_group": `
         	CREATE VIEW rich_feature_group AS
