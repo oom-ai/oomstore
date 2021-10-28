@@ -17,7 +17,7 @@ func init() {
 	postgresContainer, err := gnomock.Start(postgres.Preset(
 		postgres.WithUser("test", "test"),
 		postgres.WithDatabase("test"),
-		postgres.WithTimezone("Asia/Shanghai"),
+		postgres.WithVersion("14.0"),
 	))
 	if err != nil {
 		panic(err)
