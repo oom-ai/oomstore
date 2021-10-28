@@ -34,7 +34,7 @@ type Store interface {
 
 	// revision
 	ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error)
-	GetRevision(ctx context.Context, groupName string, revision int64) (*types.Revision, error)
+	GetRevision(ctx context.Context, opt GetRevisionOpt) (*types.Revision, error)
 	GetRevisionsByDataTables(ctx context.Context, dataTables []string) ([]*types.Revision, error)
 	GetLatestRevision(ctx context.Context, groupName string) (*types.Revision, error)
 	BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error)

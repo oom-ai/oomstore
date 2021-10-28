@@ -18,3 +18,9 @@ type InsertRevisionOpt struct {
 	DataTable   string
 	Description string
 }
+
+type GetRevisionOpt struct {
+	GroupName  *string
+	Revision   *int64
+	RevisionId *int32
+}
