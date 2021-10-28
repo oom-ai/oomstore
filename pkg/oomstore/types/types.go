@@ -109,12 +109,12 @@ func (l *RichFeatureList) Ids() (ids []int16) {
 
 func (l *RichFeatureList) ToFeatureList() (rs FeatureList) {
 	for _, f := range *l {
-		rs = append(rs, f.ToFeature())
+		rs = append(rs, f.AsFeature())
 	}
 	return
 }
 
-func (rf *RichFeature) ToFeature() *Feature {
+func (rf *RichFeature) AsFeature() *Feature {
 	if rf == nil {
 		return nil
 	}
