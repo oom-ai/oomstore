@@ -13,12 +13,12 @@ type JoinOpt struct {
 	Entity         *types.Entity
 	EntityRows     []types.EntityRow
 	RevisionRanges []*types.RevisionRange
-	Features       []*types.RichFeature
+	Features       types.RichFeatureList
 }
 
 type ImportOpt struct {
 	types.ImportBatchFeaturesOpt
 	Entity   *types.Entity
-	Features []*types.Feature
+	Features types.FeatureList
 	Header   []string
 }

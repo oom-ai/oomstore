@@ -18,7 +18,7 @@ const (
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
-	columns := getColumns(opt.Entity, opt.Features)
+	columns := append([]string{opt.Entity.Name}, opt.Features.Names()...)
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tmpTableName := opt.Revision.GroupName + "_" + strconv.Itoa(rand.Int())
@@ -71,15 +71,6 @@ func (db *DB) Purge(ctx context.Context, revision *types.Revision) error {
 		return err
 	}
 	return nil
-}
-
-func getColumns(entity *types.Entity, features []*types.Feature) []string {
-	columns := make([]string, 0, len(features)+1)
-	columns = append(columns, entity.Name)
-	for _, f := range features {
-		columns = append(columns, f.Name)
-	}
-	return columns
 }
 
 func (db *DB) insertRecordsToTable(ctx context.Context, tableName string, records []interface{}, columns []string) error {

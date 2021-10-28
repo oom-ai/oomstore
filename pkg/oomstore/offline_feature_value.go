@@ -18,12 +18,10 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 	if err != nil {
 		return nil, err
 	}
-	batchFeatures := make([]*types.RichFeature, 0)
-	for _, f := range features {
-		if f.Category == types.BatchFeatureCategory {
-			batchFeatures = append(batchFeatures, f)
-		}
-	}
+	batchFeatures := features.Filter(func(f *types.RichFeature) bool {
+		return f.Category == types.BatchFeatureCategory
+	})
+
 	// group_name -> []features
 	featureGroups := buildGroupToFeaturesMap(batchFeatures)
 
@@ -99,11 +97,11 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 }
 
 // key: group_name, value: slice of features
-func buildGroupToFeaturesMap(features []*types.RichFeature) map[string][]*types.RichFeature {
-	groups := make(map[string][]*types.RichFeature)
+func buildGroupToFeaturesMap(features types.RichFeatureList) map[string]types.RichFeatureList {
+	groups := make(map[string]types.RichFeatureList)
 	for _, f := range features {
 		if _, ok := groups[f.GroupName]; !ok {
-			groups[f.GroupName] = make([]*types.RichFeature, 0)
+			groups[f.GroupName] = types.RichFeatureList{}
 		}
 		groups[f.GroupName] = append(groups[f.GroupName], f)
 	}
