@@ -14,7 +14,7 @@ import (
 // GetHistoricalFeatureValues gets point-in-time feature values for each entity row;
 // currently, this API only supports batch features.
 func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.GetHistoricalFeatureValuesOpt) ([]*types.EntityRowWithFeatures, error) {
-	features, err := s.metadata.GetRichFeatures(ctx, opt.FeatureNames)
+	features, err := s.metadata.ListRichFeature(ctx, types.ListFeatureOpt{FeatureNames: opt.FeatureNames})
 	if err != nil {
 		return nil, err
 	}
