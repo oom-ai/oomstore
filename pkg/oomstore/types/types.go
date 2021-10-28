@@ -36,6 +36,13 @@ type FeatureGroup struct {
 	ModifyTime  time.Time `db:"modify_time"`
 }
 
+type RichFeatureGroup struct {
+	FeatureGroup
+	OnlineRevision   *int64  `db:"online_revision"`
+	OfflineRevision  *int64  `db:"offline_revision"`
+	OfflineDataTable *string `db:"offline_data_table"`
+}
+
 type Revision struct {
 	ID        int32  `db:"id"`
 	Revision  int64  `db:"revision"`
