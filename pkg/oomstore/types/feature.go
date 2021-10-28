@@ -16,10 +16,7 @@ type Feature struct {
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
-}
 
-type RichFeature struct {
-	Feature
 	EntityName string `db:"entity_name"`
 	Category   string `db:"category"`
 
@@ -30,10 +27,8 @@ type RichFeature struct {
 }
 
 type FeatureList []*Feature
-type RichFeatureList []*RichFeature
 
-func (l *FeatureList) Len() int     { return len(*l) }
-func (l *RichFeatureList) Len() int { return len(*l) }
+func (l *FeatureList) Len() int { return len(*l) }
 
 func (l *FeatureList) Names() (names []string) {
 	for _, f := range *l {
@@ -41,20 +36,8 @@ func (l *FeatureList) Names() (names []string) {
 	}
 	return
 }
-func (l *RichFeatureList) Names() (names []string) {
-	for _, f := range *l {
-		names = append(names, f.Name)
-	}
-	return
-}
 
 func (l *FeatureList) Ids() (ids []int16) {
-	for _, f := range *l {
-		ids = append(ids, f.ID)
-	}
-	return
-}
-func (l *RichFeatureList) Ids() (ids []int16) {
 	for _, f := range *l {
 		ids = append(ids, f.ID)
 	}
@@ -69,30 +52,8 @@ func (l *FeatureList) Filter(filter func(f *Feature) bool) (rs FeatureList) {
 	}
 	return
 }
-func (l *RichFeatureList) Filter(filter func(f *RichFeature) bool) (rs RichFeatureList) {
-	for _, f := range *l {
-		if filter(f) {
-			rs = append(rs, f)
-		}
-	}
-	return
-}
 
-func (l *RichFeatureList) ToFeatureList() (rs FeatureList) {
-	for _, f := range *l {
-		rs = append(rs, f.AsFeature())
-	}
-	return
-}
-
-func (rf *RichFeature) AsFeature() *Feature {
-	if rf == nil {
-		return nil
-	}
-	return &rf.Feature
-}
-
-func (rf *RichFeature) String() string {
+func (rf *Feature) String() string {
 	onlineRevision := "<NULL>"
 	offlineRevision := "<NULL>"
 	offlineDataTable := "<NULL>"
@@ -123,11 +84,11 @@ func (rf *RichFeature) String() string {
 	}, "\n")
 }
 
-func RichFeatureCsvHeader() string {
+func FeatureCsvHeader() string {
 	return strings.Join([]string{"Name", "Group", "Entity", "Category", "DBValueType", "ValueType", "Description", "OnlineRevision", "OfflineLatestRevision", "OfflineLatestDataTable", "CreateTime", "ModifyTime"}, ",")
 }
 
-func (rf *RichFeature) ToCsvRecord() string {
+func (rf *Feature) ToCsvRecord() string {
 	onlineRevision := "<NULL>"
 	offlineRevision := "<NULL>"
 	offlineDataTable := "<NULL>"
