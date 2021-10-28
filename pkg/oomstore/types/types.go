@@ -99,24 +99,30 @@ func (fg *FeatureGroup) String() string {
 	}, "\n")
 }
 
-func RichFeatureCsvHeader() string {
-	return strings.Join([]string{"Name", "Group", "Entity", "Category", "DBValueType", "ValueType", "Description", "Revision", "DataTable", "CreateTime", "ModifyTime"}, ",")
-}
+func (rfg *RichFeatureGroup) String() string {
+	onlineRevision := "<NULL>"
+	offlineRevision := "<NULL>"
+	offlineDataTable := "<NULL>"
 
-func (r *RichFeature) ToCsvRecord() string {
-	var revision, dataTable string
-	if r.Revision == nil {
-		revision = ""
-	} else {
-		revision = strconv.FormatInt(*r.Revision, 10)
+	if rfg.OnlineRevision != nil {
+		onlineRevision = fmt.Sprint(*rfg.OnlineRevision)
 	}
-	if r.DataTable == nil {
-		dataTable = ""
-	} else {
-		dataTable = *r.DataTable
+	if rfg.OfflineRevision != nil {
+		offlineRevision = fmt.Sprint(*rfg.OfflineRevision)
 	}
-
-	return strings.Join([]string{r.Name, r.GroupName, r.EntityName, r.Category, r.DBValueType, r.ValueType, r.Description, revision, dataTable, r.CreateTime.Format(time.RFC3339), r.ModifyTime.Format(time.RFC3339)}, ",")
+	if rfg.OfflineDataTable == nil {
+		offlineDataTable = *rfg.OfflineDataTable
+	}
+	return strings.Join([]string{
+		fmt.Sprintf("Name:                     %s", rfg.Name),
+		fmt.Sprintf("Entity:                   %s", rfg.EntityName),
+		fmt.Sprintf("Description:              %s", rfg.Description),
+		fmt.Sprintf("Online Revision:          %s", onlineRevision),
+		fmt.Sprintf("Offline Latest Revision:  %s", offlineRevision),
+		fmt.Sprintf("Offline Latest DataTable: %s", offlineDataTable),
+		fmt.Sprintf("CreateTime:               %s", rfg.CreateTime.Format(time.RFC3339)),
+		fmt.Sprintf("ModifyTime:               %s", rfg.ModifyTime.Format(time.RFC3339)),
+	}, "\n")
 }
 
 type RevisionRange struct {
