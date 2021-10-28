@@ -64,9 +64,8 @@ func (s *OomStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 	}
 
 	if err = s.metadata.UpdateFeatureGroup(ctx, types.UpdateFeatureGroupOpt{
-		GroupName: group.Name,
-		Revision:  &revision.Revision,
-		DataTable: &revision.DataTable,
+		GroupName:        group.Name,
+		OnlineRevisionId: &revision.ID,
 	}); err != nil {
 		return err
 	}
