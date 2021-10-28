@@ -10,7 +10,6 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (dataMap map[string]dbutil.RowMap, err error) {
@@ -52,7 +51,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (dataMap map[string
 		ON l.entity_key = r.%s
 		WHERE l.unix_time >= $1 AND l.unix_time < $2;
 	`
-	featureNamesStr := buildFeatureNameStr(opt.Features)
+	featureNamesStr := strings.Join(opt.Features.Names(), ", ")
 	for _, r := range opt.RevisionRanges {
 		_, tmpErr := db.ExecContext(ctx, fmt.Sprintf(joinQuery, entityDfWithFeatureName, featureNamesStr, featureNamesStr, entityDfName, r.DataTable, opt.Entity.Name), r.MinRevision, r.MaxRevision)
 		if tmpErr != nil {
@@ -70,14 +69,6 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (dataMap map[string
 
 	dataMap, err = getFeatureValueMapFromRows(rows, "unique_key")
 	return dataMap, err
-}
-
-func buildFeatureNameStr(features []*types.RichFeature) string {
-	featureNames := make([]string, 0, len(features))
-	for _, f := range features {
-		featureNames = append(featureNames, f.Name)
-	}
-	return strings.Join(featureNames, ", ")
 }
 
 func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]dbutil.RowMap, error) {

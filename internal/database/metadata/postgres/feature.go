@@ -55,7 +55,7 @@ func (db *DB) GetFeature(ctx context.Context, featureName string) (*types.Featur
 	return &feature, nil
 }
 
-func (db *DB) ListFeature(ctx context.Context, groupName *string) ([]*types.Feature, error) {
+func (db *DB) ListFeature(ctx context.Context, groupName *string) (types.FeatureList, error) {
 	query := "SELECT * FROM feature"
 	cond, args := buildListFeatureCond(types.ListFeatureOpt{
 		GroupName: groupName,
@@ -64,7 +64,7 @@ func (db *DB) ListFeature(ctx context.Context, groupName *string) ([]*types.Feat
 		query = fmt.Sprintf("%s WHERE %s", query, cond)
 	}
 
-	features := make([]*types.Feature, 0)
+	features := types.FeatureList{}
 	if err := db.SelectContext(ctx, &features, query, args...); err != nil {
 		return nil, err
 	}

@@ -16,13 +16,13 @@ const CREATE_DATA_TABLE = `CREATE TABLE {{TABLE_NAME}} (
 	{{COLUMN_DEFS}});
 `
 
-func BuildFeatureDataTableSchema(tableName string, entity *types.Entity, columns []*types.Feature) string {
+func BuildFeatureDataTableSchema(tableName string, entity *types.Entity, features types.FeatureList) string {
 	// sort to ensure the schema looks consistent
-	sort.Slice(columns, func(i, j int) bool {
-		return columns[i].Name < columns[j].Name
+	sort.Slice(features, func(i, j int) bool {
+		return features[i].Name < features[j].Name
 	})
 	var columnDefs []string
-	for _, column := range columns {
+	for _, column := range features {
 		columnDef := fmt.Sprintf("%s %s", column.Name, column.DBValueType)
 		columnDefs = append(columnDefs, columnDef)
 	}

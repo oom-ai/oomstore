@@ -9,7 +9,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) createTableEntityDfWithFeatures(ctx context.Context, features []*types.RichFeature, entity *types.Entity) (string, error) {
+func (db *DB) createTableEntityDfWithFeatures(ctx context.Context, features types.RichFeatureList, entity *types.Entity) (string, error) {
 	tableName := fmt.Sprintf("entity_df_with_features_%d", rand.Int())
 	schema := `
 		CREATE TABLE %s (

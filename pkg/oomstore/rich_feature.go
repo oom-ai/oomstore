@@ -15,7 +15,7 @@ func (s *OomStore) GetRichFeature(ctx context.Context, featureName string) (*typ
 	return feature, nil
 }
 
-func (s *OomStore) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error) {
+func (s *OomStore) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) (types.RichFeatureList, error) {
 	features, err := s.metadata.ListRichFeature(ctx, opt)
 	if err != nil {
 		return nil, err

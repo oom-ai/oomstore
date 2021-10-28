@@ -67,11 +67,67 @@ type Revision struct {
 	ModifyTime  time.Time `db:"modify_time"`
 }
 
+type FeatureList []*Feature
+type RichFeatureList []*RichFeature
+
+func (l *FeatureList) Names() (names []string) {
+	for _, f := range *l {
+		names = append(names, f.Name)
+	}
+	return
+}
+
+func (l *FeatureList) Ids() (ids []int16) {
+	for _, f := range *l {
+		ids = append(ids, f.ID)
+	}
+	return
+}
+
+func (l *FeatureList) Filter(filter func(f *Feature) bool) (rs FeatureList) {
+	for _, f := range *l {
+		if filter(f) {
+			rs = append(rs, f)
+		}
+	}
+	return
+}
+
+func (l *RichFeatureList) Names() (names []string) {
+	for _, f := range *l {
+		names = append(names, f.Name)
+	}
+	return
+}
+
+func (l *RichFeatureList) Ids() (ids []int16) {
+	for _, f := range *l {
+		ids = append(ids, f.ID)
+	}
+	return
+}
+
+func (l *RichFeatureList) ToFeatureList() (rs FeatureList) {
+	for _, f := range *l {
+		rs = append(rs, f.ToFeature())
+	}
+	return
+}
+
 func (rf *RichFeature) ToFeature() *Feature {
 	if rf == nil {
 		return nil
 	}
 	return &rf.Feature
+}
+
+func (l *RichFeatureList) Filter(filter func(f *RichFeature) bool) (rs RichFeatureList) {
+	for _, f := range *l {
+		if filter(f) {
+			rs = append(rs, f)
+		}
+	}
+	return
 }
 
 type FeatureKV struct {

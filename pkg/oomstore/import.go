@@ -58,7 +58,7 @@ func stringSliceEqual(a, b []string) bool {
 
 func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) error {
 	// get columns of the group
-	columns, err := s.metadata.ListFeature(ctx, &opt.GroupName)
+	features, err := s.metadata.ListFeature(ctx, &opt.GroupName)
 	if err != nil {
 		return err
 	}
@@ -81,10 +81,7 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	if hasDup(header) {
 		return fmt.Errorf("csv data source has duplicated columns: %v", header)
 	}
-	columnNames := []string{entity.Name}
-	for _, column := range columns {
-		columnNames = append(columnNames, column.Name)
-	}
+	columnNames := append([]string{entity.Name}, features.Names()...)
 	if !stringSliceEqual(header, columnNames) {
 		return fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
@@ -92,7 +89,7 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	revision, dataTable, err := s.offline.Import(ctx, offline.ImportOpt{
 		ImportBatchFeaturesOpt: opt,
 		Entity:                 entity,
-		Features:               columns,
+		Features:               features,
 		Header:                 header,
 	})
 	if err != nil {
