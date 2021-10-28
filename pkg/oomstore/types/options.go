@@ -96,10 +96,9 @@ type UpdateEntityOpt struct {
 }
 
 type UpdateFeatureGroupOpt struct {
-	GroupName   string
-	Description *string
-	Revision    *int64
-	DataTable   *string
+	GroupName        string
+	Description      *string
+	OnlineRevisionId *int32
 }
 
 type MaterializeOpt struct {
