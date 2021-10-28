@@ -17,29 +17,29 @@ func (db *DB) GetRichFeature(ctx context.Context, featureName string) (*types.Ri
 	return &richFeature, nil
 }
 
-func (db *DB) GetRichFeatures(ctx context.Context, featureNames []string) ([]*types.RichFeature, error) {
+func (db *DB) GetRichFeatures(ctx context.Context, featureNames []string) (types.RichFeatureList, error) {
 	query := "SELECT * FROM rich_feature WHERE name IN (?)"
 	sql, args, err := sqlx.In(query, featureNames)
 	if err != nil {
 		return nil, err
 	}
 
-	richFeatures := make([]*types.RichFeature, 0)
-	err = db.SelectContext(ctx, &richFeatures, db.Rebind(sql), args...)
+	features := types.RichFeatureList{}
+	err = db.SelectContext(ctx, &features, db.Rebind(sql), args...)
 	if err != nil {
 		return nil, err
 	}
-	return richFeatures, nil
+	return features, nil
 }
 
-func (db *DB) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) ([]*types.RichFeature, error) {
+func (db *DB) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) (types.RichFeatureList, error) {
 	query := "SELECT * FROM rich_feature"
 	cond, args := buildListFeatureCond(opt)
 	if len(cond) > 0 {
 		query = fmt.Sprintf("%s WHERE %s", query, cond)
 	}
 
-	features := make([]*types.RichFeature, 0)
+	features := types.RichFeatureList{}
 	if err := db.SelectContext(ctx, &features, query, args...); err != nil {
 		return nil, err
 	}

@@ -40,11 +40,11 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 			continue
 		}
 		featureValues, err := s.online.Get(ctx, online.GetOpt{
-			DataTable:  dataTable,
-			EntityName: *entityName,
-			RevisionId: revisionId,
-			EntityKey:  opt.EntityKey,
-			Features:   features,
+			DataTable:   dataTable,
+			EntityName:  *entityName,
+			RevisionId:  revisionId,
+			EntityKey:   opt.EntityKey,
+			FeatureList: features.ToFeatureList(),
 		})
 		if err != nil {
 			return m, err
@@ -85,7 +85,7 @@ func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	return buildFeatureDataSet(featureValueMap, opt)
 }
 
-func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, dataTableMap map[string][]*types.Feature, revisionIds map[string]int32, entityName string) (map[string]dbutil.RowMap, error) {
+func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, dataTableMap map[string]types.RichFeatureList, revisionIds map[string]int32, entityName string) (map[string]dbutil.RowMap, error) {
 	// entity_key -> types.RecordMap
 	featureValueMap := make(map[string]dbutil.RowMap)
 
@@ -99,11 +99,11 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 		}
 
 		featureValues, err := s.online.MultiGet(ctx, online.MultiGetOpt{
-			DataTable:  dataTable,
-			EntityName: entityName,
-			RevisionId: revisionId,
-			EntityKeys: entityKeys,
-			Features:   features,
+			DataTable:   dataTable,
+			EntityName:  entityName,
+			RevisionId:  revisionId,
+			EntityKeys:  entityKeys,
+			FeatureList: features.ToFeatureList(),
 		})
 		if err != nil {
 			return nil, err
@@ -120,7 +120,7 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
-func (s *OomStore) getRevisionIds(ctx context.Context, dataTables map[string][]*types.Feature) (map[string]int32, error) {
+func (s *OomStore) getRevisionIds(ctx context.Context, dataTables map[string]types.RichFeatureList) (map[string]int32, error) {
 	dataTableSlice := make([]string, 0, len(dataTables))
 	for dataTable := range dataTables {
 		dataTableSlice = append(dataTableSlice, dataTable)
@@ -135,7 +135,7 @@ func (s *OomStore) getRevisionIds(ctx context.Context, dataTables map[string][]*
 	}
 	return revisionMap, nil
 }
-func filterAvailableFeatures(features []*types.RichFeature) (rs []*types.RichFeature) {
+func filterAvailableFeatures(features types.RichFeatureList) (rs types.RichFeatureList) {
 	for _, f := range features {
 		if f.DataTable != nil {
 			rs = append(rs, f)
@@ -144,16 +144,16 @@ func filterAvailableFeatures(features []*types.RichFeature) (rs []*types.RichFea
 	return
 }
 
-func getDataTables(features []*types.RichFeature) map[string][]*types.Feature {
-	dataTableMap := make(map[string][]*types.Feature)
+func getDataTables(features types.RichFeatureList) map[string]types.RichFeatureList {
+	dataTableMap := make(map[string]types.RichFeatureList)
 	for _, f := range features {
 		dataTable := *f.DataTable
-		dataTableMap[dataTable] = append(dataTableMap[dataTable], f.ToFeature())
+		dataTableMap[dataTable] = append(dataTableMap[dataTable], f)
 	}
 	return dataTableMap
 }
 
-func getEntityName(features []*types.RichFeature) (*string, error) {
+func getEntityName(features types.RichFeatureList) (*string, error) {
 	m := make(map[string]string)
 	for _, f := range features {
 		m[f.EntityName] = f.Name

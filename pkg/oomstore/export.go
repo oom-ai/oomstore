@@ -34,11 +34,7 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 		return nil, nil, err
 	}
 
-	allFeatureNames := make([]string, 0, len(allFeatures))
-	for _, f := range allFeatures {
-		allFeatureNames = append(allFeatureNames, f.Name)
-	}
-
+	allFeatureNames := allFeatures.Names()
 	if len(featureNames) == 0 {
 		featureNames = allFeatureNames
 	} else {
