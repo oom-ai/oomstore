@@ -70,6 +70,9 @@ type Revision struct {
 type FeatureList []*Feature
 type RichFeatureList []*RichFeature
 
+func (l *FeatureList) Len() int     { return len(*l) }
+func (l *RichFeatureList) Len() int { return len(*l) }
+
 func (l *FeatureList) Names() (names []string) {
 	for _, f := range *l {
 		names = append(names, f.Name)
