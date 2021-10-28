@@ -3,9 +3,9 @@ package cmd
 import (
 	"context"
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -34,7 +34,7 @@ var listFeatureGroupCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
 		defer oomStore.Close()
 
-		groups, err := oomStore.ListFeatureGroup(ctx, listFeatureGroupOpt.EntityName)
+		groups, err := oomStore.ListRichFeatureGroup(ctx, listFeatureGroupOpt.EntityName)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -52,25 +52,29 @@ func init() {
 	listFeatureGroupOpt.EntityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func printFeatureGroups(featureGroups []*types.FeatureGroup) error {
+func printFeatureGroups(featureGroups []*types.RichFeatureGroup) error {
 	w := csv.NewWriter(os.Stdout)
 
-	if err := w.Write([]string{"Name", "Entity", "Description", "Revision", "DataTable", "CreateTime", "ModifyTime"}); err != nil {
+	if err := w.Write([]string{"Name", "Entity", "Description", "OnlineRevision", "OfflineLatestRevision", "OfflineLatestDataTable", "CreateTime", "ModifyTime"}); err != nil {
 		return err
 	}
-
+	var onlineRevision, offlineRevision, offlineDataTable string
 	for _, g := range featureGroups {
-		revision := ""
-		if g.Revision != nil {
-			revision = strconv.FormatInt(*g.Revision, 10)
+		onlineRevision = "<NULL>"
+		offlineRevision = "<NULL>"
+		offlineDataTable = "<NULL>"
+		if g.OnlineRevision != nil {
+			onlineRevision = fmt.Sprint(*g.OnlineRevision)
+		}
+		if g.OfflineRevision != nil {
+			offlineRevision = fmt.Sprint(*g.OfflineRevision)
 		}
 
-		dataTable := ""
-		if g.DataTable != nil {
-			dataTable = *g.DataTable
+		if g.OfflineDataTable != nil {
+			offlineDataTable = *g.OfflineDataTable
 		}
 
-		if err := w.Write([]string{g.Name, g.EntityName, g.Description, revision, dataTable,
+		if err := w.Write([]string{g.Name, g.EntityName, g.Description, onlineRevision, offlineRevision, offlineDataTable,
 			g.CreateTime.Format(time.RFC3339), g.ModifyTime.Format(time.RFC3339)}); err != nil {
 			return err
 		}
