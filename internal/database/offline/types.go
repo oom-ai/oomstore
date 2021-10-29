@@ -13,7 +13,7 @@ type JoinOpt struct {
 	Entity         *types.Entity
 	EntityRows     []types.EntityRow
 	RevisionRanges []*types.RevisionRange
-	Features       types.RichFeatureList
+	Features       types.FeatureList
 }
 
 type ImportOpt struct {

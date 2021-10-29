@@ -14,11 +14,11 @@ import (
 // GetHistoricalFeatureValues gets point-in-time feature values for each entity row;
 // currently, this API only supports batch features.
 func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.GetHistoricalFeatureValuesOpt) ([]*types.EntityRowWithFeatures, error) {
-	features, err := s.metadata.ListRichFeature(ctx, types.ListFeatureOpt{FeatureNames: opt.FeatureNames})
+	features, err := s.metadata.ListFeature(ctx, types.ListFeatureOpt{FeatureNames: opt.FeatureNames})
 	if err != nil {
 		return nil, err
 	}
-	batchFeatures := features.Filter(func(f *types.RichFeature) bool {
+	batchFeatures := features.Filter(func(f *types.Feature) bool {
 		return f.Category == types.BatchFeatureCategory
 	})
 
@@ -26,15 +26,15 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 	featureGroups := buildGroupToFeaturesMap(batchFeatures)
 
 	entityDataMap := make(map[string]dbutil.RowMap)
-	for _, richFeatures := range featureGroups {
-		if len(richFeatures) == 0 {
+	for _, features := range featureGroups {
+		if len(features) == 0 {
 			continue
 		}
-		revisionRanges, err := s.metadata.BuildRevisionRanges(ctx, richFeatures[0].GroupName)
+		revisionRanges, err := s.metadata.BuildRevisionRanges(ctx, features[0].GroupName)
 		if err != nil {
 			return nil, err
 		}
-		entity, err := s.metadata.GetEntity(ctx, richFeatures[0].EntityName)
+		entity, err := s.metadata.GetEntity(ctx, features[0].EntityName)
 		if err != nil {
 			return nil, err
 		}
@@ -42,7 +42,7 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 			Entity:         entity,
 			EntityRows:     opt.EntityRows,
 			RevisionRanges: revisionRanges,
-			Features:       richFeatures,
+			Features:       features,
 		})
 		if err != nil {
 			return nil, err
@@ -97,11 +97,11 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 }
 
 // key: group_name, value: slice of features
-func buildGroupToFeaturesMap(features types.RichFeatureList) map[string]types.RichFeatureList {
-	groups := make(map[string]types.RichFeatureList)
+func buildGroupToFeaturesMap(features types.FeatureList) map[string]types.FeatureList {
+	groups := make(map[string]types.FeatureList)
 	for _, f := range features {
 		if _, ok := groups[f.GroupName]; !ok {
-			groups[f.GroupName] = types.RichFeatureList{}
+			groups[f.GroupName] = types.FeatureList{}
 		}
 		groups[f.GroupName] = append(groups[f.GroupName], f)
 	}

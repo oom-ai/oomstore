@@ -18,11 +18,11 @@ var describeFeatureCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		featureName := args[0]
-		richFeature, err := oomStore.GetRichFeature(ctx, featureName)
+		feature, err := oomStore.GetFeature(ctx, featureName)
 		if err != nil {
 			log.Fatalf("failed getting feature %s, err %v\n", featureName, err)
 		}
-		fmt.Println(richFeature.String())
+		fmt.Println(feature.String())
 	},
 }
 
