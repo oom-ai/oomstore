@@ -178,8 +178,9 @@ func TestListEntity(t *testing.T) {
 func TestCreateFeature(t *testing.T) {
 	db := initAndOpenDB(t)
 	defer db.Close()
+	ctx := context.Background()
 
-	phoneOpt := metadata.CreateFeatureOpt{
+	opt := metadata.CreateFeatureOpt{
 		CreateFeatureOpt: types.CreateFeatureOpt{
 			FeatureName: "phone",
 			GroupName:   "device",
@@ -189,8 +190,82 @@ func TestCreateFeature(t *testing.T) {
 		ValueType: "string",
 	}
 
-	assert.Nil(t, db.CreateFeature(context.Background(), phoneOpt))
-	assert.Equal(t, db.CreateFeature(context.Background(), phoneOpt), fmt.Errorf("feature phone already exists"))
+	err := db.CreateFeature(ctx, opt)
+	assert.Nil(t, err)
+
+	var feature types.Feature
+	err = db.GetContext(ctx, &feature, "select * from feature where name = $1", opt.FeatureName)
+	assert.Nil(t, err)
+	assert.Equal(t, feature.Name, opt.FeatureName)
+	assert.Equal(t, feature.GroupName, opt.GroupName)
+	assert.Equal(t, feature.Description, opt.Description)
+	assert.Equal(t, feature.DBValueType, opt.DBValueType)
+	assert.Equal(t, feature.ValueType, opt.ValueType)
+}
+
+func TestCreateFeatureWithSameName(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
+	ctx := context.Background()
+
+	opt := metadata.CreateFeatureOpt{
+		CreateFeatureOpt: types.CreateFeatureOpt{
+			FeatureName: "phone",
+			GroupName:   "device",
+			DBValueType: "varchar(16)",
+		},
+	}
+
+	err := db.CreateFeature(ctx, opt)
+	assert.Nil(t, err)
+
+	err = db.CreateFeature(ctx, opt)
+	assert.Equal(t, err, fmt.Errorf("feature phone already exists"))
+
+	opt.GroupName = "new group"
+	assert.Equal(t, err, fmt.Errorf("feature phone already exists"))
+}
+
+func TestCreateFeatureWithSQLKeywrod(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
+	ctx := context.Background()
+
+	opt := metadata.CreateFeatureOpt{
+		CreateFeatureOpt: types.CreateFeatureOpt{
+			FeatureName: "group",
+			GroupName:   "select",
+			DBValueType: "int",
+			Description: "order",
+		},
+	}
+
+	err := db.CreateFeature(ctx, opt)
+	assert.Nil(t, err)
+
+	var feature types.Feature
+	err = db.GetContext(ctx, &feature, "select * from feature where name = $1", "group")
+	assert.Nil(t, err)
+	assert.Equal(t, feature.Name, "group")
+	assert.Equal(t, feature.GroupName, "select")
+	assert.Equal(t, feature.Description, "order")
+}
+
+func TestCreateFeatureWithInvalidDataType(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
+	ctx := context.Background()
+
+	opt := metadata.CreateFeatureOpt{
+		CreateFeatureOpt: types.CreateFeatureOpt{
+			FeatureName: "model",
+			GroupName:   "phone",
+			DBValueType: "invalid_type",
+		},
+	}
+
+	err := db.CreateFeature(ctx, opt)
+	assert.NotNil(t, err)
 }
 
 func TestGetFeature(t *testing.T) {
