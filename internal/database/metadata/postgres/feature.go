@@ -32,45 +32,33 @@ func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) 
 
 func (db *DB) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
 	var feature types.Feature
-	return &feature, db.getFeature(ctx, featureName, "feature", &feature)
-}
-
-func (db *DB) GetRichFeature(ctx context.Context, featureName string) (*types.RichFeature, error) {
-	var feature types.RichFeature
-	return &feature, db.getFeature(ctx, featureName, "rich_feature", &feature)
+	query := `SELECT * FROM "rich_feature" WHERE name = $1`
+	if err := db.GetContext(ctx, &feature, query, featureName); err != nil {
+		return nil, err
+	}
+	return &feature, nil
 }
 
 func (db *DB) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
 	features := types.FeatureList{}
-	return features, db.listFeature(ctx, opt, "feature", &features)
-}
-
-func (db *DB) ListRichFeature(ctx context.Context, opt types.ListFeatureOpt) (types.RichFeatureList, error) {
-	features := types.RichFeatureList{}
-	return features, db.listFeature(ctx, opt, "rich_feature", &features)
+	query := `SELECT * FROM "rich_feature"`
+	cond, args, err := buildListFeatureCond(opt)
+	if err != nil {
+		return nil, err
+	}
+	if len(cond) > 0 {
+		query = fmt.Sprintf("%s WHERE %s", query, cond)
+	}
+	if err := db.SelectContext(ctx, &features, db.Rebind(query), args...); err != nil {
+		return nil, err
+	}
+	return features, nil
 }
 
 func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
 	query := "UPDATE feature SET description = $1 WHERE name = $2"
 	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName)
 	return err
-}
-
-func (db *DB) getFeature(ctx context.Context, featureName string, source string, feature interface{}) error {
-	query := fmt.Sprintf(`SELECT * FROM "%s" WHERE name = $1`, source)
-	return db.GetContext(ctx, feature, query, featureName)
-}
-
-func (db *DB) listFeature(ctx context.Context, opt types.ListFeatureOpt, source string, features interface{}) error {
-	query := fmt.Sprintf(`SELECT * FROM "%s"`, source)
-	cond, args, err := buildListFeatureCond(opt)
-	if err != nil {
-		return err
-	}
-	if len(cond) > 0 {
-		query = fmt.Sprintf("%s WHERE %s", query, cond)
-	}
-	return db.SelectContext(ctx, features, db.Rebind(query), args...)
 }
 
 func buildListFeatureCond(opt types.ListFeatureOpt) (string, []interface{}, error) {

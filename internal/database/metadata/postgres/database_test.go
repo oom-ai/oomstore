@@ -213,7 +213,7 @@ func TestFeature(t *testing.T) {
 		assert.Equal(t, phoneOpt.DBValueType, feature.DBValueType)
 		assert.Equal(t, phoneOpt.ValueType, feature.ValueType)
 		assert.Equal(t, phoneOpt.Description, feature.Description)
-
+		assert.Equal(t, "batch", feature.Category)
 	}
 
 	// testUpdateFeature
@@ -237,72 +237,6 @@ func TestFeature(t *testing.T) {
 
 		groupName := "device"
 		features, err = store.ListFeature(context.Background(), types.ListFeatureOpt{GroupName: &groupName})
-		assert.Nil(t, err)
-		assert.Equal(t, 2, len(features))
-	}
-}
-
-func TestRichFeature(t *testing.T) {
-	initDB(t)
-
-	store, err := Open(&test.PostgresDbopt)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer store.Close()
-
-	phoneOpt := metadata.CreateFeatureOpt{
-		CreateFeatureOpt: types.CreateFeatureOpt{
-			FeatureName: "phone",
-			GroupName:   "device",
-			DBValueType: "varchar(16)",
-			Description: "description",
-		},
-		ValueType: "string",
-	}
-	priceOpt := metadata.CreateFeatureOpt{
-		CreateFeatureOpt: types.CreateFeatureOpt{
-			FeatureName: "price",
-			GroupName:   "device",
-			DBValueType: "varchar(16)",
-			Description: "description",
-		},
-		ValueType: "string",
-	}
-
-	assert.Nil(t, store.CreateEntity(context.Background(), types.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "description",
-	}))
-	assert.Nil(t, store.CreateFeatureGroup(context.Background(), metadata.CreateFeatureGroupOpt{
-		CreateFeatureGroupOpt: types.CreateFeatureGroupOpt{
-			Name:        "device",
-			EntityName:  "device",
-			Description: "description",
-		},
-		Category: types.BatchFeatureCategory,
-	}))
-	assert.Nil(t, store.CreateFeature(context.Background(), phoneOpt))
-	assert.Nil(t, store.CreateFeature(context.Background(), priceOpt))
-
-	// test GetRichFeature
-	{
-		feature, err := store.GetRichFeature(context.Background(), "phone")
-		assert.Nil(t, err)
-
-		assert.Equal(t, phoneOpt.FeatureName, feature.Name)
-		assert.Equal(t, phoneOpt.GroupName, feature.GroupName)
-		assert.Equal(t, phoneOpt.DBValueType, feature.DBValueType)
-		assert.Equal(t, phoneOpt.ValueType, feature.ValueType)
-		assert.Equal(t, phoneOpt.Description, feature.Description)
-		assert.Equal(t, "batch", feature.Category)
-	}
-
-	// test ListRichFeatuer
-	{
-		groupName := "device"
-		features, err := store.ListRichFeature(context.Background(), types.ListFeatureOpt{GroupName: &groupName})
 		assert.Nil(t, err)
 		assert.Equal(t, 2, len(features))
 	}

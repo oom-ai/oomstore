@@ -27,13 +27,13 @@ var listFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
 		defer oomStore.Close()
 
-		features, err := oomStore.ListRichFeature(ctx, listFeatureOpt)
+		features, err := oomStore.ListFeature(ctx, listFeatureOpt)
 		if err != nil {
 			log.Fatalf("failed listing features given option %v, error %v\n", listFeatureOpt, err)
 		}
 
 		// print csv to stdout
-		fmt.Println(types.RichFeatureCsvHeader())
+		fmt.Println(types.FeatureCsvHeader())
 		for _, feature := range features {
 			fmt.Println(feature.ToCsvRecord())
 		}

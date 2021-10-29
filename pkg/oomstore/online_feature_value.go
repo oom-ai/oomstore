@@ -12,7 +12,7 @@ import (
 func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (types.FeatureValueMap, error) {
 	m := make(map[string]interface{})
 
-	features, err := s.metadata.ListRichFeature(ctx, types.ListFeatureOpt{FeatureNames: opt.FeatureNames})
+	features, err := s.metadata.ListFeature(ctx, types.ListFeatureOpt{FeatureNames: opt.FeatureNames})
 	if err != nil {
 		return m, err
 	}
@@ -35,7 +35,7 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 			EntityName:  *entityName,
 			RevisionId:  onlineRevisionId,
 			EntityKey:   opt.EntityKey,
-			FeatureList: features.ToFeatureList(),
+			FeatureList: features,
 		})
 		if err != nil {
 			return m, err
@@ -48,7 +48,7 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 }
 
 func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
-	features, err := s.metadata.ListRichFeature(ctx, types.ListFeatureOpt{FeatureNames: opt.FeatureNames})
+	features, err := s.metadata.ListFeature(ctx, types.ListFeatureOpt{FeatureNames: opt.FeatureNames})
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	return buildFeatureDataSet(featureValueMap, opt)
 }
 
-func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int32]types.RichFeatureList, entityName string) (map[string]dbutil.RowMap, error) {
+func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int32]types.FeatureList, entityName string) (map[string]dbutil.RowMap, error) {
 	// entity_key -> types.RecordMap
 	featureValueMap := make(map[string]dbutil.RowMap)
 
@@ -84,7 +84,7 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 			EntityName:  entityName,
 			RevisionId:  onlineRevisionId,
 			EntityKeys:  entityKeys,
-			FeatureList: features.ToFeatureList(),
+			FeatureList: features,
 		})
 		if err != nil {
 			return nil, err
@@ -101,7 +101,7 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
-func filterAvailableFeatures(features types.RichFeatureList) (rs types.RichFeatureList) {
+func filterAvailableFeatures(features types.FeatureList) (rs types.FeatureList) {
 	for _, f := range features {
 		if f.OnlineRevisionID != nil {
 			rs = append(rs, f)
@@ -110,8 +110,8 @@ func filterAvailableFeatures(features types.RichFeatureList) (rs types.RichFeatu
 	return
 }
 
-func groupFeaturesByRevisionId(features types.RichFeatureList) map[int32]types.RichFeatureList {
-	featureMap := make(map[int32]types.RichFeatureList)
+func groupFeaturesByRevisionId(features types.FeatureList) map[int32]types.FeatureList {
+	featureMap := make(map[int32]types.FeatureList)
 	for _, f := range features {
 		if f.OnlineRevisionID == nil {
 			continue
@@ -121,7 +121,7 @@ func groupFeaturesByRevisionId(features types.RichFeatureList) map[int32]types.R
 	return featureMap
 }
 
-func getEntityName(features types.RichFeatureList) (*string, error) {
+func getEntityName(features types.FeatureList) (*string, error) {
 	m := make(map[string]string)
 	for _, f := range features {
 		m[f.EntityName] = f.Name
