@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/jackc/pgerrcode"
+	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -16,6 +18,13 @@ func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeature
 	}
 	query := "insert into feature_group(name, entity_name, category, description) values($1, $2, $3, $4)"
 	_, err := db.ExecContext(ctx, query, opt.Name, opt.EntityName, opt.Category, opt.Description)
+	if err != nil {
+		if e2, ok := err.(*pq.Error); ok {
+			if e2.Code == pgerrcode.UniqueViolation {
+				return fmt.Errorf("feature group %s already exist", opt.Name)
+			}
+		}
+	}
 	return err
 }
 
@@ -49,7 +58,10 @@ func (db *DB) listFeatureGroup(ctx context.Context, entityName *string, source s
 
 func (db *DB) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
 	var group types.FeatureGroup
-	return &group, db.getFeatureGroup(ctx, groupName, "feature_group", &group)
+	if err := db.getFeatureGroup(ctx, groupName, "feature_group", &group); err != nil {
+		return nil, err
+	}
+	return &group, nil
 }
 
 func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
@@ -68,11 +80,18 @@ func (db *DB) ListRichFeatureGroup(ctx context.Context, entityName *string) ([]*
 	return groups, db.listFeatureGroup(ctx, entityName, "rich_feature_group", &groups)
 }
 
-func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
+func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error) {
 	cond, args := buildUpdateFeatureGroupCond(opt)
+	if len(cond) == 0 {
+		return 0, fmt.Errorf("invliad option: nothing to update")
+	}
+
 	query := fmt.Sprintf("UPDATE feature_group SET %s WHERE name = $%d", strings.Join(cond, ","), len(cond)+1)
-	_, err := db.ExecContext(ctx, query, args...)
-	return err
+	if result, err := db.ExecContext(ctx, query, args...); err != nil {
+		return 0, err
+	} else {
+		return result.RowsAffected()
+	}
 }
 
 func buildUpdateFeatureGroupCond(opt types.UpdateFeatureGroupOpt) ([]string, []interface{}) {
