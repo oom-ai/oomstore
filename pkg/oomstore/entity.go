@@ -23,6 +23,6 @@ func (s *OomStore) ListEntity(ctx context.Context) ([]*types.Entity, error) {
 	return s.metadata.ListEntity(ctx)
 }
 
-func (s *OomStore) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) error {
+func (s *OomStore) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) (int64, error) {
 	return s.metadata.UpdateEntity(ctx, opt)
 }

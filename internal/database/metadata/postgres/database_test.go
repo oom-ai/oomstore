@@ -133,19 +133,23 @@ func TestUpdateEntity(t *testing.T) {
 		Description: "description",
 	}))
 
-	assert.Nil(t, db.UpdateEntity(context.Background(), types.UpdateEntityOpt{
+	rowsAffected, err := db.UpdateEntity(context.Background(), types.UpdateEntityOpt{
 		EntityName:     "device",
 		NewDescription: "new description",
-	}))
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(1), rowsAffected)
 
 	entity, err := db.GetEntity(context.Background(), "device")
 	assert.Nil(t, err)
 	assert.Equal(t, entity.Description, "new description")
 
-	assert.Nil(t, db.UpdateEntity(context.Background(), types.UpdateEntityOpt{
+	rowsAffected, err = db.UpdateEntity(context.Background(), types.UpdateEntityOpt{
 		EntityName:     "invalid_entity_name",
 		NewDescription: "new description",
-	}))
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(0), rowsAffected)
 }
 
 func TestListEntity(t *testing.T) {
@@ -373,9 +377,11 @@ func TestUpdateFeatuer(t *testing.T) {
 	db := initAndOpenDB(t)
 	defer db.Close()
 
-	assert.Nil(t, db.UpdateFeature(context.Background(), types.UpdateFeatureOpt{
+	rowsAffected, err := db.UpdateFeature(context.Background(), types.UpdateFeatureOpt{
 		FeatureName: "invalid_feature_name",
-	}))
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(0), rowsAffected)
 
 	assert.Nil(t, db.CreateEntity(context.Background(), types.CreateEntityOpt{
 		Name:        "device",
@@ -402,10 +408,12 @@ func TestUpdateFeatuer(t *testing.T) {
 	}
 	assert.Nil(t, db.CreateFeature(context.Background(), phoneOpt))
 
-	assert.Nil(t, db.UpdateFeature(context.Background(), types.UpdateFeatureOpt{
+	rowsAffected, err = db.UpdateFeature(context.Background(), types.UpdateFeatureOpt{
 		FeatureName:    phoneOpt.FeatureName,
 		NewDescription: "new description",
-	}))
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(1), rowsAffected)
 
 	feature, err := db.GetFeature(context.Background(), "phone")
 	assert.Nil(t, err)

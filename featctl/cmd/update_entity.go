@@ -22,7 +22,7 @@ var updateEntityCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if err := oomStore.UpdateEntity(ctx, updateEntityOpt); err != nil {
+		if _, err := oomStore.UpdateEntity(ctx, updateEntityOpt); err != nil {
 			log.Fatalf("failed updating entity %s, err %v\n", updateEntityOpt.EntityName, err)
 		}
 	},
