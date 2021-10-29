@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+SDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 PATH="$SDIR/../build:$PATH"
 
@@ -15,6 +16,7 @@ export FEATCTL_HOST=127.0.0.1
 export FEATCTL_PORT=5432
 export FEATCTL_USER=postgres
 export FEATCTL_PASS=postgres
+export FEATCTL_CONFIG="$SDIR/config.yaml"
 
 trim() {
     local var="$*"

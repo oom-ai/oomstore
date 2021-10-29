@@ -11,7 +11,7 @@ import (
 )
 
 type initOption struct {
-	types.OomStoreOpt
+	types.OomStoreOptV2
 }
 
 var initOpt initOption
@@ -20,8 +20,8 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "initialize a feature store",
 	Run: func(cmd *cobra.Command, args []string) {
-		initOpt.OomStoreOpt = oomStoreOpt
-		if _, err := oomstore.Create(context.Background(), initOpt.OomStoreOpt); err != nil {
+		initOpt.OomStoreOptV2 = oomStoreOpt
+		if _, err := oomstore.Create(context.Background(), initOpt.OomStoreOptV2); err != nil {
 			log.Fatal(err)
 		}
 	},
