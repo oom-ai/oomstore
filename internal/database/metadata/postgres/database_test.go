@@ -99,7 +99,7 @@ func TestCreateEntity(t *testing.T) {
 		Name:        "device",
 		Length:      32,
 		Description: "description",
-	}), fmt.Errorf("entity device already exist!"))
+	}), fmt.Errorf("entity device already exists"))
 }
 
 func TestGetEntity(t *testing.T) {
@@ -190,7 +190,7 @@ func TestCreateFeature(t *testing.T) {
 	}
 
 	assert.Nil(t, db.CreateFeature(context.Background(), phoneOpt))
-	assert.Equal(t, db.CreateFeature(context.Background(), phoneOpt), fmt.Errorf("feature phone already exist"))
+	assert.Equal(t, db.CreateFeature(context.Background(), phoneOpt), fmt.Errorf("feature phone already exists"))
 }
 
 func TestGetFeature(t *testing.T) {
