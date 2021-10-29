@@ -28,7 +28,7 @@ var listRevisionCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
 		revisions, err := oomStore.ListRevision(ctx, listRevisionOpt.GroupName)

@@ -19,7 +19,7 @@ var updateEntityCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
 		if err := oomStore.UpdateEntity(ctx, updateEntityOpt); err != nil {

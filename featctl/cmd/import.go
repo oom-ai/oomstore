@@ -15,7 +15,7 @@ var importCmd = &cobra.Command{
 	Short: "import feature data from a csv file",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
 		log.Println("importing features ...")

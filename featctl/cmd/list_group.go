@@ -31,7 +31,7 @@ var listFeatureGroupCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
 		groups, err := oomStore.ListRichFeatureGroup(ctx, listFeatureGroupOpt.EntityName)

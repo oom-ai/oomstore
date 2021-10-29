@@ -14,7 +14,7 @@ var joinHistoricalFeatureCmd = &cobra.Command{
 	Short: "join training label data set with historical feature values",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
 		if err := joinHistoricalFeatures(ctx, oomStore, joinHistoricalFeatureOpt); err != nil {

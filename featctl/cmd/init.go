@@ -4,24 +4,15 @@ import (
 	"context"
 	"log"
 
-	"github.com/spf13/cobra"
-
 	"github.com/oom-ai/oomstore/pkg/oomstore"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/spf13/cobra"
 )
-
-type initOption struct {
-	types.OomStoreOpt
-}
-
-var initOpt initOption
 
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "initialize a feature store",
 	Run: func(cmd *cobra.Command, args []string) {
-		initOpt.OomStoreOpt = oomStoreOpt
-		if _, err := oomstore.Create(context.Background(), initOpt.OomStoreOpt); err != nil {
+		if _, err := oomstore.Create(context.Background(), oomStoreCfg); err != nil {
 			log.Fatal(err)
 		}
 	},

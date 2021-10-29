@@ -10,8 +10,8 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func CreateDatabase(ctx context.Context, opt types.PostgresDbOpt) (err error) {
-	db, err := OpenWith(opt.Host, opt.Port, opt.User, opt.Pass, "")
+func CreateDatabase(ctx context.Context, opt types.PostgresOpt) (err error) {
+	db, err := OpenWith(opt.Host, opt.Port, opt.User, opt.Password, "")
 	if err != nil {
 		return
 	}
@@ -24,7 +24,7 @@ func CreateDatabase(ctx context.Context, opt types.PostgresDbOpt) (err error) {
 	return createMetaSchemas(ctx, opt)
 }
 
-func createMetaSchemas(ctx context.Context, opt types.PostgresDbOpt) (err error) {
+func createMetaSchemas(ctx context.Context, opt types.PostgresOpt) (err error) {
 	db, err := Open(&opt)
 	if err != nil {
 		return
