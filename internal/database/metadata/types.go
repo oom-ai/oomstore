@@ -12,7 +12,7 @@ type CreateFeatureGroupOpt struct {
 	Category string
 }
 
-type InsertRevisionOpt struct {
+type CreateRevisionOpt struct {
 	Revision    int64
 	GroupName   string
 	DataTable   string

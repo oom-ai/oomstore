@@ -71,7 +71,7 @@ func (db *DB) GetRevisionsByDataTables(ctx context.Context, dataTables []string)
 	return revisions, nil
 }
 
-func (db *DB) InsertRevision(ctx context.Context, opt metadata.InsertRevisionOpt) error {
+func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) error {
 	query := "INSERT INTO feature_group_revision(group_name, revision, data_table, description) VALUES ($1, $2, $3, $4)"
 	_, err := db.ExecContext(ctx, query, opt.GroupName, opt.Revision, opt.DataTable, opt.Description)
 	if err != nil {
