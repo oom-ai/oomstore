@@ -17,39 +17,39 @@ import (
 	onlineRedis "github.com/oom-ai/oomstore/internal/database/online/redis"
 )
 
-func OpenOnlineStore(opt types.OnlineStoreOpt) (online.Store, error) {
+func OpenOnlineStore(opt types.OnlineStoreConfig) (online.Store, error) {
 	switch opt.Backend {
 	case types.POSTGRES:
-		return onlinePG.Open(opt.PostgresDbOpt)
+		return onlinePG.Open(opt.Postgres)
 	case types.REDIS:
-		return onlineRedis.Open(opt.RedisDbOpt), nil
+		return onlineRedis.Open(opt.Redis), nil
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
 }
 
-func OpenMetadataStore(opt types.MetaStoreOpt) (metadata.Store, error) {
+func OpenMetadataStore(opt types.MetaStoreConfig) (metadata.Store, error) {
 	switch opt.Backend {
 	case types.POSTGRES:
-		return metadataPG.Open(opt.PostgresDbOpt)
+		return metadataPG.Open(opt.Postgres)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
 }
 
-func CreateMetadataDatabase(ctx context.Context, opt types.MetaStoreOpt) error {
+func CreateMetadataDatabase(ctx context.Context, opt types.MetaStoreConfig) error {
 	switch opt.Backend {
 	case types.POSTGRES:
-		return metadataPG.CreateDatabase(ctx, *opt.PostgresDbOpt)
+		return metadataPG.CreateDatabase(ctx, *opt.Postgres)
 	default:
 		return fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
 }
 
-func OpenOfflineStore(opt types.OfflineStoreOpt) (offline.Store, error) {
+func OpenOfflineStore(opt types.OfflineStoreConfig) (offline.Store, error) {
 	switch opt.Backend {
 	case types.POSTGRES:
-		return offlinePG.Open(opt.PostgresDbOpt)
+		return offlinePG.Open(opt.Postgres)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}

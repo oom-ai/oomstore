@@ -1,4 +1,4 @@
-online-store:
+onestore: &onestore
   backend: postgres
   postgres:
     host: 127.0.0.1
@@ -7,20 +7,6 @@ online-store:
     password: postgres
     database: oomstore
 
-offline-store:
-  backend: postgres
-  postgres:
-    host: 127.0.0.1
-    port: 5432
-    user: postgres
-    password: postgres
-    database: oomstore
-
-meta-store:
-  backend: postgres
-  postgres:
-    host: 127.0.0.1
-    port: 5432
-    user: postgres
-    password: postgres
-    database: oomstore
+online-store: *onestore
+offline-store: *onestore
+meta-store: *onestore

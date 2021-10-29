@@ -12,10 +12,6 @@ RST=$(tput sgr0    2>/dev/null || true)
 GRN=$(tput setaf 2 2>/dev/null || true)
 YLW=$(tput setaf 3 2>/dev/null || true)
 
-export FEATCTL_HOST=127.0.0.1
-export FEATCTL_PORT=5432
-export FEATCTL_USER=postgres
-export FEATCTL_PASS=postgres
 export FEATCTL_CONFIG="$SDIR/config.yaml"
 
 trim() {

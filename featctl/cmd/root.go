@@ -17,7 +17,7 @@ import (
 var cfgFile string
 var defaultCfgFile = filepath.Join(xdg.ConfigHome, "featctl", "config.yaml")
 
-var oomStoreOpt types.OomStoreOpt
+var oomStoreCfg types.OomStoreConfig
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -60,7 +60,7 @@ func initConfig() {
 		panic(fmt.Sprintf("failed reading config file: %v\n", err))
 	}
 
-	if err := yaml.Unmarshal(cfgContent, &oomStoreOpt); err != nil {
+	if err := yaml.Unmarshal(cfgContent, &oomStoreCfg); err != nil {
 		panic(fmt.Sprintf("failed loading config : %v\n", err))
 	}
 }

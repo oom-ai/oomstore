@@ -16,16 +16,16 @@ type DB struct {
 	*sqlx.DB
 }
 
-func Open(option *types.PostgresDbOpt) (*DB, error) {
-	return OpenWith(option.Host, option.Port, option.User, option.Pass, option.Database)
+func Open(option *types.PostgresOpt) (*DB, error) {
+	return OpenWith(option.Host, option.Port, option.User, option.Password, option.Database)
 }
 
-func OpenWith(host, port, user, pass, database string) (*DB, error) {
+func OpenWith(host, port, user, password, database string) (*DB, error) {
 	db, err := sqlx.Open(
 		"postgres",
 		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 			user,
-			pass,
+			password,
 			host,
 			port,
 			database),
