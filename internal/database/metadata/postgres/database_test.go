@@ -536,24 +536,24 @@ func TestRevision(t *testing.T) {
 		Category: types.BatchFeatureCategory,
 	}))
 
-	opt1 := metadata.InsertRevisionOpt{
+	opt1 := metadata.CreateRevisionOpt{
 		GroupName:   "device_baseinfo",
 		Revision:    20211028,
 		DataTable:   "device_bastinfo_20211028",
 		Description: "description",
 	}
 
-	opt2 := metadata.InsertRevisionOpt{
+	opt2 := metadata.CreateRevisionOpt{
 		GroupName:   "device_baseinfo",
 		Revision:    20211029,
 		DataTable:   "device_bastinfo_20211029",
 		Description: "description",
 	}
 
-	// test InsertRevision
+	// test CreateRevision
 	{
-		assert.Nil(t, store.InsertRevision(context.Background(), opt1))
-		assert.Nil(t, store.InsertRevision(context.Background(), opt2))
+		assert.Nil(t, store.CreateRevision(context.Background(), opt1))
+		assert.Nil(t, store.CreateRevision(context.Background(), opt2))
 	}
 
 	// test GetRevision and GetRevisionsByDataTables

@@ -96,7 +96,7 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return err
 	}
 
-	return s.metadata.InsertRevision(ctx, metadata.InsertRevisionOpt{
+	return s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:    revision,
 		GroupName:   opt.GroupName,
 		DataTable:   dataTable,
