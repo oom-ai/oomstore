@@ -22,7 +22,7 @@ var registerEntityCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if _, err := oomStore.CreateEntity(ctx, registerEntityOpt); err != nil {
+		if err := oomStore.CreateEntity(ctx, registerEntityOpt); err != nil {
 			log.Fatalf("failed registering new entity: %v\n", err)
 		}
 	},
