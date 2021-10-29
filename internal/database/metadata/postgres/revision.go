@@ -44,7 +44,11 @@ func (db *DB) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*ty
 	if err != nil {
 		return nil, err
 	}
-	query := fmt.Sprintf("SELECT * FROM feature_group_revision WHERE %s", strings.Join(cond, " AND "))
+	query := "SELECT * FROM feature_group_revision"
+	if len(cond) > 0 {
+		query = fmt.Sprintf("%s WHERE %s", query, strings.Join(cond, " AND "))
+	}
+
 	var rs types.Revision
 	if err := db.GetContext(ctx, &rs, db.Rebind(query), args...); err != nil {
 		return nil, err
@@ -72,8 +76,8 @@ func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt
 	_, err := db.ExecContext(ctx, query, opt.GroupName, opt.Revision, opt.DataTable, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
-			if e2.Code == pgerrcode.DuplicateColumn {
-				return fmt.Errorf("revision %v already exists", opt.Revision)
+			if e2.Code == pgerrcode.UniqueViolation {
+				return fmt.Errorf("revision %v already exist", opt.Revision)
 			}
 		}
 	}
