@@ -7,7 +7,7 @@ const (
 	REDIS    BackendType = "redis"
 )
 
-type OomStoreOptV2 struct {
+type OomStoreOpt struct {
 	MetaStoreOpt    MetaStoreOpt    `yaml:"meta-store"`
 	OfflineStoreOpt OfflineStoreOpt `yaml:"offline-store"`
 	OnlineStoreOpt  OnlineStoreOpt  `yaml:"online-store"`

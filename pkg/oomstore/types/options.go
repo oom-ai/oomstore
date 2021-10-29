@@ -1,32 +1,5 @@
 package types
 
-type OomStoreOpt struct {
-	Host      string
-	Port      string
-	User      string
-	Pass      string
-	Workspace string
-}
-
-func (opt *OomStoreOpt) ToOomStoreOptV2() *OomStoreOptV2 {
-	if opt == nil {
-		return nil
-	}
-
-	postgresOpt := PostgresDbOpt{
-		Host:     opt.Host,
-		Port:     opt.Port,
-		User:     opt.User,
-		Pass:     opt.Pass,
-		Database: opt.Workspace,
-	}
-	return &OomStoreOptV2{
-		MetaStoreOpt:    MetaStoreOpt{PostgresDbOpt: &postgresOpt, Backend: POSTGRES},
-		OnlineStoreOpt:  OnlineStoreOpt{PostgresDbOpt: &postgresOpt, Backend: POSTGRES},
-		OfflineStoreOpt: OfflineStoreOpt{PostgresDbOpt: &postgresOpt, Backend: POSTGRES},
-	}
-}
-
 type CreateFeatureOpt struct {
 	FeatureName string
 	GroupName   string

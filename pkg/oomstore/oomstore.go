@@ -18,7 +18,7 @@ type OomStore struct {
 	metadata metadata.Store
 }
 
-func Open(ctx context.Context, opt types.OomStoreOptV2) (*OomStore, error) {
+func Open(ctx context.Context, opt types.OomStoreOpt) (*OomStore, error) {
 	onlineStore, err := database.OpenOnlineStore(opt.OnlineStoreOpt)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func Open(ctx context.Context, opt types.OomStoreOptV2) (*OomStore, error) {
 	}, nil
 }
 
-func Create(ctx context.Context, opt types.OomStoreOptV2) (*OomStore, error) {
+func Create(ctx context.Context, opt types.OomStoreOpt) (*OomStore, error) {
 	if err := database.CreateMetadataDatabase(ctx, opt.MetaStoreOpt); err != nil {
 		return nil, err
 	}
