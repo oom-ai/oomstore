@@ -17,7 +17,7 @@ import (
 var cfgFile string
 var defaultCfgFile = filepath.Join(xdg.ConfigHome, "featctl", "config.yaml")
 
-var oomStoreOpt types.OomStoreOptV2
+var oomStoreOpt types.OomStoreOpt
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
