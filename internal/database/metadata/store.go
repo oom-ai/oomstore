@@ -36,7 +36,7 @@ type Store interface {
 	GetRevisionsByDataTables(ctx context.Context, dataTables []string) ([]*types.Revision, error)
 	GetLatestRevision(ctx context.Context, groupName string) (*types.Revision, error)
 	BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error)
-	InsertRevision(ctx context.Context, opt InsertRevisionOpt) error
+	CreateRevision(ctx context.Context, opt CreateRevisionOpt) error
 
 	io.Closer
 }
