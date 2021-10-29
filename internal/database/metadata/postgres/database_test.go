@@ -522,87 +522,70 @@ func TestListFeatureGroup(t *testing.T) {
 	assert.Equal(t, 0, len(fgs))
 }
 
-func TestRevision(t *testing.T) {
-	initDB(t)
+func TestCreateRevision(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
 
-	store, err := Open(&test.PostgresDbopt)
-	assert.Nil(t, err)
-	defer store.Close()
-
-	assert.Nil(t, store.CreateEntity(context.Background(), types.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "description",
-	}))
-
-	assert.Nil(t, store.CreateFeatureGroup(context.Background(), metadata.CreateFeatureGroupOpt{
-		CreateFeatureGroupOpt: types.CreateFeatureGroupOpt{
-			Name:        "deviec_baseinfo",
-			EntityName:  "device",
-			Description: "description",
-		},
-		Category: types.BatchFeatureCategory,
-	}))
-
-	opt1 := metadata.CreateRevisionOpt{
+	opt := metadata.CreateRevisionOpt{
 		GroupName:   "device_baseinfo",
-		Revision:    20211028,
+		Revision:    1,
 		DataTable:   "device_bastinfo_20211028",
 		Description: "description",
 	}
 
-	opt2 := metadata.CreateRevisionOpt{
+	assert.Nil(t, db.CreateRevision(context.Background(), opt))
+	assert.Equal(t, db.CreateRevision(context.Background(), opt), fmt.Errorf("revision 1 already exist"))
+}
+
+func TestGetRevision(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
+
+	r, err := db.GetRevision(context.Background(), metadata.GetRevisionOpt{})
+	assert.NotNil(t, err)
+	assert.Nil(t, r)
+
+	opt := metadata.CreateRevisionOpt{
 		GroupName:   "device_baseinfo",
-		Revision:    20211029,
-		DataTable:   "device_bastinfo_20211029",
+		Revision:    1,
+		DataTable:   "device_bastinfo_20211028",
+		Description: "description",
+	}
+	assert.Nil(t, db.CreateRevision(context.Background(), opt))
+
+	groupName := "invalid-group-name"
+	r, err = db.GetRevision(context.Background(), metadata.GetRevisionOpt{
+		GroupName: &groupName,
+	})
+	assert.NotNil(t, err)
+	assert.Nil(t, r)
+
+	r, err = db.GetRevision(context.Background(), metadata.GetRevisionOpt{})
+	assert.Nil(t, err)
+	assert.Equal(t, opt.GroupName, r.GroupName)
+	assert.Equal(t, opt.Revision, r.Revision)
+	assert.Equal(t, opt.DataTable, r.DataTable)
+	assert.Equal(t, opt.Description, r.Description)
+}
+
+func TestListRevision(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
+
+	rs, err := db.ListRevision(context.Background(), nil)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(rs))
+
+	opt := metadata.CreateRevisionOpt{
+		GroupName:   "device_baseinfo",
+		Revision:    1,
+		DataTable:   "device_bastinfo_20211028",
 		Description: "description",
 	}
 
-	// test CreateRevision
-	{
-		assert.Nil(t, store.CreateRevision(context.Background(), opt1))
-		assert.Nil(t, store.CreateRevision(context.Background(), opt2))
-	}
+	assert.Nil(t, db.CreateRevision(context.Background(), opt))
 
-	// test GetRevision and GetRevisionsByDataTables
-	{
-		revision, err := store.GetRevision(context.Background(), metadata.GetRevisionOpt{
-			GroupName: &opt1.GroupName,
-			Revision:  &opt1.Revision,
-		})
-		assert.Nil(t, err)
-
-		assert.Equal(t, opt1.GroupName, revision.GroupName)
-		assert.Equal(t, opt1.Revision, revision.Revision)
-		assert.Equal(t, opt1.DataTable, revision.DataTable)
-		assert.Equal(t, opt1.Description, revision.Description)
-
-		invalidGroupName := "invalid group name"
-		invalidRevision := int64(0)
-		revision, err = store.GetRevision(context.Background(), metadata.GetRevisionOpt{
-			GroupName: &invalidGroupName,
-			Revision:  &invalidRevision,
-		})
-		assert.NotNil(t, err)
-		assert.Nil(t, revision)
-
-		revisios, err := store.GetRevisionsByDataTables(context.Background(),
-			[]string{"device_bastinfo_20211028", "device_bastinfo_20211029"})
-		assert.Nil(t, err)
-
-		assert.Equal(t, 2, len(revisios))
-	}
-
-	// test ListRevision
-	{
-		revisions, err := store.ListRevision(context.Background(), nil)
-		assert.Nil(t, err)
-		assert.Equal(t, 2, len(revisions))
-
-		groupName := "device_baseinfo"
-		revisions, err = store.ListRevision(context.Background(), &groupName)
-		assert.Nil(t, err)
-		assert.Equal(t, 2, len(revisions))
-	}
-
+	rs, err = db.ListRevision(context.Background(), nil)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(rs))
 }
