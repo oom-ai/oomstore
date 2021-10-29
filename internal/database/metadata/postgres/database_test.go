@@ -16,11 +16,11 @@ import (
 
 func initDB(t *testing.T) {
 	opt := test.PostgresDbopt
-	store, err := Open(&types.PostgresDbOpt{
+	store, err := Open(&types.PostgresOpt{
 		Host:     opt.Host,
 		Port:     opt.Port,
 		User:     opt.User,
-		Pass:     opt.Pass,
+		Password: opt.Password,
 		Database: "test",
 	})
 	if err != nil {
