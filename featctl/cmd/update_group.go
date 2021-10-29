@@ -22,7 +22,7 @@ var updateGroupCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
 		defer oomStore.Close()
 
-		if err := oomStore.UpdateFeatureGroup(ctx, updateGroupOpt); err != nil {
+		if _, err := oomStore.UpdateFeatureGroup(ctx, updateGroupOpt); err != nil {
 			log.Fatalf("failed updating group %s, err %v\n", updateGroupOpt.GroupName, err)
 		}
 	},
