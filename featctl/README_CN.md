@@ -176,16 +176,36 @@ device,20210907,device_20210907,定时导入,2021-09-07T15:20:43Z,2021-09-07T15:
 
 ## Config
 
-featctl 默认读取 `$XDG_CONFIG_HOME/featctl/config.yaml` 作为配置文件（可通过 `--config` 手动指定）：
+featctl 默认读取 `$XDG_CONFIG_HOME/featctl/config.yaml` 作为配置文件（可通过环境变量`FEATCTL_CONFIG` 或参数 `--config` 指定）：
 
 ```yaml
-host: 127.0.0.1
-port: 4000
-user: <user>
-pass: <password>
-```
+online-store:
+  backend: postgres
+  postgres:
+    host: 127.0.0.1
+    port: 5432
+    user: user
+    password: password
+    database: onlinestore
 
-如果没有提供配置文件，也可以在执行命令时手动指定以上参数。
+offline-store:
+  backend: postgres
+  postgres:
+    host: 127.0.0.1
+    port: 5432
+    user: user
+    password: password
+    database: offlinestore
+
+meta-store:
+  backend: postgres
+  postgres:
+    host: 127.0.0.1
+    port: 5432
+    user: user
+    password: password
+    database: metastore
+```
 
 ## Development
 
@@ -196,32 +216,15 @@ pip install pre-commit
 pre-commit install
 ```
 
-本地编译
+编译
 
 ```
 make build
 ```
 
-构建镜像
+测试
 
 ```
-make image
+make test
+make integration-test
 ```
-
-推送镜像
-
-```
-make image-push
-```
-
-## TODO
-
-- [x] `featctl init`
-- [x] `featctl query`
-- [x] `featctl export`
-- [x] `featctl import`
-- [x] `featctl list feature`
-- [x] `featctl list revision`
-- [x] `featctl register feature`
-- [x] `featctl describe feature`
-- [x] `featctl update   feature`
