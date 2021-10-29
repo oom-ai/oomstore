@@ -7,39 +7,39 @@ const (
 	REDIS    BackendType = "redis"
 )
 
-type OomStoreOptV2 struct {
-	MetaStoreOpt    MetaStoreOpt
-	OfflineStoreOpt OfflineStoreOpt
-	OnlineStoreOpt  OnlineStoreOpt
+type OomStoreConfig struct {
+	MetaStore    MetaStoreConfig    `yaml:"meta-store"`
+	OfflineStore OfflineStoreConfig `yaml:"offline-store"`
+	OnlineStore  OnlineStoreConfig  `yaml:"online-store"`
 }
 
-type OnlineStoreOpt struct {
-	Backend       BackendType
-	PostgresDbOpt *PostgresDbOpt
-	RedisDbOpt    *RedisDbOpt
+type OnlineStoreConfig struct {
+	Backend  BackendType  `yaml:"backend"`
+	Postgres *PostgresOpt `yaml:"postgres"`
+	Redis    *RedisOpt    `yaml:"redis"`
 }
 
-type OfflineStoreOpt struct {
-	Backend       BackendType
-	PostgresDbOpt *PostgresDbOpt
+type OfflineStoreConfig struct {
+	Backend  BackendType  `yaml:"backend"`
+	Postgres *PostgresOpt `yaml:"postgres"`
 }
 
-type MetaStoreOpt struct {
-	Backend       BackendType
-	PostgresDbOpt *PostgresDbOpt
+type MetaStoreConfig struct {
+	Backend  BackendType  `yaml:"backend"`
+	Postgres *PostgresOpt `yaml:"postgres"`
 }
 
-type RedisDbOpt struct {
-	Host     string
-	Port     string
-	Pass     string
-	Database int
+type RedisOpt struct {
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Password string `yaml:"password"`
+	Database int    `yaml:"database"`
 }
 
-type PostgresDbOpt struct {
-	Host     string
-	Port     string
-	User     string
-	Pass     string
-	Database string
+type PostgresOpt struct {
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	Database string `yaml:"database"`
 }

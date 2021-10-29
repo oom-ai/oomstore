@@ -17,7 +17,7 @@ var listEntityCmd = &cobra.Command{
 	Short: "list all existing entities",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oomStore := mustOpenOomStore(ctx, oomStoreOpt)
+		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
 		entities, err := oomStore.ListEntity(ctx)

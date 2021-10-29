@@ -8,8 +8,8 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func mustOpenOomStore(ctx context.Context, opt types.OomStoreOpt) *oomstore.OomStore {
-	store, err := oomstore.Open(ctx, oomStoreOpt)
+func mustOpenOomStore(ctx context.Context, opt types.OomStoreConfig) *oomstore.OomStore {
+	store, err := oomstore.Open(ctx, oomStoreCfg)
 	if err != nil {
 		log.Fatalf("failed opening OomStore: %v", err)
 	}

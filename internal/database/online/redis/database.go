@@ -17,10 +17,10 @@ type DB struct {
 	*redis.Client
 }
 
-func Open(opt *types.RedisDbOpt) *DB {
+func Open(opt *types.RedisOpt) *DB {
 	redisOpt := redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", opt.Host, opt.Port),
-		Password: opt.Pass,
+		Password: opt.Password,
 		DB:       opt.Database,
 	}
 	return &DB{redis.NewClient(&redisOpt)}
