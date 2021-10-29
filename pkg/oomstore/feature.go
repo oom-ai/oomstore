@@ -16,7 +16,7 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 	return s.metadata.ListFeature(ctx, opt)
 }
 
-func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
+func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error) {
 	return s.metadata.UpdateFeature(ctx, opt)
 }
 

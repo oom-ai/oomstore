@@ -12,13 +12,13 @@ type Store interface {
 	CreateEntity(ctx context.Context, opt types.CreateEntityOpt) error
 	GetEntity(ctx context.Context, name string) (*types.Entity, error)
 	ListEntity(ctx context.Context) ([]*types.Entity, error)
-	UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) error
+	UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) (int64, error)
 
 	// feature
 	CreateFeature(ctx context.Context, opt CreateFeatureOpt) error
 	GetFeature(ctx context.Context, featureName string) (*types.Feature, error)
 	ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error)
-	UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error
+	UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error)
 
 	// feature group
 	CreateFeatureGroup(ctx context.Context, opt CreateFeatureGroupOpt) error
