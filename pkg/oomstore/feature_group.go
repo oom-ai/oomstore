@@ -26,6 +26,6 @@ func (s *OomStore) ListFeatureGroup(ctx context.Context, entityName *string) ([]
 
 }
 
-func (s *OomStore) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
+func (s *OomStore) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error) {
 	return s.metadata.UpdateFeatureGroup(ctx, opt)
 }
