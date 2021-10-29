@@ -8,6 +8,7 @@ import (
 
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -81,33 +82,27 @@ func (db *DB) ListRichFeatureGroup(ctx context.Context, entityName *string) ([]*
 }
 
 func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error) {
-	cond, args := buildUpdateFeatureGroupCond(opt)
+	and := make(map[string]interface{})
+	if opt.Description != nil {
+		and["description"] = *opt.Description
+	}
+	if opt.OnlineRevisionId != nil {
+		and["online_revision_id"] = *opt.OnlineRevisionId
+	}
+	cond, args, err := dbutil.BuildConditions(and, nil)
+	if err != nil {
+		return 0, err
+	}
+	args = append(args, opt.GroupName)
+
 	if len(cond) == 0 {
 		return 0, fmt.Errorf("invliad option: nothing to update")
 	}
 
 	query := fmt.Sprintf("UPDATE feature_group SET %s WHERE name = $%d", strings.Join(cond, ","), len(cond)+1)
-	if result, err := db.ExecContext(ctx, query, args...); err != nil {
+	if result, err := db.ExecContext(ctx, db.Rebind(query), args...); err != nil {
 		return 0, err
 	} else {
 		return result.RowsAffected()
 	}
-}
-
-func buildUpdateFeatureGroupCond(opt types.UpdateFeatureGroupOpt) ([]string, []interface{}) {
-	cond := make([]string, 0)
-	args := make([]interface{}, 0)
-	var id int
-	if opt.Description != nil {
-		id++
-		cond = append(cond, fmt.Sprintf("description = $%d", id))
-		args = append(args, *opt.Description)
-	}
-	if opt.OnlineRevisionId != nil {
-		id++
-		cond = append(cond, fmt.Sprintf("online_revision_id = $%d", id))
-		args = append(args, *opt.OnlineRevisionId)
-	}
-	args = append(args, opt.GroupName)
-	return cond, args
 }

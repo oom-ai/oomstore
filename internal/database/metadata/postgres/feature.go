@@ -47,7 +47,7 @@ func (db *DB) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.
 		return nil, err
 	}
 	if len(cond) > 0 {
-		query = fmt.Sprintf("%s WHERE %s", query, cond)
+		query = fmt.Sprintf("%s WHERE %s", query, strings.Join(cond, " AND "))
 	}
 	if err := db.SelectContext(ctx, &features, db.Rebind(query), args...); err != nil {
 		return nil, err
@@ -61,29 +61,22 @@ func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) err
 	return err
 }
 
-func buildListFeatureCond(opt types.ListFeatureOpt) (string, []interface{}, error) {
-	cond := make([]string, 0)
-	args := make([]interface{}, 0)
+func buildListFeatureCond(opt types.ListFeatureOpt) ([]string, []interface{}, error) {
+	and := make(map[string]interface{})
+	in := make(map[string]interface{})
 	if opt.EntityName != nil {
-		cond = append(cond, "entity_name = ?")
-		args = append(args, *opt.EntityName)
+		and["entity_name"] = *opt.EntityName
 	}
 	if opt.GroupName != nil {
-		cond = append(cond, "group_name = ?")
-		args = append(args, *opt.GroupName)
+		and["group_name"] = *opt.GroupName
 	}
 	if opt.FeatureNames != nil {
 		if len(opt.FeatureNames) == 0 {
-			return "1 = 0", nil, nil
+			return []string{"1 = 0"}, nil, nil
 		}
-		s, inArgs, err := sqlx.In("name IN (?)", opt.FeatureNames)
-		if err != nil {
-			return "", nil, err
-		}
-		cond = append(cond, s)
-		args = append(args, inArgs...)
+		in["name"] = opt.FeatureNames
 	}
-	return strings.Join(cond, " AND "), args, nil
+	return dbutil.BuildConditions(and, in)
 }
 
 func (db *DB) validateDataType(ctx context.Context, dataType string) error {

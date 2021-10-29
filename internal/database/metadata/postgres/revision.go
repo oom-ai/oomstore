@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -29,28 +30,23 @@ func (db *DB) ListRevision(ctx context.Context, groupName *string) ([]*types.Rev
 }
 
 func (db *DB) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*types.Revision, error) {
-	cond := make([]string, 0)
-	args := make([]interface{}, 0)
-	var id int
+	and := make(map[string]interface{})
 	if opt.GroupName != nil {
-		id++
-		cond = append(cond, fmt.Sprintf("group_name = $%d", id))
-		args = append(args, *opt.GroupName)
+		and["group_name"] = *opt.GroupName
 	}
 	if opt.Revision != nil {
-		id++
-		cond = append(cond, fmt.Sprintf("revision = $%d", id))
-		args = append(args, *opt.Revision)
+		and["revision"] = *opt.Revision
 	}
 	if opt.RevisionId != nil {
-		id++
-		cond = append(cond, fmt.Sprintf("id = $%d", id))
-		args = append(args, *opt.RevisionId)
+		and["id"] = *opt.RevisionId
 	}
-
+	cond, args, err := dbutil.BuildConditions(and, nil)
+	if err != nil {
+		return nil, err
+	}
 	query := fmt.Sprintf("SELECT * FROM feature_group_revision WHERE %s", strings.Join(cond, " AND "))
 	var rs types.Revision
-	if err := db.GetContext(ctx, &rs, query, args...); err != nil {
+	if err := db.GetContext(ctx, &rs, db.Rebind(query), args...); err != nil {
 		return nil, err
 	}
 	return &rs, nil
