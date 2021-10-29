@@ -83,7 +83,7 @@ func (db *DB) ListRichFeatureGroup(ctx context.Context, entityName *string) ([]*
 func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error) {
 	cond, args := buildUpdateFeatureGroupCond(opt)
 	if len(cond) == 0 {
-		return 0, fmt.Errorf("illegal option: notting to updated")
+		return 0, fmt.Errorf("invliad option: nothing to update")
 	}
 
 	query := fmt.Sprintf("UPDATE feature_group SET %s WHERE name = $%d", strings.Join(cond, ","), len(cond)+1)
