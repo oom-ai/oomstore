@@ -22,7 +22,7 @@ var registerGroupCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if _, err := oomStore.CreateFeatureGroup(ctx, registerGroupOpt); err != nil {
+		if err := oomStore.CreateFeatureGroup(ctx, registerGroupOpt); err != nil {
 			log.Fatalf("failed registering new group: %v\n", err)
 		}
 	},
