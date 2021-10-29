@@ -23,7 +23,7 @@ func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) 
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
-				return fmt.Errorf("feature %s already exist", opt.FeatureName)
+				return fmt.Errorf("feature %s already exists", opt.FeatureName)
 			}
 		}
 	}

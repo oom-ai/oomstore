@@ -77,8 +77,7 @@ func (db *DB) InsertRevision(ctx context.Context, opt metadata.InsertRevisionOpt
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.DuplicateColumn {
-				return fmt.Errorf("revision %v already exist", opt.Revision)
-
+				return fmt.Errorf("revision %v already exists", opt.Revision)
 			}
 		}
 	}
