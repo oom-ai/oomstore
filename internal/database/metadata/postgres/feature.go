@@ -55,10 +55,13 @@ func (db *DB) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.
 	return features, nil
 }
 
-func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
+func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error) {
 	query := "UPDATE feature SET description = $1 WHERE name = $2"
-	_, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName)
-	return err
+	if result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName); err != nil {
+		return 0, err
+	} else {
+		return result.RowsAffected()
+	}
 }
 
 func buildListFeatureCond(opt types.ListFeatureOpt) ([]string, []interface{}, error) {
