@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -33,4 +34,22 @@ func BuildFeatureDataTableSchema(tableName string, entity *types.Entity, feature
 	schema = strings.ReplaceAll(schema, "{{ENTITY_LENGTH}}", strconv.Itoa(entity.Length))
 	schema = strings.ReplaceAll(schema, "{{COLUMN_DEFS}}", strings.Join(columnDefs, ",\n"))
 	return schema
+}
+
+func BuildConditions(equal map[string]interface{}, in map[string]interface{}) ([]string, []interface{}, error) {
+	cond := make([]string, 0)
+	args := make([]interface{}, 0)
+	for key, value := range equal {
+		cond = append(cond, fmt.Sprintf("%s = ?", key))
+		args = append(args, value)
+	}
+	for key, value := range in {
+		s, inArgs, err := sqlx.In(fmt.Sprintf("%s IN (?)", key), value)
+		if err != nil {
+			return nil, nil, err
+		}
+		cond = append(cond, s)
+		args = append(args, inArgs...)
+	}
+	return cond, args, nil
 }
