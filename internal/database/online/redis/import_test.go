@@ -5,7 +5,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"gotest.tools/v3/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestImport(t *testing.T) {
@@ -42,29 +42,29 @@ func TestImport(t *testing.T) {
 	}
 
 	err := store.Import(ctx, opt)
-	assert.NilError(t, err)
+	require.NoError(t, err)
 
 	{
 		field, err := SerializeByValue(feature1.ID)
-		assert.NilError(t, err)
+		require.NoError(t, err)
 		value, err := SerializeByValue(int16(18))
-		assert.NilError(t, err)
+		require.NoError(t, err)
 		key, err := SerializeRedisKey(revision.ID, "3215")
-		assert.NilError(t, err)
+		require.NoError(t, err)
 		age, err := store.HGet(ctx, key, field).Result()
-		assert.NilError(t, err)
-		assert.Equal(t, age, value)
+		require.NoError(t, err)
+		require.Equal(t, age, value)
 	}
 
 	{
 		field, err := SerializeByValue(feature2.ID)
-		assert.NilError(t, err)
+		require.NoError(t, err)
 		value, err := SerializeByValue("F")
-		assert.NilError(t, err)
+		require.NoError(t, err)
 		key, err := SerializeRedisKey(revision.ID, "3215")
-		assert.NilError(t, err)
+		require.NoError(t, err)
 		gender, err := store.HGet(ctx, key, field).Result()
-		assert.NilError(t, err)
-		assert.Equal(t, gender, value)
+		require.NoError(t, err)
+		require.Equal(t, gender, value)
 	}
 }
