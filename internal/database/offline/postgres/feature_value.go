@@ -13,7 +13,7 @@ import (
 )
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (dataMap map[string]dbutil.RowMap, err error) {
-	if len(opt.Features) == 0 {
+	if len(opt.Features) == 0 || len(opt.EntityRows) == 0 {
 		return make(map[string]dbutil.RowMap), nil
 	}
 
