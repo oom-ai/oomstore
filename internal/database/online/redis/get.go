@@ -54,7 +54,9 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		if err != nil {
 			return res, err
 		}
-		res[entityKey] = rowMap
+		if len(rowMap) > 0 {
+			res[entityKey] = rowMap
+		}
 	}
 	return res, nil
 }
