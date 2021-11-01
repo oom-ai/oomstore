@@ -24,3 +24,8 @@ type GetRevisionOpt struct {
 	Revision   *int64
 	RevisionId *int32
 }
+
+type ListRevisionOpt struct {
+	GroupName  *string
+	DataTables []string
+}
