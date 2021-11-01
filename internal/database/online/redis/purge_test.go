@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"gotest.tools/v3/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
@@ -15,20 +15,20 @@ func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
 
 	for i := 0; i < PipelineBatchSize+1; i++ {
 		key, err := SerializeRedisKey(revision.ID, i)
-		assert.NilError(t, err)
-		assert.NilError(t, store.HSet(ctx, key, strconv.Itoa(i), strconv.Itoa(i+1)).Err())
+		require.NoError(t, err)
+		require.NoError(t, store.HSet(ctx, key, strconv.Itoa(i), strconv.Itoa(i+1)).Err())
 
 		v, err := store.HGet(ctx, key, strconv.Itoa(i)).Result()
-		assert.NilError(t, err)
-		assert.Equal(t, v, strconv.Itoa(i+1))
+		require.NoError(t, err)
+		require.Equal(t, v, strconv.Itoa(i+1))
 	}
 
 	err := store.Purge(ctx, &revision)
-	assert.NilError(t, err)
+	require.NoError(t, err)
 
 	sz, err := store.DBSize(ctx).Result()
-	assert.NilError(t, err)
-	assert.Equal(t, int64(0), sz)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), sz)
 }
 
 func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
@@ -39,33 +39,33 @@ func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
 	// prepare the revision to be purged
 	for i := 0; i < PipelineBatchSize+1; i++ {
 		key, err := SerializeRedisKey(revision.ID, i)
-		assert.NilError(t, err)
-		assert.NilError(t, store.HSet(ctx, key, strconv.Itoa(i), strconv.Itoa(i+1)).Err())
+		require.NoError(t, err)
+		require.NoError(t, store.HSet(ctx, key, strconv.Itoa(i), strconv.Itoa(i+1)).Err())
 
 		v, err := store.HGet(ctx, key, strconv.Itoa(i)).Result()
-		assert.NilError(t, err)
-		assert.Equal(t, v, strconv.Itoa(i+1))
+		require.NoError(t, err)
+		require.Equal(t, v, strconv.Itoa(i+1))
 	}
 
 	// prepare another revision
 	for i := 0; i < 10; i++ {
 		key, err := SerializeRedisKey(0, i)
-		assert.NilError(t, err)
-		assert.NilError(t, store.HSet(ctx, key, strconv.Itoa(i), strconv.Itoa(i+1)).Err())
+		require.NoError(t, err)
+		require.NoError(t, store.HSet(ctx, key, strconv.Itoa(i), strconv.Itoa(i+1)).Err())
 
 		v, err := store.HGet(ctx, key, strconv.Itoa(i)).Result()
-		assert.NilError(t, err)
-		assert.Equal(t, v, strconv.Itoa(i+1))
+		require.NoError(t, err)
+		require.Equal(t, v, strconv.Itoa(i+1))
 	}
 
 	err := store.Purge(ctx, &revision)
-	assert.NilError(t, err)
+	require.NoError(t, err)
 
 	for i := 0; i < 10; i++ {
 		key, err := SerializeRedisKey(0, i)
-		assert.NilError(t, err)
+		require.NoError(t, err)
 		v, err := store.HGet(ctx, key, strconv.Itoa(i)).Result()
-		assert.NilError(t, err)
-		assert.Equal(t, v, strconv.Itoa(i+1))
+		require.NoError(t, err)
+		require.Equal(t, v, strconv.Itoa(i+1))
 	}
 }
