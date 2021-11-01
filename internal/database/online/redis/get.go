@@ -29,6 +29,9 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 
 	rowMap := make(dbutil.RowMap)
 	for i, v := range values {
+		if v == nil {
+			continue
+		}
 		typedValue, err := DeserializeByTag(v, opt.FeatureList[i].ValueType)
 		if err != nil {
 			return nil, err
