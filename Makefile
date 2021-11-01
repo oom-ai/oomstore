@@ -21,7 +21,7 @@ featctl:
 
 .PHONY: test
 test:
-	@go test ./...
+	@go test -race -coverprofile=coverage.out -covermode=atomic ./...
 
 .PHONY: integration-test
 integration-test:
