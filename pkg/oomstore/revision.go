@@ -8,7 +8,7 @@ import (
 )
 
 func (s *OomStore) ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error) {
-	return s.metadata.ListRevision(ctx, groupName)
+	return s.metadata.ListRevision(ctx, metadata.ListRevisionOpt{GroupName: groupName})
 }
 
 func (s *OomStore) GetRevision(ctx context.Context, groupName string, revision int64) (*types.Revision, error) {

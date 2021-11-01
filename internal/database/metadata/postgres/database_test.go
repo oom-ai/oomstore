@@ -572,20 +572,43 @@ func TestListRevision(t *testing.T) {
 	db := initAndOpenDB(t)
 	defer db.Close()
 
-	rs, err := db.ListRevision(context.Background(), nil)
+	rs, err := db.ListRevision(context.Background(), metadata.ListRevisionOpt{})
 	assert.Nil(t, err)
 	assert.Equal(t, 0, len(rs))
 
-	opt := metadata.CreateRevisionOpt{
+	opt1 := metadata.CreateRevisionOpt{
 		GroupName:   "device_baseinfo",
 		Revision:    1,
 		DataTable:   "device_bastinfo_20211028",
 		Description: "description",
 	}
 
-	assert.Nil(t, db.CreateRevision(context.Background(), opt))
+	opt2 := metadata.CreateRevisionOpt{
+		GroupName:   "device_baseinfo",
+		Revision:    2,
+		DataTable:   "device_bastinfo_20211029",
+		Description: "description",
+	}
 
-	rs, err = db.ListRevision(context.Background(), nil)
+	assert.Nil(t, db.CreateRevision(context.Background(), opt1))
+	assert.Nil(t, db.CreateRevision(context.Background(), opt2))
+
+	groupName := "device_baseinfo"
+	rs, err = db.ListRevision(context.Background(), metadata.ListRevisionOpt{
+		GroupName: &groupName,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(rs))
+
+	rs, err = db.ListRevision(context.Background(), metadata.ListRevisionOpt{
+		DataTables: []string{},
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(rs))
+
+	rs, err = db.ListRevision(context.Background(), metadata.ListRevisionOpt{
+		DataTables: []string{"device_bastinfo_20211028"},
+	})
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(rs))
 }

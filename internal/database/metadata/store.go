@@ -31,9 +31,8 @@ type Store interface {
 	ListRichFeatureGroup(ctx context.Context, entityName *string) ([]*types.RichFeatureGroup, error)
 
 	// revision
-	ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error)
+	ListRevision(ctx context.Context, opt ListRevisionOpt) ([]*types.Revision, error)
 	GetRevision(ctx context.Context, opt GetRevisionOpt) (*types.Revision, error)
-	GetRevisionsByDataTables(ctx context.Context, dataTables []string) ([]*types.Revision, error)
 	GetLatestRevision(ctx context.Context, groupName string) (*types.Revision, error)
 	BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error)
 	CreateRevision(ctx context.Context, opt CreateRevisionOpt) error

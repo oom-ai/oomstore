@@ -7,26 +7,42 @@ import (
 	"strings"
 
 	"github.com/jackc/pgerrcode"
-	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) ListRevision(ctx context.Context, groupName *string) ([]*types.Revision, error) {
+func (db *DB) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) ([]*types.Revision, error) {
+	revisions := []*types.Revision{}
 	query := "SELECT * FROM feature_group_revision"
-	var cond []interface{}
-	if groupName != nil {
-		query += " WHERE group_name = $1"
-		cond = append(cond, *groupName)
+	cond, args, err := buildListRevisionCond(opt)
+	if err != nil {
+		return nil, err
 	}
-	revisions := make([]*types.Revision, 0)
-
-	if err := db.SelectContext(ctx, &revisions, query, cond...); err != nil {
+	if len(cond) > 0 {
+		query = fmt.Sprintf("%s WHERE %s", query, strings.Join(cond, " AND "))
+	}
+	if err := db.SelectContext(ctx, &revisions, db.Rebind(query), args...); err != nil {
 		return nil, err
 	}
 	return revisions, nil
+}
+
+func buildListRevisionCond(opt metadata.ListRevisionOpt) ([]string, []interface{}, error) {
+	and := make(map[string]interface{})
+	in := make(map[string]interface{})
+
+	if opt.GroupName != nil {
+		and["group_name"] = *opt.GroupName
+	}
+	if opt.DataTables != nil {
+		if len(opt.DataTables) == 0 {
+			return []string{"false"}, nil, nil
+		}
+		in["data_table"] = opt.DataTables
+	}
+	return dbutil.BuildConditions(and, in)
 }
 
 func (db *DB) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*types.Revision, error) {
@@ -54,21 +70,6 @@ func (db *DB) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*ty
 		return nil, err
 	}
 	return &rs, nil
-}
-
-func (db *DB) GetRevisionsByDataTables(ctx context.Context, dataTables []string) ([]*types.Revision, error) {
-	query := "SELECT * FROM feature_group_revision WHERE data_table IN (?)"
-	sql, args, err := sqlx.In(query, dataTables)
-	if err != nil {
-		return nil, err
-	}
-
-	revisions := make([]*types.Revision, 0)
-	err = db.SelectContext(ctx, &revisions, db.Rebind(sql), args...)
-	if err != nil {
-		return nil, err
-	}
-	return revisions, nil
 }
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) error {
