@@ -41,8 +41,16 @@ func importSample(t *testing.T) online.ImportOpt {
 	stream := make(chan *types.RawFeatureValueRecord)
 	go func() {
 		defer close(stream)
-		stream <- &types.RawFeatureValueRecord{
-			Record: []interface{}{"3215", int16(18), "F"},
+
+		records := [][]interface{}{
+			{"3215", int16(18), "F"},
+			{"3216", int16(29), nil},
+			{"3217", int16(44), "M"},
+		}
+		for _, record := range records {
+			stream <- &types.RawFeatureValueRecord{
+				Record: record,
+			}
 		}
 	}()
 
