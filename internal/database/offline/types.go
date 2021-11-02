@@ -1,6 +1,10 @@
 package offline
 
-import "github.com/oom-ai/oomstore/pkg/oomstore/types"
+import (
+	"encoding/csv"
+
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+)
 
 type ExportOpt struct {
 	DataTable    string
@@ -17,8 +21,11 @@ type JoinOpt struct {
 }
 
 type ImportOpt struct {
-	types.ImportBatchFeaturesOpt
-	Entity   *types.Entity
-	Features types.FeatureList
-	Header   []string
+	GroupName string
+	Entity    *types.Entity
+	Features  types.FeatureList
+	Header    []string
+
+	// CsvReader must not contain header
+	CsvReader *csv.Reader
 }

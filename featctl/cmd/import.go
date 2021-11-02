@@ -3,12 +3,18 @@ package cmd
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
-var importOpt types.ImportBatchFeaturesOpt
+type importOption struct {
+	types.ImportBatchFeaturesOpt
+	FilePath string
+}
+
+var importOpt importOption
 
 var importCmd = &cobra.Command{
 	Use:   "import",
@@ -18,8 +24,16 @@ var importCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
+		file, err := os.Open(importOpt.FilePath)
+		if err != nil {
+			log.Fatalf("read file %s failed: %v", importOpt.FilePath, err)
+		}
+		defer file.Close()
+
+		importOpt.DataSource.Reader = file
+
 		log.Println("importing features ...")
-		if err := oomStore.ImportBatchFeatures(ctx, importOpt); err != nil {
+		if err := oomStore.ImportBatchFeatures(ctx, importOpt.ImportBatchFeaturesOpt); err != nil {
 			log.Fatalf("failed importing features: %v\n", err)
 		}
 
@@ -38,7 +52,7 @@ func init() {
 	flags.StringVar(&importOpt.Description, "description", "", "revision description")
 	_ = importCmd.MarkFlagRequired("description")
 
-	flags.StringVar(&importOpt.DataSource.FilePath, "input-file", "", "input csv file")
+	flags.StringVar(&importOpt.FilePath, "input-file", "", "input csv file")
 	_ = importCmd.MarkFlagRequired("input-file")
 	flags.StringVar(&importOpt.DataSource.Delimiter, "delimiter", ",", "specify field delimiter")
 }
