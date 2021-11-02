@@ -19,7 +19,6 @@ repos:
   hooks:
   - id: go-fmt
   - id: go-imports
-  - id: go-unit-tests
   - id: golangci-lint
   # - id: go-cyclo
     # args: [-over=20]
