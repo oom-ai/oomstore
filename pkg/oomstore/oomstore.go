@@ -18,6 +18,14 @@ type OomStore struct {
 	metadata metadata.Store
 }
 
+func NewOomStore(online online.Store, offline offline.Store, metadata metadata.Store) *OomStore {
+	return &OomStore{
+		online:   online,
+		offline:  offline,
+		metadata: metadata,
+	}
+}
+
 func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 	onlineStore, err := database.OpenOnlineStore(opt.OnlineStore)
 	if err != nil {
