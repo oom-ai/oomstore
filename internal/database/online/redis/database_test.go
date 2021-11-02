@@ -4,16 +4,17 @@ import (
 	"context"
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/test/test_redis"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/internal/database/test/runtime_redis"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func prepare() (context.Context, *DB) {
 	ctx := context.Background()
-	store := Open(&test_redis.RedisDbOpt)
+	store := Open(&runtime_redis.RedisDbOpt)
 	if _, err := store.FlushDB(ctx).Result(); err != nil {
 		panic(err)
 	}
