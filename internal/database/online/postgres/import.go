@@ -10,7 +10,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 const (
@@ -63,14 +62,6 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 func getOnlineBatchTableName(revisionId int32) string {
 	return fmt.Sprintf("batch_%d", revisionId)
-}
-
-func (db *DB) Purge(ctx context.Context, revision *types.Revision) error {
-	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, getOnlineBatchTableName(revision.ID))
-	if _, err := db.ExecContext(ctx, query); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (db *DB) insertRecordsToTable(ctx context.Context, tableName string, records []interface{}, columns []string) error {
