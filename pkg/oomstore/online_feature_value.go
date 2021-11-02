@@ -16,7 +16,9 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 	if err != nil {
 		return m, err
 	}
-	features = filterAvailableFeatures(features)
+	features = features.Filter(func(f *types.Feature) bool {
+		return f.OnlineRevisionID != nil
+	})
 	if len(features) == 0 {
 		return m, nil
 	}
@@ -47,12 +49,14 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 	return m, nil
 }
 
-func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
+func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (types.FeatureDataSet, error) {
 	features, err := s.metadata.ListFeature(ctx, types.ListFeatureOpt{FeatureNames: opt.FeatureNames})
 	if err != nil {
 		return nil, err
 	}
-	features = filterAvailableFeatures(features)
+	features = features.Filter(func(f *types.Feature) bool {
+		return f.OnlineRevisionID != nil
+	})
 	if len(features) == 0 {
 		return nil, nil
 	}
@@ -101,15 +105,6 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
-func filterAvailableFeatures(features types.FeatureList) (rs types.FeatureList) {
-	for _, f := range features {
-		if f.OnlineRevisionID != nil {
-			rs = append(rs, f)
-		}
-	}
-	return
-}
-
 func groupFeaturesByRevisionId(features types.FeatureList) map[int32]types.FeatureList {
 	featureMap := make(map[int32]types.FeatureList)
 	for _, f := range features {
@@ -135,7 +130,7 @@ func getEntityName(features types.FeatureList) (*string, error) {
 	return nil, nil
 }
 
-func buildFeatureDataSet(valueMap map[string]dbutil.RowMap, opt types.MultiGetOnlineFeatureValuesOpt) (*types.FeatureDataSet, error) {
+func buildFeatureDataSet(valueMap map[string]dbutil.RowMap, opt types.MultiGetOnlineFeatureValuesOpt) (types.FeatureDataSet, error) {
 	fds := types.NewFeatureDataSet()
 	for _, entityKey := range opt.EntityKeys {
 		fds[entityKey] = make([]types.FeatureKV, 0)
@@ -147,5 +142,5 @@ func buildFeatureDataSet(valueMap map[string]dbutil.RowMap, opt types.MultiGetOn
 			}
 		}
 	}
-	return &fds, nil
+	return fds, nil
 }
