@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -21,6 +23,11 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
+		}
+		if e2, ok := err.(*pq.Error); ok {
+			if e2.Code == pgerrcode.UndefinedTable {
+				return nil, nil
+			}
 		}
 		return nil, err
 	}
