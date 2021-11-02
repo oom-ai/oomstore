@@ -209,23 +209,30 @@ func prepareFeatures(isConsistent bool, available bool) types.FeatureList {
 			DBValueType:      "VARCHAR(32)",
 			EntityName:       "device",
 			OnlineRevisionID: &revision1,
+			Category:         types.BatchFeatureCategory,
+			GroupName:        "device_basic",
 		},
 		{
 			Name:             "price",
 			DBValueType:      "INT",
 			EntityName:       "device",
 			OnlineRevisionID: &revision2,
+			Category:         types.BatchFeatureCategory,
+			GroupName:        "device_advanced",
 		},
 		{
 			Name:             "age",
 			DBValueType:      "INT",
 			EntityName:       "user",
 			OnlineRevisionID: &revision2,
+			Category:         types.BatchFeatureCategory,
+			GroupName:        "user_info",
 		},
 	}
 	if !available {
 		for i := range features {
 			features[i].OnlineRevisionID = nil
+			features[i].Category = types.StreamFeatureCategory
 		}
 	}
 
