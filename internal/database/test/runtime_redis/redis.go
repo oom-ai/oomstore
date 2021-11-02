@@ -1,4 +1,4 @@
-package test_redis
+package runtime_redis
 
 import (
 	"os"
