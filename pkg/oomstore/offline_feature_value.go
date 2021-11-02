@@ -18,23 +18,30 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 	if err != nil {
 		return nil, err
 	}
-	batchFeatures := features.Filter(func(f *types.Feature) bool {
+	features = features.Filter(func(f *types.Feature) bool {
 		return f.Category == types.BatchFeatureCategory
 	})
+	if len(features) == 0 {
+		return nil, nil
+	}
+	entityName, err := getEntityName(features)
+	if err != nil || entityName == nil {
+		return nil, err
+	}
+	entity, err := s.metadata.GetEntity(ctx, *entityName)
+	if err != nil {
+		return nil, err
+	}
 
 	// group_name -> []features
-	featureGroups := buildGroupToFeaturesMap(batchFeatures)
+	featureGroups := buildGroupToFeaturesMap(features)
 
 	entityDataMap := make(map[string]dbutil.RowMap)
-	for _, features := range featureGroups {
-		if len(features) == 0 {
+	for groupName, featureSlice := range featureGroups {
+		if len(featureSlice) == 0 {
 			continue
 		}
-		revisionRanges, err := s.metadata.BuildRevisionRanges(ctx, features[0].GroupName)
-		if err != nil {
-			return nil, err
-		}
-		entity, err := s.metadata.GetEntity(ctx, features[0].EntityName)
+		revisionRanges, err := s.metadata.BuildRevisionRanges(ctx, groupName)
 		if err != nil {
 			return nil, err
 		}
@@ -42,7 +49,7 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 			Entity:         entity,
 			EntityRows:     opt.EntityRows,
 			RevisionRanges: revisionRanges,
-			Features:       features,
+			Features:       featureSlice,
 		})
 		if err != nil {
 			return nil, err
@@ -56,12 +63,12 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 			}
 		}
 	}
-	for _, entity := range opt.EntityRows {
-		key := entity.EntityKey + "," + strconv.Itoa(int(entity.UnixTime))
+	for _, e := range opt.EntityRows {
+		key := e.EntityKey + "," + strconv.Itoa(int(e.UnixTime))
 		if _, ok := entityDataMap[key]; !ok {
 			entityDataMap[key] = dbutil.RowMap{
-				"entity_key": entity.EntityKey,
-				"unix_time":  entity.UnixTime,
+				"entity_key": e.EntityKey,
+				"unix_time":  e.UnixTime,
 			}
 		}
 	}
