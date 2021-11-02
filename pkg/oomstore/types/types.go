@@ -113,6 +113,14 @@ type RawFeatureValueRecord struct {
 	Error  error
 }
 
+func (r *RawFeatureValueRecord) EntityKey() string {
+	return r.Record[0].(string)
+}
+
+func (r *RawFeatureValueRecord) ValueAt(i int) interface{} {
+	return r.Record[i+1]
+}
+
 type EntityRow struct {
 	EntityKey string `db:"entity_key"`
 	UnixTime  int64  `db:"unix_time"`
