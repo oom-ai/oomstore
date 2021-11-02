@@ -5,14 +5,13 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/oom-ai/oomstore/internal/database/test"
+	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/stretchr/testify/assert"
 )
 
 func initDB(t *testing.T) {
-	opt := test.PostgresDbopt
+	opt := runtime_pg.PostgresDbopt
 	store, err := Open(&types.PostgresOpt{
 		Host:     opt.Host,
 		Port:     opt.Port,
@@ -29,7 +28,7 @@ func initDB(t *testing.T) {
 	}
 	store.Close()
 
-	if err := CreateDatabase(context.Background(), test.PostgresDbopt); err != nil {
+	if err := CreateDatabase(context.Background(), runtime_pg.PostgresDbopt); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -37,7 +36,7 @@ func initDB(t *testing.T) {
 func initAndOpenDB(t *testing.T) *DB {
 	initDB(t)
 
-	db, err := Open(&test.PostgresDbopt)
+	db, err := Open(&runtime_pg.PostgresDbopt)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,11 +45,11 @@ func initAndOpenDB(t *testing.T) *DB {
 
 func TestCreateDatabase(t *testing.T) {
 	ctx := context.Background()
-	if err := CreateDatabase(ctx, test.PostgresDbopt); err != nil {
+	if err := CreateDatabase(ctx, runtime_pg.PostgresDbopt); err != nil {
 		t.Fatal(err)
 	}
 
-	store, err := Open(&test.PostgresDbopt)
+	store, err := Open(&runtime_pg.PostgresDbopt)
 	if err != nil {
 		t.Fatal(err)
 	}

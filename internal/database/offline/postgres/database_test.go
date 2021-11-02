@@ -6,12 +6,12 @@ import (
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/offline/postgres"
-	"github.com/oom-ai/oomstore/internal/database/test"
+	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func initDB(t *testing.T) {
-	opt := test.PostgresDbopt
+	opt := runtime_pg.PostgresDbopt
 	store, err := postgres.Open(&types.PostgresOpt{
 		Host:     opt.Host,
 		Port:     opt.Port,
@@ -36,7 +36,7 @@ func initDB(t *testing.T) {
 func initAndOpenDB(t *testing.T) *postgres.DB {
 	initDB(t)
 
-	db, err := postgres.Open(&test.PostgresDbopt)
+	db, err := postgres.Open(&runtime_pg.PostgresDbopt)
 	if err != nil {
 		t.Fatal(err)
 	}

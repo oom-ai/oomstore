@@ -1,4 +1,4 @@
-package test
+package runtime_pg
 
 import (
 	"os"
