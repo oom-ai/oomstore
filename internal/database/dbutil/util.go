@@ -12,8 +12,8 @@ import (
 
 type RowMap = map[string]interface{}
 
-const CREATE_DATA_TABLE = `CREATE TABLE {{TABLE_NAME}} (
-	{{ENTITY_NAME}} VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY,
+const CREATE_DATA_TABLE = `CREATE TABLE "{{TABLE_NAME}}" (
+	"{{ENTITY_NAME}}" VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY,
 	{{COLUMN_DEFS}});
 `
 
@@ -24,7 +24,7 @@ func BuildFeatureDataTableSchema(tableName string, entity *types.Entity, feature
 	})
 	var columnDefs []string
 	for _, column := range features {
-		columnDef := fmt.Sprintf("%s %s", column.Name, column.DBValueType)
+		columnDef := fmt.Sprintf(`"%s" %s`, column.Name, column.DBValueType)
 		columnDefs = append(columnDefs, columnDef)
 	}
 
@@ -52,4 +52,12 @@ func BuildConditions(equal map[string]interface{}, in map[string]interface{}) ([
 		args = append(args, inArgs...)
 	}
 	return cond, args, nil
+}
+
+func Quote(quote string, fields ...string) string {
+	var rs []string
+	for _, f := range fields {
+		rs = append(rs, quote+f+quote)
+	}
+	return strings.Join(rs, ",")
 }

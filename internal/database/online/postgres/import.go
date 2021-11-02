@@ -54,7 +54,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 		// rename the tmp table to final table
 		finalTableName := getOnlineBatchTableName(opt.Revision.ID)
-		rename := fmt.Sprintf("ALTER TABLE %s RENAME TO %s", tmpTableName, finalTableName)
+		rename := fmt.Sprintf(`ALTER TABLE "%s" RENAME TO "%s"`, tmpTableName, finalTableName)
 		_, err = tx.ExecContext(ctx, rename)
 		return err
 	})
@@ -83,7 +83,7 @@ func (db *DB) insertRecordsToTable(ctx context.Context, tableName string, record
 	}
 
 	query, args, err := sqlx.In(
-		fmt.Sprintf("INSERT INTO %s (%s) VALUES %s", tableName, strings.Join(columns, ","), strings.Join(valueFlags, ",")),
+		fmt.Sprintf(`INSERT INTO "%s" (%s) VALUES %s`, tableName, dbutil.Quote(`"`, columns...), strings.Join(valueFlags, ",")),
 		records...)
 	if err != nil {
 		return err

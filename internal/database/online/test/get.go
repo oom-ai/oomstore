@@ -11,6 +11,7 @@ import (
 func TestGetExisted(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	s := &SampleSmall
 	ctx, store := prepareStore()
+	defer store.Close()
 	importSample(t, ctx, store, s)
 
 	for _, target := range s.Data {
@@ -24,7 +25,7 @@ func TestGetExisted(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		require.NoError(t, err)
 
 		for i, f := range s.Features {
-			assert.Equal(t, rs[f.Name], target.ValueAt(i), "result: %+v", rs)
+			assert.Equal(t, target.ValueAt(i), rs[f.Name], "result: %+v", rs)
 		}
 	}
 }
@@ -32,6 +33,7 @@ func TestGetExisted(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	s := &SampleSmall
 	ctx, store := prepareStore()
+	defer store.Close()
 	importSample(t, ctx, store, s)
 
 	rs, err := store.Get(ctx, online.GetOpt{
@@ -47,6 +49,7 @@ func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreRuntimeFu
 func TestMultiGet(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	s := &SampleSmall
 	ctx, store := prepareStore()
+	defer store.Close()
 	importSample(t, ctx, store, s)
 
 	keys := []string{"not-existed-key"}
