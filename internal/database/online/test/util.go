@@ -31,20 +31,22 @@ func init() {
 		SampleSmall = Sample{
 			Features: types.FeatureList{
 				&types.Feature{
-					ID:        0,
-					Name:      "age",
-					GroupName: "user",
-					ValueType: types.INT16,
+					ID:          0,
+					Name:        "age",
+					GroupName:   "user",
+					ValueType:   types.INT16,
+					DBValueType: "smallint",
 				},
 				&types.Feature{
-					ID:        1,
-					Name:      "gender",
-					GroupName: "user",
-					ValueType: types.STRING,
+					ID:          1,
+					Name:        "gender",
+					GroupName:   "user",
+					ValueType:   types.STRING,
+					DBValueType: "varchar(1)",
 				},
 			},
 			Revision: &types.Revision{ID: 3},
-			Entity:   &types.Entity{ID: 5},
+			Entity:   &types.Entity{ID: 5, Name: "user", Length: 4},
 			Data: []types.RawFeatureValueRecord{
 				newRecord([]interface{}{"3215", int16(18), "F"}),
 				newRecord([]interface{}{"3216", int16(29), nil}),
@@ -57,20 +59,21 @@ func init() {
 	{
 		features := types.FeatureList{
 			&types.Feature{
-				ID:        2,
-				Name:      "charge",
-				GroupName: "user",
-				ValueType: types.FLOAT64,
+				ID:          2,
+				Name:        "charge",
+				GroupName:   "group",
+				ValueType:   types.FLOAT64,
+				DBValueType: "float8",
 			},
 		}
 
 		revision := &types.Revision{ID: 9}
-		entity := &types.Entity{ID: 1}
+		entity := &types.Entity{ID: 5, Name: "user", Length: 5}
 		var data []types.RawFeatureValueRecord
 
 		for i := 0; i < 1000; i++ {
 			record := newRecord([]interface{}{
-				RandString(5),
+				RandString(entity.Length),
 				rand.Float64(),
 			})
 			data = append(data, record)
