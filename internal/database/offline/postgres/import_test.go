@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"os"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,17 +23,9 @@ func TestImport(t *testing.T) {
 		Length: 16,
 	}
 
-	tempFeaturesFile := tempFeatureFile(t)
 	opt := offline.ImportOpt{
-		ImportBatchFeaturesOpt: types.ImportBatchFeaturesOpt{
-			GroupName:   "device",
-			Description: "description",
-			DataSource: types.LocalFileDataSourceOpt{
-				FilePath:  tempFeaturesFile,
-				Delimiter: ",",
-			},
-		},
-		Entity: &entity,
+		GroupName: "device",
+		Entity:    &entity,
 		Features: []*types.Feature{
 			{
 				Name:        "model",
@@ -44,6 +36,12 @@ func TestImport(t *testing.T) {
 			},
 		},
 		Header: []string{"device", "model", "price"},
+		CsvReader: csv.NewReader(strings.NewReader(`
+1234,xiaomi,1899
+1235,apple,4999
+1236,huawei,5999
+1237,oneplus,3999
+`)),
 	}
 
 	t.Run("invalid db value type", func(t *testing.T) {
@@ -74,28 +72,4 @@ func TestImport(t *testing.T) {
 		assert.Equal(t, T{Device: "1236", Model: "huawei", Price: 5999}, records[2])
 		assert.Equal(t, T{Device: "1237", Model: "oneplus", Price: 3999}, records[3])
 	})
-}
-
-func tempFeatureFile(t *testing.T) string {
-	filePath := fmt.Sprintf("%s/features.csv", t.TempDir())
-	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR, 0666)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	w := csv.NewWriter(file)
-	records := [][]string{
-		{"device", "model", "price"},
-		{"1234", "xiaomi", "1899"},
-		{"1235", "apple", "4999"},
-		{"1236", "huawei", "5999"},
-		{"1237", "oneplus", "3999"},
-	}
-
-	if err = w.WriteAll(records); err != nil {
-		panic(err)
-	}
-	w.Flush()
-	return file.Name()
 }
