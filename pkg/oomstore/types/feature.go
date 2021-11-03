@@ -7,18 +7,20 @@ import (
 )
 
 type Feature struct {
-	ID          int16  `db:"id"`
-	Name        string `db:"name"`
-	GroupName   string `db:"group_name"`
-	ValueType   string `db:"value_type"`
-	DBValueType string `db:"db_value_type"`
-
+	ID          int16     `db:"id"`
+	Name        string    `db:"name"`
+	ValueType   string    `db:"value_type"`
+	DBValueType string    `db:"db_value_type"`
+	Category    string    `db:"category"`
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
 
+	GroupId   int16  `db:"group_id"`
+	GroupName string `db:"group_name"`
+
+	EntityId   int16  `db:"entity_id"`
 	EntityName string `db:"entity_name"`
-	Category   string `db:"category"`
 
 	OnlineRevisionID *int32  `db:"online_revision_id"`
 	OnlineRevision   *int64  `db:"online_revision"`

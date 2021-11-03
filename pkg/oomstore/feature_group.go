@@ -8,9 +8,15 @@ import (
 )
 
 func (s *OomStore) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt) error {
+	entity, err := s.metadata.GetEntity(ctx, opt.EntityName)
+	if err != nil {
+		return err
+	}
 	return s.metadata.CreateFeatureGroup(ctx, metadata.CreateFeatureGroupOpt{
-		CreateFeatureGroupOpt: opt,
-		Category:              types.BatchFeatureCategory,
+		Name:        opt.Name,
+		EntityId:    entity.ID,
+		Description: opt.Description,
+		Category:    types.BatchFeatureCategory,
 	})
 }
 

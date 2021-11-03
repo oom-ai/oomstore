@@ -87,6 +87,7 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 
 	return s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:    revision,
+		GroupId:     group.ID,
 		GroupName:   opt.GroupName,
 		DataTable:   dataTable,
 		Description: opt.Description,

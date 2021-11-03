@@ -24,13 +24,15 @@ type Entity struct {
 type FeatureGroup struct {
 	ID               int16  `db:"id"`
 	Name             string `db:"name"`
-	EntityName       string `db:"entity_name"`
 	OnlineRevisionID *int32 `db:"online_revision_id"`
 	Category         string `db:"category"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
+
+	EntityId   int16  `db:"entity_id"`
+	EntityName string `db:"entity_name"`
 
 	OnlineRevision   *int64  `db:"online_revision"`
 	OfflineRevision  *int64  `db:"offline_revision"`
@@ -40,6 +42,7 @@ type FeatureGroup struct {
 type Revision struct {
 	ID        int32  `db:"id"`
 	Revision  int64  `db:"revision"`
+	GroupId   int16  `db:"group_id"`
 	GroupName string `db:"group_name"`
 	DataTable string `db:"data_table"`
 

@@ -170,6 +170,7 @@ func TestCreateBatchFeature(t *testing.T) {
 			},
 			valueType: types.STRING,
 			group: types.FeatureGroup{
+				ID:       1,
 				Name:     "device_info",
 				Category: types.BatchFeatureCategory,
 			},
@@ -184,6 +185,7 @@ func TestCreateBatchFeature(t *testing.T) {
 			},
 			valueType: types.INT64,
 			group: types.FeatureGroup{
+				ID:       2,
 				Name:     "device_info",
 				Category: types.StreamFeatureCategory,
 			},
@@ -197,8 +199,11 @@ func TestCreateBatchFeature(t *testing.T) {
 			metadataStore.EXPECT().GetFeatureGroup(gomock.Any(), tc.opt.GroupName).Return(&tc.group, nil)
 			if tc.group.Category == types.BatchFeatureCategory {
 				metadataStore.EXPECT().CreateFeature(gomock.Any(), metadata.CreateFeatureOpt{
-					CreateFeatureOpt: tc.opt,
-					ValueType:        tc.valueType,
+					FeatureName: tc.opt.FeatureName,
+					GroupId:     tc.group.ID,
+					DBValueType: tc.opt.DBValueType,
+					Description: tc.opt.Description,
+					ValueType:   tc.valueType,
 				}).Return(nil)
 			}
 
