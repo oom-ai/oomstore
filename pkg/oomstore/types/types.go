@@ -31,10 +31,7 @@ type FeatureGroup struct {
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
-}
 
-type RichFeatureGroup struct {
-	FeatureGroup
 	OnlineRevision   *int64  `db:"online_revision"`
 	OfflineRevision  *int64  `db:"offline_revision"`
 	OfflineDataTable *string `db:"offline_data_table"`
@@ -76,29 +73,29 @@ type EntityRowWithFeatures struct {
 	FeatureValues []FeatureKV
 }
 
-func (rfg *RichFeatureGroup) String() string {
+func (fg *FeatureGroup) String() string {
 	onlineRevision := "<NULL>"
 	offlineRevision := "<NULL>"
 	offlineDataTable := "<NULL>"
 
-	if rfg.OnlineRevision != nil {
-		onlineRevision = fmt.Sprint(*rfg.OnlineRevision)
+	if fg.OnlineRevision != nil {
+		onlineRevision = fmt.Sprint(*fg.OnlineRevision)
 	}
-	if rfg.OfflineRevision != nil {
-		offlineRevision = fmt.Sprint(*rfg.OfflineRevision)
+	if fg.OfflineRevision != nil {
+		offlineRevision = fmt.Sprint(*fg.OfflineRevision)
 	}
-	if rfg.OfflineDataTable == nil {
-		offlineDataTable = *rfg.OfflineDataTable
+	if fg.OfflineDataTable == nil {
+		offlineDataTable = *fg.OfflineDataTable
 	}
 	return strings.Join([]string{
-		fmt.Sprintf("Name:                     %s", rfg.Name),
-		fmt.Sprintf("Entity:                   %s", rfg.EntityName),
-		fmt.Sprintf("Description:              %s", rfg.Description),
+		fmt.Sprintf("Name:                     %s", fg.Name),
+		fmt.Sprintf("Entity:                   %s", fg.EntityName),
+		fmt.Sprintf("Description:              %s", fg.Description),
 		fmt.Sprintf("Online Revision:          %s", onlineRevision),
 		fmt.Sprintf("Offline Latest Revision:  %s", offlineRevision),
 		fmt.Sprintf("Offline Latest DataTable: %s", offlineDataTable),
-		fmt.Sprintf("CreateTime:               %s", rfg.CreateTime.Format(time.RFC3339)),
-		fmt.Sprintf("ModifyTime:               %s", rfg.ModifyTime.Format(time.RFC3339)),
+		fmt.Sprintf("CreateTime:               %s", fg.CreateTime.Format(time.RFC3339)),
+		fmt.Sprintf("ModifyTime:               %s", fg.ModifyTime.Format(time.RFC3339)),
 	}, "\n")
 }
 
