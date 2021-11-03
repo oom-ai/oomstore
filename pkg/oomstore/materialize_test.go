@@ -48,9 +48,9 @@ func TestMaterialize(t *testing.T) {
 			description: "user-defined revision, succeed",
 			opt: types.MaterializeOpt{
 				GroupName:     "device_info",
-				GroupRevision: oomstore.Int64Ptr(10),
+				GroupRevision: int64Ptr(10),
 			},
-			group:            prepareGroup(oomstore.Int32Ptr(2)),
+			group:            prepareGroup(int32Ptr(2)),
 			revision:         revision1,
 			previousRevision: revision2,
 			expectedError:    nil,
@@ -60,7 +60,7 @@ func TestMaterialize(t *testing.T) {
 			opt: types.MaterializeOpt{
 				GroupName: "device_info",
 			},
-			group:            prepareGroup(oomstore.Int32Ptr(2)),
+			group:            prepareGroup(int32Ptr(2)),
 			revision:         revision3,
 			previousRevision: revision2,
 			expectedError:    nil,
@@ -79,7 +79,7 @@ func TestMaterialize(t *testing.T) {
 			opt: types.MaterializeOpt{
 				GroupName: "device_info",
 			},
-			group:         prepareGroup(oomstore.Int32Ptr(3)),
+			group:         prepareGroup(int32Ptr(3)),
 			revision:      revision3,
 			expectedError: fmt.Errorf("online store already in the latest revision"),
 		},
@@ -146,4 +146,12 @@ func prepareGroup(revisionId *int32) types.FeatureGroup {
 		OnlineRevisionID: revisionId,
 		EntityName:       "device",
 	}
+}
+
+func int64Ptr(i int64) *int64 {
+	return &i
+}
+
+func int32Ptr(i int32) *int32 {
+	return &i
 }
