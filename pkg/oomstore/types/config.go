@@ -8,9 +8,9 @@ const (
 )
 
 type OomStoreConfig struct {
-	MetaStore    MetaStoreConfig    `yaml:"meta-store"`
-	OfflineStore OfflineStoreConfig `yaml:"offline-store"`
-	OnlineStore  OnlineStoreConfig  `yaml:"online-store"`
+	MetadataStore MetadataStoreConfig `yaml:"metadata-store"`
+	OfflineStore  OfflineStoreConfig  `yaml:"offline-store"`
+	OnlineStore   OnlineStoreConfig   `yaml:"online-store"`
 }
 
 type OnlineStoreConfig struct {
@@ -24,7 +24,7 @@ type OfflineStoreConfig struct {
 	Postgres *PostgresOpt `yaml:"postgres"`
 }
 
-type MetaStoreConfig struct {
+type MetadataStoreConfig struct {
 	Backend  BackendType  `yaml:"backend"`
 	Postgres *PostgresOpt `yaml:"postgres"`
 }

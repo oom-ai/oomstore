@@ -9,4 +9,4 @@ onestore: &onestore
 
 online-store: *onestore
 offline-store: *onestore
-meta-store: *onestore
+metadata-store: *onestore
