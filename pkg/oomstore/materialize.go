@@ -71,7 +71,7 @@ func (s *OomStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 	}
 
 	if previousRevision != nil {
-		return s.online.Purge(ctx, revision)
+		return s.online.Purge(ctx, previousRevision)
 	}
 	return nil
 }
