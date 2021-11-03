@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
-	"os"
 	"strconv"
 	"time"
 
@@ -16,7 +15,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/offline"
 )
 
-func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter string, header []string) error {
+func (db *DB) LoadData(ctx context.Context, csvReader *csv.Reader, tableName string, header []string) error {
 	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		stmt, err := tx.PreparexContext(ctx, pq.CopyIn(tableName, header...))
 		if err != nil {
@@ -24,23 +23,8 @@ func (db *DB) LoadLocalFile(ctx context.Context, filePath, tableName, delimiter 
 		}
 		defer stmt.Close()
 
-		dataFile, err := os.Open(filePath)
-		if err != nil {
-			return err
-		}
-		defer dataFile.Close()
-
-		reader := csv.NewReader(dataFile)
-		reader.Comma = []rune(delimiter)[0]
-
-		// skip header
-		_, err = reader.Read()
-		if err != nil {
-			return nil
-		}
-
 		for {
-			row, err := reader.Read()
+			row, err := csvReader.Read()
 			if err == io.EOF {
 				break
 			}
@@ -75,7 +59,7 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, string,
 		}
 
 		// populate the data table
-		err = db.LoadLocalFile(ctx, opt.DataSource.FilePath, tmpTableName, opt.DataSource.Delimiter, opt.Header)
+		err = db.LoadData(ctx, opt.CsvReader, tmpTableName, opt.Header)
 		if err != nil {
 			return err
 		}

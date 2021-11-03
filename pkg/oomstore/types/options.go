@@ -1,5 +1,7 @@
 package types
 
+import "io"
+
 type CreateFeatureOpt struct {
 	FeatureName string
 	GroupName   string
@@ -40,11 +42,11 @@ type ExportFeatureValuesOpt struct {
 type ImportBatchFeaturesOpt struct {
 	GroupName   string
 	Description string
-	DataSource  LocalFileDataSourceOpt
+	DataSource  CsvDataSource
 }
 
-type LocalFileDataSourceOpt struct {
-	FilePath  string
+type CsvDataSource struct {
+	Reader    io.Reader
 	Delimiter string
 }
 

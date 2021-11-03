@@ -4,26 +4,12 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"os"
+	"log"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
-
-func getCsvHeader(filePath string) ([]string, error) {
-	f, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	r := csv.NewReader(f)
-	header, err := r.Read()
-	if err != nil {
-		return nil, err
-	}
-	return header, nil
-}
 
 func hasDup(a []string) bool {
 	s := make(map[string]bool)
@@ -74,7 +60,10 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	}
 
 	// make sure csv data source has all defined columns
-	header, err := getCsvHeader(opt.DataSource.FilePath)
+	csvReader := csv.NewReader(opt.DataSource.Reader)
+	csvReader.Comma = []rune(opt.DataSource.Delimiter)[0]
+
+	header, err := csvReader.Read()
 	if err != nil {
 		return err
 	}
@@ -86,11 +75,13 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
+	log.Printf("start load data")
 	revision, dataTable, err := s.offline.Import(ctx, offline.ImportOpt{
-		ImportBatchFeaturesOpt: opt,
-		Entity:                 entity,
-		Features:               features,
-		Header:                 header,
+		GroupName: opt.GroupName,
+		Entity:    entity,
+		Features:  features,
+		Header:    header,
+		CsvReader: csvReader,
 	})
 	if err != nil {
 		return err
