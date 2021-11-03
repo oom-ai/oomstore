@@ -20,7 +20,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	columns := append([]string{opt.Entity.Name}, opt.Features.Names()...)
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		tmpTableName := opt.Revision.GroupName + "_" + strconv.Itoa(rand.Int())
+		tmpTableName := fmt.Sprint(opt.Revision.GroupId) + "_" + strconv.Itoa(rand.Int())
 		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, opt.Entity, opt.Features)
 		_, err := db.ExecContext(ctx, schema)
 		if err != nil {

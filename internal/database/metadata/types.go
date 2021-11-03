@@ -1,19 +1,23 @@
 package metadata
 
-import "github.com/oom-ai/oomstore/pkg/oomstore/types"
-
 type CreateFeatureOpt struct {
-	types.CreateFeatureOpt
-	ValueType string
+	FeatureName string
+	GroupId     int16
+	DBValueType string
+	Description string
+	ValueType   string
 }
 
 type CreateFeatureGroupOpt struct {
-	types.CreateFeatureGroupOpt
-	Category string
+	Name        string
+	EntityId    int16
+	Description string
+	Category    string
 }
 
 type CreateRevisionOpt struct {
 	Revision    int64
+	GroupId     int16
 	GroupName   string
 	DataTable   string
 	Description string

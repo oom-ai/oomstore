@@ -73,8 +73,8 @@ func (db *DB) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*ty
 }
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) error {
-	query := "INSERT INTO feature_group_revision(group_name, revision, data_table, description) VALUES ($1, $2, $3, $4)"
-	_, err := db.ExecContext(ctx, query, opt.GroupName, opt.Revision, opt.DataTable, opt.Description)
+	query := "INSERT INTO feature_group_revision(group_id, group_name, revision, data_table, description) VALUES ($1, $2, $3, $4, $5)"
+	_, err := db.ExecContext(ctx, query, opt.GroupId, opt.GroupName, opt.Revision, opt.DataTable, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {

@@ -17,8 +17,8 @@ func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeature
 	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
 		return fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", opt.Category)
 	}
-	query := "insert into feature_group(name, entity_name, category, description) values($1, $2, $3, $4)"
-	_, err := db.ExecContext(ctx, query, opt.Name, opt.EntityName, opt.Category, opt.Description)
+	query := "insert into feature_group(name, entity_id, category, description) values($1, $2, $3, $4)"
+	_, err := db.ExecContext(ctx, query, opt.Name, opt.EntityId, opt.Category, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
