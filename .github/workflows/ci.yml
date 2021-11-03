@@ -55,3 +55,9 @@ jobs:
       run: make test
     - name: Run integration tests
       run: make integration-test
+    - uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.out
+        fail_ci_if_error: true
+        verbose: true
