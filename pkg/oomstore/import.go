@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"log"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -75,7 +74,6 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
-	log.Printf("start load data")
 	revision, dataTable, err := s.offline.Import(ctx, offline.ImportOpt{
 		GroupName: opt.GroupName,
 		Entity:    entity,
