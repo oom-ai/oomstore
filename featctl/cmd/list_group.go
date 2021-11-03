@@ -34,7 +34,7 @@ var listFeatureGroupCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		groups, err := oomStore.ListRichFeatureGroup(ctx, listFeatureGroupOpt.EntityName)
+		groups, err := oomStore.ListFeatureGroup(ctx, listFeatureGroupOpt.EntityName)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -52,7 +52,7 @@ func init() {
 	listFeatureGroupOpt.EntityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func printFeatureGroups(featureGroups []*types.RichFeatureGroup) error {
+func printFeatureGroups(featureGroups []*types.FeatureGroup) error {
 	w := csv.NewWriter(os.Stdout)
 
 	if err := w.Write([]string{"Name", "Entity", "Description", "OnlineRevision", "OfflineLatestRevision", "OfflineLatestDataTable", "CreateTime", "ModifyTime"}); err != nil {

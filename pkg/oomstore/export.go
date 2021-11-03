@@ -9,7 +9,7 @@ import (
 )
 
 func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeatureValuesOpt) ([]string, <-chan *types.RawFeatureValueRecord, error) {
-	group, err := s.metadata.GetRichFeatureGroup(ctx, opt.GroupName)
+	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupName)
 	if err != nil {
 		return nil, nil, err
 	}
