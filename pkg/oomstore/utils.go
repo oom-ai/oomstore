@@ -17,3 +17,11 @@ func castToInt64(i interface{}) (int64, error) {
 	}
 	return int64(val), nil
 }
+
+func Int64Ptr(i int64) *int64 {
+	return &i
+}
+
+func Int32Ptr(i int32) *int32 {
+	return &i
+}

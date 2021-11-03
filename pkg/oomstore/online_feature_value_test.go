@@ -200,7 +200,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 	}
 }
 
-func prepareFeatures(isConsistent bool, available bool) types.FeatureList {
+func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 	revision1 := int32(1)
 	revision2 := int32(2)
 	features := types.FeatureList{
@@ -229,7 +229,7 @@ func prepareFeatures(isConsistent bool, available bool) types.FeatureList {
 			GroupName:        "user_info",
 		},
 	}
-	if !available {
+	if !isAvailable {
 		for i := range features {
 			features[i].OnlineRevisionID = nil
 			features[i].Category = types.StreamFeatureCategory
