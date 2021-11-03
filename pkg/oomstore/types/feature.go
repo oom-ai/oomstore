@@ -64,7 +64,7 @@ func (rf *Feature) String() string {
 	if rf.OfflineRevision != nil {
 		offlineRevision = fmt.Sprint(*rf.OfflineRevision)
 	}
-	if rf.OfflineDataTable == nil {
+	if rf.OfflineDataTable != nil {
 		offlineDataTable = *rf.OfflineDataTable
 	}
 
