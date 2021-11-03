@@ -28,7 +28,7 @@ func OpenOnlineStore(opt types.OnlineStoreConfig) (online.Store, error) {
 	}
 }
 
-func OpenMetadataStore(opt types.MetaStoreConfig) (metadata.Store, error) {
+func OpenMetadataStore(opt types.MetadataStoreConfig) (metadata.Store, error) {
 	switch opt.Backend {
 	case types.POSTGRES:
 		return metadataPG.Open(opt.Postgres)
@@ -37,7 +37,7 @@ func OpenMetadataStore(opt types.MetaStoreConfig) (metadata.Store, error) {
 	}
 }
 
-func CreateMetadataDatabase(ctx context.Context, opt types.MetaStoreConfig) error {
+func CreateMetadataDatabase(ctx context.Context, opt types.MetadataStoreConfig) error {
 	switch opt.Backend {
 	case types.POSTGRES:
 		return metadataPG.CreateDatabase(ctx, *opt.Postgres)

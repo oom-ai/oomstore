@@ -197,14 +197,14 @@ offline-store:
     password: password
     database: offlinestore
 
-meta-store:
+metadata-store:
   backend: postgres
   postgres:
     host: 127.0.0.1
     port: 5432
     user: user
     password: password
-    database: metastore
+    database: metadatastore
 ```
 
 ## Development

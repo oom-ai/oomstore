@@ -35,7 +35,7 @@ func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	metadataStore, err := database.OpenMetadataStore(opt.MetaStore)
+	metadataStore, err := database.OpenMetadataStore(opt.MetadataStore)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 }
 
 func Create(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
-	if err := database.CreateMetadataDatabase(ctx, opt.MetaStore); err != nil {
+	if err := database.CreateMetadataDatabase(ctx, opt.MetadataStore); err != nil {
 		return nil, err
 	}
 	return Open(ctx, opt)
