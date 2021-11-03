@@ -26,10 +26,6 @@ type Store interface {
 	ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error)
 	UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error)
 
-	// rich feature group
-	GetRichFeatureGroup(ctx context.Context, groupName string) (*types.RichFeatureGroup, error)
-	ListRichFeatureGroup(ctx context.Context, entityName *string) ([]*types.RichFeatureGroup, error)
-
 	// revision
 	ListRevision(ctx context.Context, opt ListRevisionOpt) ([]*types.Revision, error)
 	GetRevision(ctx context.Context, opt GetRevisionOpt) (*types.Revision, error)

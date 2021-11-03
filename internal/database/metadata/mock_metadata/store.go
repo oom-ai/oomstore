@@ -196,21 +196,6 @@ func (mr *MockStoreMockRecorder) GetRevision(ctx, opt interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevision", reflect.TypeOf((*MockStore)(nil).GetRevision), ctx, opt)
 }
 
-// GetRichFeatureGroup mocks base method.
-func (m *MockStore) GetRichFeatureGroup(ctx context.Context, groupName string) (*types.RichFeatureGroup, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRichFeatureGroup", ctx, groupName)
-	ret0, _ := ret[0].(*types.RichFeatureGroup)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRichFeatureGroup indicates an expected call of GetRichFeatureGroup.
-func (mr *MockStoreMockRecorder) GetRichFeatureGroup(ctx, groupName interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRichFeatureGroup", reflect.TypeOf((*MockStore)(nil).GetRichFeatureGroup), ctx, groupName)
-}
-
 // ListEntity mocks base method.
 func (m *MockStore) ListEntity(ctx context.Context) ([]*types.Entity, error) {
 	m.ctrl.T.Helper()
@@ -269,21 +254,6 @@ func (m *MockStore) ListRevision(ctx context.Context, opt metadata.ListRevisionO
 func (mr *MockStoreMockRecorder) ListRevision(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRevision", reflect.TypeOf((*MockStore)(nil).ListRevision), ctx, opt)
-}
-
-// ListRichFeatureGroup mocks base method.
-func (m *MockStore) ListRichFeatureGroup(ctx context.Context, entityName *string) ([]*types.RichFeatureGroup, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListRichFeatureGroup", ctx, entityName)
-	ret0, _ := ret[0].([]*types.RichFeatureGroup)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListRichFeatureGroup indicates an expected call of ListRichFeatureGroup.
-func (mr *MockStoreMockRecorder) ListRichFeatureGroup(ctx, entityName interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRichFeatureGroup", reflect.TypeOf((*MockStore)(nil).ListRichFeatureGroup), ctx, entityName)
 }
 
 // UpdateEntity mocks base method.

@@ -74,11 +74,9 @@ func TestExportFeatureValues(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			// mock database methods
-			metadataStore.EXPECT().GetRichFeatureGroup(gomock.Any(), tc.opt.GroupName).Return(&types.RichFeatureGroup{
-				FeatureGroup: types.FeatureGroup{
-					Name:       "device_info",
-					EntityName: "device",
-				},
+			metadataStore.EXPECT().GetFeatureGroup(gomock.Any(), tc.opt.GroupName).Return(&types.FeatureGroup{
+				Name:             "device_info",
+				EntityName:       "device",
 				OfflineDataTable: &dataTable,
 			}, nil)
 			metadataStore.EXPECT().ListFeature(gomock.Any(), types.ListFeatureOpt{GroupName: &tc.opt.GroupName}).Return(features, nil)
