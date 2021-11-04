@@ -1,0 +1,26 @@
+name: pre-release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  pre-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: '1.17'
+    - name: Build
+      run: |
+        cd featctl && make release
+
+    - uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: true
+        files: |
+          featctl/build/*
