@@ -29,6 +29,7 @@ entity_key,unix_time,model,price
 actual=$(featctl join historical-feature \
     --feature model,price \
     --input-file entity_rows.csv \
+    --output csv
     )
 
 assert_eq "$case" "$expected" "$actual"
