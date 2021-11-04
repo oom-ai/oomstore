@@ -13,5 +13,5 @@ expected='
 device,model,price
 1,xiaomi-mix3,3999
 '
-actual=$(featctl get online-feature --feature price,model -k 1)
+actual=$(featctl get online-feature --feature price,model -k 1 -o csv)
 assert_eq "$case" "$expected" "$actual"
