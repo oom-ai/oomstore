@@ -9,6 +9,7 @@ import (
 )
 
 var getHistoricalFeatureOpt types.ExportFeatureValuesOpt
+var getHistoricalFeatureOutput *string
 
 var getHistoricalFeatureCmd = &cobra.Command{
 	Use:   "historical-feature",
@@ -20,13 +21,16 @@ var getHistoricalFeatureCmd = &cobra.Command{
 		if !cmd.Flags().Changed("limit") {
 			getHistoricalFeatureOpt.Limit = nil
 		}
+		if !cmd.Flags().Changed("output") {
+			getHistoricalFeatureOutput = stringPtr(ASCIITable)
+		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if err := getHistoricalFeature(ctx, oomStore, getHistoricalFeatureOpt); err != nil {
+		if err := getHistoricalFeature(ctx, oomStore, getHistoricalFeatureOpt, *getHistoricalFeatureOutput); err != nil {
 			log.Fatalf("failed exporting features: %v\n", err)
 		}
 	},
@@ -44,4 +48,5 @@ func init() {
 
 	getHistoricalFeatureOpt.Limit = flags.Uint64P("limit", "l", 0, "max records to export")
 	getHistoricalFeatureOpt.GroupRevision = flags.Int64P("revision", "r", 0, "feature group revision")
+	getHistoricalFeatureOutput = flags.StringP("output", "o", "", "output format")
 }
