@@ -10,6 +10,6 @@ case='featctl list group works'
 expected='Name,Entity,Description,OnlineRevision,OfflineLatestRevision,OfflineLatestDataTable,CreateTime,ModifyTime
 phone,device,,<NULL>,<NULL>,,2021-10-19T04:01:20Z,2021-10-19T04:01:20Z
 '
-actual=$(featctl list group)
+actual=$(featctl list group -o csv)
 ignore_time() { cut -d ',' -f 1-5 <<<"$1"; }
 assert_eq "$case" "$(ignore_time "$expected" | sort)" "$(ignore_time "$actual" | sort)"
