@@ -15,7 +15,7 @@ import (
 )
 
 var cfgFile string
-var defaultCfgFile = filepath.Join(xdg.ConfigHome, "featctl", "config.yaml")
+var defaultCfgFile = filepath.Join(xdg.Home, ".config", "featctl", "config.yaml")
 
 var oomStoreCfg types.OomStoreConfig
 
@@ -24,9 +24,6 @@ var rootCmd = &cobra.Command{
 	Use:     "featctl",
 	Short:   "a cli tool that lets you control the oom feature store.",
 	Version: version.String(),
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		// panic("sjdfiod")
-	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
