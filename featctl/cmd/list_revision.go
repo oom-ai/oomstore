@@ -19,7 +19,6 @@ type listRevisionOption struct {
 }
 
 var listRevisionOpt listRevisionOption
-var listRevisionOutput *string
 
 var listRevisionCmd = &cobra.Command{
 	Use:   "revision",
@@ -27,9 +26,6 @@ var listRevisionCmd = &cobra.Command{
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("group") {
 			listRevisionOpt.GroupName = nil
-		}
-		if !cmd.Flags().Changed("output") {
-			listRevisionOutput = stringPtr(ASCIITable)
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -42,7 +38,7 @@ var listRevisionCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		if err := printRevisions(revisions, *listRevisionOutput); err != nil {
+		if err := printRevisions(revisions, *listOutput); err != nil {
 			log.Fatalf("failed printing revisions, error %v\n", err)
 		}
 
@@ -54,7 +50,6 @@ func init() {
 
 	flags := listRevisionCmd.Flags()
 	listRevisionOpt.GroupName = flags.StringP("group", "g", "", "feature group")
-	listRevisionOutput = flags.StringP("output", "o", "", "output format")
 }
 
 func printRevisions(revisions []*types.Revision, output string) error {
