@@ -3,14 +3,14 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"strings"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) createTableEntityDfWithFeatures(ctx context.Context, features types.FeatureList, entity *types.Entity) (string, error) {
-	tableName := fmt.Sprintf("entity_df_with_features_%d", rand.Int())
+	tableName := dbutil.TempTable("entity_df_with_features")
 	schema := `
 		CREATE TABLE %s (
 			unique_key  VARCHAR(%d) NOT NULL,
@@ -33,7 +33,7 @@ func (db *DB) createTableEntityDfWithFeatures(ctx context.Context, features type
 }
 
 func (db *DB) createAndImportTableEntityDf(ctx context.Context, entityRows []types.EntityRow, entity *types.Entity) (string, error) {
-	tableName := fmt.Sprintf("entity_df_%d", rand.Int())
+	tableName := dbutil.TempTable("entity_df_with_features")
 	schema := fmt.Sprintf(`
 		CREATE TABLE %s (
 			entity_key  VARCHAR(%d) NOT NULL,

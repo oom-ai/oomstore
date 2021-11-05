@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -60,4 +61,8 @@ func Quote(quote string, fields ...string) string {
 		rs = append(rs, quote+f+quote)
 	}
 	return strings.Join(rs, ",")
+}
+
+func TempTable(prefix string) string {
+	return fmt.Sprintf("tmp_%s_%d", prefix, time.Now().UnixNano())
 }

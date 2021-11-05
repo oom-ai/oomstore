@@ -3,8 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"math/rand"
-	"strconv"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -20,7 +18,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	columns := append([]string{opt.Entity.Name}, opt.Features.Names()...)
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		tmpTableName := opt.Revision.GroupName + "_" + strconv.Itoa(rand.Int())
+		tmpTableName := dbutil.TempTable(opt.Revision.GroupName)
 		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, opt.Entity, opt.Features)
 		_, err := db.ExecContext(ctx, schema)
 		if err != nil {
