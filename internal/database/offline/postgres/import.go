@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"math/rand"
 	"strconv"
 	"time"
 
@@ -51,7 +50,7 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, string,
 	var finalTableName string
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		tmpTableName := opt.GroupName + "_" + strconv.Itoa(rand.Int())
+		tmpTableName := dbutil.TempTable(opt.GroupName)
 		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, opt.Entity, opt.Features)
 		_, err := db.ExecContext(ctx, schema)
 		if err != nil {
