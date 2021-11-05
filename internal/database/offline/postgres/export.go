@@ -3,15 +3,15 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"strings"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan *types.RawFeatureValueRecord, error) {
 	fields := append([]string{opt.EntityName}, opt.FeatureNames...)
-	query := fmt.Sprintf("select %s from %s", strings.Join(fields, ","), opt.DataTable)
+	query := fmt.Sprintf("select %s from %s", dbutil.Quote(`"`, fields...), opt.DataTable)
 	if opt.Limit != nil {
 		query += fmt.Sprintf(" LIMIT %d", *opt.Limit)
 	}

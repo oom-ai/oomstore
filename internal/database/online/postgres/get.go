@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
@@ -17,7 +16,7 @@ import (
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
 	featureNames := opt.FeatureList.Names()
 	tableName := getOnlineBatchTableName(opt.RevisionId)
-	query := fmt.Sprintf(`SELECT "%s",%s FROM "%s" WHERE "%s" = $1`, opt.EntityName, strings.Join(featureNames, ","), tableName, opt.EntityName)
+	query := fmt.Sprintf(`SELECT "%s", %s FROM "%s" WHERE "%s" = $1`, opt.EntityName, dbutil.Quote(`"`, featureNames...), tableName, opt.EntityName)
 
 	record, err := db.QueryRowxContext(ctx, query, opt.EntityKey).SliceScan()
 	if err != nil {
@@ -45,7 +44,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
 	featureNames := opt.FeatureList.Names()
 	tableName := getOnlineBatchTableName(opt.RevisionId)
-	query := fmt.Sprintf(`SELECT "%s", %s FROM "%s" WHERE "%s" in (?);`, opt.EntityName, strings.Join(featureNames, ","), tableName, opt.EntityName)
+	query := fmt.Sprintf(`SELECT "%s", %s FROM "%s" WHERE "%s" in (?);`, opt.EntityName, dbutil.Quote(`"`, featureNames...), tableName, opt.EntityName)
 	sql, args, err := sqlx.In(query, opt.EntityKeys)
 	if err != nil {
 		return nil, err
