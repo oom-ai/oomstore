@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/cast"
@@ -40,27 +39,28 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (dataMap map[string
 
 	// Step 1: iterate each table range, get result
 	joinQuery := `
-		INSERT INTO %s(unique_key, entity_key, unix_time, %s)
+		INSERT INTO "%s"(unique_key, entity_key, unix_time, %s)
 		SELECT
 			CONCAT(l.entity_key, ',', l.unix_time) AS unique_key,
 			l.entity_key AS entity_key,
 			l.unix_time AS unix_time,
 			%s
-		FROM %s AS l
-		LEFT JOIN %s AS r
+		FROM "%s" AS l
+		LEFT JOIN "%s" AS r
 		ON l.entity_key = r.%s
 		WHERE l.unix_time >= $1 AND l.unix_time < $2;
 	`
-	featureNamesStr := strings.Join(opt.Features.Names(), ", ")
+	featureNamesStr := dbutil.Quote(`"`, opt.Features.Names()...)
 	for _, r := range opt.RevisionRanges {
-		_, tmpErr := db.ExecContext(ctx, fmt.Sprintf(joinQuery, entityDfWithFeatureName, featureNamesStr, featureNamesStr, entityDfName, r.DataTable, opt.Entity.Name), r.MinRevision, r.MaxRevision)
+		query := fmt.Sprintf(joinQuery, entityDfWithFeatureName, featureNamesStr, featureNamesStr, entityDfName, r.DataTable, opt.Entity.Name)
+		_, tmpErr := db.ExecContext(ctx, query, r.MinRevision, r.MaxRevision)
 		if tmpErr != nil {
 			return nil, tmpErr
 		}
 	}
 
 	// Step 2: get rows from entity_df_with_features table
-	resultQuery := fmt.Sprintf(`SELECT * FROM %s`, entityDfWithFeatureName)
+	resultQuery := fmt.Sprintf(`SELECT * FROM "%s"`, entityDfWithFeatureName)
 	rows, tmpErr := db.QueryxContext(ctx, resultQuery)
 	if tmpErr != nil {
 		return nil, tmpErr
