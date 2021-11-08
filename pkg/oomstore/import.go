@@ -79,6 +79,7 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		Entity:    entity,
 		Features:  features,
 		Header:    header,
+		Revision:  opt.Revision,
 		CsvReader: csvReader,
 	})
 	if err != nil {
@@ -90,5 +91,6 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		GroupName:   opt.GroupName,
 		DataTable:   dataTable,
 		Description: opt.Description,
+		Anchored:    opt.Revision != nil,
 	})
 }
