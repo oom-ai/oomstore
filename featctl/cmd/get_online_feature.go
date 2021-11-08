@@ -16,16 +16,10 @@ import (
 )
 
 var getOnlineFeatureOpt types.GetOnlineFeatureValuesOpt
-var getOnlineFeatureOutput *string
 
 var getOnlineFeatureCmd = &cobra.Command{
 	Use:   "online-feature",
 	Short: "get online feature values",
-	PreRun: func(cmd *cobra.Command, args []string) {
-		if !cmd.Flags().Changed("output") {
-			getOnlineFeatureOutput = stringPtr(ASCIITable)
-		}
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
@@ -36,7 +30,7 @@ var getOnlineFeatureCmd = &cobra.Command{
 			log.Fatalf("failed getting online features: %v", err)
 		}
 
-		if err := printOnlineFeatures(featureValueMap, *getOnlineFeatureOutput); err != nil {
+		if err := printOnlineFeatures(featureValueMap, *getOutput); err != nil {
 			log.Fatalf("failed printing online feature values, error %v\n", err)
 		}
 	},
@@ -52,8 +46,6 @@ func init() {
 
 	flags.StringSliceVar(&getOnlineFeatureOpt.FeatureNames, "feature", nil, "feature names")
 	_ = getOnlineFeatureCmd.MarkFlagRequired("feature")
-
-	getOnlineFeatureOutput = flags.StringP("output", "o", "", "output format")
 }
 
 func printOnlineFeatures(featureValueMap types.FeatureValueMap, output string) error {

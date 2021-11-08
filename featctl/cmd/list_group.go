@@ -18,7 +18,6 @@ type listFeatureGroupOption struct {
 }
 
 var listFeatureGroupOpt listFeatureGroupOption
-var listFeatureGroupOutput *string
 
 var listFeatureGroupCmd = &cobra.Command{
 	Use:   "group",
@@ -30,9 +29,6 @@ var listFeatureGroupCmd = &cobra.Command{
 		if !cmd.Flags().Changed("entity") {
 			listFeatureGroupOpt.EntityName = nil
 		}
-		if !cmd.Flags().Changed("output") {
-			listFeatureGroupOutput = stringPtr(ASCIITable)
-		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
@@ -43,7 +39,7 @@ var listFeatureGroupCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		if err := printFeatureGroups(groups, *listFeatureGroupOutput); err != nil {
+		if err := printFeatureGroups(groups, *listOutput); err != nil {
 			log.Fatalf("failed printing feature groups, error %v\n", err)
 		}
 	},
@@ -55,7 +51,6 @@ func init() {
 	flags := listFeatureGroupCmd.Flags()
 
 	listFeatureGroupOpt.EntityName = flags.StringP("entity", "", "", "use to filter groups")
-	listFeatureGroupOutput = flags.StringP("output", "o", "", "output format")
 }
 
 func printFeatureGroups(groups []*types.FeatureGroup, output string) error {
