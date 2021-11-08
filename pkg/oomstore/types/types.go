@@ -42,6 +42,7 @@ type Revision struct {
 	Revision  int64  `db:"revision"`
 	GroupName string `db:"group_name"`
 	DataTable string `db:"data_table"`
+	Anchored  bool   `db:"anchored"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
