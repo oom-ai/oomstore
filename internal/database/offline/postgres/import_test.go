@@ -50,7 +50,9 @@ func TestImport(t *testing.T) {
 	})
 
 	t.Run("normal import call", func(t *testing.T) {
+		revision := int64(1234)
 		opt.Features[0].DBValueType = "varchar(32)"
+		opt.Revision = &revision
 		_, tableName, err := db.Import(context.Background(), opt)
 		assert.Nil(t, err)
 

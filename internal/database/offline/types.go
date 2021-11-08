@@ -25,6 +25,7 @@ type ImportOpt struct {
 	Entity    *types.Entity
 	Features  types.FeatureList
 	Header    []string
+	Revision  *int64
 
 	// CsvReader must not contain header
 	CsvReader *csv.Reader
