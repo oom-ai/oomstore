@@ -19,6 +19,11 @@ var importOpt importOption
 var importCmd = &cobra.Command{
 	Use:   "import",
 	Short: "import feature data from a csv file",
+	PreRun: func(cmd *cobra.Command, args []string) {
+		if !cmd.Flags().Changed("revision") {
+			importOpt.Revision = nil
+		}
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
@@ -54,5 +59,7 @@ func init() {
 
 	flags.StringVar(&importOpt.FilePath, "input-file", "", "input csv file")
 	_ = importCmd.MarkFlagRequired("input-file")
+
 	flags.StringVar(&importOpt.DataSource.Delimiter, "delimiter", ",", "specify field delimiter")
+	importOpt.Revision = flags.Int64P("revision", "r", 0, "user-defined revision")
 }
