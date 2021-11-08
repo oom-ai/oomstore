@@ -17,6 +17,7 @@ type CreateRevisionOpt struct {
 	GroupName   string
 	DataTable   string
 	Description string
+	Anchored    bool
 }
 
 type GetRevisionOpt struct {
