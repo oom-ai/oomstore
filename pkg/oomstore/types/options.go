@@ -43,6 +43,7 @@ type ImportBatchFeaturesOpt struct {
 	GroupName   string
 	Description string
 	DataSource  CsvDataSource
+	Revision    *int64
 }
 
 type CsvDataSource struct {

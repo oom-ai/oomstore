@@ -63,8 +63,13 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, string,
 			return err
 		}
 
-		// generate revision using current timestamp
-		revision = time.Now().Unix()
+		if opt.Revision != nil {
+			// use user-defined revision
+			revision = *opt.Revision
+		} else {
+			// generate revision using current timestamp
+			revision = time.Now().Unix()
+		}
 
 		// generate final data table name
 		finalTableName = opt.GroupName + "_" + strconv.FormatInt(revision, 10)
