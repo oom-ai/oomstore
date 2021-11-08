@@ -14,7 +14,6 @@ import (
 )
 
 var listFeatureOpt types.ListFeatureOpt
-var listFeatureOutput *string
 
 var listFeatureCmd = &cobra.Command{
 	Use:   "feature",
@@ -25,9 +24,6 @@ var listFeatureCmd = &cobra.Command{
 		}
 		if !cmd.Flags().Changed("group") {
 			listFeatureOpt.GroupName = nil
-		}
-		if !cmd.Flags().Changed("output") {
-			listFeatureOutput = stringPtr(ASCIITable)
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -41,7 +37,7 @@ var listFeatureCmd = &cobra.Command{
 		}
 
 		// print features to stdout
-		if err := printFeatures(features, *listFeatureOutput); err != nil {
+		if err := printFeatures(features, *listOutput); err != nil {
 			log.Fatalf("failed printing features, error %v\n", err)
 		}
 	},
@@ -54,7 +50,6 @@ func init() {
 
 	listFeatureOpt.EntityName = flags.StringP("entity", "e", "", "entity")
 	listFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
-	listFeatureOutput = flags.StringP("output", "o", "", "output format")
 }
 
 func printFeatures(features types.FeatureList, output string) error {

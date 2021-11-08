@@ -14,14 +14,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listEntityOutput *string
 var listEntityCmd = &cobra.Command{
 	Use:   "entity",
 	Short: "list all existing entities",
 	PreRun: func(cmd *cobra.Command, args []string) {
-		if !cmd.Flags().Changed("output") {
-			listEntityOutput = stringPtr(ASCIITable)
-		}
 		if !cmd.Flags().Changed("limit") {
 			getHistoricalFeatureOpt.Limit = nil
 		}
@@ -37,7 +33,7 @@ var listEntityCmd = &cobra.Command{
 		}
 
 		// print entities to stdout
-		if err := printEntities(entities, *listEntityOutput); err != nil {
+		if err := printEntities(entities, *listOutput); err != nil {
 			log.Fatalf("failing printing entities, error %v\n", err)
 		}
 	},
@@ -45,10 +41,6 @@ var listEntityCmd = &cobra.Command{
 
 func init() {
 	listCmd.AddCommand(listEntityCmd)
-
-	flags := listEntityCmd.Flags()
-
-	listEntityOutput = flags.StringP("output", "o", "", "output format")
 }
 
 func printEntities(entities []*types.Entity, output string) error {
