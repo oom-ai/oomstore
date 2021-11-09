@@ -9,7 +9,7 @@ import (
 )
 
 type Store interface {
-	Join(ctx context.Context, opt JoinOpt) (map[string]dbutil.RowMap, error)
+	Join(ctx context.Context, opt JoinOpt) (stream <-chan dbutil.RowMapRecord, err error)
 	Export(ctx context.Context, opt ExportOpt) (<-chan *types.RawFeatureValueRecord, error)
 	Import(ctx context.Context, opt ImportOpt) (int64, string, error)
 
