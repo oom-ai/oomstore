@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMaterialize(t *testing.T) {
+func TestSync(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	onlineStore := mock_online.NewMockStore(ctrl)
@@ -38,7 +38,7 @@ func TestMaterialize(t *testing.T) {
 
 	testCases := []struct {
 		description      string
-		opt              types.MaterializeOpt
+		opt              types.SyncOpt
 		group            types.FeatureGroup
 		revision         types.Revision
 		previousRevision types.Revision
@@ -46,9 +46,9 @@ func TestMaterialize(t *testing.T) {
 	}{
 		{
 			description: "user-defined revision, succeed",
-			opt: types.MaterializeOpt{
-				GroupName:     "device_info",
-				GroupRevision: int64Ptr(10),
+			opt: types.SyncOpt{
+				GroupName:  "device_info",
+				RevisionId: 10,
 			},
 			group:            prepareGroup(int32Ptr(2)),
 			revision:         revision1,
@@ -57,7 +57,7 @@ func TestMaterialize(t *testing.T) {
 		},
 		{
 			description: "latest revision, succeed",
-			opt: types.MaterializeOpt{
+			opt: types.SyncOpt{
 				GroupName: "device_info",
 			},
 			group:            prepareGroup(int32Ptr(2)),
@@ -67,7 +67,7 @@ func TestMaterialize(t *testing.T) {
 		},
 		{
 			description: "no previous revision, succeed",
-			opt: types.MaterializeOpt{
+			opt: types.SyncOpt{
 				GroupName: "device_info",
 			},
 			group:         prepareGroup(nil),
@@ -76,7 +76,7 @@ func TestMaterialize(t *testing.T) {
 		},
 		{
 			description: "already in latest revision, fail",
-			opt: types.MaterializeOpt{
+			opt: types.SyncOpt{
 				GroupName: "device_info",
 			},
 			group:         prepareGroup(int32Ptr(3)),
@@ -88,16 +88,13 @@ func TestMaterialize(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			metadataStore.EXPECT().GetFeatureGroup(ctx, tc.opt.GroupName).Return(&tc.group, nil)
-			metadataStore.EXPECT().GetEntity(ctx, entity.Name).Return(&entity, nil)
-			metadataStore.EXPECT().ListFeature(ctx, types.ListFeatureOpt{GroupName: &tc.opt.GroupName}).Return(features, nil)
-			if tc.opt.GroupRevision != nil {
-				metadataStore.EXPECT().GetRevision(ctx, metadata.GetRevisionOpt{
-					GroupName: &tc.opt.GroupName,
-					Revision:  tc.opt.GroupRevision,
-				}).Return(&tc.revision, nil)
-			} else {
-				metadataStore.EXPECT().GetLatestRevision(ctx, tc.opt.GroupName).Return(&tc.revision, nil)
-			}
+			metadataStore.EXPECT().GetEntity(ctx, entity.Name).AnyTimes().Return(&entity, nil)
+			metadataStore.EXPECT().ListFeature(ctx, types.ListFeatureOpt{GroupName: &tc.opt.GroupName}).AnyTimes().Return(features, nil)
+
+			metadataStore.EXPECT().GetRevision(ctx, metadata.GetRevisionOpt{
+				GroupName:  &tc.opt.GroupName,
+				RevisionId: &tc.opt.RevisionId,
+			}).Return(&tc.revision, nil)
 			if tc.expectedError == nil {
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
 					DataTable:    tc.revision.DataTable,
@@ -120,9 +117,13 @@ func TestMaterialize(t *testing.T) {
 					GroupName:        tc.group.Name,
 					OnlineRevisionId: &tc.revision.ID,
 				})
+				metadataStore.EXPECT().
+					UpdateRevision(gomock.Any(), gomock.Any()).
+					AnyTimes().
+					Return(int64(0), nil)
 			}
 
-			err := store.Materialize(ctx, tc.opt)
+			err := store.Sync(ctx, tc.opt)
 			if tc.expectedError != nil {
 				assert.Error(t, err, tc.expectedError)
 			} else {
@@ -146,10 +147,6 @@ func prepareGroup(revisionId *int32) types.FeatureGroup {
 		OnlineRevisionID: revisionId,
 		EntityName:       "device",
 	}
-}
-
-func int64Ptr(i int64) *int64 {
-	return &i
 }
 
 func int32Ptr(i int32) *int32 {
