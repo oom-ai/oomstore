@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -42,7 +43,8 @@ var importCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("failed importing features: %v\n", err)
 		}
-		log.Printf("succeeded. Revision ID is: %d", revisionID)
+		log.Println("succeeded")
+		fmt.Printf("RevisionID: %d\n", revisionID)
 	},
 }
 

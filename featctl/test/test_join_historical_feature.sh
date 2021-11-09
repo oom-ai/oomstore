@@ -12,7 +12,7 @@ before_unix_time=$(date +%s)
 echo "1,${before_unix_time}" >> entity_rows.csv
 echo "2,${before_unix_time}" >> entity_rows.csv
 sleep 1
-import_sample
+import_sample > /dev/null
 after_unix_time=$(date +%s)
 echo "1,${after_unix_time}" >> entity_rows.csv
 echo "2,${after_unix_time}" >> entity_rows.csv

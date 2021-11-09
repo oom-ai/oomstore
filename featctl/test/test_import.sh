@@ -9,7 +9,7 @@ case='featctl import using absolute path'
 featctl import \
     --group phone \
     --input-file "$(pwd)/device.csv" \
-    --description 'test data'
+    --description 'test data' > /dev/null
 actual=$?
 expected=0
 assert_eq "$case" "$expected" "$actual"

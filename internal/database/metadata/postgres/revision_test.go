@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/stretchr/testify/assert"
@@ -27,6 +28,56 @@ func TestCreateRevision(t *testing.T) {
 	revision, err = db.CreateRevision(context.Background(), opt)
 	assert.Equal(t, err, fmt.Errorf("revision 1 already exist"))
 	assert.Nil(t, revision)
+}
+
+func TestUpdateRevision(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
+
+	groupName := "device_baseinfo"
+	revisionTimestamp := time.Now().Unix()
+	opt := metadata.CreateRevisionOpt{
+		GroupName:   groupName,
+		Revision:    revisionTimestamp,
+		DataTable:   "device_bastinfo_20211028",
+		Description: "description",
+	}
+	revision, err := db.CreateRevision(context.Background(), opt)
+	assert.Nil(t, err)
+	assert.Equal(t, int32(1), revision.ID)
+
+	r, err := db.GetRevision(context.Background(), metadata.GetRevisionOpt{
+		GroupName: &groupName,
+		Revision:  &revisionTimestamp,
+	})
+	assert.NoError(t, err)
+
+	newRevison := time.Now().Add(time.Second).Unix()
+	rowsAffected, err := db.UpdateRevision(context.Background(), metadata.UpdateRevisionOpt{
+		RevisionID:  int64(r.ID),
+		NewRevision: &newRevison,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(1), rowsAffected)
+
+	r, err = db.GetRevision(context.Background(), metadata.GetRevisionOpt{
+		RevisionId: &r.ID,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, newRevison, r.Revision)
+}
+
+func TestUpdateRevisionWithEmpty(t *testing.T) {
+	db := initAndOpenDB(t)
+	defer db.Close()
+
+	newRevision := int64(0)
+	rowsAffected, err := db.UpdateRevision(context.Background(), metadata.UpdateRevisionOpt{
+		RevisionID:  0,
+		NewRevision: &newRevision,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(0), rowsAffected)
 }
 
 func TestGetRevision(t *testing.T) {

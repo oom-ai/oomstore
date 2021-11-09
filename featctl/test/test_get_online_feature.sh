@@ -4,8 +4,8 @@ source ./util.sh
 
 init_store
 register_features
-import_sample
-materialize
+revisionID=$(import_sample)
+sync $revisionID
 
 case="query single feature"
 expected='
