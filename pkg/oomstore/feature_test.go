@@ -16,6 +16,119 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
+func TestImportBatchFeatureWithDependencyError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	offlineStore := mock_offline.NewMockStore(ctrl)
+	metadataStore := mock_metadata.NewMockStore(ctrl)
+	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
+
+	testCases := []struct {
+		description    string
+		opt            types.ImportBatchFeaturesOpt
+		mockFunc       func()
+		wantRevisionID int32
+		wantError      error
+	}{
+		{
+			description: "ListFeature failed",
+			opt:         types.ImportBatchFeaturesOpt{GroupName: "group-name"},
+			mockFunc: func() {
+				metadataStore.EXPECT().
+					ListFeature(gomock.Any(), types.ListFeatureOpt{GroupName: stringPtr("group-name")}).
+					Return(nil, fmt.Errorf("error"))
+			},
+			wantRevisionID: 0,
+			wantError:      fmt.Errorf("error"),
+		},
+		{
+			description: "GetFeatureGroup failed",
+			opt:         types.ImportBatchFeaturesOpt{GroupName: "group-name"},
+			mockFunc: func() {
+				metadataStore.EXPECT().
+					ListFeature(gomock.Any(), types.ListFeatureOpt{GroupName: stringPtr("group-name")}).
+					Return(nil, nil)
+				metadataStore.EXPECT().
+					GetFeatureGroup(gomock.Any(), "group-name").
+					Return(nil, fmt.Errorf("error"))
+			},
+			wantRevisionID: 0,
+			wantError:      fmt.Errorf("error"),
+		},
+		{
+			description: "GetEntity failed",
+			opt:         types.ImportBatchFeaturesOpt{GroupName: "group-name"},
+			mockFunc: func() {
+				metadataStore.EXPECT().
+					//ListFeature(gomock.Any(), types.ListFeatureOpt{GroupName: stringPtr("group-name")}).
+					ListFeature(gomock.Any(), gomock.Any()).
+					Return(nil, nil)
+				metadataStore.EXPECT().
+					GetFeatureGroup(gomock.Any(), "group-name").
+					Return(&types.FeatureGroup{EntityName: "entity-name"}, nil)
+				metadataStore.EXPECT().
+					GetEntity(gomock.Any(), "entity-name").
+					Return(nil, fmt.Errorf("error"))
+			},
+			wantRevisionID: 0,
+			wantError:      fmt.Errorf("error"),
+		},
+		{
+			description: "Create Revision failed",
+			opt: types.ImportBatchFeaturesOpt{
+				DataSource: types.CsvDataSource{
+					Reader: strings.NewReader(`
+device,model,price
+1234,xiaomi,200
+1235,apple,299
+`),
+					Delimiter: ",",
+				},
+				GroupName: "group-name",
+			},
+			mockFunc: func() {
+				metadataStore.EXPECT().
+					ListFeature(gomock.Any(), types.ListFeatureOpt{GroupName: stringPtr("group-name")}).
+					Return(types.FeatureList{
+						{
+							Name: "model",
+						},
+						{
+							Name: "price",
+						},
+					}, nil)
+				metadataStore.EXPECT().
+					GetFeatureGroup(gomock.Any(), "group-name").
+					Return(&types.FeatureGroup{EntityName: "entity-name"}, nil)
+				metadataStore.EXPECT().
+					GetEntity(gomock.Any(), "entity-name").
+					Return(&types.Entity{Name: "device"}, nil)
+
+				offlineStore.
+					EXPECT().
+					Import(gomock.Any(), gomock.Any()).
+					AnyTimes().Return(int64(1), "datatable", nil)
+
+				metadataStore.EXPECT().
+					CreateRevision(gomock.Any(), gomock.Any()).
+					Return(nil, fmt.Errorf("error"))
+			},
+			wantRevisionID: 0,
+			wantError:      fmt.Errorf("error"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			tc.mockFunc()
+			revisionID, err := store.ImportBatchFeatures(context.Background(), tc.opt)
+			assert.Equal(t, tc.wantError, err)
+			assert.Equal(t, tc.wantRevisionID, revisionID)
+		})
+	}
+}
+
 func TestImportBatchFeatures(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -27,11 +140,13 @@ func TestImportBatchFeatures(t *testing.T) {
 	testCases := []struct {
 		description string
 
-		opt        types.ImportBatchFeaturesOpt
-		features   types.FeatureList
-		entityName string
-		header     []string
-		wantError  error
+		opt              types.ImportBatchFeaturesOpt
+		features         types.FeatureList
+		entityName       string
+		header           []string
+		revisionID       int64
+		revisionIDIsZero bool
+		wantError        error
 	}{
 		{
 			description: "import batch feature: succeed",
@@ -52,9 +167,11 @@ func TestImportBatchFeatures(t *testing.T) {
 					Name: "price",
 				},
 			},
-			entityName: "device",
-			header:     []string{"device", "model", "price"},
-			wantError:  nil,
+			entityName:       "device",
+			header:           []string{"device", "model", "price"},
+			revisionID:       1,
+			revisionIDIsZero: false,
+			wantError:        nil,
 		},
 		{
 			description: "import batch feature: csv data source has duplicated columns",
@@ -77,9 +194,11 @@ device,model,model
 					Name: "price",
 				},
 			},
-			entityName: "device",
-			header:     []string{"device", "model"},
-			wantError:  fmt.Errorf("csv data source has duplicated columns: %v", []string{"device", "model", "model"}),
+			entityName:       "device",
+			header:           []string{"device", "model"},
+			revisionID:       0,
+			revisionIDIsZero: true,
+			wantError:        fmt.Errorf("csv data source has duplicated columns: %v", []string{"device", "model", "model"}),
 		},
 		{
 			description: "import batch feature: csv heaer of the data source doesn't match the feature group schema",
@@ -98,8 +217,10 @@ device,model,price
 					Name: "model",
 				},
 			},
-			entityName: "device",
-			header:     []string{"device", "model", "price"},
+			entityName:       "device",
+			header:           []string{"device", "model", "price"},
+			revisionID:       0,
+			revisionIDIsZero: true,
 			wantError: fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v",
 				[]string{"device", "model", "price"},
 				[]string{"device", "model"},
@@ -139,9 +260,14 @@ device,model,price
 				GroupName:   tc.opt.GroupName,
 				DataTable:   "datatable",
 				Description: tc.opt.Description,
-			}).AnyTimes().Return(nil)
+			}).AnyTimes().Return(&types.Revision{
+				ID: int32(tc.revisionID),
+			}, nil)
 
-			assert.Equal(t, tc.wantError, store.ImportBatchFeatures(context.Background(), tc.opt))
+			revisionID, err := store.ImportBatchFeatures(context.Background(), tc.opt)
+
+			assert.Equal(t, tc.wantError, err)
+			assert.Equal(t, revisionID == 0, tc.revisionIDIsZero)
 		})
 	}
 }
