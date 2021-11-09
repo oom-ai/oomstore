@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
@@ -38,14 +37,14 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			records = append(records, record)
 
 			if len(records) == PostgresBatchSize {
-				if err := db.insertRecordsToTable(ctx, tmpTableName, records, columns); err != nil {
+				if err := dbutil.InsertRecordsToTable(db.DB, ctx, tmpTableName, records, columns); err != nil {
 					return err
 				}
 				records = make([]interface{}, 0, PostgresBatchSize)
 			}
 		}
 
-		if err := db.insertRecordsToTable(ctx, tmpTableName, records, columns); err != nil {
+		if err := dbutil.InsertRecordsToTable(db.DB, ctx, tmpTableName, records, columns); err != nil {
 			return err
 		}
 
@@ -60,26 +59,4 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 func getOnlineBatchTableName(revisionId int32) string {
 	return fmt.Sprintf("batch_%d", revisionId)
-}
-
-func (db *DB) insertRecordsToTable(ctx context.Context, tableName string, records []interface{}, columns []string) error {
-	if len(records) == 0 {
-		return nil
-	}
-	valueFlags := make([]string, 0, PostgresBatchSize)
-	for i := 0; i < len(records); i++ {
-		valueFlags = append(valueFlags, "(?)")
-	}
-
-	query, args, err := sqlx.In(
-		fmt.Sprintf(`INSERT INTO "%s" (%s) VALUES %s`, tableName, dbutil.Quote(`"`, columns...), strings.Join(valueFlags, ",")),
-		records...)
-	if err != nil {
-		return err
-	}
-
-	if _, err := db.ExecContext(ctx, db.Rebind(query), args...); err != nil {
-		return err
-	}
-	return nil
 }

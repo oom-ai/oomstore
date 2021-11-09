@@ -14,10 +14,18 @@ type ExportOpt struct {
 }
 
 type JoinOpt struct {
-	Entity         *types.Entity
-	EntityRows     []types.EntityRow
-	RevisionRanges []*types.RevisionRange
-	Features       types.FeatureList
+	Entity           types.Entity
+	EntityRows       <-chan types.EntityRow
+	FeatureMap       map[string]types.FeatureList
+	RevisionRangeMap map[string][]*types.RevisionRange
+}
+
+type JoinOneFeatureGroupOpt struct {
+	GroupName           string
+	Features            types.FeatureList
+	RevisionRanges      []*types.RevisionRange
+	Entity              types.Entity
+	EntityRowsTableName string
 }
 
 type ImportOpt struct {

@@ -63,7 +63,7 @@ type MultiGetOnlineFeatureValuesOpt struct {
 
 type GetHistoricalFeatureValuesOpt struct {
 	FeatureNames []string
-	EntityRows   []EntityRow
+	EntityRows   <-chan EntityRow
 }
 
 type UpdateEntityOpt struct {
