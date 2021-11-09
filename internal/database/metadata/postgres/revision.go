@@ -72,17 +72,20 @@ func (db *DB) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*ty
 	return &rs, nil
 }
 
-func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) error {
-	query := "INSERT INTO feature_group_revision(group_name, revision, data_table, anchored, description) VALUES ($1, $2, $3, $4, $5)"
-	_, err := db.ExecContext(ctx, query, opt.GroupName, opt.Revision, opt.DataTable, opt.Anchored, opt.Description)
+func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (*types.Revision, error) {
+	query := "INSERT INTO feature_group_revision(group_name, revision, data_table, anchored, description) VALUES ($1, $2, $3, $4, $5) RETURNING *"
+	var revision types.Revision
+
+	err := db.GetContext(ctx, &revision, query, opt.GroupName, opt.Revision, opt.DataTable, opt.Anchored, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
-				return fmt.Errorf("revision %v already exist", opt.Revision)
+				return nil, fmt.Errorf("revision %v already exist", opt.Revision)
 			}
 		}
+		return nil, err
 	}
-	return err
+	return &revision, nil
 }
 
 func (db *DB) GetLatestRevision(ctx context.Context, groupName string) (*types.Revision, error) {

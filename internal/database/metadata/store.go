@@ -27,7 +27,7 @@ type Store interface {
 	UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error)
 
 	// revision
-	CreateRevision(ctx context.Context, opt CreateRevisionOpt) error
+	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (*types.Revision, error)
 	ListRevision(ctx context.Context, opt ListRevisionOpt) ([]*types.Revision, error)
 	GetRevision(ctx context.Context, opt GetRevisionOpt) (*types.Revision, error)
 	GetLatestRevision(ctx context.Context, groupName string) (*types.Revision, error)
