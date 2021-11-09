@@ -63,12 +63,6 @@ import_sample() {
     --description 'test data' |grep -o '[0-9]\+'
 }
 
-# materialize feature values from offline store to online store
-materialize() {
-    info "materialize sample data to online store..."
-    featctl materialize phone
-}
-
 # sync feature values from offline store to online store
 sync() {
     info "sync sample data to online store"
