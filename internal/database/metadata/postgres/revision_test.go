@@ -20,8 +20,13 @@ func TestCreateRevision(t *testing.T) {
 		Description: "description",
 	}
 
-	assert.Nil(t, db.CreateRevision(context.Background(), opt))
-	assert.Equal(t, db.CreateRevision(context.Background(), opt), fmt.Errorf("revision 1 already exist"))
+	revision, err := db.CreateRevision(context.Background(), opt)
+	assert.Nil(t, err)
+	assert.Equal(t, int32(1), revision.ID)
+
+	revision, err = db.CreateRevision(context.Background(), opt)
+	assert.Equal(t, err, fmt.Errorf("revision 1 already exist"))
+	assert.Nil(t, revision)
 }
 
 func TestGetRevision(t *testing.T) {
@@ -38,7 +43,9 @@ func TestGetRevision(t *testing.T) {
 		DataTable:   "device_bastinfo_20211028",
 		Description: "description",
 	}
-	assert.Nil(t, db.CreateRevision(context.Background(), opt))
+	revision, err := db.CreateRevision(context.Background(), opt)
+	assert.Nil(t, err)
+	assert.Equal(t, int32(1), revision.ID)
 
 	groupName := "invalid-group-name"
 	r, err = db.GetRevision(context.Background(), metadata.GetRevisionOpt{
@@ -77,8 +84,13 @@ func TestListRevision(t *testing.T) {
 		Description: "description",
 	}
 
-	assert.Nil(t, db.CreateRevision(context.Background(), opt1))
-	assert.Nil(t, db.CreateRevision(context.Background(), opt2))
+	revision, err := db.CreateRevision(context.Background(), opt1)
+	assert.Nil(t, err)
+	assert.Equal(t, int32(1), revision.ID)
+
+	revision, err = db.CreateRevision(context.Background(), opt2)
+	assert.Nil(t, err)
+	assert.Equal(t, int32(2), revision.ID)
 
 	groupName := "device_baseinfo"
 	rs, err = db.ListRevision(context.Background(), metadata.ListRevisionOpt{
