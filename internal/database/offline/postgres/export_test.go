@@ -37,13 +37,13 @@ func TestExport(t *testing.T) {
 	_, err := db.ExecContext(ctx, schema)
 	require.NoError(t, err)
 
-	err = insertTestData(db, ctx, "device_info_1", "1234", "xiaomi", 100)
+	err = insertTestDataToBasic(db, ctx, "device_info_1", "1234", "xiaomi", 100)
 	require.NoError(t, err)
-	err = insertTestData(db, ctx, "device_info_1", "1235", "apple", 200)
+	err = insertTestDataToBasic(db, ctx, "device_info_1", "1235", "apple", 200)
 	require.NoError(t, err)
-	err = insertTestData(db, ctx, "device_info_1", "1236", "huawei", 300)
+	err = insertTestDataToBasic(db, ctx, "device_info_1", "1236", "huawei", 300)
 	require.NoError(t, err)
-	err = insertTestData(db, ctx, "device_info_1", "1237", "oneplus", 240)
+	err = insertTestDataToBasic(db, ctx, "device_info_1", "1237", "oneplus", 240)
 	require.NoError(t, err)
 
 	testCases := []struct {

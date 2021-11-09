@@ -1,6 +1,7 @@
 package dbutil
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"strconv"
@@ -12,6 +13,14 @@ import (
 )
 
 type RowMap = map[string]interface{}
+type RowMapRecord struct {
+	RowMap RowMap
+	Error  error
+}
+
+const (
+	PostgresBatchSize = 10
+)
 
 const CREATE_DATA_TABLE = `CREATE TABLE "{{TABLE_NAME}}" (
 	"{{ENTITY_NAME}}" VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY,
@@ -65,4 +74,26 @@ func Quote(quote string, fields ...string) string {
 
 func TempTable(prefix string) string {
 	return fmt.Sprintf("tmp_%s_%d", prefix, time.Now().UnixNano())
+}
+
+func InsertRecordsToTable(db *sqlx.DB, ctx context.Context, tableName string, records []interface{}, columns []string) error {
+	if len(records) == 0 {
+		return nil
+	}
+	valueFlags := make([]string, 0, len(records))
+	for i := 0; i < len(records); i++ {
+		valueFlags = append(valueFlags, "(?)")
+	}
+
+	query, args, err := sqlx.In(
+		fmt.Sprintf(`INSERT INTO "%s" (%s) VALUES %s`, tableName, Quote(`"`, columns...), strings.Join(valueFlags, ",")),
+		records...)
+	if err != nil {
+		return err
+	}
+
+	if _, err := db.ExecContext(ctx, db.Rebind(query), args...); err != nil {
+		return err
+	}
+	return nil
 }
