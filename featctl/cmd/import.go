@@ -38,11 +38,11 @@ var importCmd = &cobra.Command{
 		importOpt.DataSource.Reader = file
 
 		log.Println("importing features ...")
-		if err := oomStore.ImportBatchFeatures(ctx, importOpt.ImportBatchFeaturesOpt); err != nil {
+		revisionID, err := oomStore.ImportBatchFeatures(ctx, importOpt.ImportBatchFeaturesOpt)
+		if err != nil {
 			log.Fatalf("failed importing features: %v\n", err)
 		}
-
-		log.Println("succeeded.")
+		log.Printf("succeeded. Revision ID is: %d", revisionID)
 	},
 }
 
