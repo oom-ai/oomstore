@@ -21,7 +21,10 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 		}
 		dataTable = *group.OfflineDataTable
 	} else {
-		revision, err := s.GetRevision(ctx, opt.GroupName, *opt.GroupRevision)
+		revision, err := s.GetRevision(ctx, types.GetRevisionOpt{
+			GroupName: &opt.GroupName,
+			Revision:  opt.GroupRevision,
+		})
 		if err != nil {
 			return nil, nil, err
 		}
