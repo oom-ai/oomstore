@@ -301,3 +301,18 @@ func (mr *MockStoreMockRecorder) UpdateFeatureGroup(ctx, opt interface{}) *gomoc
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFeatureGroup", reflect.TypeOf((*MockStore)(nil).UpdateFeatureGroup), ctx, opt)
 }
+
+// UpdateRevision mocks base method.
+func (m *MockStore) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateRevision", ctx, opt)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateRevision indicates an expected call of UpdateRevision.
+func (mr *MockStoreMockRecorder) UpdateRevision(ctx, opt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRevision", reflect.TypeOf((*MockStore)(nil).UpdateRevision), ctx, opt)
+}

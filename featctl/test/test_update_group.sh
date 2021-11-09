@@ -4,7 +4,7 @@ source ./util.sh
 
 init_store
 register_features
-import_sample
+import_sample > /dev/null
 
 case='featctl update group works'
 featctl update group phone --description "new description"

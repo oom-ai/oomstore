@@ -3,6 +3,7 @@ package oomstore
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -10,10 +11,22 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (s *OomStore) Materialize(ctx context.Context, opt types.MaterializeOpt) error {
+func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
+	revision, err := s.GetRevision(ctx, types.GetRevisionOpt{
+		GroupName:  &opt.GroupName,
+		RevisionId: &opt.RevisionId,
+	})
+	if err != nil {
+		return err
+	}
+
 	group, err := s.GetFeatureGroup(ctx, opt.GroupName)
 	if err != nil {
 		return err
+	}
+
+	if group.OnlineRevisionID != nil && *group.OnlineRevisionID == revision.ID {
+		return fmt.Errorf("online store already in the latest revision")
 	}
 
 	entity, err := s.GetEntity(ctx, group.EntityName)
@@ -26,14 +39,6 @@ func (s *OomStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
-	revision, err := s.getMaterializeRevision(ctx, opt)
-	if err != nil {
-		return err
-	}
-	if group.OnlineRevisionID != nil && *group.OnlineRevisionID == revision.ID {
-		return fmt.Errorf("online store already in the latest revision")
-	}
-
 	stream, err := s.offline.Export(ctx, offline.ExportOpt{
 		DataTable:    revision.DataTable,
 		EntityName:   group.EntityName,
@@ -43,13 +48,12 @@ func (s *OomStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 		return err
 	}
 
-	err = s.online.Import(ctx, online.ImportOpt{
+	if err = s.online.Import(ctx, online.ImportOpt{
 		Features: features,
 		Revision: revision,
 		Entity:   entity,
 		Stream:   stream,
-	})
-	if err != nil {
+	}); err != nil {
 		return err
 	}
 
@@ -73,12 +77,18 @@ func (s *OomStore) Materialize(ctx context.Context, opt types.MaterializeOpt) er
 	if previousRevision != nil {
 		return s.online.Purge(ctx, previousRevision)
 	}
-	return nil
-}
 
-func (s *OomStore) getMaterializeRevision(ctx context.Context, opt types.MaterializeOpt) (*types.Revision, error) {
-	if opt.GroupRevision != nil {
-		return s.GetRevision(ctx, opt.GroupName, *opt.GroupRevision)
+	if !revision.Anchored {
+		newRevision := time.Now().Unix()
+		newChored := true
+		// udpate revision timestamp using current timestamp
+		if _, err = s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
+			RevisionID:  int64(revision.ID),
+			NewRevision: &newRevision,
+			NewAnchored: &newChored,
+		}); err != nil {
+			return err
+		}
 	}
-	return s.metadata.GetLatestRevision(ctx, opt.GroupName)
+	return nil
 }

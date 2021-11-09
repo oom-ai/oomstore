@@ -1,6 +1,8 @@
 package types
 
-import "io"
+import (
+	"io"
+)
 
 type CreateFeatureOpt struct {
 	FeatureName string
@@ -80,4 +82,15 @@ type UpdateFeatureGroupOpt struct {
 type MaterializeOpt struct {
 	GroupName     string
 	GroupRevision *int64
+}
+
+type SyncOpt struct {
+	GroupName  string
+	RevisionId int32
+}
+
+type GetRevisionOpt struct {
+	GroupName  *string
+	Revision   *int64
+	RevisionId *int32
 }
