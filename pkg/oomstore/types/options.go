@@ -79,11 +79,6 @@ type UpdateFeatureGroupOpt struct {
 	OnlineRevisionId *int32
 }
 
-type MaterializeOpt struct {
-	GroupName     string
-	GroupRevision *int64
-}
-
 type SyncOpt struct {
 	GroupName  string
 	RevisionId int32
