@@ -11,9 +11,10 @@ func (s *OomStore) ListRevision(ctx context.Context, groupName *string) ([]*type
 	return s.metadata.ListRevision(ctx, metadata.ListRevisionOpt{GroupName: groupName})
 }
 
-func (s *OomStore) GetRevision(ctx context.Context, groupName string, revision int64) (*types.Revision, error) {
+func (s *OomStore) GetRevision(ctx context.Context, opt types.GetRevisionOpt) (*types.Revision, error) {
 	return s.metadata.GetRevision(ctx, metadata.GetRevisionOpt{
-		GroupName: &groupName,
-		Revision:  &revision,
+		GroupName:  opt.GroupName,
+		Revision:   opt.Revision,
+		RevisionId: opt.RevisionId,
 	})
 }
