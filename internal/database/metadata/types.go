@@ -30,3 +30,9 @@ type ListRevisionOpt struct {
 	GroupName  *string
 	DataTables []string
 }
+
+type UpdateRevisionOpt struct {
+	RevisionID  int64
+	NewRevision *int64
+	NewAnchored *bool
+}
