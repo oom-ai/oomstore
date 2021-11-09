@@ -4,7 +4,7 @@ source ./util.sh
 
 init_store
 register_features
-import_sample
+import_sample > /dev/null
 
 case='featctl update entity works'
 featctl update entity device --description "new description"
