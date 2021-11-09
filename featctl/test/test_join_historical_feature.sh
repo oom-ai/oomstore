@@ -20,10 +20,10 @@ echo "2,${after_unix_time}" >> entity_rows.csv
 case='featctl join historical-feature'
 expected="
 entity_key,unix_time,model,price
-1,${before_unix_time},,
 1,${after_unix_time},xiaomi-mix3,3999
-2,${before_unix_time},,
 2,${after_unix_time},huawei-p40,5299
+1,${before_unix_time},,
+2,${before_unix_time},,
 "
 
 actual=$(featctl join historical-feature \
@@ -32,4 +32,7 @@ actual=$(featctl join historical-feature \
     --output csv
     )
 
-assert_eq "$case" "$expected" "$actual"
+sorted_expected=$(echo "$expected"|sort)
+sorted_actual=$(echo "$actual"|sort)
+
+assert_eq "$case" "$sorted_expected" "$sorted_actual"

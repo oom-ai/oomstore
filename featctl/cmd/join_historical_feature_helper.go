@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 
@@ -39,35 +40,50 @@ func joinHistoricalFeatures(ctx context.Context, store *oomstore.OomStore, opt J
 	return nil
 }
 
-func getEntityRowsFromInputFile(inputFilePath string) ([]types.EntityRow, error) {
+func getEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, error) {
 	input, err := os.Open(inputFilePath)
 	if err != nil {
 		return nil, err
 	}
-	defer input.Close()
-
-	lines, err := csv.NewReader(input).ReadAll()
-	if err != nil {
-		return nil, err
-	}
-	entityRows := make([]types.EntityRow, 0, len(lines))
-	for i, line := range lines {
-		if len(line) != 2 {
-			return nil, fmt.Errorf("expected 2 values per row, got %d value(s) at row %d", len(line), i)
+	entityRows := make(chan types.EntityRow)
+	var readErr error
+	go func() {
+		defer close(entityRows)
+		defer input.Close()
+		reader := csv.NewReader(input)
+		var i int64
+		for {
+			line, err := reader.Read()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				readErr = err
+				return
+			}
+			if len(line) != 2 {
+				readErr = fmt.Errorf("expected 2 values per row, got %d value(s) at row %d", len(line), i)
+				return
+			}
+			unixTime, err := strconv.Atoi(line[1])
+			if err != nil {
+				readErr = err
+				return
+			}
+			entityRows <- types.EntityRow{
+				EntityKey: line[0],
+				UnixTime:  int64(unixTime),
+			}
+			i++
 		}
-		unixTime, err := strconv.Atoi(line[1])
-		if err != nil {
-			return nil, err
-		}
-		entityRows = append(entityRows, types.EntityRow{
-			EntityKey: line[0],
-			UnixTime:  int64(unixTime),
-		})
+	}()
+	if readErr != nil {
+		return nil, readErr
 	}
 	return entityRows, nil
 }
 
-func printJoinedHistoricalFeatures(featureRows []*types.EntityRowWithFeatures, featureNames []string, output string) error {
+func printJoinedHistoricalFeatures(featureRows <-chan *types.EntityRowWithFeatures, featureNames []string, output string) error {
 	switch output {
 	case CSV:
 		return printJoinedHistoricalFeaturesInCSV(featureRows, featureNames)
@@ -78,13 +94,13 @@ func printJoinedHistoricalFeatures(featureRows []*types.EntityRowWithFeatures, f
 	}
 }
 
-func printJoinedHistoricalFeaturesInCSV(featureRows []*types.EntityRowWithFeatures, featureNames []string) error {
+func printJoinedHistoricalFeaturesInCSV(featureRows <-chan *types.EntityRowWithFeatures, featureNames []string) error {
 	w := csv.NewWriter(os.Stdout)
 	defer w.Flush()
 	if err := w.Write(joinHeader(featureNames)); err != nil {
 		return err
 	}
-	for _, row := range featureRows {
+	for row := range featureRows {
 		if err := w.Write(joinRecord(row)); err != nil {
 			return err
 		}
@@ -92,12 +108,12 @@ func printJoinedHistoricalFeaturesInCSV(featureRows []*types.EntityRowWithFeatur
 	return nil
 }
 
-func printJoinedHistoricalFeaturesInASCIITable(featureRows []*types.EntityRowWithFeatures, featureNames []string) error {
+func printJoinedHistoricalFeaturesInASCIITable(featureRows <-chan *types.EntityRowWithFeatures, featureNames []string) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(joinHeader(featureNames))
 	table.SetAutoFormatHeaders(false)
 
-	for _, row := range featureRows {
+	for row := range featureRows {
 		table.Append(joinRecord(row))
 	}
 	table.Render()
