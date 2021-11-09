@@ -3,45 +3,73 @@ package postgres
 import (
 	"context"
 	"fmt"
-
-	"github.com/jmoiron/sqlx"
-	"github.com/spf13/cast"
+	"strings"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (dataMap map[string]dbutil.RowMap, err error) {
-	if len(opt.Features) == 0 || len(opt.EntityRows) == 0 {
-		return make(map[string]dbutil.RowMap), nil
+func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (<-chan dbutil.RowMapRecord, error) {
+	// Step 1: prepare temporary table entity_rows
+	features := types.FeatureList{}
+	for _, featureList := range opt.FeatureMap {
+		features = append(features, featureList...)
+	}
+	if len(features) == 0 {
+		return nil, nil
+	}
+	entityRowsTableName, err := db.createAndImportTableEntityRows(ctx, opt.Entity, opt.EntityRows)
+	if err != nil {
+		return nil, err
 	}
 
-	// Step 0: prepare temporary tables
-	entityDfWithFeatureName, tmpErr := db.createTableEntityDfWithFeatures(ctx, opt.Features, opt.Entity)
-	if tmpErr != nil {
-		return nil, tmpErr
-	}
-	defer func() {
-		if tmpErr := db.dropTable(ctx, entityDfWithFeatureName); tmpErr != nil {
-			err = tmpErr
+	// Step 2: process features by group, insert result to table joined
+	tableNames := make([]string, 0)
+	tableToFeatureMap := make(map[string]types.FeatureList)
+	for groupName, featureList := range opt.FeatureMap {
+		revisionRanges, ok := opt.RevisionRangeMap[groupName]
+		if !ok {
+			continue
 		}
-	}()
-
-	entityDfName, tmpErr := db.createAndImportTableEntityDf(ctx, opt.EntityRows, opt.Entity)
-	if tmpErr != nil {
-		return nil, tmpErr
-	}
-	defer func() {
-		if tmpErr := db.dropTable(ctx, entityDfName); tmpErr != nil {
-			err = tmpErr
+		joinedTableName, err := db.joinOneFeatureGroup(ctx, offline.JoinOneFeatureGroupOpt{
+			GroupName:           groupName,
+			Entity:              opt.Entity,
+			Features:            featureList,
+			RevisionRanges:      revisionRanges,
+			EntityRowsTableName: entityRowsTableName,
+		})
+		if err != nil {
+			return nil, err
 		}
-	}()
+		if joinedTableName != "" {
+			tableNames = append(tableNames, joinedTableName)
+			tableToFeatureMap[joinedTableName] = featureList
+		}
+	}
 
-	// Step 1: iterate each table range, get result
+	// Step 3: read joined results
+	stream, err := db.readJoinedTable(ctx, entityRowsTableName, tableNames, tableToFeatureMap)
+	if err != nil {
+		return nil, err
+	}
+	return stream, nil
+}
+
+func (db *DB) joinOneFeatureGroup(ctx context.Context, opt offline.JoinOneFeatureGroupOpt) (string, error) {
+	if len(opt.Features) == 0 {
+		return "", nil
+	}
+	// Step 1: create temporary joined table
+	joinedTableName, err := db.createTableJoined(ctx, opt.Features, opt.Entity, opt.GroupName)
+	if err != nil {
+		return "", err
+	}
+
+	// Step 2: iterate each table range, join entity_rows table and each data tables
 	joinQuery := `
-		INSERT INTO "%s"(unique_key, entity_key, unix_time, %s)
+		INSERT INTO "%s"(entity_key, unix_time, %s)
 		SELECT
-			CONCAT(l.entity_key, ',', l.unix_time) AS unique_key,
 			l.entity_key AS entity_key,
 			l.unix_time AS unix_time,
 			%s
@@ -52,38 +80,68 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (dataMap map[string
 	`
 	featureNamesStr := dbutil.Quote(`"`, opt.Features.Names()...)
 	for _, r := range opt.RevisionRanges {
-		query := fmt.Sprintf(joinQuery, entityDfWithFeatureName, featureNamesStr, featureNamesStr, entityDfName, r.DataTable, opt.Entity.Name)
-		_, tmpErr := db.ExecContext(ctx, query, r.MinRevision, r.MaxRevision)
-		if tmpErr != nil {
-			return nil, tmpErr
+		query := fmt.Sprintf(joinQuery, joinedTableName, featureNamesStr, featureNamesStr, opt.EntityRowsTableName, r.DataTable, opt.Entity.Name)
+		if _, tmpErr := db.ExecContext(ctx, query, r.MinRevision, r.MaxRevision); tmpErr != nil {
+			return "", tmpErr
 		}
 	}
 
-	// Step 2: get rows from entity_df_with_features table
-	resultQuery := fmt.Sprintf(`SELECT * FROM "%s"`, entityDfWithFeatureName)
-	rows, tmpErr := db.QueryxContext(ctx, resultQuery)
-	if tmpErr != nil {
-		return nil, tmpErr
-	}
-	defer rows.Close()
-
-	dataMap, err = getFeatureValueMapFromRows(rows, "unique_key")
-	return dataMap, err
+	return joinedTableName, nil
 }
 
-func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string) (map[string]dbutil.RowMap, error) {
-	featureValueMap := make(map[string]dbutil.RowMap)
-	for rows.Next() {
-		rowMap := make(dbutil.RowMap)
-		if err := rows.MapScan(rowMap); err != nil {
-			return nil, err
-		}
-		entityKey, ok := rowMap[entityName]
-		if !ok {
-			return nil, fmt.Errorf("missing column %s", entityName)
-		}
-		delete(rowMap, entityName)
-		featureValueMap[cast.ToString(entityKey)] = rowMap
+func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, tableNames []string, featureMap map[string]types.FeatureList) (<-chan dbutil.RowMapRecord, error) {
+	if len(tableNames) == 0 {
+		return nil, nil
 	}
-	return featureValueMap, nil
+
+	// Step 1: join temporary tables
+	/*
+		SELECT
+		entity_rows_table.entity_key,
+			entity_rows_table.unix_time,
+			joined_table_1.feature_1,
+			joined_table_1.feature_2,
+			joined_table_2.feature_3
+		FROM entity_rows_table
+		LEFT JOIN joined_table_1
+		ON entity_rows_table.entity_key = joined_table_1.entity_key AND entity_rows_table.unix_time = joined_table_1.unix_time
+		LEFT JOIN joined_table_2
+		ON entity_rows_table.entity_key = joined_table_2.entity_key AND entity_rows_table.unix_time = joined_table_2.unix_time;
+	*/
+	fields := []string{fmt.Sprintf("%s.entity_key, %s.unix_time", entityRowsTableName, entityRowsTableName)}
+	for _, tableName := range tableNames {
+		for _, f := range featureMap[tableName] {
+			fields = append(fields, fmt.Sprintf("%s.%s", tableName, f.Name))
+		}
+	}
+	query := fmt.Sprintf(`SELECT %s FROM %s`, strings.Join(fields, ","), dbutil.Quote(`"`, entityRowsTableName))
+	tableNames = append([]string{entityRowsTableName}, tableNames...)
+	for i := range tableNames {
+		if i == 0 {
+			continue
+		}
+		query = fmt.Sprintf("%s LEFT JOIN %s ON %s.unix_time = %s.unix_time AND %s.entity_key = %s.entity_key",
+			query, tableNames[i], tableNames[i-1], tableNames[i], tableNames[i-1], tableNames[i])
+	}
+
+	// Step 2: read joined results
+	rows, err := db.QueryxContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	stream := make(chan dbutil.RowMapRecord)
+	go func() {
+		defer rows.Close()
+		defer close(stream)
+		for rows.Next() {
+			rowMap := make(dbutil.RowMap)
+			err := rows.MapScan(rowMap)
+			stream <- dbutil.RowMapRecord{
+				RowMap: rowMap,
+				Error:  err,
+			}
+		}
+	}()
+	return stream, nil
 }
