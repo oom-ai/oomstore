@@ -41,21 +41,21 @@ func stringSliceEqual(a, b []string) bool {
 	return true
 }
 
-func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) error {
+func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) (int32, error) {
 	// get columns of the group
 	features, err := s.metadata.ListFeature(ctx, types.ListFeatureOpt{GroupName: &opt.GroupName})
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// get entity info
 	group, err := s.GetFeatureGroup(ctx, opt.GroupName)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	entity, err := s.GetEntity(ctx, group.EntityName)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// make sure csv data source has all defined columns
@@ -64,14 +64,14 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 
 	header, err := csvReader.Read()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if hasDup(header) {
-		return fmt.Errorf("csv data source has duplicated columns: %v", header)
+		return 0, fmt.Errorf("csv data source has duplicated columns: %v", header)
 	}
 	columnNames := append([]string{entity.Name}, features.Names()...)
 	if !stringSliceEqual(header, columnNames) {
-		return fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
+		return 0, fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
 	revision, dataTable, err := s.offline.Import(ctx, offline.ImportOpt{
@@ -83,14 +83,18 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		CsvReader: csvReader,
 	})
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	newRevision, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:    revision,
 		GroupName:   opt.GroupName,
 		DataTable:   dataTable,
 		Description: opt.Description,
 		Anchored:    opt.Revision != nil,
 	})
+	if err != nil {
+		return 0, err
+	}
+	return newRevision.ID, nil
 }

@@ -155,3 +155,7 @@ func int64Ptr(i int64) *int64 {
 func int32Ptr(i int32) *int32 {
 	return &i
 }
+
+func stringPtr(s string) *string {
+	return &s
+}
