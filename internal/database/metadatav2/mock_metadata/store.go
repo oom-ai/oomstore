@@ -81,11 +81,12 @@ func (mr *MockStoreMockRecorder) CreateEntity(ctx, opt interface{}) *gomock.Call
 }
 
 // CreateFeature mocks base method.
-func (m *MockStore) CreateFeature(ctx context.Context, opt metadatav2.CreateFeatureOpt) error {
+func (m *MockStore) CreateFeature(ctx context.Context, opt metadatav2.CreateFeatureOpt) (int16, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFeature", ctx, opt)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int16)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CreateFeature indicates an expected call of CreateFeature.

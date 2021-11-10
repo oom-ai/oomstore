@@ -16,7 +16,7 @@ type Store interface {
 	ListEntity(ctx context.Context) typesv2.EntityList
 
 	// feature
-	CreateFeature(ctx context.Context, opt CreateFeatureOpt) error
+	CreateFeature(ctx context.Context, opt CreateFeatureOpt) (int16, error)
 	UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error)
 	GetFeature(ctx context.Context, featureName string) *typesv2.Feature
 	ListFeature(ctx context.Context, opt types.ListFeatureOpt) typesv2.FeatureList
