@@ -22,7 +22,7 @@ type Store interface {
 	ListFeature(ctx context.Context, opt types.ListFeatureOpt) typesv2.FeatureList
 
 	// feature group
-	CreateFeatureGroup(ctx context.Context, opt CreateFeatureGroupOpt) error
+	CreateFeatureGroup(ctx context.Context, opt CreateFeatureGroupOpt) (int16, error)
 	UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error)
 	GetFeatureGroup(ctx context.Context, groupName string) *typesv2.FeatureGroup
 	ListFeatureGroup(ctx context.Context, entityName *string) typesv2.FeatureGroupList
