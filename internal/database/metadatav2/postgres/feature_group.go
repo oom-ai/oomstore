@@ -12,20 +12,21 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadatav2.CreateFeatureGroupOpt) error {
+func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadatav2.CreateFeatureGroupOpt) (int16, error) {
 	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
-		return fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", opt.Category)
+		return 0, fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", opt.Category)
 	}
+	var featureGroupId int16
 	query := "insert into feature_group(name, entity_id, category, description) values($1, $2, $3, $4)"
-	_, err := db.ExecContext(ctx, query, opt.Name, opt.EntityID, opt.Category, opt.Description)
+	err := db.GetContext(ctx, &featureGroupId, query, opt.Name, opt.EntityID, opt.Category, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
-				return fmt.Errorf("feature group %s already exist", opt.Name)
+				return 0, fmt.Errorf("feature group %s already exist", opt.Name)
 			}
 		}
 	}
-	return err
+	return featureGroupId, err
 }
 
 func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error) {
