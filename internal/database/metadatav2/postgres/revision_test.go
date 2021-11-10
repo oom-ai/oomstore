@@ -68,3 +68,63 @@ func TestCreateRevision(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateRevision(t *testing.T) {
+	ctx, db := prepareStore(t)
+	defer db.Close()
+
+	entityId, err := db.CreateEntity(ctx, types.CreateEntityOpt{
+		Name:        "device",
+		Length:      32,
+		Description: "device entity",
+	})
+	require.NoError(t, err)
+	groupId, err := db.CreateFeatureGroup(ctx, metadatav2.CreateFeatureGroupOpt{
+		Name:        "device_info",
+		EntityID:    entityId,
+		Category:    types.BatchFeatureCategory,
+		Description: "device info",
+	})
+	require.NoError(t, err)
+	revisionId, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
+		Revision:  1000,
+		GroupId:   groupId,
+		DataTable: "device_info_1000",
+		Anchored:  false,
+	})
+	require.NoError(t, err)
+
+	testCases := []struct {
+		description string
+		opt         metadatav2.UpdateRevisionOpt
+		expected    error
+	}{
+		{
+			description: "update revision successfully",
+			opt: metadatav2.UpdateRevisionOpt{
+				RevisionID:  revisionId,
+				NewAnchored: boolPtr(true),
+			},
+			expected: nil,
+		},
+		{
+			description: "cannot update revision, return err",
+			opt: metadatav2.UpdateRevisionOpt{
+				RevisionID:  revisionId - 1,
+				NewAnchored: boolPtr(true),
+			},
+			expected: fmt.Errorf("failed to update revision %d", revisionId-1),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			actual := db.UpdateRevision(ctx, tc.opt)
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
+func boolPtr(i bool) *bool {
+	return &i
+}
