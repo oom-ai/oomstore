@@ -10,7 +10,7 @@ import (
 
 type Store interface {
 	// entity
-	CreateEntity(ctx context.Context, opt types.CreateEntityOpt) (*types.Entity, error)
+	CreateEntity(ctx context.Context, opt types.CreateEntityOpt) (int16, error)
 	UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) (int64, error)
 	GetEntity(ctx context.Context, name string) *typesv2.Entity
 	ListEntity(ctx context.Context) typesv2.EntityList

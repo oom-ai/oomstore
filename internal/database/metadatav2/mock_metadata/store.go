@@ -66,10 +66,10 @@ func (mr *MockStoreMockRecorder) Close() *gomock.Call {
 }
 
 // CreateEntity mocks base method.
-func (m *MockStore) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) (*types.Entity, error) {
+func (m *MockStore) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) (int16, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEntity", ctx, opt)
-	ret0, _ := ret[0].(*types.Entity)
+	ret0, _ := ret[0].(int16)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
