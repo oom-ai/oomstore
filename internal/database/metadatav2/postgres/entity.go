@@ -9,16 +9,16 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) (*types.Entity, error) {
-	var entity types.Entity
-	query := "insert into feature_entity(name, length, description) values($1, $2, $3) returning *"
-	err := db.GetContext(ctx, &entity, query, opt.Name, opt.Length, opt.Description)
+func (db *DB) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) (int16, error) {
+	var entityId int16
+	query := "insert into feature_entity(name, length, description) values($1, $2, $3) returning id"
+	err := db.GetContext(ctx, &entityId, query, opt.Name, opt.Length, opt.Description)
 	if er, ok := err.(*pq.Error); ok {
 		if er.Code == pgerrcode.UniqueViolation {
-			return nil, fmt.Errorf("entity %s already exists", opt.Name)
+			return 0, fmt.Errorf("entity %s already exists", opt.Name)
 		}
 	}
-	return &entity, err
+	return entityId, err
 }
 
 func (db *DB) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) (int64, error) {
