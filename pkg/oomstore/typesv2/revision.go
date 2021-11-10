@@ -6,6 +6,7 @@ type Revision struct {
 	ID        int32  `db:"id"`
 	Revision  int64  `db:"revision"`
 	DataTable string `db:"data_table"`
+	Anchored  bool   `db:"anchored"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`
