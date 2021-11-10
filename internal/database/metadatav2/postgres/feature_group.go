@@ -17,7 +17,7 @@ func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadatav2.CreateFeatu
 		return 0, fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", opt.Category)
 	}
 	var featureGroupId int16
-	query := "insert into feature_group(name, entity_id, category, description) values($1, $2, $3, $4)"
+	query := "insert into feature_group(name, entity_id, category, description) values($1, $2, $3, $4) returning id"
 	err := db.GetContext(ctx, &featureGroupId, query, opt.Name, opt.EntityID, opt.Category, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
