@@ -28,7 +28,7 @@ type Store interface {
 	ListFeatureGroup(ctx context.Context, entityName *string) typesv2.FeatureGroupList
 
 	// revision
-	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (*typesv2.Revision, error)
+	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int32, error)
 	UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) (int64, error)
 	ListRevision(ctx context.Context, opt ListRevisionOpt) typesv2.RevisionList
 	GetRevision(ctx context.Context, opt GetRevisionOpt) (*typesv2.Revision, error)
