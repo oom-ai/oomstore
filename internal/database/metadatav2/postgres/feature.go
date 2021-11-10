@@ -18,8 +18,8 @@ func (db *DB) CreateFeature(ctx context.Context, opt metadatav2.CreateFeatureOpt
 		return 0, fmt.Errorf("err when validating value_type input, details: %s", err.Error())
 	}
 	var featureId int16
-	query := "INSERT INTO feature(name, group_name, db_value_type, value_type, description) VALUES ($1, $2, $3, $4, $5) RETURNING id"
-	err := db.GetContext(ctx, &featureId, query, opt.FeatureName, opt.GroupName, opt.DBValueType, opt.ValueType, opt.Description)
+	query := "INSERT INTO feature(name, group_id, db_value_type, value_type, description) VALUES ($1, $2, $3, $4, $5) RETURNING id"
+	err := db.GetContext(ctx, &featureId, query, opt.FeatureName, opt.GroupID, opt.DBValueType, opt.ValueType, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
