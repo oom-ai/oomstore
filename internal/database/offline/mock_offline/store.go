@@ -9,7 +9,6 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	dbutil "github.com/oom-ai/oomstore/internal/database/dbutil"
 	offline "github.com/oom-ai/oomstore/internal/database/offline"
 	types "github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -83,10 +82,10 @@ func (mr *MockStoreMockRecorder) Import(ctx, opt interface{}) *gomock.Call {
 }
 
 // Join mocks base method.
-func (m *MockStore) Join(ctx context.Context, opt offline.JoinOpt) (<-chan dbutil.RowMapRecord, error) {
+func (m *MockStore) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Join", ctx, opt)
-	ret0, _ := ret[0].(<-chan dbutil.RowMapRecord)
+	ret0, _ := ret[0].(*types.JoinResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
