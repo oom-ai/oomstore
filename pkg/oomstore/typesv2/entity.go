@@ -18,7 +18,7 @@ type Entity struct {
 
 type EntityList []*Entity
 
-func (l *EntityList) Find(find func(e *Entity) bool) *Entity {
+func (l *EntityList) Find(find func(*Entity) bool) *Entity {
 	for _, e := range *l {
 		if find(e) {
 			return e
@@ -27,7 +27,7 @@ func (l *EntityList) Find(find func(e *Entity) bool) *Entity {
 	return nil
 }
 
-func (l *EntityList) Filter(filter func(e *Entity) bool) (rs EntityList) {
+func (l *EntityList) Filter(filter func(*Entity) bool) (rs EntityList) {
 	for _, e := range *l {
 		if filter(e) {
 			rs = append(rs, e)
