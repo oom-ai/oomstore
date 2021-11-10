@@ -129,6 +129,9 @@ func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, t
 	if err != nil {
 		return nil, err
 	}
+	if err := db.dropTemporaryTables(ctx, tableNames); err != nil {
+		return nil, err
+	}
 
 	stream := make(chan dbutil.RowMapRecord)
 	go func() {
@@ -144,4 +147,14 @@ func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, t
 		}
 	}()
 	return stream, nil
+}
+
+func (db *DB) dropTemporaryTables(ctx context.Context, tableNames []string) error {
+	var err error
+	for _, tableName := range tableNames {
+		if tmpErr := db.dropTable(ctx, tableName); tmpErr != nil {
+			err = tmpErr
+		}
+	}
+	return err
 }
