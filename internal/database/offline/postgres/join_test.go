@@ -17,52 +17,28 @@ import (
 func TestJoin(t *testing.T) {
 	db := initAndOpenDB(t)
 	defer db.Close()
-
-	// make test entities
 	ctx := context.Background()
+
+	// prepare test data
 	entity := &types.Entity{
 		Name:   "device",
 		Length: 10,
 	}
 	oneGroupFeatures, oneGroupFeatureMap := prepareFeatures(true)
 	_, twoGroupFeatureMap := prepareFeatures(false)
-	var nilChannel <-chan dbutil.RowMapRecord
-
-	// prepare test data
-	schema := dbutil.BuildFeatureDataTableSchema("device_basic_1", entity, oneGroupFeatures)
-	_, err := db.ExecContext(ctx, schema)
-	require.NoError(t, err)
-	schema = dbutil.BuildFeatureDataTableSchema("device_basic_15", entity, oneGroupFeatures)
-	_, err = db.ExecContext(ctx, schema)
-	require.NoError(t, err)
-	schema = dbutil.BuildFeatureDataTableSchema("device_advanced_5", entity, twoGroupFeatureMap["device_advanced"])
-	_, err = db.ExecContext(ctx, schema)
-	require.NoError(t, err)
-
-	err = insertTestDataToBasic(db, ctx, "device_basic_1", "1234", "xiaomi", 100)
-	require.NoError(t, err)
-	err = insertTestDataToBasic(db, ctx, "device_basic_1", "1235", "apple", 200)
-	require.NoError(t, err)
-	err = insertTestDataToBasic(db, ctx, "device_basic_15", "1234", "galaxy", 300)
-	require.NoError(t, err)
-	err = insertTestDataToBasic(db, ctx, "device_basic_15", "1235", "oneplus", 240)
-	require.NoError(t, err)
-	err = insertTestDataToAdvanced(db, ctx, "device_advanced_5", "1234", true)
-	require.NoError(t, err)
-	err = insertTestDataToAdvanced(db, ctx, "device_advanced_5", "1235", false)
-	require.NoError(t, err)
+	prepareTestData(ctx, db, t, entity, oneGroupFeatures, twoGroupFeatureMap)
 
 	testCases := []struct {
 		description string
 		opt         offline.JoinOpt
-		expected    <-chan dbutil.RowMapRecord
+		expected    *types.JoinResult
 	}{
 		{
 			description: "no features",
 			opt: offline.JoinOpt{
 				FeatureMap: make(map[string]types.FeatureList),
 			},
-			expected: nilChannel,
+			expected: nil,
 		},
 		{
 			description: "no entity rows",
@@ -71,7 +47,7 @@ func TestJoin(t *testing.T) {
 				FeatureMap: oneGroupFeatureMap,
 				EntityRows: prepareEntityRows(true),
 			},
-			expected: nilChannel,
+			expected: nil,
 		},
 		{
 			description: "one feature group",
@@ -102,13 +78,38 @@ func TestJoin(t *testing.T) {
 			if tc.expected == nil {
 				assert.Equal(t, tc.expected, actual)
 			} else {
-				expectedValues := extractValues(tc.expected)
-
-				actualValues := extractValues(actual)
+				expectedValues := extractValues(tc.expected.Data)
+				actualValues := extractValues(actual.Data)
+				assert.Equal(t, tc.expected.Header, actual.Header)
 				assert.ObjectsAreEqual(expectedValues, actualValues)
 			}
 		})
 	}
+}
+
+func prepareTestData(ctx context.Context, db *postgres.DB, t *testing.T, entity *types.Entity, oneGroupFeatures types.FeatureList, twoGroupFeatureMap map[string]types.FeatureList) {
+	schema := dbutil.BuildFeatureDataTableSchema("device_basic_1", entity, oneGroupFeatures)
+	_, err := db.ExecContext(ctx, schema)
+	require.NoError(t, err)
+	schema = dbutil.BuildFeatureDataTableSchema("device_basic_15", entity, oneGroupFeatures)
+	_, err = db.ExecContext(ctx, schema)
+	require.NoError(t, err)
+	schema = dbutil.BuildFeatureDataTableSchema("device_advanced_5", entity, twoGroupFeatureMap["device_advanced"])
+	_, err = db.ExecContext(ctx, schema)
+	require.NoError(t, err)
+
+	err = insertTestDataToBasic(db, ctx, "device_basic_1", "1234", "xiaomi", 100)
+	require.NoError(t, err)
+	err = insertTestDataToBasic(db, ctx, "device_basic_1", "1235", "apple", 200)
+	require.NoError(t, err)
+	err = insertTestDataToBasic(db, ctx, "device_basic_15", "1234", "galaxy", 300)
+	require.NoError(t, err)
+	err = insertTestDataToBasic(db, ctx, "device_basic_15", "1235", "oneplus", 240)
+	require.NoError(t, err)
+	err = insertTestDataToAdvanced(db, ctx, "device_advanced_5", "1234", true)
+	require.NoError(t, err)
+	err = insertTestDataToAdvanced(db, ctx, "device_advanced_5", "1235", false)
+	require.NoError(t, err)
 }
 
 func insertTestDataToBasic(db *postgres.DB, ctx context.Context, tableName string, device, model string, price int32) error {
@@ -218,9 +219,9 @@ func prepareEntityRows(isEmpty bool) <-chan types.EntityRow {
 	return entityRows
 }
 
-func prepareResult(oneGroup bool) <-chan dbutil.RowMapRecord {
-	stream := make(chan dbutil.RowMapRecord)
-	values := []dbutil.RowMap{
+func prepareResult(oneGroup bool) *types.JoinResult {
+	header := []string{"entity_key", "unix_time", "model", "price", "is_active"}
+	values := []map[string]interface{}{
 		{
 			"entity_key": "1234",
 			"unix_time":  int64(10),
@@ -251,23 +252,28 @@ func prepareResult(oneGroup bool) <-chan dbutil.RowMapRecord {
 		},
 	}
 	if oneGroup {
-		for _, item := range values {
-			delete(item, "is_active")
-		}
+		header = header[:len(header)-1]
 	}
+
+	data := make(chan []interface{})
 	go func() {
-		defer close(stream)
+		defer close(data)
 		for _, item := range values {
-			stream <- dbutil.RowMapRecord{
-				RowMap: item,
+			record := make([]interface{}, 0, len(header))
+			for _, h := range header {
+				record = append(record, item[h])
 			}
+			data <- record
 		}
 	}()
-	return stream
+	return &types.JoinResult{
+		Header: header,
+		Data:   data,
+	}
 }
 
-func extractValues(stream <-chan dbutil.RowMapRecord) []dbutil.RowMapRecord {
-	values := make([]dbutil.RowMapRecord, 0)
+func extractValues(stream <-chan []interface{}) [][]interface{} {
+	values := make([][]interface{}, 0)
 	for item := range stream {
 		values = append(values, item)
 	}

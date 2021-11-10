@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -37,7 +36,8 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		},
 	}
 
-	joined, result := prepareResults()
+	var emptyResult *types.JoinResult
+	validResult := prepareResult()
 	entityRows := make(chan types.EntityRow)
 
 	testCases := []struct {
@@ -46,9 +46,9 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		features      types.FeatureList
 		entity        *types.Entity
 		featureMap    map[string]types.FeatureList
-		joined        <-chan dbutil.RowMapRecord
+		joined        *types.JoinResult
 		expectedError error
-		expected      []*types.EntityRowWithFeatures
+		expected      *types.JoinResult
 	}{
 		{
 			description: "no valid features, return nil",
@@ -58,7 +58,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 			},
 			features:      streamFeatures,
 			expectedError: nil,
-			expected:      nil,
+			expected:      emptyResult,
 		},
 		{
 			description: "inconsistent features, return nil",
@@ -84,7 +84,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 			},
 			joined:        nil,
 			expectedError: nil,
-			expected:      nil,
+			expected:      emptyResult,
 		},
 		{
 			description: "consistent entity type, succeed",
@@ -98,9 +98,9 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 				"device_basic":    {consistentFeatures[0]},
 				"device_advanced": {consistentFeatures[1]},
 			},
-			joined:        joined,
+			joined:        validResult,
 			expectedError: nil,
-			expected:      result,
+			expected:      validResult,
 		},
 	}
 
@@ -119,100 +119,36 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 			if tc.expectedError != nil {
 				assert.Error(t, err, tc.expectedError)
 			} else if tc.expected == nil {
-				var emptyChannel <-chan *types.EntityRowWithFeatures
-				assert.Equal(t, emptyChannel, actual)
+				assert.Equal(t, tc.expected, actual)
 			} else {
 				assert.NoError(t, err)
-				values := make([]*types.EntityRowWithFeatures, 0)
-				for item := range actual {
-					values = append(values, item)
-				}
-				assert.Equal(t, tc.expected, values)
+				assert.Equal(t, tc.expected.Header, actual.Header)
+				assert.ObjectsAreEqual(extractValues(tc.expected.Data), extractValues(actual.Data))
 			}
 		})
 	}
 }
 
-func prepareResults() (<-chan dbutil.RowMapRecord, []*types.EntityRowWithFeatures) {
-	joined := make(chan dbutil.RowMapRecord)
+func prepareResult() *types.JoinResult {
+	header := []string{"entity_key", "unix_time", "model", "price"}
+	data := make(chan []interface{})
 	go func() {
-		defer close(joined)
-		joined <- dbutil.RowMapRecord{
-			RowMap: dbutil.RowMap{
-				"model":      "apple",
-				"price":      100,
-				"entity_key": "1234",
-				"unix_time":  10,
-			},
-		}
-		joined <- dbutil.RowMapRecord{
-			RowMap: dbutil.RowMap{
-				"model":      "oneplus",
-				"price":      120,
-				"entity_key": "1234",
-				"unix_time":  20,
-			},
-		}
-		joined <- dbutil.RowMapRecord{
-			RowMap: dbutil.RowMap{
-				"model":      "huawei",
-				"price":      90,
-				"entity_key": "1235",
-				"unix_time":  15,
-			},
-		}
+		defer close(data)
+		data <- []interface{}{"1234", 10, "apple", 100}
+		data <- []interface{}{"1234", 20, "oneplus", 120}
+		data <- []interface{}{"1235", 15, "galaxy", 90}
 	}()
 
-	result := []*types.EntityRowWithFeatures{
-		{
-			EntityRow: types.EntityRow{
-				EntityKey: "1234",
-				UnixTime:  10,
-			},
-			FeatureValues: []types.FeatureKV{
-				{
-					FeatureName:  "model",
-					FeatureValue: "apple",
-				},
-				{
-					FeatureName:  "price",
-					FeatureValue: 100,
-				},
-			},
-		},
-		{
-			EntityRow: types.EntityRow{
-				EntityKey: "1234",
-				UnixTime:  20,
-			},
-			FeatureValues: []types.FeatureKV{
-				{
-					FeatureName:  "model",
-					FeatureValue: "oneplus",
-				},
-				{
-					FeatureName:  "price",
-					FeatureValue: 120,
-				},
-			},
-		},
-		{
-			EntityRow: types.EntityRow{
-				EntityKey: "1235",
-				UnixTime:  15,
-			},
-			FeatureValues: []types.FeatureKV{
-				{
-					FeatureName:  "model",
-					FeatureValue: "huawei",
-				},
-				{
-					FeatureName:  "price",
-					FeatureValue: 90,
-				},
-			},
-		},
+	return &types.JoinResult{
+		Header: header,
+		Data:   data,
 	}
+}
 
-	return joined, result
+func extractValues(stream <-chan []interface{}) [][]interface{} {
+	values := make([][]interface{}, 0)
+	for item := range stream {
+		values = append(values, item)
+	}
+	return values
 }

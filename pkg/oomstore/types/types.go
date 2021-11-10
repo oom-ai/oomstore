@@ -69,11 +69,6 @@ func NewFeatureDataSet() FeatureDataSet {
 	return make(map[string][]FeatureKV)
 }
 
-type EntityRowWithFeatures struct {
-	EntityRow
-	FeatureValues []FeatureKV
-}
-
 func (fg *FeatureGroup) String() string {
 	onlineRevision := "<NULL>"
 	offlineRevision := "<NULL>"
@@ -132,4 +127,9 @@ func (e *Entity) String() string {
 		fmt.Sprintf("CreateTime:    %s", e.CreateTime.Format(time.RFC3339)),
 		fmt.Sprintf("ModifyTime:    %s", e.ModifyTime.Format(time.RFC3339)),
 	}, "\n")
+}
+
+type JoinResult struct {
+	Header []string
+	Data   <-chan []interface{}
 }
