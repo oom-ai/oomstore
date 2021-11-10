@@ -80,7 +80,7 @@ func TestJoin(t *testing.T) {
 			} else {
 				expectedValues := extractValues(tc.expected.Data)
 				actualValues := extractValues(actual.Data)
-				assert.Equal(t, tc.expected.Header, actual.Header)
+				assert.ObjectsAreEqual(tc.expected.Header, actual.Header)
 				assert.ObjectsAreEqual(expectedValues, actualValues)
 			}
 		})

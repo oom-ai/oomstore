@@ -14,6 +14,12 @@ type CreateFeatureGroupOpt struct {
 	Category    string
 }
 
+type UpdateFeatureGroupOpt struct {
+	GroupID          int16
+	Description      *string
+	OnlineRevisionId *int32
+}
+
 type CreateRevisionOpt struct {
 	Revision    int64
 	GroupId     int16
