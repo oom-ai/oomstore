@@ -10,7 +10,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (<-chan dbutil.RowMapRecord, error) {
+func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
 	// Step 1: prepare temporary table entity_rows
 	features := types.FeatureList{}
 	for _, featureList := range opt.FeatureMap {
@@ -49,11 +49,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (<-chan dbutil.RowM
 	}
 
 	// Step 3: read joined results
-	stream, err := db.readJoinedTable(ctx, entityRowsTableName, tableNames, tableToFeatureMap)
-	if err != nil {
-		return nil, err
-	}
-	return stream, nil
+	return db.readJoinedTable(ctx, entityRowsTableName, tableNames, tableToFeatureMap)
 }
 
 func (db *DB) joinOneFeatureGroup(ctx context.Context, opt offline.JoinOneFeatureGroupOpt) (string, error) {
@@ -89,7 +85,7 @@ func (db *DB) joinOneFeatureGroup(ctx context.Context, opt offline.JoinOneFeatur
 	return joinedTableName, nil
 }
 
-func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, tableNames []string, featureMap map[string]types.FeatureList) (<-chan dbutil.RowMapRecord, error) {
+func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, tableNames []string, featureMap map[string]types.FeatureList) (*types.JoinResult, error) {
 	if len(tableNames) == 0 {
 		return nil, nil
 	}
@@ -132,21 +128,28 @@ func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, t
 	if err := db.dropTemporaryTables(ctx, tableNames); err != nil {
 		return nil, err
 	}
+	header, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
 
-	stream := make(chan dbutil.RowMapRecord)
+	data := make(chan []interface{})
+	var scanErr error
 	go func() {
 		defer rows.Close()
-		defer close(stream)
+		defer close(data)
 		for rows.Next() {
-			rowMap := make(dbutil.RowMap)
-			err := rows.MapScan(rowMap)
-			stream <- dbutil.RowMapRecord{
-				RowMap: rowMap,
-				Error:  err,
+			record, err := rows.SliceScan()
+			if err != nil {
+				scanErr = err
 			}
+			data <- record
 		}
 	}()
-	return stream, nil
+	return &types.JoinResult{
+		Header: header,
+		Data:   data,
+	}, scanErr
 }
 
 func (db *DB) dropTemporaryTables(ctx context.Context, tableNames []string) error {
