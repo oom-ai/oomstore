@@ -1,19 +1,20 @@
-package postgres
+package postgres_test
 
 import (
 	"context"
 	"sort"
 	"testing"
 
+	"github.com/oom-ai/oomstore/internal/database/metadatav2/postgres"
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func prepareStore(t *testing.T) (context.Context, *DB) {
+func prepareStore(t *testing.T) (context.Context, *postgres.DB) {
 	ctx := context.Background()
 	opt := runtime_pg.PostgresDbopt
-	pg, err := openDB(
+	pg, err := postgres.OpenDB(
 		context.Background(),
 		opt.Host,
 		opt.Port,
@@ -26,10 +27,10 @@ func prepareStore(t *testing.T) (context.Context, *DB) {
 	require.NoError(t, err)
 	pg.Close()
 
-	err = CreateDatabase(ctx, runtime_pg.PostgresDbopt)
+	err = postgres.CreateDatabase(ctx, runtime_pg.PostgresDbopt)
 	require.NoError(t, err)
 
-	db, err := Open(context.Background(), &runtime_pg.PostgresDbopt)
+	db, err := postgres.Open(context.Background(), &runtime_pg.PostgresDbopt)
 	require.NoError(t, err)
 
 	return ctx, db
@@ -48,10 +49,10 @@ func TestCreateDatabase(t *testing.T) {
 	require.NoError(t, err)
 
 	var wantTables []string
-	for table := range META_TABLE_SCHEMAS {
+	for table := range postgres.META_TABLE_SCHEMAS {
 		wantTables = append(wantTables, table)
 	}
-	for table := range META_VIEW_SCHEMAS {
+	for table := range postgres.META_VIEW_SCHEMAS {
 		wantTables = append(wantTables, table)
 	}
 
