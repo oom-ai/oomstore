@@ -4,12 +4,11 @@ import (
 	"context"
 	"io"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 type Store interface {
-	Join(ctx context.Context, opt JoinOpt) (stream <-chan dbutil.RowMapRecord, err error)
+	Join(ctx context.Context, opt JoinOpt) (*types.JoinResult, error)
 	Export(ctx context.Context, opt ExportOpt) (<-chan *types.RawFeatureValueRecord, error)
 	Import(ctx context.Context, opt ImportOpt) (int64, string, error)
 
