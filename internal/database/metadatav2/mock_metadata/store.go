@@ -95,11 +95,12 @@ func (mr *MockStoreMockRecorder) CreateFeature(ctx, opt interface{}) *gomock.Cal
 }
 
 // CreateFeatureGroup mocks base method.
-func (m *MockStore) CreateFeatureGroup(ctx context.Context, opt metadatav2.CreateFeatureGroupOpt) error {
+func (m *MockStore) CreateFeatureGroup(ctx context.Context, opt metadatav2.CreateFeatureGroupOpt) (int16, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFeatureGroup", ctx, opt)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int16)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CreateFeatureGroup indicates an expected call of CreateFeatureGroup.
