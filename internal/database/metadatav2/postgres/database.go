@@ -23,7 +23,7 @@ type DB struct {
 }
 
 func Open(ctx context.Context, option *types.PostgresOpt) (*DB, error) {
-	db, err := openDB(ctx, option.Host, option.Port, option.User, option.Password, option.Database)
+	db, err := OpenDB(ctx, option.Host, option.Port, option.User, option.Password, option.Database)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func Open(ctx context.Context, option *types.PostgresOpt) (*DB, error) {
 	return &DB{DB: db, Informer: informer}, nil
 }
 
-func openDB(ctx context.Context, host, port, user, password, database string) (*sqlx.DB, error) {
+func OpenDB(ctx context.Context, host, port, user, password, database string) (*sqlx.DB, error) {
 	return sqlx.Open(
 		"postgres",
 		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
