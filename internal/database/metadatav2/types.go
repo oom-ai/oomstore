@@ -34,7 +34,7 @@ type ListRevisionOpt struct {
 }
 
 type UpdateRevisionOpt struct {
-	RevisionID  int64
+	RevisionID  int32
 	NewRevision *int64
 	NewAnchored *bool
 }

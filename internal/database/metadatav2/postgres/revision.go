@@ -25,7 +25,9 @@ func (db *DB) CreateRevision(ctx context.Context, opt metadatav2.CreateRevisionO
 	return revisionId, nil
 }
 
-func (db *DB) UpdateRevision(ctx context.Context, opt metadatav2.UpdateRevisionOpt) (int64, error) {
+// UpdateRevision = MustUpdateRevision
+// If fail to update any row or update more than one row, return error
+func (db *DB) UpdateRevision(ctx context.Context, opt metadatav2.UpdateRevisionOpt) error {
 	and := make(map[string]interface{})
 	if opt.NewRevision != nil {
 		and["revision"] = *opt.NewRevision
@@ -35,17 +37,24 @@ func (db *DB) UpdateRevision(ctx context.Context, opt metadatav2.UpdateRevisionO
 	}
 	cond, args, err := dbutil.BuildConditions(and, nil)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	if len(cond) == 0 {
-		return 0, fmt.Errorf("invliad option: nothing to update")
+		return fmt.Errorf("invliad option: nothing to update")
 	}
 	args = append(args, opt.RevisionID)
 
 	query := fmt.Sprintf("UPDATE feature_group_revision SET %s WHERE id = ?", strings.Join(cond, ","))
-	if result, err := db.ExecContext(ctx, db.Rebind(query), args...); err != nil {
-		return 0, err
-	} else {
-		return result.RowsAffected()
+	result, err := db.ExecContext(ctx, db.Rebind(query), args...)
+	if err != nil {
+		return err
 	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected != 1 {
+		return fmt.Errorf("failed to update revision %d", opt.RevisionID)
+	}
+	return nil
 }
