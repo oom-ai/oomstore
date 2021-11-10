@@ -37,6 +37,8 @@ func prepareStore(t *testing.T) (context.Context, *DB) {
 
 func TestCreateDatabase(t *testing.T) {
 	ctx, store := prepareStore(t)
+	defer store.Close()
+
 	var tables []string
 	err := store.SelectContext(ctx, &tables,
 		`SELECT table_name
