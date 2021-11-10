@@ -81,7 +81,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	if !revision.Anchored {
 		newRevision := time.Now().Unix()
 		newChored := true
-		// udpate revision timestamp using current timestamp
+		// update revision timestamp using current timestamp
 		if _, err = s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
 			RevisionID:  int64(revision.ID),
 			NewRevision: &newRevision,

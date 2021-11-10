@@ -29,7 +29,7 @@ type Store interface {
 
 	// revision
 	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int32, error)
-	UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) (int64, error)
+	UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) error
 	ListRevision(ctx context.Context, opt ListRevisionOpt) typesv2.RevisionList
 	GetRevision(ctx context.Context, opt GetRevisionOpt) (*typesv2.Revision, error)
 	GetLatestRevision(ctx context.Context, groupName string) *typesv2.Revision
