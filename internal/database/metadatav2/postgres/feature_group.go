@@ -22,14 +22,14 @@ func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadatav2.CreateFeatu
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
-				return 0, fmt.Errorf("feature group %s already exist", opt.Name)
+				return 0, fmt.Errorf("feature group %s already exists", opt.Name)
 			}
 		}
 	}
 	return featureGroupId, err
 }
 
-func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error) {
+func (db *DB) UpdateFeatureGroup(ctx context.Context, opt metadatav2.UpdateFeatureGroupOpt) error {
 	and := make(map[string]interface{})
 	if opt.Description != nil {
 		and["description"] = *opt.Description
@@ -39,18 +39,25 @@ func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGro
 	}
 	cond, args, err := dbutil.BuildConditions(and, nil)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	args = append(args, opt.GroupName)
+	args = append(args, opt.GroupID)
 
 	if len(cond) == 0 {
-		return 0, fmt.Errorf("invliad option: nothing to update")
+		return fmt.Errorf("invalid option: nothing to update")
 	}
 
-	query := fmt.Sprintf("UPDATE feature_group SET %s WHERE name = $%d", strings.Join(cond, ","), len(cond)+1)
-	if result, err := db.ExecContext(ctx, db.Rebind(query), args...); err != nil {
-		return 0, err
-	} else {
-		return result.RowsAffected()
+	query := fmt.Sprintf("UPDATE feature_group SET %s WHERE id = ?", strings.Join(cond, ","))
+	result, err := db.ExecContext(ctx, db.Rebind(query), args...)
+	if err != nil {
+		return err
 	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected != 1 {
+		return fmt.Errorf("expect 1 affected row, get %d", rowsAffected)
+	}
+	return nil
 }
