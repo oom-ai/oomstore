@@ -17,7 +17,7 @@ func (db *DB) createTableJoined(ctx context.Context, features types.FeatureList,
 	// create table joined
 	tableName := dbutil.TempTable(fmt.Sprintf("joined_%s", groupName))
 	schema := `
-		CREATE TEMPORARY TABLE %s (
+		CREATE TABLE %s (
 			entity_key  VARCHAR(%d) NOT NULL,
 			unix_time   BIGINT NOT NULL,
 			%s
@@ -43,7 +43,7 @@ func (db *DB) createAndImportTableEntityRows(ctx context.Context, entity types.E
 	// create table entity_rows
 	tableName := dbutil.TempTable("entity_rows")
 	schema := fmt.Sprintf(`
-		CREATE TEMPORARY TABLE %s (
+		CREATE TABLE %s (
 			entity_key  VARCHAR(%d) NOT NULL,
 			unix_time   BIGINT NOT NULL
 		);
@@ -83,4 +83,10 @@ func (db *DB) insertEntityRows(ctx context.Context, tableName string, entityRows
 		return err
 	}
 	return nil
+}
+
+func (db *DB) dropTable(ctx context.Context, tableName string) error {
+	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
+	_, err := db.ExecContext(ctx, query)
+	return err
 }
