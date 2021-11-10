@@ -1,10 +1,11 @@
 package metadatav2
 
-import "github.com/oom-ai/oomstore/pkg/oomstore/types"
-
 type CreateFeatureOpt struct {
-	types.CreateFeatureOpt
-	ValueType string
+	FeatureName string
+	GroupID     int16
+	DBValueType string
+	Description string
+	ValueType   string
 }
 
 type CreateFeatureGroupOpt struct {
