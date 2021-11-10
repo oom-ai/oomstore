@@ -24,7 +24,7 @@ type FeatureGroup struct {
 
 type FeatureGroupList []*FeatureGroup
 
-func (l *FeatureGroupList) Find(find func(g *FeatureGroup) bool) *FeatureGroup {
+func (l *FeatureGroupList) Find(find func(*FeatureGroup) bool) *FeatureGroup {
 	for _, g := range *l {
 		if find(g) {
 			return g
@@ -33,7 +33,7 @@ func (l *FeatureGroupList) Find(find func(g *FeatureGroup) bool) *FeatureGroup {
 	return nil
 }
 
-func (l *FeatureGroupList) Filter(filter func(g *FeatureGroup) bool) (rs FeatureGroupList) {
+func (l *FeatureGroupList) Filter(filter func(*FeatureGroup) bool) (rs FeatureGroupList) {
 	for _, g := range *l {
 		if filter(g) {
 			rs = append(rs, g)

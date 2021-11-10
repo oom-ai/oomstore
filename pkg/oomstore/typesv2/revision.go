@@ -17,7 +17,7 @@ type Revision struct {
 
 type RevisionList []*Revision
 
-func (l *RevisionList) Find(find func(r *Revision) bool) *Revision {
+func (l *RevisionList) Find(find func(*Revision) bool) *Revision {
 	for _, r := range *l {
 		if find(r) {
 			return r
@@ -26,7 +26,7 @@ func (l *RevisionList) Find(find func(r *Revision) bool) *Revision {
 	return nil
 }
 
-func (l *RevisionList) Filter(filter func(r *Revision) bool) (rs RevisionList) {
+func (l *RevisionList) Filter(filter func(*Revision) bool) (rs RevisionList) {
 	for _, r := range *l {
 		if filter(r) {
 			rs = append(rs, r)
