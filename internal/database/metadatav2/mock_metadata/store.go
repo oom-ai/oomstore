@@ -298,12 +298,11 @@ func (mr *MockStoreMockRecorder) UpdateFeatureGroup(ctx, opt interface{}) *gomoc
 }
 
 // UpdateRevision mocks base method.
-func (m *MockStore) UpdateRevision(ctx context.Context, opt metadatav2.UpdateRevisionOpt) (int64, error) {
+func (m *MockStore) UpdateRevision(ctx context.Context, opt metadatav2.UpdateRevisionOpt) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateRevision", ctx, opt)
-	ret0, _ := ret[0].(int64)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // UpdateRevision indicates an expected call of UpdateRevision.
