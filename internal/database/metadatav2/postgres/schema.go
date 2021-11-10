@@ -66,6 +66,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 			group_id    INT         NOT     NULL,
 			revision    BIGINT      NOT     NULL,
 			data_table  VARCHAR(64) NOT     NULL,
+			anchored    BOOLEAN     NOT     NULL,
 			description VARCHAR(64) DEFAULT '',
 			create_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP,
 			modify_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP,
