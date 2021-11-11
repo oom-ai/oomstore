@@ -41,9 +41,9 @@ func (c *FeatureCache) List(opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
 	}
 
 	// filter group
-	if opt.GroupName != nil {
+	if opt.GroupID != nil {
 		features = features.Filter(func(f *typesv2.Feature) bool {
-			return f.Group.Name == *opt.GroupName
+			return f.Group.ID == *opt.GroupID
 		})
 	}
 	return features
