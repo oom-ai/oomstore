@@ -22,11 +22,11 @@ func (c *GroupCache) Enrich(entityCache *EntityCache, revisionCache *RevisionCac
 	}
 }
 
-func (c *GroupCache) List(entityName *string) []*typesv2.FeatureGroup {
-	if entityName == nil {
+func (c *GroupCache) List(entityID *int16) []*typesv2.FeatureGroup {
+	if entityID == nil {
 		return c.FeatureGroupList
 	}
 	return c.FeatureGroupList.Filter(func(g *typesv2.FeatureGroup) bool {
-		return g.Entity.Name == *entityName
+		return g.Entity.ID == *entityID
 	})
 }
