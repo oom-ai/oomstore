@@ -30,7 +30,7 @@ func CreateDatabase(ctx context.Context, opt types.PostgresOpt) (err error) {
 }
 
 func createMetaSchemas(ctx context.Context, db *sqlx.DB) (err error) {
-	// Use translation to guarantee the following operations be executed
+	// Use transaction to guarantee the following operations be executed
 	// on the same connection: http://go-database-sql.org/modifying.html
 	return dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create database functions

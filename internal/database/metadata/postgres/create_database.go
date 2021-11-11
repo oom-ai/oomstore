@@ -31,7 +31,7 @@ func createMetaSchemas(ctx context.Context, opt types.PostgresOpt) (err error) {
 	}
 	defer db.Close()
 
-	// Use translation to guarantee the following operations be executed
+	// Use transaction to guarantee the following operations be executed
 	// on the same connection: http://go-database-sql.org/modifying.html
 	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create database functions
