@@ -37,7 +37,7 @@ func TestCreateFeature(t *testing.T) {
 	_, groupID := prepareEntityAndGroup(t, ctx, db)
 
 	opt := metadatav2.CreateFeatureOpt{
-		FeatureName: "phone",
+		Name:        "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
 		Description: "description",
@@ -54,7 +54,7 @@ func TestCreateFeatureWithSameName(t *testing.T) {
 	_, groupID := prepareEntityAndGroup(t, ctx, db)
 
 	opt := metadatav2.CreateFeatureOpt{
-		FeatureName: "phone",
+		Name:        "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
 	}
@@ -72,7 +72,7 @@ func TestCreateFeatureWithSQLKeywrod(t *testing.T) {
 	_, groupID := prepareEntityAndGroup(t, ctx, db)
 
 	opt := metadatav2.CreateFeatureOpt{
-		FeatureName: "user",
+		Name:        "user",
 		GroupID:     groupID,
 		DBValueType: "int",
 		Description: "order",
@@ -88,7 +88,7 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T) {
 	_, groupID := prepareEntityAndGroup(t, ctx, db)
 
 	_, err := db.CreateFeature(ctx, metadatav2.CreateFeatureOpt{
-		FeatureName: "model",
+		Name:        "model",
 		GroupID:     groupID,
 		DBValueType: "invalid_type",
 	})
@@ -104,7 +104,7 @@ func TestGetFeature(t *testing.T) {
 	assert.Nil(t, feature)
 
 	_, err := db.CreateFeature(ctx, metadatav2.CreateFeatureOpt{
-		FeatureName: "phone",
+		Name:        "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
 		Description: "description",
@@ -131,7 +131,7 @@ func TestListFeature(t *testing.T) {
 	assert.Equal(t, 0, features.Len())
 
 	featureID, err := db.CreateFeature(ctx, metadatav2.CreateFeatureOpt{
-		FeatureName: "phone",
+		Name:        "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
 		Description: "description",
@@ -173,7 +173,7 @@ func TestUpdateFeature(t *testing.T) {
 	_, groupID := prepareEntityAndGroup(t, ctx, db)
 
 	opt := metadatav2.CreateFeatureOpt{
-		FeatureName: "phone",
+		Name:        "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
 		Description: "description",
