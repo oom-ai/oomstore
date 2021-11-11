@@ -37,17 +37,17 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 }
 
 // BuildRevisionRanges mocks base method.
-func (m *MockStore) BuildRevisionRanges(ctx context.Context, groupName string) []*metadatav2.RevisionRange {
+func (m *MockStore) BuildRevisionRanges(ctx context.Context, groupID int16) []*metadatav2.RevisionRange {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BuildRevisionRanges", ctx, groupName)
+	ret := m.ctrl.Call(m, "BuildRevisionRanges", ctx, groupID)
 	ret0, _ := ret[0].([]*metadatav2.RevisionRange)
 	return ret0
 }
 
 // BuildRevisionRanges indicates an expected call of BuildRevisionRanges.
-func (mr *MockStoreMockRecorder) BuildRevisionRanges(ctx, groupName interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) BuildRevisionRanges(ctx, groupID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildRevisionRanges", reflect.TypeOf((*MockStore)(nil).BuildRevisionRanges), ctx, groupName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildRevisionRanges", reflect.TypeOf((*MockStore)(nil).BuildRevisionRanges), ctx, groupID)
 }
 
 // Close mocks base method.
@@ -125,61 +125,107 @@ func (mr *MockStoreMockRecorder) CreateRevision(ctx, opt interface{}) *gomock.Ca
 }
 
 // GetEntity mocks base method.
-func (m *MockStore) GetEntity(ctx context.Context, name string) (*typesv2.Entity, error) {
+func (m *MockStore) GetEntity(ctx context.Context, id int16) (*typesv2.Entity, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEntity", ctx, name)
+	ret := m.ctrl.Call(m, "GetEntity", ctx, id)
 	ret0, _ := ret[0].(*typesv2.Entity)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetEntity indicates an expected call of GetEntity.
-func (mr *MockStoreMockRecorder) GetEntity(ctx, name interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) GetEntity(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEntity", reflect.TypeOf((*MockStore)(nil).GetEntity), ctx, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEntity", reflect.TypeOf((*MockStore)(nil).GetEntity), ctx, id)
+}
+
+// GetEntityByName mocks base method.
+func (m *MockStore) GetEntityByName(ctx context.Context, name string) (*typesv2.Entity, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEntityByName", ctx, name)
+	ret0, _ := ret[0].(*typesv2.Entity)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEntityByName indicates an expected call of GetEntityByName.
+func (mr *MockStoreMockRecorder) GetEntityByName(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEntityByName", reflect.TypeOf((*MockStore)(nil).GetEntityByName), ctx, name)
 }
 
 // GetFeature mocks base method.
-func (m *MockStore) GetFeature(ctx context.Context, featureName string) *typesv2.Feature {
+func (m *MockStore) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFeature", ctx, featureName)
+	ret := m.ctrl.Call(m, "GetFeature", ctx, id)
 	ret0, _ := ret[0].(*typesv2.Feature)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetFeature indicates an expected call of GetFeature.
-func (mr *MockStoreMockRecorder) GetFeature(ctx, featureName interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) GetFeature(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeature", reflect.TypeOf((*MockStore)(nil).GetFeature), ctx, featureName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeature", reflect.TypeOf((*MockStore)(nil).GetFeature), ctx, id)
+}
+
+// GetFeatureByName mocks base method.
+func (m *MockStore) GetFeatureByName(ctx context.Context, name string) (*typesv2.Feature, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFeatureByName", ctx, name)
+	ret0, _ := ret[0].(*typesv2.Feature)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFeatureByName indicates an expected call of GetFeatureByName.
+func (mr *MockStoreMockRecorder) GetFeatureByName(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockStore)(nil).GetFeatureByName), ctx, name)
 }
 
 // GetFeatureGroup mocks base method.
-func (m *MockStore) GetFeatureGroup(ctx context.Context, groupName string) (*typesv2.FeatureGroup, error) {
+func (m *MockStore) GetFeatureGroup(ctx context.Context, id int16) (*typesv2.FeatureGroup, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFeatureGroup", ctx, groupName)
+	ret := m.ctrl.Call(m, "GetFeatureGroup", ctx, id)
 	ret0, _ := ret[0].(*typesv2.FeatureGroup)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFeatureGroup indicates an expected call of GetFeatureGroup.
-func (mr *MockStoreMockRecorder) GetFeatureGroup(ctx, groupName interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) GetFeatureGroup(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroup", reflect.TypeOf((*MockStore)(nil).GetFeatureGroup), ctx, groupName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroup", reflect.TypeOf((*MockStore)(nil).GetFeatureGroup), ctx, id)
+}
+
+// GetFeatureGroupByName mocks base method.
+func (m *MockStore) GetFeatureGroupByName(ctx context.Context, name string) (*typesv2.FeatureGroup, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFeatureGroupByName", ctx, name)
+	ret0, _ := ret[0].(*typesv2.FeatureGroup)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFeatureGroupByName indicates an expected call of GetFeatureGroupByName.
+func (mr *MockStoreMockRecorder) GetFeatureGroupByName(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroupByName", reflect.TypeOf((*MockStore)(nil).GetFeatureGroupByName), ctx, name)
 }
 
 // GetLatestRevision mocks base method.
-func (m *MockStore) GetLatestRevision(ctx context.Context, groupName string) *typesv2.Revision {
+func (m *MockStore) GetLatestRevision(ctx context.Context, groupID int16) *typesv2.Revision {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLatestRevision", ctx, groupName)
+	ret := m.ctrl.Call(m, "GetLatestRevision", ctx, groupID)
 	ret0, _ := ret[0].(*typesv2.Revision)
 	return ret0
 }
 
 // GetLatestRevision indicates an expected call of GetLatestRevision.
-func (mr *MockStoreMockRecorder) GetLatestRevision(ctx, groupName interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) GetLatestRevision(ctx, groupID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatestRevision", reflect.TypeOf((*MockStore)(nil).GetLatestRevision), ctx, groupName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatestRevision", reflect.TypeOf((*MockStore)(nil).GetLatestRevision), ctx, groupID)
 }
 
 // GetRevision mocks base method.
@@ -226,17 +272,17 @@ func (mr *MockStoreMockRecorder) ListFeature(ctx, opt interface{}) *gomock.Call 
 }
 
 // ListFeatureGroup mocks base method.
-func (m *MockStore) ListFeatureGroup(ctx context.Context, entityName *string) typesv2.FeatureGroupList {
+func (m *MockStore) ListFeatureGroup(ctx context.Context, entityID *int16) typesv2.FeatureGroupList {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListFeatureGroup", ctx, entityName)
+	ret := m.ctrl.Call(m, "ListFeatureGroup", ctx, entityID)
 	ret0, _ := ret[0].(typesv2.FeatureGroupList)
 	return ret0
 }
 
 // ListFeatureGroup indicates an expected call of ListFeatureGroup.
-func (mr *MockStoreMockRecorder) ListFeatureGroup(ctx, entityName interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) ListFeatureGroup(ctx, entityID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFeatureGroup", reflect.TypeOf((*MockStore)(nil).ListFeatureGroup), ctx, entityName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFeatureGroup", reflect.TypeOf((*MockStore)(nil).ListFeatureGroup), ctx, entityID)
 }
 
 // ListRevision mocks base method.
