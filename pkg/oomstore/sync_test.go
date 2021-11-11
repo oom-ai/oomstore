@@ -103,10 +103,10 @@ func TestSync(t *testing.T) {
 					FeatureNames: features.Names(),
 				}).Return(stream, nil)
 				onlineStore.EXPECT().Import(ctx, online.ImportOpt{
-					Features: features,
-					Revision: &tc.revision,
-					Entity:   &entity,
-					Stream:   stream,
+					FeatureList: features,
+					Revision:    &tc.revision,
+					Entity:      &entity,
+					Stream:      stream,
 				})
 				if tc.group.OnlineRevisionID != nil {
 					metadataStore.EXPECT().GetRevision(ctx, metadata.GetRevisionOpt{

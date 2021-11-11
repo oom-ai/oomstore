@@ -15,8 +15,8 @@ import (
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
 	featureNames := opt.FeatureList.Names()
-	tableName := getOnlineBatchTableName(opt.RevisionId)
-	query := fmt.Sprintf(`SELECT "%s", %s FROM "%s" WHERE "%s" = $1`, opt.EntityName, dbutil.Quote(`"`, featureNames...), tableName, opt.EntityName)
+	tableName := getOnlineBatchTableName(opt.RevisionID)
+	query := fmt.Sprintf(`SELECT %s FROM "%s" WHERE "%s" = $1`, dbutil.Quote(`"`, featureNames...), tableName, opt.Entity.Name)
 
 	record, err := db.QueryRowxContext(ctx, query, opt.EntityKey).SliceScan()
 	if err != nil {
@@ -31,20 +31,18 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		return nil, err
 	}
 
-	entityKey, values := record[0].(string), record[1:]
-	rs, err := deserializeIntoRowMap(values, opt.FeatureList)
+	rs, err := deserializeIntoRowMap(record, opt.FeatureList)
 	if err != nil {
 		return nil, err
 	}
-	rs[opt.EntityName] = entityKey
 	return rs, nil
 }
 
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
 	featureNames := opt.FeatureList.Names()
-	tableName := getOnlineBatchTableName(opt.RevisionId)
-	query := fmt.Sprintf(`SELECT "%s", %s FROM "%s" WHERE "%s" in (?);`, opt.EntityName, dbutil.Quote(`"`, featureNames...), tableName, opt.EntityName)
+	tableName := getOnlineBatchTableName(opt.RevisionID)
+	query := fmt.Sprintf(`SELECT "%s", %s FROM "%s" WHERE "%s" in (?);`, opt.Entity.Name, dbutil.Quote(`"`, featureNames...), tableName, opt.Entity.Name)
 	sql, args, err := sqlx.In(query, opt.EntityKeys)
 	if err != nil {
 		return nil, err
@@ -56,10 +54,10 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	}
 	defer rows.Close()
 
-	return getFeatureValueMapFromRows(rows, opt.EntityName, opt.FeatureList)
+	return getFeatureValueMapFromRows(rows, opt.FeatureList)
 }
 
-func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string, features typesv2.FeatureList) (map[string]dbutil.RowMap, error) {
+func getFeatureValueMapFromRows(rows *sqlx.Rows, features typesv2.FeatureList) (map[string]dbutil.RowMap, error) {
 	featureValueMap := make(map[string]dbutil.RowMap)
 	for rows.Next() {
 		record, err := rows.SliceScan()

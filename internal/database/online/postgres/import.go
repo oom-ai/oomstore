@@ -14,11 +14,11 @@ const (
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
-	columns := append([]string{opt.Entity.Name}, opt.Features.Names()...)
+	columns := append([]string{opt.Entity.Name}, opt.FeatureList.Names()...)
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		tmpTableName := dbutil.TempTable(opt.Revision.Group.Name)
-		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, opt.Entity, opt.Features)
+		tmpTableName := dbutil.TempTable(fmt.Sprintf("import_revision_%d", opt.Revision.ID))
+		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, opt.Entity, opt.FeatureList)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return err
@@ -31,8 +31,8 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 				return item.Error
 			}
 			record := item.Record
-			if len(record) != len(opt.Features)+1 {
-				return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
+			if len(record) != len(opt.FeatureList)+1 {
+				return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.FeatureList)+1, len(record))
 			}
 			records = append(records, record)
 
