@@ -27,7 +27,7 @@ func prepareEntityAndGroup(t *testing.T, ctx context.Context, db *postgres.DB) (
 		Category:    types.BatchFeatureCategory,
 	})
 	require.NoError(t, err)
-
+	require.NoError(t, db.Refresh())
 	return entityID, groupID
 }
 
