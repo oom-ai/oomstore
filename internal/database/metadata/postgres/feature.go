@@ -15,11 +15,19 @@ import (
 )
 
 func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) error {
-	if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
+	return createFeature(ctx, db, opt)
+}
+
+func (tx *Tx) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) error {
+	return createFeature(ctx, tx, opt)
+}
+
+func createFeature(ctx context.Context, ext metadata.ExtContext, opt metadata.CreateFeatureOpt) error {
+	if err := validateDataType(ctx, ext, opt.DBValueType); err != nil {
 		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
 	}
 	query := "INSERT INTO feature(name, group_name, db_value_type, value_type, description) VALUES ($1, $2, $3, $4, $5)"
-	_, err := db.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.DBValueType, opt.ValueType, opt.Description)
+	_, err := ext.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.DBValueType, opt.ValueType, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
@@ -31,15 +39,31 @@ func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) 
 }
 
 func (db *DB) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
+	return getFeature(ctx, db, featureName)
+}
+
+func (tx *Tx) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
+	return getFeature(ctx, tx, featureName)
+}
+
+func getFeature(ctx context.Context, ext metadata.ExtContext, featureName string) (*types.Feature, error) {
 	var feature types.Feature
 	query := `SELECT * FROM "rich_feature" WHERE name = $1`
-	if err := db.GetContext(ctx, &feature, query, featureName); err != nil {
+	if err := ext.GetContext(ctx, &feature, query, featureName); err != nil {
 		return nil, err
 	}
 	return &feature, nil
 }
 
 func (db *DB) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
+	return listFeature(ctx, db, opt)
+}
+
+func (tx *Tx) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
+	return listFeature(ctx, tx, opt)
+}
+
+func listFeature(ctx context.Context, ext metadata.ExtContext, opt types.ListFeatureOpt) (types.FeatureList, error) {
 	features := types.FeatureList{}
 	query := `SELECT * FROM "rich_feature"`
 	cond, args, err := buildListFeatureCond(opt)
@@ -49,15 +73,23 @@ func (db *DB) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.
 	if len(cond) > 0 {
 		query = fmt.Sprintf("%s WHERE %s", query, strings.Join(cond, " AND "))
 	}
-	if err := db.SelectContext(ctx, &features, db.Rebind(query), args...); err != nil {
+	if err := ext.SelectContext(ctx, &features, ext.Rebind(query), args...); err != nil {
 		return nil, err
 	}
 	return features, nil
 }
 
 func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error) {
+	return updateFeature(ctx, db, opt)
+}
+
+func (tx *Tx) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error) {
+	return updateFeature(ctx, tx, opt)
+}
+
+func updateFeature(ctx context.Context, ext metadata.ExtContext, opt types.UpdateFeatureOpt) (int64, error) {
 	query := "UPDATE feature SET description = $1 WHERE name = $2"
-	if result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName); err != nil {
+	if result, err := ext.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName); err != nil {
 		return 0, err
 	} else {
 		return result.RowsAffected()
@@ -82,9 +114,9 @@ func buildListFeatureCond(opt types.ListFeatureOpt) ([]string, []interface{}, er
 	return dbutil.BuildConditions(and, in)
 }
 
-func (db *DB) validateDataType(ctx context.Context, dataType string) error {
+func validateDataType(ctx context.Context, ext metadata.ExtContext, dataType string) error {
 	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Int())
-	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+	return ext.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", tmpTableName)); err != nil {
 			return err
 		}
