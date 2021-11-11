@@ -34,9 +34,9 @@ func (c *FeatureCache) List(opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
 	}
 
 	// filter entity
-	if opt.EntityName != nil {
+	if opt.EntityID != nil {
 		features = features.Filter(func(f *typesv2.Feature) bool {
-			return f.Entity().Name == *opt.EntityName
+			return f.Entity().ID == *opt.EntityID
 		})
 	}
 

@@ -125,7 +125,7 @@ func TestGetFeature(t *testing.T) {
 func TestListFeature(t *testing.T) {
 	ctx, db := prepareStore(t)
 	defer db.Close()
-	_, groupID := prepareEntityAndGroup(t, ctx, db)
+	entityID, groupID := prepareEntityAndGroup(t, ctx, db)
 
 	features := db.ListFeature(ctx, metadatav2.ListFeatureOpt{})
 	assert.Equal(t, 0, features.Len())
@@ -149,23 +149,20 @@ func TestListFeature(t *testing.T) {
 	})
 	assert.Equal(t, 1, features.Len())
 
-	entityName := "invalid_entity_name"
 	features = db.ListFeature(ctx, metadatav2.ListFeatureOpt{
-		EntityName:   &entityName,
+		EntityID:     int16Ptr(entityID + 1),
 		FeatureNames: []string{"phone", "model"},
 	})
 	assert.Equal(t, 0, features.Len())
 
-	entityName = "device"
 	features = db.ListFeature(ctx, metadatav2.ListFeatureOpt{
-		EntityName:   &entityName,
+		EntityID:     &entityID,
 		FeatureNames: []string{},
 	})
 	assert.Equal(t, 0, len(features))
 
-	entityName = "device"
 	features = db.ListFeature(ctx, metadatav2.ListFeatureOpt{
-		EntityName: &entityName,
+		EntityID: &entityID,
 	})
 	assert.Equal(t, 1, len(features))
 }
@@ -203,4 +200,8 @@ func TestUpdateFeature(t *testing.T) {
 	assert.Equal(t, "device_info", feature.Group.Name)
 	assert.Equal(t, "varchar(16)", feature.DBValueType)
 	assert.Equal(t, "new description", feature.Description)
+}
+
+func int16Ptr(s int16) *int16 {
+	return &s
 }
