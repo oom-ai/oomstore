@@ -92,11 +92,11 @@ func (f *Informer) Cache() *Cache {
 	return f.cache.Load().(*Cache)
 }
 
-func (f *Informer) GetEntity(ctx context.Context, name string) (*typesv2.Entity, error) {
+func (f *Informer) GetEntity(ctx context.Context, id int16) (*typesv2.Entity, error) {
 	if entity := f.Cache().Entities.Find(func(e *typesv2.Entity) bool {
-		return e.Name == name
+		return e.ID == id
 	}); entity == nil {
-		return nil, fmt.Errorf("feature group name=%s not found", name)
+		return nil, fmt.Errorf("feature entity %d not found", id)
 	} else {
 		return entity, nil
 	}
@@ -106,9 +106,9 @@ func (f *Informer) ListEntity(ctx context.Context) typesv2.EntityList {
 	return f.Cache().Entities.List()
 }
 
-func (f *Informer) GetFeature(ctx context.Context, name string) *typesv2.Feature {
+func (f *Informer) GetFeature(ctx context.Context, id int16) *typesv2.Feature {
 	return f.Cache().Features.Find(func(f *typesv2.Feature) bool {
-		return f.Name == name
+		return f.ID == id
 	})
 }
 
@@ -116,38 +116,38 @@ func (f *Informer) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOp
 	return f.Cache().Features.List(opt)
 }
 
-func (f *Informer) GetFeatureGroup(ctx context.Context, name string) (*typesv2.FeatureGroup, error) {
+func (f *Informer) GetFeatureGroup(ctx context.Context, id int16) (*typesv2.FeatureGroup, error) {
 	if featureGroup := f.Cache().Groups.Find(func(g *typesv2.FeatureGroup) bool {
-		return g.Name == name
+		return g.ID == id
 	}); featureGroup == nil {
-		return nil, fmt.Errorf("feature group name=%s not found", name)
+		return nil, fmt.Errorf("feature group %d not found", id)
 	} else {
 		return featureGroup, nil
 	}
 }
 
-func (f *Informer) ListFeatureGroup(ctx context.Context, entityName *string) typesv2.FeatureGroupList {
-	return f.Cache().Groups.List(entityName)
+func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int16) typesv2.FeatureGroupList {
+	return f.Cache().Groups.List(entityID)
 }
 
 func (f *Informer) GetRevision(ctx context.Context, opt metadatav2.GetRevisionOpt) (*typesv2.Revision, error) {
 	if opt.RevisionId != nil {
-		if opt.GroupName != nil || opt.Revision != nil {
+		if opt.GroupID != nil || opt.Revision != nil {
 			return nil, fmt.Errorf("invalid GetRevisionOpt: %+v", opt)
 		}
 		revision := f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
 			return r.ID == *opt.RevisionId
 		})
 		if revision == nil {
-			return nil, fmt.Errorf("cannot find revision: revisionId=%d", *opt.RevisionId)
+			return nil, fmt.Errorf("revision not found")
 		}
 		return revision, nil
-	} else if opt.GroupName != nil && opt.Revision != nil {
+	} else if opt.GroupID != nil && opt.Revision != nil {
 		revision := f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
-			return r.Group.Name == *opt.GroupName && r.Revision == *opt.Revision
+			return r.Group.ID == *opt.GroupID && r.Revision == *opt.Revision
 		})
 		if revision == nil {
-			return nil, fmt.Errorf("cannot find revision: groupName=%s, revision=%d", *opt.GroupName, *opt.Revision)
+			return nil, fmt.Errorf("revision not found")
 		}
 		return revision, nil
 	}
@@ -159,11 +159,11 @@ func (f *Informer) ListRevision(ctx context.Context, opt metadatav2.ListRevision
 }
 
 // TODO: not necessary anymore ?
-func (f *Informer) GetLatestRevision(ctx context.Context, groupName string) *typesv2.Revision {
-	return f.Cache().Revisions.MaxRevision(groupName)
+func (f *Informer) GetLatestRevision(ctx context.Context, groupID int16) *typesv2.Revision {
+	return f.Cache().Revisions.MaxRevision(groupID)
 }
 
 // TODO: refactor this into a private function of OomStore
-func (f *Informer) BuildRevisionRanges(ctx context.Context, groupName string) []*metadatav2.RevisionRange {
-	return f.Cache().Revisions.BuildRevisionRanges(groupName)
+func (f *Informer) BuildRevisionRanges(ctx context.Context, groupID int16) []*metadatav2.RevisionRange {
+	return f.Cache().Revisions.BuildRevisionRanges(groupID)
 }

@@ -14,7 +14,7 @@ type CreateEntityOpt struct {
 }
 
 type CreateFeatureOpt struct {
-	FeatureName string
+	Name        string
 	GroupID     int16
 	DBValueType string
 	Description string
@@ -30,7 +30,7 @@ type CreateFeatureGroupOpt struct {
 
 type CreateRevisionOpt struct {
 	Revision    int64
-	GroupId     int16
+	GroupID     int16
 	DataTable   string
 	Anchored    bool
 	Description string
@@ -61,19 +61,19 @@ type UpdateRevisionOpt struct {
 
 // Get
 type GetRevisionOpt struct {
-	GroupName  *string
+	GroupID    *int16
 	Revision   *int64
 	RevisionId *int32
 }
 
 // List
 type ListRevisionOpt struct {
-	GroupName  *string
+	GroupID    *int16
 	DataTables []string
 }
 
 type ListFeatureOpt struct {
-	EntityName   *string
-	GroupName    *string
-	FeatureNames []string
+	EntityID   *int16
+	GroupID    *int16
+	FeatureIDs []int16
 }
