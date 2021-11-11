@@ -14,11 +14,19 @@ import (
 )
 
 func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) error {
+	return createFeatureGroup(ctx, db, opt)
+}
+
+func (tx *Tx) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) error {
+	return createFeatureGroup(ctx, tx, opt)
+}
+
+func createFeatureGroup(ctx context.Context, ext metadata.ExtContext, opt metadata.CreateFeatureGroupOpt) error {
 	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
 		return fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", opt.Category)
 	}
 	query := "insert into feature_group(name, entity_name, category, description) values($1, $2, $3, $4)"
-	_, err := db.ExecContext(ctx, query, opt.Name, opt.EntityName, opt.Category, opt.Description)
+	_, err := ext.ExecContext(ctx, query, opt.Name, opt.EntityName, opt.Category, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
@@ -30,10 +38,18 @@ func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeature
 }
 
 func (db *DB) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
+	return getFeatureGroup(ctx, db, groupName)
+}
+
+func (tx *Tx) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
+	return getFeatureGroup(ctx, tx, groupName)
+}
+
+func getFeatureGroup(ctx context.Context, ext metadata.ExtContext, groupName string) (*types.FeatureGroup, error) {
 	query := "SELECT * FROM rich_feature_group WHERE name = $1"
 
 	var group types.FeatureGroup
-	if err := db.GetContext(ctx, &group, query, groupName); err != nil {
+	if err := ext.GetContext(ctx, &group, query, groupName); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("group %s does not exist", groupName)
 		}
@@ -43,6 +59,14 @@ func (db *DB) GetFeatureGroup(ctx context.Context, groupName string) (*types.Fea
 }
 
 func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
+	return listFeatureGroup(ctx, db, entityName)
+}
+
+func (tx *Tx) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
+	return listFeatureGroup(ctx, tx, entityName)
+}
+
+func listFeatureGroup(ctx context.Context, ext metadata.ExtContext, entityName *string) ([]*types.FeatureGroup, error) {
 	var cond []interface{}
 	query := "SELECT * FROM rich_feature_group"
 	if entityName != nil {
@@ -51,7 +75,7 @@ func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*type
 	}
 
 	var groups []*types.FeatureGroup
-	if err := db.SelectContext(ctx, &groups, query, cond...); err != nil {
+	if err := ext.SelectContext(ctx, &groups, query, cond...); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -61,6 +85,14 @@ func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*type
 }
 
 func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error) {
+	return updateFeatureGroup(ctx, db, opt)
+}
+
+func (tx *Tx) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error) {
+	return updateFeatureGroup(ctx, tx, opt)
+}
+
+func updateFeatureGroup(ctx context.Context, ext metadata.ExtContext, opt types.UpdateFeatureGroupOpt) (int64, error) {
 	and := make(map[string]interface{})
 	if opt.Description != nil {
 		and["description"] = *opt.Description
@@ -79,7 +111,7 @@ func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGro
 	}
 
 	query := fmt.Sprintf("UPDATE feature_group SET %s WHERE name = $%d", strings.Join(cond, ","), len(cond)+1)
-	if result, err := db.ExecContext(ctx, db.Rebind(query), args...); err != nil {
+	if result, err := ext.ExecContext(ctx, ext.Rebind(query), args...); err != nil {
 		return 0, err
 	} else {
 		return result.RowsAffected()
