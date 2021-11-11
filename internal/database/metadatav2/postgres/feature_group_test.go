@@ -14,7 +14,7 @@ import (
 
 // create an entity with given name
 func prepareEntity(t *testing.T, ctx context.Context, db *postgres.DB, name string) int16 {
-	entityId, err := db.CreateEntity(ctx, types.CreateEntityOpt{
+	entityId, err := db.CreateEntity(ctx, metadatav2.CreateEntityOpt{
 		Name:        name,
 		Length:      32,
 		Description: "description",
@@ -111,20 +111,17 @@ func TestCreateFeatureGroup(t *testing.T) {
 	}
 
 	// create successfully
-	var featureGroupId int16
 	featureGroupId, err := db.CreateFeatureGroup(ctx, opt)
 	assert.NotEqual(t, int16(0), featureGroupId)
 	assert.NoError(t, err)
 
 	// cannot create feature group with same name
-	featureGroupId, err = db.CreateFeatureGroup(ctx, opt)
-	assert.Equal(t, int16(0), featureGroupId)
+	_, err = db.CreateFeatureGroup(ctx, opt)
 	assert.Equal(t, fmt.Errorf("feature group device_baseinfo already exists"), err)
 
 	// cannot create feature group with invalid category
 	opt.Category = "invalid-category"
-	featureGroupId, err = db.CreateFeatureGroup(ctx, opt)
-	assert.Equal(t, int16(0), featureGroupId)
+	_, err = db.CreateFeatureGroup(ctx, opt)
 	assert.NotNil(t, err)
 }
 
@@ -140,19 +137,18 @@ func TestUpdateFeatureGroup(t *testing.T) {
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
 	}
-	var featureGroupId int16
 	featureGroupId, err := db.CreateFeatureGroup(ctx, opt)
 	require.NoError(t, err)
 
 	// update non-exist feature group
 	assert.NotNil(t, db.UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
-		GroupID: int16(0),
+		GroupID: 0,
 	}))
 
 	// update existing feature group
 	description := "new description"
 	assert.Nil(t, db.UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
-		GroupID:     int16(featureGroupId),
+		GroupID:     featureGroupId,
 		Description: &description,
 	}))
 }

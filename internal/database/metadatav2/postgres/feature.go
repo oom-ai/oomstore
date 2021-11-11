@@ -8,7 +8,6 @@ import (
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadatav2"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) CreateFeature(ctx context.Context, opt metadatav2.CreateFeatureOpt) (int16, error) {
@@ -28,13 +27,20 @@ func (db *DB) CreateFeature(ctx context.Context, opt metadatav2.CreateFeatureOpt
 	return featureId, err
 }
 
-func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error) {
-	query := "UPDATE feature SET description = $1 WHERE name = $2"
-	if result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName); err != nil {
-		return 0, err
-	} else {
-		return result.RowsAffected()
+func (db *DB) UpdateFeature(ctx context.Context, opt metadatav2.UpdateFeatureOpt) error {
+	query := "UPDATE feature SET description = $1 WHERE id = $2"
+	result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureID)
+	if err != nil {
+		return err
 	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected != 1 {
+		return fmt.Errorf("failed to update feature %d: feature not found", opt.FeatureID)
+	}
+	return nil
 }
 
 func (db *DB) validateDataType(ctx context.Context, dataType string) error {
