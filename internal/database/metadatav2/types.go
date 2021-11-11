@@ -73,7 +73,7 @@ type ListRevisionOpt struct {
 }
 
 type ListFeatureOpt struct {
-	EntityID     *int16
-	GroupID      *int16
-	FeatureNames []string
+	EntityID   *int16
+	GroupID    *int16
+	FeatureIDs []int16
 }

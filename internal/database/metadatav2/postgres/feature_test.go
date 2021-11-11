@@ -130,7 +130,7 @@ func TestListFeature(t *testing.T) {
 	features := db.ListFeature(ctx, metadatav2.ListFeatureOpt{})
 	assert.Equal(t, 0, features.Len())
 
-	_, err := db.CreateFeature(ctx, metadatav2.CreateFeatureOpt{
+	featureID, err := db.CreateFeature(ctx, metadatav2.CreateFeatureOpt{
 		FeatureName: "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
@@ -145,19 +145,19 @@ func TestListFeature(t *testing.T) {
 	assert.Equal(t, 1, features.Len())
 
 	features = db.ListFeature(ctx, metadatav2.ListFeatureOpt{
-		FeatureNames: []string{"phone", "model"},
+		FeatureIDs: []int16{featureID},
 	})
 	assert.Equal(t, 1, features.Len())
 
 	features = db.ListFeature(ctx, metadatav2.ListFeatureOpt{
-		EntityID:     int16Ptr(entityID + 1),
-		FeatureNames: []string{"phone", "model"},
+		EntityID:   int16Ptr(entityID + 1),
+		FeatureIDs: []int16{featureID},
 	})
 	assert.Equal(t, 0, features.Len())
 
 	features = db.ListFeature(ctx, metadatav2.ListFeatureOpt{
-		EntityID:     &entityID,
-		FeatureNames: []string{},
+		EntityID:   &entityID,
+		FeatureIDs: []int16{},
 	})
 	assert.Equal(t, 0, len(features))
 
