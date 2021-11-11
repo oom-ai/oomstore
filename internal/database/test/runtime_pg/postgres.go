@@ -14,11 +14,14 @@ import (
 var PostgresDbopt types.PostgresOpt
 
 func init() {
-	postgresContainer, err := gnomock.Start(postgres.Preset(
-		postgres.WithUser("test", "test"),
-		postgres.WithDatabase("test"),
-		postgres.WithVersion("14.0"),
-	))
+	postgresContainer, err := gnomock.Start(
+		postgres.Preset(
+			postgres.WithUser("test", "test"),
+			postgres.WithDatabase("test"),
+			postgres.WithVersion("14.0"),
+		),
+		gnomock.WithUseLocalImagesFirst(),
+	)
 	if err != nil {
 		panic(err)
 	}
