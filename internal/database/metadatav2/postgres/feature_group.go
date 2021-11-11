@@ -57,7 +57,7 @@ func (db *DB) UpdateFeatureGroup(ctx context.Context, opt metadatav2.UpdateFeatu
 		return err
 	}
 	if rowsAffected != 1 {
-		return fmt.Errorf("expect 1 affected row, get %d", rowsAffected)
+		return fmt.Errorf("failed to update feature group %d: feature group not found", opt.GroupID)
 	}
 	return nil
 }

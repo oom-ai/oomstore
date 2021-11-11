@@ -14,7 +14,7 @@ func TestCreateRevision(t *testing.T) {
 	ctx, db := prepareStore(t)
 	defer db.Close()
 
-	entityId, err := db.CreateEntity(ctx, types.CreateEntityOpt{
+	entityId, err := db.CreateEntity(ctx, metadatav2.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
 		Description: "device entity",
@@ -73,7 +73,7 @@ func TestUpdateRevision(t *testing.T) {
 	ctx, db := prepareStore(t)
 	defer db.Close()
 
-	entityId, err := db.CreateEntity(ctx, types.CreateEntityOpt{
+	entityId, err := db.CreateEntity(ctx, metadatav2.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
 		Description: "device entity",
@@ -113,7 +113,7 @@ func TestUpdateRevision(t *testing.T) {
 				RevisionID:  revisionId - 1,
 				NewAnchored: boolPtr(true),
 			},
-			expected: fmt.Errorf("failed to update revision %d", revisionId-1),
+			expected: fmt.Errorf("failed to update revision %d: revision not found", revisionId-1),
 		},
 	}
 

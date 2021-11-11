@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/oom-ai/oomstore/internal/database/metadatav2"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
@@ -64,7 +63,7 @@ func (c *RevisionCache) MaxRevision(groupName string) *typesv2.Revision {
 	return max
 }
 
-func (c *RevisionCache) BuildRevisionRanges(groupName string) []*types.RevisionRange {
+func (c *RevisionCache) BuildRevisionRanges(groupName string) []*metadatav2.RevisionRange {
 	revisionIndex := c.GetGroup(groupName)
 	if len(revisionIndex) == 0 {
 		return nil
@@ -76,16 +75,16 @@ func (c *RevisionCache) BuildRevisionRanges(groupName string) []*types.RevisionR
 		return revisions[i].Revision < revisions[j].Revision
 	})
 
-	var ranges []*types.RevisionRange
+	var ranges []*metadatav2.RevisionRange
 	for i := 1; i < len(revisions); i++ {
-		ranges = append(ranges, &types.RevisionRange{
+		ranges = append(ranges, &metadatav2.RevisionRange{
 			MinRevision: revisions[i-1].Revision,
 			MaxRevision: revisions[i].Revision,
 			DataTable:   revisions[i-1].DataTable,
 		})
 	}
 
-	return append(ranges, &types.RevisionRange{
+	return append(ranges, &metadatav2.RevisionRange{
 		MinRevision: revisions[len(revisions)-1].Revision,
 		MaxRevision: revisions[math.MaxInt64].Revision,
 		DataTable:   revisions[len(revisions)-1].DataTable,

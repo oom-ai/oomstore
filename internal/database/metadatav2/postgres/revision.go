@@ -54,7 +54,7 @@ func (db *DB) UpdateRevision(ctx context.Context, opt metadatav2.UpdateRevisionO
 		return err
 	}
 	if rowsAffected != 1 {
-		return fmt.Errorf("failed to update revision %d", opt.RevisionID)
+		return fmt.Errorf("failed to update revision %d: revision not found", opt.RevisionID)
 	}
 	return nil
 }
