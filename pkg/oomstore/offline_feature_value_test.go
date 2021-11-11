@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
+	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -18,8 +19,9 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 	defer ctrl.Finish()
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
+	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
+	store := oomstore.NewOomStore(nil, offlineStore, metadataStore, metadatav2Store)
 
-	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
 	streamFeatures := prepareFeatures(true, false)
 	inconsistentFeatures := prepareFeatures(false, true)
 	consistentFeatures := prepareFeatures(true, true)

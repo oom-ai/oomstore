@@ -103,6 +103,16 @@ func (f *Informer) GetEntity(ctx context.Context, id int16) (*typesv2.Entity, er
 	}
 }
 
+func (f *Informer) GetEntityByName(ctx context.Context, name string) (*typesv2.Entity, error) {
+	if entity := f.Cache().Entities.Find(func(e *typesv2.Entity) bool {
+		return e.Name == name
+	}); entity == nil {
+		return nil, fmt.Errorf("feature entity %s not found", name)
+	} else {
+		return entity, nil
+	}
+}
+
 func (f *Informer) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, error) {
 	if feature := f.Cache().Features.Find(func(f *typesv2.Feature) bool {
 		return f.ID == id
@@ -113,11 +123,31 @@ func (f *Informer) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, 
 	}
 }
 
+func (f *Informer) GetFeatureByName(ctx context.Context, name string) (*typesv2.Feature, error) {
+	if feature := f.Cache().Features.Find(func(f *typesv2.Feature) bool {
+		return f.Name == name
+	}); feature == nil {
+		return nil, fmt.Errorf("feature %s not found", name)
+	} else {
+		return feature, nil
+	}
+}
+
 func (f *Informer) GetFeatureGroup(ctx context.Context, id int16) (*typesv2.FeatureGroup, error) {
 	if featureGroup := f.Cache().Groups.Find(func(g *typesv2.FeatureGroup) bool {
 		return g.ID == id
 	}); featureGroup == nil {
 		return nil, fmt.Errorf("feature group %d not found", id)
+	} else {
+		return featureGroup, nil
+	}
+}
+
+func (f *Informer) GetFeatureGroupByName(ctx context.Context, name string) (*typesv2.FeatureGroup, error) {
+	if featureGroup := f.Cache().Groups.Find(func(g *typesv2.FeatureGroup) bool {
+		return g.Name == name
+	}); featureGroup == nil {
+		return nil, fmt.Errorf("feature group %s not found", name)
 	} else {
 		return featureGroup, nil
 	}

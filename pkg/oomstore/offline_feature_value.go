@@ -3,40 +3,38 @@ package oomstore
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 // GetHistoricalFeatureValues gets point-in-time feature values for each entity row;
 // currently, this API only supports batch features.
 func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.GetHistoricalFeatureValuesOpt) (*types.JoinResult, error) {
-	features, err := s.metadata.ListFeature(ctx, types.ListFeatureOpt{FeatureNames: opt.FeatureNames})
-	if err != nil {
-		return nil, err
-	}
-	features = features.Filter(func(f *types.Feature) bool {
-		return f.Category == types.BatchFeatureCategory
+	features := s.metadatav2.ListFeature(ctx, metadatav2.ListFeatureOpt{FeatureIDs: opt.FeatureIDs})
+
+	features = features.Filter(func(f *typesv2.Feature) bool {
+		return f.Group.Category == types.BatchFeatureCategory
 	})
 	if len(features) == 0 {
 		return nil, nil
 	}
 
-	entityName, err := getEntityName(features)
-	if err != nil || entityName == nil {
-		return nil, err
-	}
-	entity, err := s.metadata.GetEntity(ctx, *entityName)
-	if err != nil {
+	entity, err := s.getSharedEntity(ctx, features)
+	if err != nil || entity == nil {
 		return nil, err
 	}
 
 	featureMap := buildGroupToFeaturesMap(features)
-	revisionRangeMap := make(map[string][]*types.RevisionRange)
+	revisionRangeMap := make(map[string][]*metadatav2.RevisionRange)
 	for groupName := range featureMap {
-		revisionRanges, err := s.metadata.BuildRevisionRanges(ctx, groupName)
+		// TODO: This is slow but I haven't figured out a better way
+		group, err := s.metadatav2.GetFeatureGroupByName(ctx, groupName)
 		if err != nil {
 			return nil, err
 		}
+		revisionRanges := s.metadatav2.BuildRevisionRanges(ctx, group.ID)
 		revisionRangeMap[groupName] = revisionRanges
 	}
 
@@ -49,13 +47,13 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 }
 
 // key: group_name, value: slice of features
-func buildGroupToFeaturesMap(features types.FeatureList) map[string]types.FeatureList {
-	groups := make(map[string]types.FeatureList)
+func buildGroupToFeaturesMap(features typesv2.FeatureList) map[string]typesv2.FeatureList {
+	groups := make(map[string]typesv2.FeatureList)
 	for _, f := range features {
-		if _, ok := groups[f.GroupName]; !ok {
-			groups[f.GroupName] = types.FeatureList{}
+		if _, ok := groups[f.Group.Name]; !ok {
+			groups[f.Group.Name] = typesv2.FeatureList{}
 		}
-		groups[f.GroupName] = append(groups[f.GroupName], f)
+		groups[f.Group.Name] = append(groups[f.Group.Name], f)
 	}
 	return groups
 }

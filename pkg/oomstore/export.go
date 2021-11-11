@@ -4,26 +4,22 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeatureValuesOpt) ([]string, <-chan *types.RawFeatureValueRecord, error) {
-	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupName)
+	group, err := s.metadatav2.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dataTable string
 	if opt.GroupRevision == nil {
-		if group.OfflineDataTable == nil {
-			return nil, nil, fmt.Errorf("feature group '%s' data source not set", opt.GroupName)
-		}
-		dataTable = *group.OfflineDataTable
-	} else {
-		revision, err := s.GetRevision(ctx, types.GetRevisionOpt{
-			GroupName: &opt.GroupName,
-			Revision:  opt.GroupRevision,
+		revision, err := s.GetRevision(ctx, metadatav2.GetRevisionOpt{
+			GroupID:  &opt.GroupID,
+			Revision: opt.GroupRevision,
 		})
 		if err != nil {
 			return nil, nil, err
@@ -32,7 +28,7 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 	}
 
 	featureNames := opt.FeatureNames
-	allFeatures, err := s.ListFeature(ctx, types.ListFeatureOpt{GroupName: &opt.GroupName})
+	allFeatures := s.ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &opt.GroupID})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -48,14 +44,19 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 		}
 	}
 
+	entity, err := s.metadatav2.GetEntity(ctx, group.EntityID)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get entity id=%d: %v", group.EntityID, err)
+	}
+
 	stream, err := s.offline.Export(ctx, offline.ExportOpt{
 		DataTable:    dataTable,
-		EntityName:   group.EntityName,
+		EntityName:   entity.Name,
 		FeatureNames: featureNames,
 		Limit:        opt.Limit,
 	})
 
-	fields := append([]string{group.EntityName}, featureNames...)
+	fields := append([]string{entity.Name}, featureNames...)
 	return fields, stream, err
 }
 

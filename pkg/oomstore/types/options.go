@@ -6,7 +6,7 @@ import (
 
 type CreateFeatureOpt struct {
 	FeatureName string
-	GroupName   string
+	GroupID     string
 	DBValueType string
 	Description string
 }
@@ -35,14 +35,14 @@ type CreateFeatureGroupOpt struct {
 }
 
 type ExportFeatureValuesOpt struct {
-	GroupName     string
+	GroupID       int16
 	GroupRevision *int64
 	FeatureNames  []string
 	Limit         *uint64
 }
 
 type ImportBatchFeaturesOpt struct {
-	GroupName   string
+	GroupID     int16
 	Description string
 	DataSource  CsvDataSource
 	Revision    *int64
@@ -54,18 +54,18 @@ type CsvDataSource struct {
 }
 
 type GetOnlineFeatureValuesOpt struct {
-	FeatureNames []string
-	EntityKey    string
+	FeatureIDs []int16
+	EntityKey  string
 }
 
 type MultiGetOnlineFeatureValuesOpt struct {
-	FeatureNames []string
-	EntityKeys   []string
+	FeatureIDs []int16
+	EntityKeys []string
 }
 
 type GetHistoricalFeatureValuesOpt struct {
-	FeatureNames []string
-	EntityRows   <-chan EntityRow
+	FeatureIDs []int16
+	EntityRows <-chan EntityRow
 }
 
 type UpdateEntityOpt struct {
@@ -80,7 +80,7 @@ type UpdateFeatureGroupOpt struct {
 }
 
 type SyncOpt struct {
-	GroupName  string
+	GroupID    int16
 	RevisionId int32
 }
 

@@ -7,13 +7,14 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 const (
 	PostgresBatchSize = 10
 )
 
-func (db *DB) createTableJoined(ctx context.Context, features types.FeatureList, entity types.Entity, groupName string) (string, error) {
+func (db *DB) createTableJoined(ctx context.Context, features typesv2.FeatureList, entity typesv2.Entity, groupName string) (string, error) {
 	// create table joined
 	tableName := dbutil.TempTable(fmt.Sprintf("joined_%s", groupName))
 	schema := `
@@ -39,7 +40,7 @@ func (db *DB) createTableJoined(ctx context.Context, features types.FeatureList,
 	return tableName, err
 }
 
-func (db *DB) createAndImportTableEntityRows(ctx context.Context, entity types.Entity, entityRows <-chan types.EntityRow) (string, error) {
+func (db *DB) createAndImportTableEntityRows(ctx context.Context, entity typesv2.Entity, entityRows <-chan types.EntityRow) (string, error) {
 	// create table entity_rows
 	tableName := dbutil.TempTable("entity_rows")
 	schema := fmt.Sprintf(`
