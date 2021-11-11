@@ -22,7 +22,7 @@ func TestCreateRevision(t *testing.T) {
 	_, groupId := prepareEntityAndGroup(t, ctx, db)
 
 	opt := metadatav2.CreateRevisionOpt{
-		GroupId:     groupId,
+		GroupID:     groupId,
 		Revision:    1,
 		DataTable:   "device_info_20211028",
 		Description: "description",
@@ -68,7 +68,7 @@ func TestUpdateRevision(t *testing.T) {
 	_, groupId := prepareEntityAndGroup(t, ctx, db)
 	revisionId, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
 		Revision:  1000,
-		GroupId:   groupId,
+		GroupID:   groupId,
 		DataTable: "device_info_1000",
 		Anchored:  false,
 	})

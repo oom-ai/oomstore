@@ -14,7 +14,7 @@ import (
 func (db *DB) CreateRevision(ctx context.Context, opt metadatav2.CreateRevisionOpt) (int32, error) {
 	query := "INSERT INTO feature_group_revision(group_id, revision, data_table, anchored, description) VALUES ($1, $2, $3, $4, $5) RETURNING id"
 	var revisionId int32
-	if err := db.GetContext(ctx, &revisionId, query, opt.GroupId, opt.Revision, opt.DataTable, opt.Anchored, opt.Description); err != nil {
+	if err := db.GetContext(ctx, &revisionId, query, opt.GroupID, opt.Revision, opt.DataTable, opt.Anchored, opt.Description); err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
 				return 0, fmt.Errorf("revision %v already exist", opt.Revision)

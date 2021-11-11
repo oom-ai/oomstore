@@ -34,22 +34,22 @@ func (c *RevisionCache) List(opt metadatav2.ListRevisionOpt) typesv2.RevisionLis
 		revisions = c.RevisionList
 	}
 
-	if opt.GroupName != nil {
+	if opt.GroupID != nil {
 		revisions = revisions.Filter(func(r *typesv2.Revision) bool {
-			return r.Group.Name == *opt.GroupName
+			return r.Group.ID == *opt.GroupID
 		})
 	}
 	return revisions
 }
 
-func (c *RevisionCache) GetGroup(groupName string) typesv2.RevisionList {
+func (c *RevisionCache) GetGroup(groupID int16) typesv2.RevisionList {
 	return c.Filter(func(r *typesv2.Revision) bool {
-		return r.Group.Name == groupName
+		return r.Group.ID == groupID
 	})
 }
 
-func (c *RevisionCache) MaxRevision(groupName string) *typesv2.Revision {
-	revisions := c.GetGroup(groupName)
+func (c *RevisionCache) MaxRevision(groupID int16) *typesv2.Revision {
+	revisions := c.GetGroup(groupID)
 	if revisions == nil {
 		return nil
 	}
@@ -63,8 +63,8 @@ func (c *RevisionCache) MaxRevision(groupName string) *typesv2.Revision {
 	return max
 }
 
-func (c *RevisionCache) BuildRevisionRanges(groupName string) []*metadatav2.RevisionRange {
-	revisionIndex := c.GetGroup(groupName)
+func (c *RevisionCache) BuildRevisionRanges(groupID int16) []*metadatav2.RevisionRange {
+	revisionIndex := c.GetGroup(groupID)
 	if len(revisionIndex) == 0 {
 		return nil
 	}
