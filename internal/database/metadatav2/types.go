@@ -31,7 +31,7 @@ type CreateFeatureGroupOpt struct {
 type CreateRevisionOpt struct {
 	Revision    int64
 	GroupID     int16
-	DataTable   string
+	DataTable   *string
 	Anchored    bool
 	Description string
 }
