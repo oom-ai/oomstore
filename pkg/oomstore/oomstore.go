@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"github.com/oom-ai/oomstore/internal/database"
-	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -19,7 +18,7 @@ type OomStore struct {
 	metadatav2 metadatav2.Store
 }
 
-func NewOomStore(online online.Store, offline offline.Store, metadata metadata.Store, metadatav2 metadatav2.Store) *OomStore {
+func NewOomStore(online online.Store, offline offline.Store, metadatav2 metadatav2.Store) *OomStore {
 	return &OomStore{
 		online:     online,
 		offline:    offline,
