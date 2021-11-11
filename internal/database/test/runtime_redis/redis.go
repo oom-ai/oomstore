@@ -14,9 +14,12 @@ import (
 var RedisDbOpt types.RedisOpt
 
 func init() {
-	container, err := gnomock.Start(redis.Preset(
-		redis.WithVersion("6.2.6"),
-	))
+	container, err := gnomock.Start(
+		redis.Preset(
+			redis.WithVersion("6.2.6"),
+		),
+		gnomock.WithUseLocalImagesFirst(),
+	)
 	if err != nil {
 		panic(err)
 	}
