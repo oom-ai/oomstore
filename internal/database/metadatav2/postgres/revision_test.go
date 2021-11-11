@@ -20,30 +20,60 @@ func TestCreateRevision(t *testing.T) {
 	defer db.Close()
 
 	_, groupId := prepareEntityAndGroup(t, ctx, db)
-
+	group, err := db.GetFeatureGroup(ctx, groupId)
+	require.NoError(t, err)
 	opt := metadatav2.CreateRevisionOpt{
 		GroupID:     groupId,
-		Revision:    1,
-		DataTable:   "device_info_20211028",
+		Revision:    1000,
+		DataTable:   stringPtr("device_info_20211028"),
 		Description: "description",
 	}
 
 	testCases := []struct {
-		description   string
-		opt           metadatav2.CreateRevisionOpt
-		expectedError error
-		expected      int32
+		description      string
+		opt              metadatav2.CreateRevisionOpt
+		expectedError    error
+		expected         int32
+		expectedRevision *typesv2.Revision
 	}{
 		{
 			description:   "create revision successfully, return id",
 			opt:           opt,
 			expectedError: nil,
 			expected:      int32(1),
+			expectedRevision: &typesv2.Revision{
+				ID:          1,
+				Revision:    1000,
+				DataTable:   "device_info_20211028",
+				Anchored:    false,
+				Description: "description",
+				GroupID:     groupId,
+				Group:       group,
+			},
+		},
+		{
+			description: "create revision without data table, use default data table name",
+			opt: metadatav2.CreateRevisionOpt{
+				GroupID:     groupId,
+				Revision:    2000,
+				Description: "description",
+			},
+			expectedError: nil,
+			expected:      int32(2),
+			expectedRevision: &typesv2.Revision{
+				ID:          2,
+				Revision:    2000,
+				DataTable:   "data_1_2",
+				Anchored:    false,
+				Description: "description",
+				GroupID:     groupId,
+				Group:       group,
+			},
 		},
 		{
 			description:   "create existing revision, return error",
 			opt:           opt,
-			expectedError: fmt.Errorf("revision 1 already exist"),
+			expectedError: fmt.Errorf("revision already exists: groupId=%d, revision=1000", groupId),
 			expected:      int32(0),
 		},
 	}
@@ -56,6 +86,13 @@ func TestCreateRevision(t *testing.T) {
 				assert.EqualError(t, err, tc.expectedError.Error())
 			} else {
 				assert.NoError(t, tc.expectedError)
+				assert.NoError(t, db.Refresh())
+				actualRevision, err := db.GetRevision(ctx, metadatav2.GetRevisionOpt{
+					RevisionId: &tc.expected,
+				})
+				assert.NoError(t, err)
+				ignoreCreateAndModifyTime(actualRevision)
+				assert.Equal(t, tc.expectedRevision, actualRevision)
 			}
 		})
 	}
@@ -69,7 +106,7 @@ func TestUpdateRevision(t *testing.T) {
 	revisionId, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
 		Revision:  1000,
 		GroupID:   groupId,
-		DataTable: "device_info_1000",
+		DataTable: stringPtr("device_info_1000"),
 		Anchored:  false,
 	})
 	require.NoError(t, err)
@@ -117,7 +154,7 @@ func TestGetRevision(t *testing.T) {
 	revisionId, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
 		Revision:  1000,
 		GroupID:   groupId,
-		DataTable: "device_info_1000",
+		DataTable: stringPtr("device_info_1000"),
 		Anchored:  false,
 	})
 	require.NoError(t, err)
@@ -284,6 +321,10 @@ func int32Ptr(i int32) *int32 {
 	return &i
 }
 
+func stringPtr(s string) *string {
+	return &s
+}
+
 func ignoreCreateAndModifyTime(revision *typesv2.Revision) {
 	revision.CreateTime = time.Time{}
 	revision.ModifyTime = time.Time{}
@@ -304,11 +345,11 @@ func prepareRevisions(t *testing.T, ctx context.Context, db *postgres.DB) (int16
 		Category:    types.BatchFeatureCategory,
 	})
 	require.NoError(t, err)
-
+	require.NoError(t, db.Refresh())
 	revisionId1, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
 		Revision:  1000,
 		GroupID:   groupId,
-		DataTable: "device_info_1000",
+		DataTable: stringPtr("device_info_1000"),
 		Anchored:  false,
 	})
 	require.NoError(t, err)
@@ -316,7 +357,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, db *postgres.DB) (int16
 	revisionId2, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
 		Revision:  2000,
 		GroupID:   groupId,
-		DataTable: "device_info_2000",
+		DataTable: stringPtr("device_info_2000"),
 		Anchored:  false,
 	})
 	require.NoError(t, err)
