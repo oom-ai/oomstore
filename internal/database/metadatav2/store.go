@@ -17,7 +17,7 @@ type Store interface {
 	// feature
 	CreateFeature(ctx context.Context, opt CreateFeatureOpt) (int16, error)
 	UpdateFeature(ctx context.Context, opt UpdateFeatureOpt) error
-	GetFeature(ctx context.Context, id int16) *typesv2.Feature
+	GetFeature(ctx context.Context, id int16) (*typesv2.Feature, error)
 	ListFeature(ctx context.Context, opt ListFeatureOpt) typesv2.FeatureList
 
 	// feature group
@@ -29,8 +29,8 @@ type Store interface {
 	// revision
 	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int32, error)
 	UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) error
-	ListRevision(ctx context.Context, opt ListRevisionOpt) typesv2.RevisionList
 	GetRevision(ctx context.Context, opt GetRevisionOpt) (*typesv2.Revision, error)
+	ListRevision(ctx context.Context, opt ListRevisionOpt) typesv2.RevisionList
 	GetLatestRevision(ctx context.Context, groupID int16) *typesv2.Revision
 	BuildRevisionRanges(ctx context.Context, groupID int16) []*RevisionRange
 

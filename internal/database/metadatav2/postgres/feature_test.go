@@ -111,11 +111,11 @@ func TestGetFeature(t *testing.T) {
 
 	require.NoError(t, db.Refresh())
 
-	feature := db.GetFeature(ctx, id+1)
-	assert.Nil(t, feature)
+	_, err = db.GetFeature(ctx, 0)
+	require.EqualError(t, err, "feature 0 not found")
 
-	feature = db.GetFeature(ctx, id)
-	require.NotNil(t, feature)
+	feature, err := db.GetFeature(ctx, id)
+	require.NoError(t, err)
 	assert.Equal(t, "phone", feature.Name)
 	assert.Equal(t, "device_info", feature.Group.Name)
 	assert.Equal(t, "varchar(16)", feature.DBValueType)
@@ -194,8 +194,8 @@ func TestUpdateFeature(t *testing.T) {
 
 	require.NoError(t, db.Refresh())
 
-	feature := db.GetFeature(ctx, id)
-	require.NotNil(t, feature)
+	feature, err := db.GetFeature(ctx, id)
+	require.NoError(t, err)
 	assert.Equal(t, "phone", feature.Name)
 	assert.Equal(t, "device_info", feature.Group.Name)
 	assert.Equal(t, "varchar(16)", feature.DBValueType)
