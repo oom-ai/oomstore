@@ -10,7 +10,6 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2"
-	types "github.com/oom-ai/oomstore/pkg/oomstore/types"
 	typesv2 "github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
@@ -38,10 +37,10 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 }
 
 // BuildRevisionRanges mocks base method.
-func (m *MockStore) BuildRevisionRanges(ctx context.Context, groupName string) []*types.RevisionRange {
+func (m *MockStore) BuildRevisionRanges(ctx context.Context, groupName string) []*metadatav2.RevisionRange {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BuildRevisionRanges", ctx, groupName)
-	ret0, _ := ret[0].([]*types.RevisionRange)
+	ret0, _ := ret[0].([]*metadatav2.RevisionRange)
 	return ret0
 }
 
@@ -66,7 +65,7 @@ func (mr *MockStoreMockRecorder) Close() *gomock.Call {
 }
 
 // CreateEntity mocks base method.
-func (m *MockStore) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) (int16, error) {
+func (m *MockStore) CreateEntity(ctx context.Context, opt metadatav2.CreateEntityOpt) (int16, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEntity", ctx, opt)
 	ret0, _ := ret[0].(int16)
@@ -212,7 +211,7 @@ func (mr *MockStoreMockRecorder) ListEntity(ctx interface{}) *gomock.Call {
 }
 
 // ListFeature mocks base method.
-func (m *MockStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) typesv2.FeatureList {
+func (m *MockStore) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListFeature", ctx, opt)
 	ret0, _ := ret[0].(typesv2.FeatureList)
@@ -254,12 +253,11 @@ func (mr *MockStoreMockRecorder) ListRevision(ctx, opt interface{}) *gomock.Call
 }
 
 // UpdateEntity mocks base method.
-func (m *MockStore) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) (int64, error) {
+func (m *MockStore) UpdateEntity(ctx context.Context, opt metadatav2.UpdateEntityOpt) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateEntity", ctx, opt)
-	ret0, _ := ret[0].(int64)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // UpdateEntity indicates an expected call of UpdateEntity.
@@ -269,12 +267,11 @@ func (mr *MockStoreMockRecorder) UpdateEntity(ctx, opt interface{}) *gomock.Call
 }
 
 // UpdateFeature mocks base method.
-func (m *MockStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error) {
+func (m *MockStore) UpdateFeature(ctx context.Context, opt metadatav2.UpdateFeatureOpt) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateFeature", ctx, opt)
-	ret0, _ := ret[0].(int64)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // UpdateFeature indicates an expected call of UpdateFeature.
