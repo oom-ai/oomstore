@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -31,4 +32,16 @@ func OpenWith(host, port, user, password, database string) (*DB, error) {
 			database),
 	)
 	return &DB{db}, err
+}
+
+type Tx struct {
+	*sqlx.Tx
+}
+
+func openTx(ctx context.Context, db *sqlx.DB) (*Tx, error) {
+	tx, err := db.BeginTxx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &Tx{Tx: tx}, nil
 }

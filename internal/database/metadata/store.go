@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -35,4 +36,11 @@ type Store interface {
 	BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error)
 
 	io.Closer
+}
+
+type ExtContext interface {
+	GetContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
+	SelectContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
+
+	sqlx.ExtContext
 }
