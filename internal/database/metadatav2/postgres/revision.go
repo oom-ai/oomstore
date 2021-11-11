@@ -24,7 +24,7 @@ func (db *DB) CreateRevision(ctx context.Context, opt metadatav2.CreateRevisionO
 		if err := tx.GetContext(ctx, &revisionId, insertQuery, opt.GroupID, opt.Revision, dataTable, opt.Anchored, opt.Description); err != nil {
 			if e2, ok := err.(*pq.Error); ok {
 				if e2.Code == pgerrcode.UniqueViolation {
-					return fmt.Errorf("revision already exist: groupId=%d, revision=%d", opt.GroupID, opt.Revision)
+					return fmt.Errorf("revision already exists: groupId=%d, revision=%d", opt.GroupID, opt.Revision)
 				}
 			}
 			return err
