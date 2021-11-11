@@ -6,8 +6,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
@@ -15,6 +14,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/online/mock_online"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,15 +23,15 @@ func TestSync(t *testing.T) {
 	defer ctrl.Finish()
 	onlineStore := mock_online.NewMockStore(ctrl)
 	offlineStore := mock_offline.NewMockStore(ctrl)
-	metadataStore := mock_metadata.NewMockStore(ctrl)
 	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(onlineStore, offlineStore, metadataStore, metadatav2Store)
+	store := oomstore.NewOomStore(onlineStore, offlineStore, metadatav2Store)
 	ctx := context.Background()
 
 	revision1 := prepareRevision(1, 10)
 	revision2 := prepareRevision(2, 20)
 	revision3 := prepareRevision(3, 30)
-	entity := types.Entity{
+	entity := typesv2.Entity{
+		ID:   1,
 		Name: "device",
 	}
 	features := prepareFeatures(true, true)
@@ -40,15 +40,15 @@ func TestSync(t *testing.T) {
 	testCases := []struct {
 		description      string
 		opt              types.SyncOpt
-		group            types.FeatureGroup
-		revision         types.Revision
-		previousRevision types.Revision
+		group            typesv2.FeatureGroup
+		revision         typesv2.Revision
+		previousRevision typesv2.Revision
 		expectedError    error
 	}{
 		{
 			description: "user-defined revision, succeed",
 			opt: types.SyncOpt{
-				GroupName:  "device_info",
+				GroupID:    1,
 				RevisionId: 10,
 			},
 			group:            prepareGroup(int32Ptr(2)),
@@ -59,7 +59,7 @@ func TestSync(t *testing.T) {
 		{
 			description: "latest revision, succeed",
 			opt: types.SyncOpt{
-				GroupName: "device_info",
+				GroupID: 1,
 			},
 			group:            prepareGroup(int32Ptr(2)),
 			revision:         revision3,
@@ -69,7 +69,7 @@ func TestSync(t *testing.T) {
 		{
 			description: "no previous revision, succeed",
 			opt: types.SyncOpt{
-				GroupName: "device_info",
+				GroupID: 1,
 			},
 			group:         prepareGroup(nil),
 			revision:      revision1,
@@ -78,7 +78,7 @@ func TestSync(t *testing.T) {
 		{
 			description: "already in latest revision, fail",
 			opt: types.SyncOpt{
-				GroupName: "device_info",
+				GroupID: 1,
 			},
 			group:         prepareGroup(int32Ptr(3)),
 			revision:      revision3,
@@ -88,18 +88,18 @@ func TestSync(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().GetFeatureGroup(ctx, tc.opt.GroupName).Return(&tc.group, nil)
-			metadataStore.EXPECT().GetEntity(ctx, entity.Name).AnyTimes().Return(&entity, nil)
-			metadataStore.EXPECT().ListFeature(ctx, types.ListFeatureOpt{GroupName: &tc.opt.GroupName}).AnyTimes().Return(features, nil)
+			metadatav2Store.EXPECT().GetFeatureGroup(ctx, tc.opt.GroupID).Return(&tc.group, nil)
+			metadatav2Store.EXPECT().GetEntity(ctx, entity.ID).AnyTimes().Return(&entity, nil)
+			metadatav2Store.EXPECT().ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &tc.opt.GroupID}).AnyTimes().Return(features, nil)
 
-			metadataStore.EXPECT().GetRevision(ctx, metadata.GetRevisionOpt{
-				GroupName:  &tc.opt.GroupName,
+			metadatav2Store.EXPECT().GetRevision(ctx, metadatav2.GetRevisionOpt{
+				GroupID:    &tc.opt.GroupID,
 				RevisionId: &tc.opt.RevisionId,
 			}).Return(&tc.revision, nil)
 			if tc.expectedError == nil {
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
 					DataTable:    tc.revision.DataTable,
-					EntityName:   tc.group.EntityName,
+					EntityName:   entity.Name,
 					FeatureNames: features.Names(),
 				}).Return(stream, nil)
 				onlineStore.EXPECT().Import(ctx, online.ImportOpt{
@@ -109,16 +109,16 @@ func TestSync(t *testing.T) {
 					Stream:      stream,
 				})
 				if tc.group.OnlineRevisionID != nil {
-					metadataStore.EXPECT().GetRevision(ctx, metadata.GetRevisionOpt{
+					metadatav2Store.EXPECT().GetRevision(ctx, metadatav2.GetRevisionOpt{
 						RevisionId: tc.group.OnlineRevisionID,
 					}).Return(&tc.previousRevision, nil)
 					onlineStore.EXPECT().Purge(ctx, &tc.previousRevision).Return(nil)
 				}
-				metadataStore.EXPECT().UpdateFeatureGroup(ctx, types.UpdateFeatureGroupOpt{
-					GroupName:        tc.group.Name,
-					OnlineRevisionId: &tc.revision.ID,
+				metadatav2Store.EXPECT().UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
+					GroupID:             tc.group.ID,
+					NewOnlineRevisionID: &tc.revision.ID,
 				})
-				metadataStore.EXPECT().
+				metadatav2Store.EXPECT().
 					UpdateRevision(gomock.Any(), gomock.Any()).
 					AnyTimes().
 					Return(int64(0), nil)
@@ -134,20 +134,24 @@ func TestSync(t *testing.T) {
 	}
 }
 
-func prepareRevision(id int32, revision int64) types.Revision {
-	return types.Revision{
+func prepareRevision(id int32, revision int64) typesv2.Revision {
+	return typesv2.Revision{
 		ID:        id,
 		Revision:  revision,
-		GroupName: "device_info",
+		GroupID:   1,
 		DataTable: fmt.Sprintf("device_info_%d", revision),
 	}
 }
-func prepareGroup(revisionId *int32) types.FeatureGroup {
-	return types.FeatureGroup{
+func prepareGroup(revisionId *int32) typesv2.FeatureGroup {
+	return typesv2.FeatureGroup{
 		Name:             "device_info",
 		OnlineRevisionID: revisionId,
-		EntityName:       "device",
+		EntityID:         1,
 	}
+}
+
+func int16Ptr(i int16) *int16 {
+	return &i
 }
 
 func int32Ptr(i int32) *int32 {

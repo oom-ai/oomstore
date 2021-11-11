@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,19 +19,18 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	offlineStore := mock_offline.NewMockStore(ctrl)
-	metadataStore := mock_metadata.NewMockStore(ctrl)
 	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(nil, offlineStore, metadataStore, metadatav2Store)
+	store := oomstore.NewOomStore(nil, offlineStore, metadatav2Store)
 
 	streamFeatures := prepareFeatures(true, false)
 	inconsistentFeatures := prepareFeatures(false, true)
 	consistentFeatures := prepareFeatures(true, true)
 
-	entity := types.Entity{
+	entity := typesv2.Entity{
 		Name:   "device",
 		Length: 10,
 	}
-	revisionRanges := []*types.RevisionRange{
+	revisionRanges := []*metadatav2.RevisionRange{
 		{
 			MinRevision: 1,
 			MaxRevision: 20,
@@ -45,9 +45,9 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 	testCases := []struct {
 		description   string
 		opt           types.GetHistoricalFeatureValuesOpt
-		features      types.FeatureList
-		entity        *types.Entity
-		featureMap    map[string]types.FeatureList
+		features      typesv2.FeatureList
+		entity        *typesv2.Entity
+		featureMap    map[string]typesv2.FeatureList
 		joined        *types.JoinResult
 		expectedError error
 		expected      *types.JoinResult
@@ -55,8 +55,8 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "no valid features, return nil",
 			opt: types.GetHistoricalFeatureValuesOpt{
-				FeatureNames: streamFeatures.Names(),
-				EntityRows:   entityRows,
+				FeatureIDs: streamFeatures.Ids(),
+				EntityRows: entityRows,
 			},
 			features:      streamFeatures,
 			expectedError: nil,
@@ -65,8 +65,8 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "inconsistent features, return nil",
 			opt: types.GetHistoricalFeatureValuesOpt{
-				FeatureNames: inconsistentFeatures.Names(),
-				EntityRows:   entityRows,
+				FeatureIDs: inconsistentFeatures.Ids(),
+				EntityRows: entityRows,
 			},
 			features:      inconsistentFeatures,
 			expectedError: fmt.Errorf("inconsistent entity type: %v", map[string]string{"device": "price", "user": "age"}),
@@ -75,12 +75,12 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "nil joined, return nil",
 			opt: types.GetHistoricalFeatureValuesOpt{
-				FeatureNames: consistentFeatures.Names(),
-				EntityRows:   entityRows,
+				FeatureIDs: consistentFeatures.Ids(),
+				EntityRows: entityRows,
 			},
 			entity:   &entity,
 			features: consistentFeatures,
-			featureMap: map[string]types.FeatureList{
+			featureMap: map[string]typesv2.FeatureList{
 				"device_basic":    {consistentFeatures[0]},
 				"device_advanced": {consistentFeatures[1]},
 			},
@@ -91,12 +91,12 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.GetHistoricalFeatureValuesOpt{
-				FeatureNames: consistentFeatures.Names(),
-				EntityRows:   entityRows,
+				FeatureIDs: consistentFeatures.Ids(),
+				EntityRows: entityRows,
 			},
 			entity:   &entity,
 			features: consistentFeatures,
-			featureMap: map[string]types.FeatureList{
+			featureMap: map[string]typesv2.FeatureList{
 				"device_basic":    {consistentFeatures[0]},
 				"device_advanced": {consistentFeatures[1]},
 			},
@@ -108,11 +108,11 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().ListFeature(gomock.Any(), types.ListFeatureOpt{FeatureNames: tc.opt.FeatureNames}).Return(tc.features, nil)
+			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: tc.opt.FeatureIDs}).Return(tc.features, nil)
 			if tc.entity != nil {
-				metadataStore.EXPECT().GetEntity(gomock.Any(), tc.entity.Name).Return(&entity, nil)
+				metadatav2Store.EXPECT().GetEntity(gomock.Any(), tc.entity.Name).Return(&entity, nil)
 				for groupName := range tc.featureMap {
-					metadataStore.EXPECT().BuildRevisionRanges(gomock.Any(), groupName).Return(revisionRanges, nil).AnyTimes()
+					metadatav2Store.EXPECT().BuildRevisionRanges(gomock.Any(), groupName).Return(revisionRanges, nil).AnyTimes()
 				}
 				offlineStore.EXPECT().Join(gomock.Any(), gomock.Any()).Return(tc.joined, nil)
 			}
