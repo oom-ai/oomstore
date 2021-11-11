@@ -11,7 +11,7 @@ import (
 	"github.com/orlangure/gnomock/preset/postgres"
 )
 
-var PostgresDbopt types.PostgresOpt
+var PostgresDbOpt types.PostgresOpt
 
 func init() {
 	postgresContainer, err := gnomock.Start(
@@ -26,7 +26,7 @@ func init() {
 		panic(err)
 	}
 
-	PostgresDbopt = types.PostgresOpt{
+	PostgresDbOpt = types.PostgresOpt{
 		Host:     postgresContainer.Host,
 		Port:     strconv.Itoa(postgresContainer.DefaultPort()),
 		User:     "test",
