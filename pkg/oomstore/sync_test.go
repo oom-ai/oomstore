@@ -8,6 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
+	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -23,8 +24,8 @@ func TestSync(t *testing.T) {
 	onlineStore := mock_online.NewMockStore(ctrl)
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-
-	store := oomstore.NewOomStore(onlineStore, offlineStore, metadataStore)
+	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
+	store := oomstore.NewOomStore(onlineStore, offlineStore, metadataStore, metadatav2Store)
 	ctx := context.Background()
 
 	revision1 := prepareRevision(1, 10)

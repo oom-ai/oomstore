@@ -18,7 +18,7 @@ var describeGroupCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		groupName := args[0]
-		group, err := oomStore.GetFeatureGroup(ctx, groupName)
+		group, err := oomStore.GetFeatureGroupByName(ctx, groupName)
 		if err != nil {
 			log.Fatalf("failed getting group %s, err %v\n", groupName, err)
 		}

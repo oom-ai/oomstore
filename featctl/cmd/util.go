@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"log"
+	"strconv"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -23,4 +24,8 @@ func mustOpenOomStore(ctx context.Context, opt types.OomStoreConfig) *oomstore.O
 
 func stringPtr(s string) *string {
 	return &s
+}
+
+func serializeInt16(i int16) string {
+	return strconv.FormatInt(int64(i), 10)
 }

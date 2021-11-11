@@ -12,7 +12,8 @@ import (
 
 type importOption struct {
 	types.ImportBatchFeaturesOpt
-	FilePath string
+	FilePath  string
+	groupName string
 }
 
 var importOpt importOption
@@ -29,6 +30,12 @@ var importCmd = &cobra.Command{
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
+
+		if group, err := oomStore.GetFeatureGroupByName(ctx, importOpt.groupName); err != nil {
+			log.Fatalf("failed to get feature group name=%s: %v", importOpt.groupName, err)
+		} else {
+			importOpt.GroupID = group.ID
+		}
 
 		file, err := os.Open(importOpt.FilePath)
 		if err != nil {
@@ -53,7 +60,7 @@ func init() {
 
 	flags := importCmd.Flags()
 
-	flags.StringVarP(&importOpt.GroupName, "group", "g", "", "feature group")
+	flags.StringVarP(&importOpt.groupName, "group", "g", "", "feature group")
 	_ = importCmd.MarkFlagRequired("group")
 
 	flags.StringVar(&importOpt.Description, "description", "", "revision description")

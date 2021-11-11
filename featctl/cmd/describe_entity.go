@@ -18,7 +18,7 @@ var describeEntityCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		entityName := args[0]
-		entity, err := oomStore.GetEntity(ctx, entityName)
+		entity, err := oomStore.GetEntityByName(ctx, entityName)
 		if err != nil {
 			log.Fatalf("failed getting entity %s, err %v\n", entityName, err)
 		}

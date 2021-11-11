@@ -4,26 +4,30 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/spf13/cobra"
 )
 
-var updateFeatureOpt types.UpdateFeatureOpt
+var updateFeatureOpt metadatav2.UpdateFeatureOpt
 
 var updateFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "update a specified feature",
 	Args:  cobra.ExactArgs(1),
-	PreRun: func(cmd *cobra.Command, args []string) {
-		updateFeatureOpt.FeatureName = args[0]
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if _, err := oomStore.UpdateFeature(ctx, updateFeatureOpt); err != nil {
-			log.Fatalf("failed updating feature %s, err %v\n", updateFeatureOpt.FeatureName, err)
+		featureName := args[0]
+		feature, err := oomStore.GetFeatureByName(ctx, featureName)
+		if err != nil {
+			log.Fatalf("failed to get feature name=%s: %v", featureName, err)
+		}
+		updateFeatureOpt.FeatureID = feature.ID
+
+		if err := oomStore.UpdateFeature(ctx, updateFeatureOpt); err != nil {
+			log.Fatalf("failed to update feature %s, err %v\n", feature.ID, err)
 		}
 	},
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
@@ -59,7 +59,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	return getFeatureValueMapFromRows(rows, opt.EntityName, opt.FeatureList)
 }
 
-func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string, features types.FeatureList) (map[string]dbutil.RowMap, error) {
+func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string, features typesv2.FeatureList) (map[string]dbutil.RowMap, error) {
 	featureValueMap := make(map[string]dbutil.RowMap)
 	for rows.Next() {
 		record, err := rows.SliceScan()
@@ -76,7 +76,7 @@ func getFeatureValueMapFromRows(rows *sqlx.Rows, entityName string, features typ
 	return featureValueMap, nil
 }
 
-func deserializeIntoRowMap(values []interface{}, features types.FeatureList) (dbutil.RowMap, error) {
+func deserializeIntoRowMap(values []interface{}, features typesv2.FeatureList) (dbutil.RowMap, error) {
 	rs := map[string]interface{}{}
 	for i := range values {
 		v, err := DeserializeByTag(values[i], features[i].ValueType)

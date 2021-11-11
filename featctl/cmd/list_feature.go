@@ -9,21 +9,28 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/spf13/cobra"
 )
 
-var listFeatureOpt types.ListFeatureOpt
+type listFeatureOption struct {
+	metadatav2.ListFeatureOpt
+	entityName *string
+	groupName  *string
+}
+
+var listFeatureOpt listFeatureOption
 
 var listFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "list all existing features given a specific group",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
-			listFeatureOpt.EntityName = nil
+			listFeatureOpt.EntityID = nil
 		}
 		if !cmd.Flags().Changed("group") {
-			listFeatureOpt.GroupName = nil
+			listFeatureOpt.GroupID = nil
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -31,10 +38,23 @@ var listFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		features, err := oomStore.ListFeature(ctx, listFeatureOpt)
-		if err != nil {
-			log.Fatalf("failed listing features given option %v, error %v\n", listFeatureOpt, err)
+		if listFeatureOpt.entityName != nil {
+			entity, err := oomStore.GetEntityByName(ctx, *listFeatureOpt.entityName)
+			if err != nil {
+				log.Fatalf("failed to get entity name=%s: %v", *listFeatureOpt.entityName, err)
+			}
+			listFeatureOpt.EntityID = &entity.ID
 		}
+
+		if listFeatureOpt.groupName != nil {
+			group, err := oomStore.GetFeatureGroupByName(ctx, *listFeatureOpt.groupName)
+			if err != nil {
+				log.Fatalf("failed to get feature group name=%s: %v", *listFeatureOpt.groupName, err)
+			}
+			listFeatureOpt.GroupID = &group.ID
+		}
+
+		features := oomStore.ListFeature(ctx, listFeatureOpt.ListFeatureOpt)
 
 		// print features to stdout
 		if err := printFeatures(features, *listOutput); err != nil {
@@ -47,12 +67,11 @@ func init() {
 	listCmd.AddCommand(listFeatureCmd)
 
 	flags := listFeatureCmd.Flags()
-
-	listFeatureOpt.EntityName = flags.StringP("entity", "e", "", "entity")
-	listFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
+	listFeatureOpt.entityName = flags.StringP("entity", "e", "", "entity")
+	listFeatureOpt.groupName = flags.StringP("group", "g", "", "feature group")
 }
 
-func printFeatures(features types.FeatureList, output string) error {
+func printFeatures(features typesv2.FeatureList, output string) error {
 	switch output {
 	case CSV:
 		return printFeaturesInCSV(features)
@@ -63,7 +82,7 @@ func printFeatures(features types.FeatureList, output string) error {
 	}
 }
 
-func printFeaturesInCSV(features types.FeatureList) error {
+func printFeaturesInCSV(features typesv2.FeatureList) error {
 	w := csv.NewWriter(os.Stdout)
 	if err := w.Write(featureHeader()); err != nil {
 		return err
@@ -78,7 +97,7 @@ func printFeaturesInCSV(features types.FeatureList) error {
 	return nil
 }
 
-func printFeaturesInASCIITable(features types.FeatureList) error {
+func printFeaturesInASCIITable(features typesv2.FeatureList) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(featureHeader())
 	table.SetAutoFormatHeaders(false)
@@ -91,23 +110,15 @@ func printFeaturesInASCIITable(features types.FeatureList) error {
 }
 
 func featureHeader() []string {
-	return []string{"Name", "Group", "Entity", "Category", "DBValueType", "ValueType", "Description", "OnlineRevision", "OfflineLatestRevision", "OfflineLatestDataTable", "CreateTime", "ModifyTime"}
+	return []string{"Name", "GroupID", "EntityID", "DBValueType", "ValueType", "Description", "OnlineRevision", "CreateTime", "ModifyTime"}
 }
 
-func featureRecord(f *types.Feature) []string {
+func featureRecord(f *typesv2.Feature) []string {
 	onlineRevision := "<NULL>"
-	offlineRevision := "<NULL>"
-	offlineDataTable := "<NULL>"
 
 	if f.OnlineRevision != nil {
-		onlineRevision = fmt.Sprint(*f.OnlineRevision)
-	}
-	if f.OfflineRevision != nil {
-		offlineRevision = fmt.Sprint(*f.OfflineRevision)
-	}
-	if f.OfflineDataTable != nil {
-		offlineDataTable = *f.OfflineDataTable
+		onlineRevision = fmt.Sprint(*f.OnlineRevision())
 	}
 
-	return []string{f.Name, f.GroupName, f.EntityName, f.Category, f.DBValueType, f.ValueType, f.Description, onlineRevision, offlineRevision, offlineDataTable, f.CreateTime.Format(time.RFC3339), f.ModifyTime.Format(time.RFC3339)}
+	return []string{f.Name, serializeInt16(f.GroupID), serializeInt16(f.Entity().ID), f.DBValueType, f.ValueType, f.Description, onlineRevision, f.CreateTime.Format(time.RFC3339), f.ModifyTime.Format(time.RFC3339)}
 }

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/spf13/cobra"
 )
 
@@ -27,10 +27,7 @@ var listEntityCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		entities, err := oomStore.ListEntity(ctx)
-		if err != nil {
-			log.Fatalf("failed listing entities, error %v\n", err)
-		}
+		entities := oomStore.ListEntity(ctx)
 
 		// print entities to stdout
 		if err := printEntities(entities, *listOutput); err != nil {
@@ -43,7 +40,7 @@ func init() {
 	listCmd.AddCommand(listEntityCmd)
 }
 
-func printEntities(entities []*types.Entity, output string) error {
+func printEntities(entities typesv2.EntityList, output string) error {
 	switch output {
 	case CSV:
 		return printEntitiesInCSV(entities)
@@ -54,7 +51,7 @@ func printEntities(entities []*types.Entity, output string) error {
 	}
 }
 
-func printEntitiesInCSV(entities []*types.Entity) error {
+func printEntitiesInCSV(entities typesv2.EntityList) error {
 	w := csv.NewWriter(os.Stdout)
 	if err := w.Write(entityHeader()); err != nil {
 		return err
@@ -69,7 +66,7 @@ func printEntitiesInCSV(entities []*types.Entity) error {
 	return nil
 }
 
-func printEntitiesInASCIITable(entities []*types.Entity) error {
+func printEntitiesInASCIITable(entities typesv2.EntityList) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(entityHeader())
 	table.SetAutoFormatHeaders(false)
@@ -81,7 +78,7 @@ func printEntitiesInASCIITable(entities []*types.Entity) error {
 	return nil
 }
 
-func entityRecord(entity *types.Entity) []string {
+func entityRecord(entity *typesv2.Entity) []string {
 	return []string{entity.Name, strconv.Itoa(entity.Length), entity.Description, entity.CreateTime.Format(time.RFC3339),
 		entity.ModifyTime.Format(time.RFC3339)}
 }
