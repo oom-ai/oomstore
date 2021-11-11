@@ -12,6 +12,7 @@ import (
 )
 
 var _ metadata.Store = &DB{}
+var _ metadata.Store = &Tx{}
 
 type DB struct {
 	*sqlx.DB
@@ -38,10 +39,34 @@ type Tx struct {
 	*sqlx.Tx
 }
 
-func openTx(ctx context.Context, db *sqlx.DB) (*Tx, error) {
+func (tx *Tx) Close() error {
+	return nil
+}
+
+func (db *DB) WithTransaction(ctx context.Context, fn metadata.TxFn) (err error) {
 	tx, err := db.BeginTxx(ctx, nil)
 	if err != nil {
-		return nil, err
+		return
 	}
-	return &Tx{Tx: tx}, nil
+	txStore := &Tx{Tx: tx}
+
+	defer func() {
+		if p := recover(); p != nil {
+			// a panic occurred, rollback and repanic
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			// something went wrong, rollback
+			_ = tx.Rollback()
+		} else {
+			// all good, commit
+			err = tx.Commit()
+		}
+	}()
+
+	return fn(ctx, txStore)
+}
+
+func (tx *Tx) WithTransaction(ctx context.Context, fn metadata.TxFn) (err error) {
+	return fn(ctx, tx)
 }

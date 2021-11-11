@@ -35,6 +35,9 @@ type Store interface {
 	UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) (int64, error)
 	BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error)
 
+	// transaction
+	WithTransaction(ctx context.Context, fn TxFn) error
+
 	io.Closer
 }
 
@@ -44,3 +47,5 @@ type ExtContext interface {
 
 	sqlx.ExtContext
 }
+
+type TxFn func(ctx context.Context, txStore Store) error

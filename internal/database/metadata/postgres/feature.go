@@ -15,17 +15,20 @@ import (
 )
 
 func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) error {
+	if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
+		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
+	}
 	return createFeature(ctx, db, opt)
 }
 
 func (tx *Tx) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) error {
+	if err := tx.validateDataType(ctx, opt.DBValueType); err != nil {
+		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
+	}
 	return createFeature(ctx, tx, opt)
 }
 
 func createFeature(ctx context.Context, ext metadata.ExtContext, opt metadata.CreateFeatureOpt) error {
-	if err := validateDataType(ctx, ext, opt.DBValueType); err != nil {
-		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
-	}
 	query := "INSERT INTO feature(name, group_name, db_value_type, value_type, description) VALUES ($1, $2, $3, $4, $5)"
 	_, err := ext.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.DBValueType, opt.ValueType, opt.Description)
 	if err != nil {
@@ -114,18 +117,26 @@ func buildListFeatureCond(opt types.ListFeatureOpt) ([]string, []interface{}, er
 	return dbutil.BuildConditions(and, in)
 }
 
-func validateDataType(ctx context.Context, ext metadata.ExtContext, dataType string) error {
-	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Int())
-	return ext.WithTransaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
-		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", tmpTableName)); err != nil {
-			return err
-		}
-		if _, err := tx.ExecContext(ctx, fmt.Sprintf("CREATE TABLE %s (a %s)", tmpTableName, dataType)); err != nil {
-			return err
-		}
-		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE %s", tmpTableName)); err != nil {
-			return err
-		}
-		return nil
+func (db *DB) validateDataType(ctx context.Context, dataType string) error {
+	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+		return validateDataType(ctx, tx, dataType)
 	})
+}
+func (tx *Tx) validateDataType(ctx context.Context, dataType string) error {
+	return validateDataType(ctx, tx.Tx, dataType)
+}
+
+func validateDataType(ctx context.Context, tx *sqlx.Tx, dataType string) error {
+	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Int())
+	if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", tmpTableName)); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, fmt.Sprintf("CREATE TABLE %s (a %s)", tmpTableName, dataType)); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE %s", tmpTableName)); err != nil {
+		return err
+	}
+	return nil
+
 }
