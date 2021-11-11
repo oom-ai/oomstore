@@ -154,11 +154,12 @@ func (mr *MockStoreMockRecorder) GetFeature(ctx, featureName interface{}) *gomoc
 }
 
 // GetFeatureGroup mocks base method.
-func (m *MockStore) GetFeatureGroup(ctx context.Context, groupName string) *typesv2.FeatureGroup {
+func (m *MockStore) GetFeatureGroup(ctx context.Context, groupName string) (*typesv2.FeatureGroup, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeatureGroup", ctx, groupName)
 	ret0, _ := ret[0].(*typesv2.FeatureGroup)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetFeatureGroup indicates an expected call of GetFeatureGroup.

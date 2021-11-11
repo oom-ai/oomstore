@@ -113,10 +113,14 @@ func (f *Informer) ListFeature(ctx context.Context, opt types.ListFeatureOpt) ty
 	return f.Cache().Features.List(opt)
 }
 
-func (f *Informer) GetFeatureGroup(ctx context.Context, name string) *typesv2.FeatureGroup {
-	return f.Cache().Groups.Find(func(g *typesv2.FeatureGroup) bool {
+func (f *Informer) GetFeatureGroup(ctx context.Context, name string) (*typesv2.FeatureGroup, error) {
+	if featureGroup := f.Cache().Groups.Find(func(g *typesv2.FeatureGroup) bool {
 		return g.Name == name
-	})
+	}); featureGroup == nil {
+		return nil, fmt.Errorf("feature group name=%s not found", name)
+	} else {
+		return featureGroup, nil
+	}
 }
 
 func (f *Informer) ListFeatureGroup(ctx context.Context, entityName *string) typesv2.FeatureGroupList {
