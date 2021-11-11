@@ -8,7 +8,7 @@ import (
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
-	key, err := SerializeRedisKey(opt.RevisionId, opt.EntityKey)
+	key, err := SerializeRedisKey(opt.RevisionID, opt.EntityKey)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +46,8 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	res := make(map[string]dbutil.RowMap)
 	for _, entityKey := range opt.EntityKeys {
 		rowMap, err := db.Get(ctx, online.GetOpt{
-			EntityName:  opt.EntityName,
-			RevisionId:  opt.RevisionId,
+			Entity:      opt.Entity,
+			RevisionID:  opt.RevisionID,
 			EntityKey:   entityKey,
 			FeatureList: opt.FeatureList,
 		})
