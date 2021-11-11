@@ -4,26 +4,30 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/spf13/cobra"
 )
 
-var updateGroupOpt types.UpdateFeatureGroupOpt
+var updateGroupOpt metadatav2.UpdateFeatureGroupOpt
 
 var updateGroupCmd = &cobra.Command{
 	Use:   "group",
 	Short: "update a specified group",
 	Args:  cobra.ExactArgs(1),
-	PreRun: func(cmd *cobra.Command, args []string) {
-		updateGroupOpt.GroupName = args[0]
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if _, err := oomStore.UpdateFeatureGroup(ctx, updateGroupOpt); err != nil {
-			log.Fatalf("failed updating group %s, err %v\n", updateGroupOpt.GroupName, err)
+		groupName := args[0]
+		group, err := oomStore.GetFeatureGroupByName(ctx, groupName)
+		if err != nil {
+			log.Fatalf("failed to get feature group name=%s: %v", groupName, err)
+		}
+		updateGroupOpt.GroupID = group.ID
+
+		if err := oomStore.UpdateFeatureGroup(ctx, updateGroupOpt); err != nil {
+			log.Fatalf("failed updating group %d, err %v\n", group.ID, err)
 		}
 	},
 }
@@ -33,6 +37,6 @@ func init() {
 
 	flags := updateGroupCmd.Flags()
 
-	updateGroupOpt.Description = flags.StringP("description", "d", "", "new group description")
+	updateGroupOpt.NewDescription = flags.StringP("description", "d", "", "new group description")
 	_ = updateGroupCmd.MarkFlagRequired("description")
 }

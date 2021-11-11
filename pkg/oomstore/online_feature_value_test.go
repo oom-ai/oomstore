@@ -8,6 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
+	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/online/mock_online"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -19,8 +20,8 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 	defer ctrl.Finish()
 	onlineStore := mock_online.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-
-	store := oomstore.NewOomStore(onlineStore, nil, metadataStore)
+	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
+	store := oomstore.NewOomStore(onlineStore, nil, metadataStore, metadatav2Store)
 
 	entityName := "device"
 	consistentFeatures := prepareFeatures(true, true)

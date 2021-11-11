@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/spf13/cobra"
 )
 
 type listFeatureGroupOption struct {
-	EntityName *string
+	entityName *string
 }
 
 var listFeatureGroupOpt listFeatureGroupOption
@@ -27,7 +27,7 @@ var listFeatureGroupCmd = &cobra.Command{
 `,
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
-			listFeatureGroupOpt.EntityName = nil
+			listFeatureGroupOpt.entityName = nil
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -35,10 +35,17 @@ var listFeatureGroupCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		groups, err := oomStore.ListFeatureGroup(ctx, listFeatureGroupOpt.EntityName)
-		if err != nil {
-			log.Fatal(err)
+		var entityID *int16
+
+		if listFeatureGroupOpt.entityName != nil {
+			entity, err := oomStore.GetEntityByName(ctx, *listFeatureGroupOpt.entityName)
+			if err != nil {
+				log.Fatalf("failed to get entity name=%s: %v", *listFeatureGroupOpt.entityName, err)
+			}
+			entityID = &entity.ID
 		}
+
+		groups := oomStore.ListFeatureGroup(ctx, entityID)
 		if err := printFeatureGroups(groups, *listOutput); err != nil {
 			log.Fatalf("failed printing feature groups, error %v\n", err)
 		}
@@ -50,10 +57,10 @@ func init() {
 
 	flags := listFeatureGroupCmd.Flags()
 
-	listFeatureGroupOpt.EntityName = flags.StringP("entity", "", "", "use to filter groups")
+	listFeatureGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func printFeatureGroups(groups []*types.FeatureGroup, output string) error {
+func printFeatureGroups(groups []*typesv2.FeatureGroup, output string) error {
 	switch output {
 	case CSV:
 		return printFeatureGroupsInCSV(groups)
@@ -64,7 +71,7 @@ func printFeatureGroups(groups []*types.FeatureGroup, output string) error {
 	}
 }
 
-func printFeatureGroupsInCSV(groups []*types.FeatureGroup) error {
+func printFeatureGroupsInCSV(groups typesv2.FeatureGroupList) error {
 	w := csv.NewWriter(os.Stdout)
 
 	if err := w.Write(groupHeader()); err != nil {
@@ -79,7 +86,7 @@ func printFeatureGroupsInCSV(groups []*types.FeatureGroup) error {
 	return nil
 }
 
-func printFeatureGroupsInASCIITable(groups []*types.FeatureGroup) error {
+func printFeatureGroupsInASCIITable(groups typesv2.FeatureGroupList) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(groupHeader())
 	table.SetAutoFormatHeaders(false)
@@ -92,25 +99,14 @@ func printFeatureGroupsInASCIITable(groups []*types.FeatureGroup) error {
 }
 
 func groupHeader() []string {
-	return []string{"Name", "Entity", "Description", "OnlineRevision", "OfflineLatestRevision", "OfflineLatestDataTable", "CreateTime", "ModifyTime"}
+	return []string{"Name", "EntityID", "Description", "OnlineRevision", "CreateTime", "ModifyTime"}
 }
 
-func groupRecord(g *types.FeatureGroup) []string {
-	var onlineRevision, offlineRevision, offlineDataTable string
-
-	onlineRevision = "<NULL>"
-	offlineRevision = "<NULL>"
-	offlineDataTable = "<NULL>"
+func groupRecord(g *typesv2.FeatureGroup) []string {
+	onlineRevision := "<NULL>"
 	if g.OnlineRevision != nil {
 		onlineRevision = fmt.Sprint(*g.OnlineRevision)
 	}
-	if g.OfflineRevision != nil {
-		offlineRevision = fmt.Sprint(*g.OfflineRevision)
-	}
-
-	if g.OfflineDataTable != nil {
-		offlineDataTable = *g.OfflineDataTable
-	}
-	return []string{g.Name, g.EntityName, g.Description, onlineRevision, offlineRevision, offlineDataTable,
+	return []string{g.Name, serializeInt16(g.EntityID), g.Description, onlineRevision,
 		g.CreateTime.Format(time.RFC3339), g.ModifyTime.Format(time.RFC3339)}
 }

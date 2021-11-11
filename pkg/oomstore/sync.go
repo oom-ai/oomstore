@@ -5,22 +5,23 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
-	revision, err := s.GetRevision(ctx, types.GetRevisionOpt{
-		GroupName:  &opt.GroupName,
+	revision, err := s.GetRevision(ctx, metadatav2.GetRevisionOpt{
+		GroupID:    &opt.GroupID,
 		RevisionId: &opt.RevisionId,
 	})
 	if err != nil {
 		return err
 	}
 
-	group, err := s.GetFeatureGroup(ctx, opt.GroupName)
+	group, err := s.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
 		return err
 	}
@@ -29,19 +30,19 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		return fmt.Errorf("online store already in the latest revision")
 	}
 
-	entity, err := s.GetEntity(ctx, group.EntityName)
+	entity, err := s.GetEntity(ctx, group.EntityID)
 	if err != nil {
 		return err
 	}
 
-	features, err := s.ListFeature(ctx, types.ListFeatureOpt{GroupName: &opt.GroupName})
+	features := s.ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &opt.GroupID})
 	if err != nil {
 		return err
 	}
 
 	stream, err := s.offline.Export(ctx, offline.ExportOpt{
 		DataTable:    revision.DataTable,
-		EntityName:   group.EntityName,
+		EntityName:   entity.Name,
 		FeatureNames: features.Names(),
 	})
 	if err != nil {
@@ -57,9 +58,9 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		return err
 	}
 
-	var previousRevision *types.Revision
+	var previousRevision *typesv2.Revision
 	if group.OnlineRevisionID != nil {
-		previousRevision, err = s.metadata.GetRevision(ctx, metadata.GetRevisionOpt{
+		previousRevision, err = s.metadatav2.GetRevision(ctx, metadatav2.GetRevisionOpt{
 			RevisionId: group.OnlineRevisionID,
 		})
 		if err != nil {
@@ -67,9 +68,9 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		}
 	}
 
-	if _, err = s.metadata.UpdateFeatureGroup(ctx, types.UpdateFeatureGroupOpt{
-		GroupName:        group.Name,
-		OnlineRevisionId: &revision.ID,
+	if err = s.metadatav2.UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
+		GroupID:             group.ID,
+		NewOnlineRevisionID: &revision.ID,
 	}); err != nil {
 		return err
 	}
@@ -82,8 +83,8 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		newRevision := time.Now().Unix()
 		newChored := true
 		// update revision timestamp using current timestamp
-		if _, err = s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
-			RevisionID:  int64(revision.ID),
+		if err = s.metadatav2.UpdateRevision(ctx, metadatav2.UpdateRevisionOpt{
+			RevisionID:  int32(revision.ID),
 			NewRevision: &newRevision,
 			NewAnchored: &newChored,
 		}); err != nil {

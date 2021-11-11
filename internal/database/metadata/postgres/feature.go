@@ -6,28 +6,27 @@ import (
 	"math/rand"
 	"strings"
 
-	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
-	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) error {
-	if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
-		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
-	}
-	query := "INSERT INTO feature(name, group_name, db_value_type, value_type, description) VALUES ($1, $2, $3, $4, $5)"
-	_, err := db.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.DBValueType, opt.ValueType, opt.Description)
-	if err != nil {
-		if e2, ok := err.(*pq.Error); ok {
-			if e2.Code == pgerrcode.UniqueViolation {
-				return fmt.Errorf("feature %s already exists", opt.FeatureName)
-			}
-		}
-	}
-	return err
+	return nil
+	// if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
+	// 	return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
+	// }
+	// query := "INSERT INTO feature(name, group_name, db_value_type, value_type, description) VALUES ($1, $2, $3, $4, $5)"
+	// _, err := db.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.DBValueType, opt.ValueType, opt.Description)
+	// if err != nil {
+	// 	if e2, ok := err.(*pq.Error); ok {
+	// 		if e2.Code == pgerrcode.UniqueViolation {
+	// 			return fmt.Errorf("feature %s already exists", opt.FeatureName)
+	// 		}
+	// 	}
+	// }
+	// return err
 }
 
 func (db *DB) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {

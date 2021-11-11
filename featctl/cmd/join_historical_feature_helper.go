@@ -25,9 +25,12 @@ func joinHistoricalFeatures(ctx context.Context, store *oomstore.OomStore, opt J
 		return err
 	}
 
+	// TODO: convert feature names into feature IDs
+	var featureIDs []int16
+
 	joinResult, err := store.GetHistoricalFeatureValues(ctx, types.GetHistoricalFeatureValuesOpt{
-		FeatureNames: opt.FeatureNames,
-		EntityRows:   entityRows,
+		FeatureIDs: featureIDs,
+		EntityRows: entityRows,
 	})
 	if err != nil {
 		return err

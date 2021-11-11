@@ -11,6 +11,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
+	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -22,7 +23,8 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
+	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
+	store := oomstore.NewOomStore(nil, offlineStore, metadataStore, metadatav2Store)
 
 	testCases := []struct {
 		description    string
@@ -135,7 +137,8 @@ func TestImportBatchFeatures(t *testing.T) {
 
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
+	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
+	store := oomstore.NewOomStore(nil, offlineStore, metadataStore, metadatav2Store)
 
 	testCases := []struct {
 		description string
@@ -277,8 +280,8 @@ func TestCreateBatchFeature(t *testing.T) {
 	defer ctrl.Finish()
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-
-	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
+	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
+	store := oomstore.NewOomStore(nil, offlineStore, metadataStore, metadatav2Store)
 
 	testCases := []struct {
 		description string

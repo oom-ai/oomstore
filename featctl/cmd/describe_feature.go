@@ -18,7 +18,7 @@ var describeFeatureCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		featureName := args[0]
-		feature, err := oomStore.GetFeature(ctx, featureName)
+		feature, err := oomStore.GetFeatureByName(ctx, featureName)
 		if err != nil {
 			log.Fatalf("failed getting feature %s, err %v\n", featureName, err)
 		}
