@@ -13,7 +13,7 @@ import (
 )
 
 func prepareEntityAndGroup(t *testing.T, ctx context.Context, db *postgres.DB) (int16, int16) {
-	entityID, err := db.CreateEntity(ctx, types.CreateEntityOpt{
+	entityID, err := db.CreateEntity(ctx, metadatav2.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
 		Description: "description",
@@ -127,7 +127,7 @@ func TestListFeature(t *testing.T) {
 	defer db.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, db)
 
-	features := db.ListFeature(ctx, types.ListFeatureOpt{})
+	features := db.ListFeature(ctx, metadatav2.ListFeatureOpt{})
 	assert.Equal(t, 0, features.Len())
 
 	_, err := db.CreateFeature(ctx, metadatav2.CreateFeatureOpt{
@@ -141,30 +141,30 @@ func TestListFeature(t *testing.T) {
 
 	require.NoError(t, db.Refresh())
 
-	features = db.ListFeature(ctx, types.ListFeatureOpt{})
+	features = db.ListFeature(ctx, metadatav2.ListFeatureOpt{})
 	assert.Equal(t, 1, features.Len())
 
-	features = db.ListFeature(ctx, types.ListFeatureOpt{
+	features = db.ListFeature(ctx, metadatav2.ListFeatureOpt{
 		FeatureNames: []string{"phone", "model"},
 	})
 	assert.Equal(t, 1, features.Len())
 
 	entityName := "invalid_entity_name"
-	features = db.ListFeature(ctx, types.ListFeatureOpt{
+	features = db.ListFeature(ctx, metadatav2.ListFeatureOpt{
 		EntityName:   &entityName,
 		FeatureNames: []string{"phone", "model"},
 	})
 	assert.Equal(t, 0, features.Len())
 
 	entityName = "device"
-	features = db.ListFeature(ctx, types.ListFeatureOpt{
+	features = db.ListFeature(ctx, metadatav2.ListFeatureOpt{
 		EntityName:   &entityName,
 		FeatureNames: []string{},
 	})
 	assert.Equal(t, 0, len(features))
 
 	entityName = "device"
-	features = db.ListFeature(ctx, types.ListFeatureOpt{
+	features = db.ListFeature(ctx, metadatav2.ListFeatureOpt{
 		EntityName: &entityName,
 	})
 	assert.Equal(t, 1, len(features))
@@ -175,12 +175,6 @@ func TestUpdateFeature(t *testing.T) {
 	defer db.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, db)
 
-	rowsAffected, err := db.UpdateFeature(ctx, types.UpdateFeatureOpt{
-		FeatureName: "invalid_feature_name",
-	})
-	require.NoError(t, err)
-	assert.Equal(t, int64(0), rowsAffected)
-
 	opt := metadatav2.CreateFeatureOpt{
 		FeatureName: "phone",
 		GroupID:     groupID,
@@ -188,15 +182,18 @@ func TestUpdateFeature(t *testing.T) {
 		Description: "description",
 		ValueType:   "string",
 	}
-	_, err = db.CreateFeature(ctx, opt)
+	id, err := db.CreateFeature(ctx, opt)
 	require.NoError(t, err)
 
-	rowsAffected, err = db.UpdateFeature(ctx, types.UpdateFeatureOpt{
-		FeatureName:    opt.FeatureName,
+	require.Error(t, db.UpdateFeature(ctx, metadatav2.UpdateFeatureOpt{
+		FeatureID: id + 1,
+	}))
+
+	err = db.UpdateFeature(ctx, metadatav2.UpdateFeatureOpt{
+		FeatureID:      id,
 		NewDescription: "new description",
 	})
 	require.NoError(t, err)
-	assert.Equal(t, int64(1), rowsAffected)
 
 	require.NoError(t, db.Refresh())
 

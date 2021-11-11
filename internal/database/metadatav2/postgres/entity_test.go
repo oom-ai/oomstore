@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -13,7 +13,7 @@ func TestCreateEntity(t *testing.T) {
 	ctx, db := prepareStore(t)
 	defer db.Close()
 
-	opt := types.CreateEntityOpt{
+	opt := metadatav2.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
 		Description: "description",
@@ -21,7 +21,7 @@ func TestCreateEntity(t *testing.T) {
 	_, err := db.CreateEntity(ctx, opt)
 	assert.NoError(t, err)
 
-	_, err = db.CreateEntity(ctx, types.CreateEntityOpt{
+	_, err = db.CreateEntity(ctx, metadatav2.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
 		Description: "description",
@@ -33,7 +33,7 @@ func TestGetEntity(t *testing.T) {
 	ctx, db := prepareStore(t)
 	defer db.Close()
 
-	opt := types.CreateEntityOpt{
+	opt := metadatav2.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
 		Description: "description",
@@ -57,19 +57,17 @@ func TestUpdateEntity(t *testing.T) {
 	ctx, db := prepareStore(t)
 	defer db.Close()
 
-	_, err := db.CreateEntity(ctx, types.CreateEntityOpt{
+	id, err := db.CreateEntity(ctx, metadatav2.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
 		Description: "description",
 	})
 	require.NoError(t, err)
 
-	rowsAffected, err := db.UpdateEntity(ctx, types.UpdateEntityOpt{
-		EntityName:     "device",
+	require.NoError(t, db.UpdateEntity(ctx, metadatav2.UpdateEntityOpt{
+		EntityID:       id,
 		NewDescription: "new description",
-	})
-	require.NoError(t, err)
-	assert.Equal(t, int64(1), rowsAffected)
+	}))
 
 	require.NoError(t, db.Refresh())
 
@@ -77,12 +75,10 @@ func TestUpdateEntity(t *testing.T) {
 	require.NotNil(t, entity)
 	assert.Equal(t, entity.Description, "new description")
 
-	rowsAffected, err = db.UpdateEntity(ctx, types.UpdateEntityOpt{
-		EntityName:     "invalid_entity_name",
+	require.Error(t, db.UpdateEntity(ctx, metadatav2.UpdateEntityOpt{
+		EntityID:       id + 1,
 		NewDescription: "new description",
-	})
-	require.NoError(t, err)
-	assert.Equal(t, int64(0), rowsAffected)
+	}))
 }
 
 func TestListEntity(t *testing.T) {
@@ -94,7 +90,7 @@ func TestListEntity(t *testing.T) {
 	entitys := db.ListEntity(ctx)
 	assert.Equal(t, 0, len(entitys))
 
-	_, err := db.CreateEntity(ctx, types.CreateEntityOpt{
+	_, err := db.CreateEntity(ctx, metadatav2.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
 		Description: "description",
@@ -105,7 +101,7 @@ func TestListEntity(t *testing.T) {
 
 	entitys = db.ListEntity(ctx)
 	assert.Equal(t, 1, len(entitys))
-	_, err = db.CreateEntity(ctx, types.CreateEntityOpt{
+	_, err = db.CreateEntity(ctx, metadatav2.CreateEntityOpt{
 		Name:        "user",
 		Length:      16,
 		Description: "description",

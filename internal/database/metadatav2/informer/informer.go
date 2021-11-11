@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/oom-ai/oomstore/internal/database/metadatav2"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
@@ -109,7 +108,7 @@ func (f *Informer) GetFeature(ctx context.Context, name string) *typesv2.Feature
 	})
 }
 
-func (f *Informer) ListFeature(ctx context.Context, opt types.ListFeatureOpt) typesv2.FeatureList {
+func (f *Informer) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
 	return f.Cache().Features.List(opt)
 }
 
@@ -151,6 +150,6 @@ func (f *Informer) GetLatestRevision(ctx context.Context, groupName string) *typ
 }
 
 // TODO: refactor this into a private function of OomStore
-func (f *Informer) BuildRevisionRanges(ctx context.Context, groupName string) []*types.RevisionRange {
+func (f *Informer) BuildRevisionRanges(ctx context.Context, groupName string) []*metadatav2.RevisionRange {
 	return f.Cache().Revisions.BuildRevisionRanges(groupName)
 }
