@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -43,17 +43,14 @@ func stringSliceEqual(a, b []string) bool {
 
 func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) (int32, error) {
 	// get columns of the group
-	features, err := s.metadata.ListFeature(ctx, types.ListFeatureOpt{GroupName: &opt.GroupName})
-	if err != nil {
-		return 0, err
-	}
+	features := s.metadatav2.ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &opt.GroupID})
 
 	// get entity info
-	group, err := s.GetFeatureGroup(ctx, opt.GroupName)
+	group, err := s.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
 		return 0, err
 	}
-	entity, err := s.GetEntity(ctx, group.EntityName)
+	entity, err := s.GetEntity(ctx, group.EntityID)
 	if err != nil {
 		return 0, err
 	}
@@ -75,7 +72,7 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	}
 
 	revision, dataTable, err := s.offline.Import(ctx, offline.ImportOpt{
-		GroupName: opt.GroupName,
+		GroupName: group.Name,
 		Entity:    entity,
 		Features:  features,
 		Header:    header,
@@ -86,15 +83,15 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return 0, err
 	}
 
-	newRevision, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	newRevisionID, err := s.metadatav2.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
 		Revision:    revision,
-		GroupName:   opt.GroupName,
-		DataTable:   dataTable,
+		GroupID:     group.ID,
+		DataTable:   &dataTable,
 		Description: opt.Description,
 		Anchored:    opt.Revision != nil,
 	})
 	if err != nil {
 		return 0, err
 	}
-	return newRevision.ID, nil
+	return newRevisionID, nil
 }

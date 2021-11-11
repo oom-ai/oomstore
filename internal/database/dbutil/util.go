@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 type RowMap = map[string]interface{}
@@ -27,7 +27,7 @@ const CREATE_DATA_TABLE = `CREATE TABLE "{{TABLE_NAME}}" (
 	{{COLUMN_DEFS}});
 `
 
-func BuildFeatureDataTableSchema(tableName string, entity *types.Entity, features types.FeatureList) string {
+func BuildFeatureDataTableSchema(tableName string, entity *typesv2.Entity, features typesv2.FeatureList) string {
 	// sort to ensure the schema looks consistent
 	sort.Slice(features, func(i, j int) bool {
 		return features[i].Name < features[j].Name

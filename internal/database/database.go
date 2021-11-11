@@ -8,6 +8,8 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	metadataPG "github.com/oom-ai/oomstore/internal/database/metadata/postgres"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	metadatav2PG "github.com/oom-ai/oomstore/internal/database/metadatav2/postgres"
 
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	offlinePG "github.com/oom-ai/oomstore/internal/database/offline/postgres"
@@ -37,10 +39,19 @@ func OpenMetadataStore(opt types.MetadataStoreConfig) (metadata.Store, error) {
 	}
 }
 
+func OpenMetadatav2Store(opt types.MetadataStoreConfig) (metadatav2.Store, error) {
+	switch opt.Backend {
+	case types.POSTGRES:
+		return metadatav2PG.Open(context.Background(), opt.Postgres)
+	default:
+		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
+	}
+}
+
 func CreateMetadataDatabase(ctx context.Context, opt types.MetadataStoreConfig) error {
 	switch opt.Backend {
 	case types.POSTGRES:
-		return metadataPG.CreateDatabase(ctx, *opt.Postgres)
+		return metadatav2PG.CreateDatabase(ctx, *opt.Postgres)
 	default:
 		return fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}

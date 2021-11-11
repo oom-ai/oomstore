@@ -8,11 +8,12 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
 	// Step 1: prepare temporary table entity_rows
-	features := types.FeatureList{}
+	features := typesv2.FeatureList{}
 	for _, featureList := range opt.FeatureMap {
 		features = append(features, featureList...)
 	}
@@ -26,7 +27,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 
 	// Step 2: process features by group, insert result to table joined
 	tableNames := make([]string, 0)
-	tableToFeatureMap := make(map[string]types.FeatureList)
+	tableToFeatureMap := make(map[string]typesv2.FeatureList)
 	for groupName, featureList := range opt.FeatureMap {
 		revisionRanges, ok := opt.RevisionRangeMap[groupName]
 		if !ok {
@@ -85,7 +86,7 @@ func (db *DB) joinOneFeatureGroup(ctx context.Context, opt offline.JoinOneFeatur
 	return joinedTableName, nil
 }
 
-func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, tableNames []string, featureMap map[string]types.FeatureList) (*types.JoinResult, error) {
+func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, tableNames []string, featureMap map[string]typesv2.FeatureList) (*types.JoinResult, error) {
 	if len(tableNames) == 0 {
 		return nil, nil
 	}

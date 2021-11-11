@@ -3,7 +3,9 @@ package offline
 import (
 	"encoding/csv"
 
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 type ExportOpt struct {
@@ -14,24 +16,24 @@ type ExportOpt struct {
 }
 
 type JoinOpt struct {
-	Entity           types.Entity
+	Entity           typesv2.Entity
 	EntityRows       <-chan types.EntityRow
-	FeatureMap       map[string]types.FeatureList
-	RevisionRangeMap map[string][]*types.RevisionRange
+	FeatureMap       map[string]typesv2.FeatureList
+	RevisionRangeMap map[string][]*metadatav2.RevisionRange
 }
 
 type JoinOneFeatureGroupOpt struct {
 	GroupName           string
-	Features            types.FeatureList
-	RevisionRanges      []*types.RevisionRange
-	Entity              types.Entity
+	Features            typesv2.FeatureList
+	RevisionRanges      []*metadatav2.RevisionRange
+	Entity              typesv2.Entity
 	EntityRowsTableName string
 }
 
 type ImportOpt struct {
 	GroupName string
-	Entity    *types.Entity
-	Features  types.FeatureList
+	Entity    *typesv2.Entity
+	Features  typesv2.FeatureList
 	Header    []string
 	Revision  *int64
 

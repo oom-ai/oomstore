@@ -10,12 +10,12 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/spf13/cobra"
 )
 
 type listRevisionOption struct {
-	GroupName *string
+	groupName *string
 }
 
 var listRevisionOpt listRevisionOption
@@ -25,7 +25,7 @@ var listRevisionCmd = &cobra.Command{
 	Short: "list historical revisions given a specific group",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("group") {
-			listRevisionOpt.GroupName = nil
+			listRevisionOpt.groupName = nil
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -33,10 +33,17 @@ var listRevisionCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		revisions, err := oomStore.ListRevision(ctx, listRevisionOpt.GroupName)
-		if err != nil {
-			log.Fatal(err)
+		var groupID *int16
+
+		if listRevisionOpt.groupName != nil {
+			group, err := oomStore.GetFeatureGroupByName(ctx, *listRevisionOpt.groupName)
+			if err != nil {
+				log.Fatalf("failed to get feature group name=%s: %v", *listRevisionOpt.groupName, err)
+			}
+			groupID = &group.ID
 		}
+
+		revisions := oomStore.ListRevision(ctx, groupID)
 
 		if err := printRevisions(revisions, *listOutput); err != nil {
 			log.Fatalf("failed printing revisions, error %v\n", err)
@@ -49,10 +56,10 @@ func init() {
 	listCmd.AddCommand(listRevisionCmd)
 
 	flags := listRevisionCmd.Flags()
-	listRevisionOpt.GroupName = flags.StringP("group", "g", "", "feature group")
+	listRevisionOpt.groupName = flags.StringP("group", "g", "", "feature group")
 }
 
-func printRevisions(revisions []*types.Revision, output string) error {
+func printRevisions(revisions []*typesv2.Revision, output string) error {
 	switch output {
 	case CSV:
 		return printRevisionsInCSV(revisions)
@@ -63,7 +70,7 @@ func printRevisions(revisions []*types.Revision, output string) error {
 	}
 }
 
-func printRevisionsInCSV(revisions []*types.Revision) error {
+func printRevisionsInCSV(revisions []*typesv2.Revision) error {
 	w := csv.NewWriter(os.Stdout)
 
 	if err := w.Write(revisionHeader()); err != nil {
@@ -79,7 +86,7 @@ func printRevisionsInCSV(revisions []*types.Revision) error {
 	return nil
 }
 
-func printRevisionsInASCIITable(revisions []*types.Revision) error {
+func printRevisionsInASCIITable(revisions []*typesv2.Revision) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(revisionHeader())
 	table.SetAutoFormatHeaders(false)
@@ -92,10 +99,10 @@ func printRevisionsInASCIITable(revisions []*types.Revision) error {
 }
 
 func revisionHeader() []string {
-	return []string{"Revision", "GroupName", "DataTable", "Description", "CreateTime", "ModifyTime"}
+	return []string{"Revision", "GroupID", "DataTable", "Description", "CreateTime", "ModifyTime"}
 }
 
-func revisionRecord(r *types.Revision) []string {
-	return []string{strconv.Itoa(int(r.Revision)), r.GroupName, r.DataTable, r.Description,
+func revisionRecord(r *typesv2.Revision) []string {
+	return []string{strconv.Itoa(int(r.Revision)), serializeInt16(r.GroupID), r.DataTable, r.Description,
 		r.CreateTime.Format(time.RFC3339), r.ModifyTime.Format(time.RFC3339)}
 }

@@ -3,21 +3,26 @@ package oomstore
 import (
 	"context"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
-func (s *OomStore) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) error {
-	return s.metadata.CreateEntity(ctx, opt)
+func (s *OomStore) GetEntity(ctx context.Context, id int16) (*typesv2.Entity, error) {
+	return s.metadatav2.GetEntity(ctx, id)
 }
 
-func (s *OomStore) GetEntity(ctx context.Context, name string) (*types.Entity, error) {
-	return s.metadata.GetEntity(ctx, name)
+func (s *OomStore) GetEntityByName(ctx context.Context, name string) (*typesv2.Entity, error) {
+	return s.metadatav2.GetEntityByName(ctx, name)
 }
 
-func (s *OomStore) ListEntity(ctx context.Context) ([]*types.Entity, error) {
-	return s.metadata.ListEntity(ctx)
+func (s *OomStore) ListEntity(ctx context.Context) typesv2.EntityList {
+	return s.metadatav2.ListEntity(ctx)
 }
 
-func (s *OomStore) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) (int64, error) {
-	return s.metadata.UpdateEntity(ctx, opt)
+func (s *OomStore) CreateEntity(ctx context.Context, opt metadatav2.CreateEntityOpt) (int16, error) {
+	return s.metadatav2.CreateEntity(ctx, opt)
+}
+
+func (s *OomStore) UpdateEntity(ctx context.Context, opt metadatav2.UpdateEntityOpt) error {
+	return s.metadatav2.UpdateEntity(ctx, opt)
 }

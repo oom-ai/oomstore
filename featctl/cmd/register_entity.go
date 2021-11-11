@@ -4,11 +4,11 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/spf13/cobra"
 )
 
-var registerEntityOpt types.CreateEntityOpt
+var registerEntityOpt metadatav2.CreateEntityOpt
 
 var registerEntityCmd = &cobra.Command{
 	Use:   "entity",
@@ -22,7 +22,7 @@ var registerEntityCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if err := oomStore.CreateEntity(ctx, registerEntityOpt); err != nil {
+		if _, err := oomStore.CreateEntity(ctx, registerEntityOpt); err != nil {
 			log.Fatalf("failed registering new entity: %v\n", err)
 		}
 	},

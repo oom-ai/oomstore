@@ -4,36 +4,34 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
-func (s *OomStore) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
-	return s.metadata.GetFeature(ctx, featureName)
+func (s *OomStore) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, error) {
+	return s.metadatav2.GetFeature(ctx, id)
 }
 
-func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
-	return s.metadata.ListFeature(ctx, opt)
+func (s *OomStore) GetFeatureByName(ctx context.Context, name string) (*typesv2.Feature, error) {
+	return s.metadatav2.GetFeatureByName(ctx, name)
 }
 
-func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error) {
-	return s.metadata.UpdateFeature(ctx, opt)
+func (s *OomStore) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
+	return s.metadatav2.ListFeature(ctx, opt)
 }
 
-func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatureOpt) error {
-	valueType, err := s.offline.TypeTag(opt.DBValueType)
+func (s *OomStore) UpdateFeature(ctx context.Context, opt metadatav2.UpdateFeatureOpt) error {
+	return s.metadatav2.UpdateFeature(ctx, opt)
+}
+
+func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadatav2.CreateFeatureOpt) (int16, error) {
+	group, err := s.metadatav2.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
-		return err
-	}
-	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupName)
-	if err != nil {
-		return err
+		return 0, err
 	}
 	if group.Category != types.BatchFeatureCategory {
-		return fmt.Errorf("expected batch feature group, got %s feature group", group.Category)
+		return 0, fmt.Errorf("expected batch feature group, got %s feature group", group.Category)
 	}
-	return s.metadata.CreateFeature(ctx, metadata.CreateFeatureOpt{
-		CreateFeatureOpt: opt,
-		ValueType:        valueType,
-	})
+	return s.metadatav2.CreateFeature(ctx, opt)
 }

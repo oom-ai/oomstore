@@ -7,22 +7,23 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 type OomStore struct {
-	online   online.Store
-	offline  offline.Store
-	metadata metadata.Store
+	online     online.Store
+	offline    offline.Store
+	metadatav2 metadatav2.Store
 }
 
-func NewOomStore(online online.Store, offline offline.Store, metadata metadata.Store) *OomStore {
+func NewOomStore(online online.Store, offline offline.Store, metadata metadata.Store, metadatav2 metadatav2.Store) *OomStore {
 	return &OomStore{
-		online:   online,
-		offline:  offline,
-		metadata: metadata,
+		online:     online,
+		offline:    offline,
+		metadatav2: metadatav2,
 	}
 }
 
@@ -35,15 +36,15 @@ func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	metadataStore, err := database.OpenMetadataStore(opt.MetadataStore)
+	metadatav2Store, err := database.OpenMetadatav2Store(opt.MetadataStore)
 	if err != nil {
 		return nil, err
 	}
 
 	return &OomStore{
-		online:   onlineStore,
-		offline:  offlineStore,
-		metadata: metadataStore,
+		online:     onlineStore,
+		offline:    offlineStore,
+		metadatav2: metadatav2Store,
 	}, nil
 }
 
@@ -57,7 +58,7 @@ func Create(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 func (s *OomStore) Close() error {
 	errs := []error{}
 
-	for _, closer := range []io.Closer{s.online, s.offline, s.metadata} {
+	for _, closer := range []io.Closer{s.online, s.offline, s.metadatav2} {
 		if err := closer.Close(); err != nil {
 			errs = append(errs, err)
 		}

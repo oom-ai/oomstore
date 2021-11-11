@@ -17,7 +17,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	columns := append([]string{opt.Entity.Name}, opt.Features.Names()...)
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		tmpTableName := dbutil.TempTable(opt.Revision.GroupName)
+		tmpTableName := dbutil.TempTable(opt.Revision.Group.Name)
 		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, opt.Entity, opt.Features)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
