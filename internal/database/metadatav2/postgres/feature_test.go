@@ -21,7 +21,7 @@ func prepareEntityAndGroup(t *testing.T, ctx context.Context, db *postgres.DB) (
 	require.NoError(t, err)
 
 	groupID, err := db.CreateFeatureGroup(ctx, metadatav2.CreateFeatureGroupOpt{
-		Name:        "device_baseinfo",
+		Name:        "device_info",
 		EntityID:    entityID,
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
@@ -117,7 +117,7 @@ func TestGetFeature(t *testing.T) {
 	feature = db.GetFeature(ctx, "phone")
 	require.NotNil(t, feature)
 	assert.Equal(t, "phone", feature.Name)
-	assert.Equal(t, "device_baseinfo", feature.Group.Name)
+	assert.Equal(t, "device_info", feature.Group.Name)
 	assert.Equal(t, "varchar(16)", feature.DBValueType)
 	assert.Equal(t, "description", feature.Description)
 }
@@ -200,7 +200,7 @@ func TestUpdateFeature(t *testing.T) {
 	feature := db.GetFeature(ctx, "phone")
 	require.NotNil(t, feature)
 	assert.Equal(t, "phone", feature.Name)
-	assert.Equal(t, "device_baseinfo", feature.Group.Name)
+	assert.Equal(t, "device_info", feature.Group.Name)
 	assert.Equal(t, "varchar(16)", feature.DBValueType)
 	assert.Equal(t, "new description", feature.Description)
 }
