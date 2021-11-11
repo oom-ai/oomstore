@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/metadatav2"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -14,19 +14,7 @@ func TestCreateRevision(t *testing.T) {
 	ctx, db := prepareStore(t)
 	defer db.Close()
 
-	entityId, err := db.CreateEntity(ctx, metadatav2.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "device entity",
-	})
-	require.NoError(t, err)
-	groupId, err := db.CreateFeatureGroup(ctx, metadatav2.CreateFeatureGroupOpt{
-		Name:        "device_info",
-		EntityID:    entityId,
-		Category:    types.BatchFeatureCategory,
-		Description: "device info",
-	})
-	require.NoError(t, err)
+	_, groupId := prepareEntityAndGroup(t, ctx, db)
 
 	opt := metadatav2.CreateRevisionOpt{
 		GroupId:     groupId,
@@ -58,12 +46,11 @@ func TestCreateRevision(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			actual, err := db.CreateRevision(ctx, tc.opt)
+			assert.Equal(t, tc.expected, actual)
 			if tc.expectedError != nil {
-				assert.Error(t, err, tc.expectedError)
-				assert.Equal(t, tc.expected, actual)
+				assert.EqualError(t, err, tc.expectedError.Error())
 			} else {
 				assert.NoError(t, tc.expectedError)
-				assert.Equal(t, tc.expected, actual)
 			}
 		})
 	}
@@ -73,19 +60,7 @@ func TestUpdateRevision(t *testing.T) {
 	ctx, db := prepareStore(t)
 	defer db.Close()
 
-	entityId, err := db.CreateEntity(ctx, metadatav2.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "device entity",
-	})
-	require.NoError(t, err)
-	groupId, err := db.CreateFeatureGroup(ctx, metadatav2.CreateFeatureGroupOpt{
-		Name:        "device_info",
-		EntityID:    entityId,
-		Category:    types.BatchFeatureCategory,
-		Description: "device info",
-	})
-	require.NoError(t, err)
+	_, groupId := prepareEntityAndGroup(t, ctx, db)
 	revisionId, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
 		Revision:  1000,
 		GroupId:   groupId,
@@ -120,11 +95,122 @@ func TestUpdateRevision(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			actual := db.UpdateRevision(ctx, tc.opt)
-			assert.Equal(t, tc.expected, actual)
+			if tc.expected == nil {
+				assert.NoError(t, actual)
+			} else {
+				assert.EqualError(t, actual, tc.expected.Error())
+			}
+		})
+	}
+}
+
+func TestGetRevision(t *testing.T) {
+	ctx, db := prepareStore(t)
+	defer db.Close()
+
+	_, groupId := prepareEntityAndGroup(t, ctx, db)
+	revisionId, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
+		Revision:  1000,
+		GroupId:   groupId,
+		DataTable: "device_info_1000",
+		Anchored:  false,
+	})
+	require.NoError(t, err)
+	revision := typesv2.Revision{
+		ID:        revisionId,
+		Revision:  1000,
+		GroupID:   groupId,
+		DataTable: "device_info_1000",
+		Anchored:  false,
+	}
+	groupName := "device_info"
+	db.Refresh()
+
+	testCases := []struct {
+		description   string
+		opt           metadatav2.GetRevisionOpt
+		expectedError error
+		expected      *typesv2.Revision
+	}{
+		{
+			description: "get revision by revisionId successfully",
+			opt: metadatav2.GetRevisionOpt{
+				RevisionId: &revisionId,
+			},
+			expectedError: nil,
+			expected:      &revision,
+		},
+		{
+			description: "get revision by groupName and revision successfully",
+			opt: metadatav2.GetRevisionOpt{
+				GroupName: &groupName,
+				Revision:  &revision.Revision,
+			},
+			expectedError: nil,
+			expected:      &revision,
+		},
+		{
+			description: "get revision by groupName, return error",
+			opt: metadatav2.GetRevisionOpt{
+				GroupName: &groupName,
+			},
+			expectedError: fmt.Errorf("invalid GetRevisionOpt: %+v", metadatav2.GetRevisionOpt{
+				GroupName: &groupName,
+			}),
+			expected: nil,
+		},
+		{
+			description: "get revision by groupName, return error",
+			opt: metadatav2.GetRevisionOpt{
+				GroupName: &groupName,
+			},
+			expectedError: fmt.Errorf("invalid GetRevisionOpt: %+v", metadatav2.GetRevisionOpt{
+				GroupName: &groupName,
+			}),
+			expected: nil,
+		},
+		{
+			description: "get revision by revisionId and revision, return error",
+			opt: metadatav2.GetRevisionOpt{
+				RevisionId: &revisionId,
+				Revision:   &revision.Revision,
+			},
+			expectedError: fmt.Errorf("invalid GetRevisionOpt: %+v", metadatav2.GetRevisionOpt{
+				RevisionId: &revisionId,
+				Revision:   &revision.Revision,
+			}),
+			expected: nil,
+		},
+		{
+			description: "try to not existed revision, return error",
+			opt: metadatav2.GetRevisionOpt{
+				RevisionId: int32Ptr(0),
+			},
+			expectedError: fmt.Errorf("cannot find revision: revisionId=%d", 0),
+			expected:      nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			actual, err := db.GetRevision(ctx, tc.opt)
+
+			if tc.expectedError != nil {
+				assert.EqualError(t, err, tc.expectedError.Error())
+				assert.Equal(t, tc.expected, actual)
+			} else {
+				assert.NoError(t, tc.expectedError)
+				tc.expected.CreateTime = actual.CreateTime
+				tc.expected.ModifyTime = actual.ModifyTime
+			}
 		})
 	}
 }
 
 func boolPtr(i bool) *bool {
+	return &i
+}
+
+func int32Ptr(i int32) *int32 {
 	return &i
 }
