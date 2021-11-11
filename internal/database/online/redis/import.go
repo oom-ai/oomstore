@@ -17,8 +17,8 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			return item.Error
 		}
 		record := item.Record
-		if len(record) != len(opt.Features)+1 {
-			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
+		if len(record) != len(opt.FeatureList)+1 {
+			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.FeatureList)+1, len(record))
 		}
 
 		entityKey, values := record[0], record[1:]
@@ -29,17 +29,17 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		}
 
 		featureValues := make(map[string]string)
-		for i := range opt.Features {
+		for i := range opt.FeatureList {
 			// omit nil feature value
 			if values[i] == nil {
 				continue
 			}
-			featureValue, err := SerializeByTag(values[i], opt.Features[i].ValueType)
+			featureValue, err := SerializeByTag(values[i], opt.FeatureList[i].ValueType)
 			if err != nil {
 				return err
 			}
 
-			featureId, err := SerializeByValue(opt.Features[i].ID)
+			featureId, err := SerializeByValue(opt.FeatureList[i].ID)
 			if err != nil {
 				return err
 			}

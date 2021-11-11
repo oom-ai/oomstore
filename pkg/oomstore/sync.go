@@ -50,10 +50,10 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	}
 
 	if err = s.online.Import(ctx, online.ImportOpt{
-		Features: features,
-		Revision: revision,
-		Entity:   entity,
-		Stream:   stream,
+		FeatureList: features,
+		Revision:    revision,
+		Entity:      entity,
+		Stream:      stream,
 	}); err != nil {
 		return err
 	}
