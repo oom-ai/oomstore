@@ -13,7 +13,7 @@ import (
 
 func prepareStore() (context.Context, online.Store) {
 	ctx := context.Background()
-	opt := runtime_pg.PostgresDbopt
+	opt := runtime_pg.PostgresDbOpt
 	store, err := Open(&types.PostgresOpt{
 		Host:     opt.Host,
 		Port:     opt.Port,

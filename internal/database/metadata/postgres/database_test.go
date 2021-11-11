@@ -11,7 +11,7 @@ import (
 )
 
 func initDB(t *testing.T) {
-	opt := runtime_pg.PostgresDbopt
+	opt := runtime_pg.PostgresDbOpt
 	store, err := Open(&types.PostgresOpt{
 		Host:     opt.Host,
 		Port:     opt.Port,
@@ -28,7 +28,7 @@ func initDB(t *testing.T) {
 	}
 	store.Close()
 
-	if err := CreateDatabase(context.Background(), runtime_pg.PostgresDbopt); err != nil {
+	if err := CreateDatabase(context.Background(), runtime_pg.PostgresDbOpt); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -36,7 +36,7 @@ func initDB(t *testing.T) {
 func initAndOpenDB(t *testing.T) *DB {
 	initDB(t)
 
-	db, err := Open(&runtime_pg.PostgresDbopt)
+	db, err := Open(&runtime_pg.PostgresDbOpt)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -45,11 +45,11 @@ func initAndOpenDB(t *testing.T) *DB {
 
 func TestCreateDatabase(t *testing.T) {
 	ctx := context.Background()
-	if err := CreateDatabase(ctx, runtime_pg.PostgresDbopt); err != nil {
+	if err := CreateDatabase(ctx, runtime_pg.PostgresDbOpt); err != nil {
 		t.Fatal(err)
 	}
 
-	store, err := Open(&runtime_pg.PostgresDbopt)
+	store, err := Open(&runtime_pg.PostgresDbOpt)
 	if err != nil {
 		t.Fatal(err)
 	}
