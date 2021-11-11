@@ -65,22 +65,22 @@ func list(ctx context.Context, db *sqlx.DB) (*informer.Cache, error) {
 	var cache *informer.Cache
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		entities := typesv2.EntityList{}
-		if err := db.SelectContext(ctx, &entities, `SELECT * FROM "feature_entity"`); err != nil {
+		if err := tx.SelectContext(ctx, &entities, `SELECT * FROM "feature_entity"`); err != nil {
 			return err
 		}
 
 		features := typesv2.FeatureList{}
-		if err := db.SelectContext(ctx, &features, `SELECT * FROM "feature"`); err != nil {
+		if err := tx.SelectContext(ctx, &features, `SELECT * FROM "feature"`); err != nil {
 			return err
 		}
 
 		groups := typesv2.FeatureGroupList{}
-		if err := db.SelectContext(ctx, &groups, `SELECT * FROM "feature_group"`); err != nil {
+		if err := tx.SelectContext(ctx, &groups, `SELECT * FROM "feature_group"`); err != nil {
 			return err
 		}
 
 		revisions := typesv2.RevisionList{}
-		if err := db.SelectContext(ctx, &revisions, `SELECT * FROM "feature_group_revision"`); err != nil {
+		if err := tx.SelectContext(ctx, &revisions, `SELECT * FROM "feature_group_revision"`); err != nil {
 			return err
 		}
 		cache = informer.NewCache(entities, features, groups, revisions)

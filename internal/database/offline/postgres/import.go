@@ -14,35 +14,34 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/offline"
 )
 
-func (db *DB) LoadData(ctx context.Context, csvReader *csv.Reader, tableName string, header []string) error {
-	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
-		stmt, err := tx.PreparexContext(ctx, pq.CopyIn(tableName, header...))
+func loadData(tx *sqlx.Tx, ctx context.Context, csvReader *csv.Reader, tableName string, header []string) error {
+	stmt, err := tx.PreparexContext(ctx, pq.CopyIn(tableName, header...))
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for {
+		row, err := csvReader.Read()
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
 			return err
 		}
-		defer stmt.Close()
 
-		for {
-			row, err := csvReader.Read()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				return err
-			}
-
-			args := []interface{}{}
-			for _, v := range row {
-				args = append(args, v)
-			}
-			if _, err := stmt.ExecContext(ctx, args...); err != nil {
-				return err
-			}
+		args := []interface{}{}
+		for _, v := range row {
+			args = append(args, v)
 		}
+		if _, err := stmt.ExecContext(ctx, args...); err != nil {
+			return err
+		}
+	}
 
-		_, err = stmt.ExecContext(ctx)
-		return err
-	})
+	_, err = stmt.ExecContext(ctx)
+	return err
+
 }
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, string, error) {
@@ -52,13 +51,13 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, string,
 		// create the data table
 		tmpTableName := dbutil.TempTable(opt.GroupName)
 		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, opt.Entity, opt.Features)
-		_, err := db.ExecContext(ctx, schema)
+		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return err
 		}
 
 		// populate the data table
-		err = db.LoadData(ctx, opt.CsvReader, tmpTableName, opt.Header)
+		err = loadData(tx, ctx, opt.CsvReader, tmpTableName, opt.Header)
 		if err != nil {
 			return err
 		}
