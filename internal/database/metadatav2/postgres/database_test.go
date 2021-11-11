@@ -13,7 +13,7 @@ import (
 
 func prepareStore(t *testing.T) (context.Context, *postgres.DB) {
 	ctx := context.Background()
-	opt := runtime_pg.PostgresDbopt
+	opt := runtime_pg.PostgresDbOpt
 	pg, err := postgres.OpenDB(
 		context.Background(),
 		opt.Host,
@@ -27,10 +27,10 @@ func prepareStore(t *testing.T) (context.Context, *postgres.DB) {
 	require.NoError(t, err)
 	pg.Close()
 
-	err = postgres.CreateDatabase(ctx, runtime_pg.PostgresDbopt)
+	err = postgres.CreateDatabase(ctx, runtime_pg.PostgresDbOpt)
 	require.NoError(t, err)
 
-	db, err := postgres.Open(context.Background(), &runtime_pg.PostgresDbopt)
+	db, err := postgres.Open(context.Background(), &runtime_pg.PostgresDbOpt)
 	require.NoError(t, err)
 
 	return ctx, db
