@@ -92,10 +92,14 @@ func (f *Informer) Cache() *Cache {
 	return f.cache.Load().(*Cache)
 }
 
-func (f *Informer) GetEntity(ctx context.Context, name string) *typesv2.Entity {
-	return f.Cache().Entities.Find(func(e *typesv2.Entity) bool {
+func (f *Informer) GetEntity(ctx context.Context, name string) (*typesv2.Entity, error) {
+	if entity := f.Cache().Entities.Find(func(e *typesv2.Entity) bool {
 		return e.Name == name
-	})
+	}); entity == nil {
+		return nil, fmt.Errorf("feature group name=%s not found", name)
+	} else {
+		return entity, nil
+	}
 }
 
 func (f *Informer) ListEntity(ctx context.Context) typesv2.EntityList {

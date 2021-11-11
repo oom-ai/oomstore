@@ -125,11 +125,12 @@ func (mr *MockStoreMockRecorder) CreateRevision(ctx, opt interface{}) *gomock.Ca
 }
 
 // GetEntity mocks base method.
-func (m *MockStore) GetEntity(ctx context.Context, name string) *typesv2.Entity {
+func (m *MockStore) GetEntity(ctx context.Context, name string) (*typesv2.Entity, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEntity", ctx, name)
 	ret0, _ := ret[0].(*typesv2.Entity)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetEntity indicates an expected call of GetEntity.
