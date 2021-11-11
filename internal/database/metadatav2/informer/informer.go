@@ -126,16 +126,26 @@ func (f *Informer) ListFeatureGroup(ctx context.Context, entityName *string) typ
 	return f.Cache().Groups.List(entityName)
 }
 
-// TODO: refactor this
 func (f *Informer) GetRevision(ctx context.Context, opt metadatav2.GetRevisionOpt) (*typesv2.Revision, error) {
 	if opt.RevisionId != nil {
-		return f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
+		if opt.GroupName != nil || opt.Revision != nil {
+			return nil, fmt.Errorf("invalid GetRevisionOpt: %+v", opt)
+		}
+		revision := f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
 			return r.ID == *opt.RevisionId
-		}), nil
+		})
+		if revision == nil {
+			return nil, fmt.Errorf("cannot find revision: revisionId=%d", *opt.RevisionId)
+		}
+		return revision, nil
 	} else if opt.GroupName != nil && opt.Revision != nil {
-		return f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
+		revision := f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
 			return r.Group.Name == *opt.GroupName && r.Revision == *opt.Revision
-		}), nil
+		})
+		if revision == nil {
+			return nil, fmt.Errorf("cannot find revision: groupName=%s, revision=%d", *opt.GroupName, *opt.Revision)
+		}
+		return revision, nil
 	}
 	return nil, fmt.Errorf("invalid GetRevisionOpt: %+v", opt)
 }
