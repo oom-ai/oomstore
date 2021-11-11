@@ -92,6 +92,7 @@ func (f *Informer) Cache() *Cache {
 	return f.cache.Load().(*Cache)
 }
 
+// Get
 func (f *Informer) GetEntity(ctx context.Context, id int16) (*typesv2.Entity, error) {
 	if entity := f.Cache().Entities.Find(func(e *typesv2.Entity) bool {
 		return e.ID == id
@@ -102,18 +103,14 @@ func (f *Informer) GetEntity(ctx context.Context, id int16) (*typesv2.Entity, er
 	}
 }
 
-func (f *Informer) ListEntity(ctx context.Context) typesv2.EntityList {
-	return f.Cache().Entities.List()
-}
-
-func (f *Informer) GetFeature(ctx context.Context, id int16) *typesv2.Feature {
-	return f.Cache().Features.Find(func(f *typesv2.Feature) bool {
+func (f *Informer) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, error) {
+	if feature := f.Cache().Features.Find(func(f *typesv2.Feature) bool {
 		return f.ID == id
-	})
-}
-
-func (f *Informer) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
-	return f.Cache().Features.List(opt)
+	}); feature == nil {
+		return nil, fmt.Errorf("feature %d not found", id)
+	} else {
+		return feature, nil
+	}
 }
 
 func (f *Informer) GetFeatureGroup(ctx context.Context, id int16) (*typesv2.FeatureGroup, error) {
@@ -124,10 +121,6 @@ func (f *Informer) GetFeatureGroup(ctx context.Context, id int16) (*typesv2.Feat
 	} else {
 		return featureGroup, nil
 	}
-}
-
-func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int16) typesv2.FeatureGroupList {
-	return f.Cache().Groups.List(entityID)
 }
 
 func (f *Informer) GetRevision(ctx context.Context, opt metadatav2.GetRevisionOpt) (*typesv2.Revision, error) {
@@ -152,6 +145,19 @@ func (f *Informer) GetRevision(ctx context.Context, opt metadatav2.GetRevisionOp
 		return revision, nil
 	}
 	return nil, fmt.Errorf("invalid GetRevisionOpt: %+v", opt)
+}
+
+// List
+func (f *Informer) ListEntity(ctx context.Context) typesv2.EntityList {
+	return f.Cache().Entities.List()
+}
+
+func (f *Informer) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
+	return f.Cache().Features.List(opt)
+}
+
+func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int16) typesv2.FeatureGroupList {
+	return f.Cache().Groups.List(entityID)
 }
 
 func (f *Informer) ListRevision(ctx context.Context, opt metadatav2.ListRevisionOpt) typesv2.RevisionList {
