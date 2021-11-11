@@ -1,10 +1,15 @@
 package postgres_test
 
 import (
+	"context"
 	"fmt"
+	"sort"
 	"testing"
+	"time"
 
 	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2/postgres"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -116,15 +121,20 @@ func TestGetRevision(t *testing.T) {
 		Anchored:  false,
 	})
 	require.NoError(t, err)
+
+	require.NoError(t, db.Refresh())
+	groupName := "device_info"
+	group, err := db.GetFeatureGroup(ctx, groupName)
+	require.NoError(t, err)
+
 	revision := typesv2.Revision{
 		ID:        revisionId,
 		Revision:  1000,
 		GroupID:   groupId,
 		DataTable: "device_info_1000",
 		Anchored:  false,
+		Group:     group,
 	}
-	groupName := "device_info"
-	db.Refresh()
 
 	testCases := []struct {
 		description   string
@@ -200,9 +210,70 @@ func TestGetRevision(t *testing.T) {
 				assert.Equal(t, tc.expected, actual)
 			} else {
 				assert.NoError(t, tc.expectedError)
-				tc.expected.CreateTime = actual.CreateTime
-				tc.expected.ModifyTime = actual.ModifyTime
+				ignoreCreateAndModifyTime(actual)
+				assert.Equal(t, tc.expected, actual)
 			}
+		})
+	}
+}
+
+func TestListRevision(t *testing.T) {
+	ctx, db := prepareStore(t)
+	defer db.Close()
+
+	_, _, _, revisions := prepareRevisions(t, ctx, db)
+	groupName := "device_info"
+	var nilRevisionList typesv2.RevisionList
+	require.NoError(t, db.Refresh())
+
+	testCases := []struct {
+		description string
+		opt         metadatav2.ListRevisionOpt
+		expected    typesv2.RevisionList
+	}{
+		{
+			description: "list revision by groupName, succeed",
+			opt: metadatav2.ListRevisionOpt{
+				GroupName: &groupName,
+			},
+			expected: revisions,
+		},
+		{
+			description: "list revision by dataTables, succeed",
+			opt: metadatav2.ListRevisionOpt{
+				DataTables: []string{"device_info_1000", "device_info_2000"},
+			},
+			expected: revisions,
+		},
+		{
+			description: "list revision by invalid dataTables, return empty list",
+			opt: metadatav2.ListRevisionOpt{
+				DataTables: []string{"device_info_3000"},
+			},
+			expected: nilRevisionList,
+		},
+		{
+			description: "list revision by empty dataTables, return empty list",
+			opt: metadatav2.ListRevisionOpt{
+				DataTables: []string{},
+				GroupName:  &groupName,
+			},
+			expected: nilRevisionList,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			actual := db.ListRevision(ctx, tc.opt)
+			for _, item := range actual {
+				ignoreCreateAndModifyTime(item)
+			}
+			sort.Slice(tc.expected, func(i, j int) bool {
+				return tc.expected[i].ID < tc.expected[j].ID
+			})
+			sort.Slice(actual, func(i, j int) bool {
+				return actual[i].ID < actual[j].ID
+			})
+			assert.Equal(t, tc.expected, actual)
 		})
 	}
 }
@@ -213,4 +284,67 @@ func boolPtr(i bool) *bool {
 
 func int32Ptr(i int32) *int32 {
 	return &i
+}
+
+func ignoreCreateAndModifyTime(revision *typesv2.Revision) {
+	revision.CreateTime = time.Time{}
+	revision.ModifyTime = time.Time{}
+}
+
+func prepareRevisions(t *testing.T, ctx context.Context, db *postgres.DB) (int16, int16, []int32, typesv2.RevisionList) {
+	entityID, err := db.CreateEntity(ctx, metadatav2.CreateEntityOpt{
+		Name:        "device",
+		Length:      32,
+		Description: "description",
+	})
+	require.NoError(t, err)
+
+	groupId, err := db.CreateFeatureGroup(ctx, metadatav2.CreateFeatureGroupOpt{
+		Name:        "device_info",
+		EntityID:    entityID,
+		Description: "description",
+		Category:    types.BatchFeatureCategory,
+	})
+	require.NoError(t, err)
+
+	revisionId1, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
+		Revision:  1000,
+		GroupId:   groupId,
+		DataTable: "device_info_1000",
+		Anchored:  false,
+	})
+	require.NoError(t, err)
+
+	revisionId2, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
+		Revision:  2000,
+		GroupId:   groupId,
+		DataTable: "device_info_2000",
+		Anchored:  false,
+	})
+	require.NoError(t, err)
+
+	require.NoError(t, db.Refresh())
+	groupName := "device_info"
+	group, err := db.GetFeatureGroup(ctx, groupName)
+	require.NoError(t, err)
+
+	revision1 := &typesv2.Revision{
+		ID:        revisionId1,
+		Revision:  1000,
+		GroupID:   groupId,
+		DataTable: "device_info_1000",
+		Anchored:  false,
+		Group:     group,
+	}
+
+	revision2 := &typesv2.Revision{
+		ID:        revisionId2,
+		Revision:  2000,
+		GroupID:   groupId,
+		DataTable: "device_info_2000",
+		Anchored:  false,
+		Group:     group,
+	}
+
+	return entityID, groupId, []int32{revisionId1, revisionId2}, typesv2.RevisionList{revision1, revision2}
 }

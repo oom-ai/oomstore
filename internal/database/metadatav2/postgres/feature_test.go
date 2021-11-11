@@ -200,7 +200,7 @@ func TestUpdateFeature(t *testing.T) {
 	feature := db.GetFeature(ctx, "phone")
 	require.NotNil(t, feature)
 	assert.Equal(t, "phone", feature.Name)
-	assert.Equal(t, "device_baseinfo", feature.Group.Name)
+	assert.Equal(t, "device_info", feature.Group.Name)
 	assert.Equal(t, "varchar(16)", feature.DBValueType)
 	assert.Equal(t, "new description", feature.Description)
 }
