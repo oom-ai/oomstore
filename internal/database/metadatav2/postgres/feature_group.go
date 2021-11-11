@@ -31,11 +31,11 @@ func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadatav2.CreateFeatu
 
 func (db *DB) UpdateFeatureGroup(ctx context.Context, opt metadatav2.UpdateFeatureGroupOpt) error {
 	and := make(map[string]interface{})
-	if opt.Description != nil {
-		and["description"] = *opt.Description
+	if opt.NewDescription != nil {
+		and["description"] = *opt.NewDescription
 	}
-	if opt.OnlineRevisionId != nil {
-		and["online_revision_id"] = *opt.OnlineRevisionId
+	if opt.NewOnlineRevisionID != nil {
+		and["online_revision_id"] = *opt.NewOnlineRevisionID
 	}
 	cond, args, err := dbutil.BuildConditions(and, nil)
 	if err != nil {

@@ -48,9 +48,9 @@ type UpdateFeatureOpt struct {
 }
 
 type UpdateFeatureGroupOpt struct {
-	GroupID          int16
-	Description      *string
-	OnlineRevisionId *int32
+	GroupID             int16
+	NewDescription      *string
+	NewOnlineRevisionID *int32
 }
 
 type UpdateRevisionOpt struct {
