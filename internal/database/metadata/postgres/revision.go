@@ -14,6 +14,14 @@ import (
 )
 
 func (db *DB) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) ([]*types.Revision, error) {
+	return listRevision(ctx, db, opt)
+}
+
+func (tx *Tx) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) ([]*types.Revision, error) {
+	return listRevision(ctx, tx, opt)
+}
+
+func listRevision(ctx context.Context, ext metadata.ExtContext, opt metadata.ListRevisionOpt) ([]*types.Revision, error) {
 	var revisions []*types.Revision
 	query := "SELECT * FROM feature_group_revision"
 	cond, args, err := buildListRevisionCond(opt)
@@ -23,7 +31,7 @@ func (db *DB) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) ([
 	if len(cond) > 0 {
 		query = fmt.Sprintf("%s WHERE %s", query, strings.Join(cond, " AND "))
 	}
-	if err := db.SelectContext(ctx, &revisions, db.Rebind(query), args...); err != nil {
+	if err := ext.SelectContext(ctx, &revisions, ext.Rebind(query), args...); err != nil {
 		return nil, err
 	}
 	return revisions, nil
@@ -46,6 +54,14 @@ func buildListRevisionCond(opt metadata.ListRevisionOpt) ([]string, []interface{
 }
 
 func (db *DB) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*types.Revision, error) {
+	return getRevision(ctx, db, opt)
+}
+
+func (tx *Tx) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*types.Revision, error) {
+	return getRevision(ctx, tx, opt)
+}
+
+func getRevision(ctx context.Context, ext metadata.ExtContext, opt metadata.GetRevisionOpt) (*types.Revision, error) {
 	and := make(map[string]interface{})
 	if opt.GroupName != nil {
 		and["group_name"] = *opt.GroupName
@@ -66,13 +82,21 @@ func (db *DB) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*ty
 	}
 
 	var rs types.Revision
-	if err := db.GetContext(ctx, &rs, db.Rebind(query), args...); err != nil {
+	if err := ext.GetContext(ctx, &rs, ext.Rebind(query), args...); err != nil {
 		return nil, err
 	}
 	return &rs, nil
 }
 
 func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) (int64, error) {
+	return updateRevision(ctx, db, opt)
+}
+
+func (tx *Tx) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) (int64, error) {
+	return updateRevision(ctx, tx, opt)
+}
+
+func updateRevision(ctx context.Context, ext metadata.ExtContext, opt metadata.UpdateRevisionOpt) (int64, error) {
 	and := make(map[string]interface{})
 	if opt.NewRevision != nil {
 		and["revision"] = *opt.NewRevision
@@ -90,7 +114,7 @@ func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt
 	args = append(args, opt.RevisionID)
 
 	query := fmt.Sprintf("UPDATE feature_group_revision SET %s WHERE id = ?", strings.Join(cond, ","))
-	if result, err := db.ExecContext(ctx, db.Rebind(query), args...); err != nil {
+	if result, err := ext.ExecContext(ctx, ext.Rebind(query), args...); err != nil {
 		return 0, err
 	} else {
 		return result.RowsAffected()
@@ -98,9 +122,17 @@ func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt
 }
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (*types.Revision, error) {
+	return createRevision(ctx, db, opt)
+}
+
+func (tx *Tx) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (*types.Revision, error) {
+	return createRevision(ctx, tx, opt)
+}
+
+func createRevision(ctx context.Context, ext metadata.ExtContext, opt metadata.CreateRevisionOpt) (*types.Revision, error) {
 	query := "INSERT INTO feature_group_revision(group_name, revision, data_table, anchored, description) VALUES ($1, $2, $3, $4, $5) RETURNING *"
 	var revision types.Revision
-	if err := db.GetContext(ctx, &revision, query, opt.GroupName, opt.Revision, opt.DataTable, opt.Anchored, opt.Description); err != nil {
+	if err := ext.GetContext(ctx, &revision, query, opt.GroupName, opt.Revision, opt.DataTable, opt.Anchored, opt.Description); err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
 				return nil, fmt.Errorf("revision %v already exist", opt.Revision)
@@ -112,15 +144,31 @@ func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt
 }
 
 func (db *DB) GetLatestRevision(ctx context.Context, groupName string) (*types.Revision, error) {
+	return getLatestRevision(ctx, db, groupName)
+}
+
+func (tx *Tx) GetLatestRevision(ctx context.Context, groupName string) (*types.Revision, error) {
+	return getLatestRevision(ctx, tx, groupName)
+}
+
+func getLatestRevision(ctx context.Context, ext metadata.ExtContext, groupName string) (*types.Revision, error) {
 	query := "SELECT * FROM feature_group_revision WHERE group_name = $1 ORDER BY create_time DESC LIMIT 1"
 	var revision types.Revision
-	if err := db.GetContext(ctx, &revision, query, groupName); err != nil {
+	if err := ext.GetContext(ctx, &revision, query, groupName); err != nil {
 		return nil, err
 	}
 	return &revision, nil
 }
 
 func (db *DB) BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error) {
+	return buildRevisionRanges(ctx, db, groupName)
+}
+
+func (tx *Tx) BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error) {
+	return buildRevisionRanges(ctx, tx, groupName)
+}
+
+func buildRevisionRanges(ctx context.Context, ext metadata.ExtContext, groupName string) ([]*types.RevisionRange, error) {
 	query := fmt.Sprintf(`
 		SELECT
 			revision AS min_revision,
@@ -131,7 +179,7 @@ func (db *DB) BuildRevisionRanges(ctx context.Context, groupName string) ([]*typ
 	`, math.MaxInt64)
 
 	var ranges []*types.RevisionRange
-	if err := db.SelectContext(ctx, &ranges, query, groupName); err != nil {
+	if err := ext.SelectContext(ctx, &ranges, query, groupName); err != nil {
 		return nil, err
 	}
 	return ranges, nil
