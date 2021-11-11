@@ -144,7 +144,7 @@ func TestUpdateFeatureGroup(t *testing.T) {
 	// update existing feature group
 	description := "new description"
 	assert.Nil(t, db.UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
-		GroupID:     featureGroupId,
-		Description: &description,
+		GroupID:        featureGroupId,
+		NewDescription: &description,
 	}))
 }
