@@ -11,7 +11,7 @@ import (
 )
 
 func initDB(t *testing.T) {
-	opt := runtime_pg.PostgresDbopt
+	opt := runtime_pg.PostgresDbOpt
 	store, err := postgres.Open(&types.PostgresOpt{
 		Host:     opt.Host,
 		Port:     opt.Port,
@@ -36,7 +36,7 @@ func initDB(t *testing.T) {
 func initAndOpenDB(t *testing.T) *postgres.DB {
 	initDB(t)
 
-	db, err := postgres.Open(&runtime_pg.PostgresDbopt)
+	db, err := postgres.Open(&runtime_pg.PostgresDbOpt)
 	if err != nil {
 		t.Fatal(err)
 	}
