@@ -11,7 +11,7 @@ type Store interface {
 	// entity
 	CreateEntity(ctx context.Context, opt CreateEntityOpt) (int16, error)
 	UpdateEntity(ctx context.Context, opt UpdateEntityOpt) error
-	GetEntity(ctx context.Context, name string) *typesv2.Entity
+	GetEntity(ctx context.Context, name string) (*typesv2.Entity, error)
 	ListEntity(ctx context.Context) typesv2.EntityList
 
 	// feature
