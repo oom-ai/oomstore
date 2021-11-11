@@ -7,9 +7,11 @@ import (
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/postgres"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -20,7 +22,7 @@ func TestJoin(t *testing.T) {
 	ctx := context.Background()
 
 	// prepare test data
-	entity := &types.Entity{
+	entity := &typesv2.Entity{
 		Name:   "device",
 		Length: 10,
 	}
@@ -36,7 +38,7 @@ func TestJoin(t *testing.T) {
 		{
 			description: "no features",
 			opt: offline.JoinOpt{
-				FeatureMap: make(map[string]types.FeatureList),
+				FeatureMap: make(map[string]typesv2.FeatureList),
 			},
 			expected: nil,
 		},
@@ -87,7 +89,7 @@ func TestJoin(t *testing.T) {
 	}
 }
 
-func prepareTestData(ctx context.Context, db *postgres.DB, t *testing.T, entity *types.Entity, oneGroupFeatures types.FeatureList, twoGroupFeatureMap map[string]types.FeatureList) {
+func prepareTestData(ctx context.Context, db *postgres.DB, t *testing.T, entity *typesv2.Entity, oneGroupFeatures typesv2.FeatureList, twoGroupFeatureMap map[string]typesv2.FeatureList) {
 	schema := dbutil.BuildFeatureDataTableSchema("device_basic_1", entity, oneGroupFeatures)
 	_, err := db.ExecContext(ctx, schema)
 	require.NoError(t, err)
@@ -124,34 +126,34 @@ func insertTestDataToAdvanced(db *postgres.DB, ctx context.Context, tableName st
 	return err
 }
 
-func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.FeatureList) {
-	price := &types.Feature{
+func prepareFeatures(oneGroup bool) (typesv2.FeatureList, map[string]typesv2.FeatureList) {
+	price := &typesv2.Feature{
 		Name:        "price",
 		DBValueType: "INT",
-		GroupName:   "device_basic",
+		GroupID:     1,
 	}
-	model := &types.Feature{
+	model := &typesv2.Feature{
 		Name:        "model",
 		DBValueType: "VARCHAR(32)",
-		GroupName:   "device_basic",
+		GroupID:     1,
 	}
-	isActive := &types.Feature{
+	isActive := &typesv2.Feature{
 		Name:        "is_active",
 		DBValueType: "boolean",
-		GroupName:   "device_advanced",
+		GroupID:     2,
 	}
 
 	if oneGroup {
-		features := types.FeatureList{model, price}
-		featureMap := map[string]types.FeatureList{
+		features := typesv2.FeatureList{model, price}
+		featureMap := map[string]typesv2.FeatureList{
 			"device_basic": {
 				model, price,
 			},
 		}
 		return features, featureMap
 	} else {
-		features := types.FeatureList{model, price, isActive}
-		featureMap := map[string]types.FeatureList{
+		features := typesv2.FeatureList{model, price, isActive}
+		featureMap := map[string]typesv2.FeatureList{
 			"device_basic": {
 				model, price,
 			},
@@ -161,8 +163,8 @@ func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.Feature
 	}
 }
 
-func prepareRevisionRanges(oneGroup bool) map[string][]*types.RevisionRange {
-	basic := []*types.RevisionRange{
+func prepareRevisionRanges(oneGroup bool) map[string][]*metadatav2.RevisionRange {
+	basic := []*metadatav2.RevisionRange{
 		{
 			MinRevision: 1,
 			MaxRevision: 15,
@@ -174,7 +176,7 @@ func prepareRevisionRanges(oneGroup bool) map[string][]*types.RevisionRange {
 			DataTable:   "device_basic_15",
 		},
 	}
-	advanced := []*types.RevisionRange{
+	advanced := []*metadatav2.RevisionRange{
 		{
 			MinRevision: 5,
 			MaxRevision: math.MaxInt64,
@@ -182,11 +184,11 @@ func prepareRevisionRanges(oneGroup bool) map[string][]*types.RevisionRange {
 		},
 	}
 	if oneGroup {
-		return map[string][]*types.RevisionRange{
+		return map[string][]*metadatav2.RevisionRange{
 			"device_basic": basic,
 		}
 	}
-	return map[string][]*types.RevisionRange{
+	return map[string][]*metadatav2.RevisionRange{
 		"device_basic":    basic,
 		"device_advanced": advanced,
 	}
