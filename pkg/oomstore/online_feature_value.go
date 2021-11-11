@@ -33,8 +33,8 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 			continue
 		}
 		featureValues, err := s.online.Get(ctx, online.GetOpt{
-			EntityName:  entity.Name,
-			RevisionId:  onlineRevisionId,
+			EntityID:    entity.Name,
+			RevisionID:  onlineRevisionId,
 			EntityKey:   opt.EntityKey,
 			FeatureList: features,
 		})
@@ -83,7 +83,7 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 		}
 		featureValues, err := s.online.MultiGet(ctx, online.MultiGetOpt{
 			EntityName:  entityName,
-			RevisionId:  onlineRevisionId,
+			RevisionID:  onlineRevisionId,
 			EntityKeys:  entityKeys,
 			FeatureList: features,
 		})

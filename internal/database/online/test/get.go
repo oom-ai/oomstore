@@ -16,8 +16,8 @@ func TestGetExisted(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	for _, target := range s.Data {
 		opt := online.GetOpt{
-			EntityName:  s.Entity.Name,
-			RevisionId:  s.Revision.ID,
+			Entity:      s.Entity,
+			RevisionID:  s.Revision.ID,
 			FeatureList: s.Features,
 			EntityKey:   target.EntityKey(),
 		}
@@ -37,8 +37,8 @@ func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreRuntimeFu
 	importSample(t, ctx, store, s)
 
 	rs, err := store.Get(ctx, online.GetOpt{
-		EntityName:  s.Entity.Name,
-		RevisionId:  s.Revision.ID,
+		Entity:      s.Entity,
+		RevisionID:  s.Revision.ID,
 		FeatureList: s.Features,
 		EntityKey:   "not-existed-key",
 	})
@@ -57,8 +57,8 @@ func TestMultiGet(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		keys = append(keys, r.EntityKey())
 	}
 	rs, err := store.MultiGet(ctx, online.MultiGetOpt{
-		EntityName:  s.Entity.Name,
-		RevisionId:  s.Revision.ID,
+		Entity:      s.Entity,
+		RevisionID:  s.Revision.ID,
 		FeatureList: s.Features,
 		EntityKeys:  keys,
 	})
