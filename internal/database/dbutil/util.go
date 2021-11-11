@@ -76,23 +76,43 @@ func TempTable(prefix string) string {
 	return fmt.Sprintf("tmp_%s_%d", prefix, time.Now().UnixNano())
 }
 
-func InsertRecordsToTable(db *sqlx.DB, ctx context.Context, tableName string, records []interface{}, columns []string) error {
+func buildQueryAndArgsForInsertRecords(tableName string, records []interface{}, columns []string) (string, []interface{}, error) {
 	if len(records) == 0 {
-		return nil
+		return "", nil, nil
 	}
 	valueFlags := make([]string, 0, len(records))
 	for i := 0; i < len(records); i++ {
 		valueFlags = append(valueFlags, "(?)")
 	}
 
-	query, args, err := sqlx.In(
+	return sqlx.In(
 		fmt.Sprintf(`INSERT INTO "%s" (%s) VALUES %s`, tableName, Quote(`"`, columns...), strings.Join(valueFlags, ",")),
 		records...)
+}
+
+func InsertRecordsToTable(db *sqlx.DB, ctx context.Context, tableName string, records []interface{}, columns []string) error {
+	query, args, err := buildQueryAndArgsForInsertRecords(tableName, records, columns)
 	if err != nil {
 		return err
 	}
-
+	if query == "" {
+		return nil
+	}
 	if _, err := db.ExecContext(ctx, db.Rebind(query), args...); err != nil {
+		return err
+	}
+	return nil
+}
+
+func InsertRecordsToTableTx(tx *sqlx.Tx, ctx context.Context, tableName string, records []interface{}, columns []string) error {
+	query, args, err := buildQueryAndArgsForInsertRecords(tableName, records, columns)
+	if err != nil {
+		return err
+	}
+	if query == "" {
+		return nil
+	}
+	if _, err := tx.ExecContext(ctx, tx.Rebind(query), args...); err != nil {
 		return err
 	}
 	return nil
