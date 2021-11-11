@@ -23,10 +23,6 @@ func prepareEntity(t *testing.T, ctx context.Context, db *postgres.DB, name stri
 	return entityId
 }
 
-func strPtr(s string) *string {
-	return &s
-}
-
 func TestGetFeatureGroup(t *testing.T) {
 	ctx, db := prepareStore(t)
 	defer db.Close()
@@ -39,17 +35,17 @@ func TestGetFeatureGroup(t *testing.T) {
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
 	}
-	_, err := db.CreateFeatureGroup(ctx, opt)
+	id, err := db.CreateFeatureGroup(ctx, opt)
 	require.NoError(t, err)
 
 	require.NoError(t, db.Refresh())
 
 	// get non-exist feature group
-	_, err = db.GetFeatureGroup(ctx, "non-exist name")
+	_, err = db.GetFeatureGroup(ctx, 0)
 	assert.Error(t, err)
 
 	// get existing feature group
-	featureGroup, err := db.GetFeatureGroup(ctx, opt.Name)
+	featureGroup, err := db.GetFeatureGroup(ctx, id)
 	assert.NoError(t, err)
 	assert.Equal(t, opt.Name, featureGroup.Name)
 	assert.Equal(t, opt.EntityID, featureGroup.EntityID)
@@ -82,19 +78,19 @@ func TestListFeatureGroup(t *testing.T) {
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
 	}
-	_, err := db.CreateFeatureGroup(ctx, deviceOpt)
+	deviceGroupID, err := db.CreateFeatureGroup(ctx, deviceOpt)
 	require.NoError(t, err)
-	_, err = db.CreateFeatureGroup(ctx, userBaseOpt)
+	userGroupID, err := db.CreateFeatureGroup(ctx, userBaseOpt)
 	require.NoError(t, err)
 	_, err = db.CreateFeatureGroup(ctx, userBehaviorOpt)
 	require.NoError(t, err)
 
 	require.NoError(t, db.Refresh())
 
-	assert.Equal(t, 1, len(db.ListFeatureGroup(ctx, strPtr("device"))))
-	assert.Equal(t, 2, len(db.ListFeatureGroup(ctx, strPtr("user"))))
+	assert.Equal(t, 1, len(db.ListFeatureGroup(ctx, &deviceGroupID)))
+	assert.Equal(t, 2, len(db.ListFeatureGroup(ctx, &userGroupID)))
 	assert.Equal(t, 3, len(db.ListFeatureGroup(ctx, nil)))
-	assert.Equal(t, 0, len(db.ListFeatureGroup(ctx, strPtr("non-exist-entity"))))
+	assert.Equal(t, 0, len(db.ListFeatureGroup(ctx, int16Ptr(0))))
 }
 
 func TestCreateFeatureGroup(t *testing.T) {
