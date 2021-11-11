@@ -11,20 +11,20 @@ type Store interface {
 	// entity
 	CreateEntity(ctx context.Context, opt CreateEntityOpt) (int16, error)
 	UpdateEntity(ctx context.Context, opt UpdateEntityOpt) error
-	GetEntity(ctx context.Context, name string) (*typesv2.Entity, error)
+	GetEntity(ctx context.Context, id int16) (*typesv2.Entity, error)
 	ListEntity(ctx context.Context) typesv2.EntityList
 
 	// feature
 	CreateFeature(ctx context.Context, opt CreateFeatureOpt) (int16, error)
 	UpdateFeature(ctx context.Context, opt UpdateFeatureOpt) error
-	GetFeature(ctx context.Context, featureName string) *typesv2.Feature
+	GetFeature(ctx context.Context, id int16) *typesv2.Feature
 	ListFeature(ctx context.Context, opt ListFeatureOpt) typesv2.FeatureList
 
 	// feature group
 	CreateFeatureGroup(ctx context.Context, opt CreateFeatureGroupOpt) (int16, error)
 	UpdateFeatureGroup(ctx context.Context, opt UpdateFeatureGroupOpt) error
-	GetFeatureGroup(ctx context.Context, groupName string) (*typesv2.FeatureGroup, error)
-	ListFeatureGroup(ctx context.Context, entityName *string) typesv2.FeatureGroupList
+	GetFeatureGroup(ctx context.Context, id int16) (*typesv2.FeatureGroup, error)
+	ListFeatureGroup(ctx context.Context, entityID *int16) typesv2.FeatureGroupList
 
 	// revision
 	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int32, error)

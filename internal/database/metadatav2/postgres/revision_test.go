@@ -116,15 +116,14 @@ func TestGetRevision(t *testing.T) {
 	_, groupId := prepareEntityAndGroup(t, ctx, db)
 	revisionId, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
 		Revision:  1000,
-		GroupId:   groupId,
+		GroupID:   groupId,
 		DataTable: "device_info_1000",
 		Anchored:  false,
 	})
 	require.NoError(t, err)
 
 	require.NoError(t, db.Refresh())
-	groupName := "device_info"
-	group, err := db.GetFeatureGroup(ctx, groupName)
+	group, err := db.GetFeatureGroup(ctx, groupId)
 	require.NoError(t, err)
 
 	revision := typesv2.Revision{
@@ -151,31 +150,31 @@ func TestGetRevision(t *testing.T) {
 			expected:      &revision,
 		},
 		{
-			description: "get revision by groupName and revision successfully",
+			description: "get revision by groupID and revision successfully",
 			opt: metadatav2.GetRevisionOpt{
-				GroupName: &groupName,
-				Revision:  &revision.Revision,
+				GroupID:  &groupId,
+				Revision: &revision.Revision,
 			},
 			expectedError: nil,
 			expected:      &revision,
 		},
 		{
-			description: "get revision by groupName, return error",
+			description: "get revision by groupID, return error",
 			opt: metadatav2.GetRevisionOpt{
-				GroupName: &groupName,
+				GroupID: &groupId,
 			},
 			expectedError: fmt.Errorf("invalid GetRevisionOpt: %+v", metadatav2.GetRevisionOpt{
-				GroupName: &groupName,
+				GroupID: &groupId,
 			}),
 			expected: nil,
 		},
 		{
-			description: "get revision by groupName, return error",
+			description: "get revision by groupID, return error",
 			opt: metadatav2.GetRevisionOpt{
-				GroupName: &groupName,
+				GroupID: &groupId,
 			},
 			expectedError: fmt.Errorf("invalid GetRevisionOpt: %+v", metadatav2.GetRevisionOpt{
-				GroupName: &groupName,
+				GroupID: &groupId,
 			}),
 			expected: nil,
 		},
@@ -196,7 +195,7 @@ func TestGetRevision(t *testing.T) {
 			opt: metadatav2.GetRevisionOpt{
 				RevisionId: int32Ptr(0),
 			},
-			expectedError: fmt.Errorf("cannot find revision: revisionId=%d", 0),
+			expectedError: fmt.Errorf("revision not found"),
 			expected:      nil,
 		},
 	}
@@ -221,8 +220,7 @@ func TestListRevision(t *testing.T) {
 	ctx, db := prepareStore(t)
 	defer db.Close()
 
-	_, _, _, revisions := prepareRevisions(t, ctx, db)
-	groupName := "device_info"
+	_, groupId, _, revisions := prepareRevisions(t, ctx, db)
 	var nilRevisionList typesv2.RevisionList
 	require.NoError(t, db.Refresh())
 
@@ -232,9 +230,9 @@ func TestListRevision(t *testing.T) {
 		expected    typesv2.RevisionList
 	}{
 		{
-			description: "list revision by groupName, succeed",
+			description: "list revision by groupID, succeed",
 			opt: metadatav2.ListRevisionOpt{
-				GroupName: &groupName,
+				GroupID: &groupId,
 			},
 			expected: revisions,
 		},
@@ -256,7 +254,7 @@ func TestListRevision(t *testing.T) {
 			description: "list revision by empty dataTables, return empty list",
 			opt: metadatav2.ListRevisionOpt{
 				DataTables: []string{},
-				GroupName:  &groupName,
+				GroupID:    &groupId,
 			},
 			expected: nilRevisionList,
 		},
@@ -309,7 +307,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, db *postgres.DB) (int16
 
 	revisionId1, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
 		Revision:  1000,
-		GroupId:   groupId,
+		GroupID:   groupId,
 		DataTable: "device_info_1000",
 		Anchored:  false,
 	})
@@ -317,15 +315,14 @@ func prepareRevisions(t *testing.T, ctx context.Context, db *postgres.DB) (int16
 
 	revisionId2, err := db.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
 		Revision:  2000,
-		GroupId:   groupId,
+		GroupID:   groupId,
 		DataTable: "device_info_2000",
 		Anchored:  false,
 	})
 	require.NoError(t, err)
 
 	require.NoError(t, db.Refresh())
-	groupName := "device_info"
-	group, err := db.GetFeatureGroup(ctx, groupName)
+	group, err := db.GetFeatureGroup(ctx, groupId)
 	require.NoError(t, err)
 
 	revision1 := &typesv2.Revision{

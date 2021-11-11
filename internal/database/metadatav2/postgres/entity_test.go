@@ -39,19 +39,19 @@ func TestGetEntity(t *testing.T) {
 		Description: "description",
 	}
 
-	_, err := db.CreateEntity(ctx, opt)
+	id, err := db.CreateEntity(ctx, opt)
 	require.NoError(t, err)
 
 	require.NoError(t, db.Refresh())
 
-	entity, err := db.GetEntity(ctx, opt.Name)
+	entity, err := db.GetEntity(ctx, id)
 	require.NoError(t, err)
 	assert.Equal(t, opt.Name, entity.Name)
 	assert.Equal(t, opt.Length, entity.Length)
 	assert.Equal(t, opt.Description, entity.Description)
 
-	_, err = db.GetEntity(ctx, "invalid_entity_name")
-	assert.EqualError(t, err, "feature group name=invalid_entity_name not found")
+	_, err = db.GetEntity(ctx, 0)
+	assert.EqualError(t, err, "feature entity 0 not found")
 }
 
 func TestUpdateEntity(t *testing.T) {
@@ -72,7 +72,7 @@ func TestUpdateEntity(t *testing.T) {
 
 	require.NoError(t, db.Refresh())
 
-	entity, err := db.GetEntity(ctx, "device")
+	entity, err := db.GetEntity(ctx, id)
 	require.NoError(t, err)
 	assert.Equal(t, entity.Description, "new description")
 

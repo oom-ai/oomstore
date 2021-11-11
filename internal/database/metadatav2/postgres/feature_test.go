@@ -100,10 +100,7 @@ func TestGetFeature(t *testing.T) {
 	defer db.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, db)
 
-	feature := db.GetFeature(ctx, "invalid_feature_name")
-	assert.Nil(t, feature)
-
-	_, err := db.CreateFeature(ctx, metadatav2.CreateFeatureOpt{
+	id, err := db.CreateFeature(ctx, metadatav2.CreateFeatureOpt{
 		Name:        "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
@@ -114,7 +111,10 @@ func TestGetFeature(t *testing.T) {
 
 	require.NoError(t, db.Refresh())
 
-	feature = db.GetFeature(ctx, "phone")
+	feature := db.GetFeature(ctx, id+1)
+	assert.Nil(t, feature)
+
+	feature = db.GetFeature(ctx, id)
 	require.NotNil(t, feature)
 	assert.Equal(t, "phone", feature.Name)
 	assert.Equal(t, "device_info", feature.Group.Name)
@@ -194,7 +194,7 @@ func TestUpdateFeature(t *testing.T) {
 
 	require.NoError(t, db.Refresh())
 
-	feature := db.GetFeature(ctx, "phone")
+	feature := db.GetFeature(ctx, id)
 	require.NotNil(t, feature)
 	assert.Equal(t, "phone", feature.Name)
 	assert.Equal(t, "device_info", feature.Group.Name)
