@@ -20,12 +20,6 @@ func (c *FeatureCache) Enrich(groupCache *GroupCache) {
 func (c *FeatureCache) List(opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
 	features := c.FeatureList
 
-	if opt.FeatureIDs == nil && opt.FeatureNames == nil && opt.EntityID == nil && opt.GroupID == nil {
-		features = make(typesv2.FeatureList, len(c.FeatureList))
-		copy(features, c.FeatureList)
-		return features
-	}
-
 	// filter ids
 	if opt.FeatureIDs != nil {
 		var tmp typesv2.FeatureList

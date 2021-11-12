@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/jinzhu/copier"
 )
 
 type FeatureGroup struct {
@@ -25,11 +23,32 @@ type FeatureGroup struct {
 }
 
 func (fg *FeatureGroup) Copy() *FeatureGroup {
+	return fg.copyWith(nil)
+}
+
+func (fg *FeatureGroup) copyWith(onlineRevision *Revision) *FeatureGroup {
 	if fg == nil {
 		return nil
 	}
-	var copied FeatureGroup
-	copier.Copy(fg, copied)
+	copied := *fg
+
+	if copied.OnlineRevisionID != nil {
+		id := *copied.OnlineRevisionID
+		copied.OnlineRevisionID = &id
+	}
+
+	if onlineRevision != nil {
+		copied.OnlineRevision = onlineRevision
+	} else if copied.OnlineRevision != nil {
+		revision := copied.OnlineRevision.copyWith(&copied)
+		copied.OnlineRevision = revision
+	}
+
+	if copied.Entity != nil {
+		entity := copied.Entity.Copy()
+		copied.Entity = entity
+	}
+
 	return &copied
 }
 

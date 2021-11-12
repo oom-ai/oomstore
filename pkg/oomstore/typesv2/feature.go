@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/jinzhu/copier"
 )
 
 type Feature struct {
@@ -26,8 +24,11 @@ func (f *Feature) Copy() *Feature {
 	if f == nil {
 		return nil
 	}
-	var copied Feature
-	copier.Copy(f, copied)
+	copied := *f
+
+	if copied.Group != nil {
+		copied.Group = copied.Group.Copy()
+	}
 	return &copied
 }
 

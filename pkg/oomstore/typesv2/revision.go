@@ -2,8 +2,6 @@ package typesv2
 
 import (
 	"time"
-
-	"github.com/jinzhu/copier"
 )
 
 type Revision struct {
@@ -21,11 +19,20 @@ type Revision struct {
 }
 
 func (r *Revision) Copy() *Revision {
+	return r.copyWith(nil)
+}
+
+func (r *Revision) copyWith(group *FeatureGroup) *Revision {
 	if r == nil {
 		return nil
 	}
-	var copied Revision
-	copier.Copy(r, copied)
+
+	copied := *r
+	if group != nil {
+		copied.Group = group
+	} else if copied.Group != nil {
+		copied.Group = r.Group.copyWith(&copied)
+	}
 	return &copied
 }
 
