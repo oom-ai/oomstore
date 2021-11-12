@@ -144,19 +144,19 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, 1, features.Len())
 
 	features = store.ListFeature(ctx, metadatav2.ListFeatureOpt{
-		FeatureIDs: []int16{featureID},
+		FeatureIDs: &[]int16{featureID},
 	})
 	require.Equal(t, 1, features.Len())
 
 	features = store.ListFeature(ctx, metadatav2.ListFeatureOpt{
 		EntityID:   int16Ptr(entityID + 1),
-		FeatureIDs: []int16{featureID},
+		FeatureIDs: &[]int16{featureID},
 	})
 	require.Equal(t, 0, features.Len())
 
 	features = store.ListFeature(ctx, metadatav2.ListFeatureOpt{
 		EntityID:   &entityID,
-		FeatureIDs: []int16{},
+		FeatureIDs: &[]int16{},
 	})
 	require.Equal(t, 0, len(features))
 
