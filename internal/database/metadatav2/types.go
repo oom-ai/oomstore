@@ -63,7 +63,7 @@ type UpdateRevisionOpt struct {
 type GetRevisionOpt struct {
 	GroupID    *int16
 	Revision   *int64
-	RevisionId *int32
+	RevisionID *int32
 }
 
 // List

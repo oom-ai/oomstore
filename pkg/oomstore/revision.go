@@ -15,6 +15,6 @@ func (s *OomStore) GetRevision(ctx context.Context, opt metadatav2.GetRevisionOp
 	return s.metadatav2.GetRevision(ctx, metadatav2.GetRevisionOpt{
 		GroupID:    opt.GroupID,
 		Revision:   opt.Revision,
-		RevisionId: opt.RevisionId,
+		RevisionID: opt.RevisionID,
 	})
 }

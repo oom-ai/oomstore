@@ -15,7 +15,7 @@ import (
 func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	revision, err := s.GetRevision(ctx, metadatav2.GetRevisionOpt{
 		GroupID:    &opt.GroupID,
-		RevisionId: &opt.RevisionId,
+		RevisionID: &opt.RevisionId,
 	})
 	if err != nil {
 		return err
@@ -61,7 +61,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	var previousRevision *typesv2.Revision
 	if group.OnlineRevisionID != nil {
 		previousRevision, err = s.metadatav2.GetRevision(ctx, metadatav2.GetRevisionOpt{
-			RevisionId: group.OnlineRevisionID,
+			RevisionID: group.OnlineRevisionID,
 		})
 		if err != nil {
 			return err
