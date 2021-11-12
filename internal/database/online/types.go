@@ -1,6 +1,7 @@
 package online
 
 import (
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
@@ -21,6 +22,6 @@ type MultiGetOpt struct {
 type ImportOpt struct {
 	Revision    *typesv2.Revision
 	Entity      *typesv2.Entity
-	Stream      <-chan *typesv2.RawFeatureValueRecord
+	Stream      <-chan *types.RawFeatureValueRecord
 	FeatureList typesv2.FeatureList
 }

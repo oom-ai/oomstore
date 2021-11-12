@@ -33,7 +33,7 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 			continue
 		}
 		featureValues, err := s.online.Get(ctx, online.GetOpt{
-			EntityID:    entity.Name,
+			Entity:      entity,
 			RevisionID:  onlineRevisionId,
 			EntityKey:   opt.EntityKey,
 			FeatureList: features,
@@ -65,7 +65,7 @@ func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	featureMap := groupFeaturesByRevisionId(features)
 
 	// entity_key -> feature_name -> feature_value
-	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, featureMap, entity.Name)
+	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, featureMap, entity)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	return buildFeatureDataSet(featureValueMap, features.Names(), opt.EntityKeys)
 }
 
-func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int32]typesv2.FeatureList, entityName string) (map[string]dbutil.RowMap, error) {
+func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int32]typesv2.FeatureList, entity *typesv2.Entity) (map[string]dbutil.RowMap, error) {
 	// entity_key -> types.RecordMap
 	featureValueMap := make(map[string]dbutil.RowMap)
 
@@ -82,7 +82,7 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 			continue
 		}
 		featureValues, err := s.online.MultiGet(ctx, online.MultiGetOpt{
-			EntityName:  entityName,
+			Entity:      entity,
 			RevisionID:  onlineRevisionId,
 			EntityKeys:  entityKeys,
 			FeatureList: features,
