@@ -7,11 +7,12 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/online/mock_online"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,9 +20,8 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	onlineStore := mock_online.NewMockStore(ctrl)
-	metadataStore := mock_metadata.NewMockStore(ctrl)
 	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(onlineStore, nil, metadataStore, metadatav2Store)
+	store := oomstore.NewOomStore(onlineStore, nil, metadatav2Store)
 
 	entityName := "device"
 	consistentFeatures := prepareFeatures(true, true)
@@ -32,15 +32,15 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		description   string
 		opt           types.GetOnlineFeatureValuesOpt
 		entityName    *string
-		features      types.FeatureList
+		features      typesv2.FeatureList
 		expectedError error
 		expected      types.FeatureValueMap
 	}{
 		{
 			description: "no available features, return nil",
 			opt: types.GetOnlineFeatureValuesOpt{
-				FeatureNames: unavailableFeatures.Names(),
-				EntityKey:    "1234",
+				FeatureIDs: unavailableFeatures.Ids(),
+				EntityKey:  "1234",
 			},
 			features:      unavailableFeatures,
 			expectedError: nil,
@@ -49,8 +49,8 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "inconsistent entity type, fail",
 			opt: types.GetOnlineFeatureValuesOpt{
-				FeatureNames: inconsistentFeatures.Names(),
-				EntityKey:    "1234",
+				FeatureIDs: inconsistentFeatures.Ids(),
+				EntityKey:  "1234",
 			},
 			features:      inconsistentFeatures,
 			expectedError: fmt.Errorf("inconsistent entity type: %v", map[string]string{"device": "price", "user": "age"}),
@@ -59,8 +59,8 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.GetOnlineFeatureValuesOpt{
-				FeatureNames: consistentFeatures.Names(),
-				EntityKey:    "1234",
+				FeatureIDs: consistentFeatures.Ids(),
+				EntityKey:  "1234",
 			},
 			features:      consistentFeatures,
 			entityName:    &entityName,
@@ -74,7 +74,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().ListFeature(gomock.Any(), types.ListFeatureOpt{FeatureNames: tc.opt.FeatureNames}).Return(tc.features, nil)
+			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: tc.opt.FeatureIDs}).Return(tc.features, nil)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().Get(gomock.Any(), gomock.Any()).Return(dbutil.RowMap{
 					"price": int64(100),
@@ -98,9 +98,9 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	onlineStore := mock_online.NewMockStore(ctrl)
-	metadataStore := mock_metadata.NewMockStore(ctrl)
+	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
 
-	store := oomstore.NewOomStore(onlineStore, nil, metadataStore)
+	store := oomstore.NewOomStore(onlineStore, nil, metadatav2Store)
 
 	entityName := "device"
 	consistentFeatures := prepareFeatures(true, true)
@@ -111,15 +111,15 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		description   string
 		opt           types.MultiGetOnlineFeatureValuesOpt
 		entityName    *string
-		features      types.FeatureList
+		features      typesv2.FeatureList
 		expectedError error
 		expected      types.FeatureDataSet
 	}{
 		{
 			description: "no available features, return nil",
 			opt: types.MultiGetOnlineFeatureValuesOpt{
-				FeatureNames: unavailableFeatures.Names(),
-				EntityKeys:   []string{"1234", "1235"},
+				FeatureIDs: unavailableFeatures.Ids(),
+				EntityKeys: []string{"1234", "1235"},
 			},
 			features:      unavailableFeatures,
 			expectedError: nil,
@@ -128,8 +128,8 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "inconsistent entity type, fail",
 			opt: types.MultiGetOnlineFeatureValuesOpt{
-				FeatureNames: inconsistentFeatures.Names(),
-				EntityKeys:   []string{"1234", "1235"},
+				FeatureIDs: inconsistentFeatures.Ids(),
+				EntityKeys: []string{"1234", "1235"},
 			},
 			features:      inconsistentFeatures,
 			expectedError: fmt.Errorf("inconsistent entity type: %v", map[string]string{"device": "price", "user": "age"}),
@@ -138,8 +138,8 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.MultiGetOnlineFeatureValuesOpt{
-				FeatureNames: consistentFeatures.Names(),
-				EntityKeys:   []string{"1234", "1235"},
+				FeatureIDs: consistentFeatures.Ids(),
+				EntityKeys: []string{"1234", "1235"},
 			},
 			features:      consistentFeatures,
 			entityName:    &entityName,
@@ -171,7 +171,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().ListFeature(gomock.Any(), types.ListFeatureOpt{FeatureNames: tc.opt.FeatureNames}).Return(tc.features, nil)
+			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: tc.opt.FeatureIDs}).Return(tc.features, nil)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().MultiGet(gomock.Any(), gomock.Any()).Return(map[string]dbutil.RowMap{
 					"1234": {
@@ -201,39 +201,45 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 	}
 }
 
-func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
+func prepareFeatures(isConsistent bool, isAvailable bool) typesv2.FeatureList {
 	revision1 := int32(1)
 	revision2 := int32(2)
-	features := types.FeatureList{
+	features := typesv2.FeatureList{
 		{
-			Name:             "model",
-			DBValueType:      "VARCHAR(32)",
-			EntityName:       "device",
-			OnlineRevisionID: &revision1,
-			Category:         types.BatchFeatureCategory,
-			GroupName:        "device_basic",
+			Name:        "model",
+			DBValueType: "VARCHAR(32)",
+			GroupID:     1,
+			Group: &typesv2.FeatureGroup{
+				EntityID:         1,
+				OnlineRevisionID: &revision1,
+				Category:         types.BatchFeatureCategory,
+			},
 		},
 		{
-			Name:             "price",
-			DBValueType:      "INT",
-			EntityName:       "device",
-			OnlineRevisionID: &revision2,
-			Category:         types.BatchFeatureCategory,
-			GroupName:        "device_advanced",
+			Name:        "price",
+			DBValueType: "INT",
+			GroupID:     2,
+			Group: &typesv2.FeatureGroup{
+				EntityID:         1,
+				OnlineRevisionID: &revision2,
+				Category:         types.BatchFeatureCategory,
+			},
 		},
 		{
-			Name:             "age",
-			DBValueType:      "INT",
-			EntityName:       "user",
-			OnlineRevisionID: &revision2,
-			Category:         types.BatchFeatureCategory,
-			GroupName:        "user_info",
+			Name:        "age",
+			DBValueType: "INT",
+			GroupID:     3,
+			Group: &typesv2.FeatureGroup{
+				EntityID:         2,
+				OnlineRevisionID: &revision2,
+				Category:         types.BatchFeatureCategory,
+			},
 		},
 	}
 	if !isAvailable {
 		for i := range features {
-			features[i].OnlineRevisionID = nil
-			features[i].Category = types.StreamFeatureCategory
+			features[i].Group.OnlineRevisionID = nil
+			features[i].Group.Category = types.StreamFeatureCategory
 		}
 	}
 

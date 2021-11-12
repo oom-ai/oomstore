@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,15 +19,14 @@ func TestExportFeatureValues(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	offlineStore := mock_offline.NewMockStore(ctrl)
-	metadataStore := mock_metadata.NewMockStore(ctrl)
 	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
 
-	store := oomstore.NewOomStore(nil, offlineStore, metadataStore, metadatav2Store)
+	store := oomstore.NewOomStore(nil, offlineStore, metadatav2Store)
 
 	dataTable := "device_info_10"
 	prevRevision := int64(5)
 	prevDataTable := "device_info_5"
-	features := types.FeatureList{
+	features := typesv2.FeatureList{
 		{
 			Name:        "model",
 			DBValueType: "VARCHAR(32)",
@@ -47,7 +46,7 @@ func TestExportFeatureValues(t *testing.T) {
 		{
 			description: "no features",
 			opt: types.ExportFeatureValuesOpt{
-				GroupName:    "device_info",
+				GroupID:      1,
 				FeatureNames: []string{},
 			},
 			stream:   prepareTwoFeatureStream(),
@@ -56,7 +55,7 @@ func TestExportFeatureValues(t *testing.T) {
 		{
 			description: "provide one feature",
 			opt: types.ExportFeatureValuesOpt{
-				GroupName:    "device_info",
+				GroupID:      1,
 				FeatureNames: []string{"price"},
 			},
 			stream:   prepareOneFeatureStream(),
@@ -65,7 +64,7 @@ func TestExportFeatureValues(t *testing.T) {
 		{
 			description: "provide revision",
 			opt: types.ExportFeatureValuesOpt{
-				GroupName:     "device_info",
+				GroupID:       1,
 				FeatureNames:  []string{"price"},
 				GroupRevision: &prevRevision,
 			},
@@ -76,20 +75,20 @@ func TestExportFeatureValues(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			// mock database methods
-			metadataStore.EXPECT().GetFeatureGroup(gomock.Any(), tc.opt.GroupName).Return(&types.FeatureGroup{
-				Name:             "device_info",
-				EntityName:       "device",
-				OfflineDataTable: &dataTable,
+			metadatav2Store.EXPECT().GetFeatureGroup(gomock.Any(), tc.opt.GroupID).Return(&typesv2.FeatureGroup{
+				ID:       1,
+				Name:     "device_info",
+				EntityID: 1,
 			}, nil)
-			metadataStore.EXPECT().ListFeature(gomock.Any(), types.ListFeatureOpt{GroupName: &tc.opt.GroupName}).Return(features, nil)
+			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{GroupID: &tc.opt.GroupID}).Return(features)
 
 			dt := dataTable
 			if tc.opt.GroupRevision != nil {
 				dt = prevDataTable
-				metadataStore.EXPECT().GetRevision(gomock.Any(), metadata.GetRevisionOpt{
-					GroupName: &tc.opt.GroupName,
-					Revision:  tc.opt.GroupRevision,
-				}).Return(&types.Revision{
+				metadatav2Store.EXPECT().GetRevision(gomock.Any(), metadatav2.GetRevisionOpt{
+					GroupID:  &tc.opt.GroupID,
+					Revision: tc.opt.GroupRevision,
+				}).Return(&typesv2.Revision{
 					DataTable: prevDataTable,
 				}, nil)
 			}
