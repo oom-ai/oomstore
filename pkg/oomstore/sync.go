@@ -67,7 +67,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	}
 
 	if previousRevision != nil {
-		return s.online.Purge(ctx, previousRevision)
+		return s.online.Purge(ctx, previousRevision.ID)
 	}
 
 	if !revision.Anchored {
