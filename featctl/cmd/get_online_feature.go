@@ -17,7 +17,6 @@ import (
 
 type getOnlineFeatureOption struct {
 	types.GetOnlineFeatureValuesOpt
-	featureNames []string
 }
 
 var getOnlineFeatureOpt getOnlineFeatureOption
@@ -29,8 +28,6 @@ var getOnlineFeatureCmd = &cobra.Command{
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
-
-		// TODO: convert feature names into feature ids
 
 		featureValueMap, err := oomStore.GetOnlineFeatureValues(ctx, getOnlineFeatureOpt.GetOnlineFeatureValuesOpt)
 		if err != nil {
@@ -51,7 +48,7 @@ func init() {
 	flags.StringVarP(&getOnlineFeatureOpt.EntityKey, "entity-key", "k", "", "entity keys")
 	_ = getOnlineFeatureCmd.MarkFlagRequired("entity")
 
-	flags.StringSliceVar(&getOnlineFeatureOpt.featureNames, "feature", nil, "feature names")
+	flags.StringSliceVar(&getOnlineFeatureOpt.FeatureNames, "feature", nil, "feature names")
 	_ = getOnlineFeatureCmd.MarkFlagRequired("feature")
 }
 

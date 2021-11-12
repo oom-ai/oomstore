@@ -54,8 +54,8 @@ type CsvDataSource struct {
 }
 
 type GetOnlineFeatureValuesOpt struct {
-	FeatureIDs []int16
-	EntityKey  string
+	FeatureNames []string
+	EntityKey    string
 }
 
 type MultiGetOnlineFeatureValuesOpt struct {
