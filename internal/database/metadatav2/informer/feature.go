@@ -18,19 +18,38 @@ func (c *FeatureCache) Enrich(groupCache *GroupCache) {
 }
 
 func (c *FeatureCache) List(opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
-	var features typesv2.FeatureList
+	features := c.FeatureList
+
+	if opt.FeatureIDs == nil && opt.FeatureNames == nil && opt.EntityID == nil && opt.GroupID == nil {
+		features = make(typesv2.FeatureList, len(c.FeatureList))
+		copy(features, c.FeatureList)
+		return features
+	}
 
 	// filter ids
 	if opt.FeatureIDs != nil {
-		for _, id := range opt.FeatureIDs {
+		var tmp typesv2.FeatureList
+		for _, id := range *opt.FeatureIDs {
 			if f := c.Find(func(f *typesv2.Feature) bool {
 				return f.ID == id
 			}); f != nil {
-				features = append(features, f)
+				tmp = append(features, f)
 			}
 		}
-	} else {
-		features = c.FeatureList
+		features = tmp
+	}
+
+	// filter names
+	if opt.FeatureNames != nil {
+		var tmp typesv2.FeatureList
+		for _, name := range *opt.FeatureNames {
+			if f := features.Find(func(f *typesv2.Feature) bool {
+				return f.Name == name
+			}); f != nil {
+				tmp = append(tmp, f)
+			}
+		}
+		features = tmp
 	}
 
 	// filter entity

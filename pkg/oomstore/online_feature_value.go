@@ -14,7 +14,7 @@ import (
 func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (types.FeatureValueMap, error) {
 	m := make(map[string]interface{})
 
-	features := s.metadatav2.ListFeature(ctx, metadatav2.ListFeatureOpt{FeatureIDs: opt.FeatureIDs})
+	features := s.metadatav2.ListFeature(ctx, metadatav2.ListFeatureOpt{FeatureNames: &opt.FeatureNames})
 	features = features.Filter(func(f *typesv2.Feature) bool {
 		return f.Group.OnlineRevisionID != nil
 	})
@@ -49,7 +49,7 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 }
 
 func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (types.FeatureDataSet, error) {
-	features := s.metadatav2.ListFeature(ctx, metadatav2.ListFeatureOpt{FeatureIDs: opt.FeatureIDs})
+	features := s.metadatav2.ListFeature(ctx, metadatav2.ListFeatureOpt{FeatureIDs: &opt.FeatureIDs})
 
 	features = features.Filter(func(f *typesv2.Feature) bool {
 		return f.OnlineRevision() != nil

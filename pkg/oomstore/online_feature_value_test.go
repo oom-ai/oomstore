@@ -39,8 +39,8 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "no available features, return nil",
 			opt: types.GetOnlineFeatureValuesOpt{
-				FeatureIDs: unavailableFeatures.Ids(),
-				EntityKey:  "1234",
+				FeatureNames: unavailableFeatures.Ids(),
+				EntityKey:    "1234",
 			},
 			features:      unavailableFeatures,
 			expectedError: nil,
@@ -49,8 +49,8 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "inconsistent entity type, fail",
 			opt: types.GetOnlineFeatureValuesOpt{
-				FeatureIDs: inconsistentFeatures.Ids(),
-				EntityKey:  "1234",
+				FeatureNames: inconsistentFeatures.Ids(),
+				EntityKey:    "1234",
 			},
 			features:      inconsistentFeatures,
 			expectedError: fmt.Errorf("inconsistent entity type: %v", map[string]string{"device": "price", "user": "age"}),
@@ -59,8 +59,8 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.GetOnlineFeatureValuesOpt{
-				FeatureIDs: consistentFeatures.Ids(),
-				EntityKey:  "1234",
+				FeatureNames: consistentFeatures.Ids(),
+				EntityKey:    "1234",
 			},
 			features:      consistentFeatures,
 			entityName:    &entityName,
@@ -74,7 +74,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: tc.opt.FeatureIDs}).Return(tc.features, nil)
+			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: tc.opt.FeatureNames}).Return(tc.features, nil)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().Get(gomock.Any(), gomock.Any()).Return(dbutil.RowMap{
 					"price": int64(100),
