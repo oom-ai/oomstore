@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/jinzhu/copier"
 )
 
 type Feature struct {
@@ -18,6 +20,15 @@ type Feature struct {
 
 	GroupID int16 `db:"group_id"`
 	Group   *FeatureGroup
+}
+
+func (f *Feature) Copy() *Feature {
+	if f == nil {
+		return nil
+	}
+	var copied Feature
+	copier.Copy(f, copied)
+	return &copied
 }
 
 func (f *Feature) Entity() *Entity {

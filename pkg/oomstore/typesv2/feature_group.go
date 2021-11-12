@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/jinzhu/copier"
 )
 
 type FeatureGroup struct {
@@ -20,6 +22,15 @@ type FeatureGroup struct {
 
 	Entity         *Entity
 	OnlineRevision *Revision
+}
+
+func (fg *FeatureGroup) Copy() *FeatureGroup {
+	if fg == nil {
+		return nil
+	}
+	var copied FeatureGroup
+	copier.Copy(fg, copied)
+	return &copied
 }
 
 type FeatureGroupList []*FeatureGroup

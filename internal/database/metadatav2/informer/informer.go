@@ -99,7 +99,7 @@ func (f *Informer) GetEntity(ctx context.Context, id int16) (*typesv2.Entity, er
 	}); entity == nil {
 		return nil, fmt.Errorf("feature entity %d not found", id)
 	} else {
-		return entity, nil
+		return entity.Copy(), nil
 	}
 }
 
@@ -109,7 +109,7 @@ func (f *Informer) GetEntityByName(ctx context.Context, name string) (*typesv2.E
 	}); entity == nil {
 		return nil, fmt.Errorf("feature entity '%s' not found", name)
 	} else {
-		return entity, nil
+		return entity.Copy(), nil
 	}
 }
 
@@ -119,7 +119,7 @@ func (f *Informer) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, 
 	}); feature == nil {
 		return nil, fmt.Errorf("feature %d not found", id)
 	} else {
-		return feature, nil
+		return feature.Copy(), nil
 	}
 }
 
@@ -129,7 +129,7 @@ func (f *Informer) GetFeatureByName(ctx context.Context, name string) (*typesv2.
 	}); feature == nil {
 		return nil, fmt.Errorf("feature '%s' not found", name)
 	} else {
-		return feature, nil
+		return feature.Copy(), nil
 	}
 }
 
@@ -139,7 +139,7 @@ func (f *Informer) GetFeatureGroup(ctx context.Context, id int16) (*typesv2.Feat
 	}); featureGroup == nil {
 		return nil, fmt.Errorf("feature group %d not found", id)
 	} else {
-		return featureGroup, nil
+		return featureGroup.Copy(), nil
 	}
 }
 
@@ -149,7 +149,7 @@ func (f *Informer) GetFeatureGroupByName(ctx context.Context, name string) (*typ
 	}); featureGroup == nil {
 		return nil, fmt.Errorf("feature group '%s' not found", name)
 	} else {
-		return featureGroup, nil
+		return featureGroup.Copy(), nil
 	}
 }
 
@@ -159,7 +159,7 @@ func (f *Informer) GetRevision(ctx context.Context, id int32) (*typesv2.Revision
 	}); revision == nil {
 		return nil, fmt.Errorf("revision not found")
 	} else {
-		return revision, nil
+		return revision.Copy(), nil
 	}
 }
 
@@ -169,7 +169,7 @@ func (f *Informer) GetRevisionBy(ctx context.Context, groupID int16, revision in
 	}); revision == nil {
 		return nil, fmt.Errorf("revision not found")
 	} else {
-		return revision, nil
+		return revision.Copy(), nil
 	}
 }
 
