@@ -36,20 +36,6 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 	return m.recorder
 }
 
-// BuildRevisionRanges mocks base method.
-func (m *MockStore) BuildRevisionRanges(ctx context.Context, groupID int16) []*metadatav2.RevisionRange {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BuildRevisionRanges", ctx, groupID)
-	ret0, _ := ret[0].([]*metadatav2.RevisionRange)
-	return ret0
-}
-
-// BuildRevisionRanges indicates an expected call of BuildRevisionRanges.
-func (mr *MockStoreMockRecorder) BuildRevisionRanges(ctx, groupID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildRevisionRanges", reflect.TypeOf((*MockStore)(nil).BuildRevisionRanges), ctx, groupID)
-}
-
 // Close mocks base method.
 func (m *MockStore) Close() error {
 	m.ctrl.T.Helper()
@@ -214,33 +200,34 @@ func (mr *MockStoreMockRecorder) GetFeatureGroupByName(ctx, name interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroupByName", reflect.TypeOf((*MockStore)(nil).GetFeatureGroupByName), ctx, name)
 }
 
-// GetLatestRevision mocks base method.
-func (m *MockStore) GetLatestRevision(ctx context.Context, groupID int16) *typesv2.Revision {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLatestRevision", ctx, groupID)
-	ret0, _ := ret[0].(*typesv2.Revision)
-	return ret0
-}
-
-// GetLatestRevision indicates an expected call of GetLatestRevision.
-func (mr *MockStoreMockRecorder) GetLatestRevision(ctx, groupID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatestRevision", reflect.TypeOf((*MockStore)(nil).GetLatestRevision), ctx, groupID)
-}
-
 // GetRevision mocks base method.
-func (m *MockStore) GetRevision(ctx context.Context, opt metadatav2.GetRevisionOpt) (*typesv2.Revision, error) {
+func (m *MockStore) GetRevision(ctx context.Context, id int32) (*typesv2.Revision, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRevision", ctx, opt)
+	ret := m.ctrl.Call(m, "GetRevision", ctx, id)
 	ret0, _ := ret[0].(*typesv2.Revision)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetRevision indicates an expected call of GetRevision.
-func (mr *MockStoreMockRecorder) GetRevision(ctx, opt interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) GetRevision(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevision", reflect.TypeOf((*MockStore)(nil).GetRevision), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevision", reflect.TypeOf((*MockStore)(nil).GetRevision), ctx, id)
+}
+
+// GetRevisionBy mocks base method.
+func (m *MockStore) GetRevisionBy(ctx context.Context, groupID int16, revision int64) (*typesv2.Revision, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRevisionBy", ctx, groupID, revision)
+	ret0, _ := ret[0].(*typesv2.Revision)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRevisionBy indicates an expected call of GetRevisionBy.
+func (mr *MockStoreMockRecorder) GetRevisionBy(ctx, groupID, revision interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevisionBy", reflect.TypeOf((*MockStore)(nil).GetRevisionBy), ctx, groupID, revision)
 }
 
 // ListEntity mocks base method.
@@ -297,6 +284,20 @@ func (m *MockStore) ListRevision(ctx context.Context, opt metadatav2.ListRevisio
 func (mr *MockStoreMockRecorder) ListRevision(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRevision", reflect.TypeOf((*MockStore)(nil).ListRevision), ctx, opt)
+}
+
+// Refresh mocks base method.
+func (m *MockStore) Refresh() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Refresh")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Refresh indicates an expected call of Refresh.
+func (mr *MockStoreMockRecorder) Refresh() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Refresh", reflect.TypeOf((*MockStore)(nil).Refresh))
 }
 
 // UpdateEntity mocks base method.
