@@ -175,17 +175,37 @@ func (f *Informer) GetRevisionBy(ctx context.Context, groupID int16, revision in
 
 // List
 func (f *Informer) ListEntity(ctx context.Context) typesv2.EntityList {
-	return f.Cache().Entities.List()
+	list := f.Cache().Entities.List()
+	copied := make(typesv2.EntityList, 0, len(list))
+	for _, x := range list {
+		copied = append(copied, x.Copy())
+	}
+	return copied
 }
 
 func (f *Informer) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
-	return f.Cache().Features.List(opt)
+	list := f.Cache().Features.List(opt)
+	copied := make(typesv2.FeatureList, 0, len(list))
+	for _, x := range list {
+		copied = append(copied, x.Copy())
+	}
+	return copied
 }
 
 func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int16) typesv2.FeatureGroupList {
-	return f.Cache().Groups.List(entityID)
+	list := f.Cache().Groups.List(entityID)
+	copied := make(typesv2.FeatureGroupList, 0, len(list))
+	for _, x := range list {
+		copied = append(copied, x.Copy())
+	}
+	return copied
 }
 
 func (f *Informer) ListRevision(ctx context.Context, opt metadatav2.ListRevisionOpt) typesv2.RevisionList {
-	return f.Cache().Revisions.List(opt)
+	list := f.Cache().Revisions.List(opt)
+	copied := make(typesv2.RevisionList, 0, len(list))
+	for _, x := range list {
+		copied = append(copied, x.Copy())
+	}
+	return copied
 }
