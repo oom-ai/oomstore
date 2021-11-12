@@ -33,5 +33,9 @@ func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadatav2.Create
 	if group.Category != types.BatchFeatureCategory {
 		return 0, fmt.Errorf("expected batch feature group, got %s feature group", group.Category)
 	}
+
+	if opt.ValueType, err = s.offline.TypeTag(opt.DBValueType); err != nil {
+		return 0, err
+	}
 	return s.metadatav2.CreateFeature(ctx, opt)
 }
