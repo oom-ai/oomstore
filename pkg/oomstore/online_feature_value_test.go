@@ -39,7 +39,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "no available features, return nil",
 			opt: types.GetOnlineFeatureValuesOpt{
-				FeatureNames: unavailableFeatures.Ids(),
+				FeatureNames: unavailableFeatures.Names(),
 				EntityKey:    "1234",
 			},
 			features:      unavailableFeatures,
@@ -49,7 +49,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "inconsistent entity type, fail",
 			opt: types.GetOnlineFeatureValuesOpt{
-				FeatureNames: inconsistentFeatures.Ids(),
+				FeatureNames: inconsistentFeatures.Names(),
 				EntityKey:    "1234",
 			},
 			features:      inconsistentFeatures,
@@ -59,7 +59,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.GetOnlineFeatureValuesOpt{
-				FeatureNames: consistentFeatures.Ids(),
+				FeatureNames: consistentFeatures.Names(),
 				EntityKey:    "1234",
 			},
 			features:      consistentFeatures,
@@ -74,7 +74,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: tc.opt.FeatureNames}).Return(tc.features, nil)
+			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureNames: &tc.opt.FeatureNames}).Return(tc.features, nil)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().Get(gomock.Any(), gomock.Any()).Return(dbutil.RowMap{
 					"price": int64(100),
@@ -171,7 +171,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: tc.opt.FeatureIDs}).Return(tc.features, nil)
+			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: &tc.opt.FeatureIDs}).Return(tc.features, nil)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().MultiGet(gomock.Any(), gomock.Any()).Return(map[string]dbutil.RowMap{
 					"1234": {
