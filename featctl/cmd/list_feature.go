@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/olekukonko/tablewriter"
@@ -27,10 +28,10 @@ var listFeatureCmd = &cobra.Command{
 	Short: "list all existing features given a specific group",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
-			listFeatureOpt.EntityID = nil
+			listFeatureOpt.entityName = nil
 		}
 		if !cmd.Flags().Changed("group") {
-			listFeatureOpt.GroupID = nil
+			listFeatureOpt.groupName = nil
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -49,7 +50,7 @@ var listFeatureCmd = &cobra.Command{
 		if listFeatureOpt.groupName != nil {
 			group, err := oomStore.GetFeatureGroupByName(ctx, *listFeatureOpt.groupName)
 			if err != nil {
-				log.Fatalf("failed to get feature group name=%s: %v", *listFeatureOpt.groupName, err)
+				log.Fatalf("failed to get feature group name='%s': %v", *listFeatureOpt.groupName, err)
 			}
 			listFeatureOpt.GroupID = &group.ID
 		}
@@ -110,15 +111,15 @@ func printFeaturesInASCIITable(features typesv2.FeatureList) error {
 }
 
 func featureHeader() []string {
-	return []string{"Name", "GroupID", "EntityID", "DBValueType", "ValueType", "Description", "OnlineRevision", "CreateTime", "ModifyTime"}
+	return []string{"Name", "Group", "Entity", "Category", "DBValueType", "ValueType", "Description", "OnlineRevision", "CreateTime", "ModifyTime"}
 }
 
 func featureRecord(f *typesv2.Feature) []string {
 	onlineRevision := "<NULL>"
 
-	if f.OnlineRevision != nil {
-		onlineRevision = fmt.Sprint(*f.OnlineRevision())
+	if f.Group.OnlineRevision != nil {
+		onlineRevision = strconv.FormatInt(f.OnlineRevision().Revision, 10)
 	}
 
-	return []string{f.Name, serializeInt16(f.GroupID), serializeInt16(f.Entity().ID), f.DBValueType, f.ValueType, f.Description, onlineRevision, f.CreateTime.Format(time.RFC3339), f.ModifyTime.Format(time.RFC3339)}
+	return []string{f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.DBValueType, f.ValueType, f.Description, onlineRevision, f.CreateTime.Format(time.RFC3339), f.ModifyTime.Format(time.RFC3339)}
 }
