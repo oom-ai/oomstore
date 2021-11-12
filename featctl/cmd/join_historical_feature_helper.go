@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cast"
@@ -25,11 +26,15 @@ func joinHistoricalFeatures(ctx context.Context, store *oomstore.OomStore, opt J
 		return err
 	}
 
-	// TODO: convert feature names into feature IDs
-	var featureIDs []int16
+	features := store.ListFeature(ctx, metadatav2.ListFeatureOpt{
+		FeatureNames: &opt.FeatureNames,
+	})
+	if err != nil {
+		return nil
+	}
 
 	joinResult, err := store.GetHistoricalFeatureValues(ctx, types.GetHistoricalFeatureValuesOpt{
-		FeatureIDs: featureIDs,
+		FeatureIDs: features.Ids(),
 		EntityRows: entityRows,
 	})
 	if err != nil {
