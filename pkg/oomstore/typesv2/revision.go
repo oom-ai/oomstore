@@ -1,6 +1,10 @@
 package typesv2
 
-import "time"
+import (
+	"time"
+
+	"github.com/jinzhu/copier"
+)
 
 type Revision struct {
 	ID        int32  `db:"id"`
@@ -14,6 +18,15 @@ type Revision struct {
 
 	GroupID int16 `db:"group_id"`
 	Group   *FeatureGroup
+}
+
+func (r *Revision) Copy() *Revision {
+	if r == nil {
+		return nil
+	}
+	var copied Revision
+	copier.Copy(r, copied)
+	return &copied
 }
 
 type RevisionList []*Revision
