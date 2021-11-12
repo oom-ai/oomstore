@@ -64,9 +64,9 @@ func TestExportFeatureValues(t *testing.T) {
 		{
 			description: "provide revision",
 			opt: types.ExportFeatureValuesOpt{
-				GroupID:       1,
-				FeatureNames:  []string{"price"},
-				GroupRevision: &prevRevision,
+				GroupID:      1,
+				FeatureNames: []string{"price"},
+				Revision:     &prevRevision,
 			},
 			stream:   prepareTwoFeatureStream(),
 			expected: [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
@@ -83,11 +83,11 @@ func TestExportFeatureValues(t *testing.T) {
 			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{GroupID: &tc.opt.GroupID}).Return(features)
 
 			dt := dataTable
-			if tc.opt.GroupRevision != nil {
+			if tc.opt.Revision != nil {
 				dt = prevDataTable
 				metadatav2Store.EXPECT().GetRevision(gomock.Any(), metadatav2.GetRevisionOpt{
 					GroupID:  &tc.opt.GroupID,
-					Revision: tc.opt.GroupRevision,
+					Revision: tc.opt.Revision,
 				}).Return(&typesv2.Revision{
 					DataTable: prevDataTable,
 				}, nil)

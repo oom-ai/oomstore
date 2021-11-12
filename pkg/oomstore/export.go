@@ -16,11 +16,8 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 	}
 
 	var dataTable string
-	if opt.GroupRevision == nil {
-		revision, err := s.GetRevision(ctx, metadatav2.GetRevisionOpt{
-			GroupID:  &opt.GroupID,
-			Revision: opt.GroupRevision,
-		})
+	if opt.Revision == nil {
+		revision, err := s.GetRevisionBy(ctx, opt.GroupID, *opt.Revision)
 		if err != nil {
 			return nil, nil, err
 		}

@@ -49,7 +49,7 @@ func TestSync(t *testing.T) {
 			description: "user-defined revision, succeed",
 			opt: types.SyncOpt{
 				GroupID:    1,
-				RevisionId: 10,
+				RevisionID: 10,
 			},
 			group:            prepareGroup(int32Ptr(2)),
 			revision:         revision1,
@@ -94,7 +94,7 @@ func TestSync(t *testing.T) {
 
 			metadatav2Store.EXPECT().GetRevision(ctx, metadatav2.GetRevisionOpt{
 				GroupID:    &tc.opt.GroupID,
-				RevisionID: &tc.opt.RevisionId,
+				RevisionID: &tc.opt.RevisionID,
 			}).Return(&tc.revision, nil)
 			if tc.expectedError == nil {
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
