@@ -8,8 +8,8 @@ import_sample > /dev/null
 
 case='featctl describe entity works'
 expected='
-Name:          device
-Length:        32
+Name:        device
+Length:      32
 Description:
 CreateTime:
 ModifyTime:
