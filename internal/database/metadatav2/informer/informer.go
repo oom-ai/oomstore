@@ -107,7 +107,7 @@ func (f *Informer) GetEntityByName(ctx context.Context, name string) (*typesv2.E
 	if entity := f.Cache().Entities.Find(func(e *typesv2.Entity) bool {
 		return e.Name == name
 	}); entity == nil {
-		return nil, fmt.Errorf("feature entity %s not found", name)
+		return nil, fmt.Errorf("feature entity '%s' not found", name)
 	} else {
 		return entity, nil
 	}
@@ -127,7 +127,7 @@ func (f *Informer) GetFeatureByName(ctx context.Context, name string) (*typesv2.
 	if feature := f.Cache().Features.Find(func(f *typesv2.Feature) bool {
 		return f.Name == name
 	}); feature == nil {
-		return nil, fmt.Errorf("feature %s not found", name)
+		return nil, fmt.Errorf("feature '%s' not found", name)
 	} else {
 		return feature, nil
 	}
@@ -147,7 +147,7 @@ func (f *Informer) GetFeatureGroupByName(ctx context.Context, name string) (*typ
 	if featureGroup := f.Cache().Groups.Find(func(g *typesv2.FeatureGroup) bool {
 		return g.Name == name
 	}); featureGroup == nil {
-		return nil, fmt.Errorf("feature group %s not found", name)
+		return nil, fmt.Errorf("feature group '%s' not found", name)
 	} else {
 		return featureGroup, nil
 	}
