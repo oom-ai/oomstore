@@ -19,14 +19,6 @@ var syncCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		groupName := args[0]
-
-		group, err := oomStore.GetFeatureGroupByName(ctx, groupName)
-		if err != nil {
-			log.Fatalf("failed to get feature group name=%s: %v", groupName, err)
-		}
-		syncOpt.GroupID = group.ID
-
 		log.Println("syncing features ...")
 		if err := oomStore.Sync(ctx, syncOpt); err != nil {
 			log.Fatalf("failed sync features: %v\n", err)
