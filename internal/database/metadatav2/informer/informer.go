@@ -153,6 +153,7 @@ func (f *Informer) GetFeatureGroupByName(ctx context.Context, name string) (*typ
 	}
 }
 
+// TODO: split into GetRevision and GetRevisionBy
 func (f *Informer) GetRevision(ctx context.Context, opt metadatav2.GetRevisionOpt) (*typesv2.Revision, error) {
 	if opt.RevisionId != nil {
 		if opt.GroupID != nil || opt.Revision != nil {
@@ -192,14 +193,4 @@ func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int16) typesv
 
 func (f *Informer) ListRevision(ctx context.Context, opt metadatav2.ListRevisionOpt) typesv2.RevisionList {
 	return f.Cache().Revisions.List(opt)
-}
-
-// TODO: not necessary anymore ?
-func (f *Informer) GetLatestRevision(ctx context.Context, groupID int16) *typesv2.Revision {
-	return f.Cache().Revisions.MaxRevision(groupID)
-}
-
-// TODO: refactor this into a private function of OomStore
-func (f *Informer) BuildRevisionRanges(ctx context.Context, groupID int16) []*metadatav2.RevisionRange {
-	return f.Cache().Revisions.BuildRevisionRanges(groupID)
 }
