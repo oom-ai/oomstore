@@ -5,13 +5,18 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/internal/database/metadatav2/postgres"
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func prepareStore(t *testing.T) (context.Context, *postgres.DB) {
+func prepareStore(t *testing.T) (context.Context, metadatav2.Store) {
+	return prepareDB(t)
+}
+
+func prepareDB(t *testing.T) (context.Context, *postgres.DB) {
 	ctx := context.Background()
 	opt := runtime_pg.PostgresDbOpt
 	pg, err := postgres.OpenDB(
@@ -37,7 +42,7 @@ func prepareStore(t *testing.T) (context.Context, *postgres.DB) {
 }
 
 func TestCreateDatabase(t *testing.T) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareDB(t)
 	defer store.Close()
 
 	var tables []string
