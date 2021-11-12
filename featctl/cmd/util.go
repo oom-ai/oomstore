@@ -29,3 +29,7 @@ func stringPtr(s string) *string {
 func serializeInt16(i int16) string {
 	return strconv.FormatInt(int64(i), 10)
 }
+
+func serializeInt32(i int32) string {
+	return strconv.FormatInt(int64(i), 10)
+}
