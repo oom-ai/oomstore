@@ -2,12 +2,10 @@ package redis
 
 import (
 	"context"
-
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
-func (db *DB) Purge(ctx context.Context, revision *typesv2.Revision) error {
-	prefix, err := SerializeByValue(revision.ID)
+func (db *DB) Purge(ctx context.Context, revisionID int32) error {
+	prefix, err := SerializeByValue(revisionID)
 	if err != nil {
 		return nil
 	}

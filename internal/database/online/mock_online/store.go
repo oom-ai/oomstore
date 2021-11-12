@@ -11,7 +11,6 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	dbutil "github.com/oom-ai/oomstore/internal/database/dbutil"
 	online "github.com/oom-ai/oomstore/internal/database/online"
-	typesv2 "github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 // MockStore is a mock of Store interface.
@@ -96,15 +95,15 @@ func (mr *MockStoreMockRecorder) MultiGet(ctx, opt interface{}) *gomock.Call {
 }
 
 // Purge mocks base method.
-func (m *MockStore) Purge(ctx context.Context, revision *typesv2.Revision) error {
+func (m *MockStore) Purge(ctx context.Context, revisionID int32) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Purge", ctx, revision)
+	ret := m.ctrl.Call(m, "Purge", ctx, revisionID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Purge indicates an expected call of Purge.
-func (mr *MockStoreMockRecorder) Purge(ctx, revision interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) Purge(ctx, revisionID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Purge", reflect.TypeOf((*MockStore)(nil).Purge), ctx, revision)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Purge", reflect.TypeOf((*MockStore)(nil).Purge), ctx, revisionID)
 }
