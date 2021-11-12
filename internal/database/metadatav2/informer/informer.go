@@ -153,29 +153,24 @@ func (f *Informer) GetFeatureGroupByName(ctx context.Context, name string) (*typ
 	}
 }
 
-// TODO: split into GetRevision and GetRevisionBy
-func (f *Informer) GetRevision(ctx context.Context, opt metadatav2.GetRevisionOpt) (*typesv2.Revision, error) {
-	if opt.RevisionId != nil {
-		if opt.GroupID != nil || opt.Revision != nil {
-			return nil, fmt.Errorf("invalid GetRevisionOpt: %+v", opt)
-		}
-		revision := f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
-			return r.ID == *opt.RevisionId
-		})
-		if revision == nil {
-			return nil, fmt.Errorf("revision not found")
-		}
-		return revision, nil
-	} else if opt.GroupID != nil && opt.Revision != nil {
-		revision := f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
-			return r.Group.ID == *opt.GroupID && r.Revision == *opt.Revision
-		})
-		if revision == nil {
-			return nil, fmt.Errorf("revision not found")
-		}
+func (f *Informer) GetRevision(ctx context.Context, id int32) (*typesv2.Revision, error) {
+	if revision := f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
+		return r.ID == id
+	}); revision == nil {
+		return nil, fmt.Errorf("revision not found")
+	} else {
 		return revision, nil
 	}
-	return nil, fmt.Errorf("invalid GetRevisionOpt: %+v", opt)
+}
+
+func (f *Informer) GetRevisionBy(ctx context.Context, groupID int16, revision int64) (*typesv2.Revision, error) {
+	if revision := f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
+		return r.Group.ID == groupID && r.Revision == revision
+	}); revision == nil {
+		return nil, fmt.Errorf("revision not found")
+	} else {
+		return revision, nil
+	}
 }
 
 // List

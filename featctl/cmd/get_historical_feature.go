@@ -20,7 +20,7 @@ var getHistoricalFeatureCmd = &cobra.Command{
 	Short: "get historical features in a group",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("revision") {
-			getHistoricalFeatureOpt.GroupRevision = nil
+			getHistoricalFeatureOpt.Revision = nil
 		}
 		if !cmd.Flags().Changed("limit") {
 			getHistoricalFeatureOpt.Limit = nil
@@ -54,5 +54,5 @@ func init() {
 	_ = getHistoricalFeatureCmd.MarkFlagRequired("group")
 
 	getHistoricalFeatureOpt.Limit = flags.Uint64P("limit", "l", 0, "max records to export")
-	getHistoricalFeatureOpt.GroupRevision = flags.Int64P("revision", "r", 0, "feature group revision")
+	getHistoricalFeatureOpt.Revision = flags.Int64P("revision", "r", 0, "feature group revision")
 }
