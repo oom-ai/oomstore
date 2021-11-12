@@ -2,6 +2,8 @@ package oomstore
 
 import (
 	"context"
+	"math"
+	"sort"
 
 	"github.com/oom-ai/oomstore/internal/database/metadatav2"
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -34,7 +36,10 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 		if err != nil {
 			return nil, err
 		}
-		revisionRanges := s.metadatav2.BuildRevisionRanges(ctx, group.ID)
+		revisionRanges, err := s.buildRevisionRanges(ctx, group.ID)
+		if err != nil {
+			return nil, err
+		}
 		revisionRangeMap[groupName] = revisionRanges
 	}
 
@@ -56,4 +61,30 @@ func buildGroupToFeaturesMap(features typesv2.FeatureList) map[string]typesv2.Fe
 		groups[f.Group.Name] = append(groups[f.Group.Name], f)
 	}
 	return groups
+}
+
+func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int16) ([]*metadatav2.RevisionRange, error) {
+	revisions := s.metadatav2.ListRevision(ctx, metadatav2.ListRevisionOpt{GroupID: &groupID})
+	if len(revisions) == 0 {
+		return nil, nil
+	}
+
+	sort.Slice(revisions, func(i, j int) bool {
+		return revisions[i].Revision < revisions[j].Revision
+	})
+
+	var ranges []*metadatav2.RevisionRange
+	for i := 1; i < len(revisions); i++ {
+		ranges = append(ranges, &metadatav2.RevisionRange{
+			MinRevision: revisions[i-1].Revision,
+			MaxRevision: revisions[i].Revision,
+			DataTable:   revisions[i-1].DataTable,
+		})
+	}
+
+	return append(ranges, &metadatav2.RevisionRange{
+		MinRevision: revisions[len(revisions)-1].Revision,
+		MaxRevision: revisions[math.MaxInt64].Revision,
+		DataTable:   revisions[len(revisions)-1].DataTable,
+	}), nil
 }
