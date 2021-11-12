@@ -9,9 +9,9 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
+// Move a certain feature group revision data from offline to online store
 func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	revision, err := s.GetRevision(ctx, opt.RevisionId)
 	if err != nil {
@@ -19,13 +19,10 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	}
 
 	group := revision.Group
-	if group.OnlineRevisionID != nil && *group.OnlineRevisionID == revision.ID {
-		return fmt.Errorf("online store already in the latest revision")
-	}
+	prevOnlineRevisionID := group.OnlineRevisionID
 
-	entity, err := s.GetEntity(ctx, group.EntityID)
-	if err != nil {
-		return err
+	if prevOnlineRevisionID != nil && *prevOnlineRevisionID == opt.RevisionId {
+		return fmt.Errorf("the specific revision was synced to the online store, won't do it again this time")
 	}
 
 	features := s.ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &group.ID})
@@ -33,9 +30,10 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		return err
 	}
 
+	// Move data from offline to online store
 	stream, err := s.offline.Export(ctx, offline.ExportOpt{
 		DataTable:    revision.DataTable,
-		EntityName:   entity.Name,
+		EntityName:   group.Entity.Name,
 		FeatureNames: features.Names(),
 	})
 	if err != nil {
@@ -45,20 +43,13 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	if err = s.online.Import(ctx, online.ImportOpt{
 		FeatureList: features,
 		Revision:    revision,
-		Entity:      entity,
+		Entity:      group.Entity,
 		Stream:      stream,
 	}); err != nil {
 		return err
 	}
 
-	var previousRevision *typesv2.Revision
-	if group.OnlineRevisionID != nil {
-		previousRevision, err = s.metadatav2.GetRevision(ctx, *group.OnlineRevisionID)
-		if err != nil {
-			return err
-		}
-	}
-
+	// Update the online revision id of the feature group upon sync success
 	if err = s.metadatav2.UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
 		GroupID:             group.ID,
 		NewOnlineRevisionID: &revision.ID,
@@ -66,8 +57,9 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		return err
 	}
 
-	if previousRevision != nil {
-		return s.online.Purge(ctx, previousRevision.ID)
+	// Now we can delete the online data corresponding to the previous revision
+	if prevOnlineRevisionID != nil {
+		return s.online.Purge(ctx, *prevOnlineRevisionID)
 	}
 
 	if !revision.Anchored {
@@ -75,7 +67,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		newChored := true
 		// update revision timestamp using current timestamp
 		if err = s.metadatav2.UpdateRevision(ctx, metadatav2.UpdateRevisionOpt{
-			RevisionID:  int32(revision.ID),
+			RevisionID:  revision.ID,
 			NewRevision: &newRevision,
 			NewAnchored: &newChored,
 		}); err != nil {
