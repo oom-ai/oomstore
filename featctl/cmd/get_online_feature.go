@@ -15,11 +15,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-type getOnlineFeatureOption struct {
-	types.GetOnlineFeatureValuesOpt
-}
-
-var getOnlineFeatureOpt getOnlineFeatureOption
+var getOnlineFeatureOpt types.GetOnlineFeatureValuesOpt
 
 var getOnlineFeatureCmd = &cobra.Command{
 	Use:   "online-feature",
@@ -29,7 +25,7 @@ var getOnlineFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		featureValueMap, err := oomStore.GetOnlineFeatureValues(ctx, getOnlineFeatureOpt.GetOnlineFeatureValuesOpt)
+		featureValueMap, err := oomStore.GetOnlineFeatureValues(ctx, getOnlineFeatureOpt)
 		if err != nil {
 			log.Fatalf("failed getting online features: %v", err)
 		}
