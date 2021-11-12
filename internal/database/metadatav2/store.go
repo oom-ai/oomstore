@@ -35,5 +35,7 @@ type Store interface {
 	GetRevision(ctx context.Context, opt GetRevisionOpt) (*typesv2.Revision, error)
 	ListRevision(ctx context.Context, opt ListRevisionOpt) typesv2.RevisionList
 
+	// refresh
+	Refresh() error
 	io.Closer
 }
