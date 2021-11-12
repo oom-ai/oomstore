@@ -9,8 +9,8 @@ sync $revisionID
 
 case="query single feature"
 expected='
-model
-xiaomi-mix3
+device,model
+1,xiaomi-mix3
 '
 actual=$(featctl get online-feature --feature model -k 1 -o csv)
 assert_eq "$case" "$expected" "$actual"
@@ -18,8 +18,8 @@ assert_eq "$case" "$expected" "$actual"
 
 case="query multiple features"
 expected='
-model,price
-apple-iphone11,4999
+device,model,price
+6,apple-iphone11,4999
 '
 actual=$(featctl get online-feature --feature model,price -k 6 -o csv)
 assert_eq "$case" "$expected" "$actual"

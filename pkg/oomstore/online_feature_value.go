@@ -45,6 +45,7 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 			m[featureName] = featureValue
 		}
 	}
+	m[entity.Name] = opt.EntityKey
 	return m, nil
 }
 
@@ -92,11 +93,12 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 		}
 		for entityKey, m := range featureValues {
 			if featureValueMap[entityKey] == nil {
-				featureValueMap[entityKey] = make(map[string]interface{})
+				featureValueMap[entityKey] = make(dbutil.RowMap)
 			}
 			for fn, fv := range m {
 				featureValueMap[entityKey][fn] = fv
 			}
+			featureValueMap[entityKey][entity.Name] = entityKey
 		}
 	}
 	return featureValueMap, nil
