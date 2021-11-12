@@ -41,7 +41,7 @@ var listFeatureCmd = &cobra.Command{
 		if listFeatureOpt.entityName != nil {
 			entity, err := oomStore.GetEntityByName(ctx, *listFeatureOpt.entityName)
 			if err != nil {
-				log.Fatalf("failed to get entity name=%s: %v", *listFeatureOpt.entityName, err)
+				log.Fatalf("failed to get entity name='%s': %v", *listFeatureOpt.entityName, err)
 			}
 			listFeatureOpt.EntityID = &entity.ID
 		}

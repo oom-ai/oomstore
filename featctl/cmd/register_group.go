@@ -29,7 +29,7 @@ var registerGroupCmd = &cobra.Command{
 
 		entity, err := oomStore.GetEntityByName(ctx, registerGroupOpt.entityName)
 		if err != nil {
-			log.Fatalf("failed to get entity name=%s: %v", registerGroupOpt.entityName, err)
+			log.Fatalf("failed to get entity name='%s': %v", registerGroupOpt.entityName, err)
 		}
 		registerGroupOpt.EntityID = entity.ID
 
