@@ -34,8 +34,6 @@ type Store interface {
 	UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) error
 	GetRevision(ctx context.Context, opt GetRevisionOpt) (*typesv2.Revision, error)
 	ListRevision(ctx context.Context, opt ListRevisionOpt) typesv2.RevisionList
-	GetLatestRevision(ctx context.Context, groupID int16) *typesv2.Revision
-	BuildRevisionRanges(ctx context.Context, groupID int16) []*RevisionRange
 
 	io.Closer
 }
