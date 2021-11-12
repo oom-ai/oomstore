@@ -11,14 +11,21 @@ import (
 )
 
 func sampleCache() *informer.Cache {
-	entities := typesv2.EntityList{
-		&typesv2.Entity{
-			ID:     1,
-			Length: 10,
-			Name:   "user",
-		},
+	entity := typesv2.Entity{
+		ID:     1,
+		Length: 10,
+		Name:   "entity",
 	}
-	return informer.NewCache(entities, nil, nil, nil)
+	group := typesv2.FeatureGroup{
+		ID:       100,
+		Name:     "group",
+		Category: "batch",
+		EntityID: entity.ID,
+		Entity:   &entity,
+	}
+	entities := typesv2.EntityList{&entity}
+	groups := typesv2.FeatureGroupList{&group}
+	return informer.NewCache(entities, nil, groups, nil)
 }
 
 func prepareInformer(t *testing.T) (context.Context, *informer.Informer) {
@@ -35,11 +42,18 @@ func TestInformer(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	entity, err := informer.GetEntity(ctx, 1)
+	group, err := informer.GetFeatureGroup(ctx, 100)
 	require.NoError(t, err)
-	require.Equal(t, int16(1), entity.ID)
-	require.Equal(t, 10, entity.Length)
-	require.Equal(t, "user", entity.Name)
+
+	require.Equal(t, int16(100), group.ID)
+	require.Equal(t, "group", group.Name)
+	require.Equal(t, "batch", group.Category)
+	require.Equal(t, int16(1), group.EntityID)
+
+	require.NotNil(t, group.Entity)
+	require.Equal(t, int16(1), group.Entity.ID)
+	require.Equal(t, 10, group.Entity.Length)
+	require.Equal(t, "entity", group.Entity.Name)
 }
 
 func TestInformerDeepCopyGet(t *testing.T) {
@@ -56,7 +70,7 @@ func TestInformerDeepCopyGet(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, int16(1), entity.ID)
 	require.Equal(t, 10, entity.Length)
-	require.Equal(t, "user", entity.Name)
+	require.Equal(t, "entity", entity.Name)
 }
 
 func TestInformerDeepCopyList(t *testing.T) {
@@ -73,5 +87,5 @@ func TestInformerDeepCopyList(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, int16(1), entity.ID)
 	require.Equal(t, 10, entity.Length)
-	require.Equal(t, "user", entity.Name)
+	require.Equal(t, "entity", entity.Name)
 }
