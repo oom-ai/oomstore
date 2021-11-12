@@ -35,10 +35,10 @@ type CreateFeatureGroupOpt struct {
 }
 
 type ExportFeatureValuesOpt struct {
-	GroupID       int16
-	GroupRevision *int64
-	FeatureNames  []string
-	Limit         *uint64
+	GroupID      int16
+	Revision     *int64
+	FeatureNames []string
+	Limit        *uint64
 }
 
 type ImportBatchFeaturesOpt struct {
@@ -80,7 +80,6 @@ type UpdateFeatureGroupOpt struct {
 }
 
 type SyncOpt struct {
-	GroupID    int16
 	RevisionId int32
 }
 

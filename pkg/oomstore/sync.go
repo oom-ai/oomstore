@@ -13,19 +13,12 @@ import (
 )
 
 func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
-	revision, err := s.GetRevision(ctx, metadatav2.GetRevisionOpt{
-		GroupID:    &opt.GroupID,
-		RevisionId: &opt.RevisionId,
-	})
+	revision, err := s.GetRevision(ctx, opt.RevisionId)
 	if err != nil {
 		return err
 	}
 
-	group, err := s.GetFeatureGroup(ctx, opt.GroupID)
-	if err != nil {
-		return err
-	}
-
+	group := revision.Group
 	if group.OnlineRevisionID != nil && *group.OnlineRevisionID == revision.ID {
 		return fmt.Errorf("online store already in the latest revision")
 	}
@@ -35,7 +28,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		return err
 	}
 
-	features := s.ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &opt.GroupID})
+	features := s.ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &group.ID})
 	if err != nil {
 		return err
 	}
@@ -60,9 +53,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 
 	var previousRevision *typesv2.Revision
 	if group.OnlineRevisionID != nil {
-		previousRevision, err = s.metadatav2.GetRevision(ctx, metadatav2.GetRevisionOpt{
-			RevisionId: group.OnlineRevisionID,
-		})
+		previousRevision, err = s.metadatav2.GetRevision(ctx, *group.OnlineRevisionID)
 		if err != nil {
 			return err
 		}
