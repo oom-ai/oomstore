@@ -21,36 +21,55 @@ func sampleCache() *informer.Cache {
 	return informer.NewCache(entities, nil, nil, nil)
 }
 
-func TestInformer(t *testing.T) {
+func prepareInformer(t *testing.T) (context.Context, *informer.Informer) {
 	ctx := context.Background()
 
-	f, err := informer.New(time.Second, func() (*informer.Cache, error) {
+	informer, err := informer.New(time.Second, func() (*informer.Cache, error) {
 		return sampleCache(), nil
 	})
 	require.NoError(t, err)
+	return ctx, informer
+}
 
-	entity, err := f.GetEntity(ctx, 1)
+func TestInformer(t *testing.T) {
+	ctx, informer := prepareInformer(t)
+	defer informer.Close()
+
+	entity, err := informer.GetEntity(ctx, 1)
 	require.NoError(t, err)
 	require.Equal(t, int16(1), entity.ID)
 	require.Equal(t, 10, entity.Length)
 	require.Equal(t, "user", entity.Name)
 }
 
-func TestInformerDeepCopy(t *testing.T) {
-	ctx := context.Background()
+func TestInformerDeepCopyGet(t *testing.T) {
+	ctx, informer := prepareInformer(t)
+	defer informer.Close()
 
-	f, err := informer.New(time.Second, func() (*informer.Cache, error) {
-		return sampleCache(), nil
-	})
-	require.NoError(t, err)
-
-	entity, err := f.GetEntity(ctx, 1)
+	entity, err := informer.GetEntity(ctx, 1)
 	require.NoError(t, err)
 
 	// changing this entity should not change the internal state of the informer
 	entity.Length = 20
 
-	entity, err = f.GetEntity(ctx, 1)
+	entity, err = informer.GetEntity(ctx, 1)
+	require.NoError(t, err)
+	require.Equal(t, int16(1), entity.ID)
+	require.Equal(t, 10, entity.Length)
+	require.Equal(t, "user", entity.Name)
+}
+
+func TestInformerDeepCopyList(t *testing.T) {
+	ctx, informer := prepareInformer(t)
+	defer informer.Close()
+
+	entityList := informer.ListEntity(ctx)
+	require.Equal(t, 1, len(entityList))
+
+	// changing this entity should not change the internal state of the informer
+	entityList[0].Length = 20
+
+	entity, err := informer.GetEntity(ctx, 1)
 	require.NoError(t, err)
 	require.Equal(t, int16(1), entity.ID)
 	require.Equal(t, 10, entity.Length)
