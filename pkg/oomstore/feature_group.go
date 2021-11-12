@@ -4,10 +4,14 @@ import (
 	"context"
 
 	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 func (s *OomStore) CreateFeatureGroup(ctx context.Context, opt metadatav2.CreateFeatureGroupOpt) (int16, error) {
+	// Via the oomstore API, we can only create a batch feature group
+	// So we hardcode the category to be batch
+	opt.Category = types.BatchFeatureCategory
 	return s.metadatav2.CreateFeatureGroup(ctx, opt)
 }
 
