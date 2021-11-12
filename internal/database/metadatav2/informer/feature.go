@@ -33,7 +33,7 @@ func (c *FeatureCache) List(opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
 			if f := c.Find(func(f *typesv2.Feature) bool {
 				return f.ID == id
 			}); f != nil {
-				tmp = append(features, f)
+				tmp = append(tmp, f)
 			}
 		}
 		features = tmp
