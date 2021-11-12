@@ -85,9 +85,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 			} else {
 				require.NoError(t, tc.expectedError)
 				require.NoError(t, store.Refresh())
-				actualRevision, err := store.GetRevision(ctx, metadatav2.GetRevisionOpt{
-					RevisionId: &tc.expected,
-				})
+				actualRevision, err := store.GetRevision(ctx, tc.expected)
 				require.NoError(t, err)
 				ignoreCreateAndModifyTime(actualRevision)
 				require.Equal(t, tc.expectedRevision, actualRevision)
@@ -172,64 +170,19 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	testCases := []struct {
 		description   string
-		opt           metadatav2.GetRevisionOpt
+		revisionID    int32
 		expectedError error
 		expected      *typesv2.Revision
 	}{
 		{
-			description: "get revision by revisionId successfully",
-			opt: metadatav2.GetRevisionOpt{
-				RevisionId: &revisionId,
-			},
+			description:   "get revision by revisionId successfully",
+			revisionID:    revisionId,
 			expectedError: nil,
 			expected:      &revision,
 		},
 		{
-			description: "get revision by groupID and revision successfully",
-			opt: metadatav2.GetRevisionOpt{
-				GroupID:  &groupId,
-				Revision: &revision.Revision,
-			},
-			expectedError: nil,
-			expected:      &revision,
-		},
-		{
-			description: "get revision by groupID, return error",
-			opt: metadatav2.GetRevisionOpt{
-				GroupID: &groupId,
-			},
-			expectedError: fmt.Errorf("invalid GetRevisionOpt: %+v", metadatav2.GetRevisionOpt{
-				GroupID: &groupId,
-			}),
-			expected: nil,
-		},
-		{
-			description: "get revision by groupID, return error",
-			opt: metadatav2.GetRevisionOpt{
-				GroupID: &groupId,
-			},
-			expectedError: fmt.Errorf("invalid GetRevisionOpt: %+v", metadatav2.GetRevisionOpt{
-				GroupID: &groupId,
-			}),
-			expected: nil,
-		},
-		{
-			description: "get revision by revisionId and revision, return error",
-			opt: metadatav2.GetRevisionOpt{
-				RevisionId: &revisionId,
-				Revision:   &revision.Revision,
-			},
-			expectedError: fmt.Errorf("invalid GetRevisionOpt: %+v", metadatav2.GetRevisionOpt{
-				RevisionId: &revisionId,
-				Revision:   &revision.Revision,
-			}),
-			expected: nil,
-		},
-		{
-			description: "try to not existed revision, return error",
-			opt: metadatav2.GetRevisionOpt{
-				RevisionId: int32Ptr(0),
-			},
+			description:   "try to get not existed revision, return error",
+			revisionID:    0,
 			expectedError: fmt.Errorf("revision not found"),
 			expected:      nil,
 		},
@@ -237,7 +190,80 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			actual, err := store.GetRevision(ctx, tc.opt)
+			actual, err := store.GetRevision(ctx, tc.revisionID)
+
+			if tc.expectedError != nil {
+				require.EqualError(t, err, tc.expectedError.Error())
+				require.Equal(t, tc.expected, actual)
+			} else {
+				require.NoError(t, tc.expectedError)
+				ignoreCreateAndModifyTime(actual)
+				require.Equal(t, tc.expected, actual)
+			}
+		})
+	}
+}
+
+func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	_, groupId := prepareEntityAndGroup(t, ctx, store)
+	revisionId, err := store.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
+		Revision:  1000,
+		GroupID:   groupId,
+		DataTable: stringPtr("device_info_1000"),
+		Anchored:  false,
+	})
+	require.NoError(t, err)
+
+	require.NoError(t, store.Refresh())
+	group, err := store.GetFeatureGroup(ctx, groupId)
+	require.NoError(t, err)
+
+	revision := typesv2.Revision{
+		ID:        revisionId,
+		Revision:  1000,
+		GroupID:   groupId,
+		DataTable: "device_info_1000",
+		Anchored:  false,
+		Group:     group,
+	}
+
+	testCases := []struct {
+		description   string
+		opt           metadatav2.GetRevisionOpt
+		GroupID       int16
+		Revision      int64
+		expectedError error
+		expected      *typesv2.Revision
+	}{
+		{
+			description:   "get revision by groupID and revision successfully",
+			GroupID:       groupId,
+			Revision:      revision.Revision,
+			expectedError: nil,
+			expected:      &revision,
+		},
+		{
+			description:   "try to get not existed revision, return error",
+			GroupID:       groupId,
+			Revision:      0,
+			expectedError: fmt.Errorf("revision not found"),
+			expected:      nil,
+		},
+		{
+			description:   "try to get revision for a not existed group, return error",
+			GroupID:       0,
+			Revision:      revision.Revision,
+			expectedError: fmt.Errorf("revision not found"),
+			expected:      nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			actual, err := store.GetRevisionBy(ctx, tc.GroupID, tc.Revision)
 
 			if tc.expectedError != nil {
 				require.EqualError(t, err, tc.expectedError.Error())
