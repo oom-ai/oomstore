@@ -99,10 +99,10 @@ func printRevisionsInASCIITable(revisions []*typesv2.Revision) error {
 }
 
 func revisionHeader() []string {
-	return []string{"Revision", "GroupID", "DataTable", "Description", "CreateTime", "ModifyTime"}
+	return []string{"Revision", "RevisionID", "GroupName", "DataTable", "Description", "CreateTime", "ModifyTime"}
 }
 
 func revisionRecord(r *typesv2.Revision) []string {
-	return []string{strconv.Itoa(int(r.Revision)), serializeInt16(r.GroupID), r.DataTable, r.Description,
+	return []string{strconv.Itoa(int(r.Revision)), serializeInt32(r.ID), r.Group.Name, r.DataTable, r.Description,
 		r.CreateTime.Format(time.RFC3339), r.ModifyTime.Format(time.RFC3339)}
 }
