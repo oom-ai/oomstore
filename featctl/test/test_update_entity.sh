@@ -9,12 +9,10 @@ import_sample > /dev/null
 case='featctl update entity works'
 featctl update entity device --description "new description"
 expected='
-Name:          device
-Length:        32
-Description:   new description
-CreateTime:
-ModifyTime:
+Name:        device
+Length:      32
+Description: new description
 '
 actual=$(featctl describe entity device)
-ignore() { grep -Ev '^(CreateTime|ModifyTime|Revision|DataTable)' <<<"$1"; }
-assert_eq "$case" "$(ignore "$expected")" "$(ignore "$actual")"
+ignore() { grep -Ev '^(CreateTime|ModifyTime)' <<<"$1"; }
+assert_eq "$case" "$expected" "$(ignore "$actual")"
