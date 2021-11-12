@@ -40,7 +40,7 @@ var listFeatureGroupCmd = &cobra.Command{
 		if listFeatureGroupOpt.entityName != nil {
 			entity, err := oomStore.GetEntityByName(ctx, *listFeatureGroupOpt.entityName)
 			if err != nil {
-				log.Fatalf("failed to get entity name=%s: %v", *listFeatureGroupOpt.entityName, err)
+				log.Fatalf("failed to get entity name='%s': %v", *listFeatureGroupOpt.entityName, err)
 			}
 			entityID = &entity.ID
 		}
