@@ -15,13 +15,9 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 		return nil, nil, err
 	}
 
-	var dataTable string
-	if opt.Revision == nil {
-		revision, err := s.GetRevisionBy(ctx, opt.GroupID, *opt.Revision)
-		if err != nil {
-			return nil, nil, err
-		}
-		dataTable = revision.DataTable
+	revision, err := s.GetRevision(ctx, opt.RevisionID)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	featureNames := opt.FeatureNames
@@ -47,7 +43,7 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 	}
 
 	stream, err := s.offline.Export(ctx, offline.ExportOpt{
-		DataTable:    dataTable,
+		DataTable:    revision.DataTable,
 		EntityName:   entity.Name,
 		FeatureNames: featureNames,
 		Limit:        opt.Limit,
