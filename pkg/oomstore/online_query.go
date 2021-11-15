@@ -47,7 +47,6 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 			m[featureName] = featureValue
 		}
 	}
-	m[entity.Name] = opt.EntityKey
 	return &types.FeatureValues{
 		EntityName:      entity.Name,
 		EntityKey:       opt.EntityKey,
@@ -108,7 +107,6 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 			for fn, fv := range m {
 				featureValueMap[entityKey][fn] = fv
 			}
-			featureValueMap[entityKey][entity.Name] = entityKey
 		}
 	}
 	return featureValueMap, nil
