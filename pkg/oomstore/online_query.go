@@ -10,7 +10,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (types.FeatureValueMap, error) {
+func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (*types.FeatureValues, error) {
 	m := make(map[string]interface{})
 
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{FeatureNames: &opt.FeatureNames})
@@ -18,15 +18,15 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 		return f.Group.OnlineRevisionID != nil
 	})
 	if len(features) == 0 {
-		return m, nil
+		return nil, nil
 	}
 
 	entity, err := s.getSharedEntity(features)
 	if err != nil {
-		return m, err
+		return nil, err
 	}
 	if entity == nil {
-		return m, fmt.Errorf("failed to get shared entity")
+		return nil, fmt.Errorf("failed to get shared entity")
 	}
 	featureMap := groupFeaturesByRevisionId(features)
 
@@ -41,14 +41,19 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 			FeatureList: features,
 		})
 		if err != nil {
-			return m, err
+			return nil, err
 		}
 		for featureName, featureValue := range featureValues {
 			m[featureName] = featureValue
 		}
 	}
 	m[entity.Name] = opt.EntityKey
-	return m, nil
+	return &types.FeatureValues{
+		EntityName:      entity.Name,
+		EntityKey:       opt.EntityKey,
+		FeatureNames:    opt.FeatureNames,
+		FeatureValueMap: m,
+	}, nil
 }
 
 func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (types.FeatureDataSet, error) {
