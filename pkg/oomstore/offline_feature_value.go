@@ -2,6 +2,7 @@ package oomstore
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"sort"
 
@@ -23,9 +24,12 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 		return nil, nil
 	}
 
-	entity, err := s.getSharedEntity(ctx, features)
-	if err != nil || entity == nil {
+	entity, err := s.getSharedEntity(features)
+	if err != nil {
 		return nil, err
+	}
+	if entity == nil {
+		return nil, fmt.Errorf("failed to get shared entity")
 	}
 
 	featureMap := buildGroupToFeaturesMap(features)
