@@ -17,18 +17,10 @@ func NewFeatureKV(name string, value interface{}) FeatureKV {
 	}
 }
 
-type FeatureValueMap map[string]interface{}
-
 type FeatureDataSet map[string][]FeatureKV
 
 func NewFeatureDataSet() FeatureDataSet {
 	return make(map[string][]FeatureKV)
-}
-
-type RevisionRange struct {
-	MinRevision int64  `db:"min_revision"`
-	MaxRevision int64  `db:"max_revision"`
-	DataTable   string `db:"data_table"`
 }
 
 type RawFeatureValueRecord struct {
