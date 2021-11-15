@@ -14,10 +14,6 @@ import (
 
 type RowMap = map[string]interface{}
 
-const (
-	PostgresBatchSize = 10
-)
-
 const CREATE_DATA_TABLE = `CREATE TABLE "{{TABLE_NAME}}" (
 	"{{ENTITY_NAME}}" VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY,
 	{{COLUMN_DEFS}});
