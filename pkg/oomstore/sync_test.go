@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
-	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -23,8 +23,8 @@ func TestSync(t *testing.T) {
 	defer ctrl.Finish()
 	onlineStore := mock_online.NewMockStore(ctrl)
 	offlineStore := mock_offline.NewMockStore(ctrl)
-	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(onlineStore, offlineStore, metadatav2Store)
+	metadataStore := mock_metadata.NewMockStore(ctrl)
+	store := oomstore.NewOomStore(onlineStore, offlineStore, metadataStore)
 	ctx := context.Background()
 
 	testCases := []struct {
@@ -40,7 +40,7 @@ func TestSync(t *testing.T) {
 			},
 			expectedError: fmt.Errorf("the specific revision was synced to the online store, won't do it again this time"),
 			mockFn: func() {
-				metadatav2Store.EXPECT().
+				metadataStore.EXPECT().
 					GetRevision(ctx, int32(1)).
 					Return(&typesv2.Revision{
 						GroupID: 1,
@@ -70,7 +70,7 @@ func TestSync(t *testing.T) {
 					},
 					DataTable: "data-table-name",
 				}
-				metadatav2Store.EXPECT().
+				metadataStore.EXPECT().
 					GetRevision(ctx, int32(1)).
 					Return(revision, nil)
 
@@ -86,8 +86,8 @@ func TestSync(t *testing.T) {
 					},
 				}
 
-				metadatav2Store.EXPECT().
-					ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &revision.Group.ID}).
+				metadataStore.EXPECT().
+					ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).
 					Return(features)
 
 				stream := make(chan *types.RawFeatureValueRecord)
@@ -110,14 +110,14 @@ func TestSync(t *testing.T) {
 					}).
 					Return(nil)
 
-				metadatav2Store.EXPECT().
-					UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
+				metadataStore.EXPECT().
+					UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
 						GroupID:             revision.GroupID,
 						NewOnlineRevisionID: int32Ptr(revision.ID),
 					}).
 					Return(nil)
 
-				metadatav2Store.EXPECT().
+				metadataStore.EXPECT().
 					UpdateRevision(gomock.Any(), gomock.Any()).
 					Return(nil)
 			},
@@ -141,7 +141,7 @@ func TestSync(t *testing.T) {
 					},
 					DataTable: "data-table-name",
 				}
-				metadatav2Store.EXPECT().
+				metadataStore.EXPECT().
 					GetRevision(ctx, int32(1)).
 					Return(revision, nil)
 
@@ -157,8 +157,8 @@ func TestSync(t *testing.T) {
 					},
 				}
 
-				metadatav2Store.EXPECT().
-					ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &revision.Group.ID}).
+				metadataStore.EXPECT().
+					ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).
 					Return(features)
 
 				stream := make(chan *types.RawFeatureValueRecord)
@@ -181,8 +181,8 @@ func TestSync(t *testing.T) {
 					}).
 					Return(nil)
 
-				metadatav2Store.EXPECT().
-					UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
+				metadataStore.EXPECT().
+					UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
 						GroupID:             revision.GroupID,
 						NewOnlineRevisionID: int32Ptr(revision.ID),
 					}).

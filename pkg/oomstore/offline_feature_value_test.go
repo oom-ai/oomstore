@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
-	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -19,8 +19,8 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	offlineStore := mock_offline.NewMockStore(ctrl)
-	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(nil, offlineStore, metadatav2Store)
+	metadataStore := mock_metadata.NewMockStore(ctrl)
+	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
 
 	streamFeatures := prepareFeatures(true, false)
 	inconsistentFeatures := prepareFeatures(false, true)
@@ -111,10 +111,10 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: &tc.opt.FeatureIDs}).Return(tc.features)
+			metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureIDs: &tc.opt.FeatureIDs}).Return(tc.features)
 			if tc.entity != nil {
 				for _, featureList := range tc.featureMap {
-					metadatav2Store.EXPECT().ListRevision(gomock.Any(), metadatav2.ListRevisionOpt{GroupID: &featureList[0].GroupID}).Return(revisions).AnyTimes()
+					metadataStore.EXPECT().ListRevision(gomock.Any(), metadata.ListRevisionOpt{GroupID: &featureList[0].GroupID}).Return(revisions).AnyTimes()
 				}
 				offlineStore.EXPECT().Join(gomock.Any(), gomock.Any()).Return(tc.joined, nil)
 			}

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/postgres"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -163,8 +163,8 @@ func prepareFeatures(oneGroup bool) (typesv2.FeatureList, map[string]typesv2.Fea
 	}
 }
 
-func prepareRevisionRanges(oneGroup bool) map[string][]*metadatav2.RevisionRange {
-	basic := []*metadatav2.RevisionRange{
+func prepareRevisionRanges(oneGroup bool) map[string][]*metadata.RevisionRange {
+	basic := []*metadata.RevisionRange{
 		{
 			MinRevision: 1,
 			MaxRevision: 15,
@@ -176,7 +176,7 @@ func prepareRevisionRanges(oneGroup bool) map[string][]*metadatav2.RevisionRange
 			DataTable:   "device_basic_15",
 		},
 	}
-	advanced := []*metadatav2.RevisionRange{
+	advanced := []*metadata.RevisionRange{
 		{
 			MinRevision: 5,
 			MaxRevision: math.MaxInt64,
@@ -184,11 +184,11 @@ func prepareRevisionRanges(oneGroup bool) map[string][]*metadatav2.RevisionRange
 		},
 	}
 	if oneGroup {
-		return map[string][]*metadatav2.RevisionRange{
+		return map[string][]*metadata.RevisionRange{
 			"device_basic": basic,
 		}
 	}
-	return map[string][]*metadatav2.RevisionRange{
+	return map[string][]*metadata.RevisionRange{
 		"device_basic":    basic,
 		"device_advanced": advanced,
 	}

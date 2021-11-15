@@ -4,29 +4,29 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 func (s *OomStore) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, error) {
-	return s.metadatav2.GetFeature(ctx, id)
+	return s.metadata.GetFeature(ctx, id)
 }
 
 func (s *OomStore) GetFeatureByName(ctx context.Context, name string) (*typesv2.Feature, error) {
-	return s.metadatav2.GetFeatureByName(ctx, name)
+	return s.metadata.GetFeatureByName(ctx, name)
 }
 
-func (s *OomStore) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
-	return s.metadatav2.ListFeature(ctx, opt)
+func (s *OomStore) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) typesv2.FeatureList {
+	return s.metadata.ListFeature(ctx, opt)
 }
 
-func (s *OomStore) UpdateFeature(ctx context.Context, opt metadatav2.UpdateFeatureOpt) error {
-	return s.metadatav2.UpdateFeature(ctx, opt)
+func (s *OomStore) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
+	return s.metadata.UpdateFeature(ctx, opt)
 }
 
-func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadatav2.CreateFeatureOpt) (int16, error) {
-	group, err := s.metadatav2.GetFeatureGroup(ctx, opt.GroupID)
+func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int16, error) {
+	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
 		return 0, err
 	}
@@ -37,5 +37,5 @@ func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadatav2.Create
 	if opt.ValueType, err = s.offline.TypeTag(opt.DBValueType); err != nil {
 		return 0, err
 	}
-	return s.metadatav2.CreateFeature(ctx, opt)
+	return s.metadata.CreateFeature(ctx, opt)
 }

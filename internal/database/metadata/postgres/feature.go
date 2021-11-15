@@ -3,96 +3,49 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"math/rand"
-	"strings"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgerrcode"
+	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) error {
-	return nil
-	// if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
-	// 	return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
-	// }
-	// query := "INSERT INTO feature(name, group_name, db_value_type, value_type, description) VALUES ($1, $2, $3, $4, $5)"
-	// _, err := db.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.DBValueType, opt.ValueType, opt.Description)
-	// if err != nil {
-	// 	if e2, ok := err.(*pq.Error); ok {
-	// 		if e2.Code == pgerrcode.UniqueViolation {
-	// 			return fmt.Errorf("feature %s already exists", opt.FeatureName)
-	// 		}
-	// 	}
-	// }
-	// return err
-}
-
-func (db *DB) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
-	var feature types.Feature
-	query := `SELECT * FROM "rich_feature" WHERE name = $1`
-	if err := db.GetContext(ctx, &feature, query, featureName); err != nil {
-		return nil, err
+func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int16, error) {
+	if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
+		return 0, fmt.Errorf("err when validating value_type input, details: %s", err.Error())
 	}
-	return &feature, nil
-}
-
-func (db *DB) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
-	features := types.FeatureList{}
-	query := `SELECT * FROM "rich_feature"`
-	cond, args, err := buildListFeatureCond(opt)
+	var featureId int16
+	query := "INSERT INTO feature(name, group_id, db_value_type, value_type, description) VALUES ($1, $2, $3, $4, $5) RETURNING id"
+	err := db.GetContext(ctx, &featureId, query, opt.Name, opt.GroupID, opt.DBValueType, opt.ValueType, opt.Description)
 	if err != nil {
-		return nil, err
-	}
-	if len(cond) > 0 {
-		query = fmt.Sprintf("%s WHERE %s", query, strings.Join(cond, " AND "))
-	}
-	if err := db.SelectContext(ctx, &features, db.Rebind(query), args...); err != nil {
-		return nil, err
-	}
-	return features, nil
-}
-
-func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error) {
-	query := "UPDATE feature SET description = $1 WHERE name = $2"
-	if result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureName); err != nil {
-		return 0, err
-	} else {
-		return result.RowsAffected()
-	}
-}
-
-func buildListFeatureCond(opt types.ListFeatureOpt) ([]string, []interface{}, error) {
-	and := make(map[string]interface{})
-	in := make(map[string]interface{})
-	if opt.EntityName != nil {
-		and["entity_name"] = *opt.EntityName
-	}
-	if opt.GroupName != nil {
-		and["group_name"] = *opt.GroupName
-	}
-	if opt.FeatureNames != nil {
-		if len(opt.FeatureNames) == 0 {
-			return []string{"1 = 0"}, nil, nil
+		if e2, ok := err.(*pq.Error); ok {
+			if e2.Code == pgerrcode.UniqueViolation {
+				return 0, fmt.Errorf("feature %s already exists", opt.Name)
+			}
 		}
-		in["name"] = opt.FeatureNames
 	}
-	return dbutil.BuildConditions(and, in)
+	return featureId, err
+}
+
+func (db *DB) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
+	query := "UPDATE feature SET description = $1 WHERE id = $2"
+	result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureID)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected != 1 {
+		return fmt.Errorf("failed to update feature %d: feature not found", opt.FeatureID)
+	}
+	return nil
 }
 
 func (db *DB) validateDataType(ctx context.Context, dataType string) error {
-	tmpTableName := fmt.Sprintf("tmp_validate_data_type_%d", rand.Int())
-	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
-		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", tmpTableName)); err != nil {
-			return err
-		}
-		if _, err := tx.ExecContext(ctx, fmt.Sprintf("CREATE TABLE %s (a %s)", tmpTableName, dataType)); err != nil {
-			return err
-		}
-		if _, err := tx.ExecContext(ctx, fmt.Sprintf("DROP TABLE %s", tmpTableName)); err != nil {
-			return err
-		}
-		return nil
-	})
+	tmpTable := dbutil.TempTable("validate_data_type")
+	stmt := fmt.Sprintf("CREATE TEMPORARY TABLE %s (a %s) ON COMMIT DROP", tmpTable, dataType)
+	_, err := db.ExecContext(ctx, stmt)
+	return err
 }
