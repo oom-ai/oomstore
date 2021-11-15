@@ -8,21 +8,21 @@ import (
 )
 
 func (s *OomStore) GetEntity(ctx context.Context, id int16) (*typesv2.Entity, error) {
-	return s.metadatav2.GetEntity(ctx, id)
+	return s.metadata.GetEntity(ctx, id)
 }
 
 func (s *OomStore) GetEntityByName(ctx context.Context, name string) (*typesv2.Entity, error) {
-	return s.metadatav2.GetEntityByName(ctx, name)
+	return s.metadata.GetEntityByName(ctx, name)
 }
 
 func (s *OomStore) ListEntity(ctx context.Context) typesv2.EntityList {
-	return s.metadatav2.ListEntity(ctx)
+	return s.metadata.ListEntity(ctx)
 }
 
 func (s *OomStore) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int16, error) {
-	return s.metadatav2.CreateEntity(ctx, opt)
+	return s.metadata.CreateEntity(ctx, opt)
 }
 
 func (s *OomStore) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
-	return s.metadatav2.UpdateEntity(ctx, opt)
+	return s.metadata.UpdateEntity(ctx, opt)
 }

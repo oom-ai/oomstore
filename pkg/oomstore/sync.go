@@ -49,7 +49,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	}
 
 	// Update the online revision id of the feature group upon sync success
-	if err = s.metadatav2.UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
+	if err = s.metadata.UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
 		GroupID:             group.ID,
 		NewOnlineRevisionID: &revision.ID,
 	}); err != nil {
@@ -65,7 +65,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		newRevision := time.Now().Unix()
 		newChored := true
 		// update revision timestamp using current timestamp
-		if err = s.metadatav2.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
+		if err = s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
 			RevisionID:  revision.ID,
 			NewRevision: &newRevision,
 			NewAnchored: &newChored,

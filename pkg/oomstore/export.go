@@ -10,7 +10,7 @@ import (
 )
 
 func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeatureValuesOpt) ([]string, <-chan *types.RawFeatureValueRecord, error) {
-	group, err := s.metadatav2.GetFeatureGroup(ctx, opt.GroupID)
+	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
 		return nil, nil, err
 	}

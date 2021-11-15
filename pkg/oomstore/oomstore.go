@@ -13,16 +13,16 @@ import (
 )
 
 type OomStore struct {
-	online     online.Store
-	offline    offline.Store
-	metadatav2 metadata.Store
+	online   online.Store
+	offline  offline.Store
+	metadata metadata.Store
 }
 
-func NewOomStore(online online.Store, offline offline.Store, metadatav2 metadata.Store) *OomStore {
+func NewOomStore(online online.Store, offline offline.Store, metadata metadata.Store) *OomStore {
 	return &OomStore{
-		online:     online,
-		offline:    offline,
-		metadatav2: metadatav2,
+		online:   online,
+		offline:  offline,
+		metadata: metadata,
 	}
 }
 
@@ -35,15 +35,15 @@ func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	metadatav2Store, err := database.OpenMetadatav2Store(opt.MetadataStore)
+	metadataStore, err := database.OpenMetadataStore(opt.MetadataStore)
 	if err != nil {
 		return nil, err
 	}
 
 	return &OomStore{
-		online:     onlineStore,
-		offline:    offlineStore,
-		metadatav2: metadatav2Store,
+		online:   onlineStore,
+		offline:  offlineStore,
+		metadata: metadataStore,
 	}, nil
 }
 
@@ -57,7 +57,7 @@ func Create(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 func (s *OomStore) Close() error {
 	errs := []error{}
 
-	for _, closer := range []io.Closer{s.online, s.offline, s.metadatav2} {
+	for _, closer := range []io.Closer{s.online, s.offline, s.metadata} {
 		if err := closer.Close(); err != nil {
 			errs = append(errs, err)
 		}

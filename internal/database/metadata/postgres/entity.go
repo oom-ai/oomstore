@@ -6,10 +6,10 @@ import (
 
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
-	metadatav2 "github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
-func (db *DB) CreateEntity(ctx context.Context, opt metadatav2.CreateEntityOpt) (int16, error) {
+func (db *DB) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int16, error) {
 	var entityId int16
 	query := "insert into feature_entity(name, length, description) values($1, $2, $3) returning id"
 	err := db.GetContext(ctx, &entityId, query, opt.Name, opt.Length, opt.Description)
@@ -21,7 +21,7 @@ func (db *DB) CreateEntity(ctx context.Context, opt metadatav2.CreateEntityOpt) 
 	return entityId, err
 }
 
-func (db *DB) UpdateEntity(ctx context.Context, opt metadatav2.UpdateEntityOpt) error {
+func (db *DB) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
 	query := "UPDATE feature_entity SET description = $1 WHERE id = $2"
 	result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.EntityID)
 	if err != nil {

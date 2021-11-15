@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -19,9 +19,9 @@ func TestExportFeatureValues(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	offlineStore := mock_offline.NewMockStore(ctrl)
-	metadatav2Store := mock_metadatav2.NewMockStore(ctrl)
+	metadataStore := mock_metadata.NewMockStore(ctrl)
 
-	store := oomstore.NewOomStore(nil, offlineStore, metadatav2Store)
+	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
 
 	revisonID := int32(5)
 	features := typesv2.FeatureList{
@@ -75,7 +75,7 @@ func TestExportFeatureValues(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			// mock database methods
-			metadatav2Store.EXPECT().GetFeatureGroup(gomock.Any(), tc.opt.GroupID).
+			metadataStore.EXPECT().GetFeatureGroup(gomock.Any(), tc.opt.GroupID).
 				Return(&typesv2.FeatureGroup{
 					ID:       1,
 					Name:     "device_info",
@@ -83,11 +83,11 @@ func TestExportFeatureValues(t *testing.T) {
 					Entity:   &typesv2.Entity{Name: "device"},
 				}, nil)
 
-			metadatav2Store.EXPECT().
+			metadataStore.EXPECT().
 				ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: &tc.opt.GroupID}).
 				Return(features)
 
-			metadatav2Store.EXPECT().GetRevision(gomock.Any(), revisonID).
+			metadataStore.EXPECT().GetRevision(gomock.Any(), revisonID).
 				Return(&typesv2.Revision{
 					DataTable: "device_info_10",
 				}, nil)
