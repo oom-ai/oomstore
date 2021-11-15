@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 type PrepareStoreRuntimeFunc func() (context.Context, online.Store)
@@ -35,14 +34,14 @@ func init() {
 					ID:          1,
 					Name:        "age",
 					GroupID:     1,
-					ValueType:   typesv2.INT16,
+					ValueType:   types.INT16,
 					DBValueType: "smallint",
 				},
 				&types.Feature{
 					ID:          2,
 					Name:        "gender",
 					GroupID:     1,
-					ValueType:   typesv2.STRING,
+					ValueType:   types.STRING,
 					DBValueType: "varchar(1)",
 				},
 			},
@@ -63,7 +62,7 @@ func init() {
 				ID:          2,
 				Name:        "charge",
 				GroupID:     2,
-				ValueType:   typesv2.FLOAT64,
+				ValueType:   types.FLOAT64,
 				DBValueType: "float8",
 			},
 		}
