@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestExportFeatureValues(t *testing.T) {
@@ -43,7 +43,6 @@ func TestExportFeatureValues(t *testing.T) {
 		{
 			description: "no features",
 			opt: types.ExportFeatureValuesOpt{
-				GroupID:      1,
 				FeatureNames: []string{},
 				RevisionID:   revisonID,
 			},
@@ -53,7 +52,6 @@ func TestExportFeatureValues(t *testing.T) {
 		{
 			description: "provide one feature",
 			opt: types.ExportFeatureValuesOpt{
-				GroupID:      1,
 				FeatureNames: []string{"price"},
 				RevisionID:   revisonID,
 			},
@@ -63,7 +61,6 @@ func TestExportFeatureValues(t *testing.T) {
 		{
 			description: "provide revision",
 			opt: types.ExportFeatureValuesOpt{
-				GroupID:      1,
 				FeatureNames: []string{"price"},
 				RevisionID:   revisonID,
 			},
@@ -73,23 +70,24 @@ func TestExportFeatureValues(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			// mock database methods
-			metadataStore.EXPECT().GetFeatureGroup(gomock.Any(), tc.opt.GroupID).
-				Return(&types.FeatureGroup{
+			revision := types.Revision{
+				ID:        1,
+				GroupID:   1,
+				DataTable: "device_info_10",
+				Group: &types.FeatureGroup{
 					ID:       1,
-					Name:     "device_info",
 					EntityID: 1,
 					Entity:   &types.Entity{Name: "device"},
-				}, nil)
+				},
+			}
 
 			metadataStore.EXPECT().
-				ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: &tc.opt.GroupID}).
-				Return(features)
+				GetRevision(gomock.Any(), tc.opt.RevisionID).
+				Return(&revision, nil)
 
-			metadataStore.EXPECT().GetRevision(gomock.Any(), revisonID).
-				Return(&types.Revision{
-					DataTable: "device_info_10",
-				}, nil)
+			metadataStore.EXPECT().
+				ListFeature(gomock.Any(), gomock.Any()).
+				Return(features)
 
 			featureNames := tc.opt.FeatureNames
 			if len(featureNames) == 0 {
