@@ -9,8 +9,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
-	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -37,7 +37,7 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 			opt:         types.ImportBatchFeaturesOpt{GroupID: 1},
 			mockFunc: func() {
 				metadatav2Store.EXPECT().
-					ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{GroupID: int16Ptr(1)}).
+					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: int16Ptr(1)}).
 					Return(nil, fmt.Errorf("error"))
 			},
 			wantRevisionID: 0,
@@ -48,7 +48,7 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 			opt:         types.ImportBatchFeaturesOpt{GroupID: 1},
 			mockFunc: func() {
 				metadatav2Store.EXPECT().
-					ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{GroupID: int16Ptr(1)}).
+					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: int16Ptr(1)}).
 					Return(nil, nil)
 				metadatav2Store.EXPECT().
 					GetFeatureGroup(gomock.Any(), 1).
@@ -89,7 +89,7 @@ device,model,price
 			},
 			mockFunc: func() {
 				metadatav2Store.EXPECT().
-					ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{GroupID: int16Ptr(1)}).
+					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: int16Ptr(1)}).
 					Return(typesv2.FeatureList{
 						{
 							Name: "model",
@@ -250,12 +250,12 @@ device,model,price
 
 			metadatav2Store.
 				EXPECT().
-				ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{
+				ListFeature(gomock.Any(), metadata.ListFeatureOpt{
 					GroupID: &tc.opt.GroupID,
 				}).
 				Return(tc.features, nil)
 
-			metadatav2Store.EXPECT().CreateRevision(gomock.Any(), metadatav2.CreateRevisionOpt{
+			metadatav2Store.EXPECT().CreateRevision(gomock.Any(), metadata.CreateRevisionOpt{
 				Revision:    int64(1),
 				GroupID:     tc.opt.GroupID,
 				DataTable:   stringPtr("datatable"),
@@ -281,14 +281,14 @@ func TestCreateBatchFeature(t *testing.T) {
 
 	testCases := []struct {
 		description string
-		opt         metadatav2.CreateFeatureOpt
+		opt         metadata.CreateFeatureOpt
 		valueType   string
 		group       typesv2.FeatureGroup
 		expectError bool
 	}{
 		{
 			description: "create batch feature, succeed",
-			opt: metadatav2.CreateFeatureOpt{
+			opt: metadata.CreateFeatureOpt{
 				Name:        "model",
 				GroupID:     1,
 				DBValueType: "VARCHAR(32)",
@@ -302,7 +302,7 @@ func TestCreateBatchFeature(t *testing.T) {
 		},
 		{
 			description: "create stream feature, fail",
-			opt: metadatav2.CreateFeatureOpt{
+			opt: metadata.CreateFeatureOpt{
 				Name:        "model",
 				GroupID:     1,
 				DBValueType: "BIGINT",

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
@@ -17,15 +17,15 @@ func (s *OomStore) GetFeatureByName(ctx context.Context, name string) (*typesv2.
 	return s.metadatav2.GetFeatureByName(ctx, name)
 }
 
-func (s *OomStore) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
+func (s *OomStore) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) typesv2.FeatureList {
 	return s.metadatav2.ListFeature(ctx, opt)
 }
 
-func (s *OomStore) UpdateFeature(ctx context.Context, opt metadatav2.UpdateFeatureOpt) error {
+func (s *OomStore) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
 	return s.metadatav2.UpdateFeature(ctx, opt)
 }
 
-func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadatav2.CreateFeatureOpt) (int16, error) {
+func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int16, error) {
 	group, err := s.metadatav2.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
 		return 0, err

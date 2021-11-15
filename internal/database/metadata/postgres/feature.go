@@ -7,10 +7,10 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
-func (db *DB) CreateFeature(ctx context.Context, opt metadatav2.CreateFeatureOpt) (int16, error) {
+func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int16, error) {
 	if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
 		return 0, fmt.Errorf("err when validating value_type input, details: %s", err.Error())
 	}
@@ -27,7 +27,7 @@ func (db *DB) CreateFeature(ctx context.Context, opt metadatav2.CreateFeatureOpt
 	return featureId, err
 }
 
-func (db *DB) UpdateFeature(ctx context.Context, opt metadatav2.UpdateFeatureOpt) error {
+func (db *DB) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
 	query := "UPDATE feature SET description = $1 WHERE id = $2"
 	result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.FeatureID)
 	if err != nil {

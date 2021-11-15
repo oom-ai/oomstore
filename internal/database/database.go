@@ -8,8 +8,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	metadataPG "github.com/oom-ai/oomstore/internal/database/metadata/postgres"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
-	metadatav2PG "github.com/oom-ai/oomstore/internal/database/metadatav2/postgres"
+	metadatav2PG "github.com/oom-ai/oomstore/internal/database/metadata/postgres"
 
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	offlinePG "github.com/oom-ai/oomstore/internal/database/offline/postgres"
@@ -39,7 +38,7 @@ func OpenMetadataStore(opt types.MetadataStoreConfig) (metadata.Store, error) {
 	}
 }
 
-func OpenMetadatav2Store(opt types.MetadataStoreConfig) (metadatav2.Store, error) {
+func OpenMetadatav2Store(opt types.MetadataStoreConfig) (metadata.Store, error) {
 	switch opt.Backend {
 	case types.POSTGRES:
 		return metadatav2PG.Open(context.Background(), opt.Postgres)

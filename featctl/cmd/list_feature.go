@@ -10,13 +10,13 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/spf13/cobra"
 )
 
 type listFeatureOption struct {
-	metadatav2.ListFeatureOpt
+	metadata.ListFeatureOpt
 	entityName *string
 	groupName  *string
 }

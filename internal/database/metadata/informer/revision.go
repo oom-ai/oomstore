@@ -1,7 +1,7 @@
 package informer
 
 import (
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
@@ -17,7 +17,7 @@ func (c *RevisionCache) Enrich(groupCache *GroupCache) {
 	}
 }
 
-func (c *RevisionCache) List(opt metadatav2.ListRevisionOpt) typesv2.RevisionList {
+func (c *RevisionCache) List(opt metadata.ListRevisionOpt) typesv2.RevisionList {
 	var revisions typesv2.RevisionList
 	if opt.DataTables != nil {
 		for _, table := range opt.DataTables {

@@ -8,11 +8,11 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadatav2.CreateFeatureGroupOpt) (int16, error) {
+func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int16, error) {
 	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
 		return 0, fmt.Errorf("illegal category '%s', should be either 'stream' or 'batch'", opt.Category)
 	}
@@ -29,7 +29,7 @@ func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadatav2.CreateFeatu
 	return featureGroupId, err
 }
 
-func (db *DB) UpdateFeatureGroup(ctx context.Context, opt metadatav2.UpdateFeatureGroupOpt) error {
+func (db *DB) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
 	and := make(map[string]interface{})
 	if opt.NewDescription != nil {
 		and["description"] = *opt.NewDescription

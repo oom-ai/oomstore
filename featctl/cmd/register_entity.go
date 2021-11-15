@@ -4,11 +4,11 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/spf13/cobra"
 )
 
-var registerEntityOpt metadatav2.CreateEntityOpt
+var registerEntityOpt metadata.CreateEntityOpt
 
 var registerEntityCmd = &cobra.Command{
 	Use:   "entity",

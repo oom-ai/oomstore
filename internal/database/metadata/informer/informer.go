@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
@@ -178,7 +178,7 @@ func (f *Informer) ListEntity(ctx context.Context) typesv2.EntityList {
 	return f.Cache().Entities.List().Copy()
 }
 
-func (f *Informer) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
+func (f *Informer) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) typesv2.FeatureList {
 	return f.Cache().Features.List(opt).Copy()
 }
 
@@ -186,6 +186,6 @@ func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int16) typesv
 	return f.Cache().Groups.List(entityID).Copy()
 }
 
-func (f *Informer) ListRevision(ctx context.Context, opt metadatav2.ListRevisionOpt) typesv2.RevisionList {
+func (f *Informer) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) typesv2.RevisionList {
 	return f.Cache().Revisions.List(opt).Copy()
 }

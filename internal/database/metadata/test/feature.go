@@ -7,19 +7,19 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadatav2.Store) (int16, int16) {
-	entityID, err := store.CreateEntity(ctx, metadatav2.CreateEntityOpt{
+func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Store) (int16, int16) {
+	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
 		Description: "description",
 	})
 	require.NoError(t, err)
 
-	groupID, err := store.CreateFeatureGroup(ctx, metadatav2.CreateFeatureGroupOpt{
+	groupID, err := store.CreateFeatureGroup(ctx, metadata.CreateFeatureGroupOpt{
 		Name:        "device_info",
 		EntityID:    entityID,
 		Description: "description",
@@ -35,7 +35,7 @@ func TestCreateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
-	opt := metadatav2.CreateFeatureOpt{
+	opt := metadata.CreateFeatureOpt{
 		Name:        "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
@@ -52,7 +52,7 @@ func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreRuntim
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
-	opt := metadatav2.CreateFeatureOpt{
+	opt := metadata.CreateFeatureOpt{
 		Name:        "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
@@ -70,7 +70,7 @@ func TestCreateFeatureWithSQLKeywrod(t *testing.T, prepareStore PrepareStoreRunt
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
-	opt := metadatav2.CreateFeatureOpt{
+	opt := metadata.CreateFeatureOpt{
 		Name:        "user",
 		GroupID:     groupID,
 		DBValueType: "int",
@@ -86,7 +86,7 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStor
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
-	_, err := store.CreateFeature(ctx, metadatav2.CreateFeatureOpt{
+	_, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		Name:        "model",
 		GroupID:     groupID,
 		DBValueType: "invalid_type",
@@ -99,7 +99,7 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
-	id, err := store.CreateFeature(ctx, metadatav2.CreateFeatureOpt{
+	id, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		Name:        "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
@@ -126,10 +126,10 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
 
-	features := store.ListFeature(ctx, metadatav2.ListFeatureOpt{})
+	features := store.ListFeature(ctx, metadata.ListFeatureOpt{})
 	require.Equal(t, 0, features.Len())
 
-	featureID, err := store.CreateFeature(ctx, metadatav2.CreateFeatureOpt{
+	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		Name:        "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
@@ -140,27 +140,27 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	features = store.ListFeature(ctx, metadatav2.ListFeatureOpt{})
+	features = store.ListFeature(ctx, metadata.ListFeatureOpt{})
 	require.Equal(t, 1, features.Len())
 
-	features = store.ListFeature(ctx, metadatav2.ListFeatureOpt{
+	features = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureIDs: &[]int16{featureID},
 	})
 	require.Equal(t, 1, features.Len())
 
-	features = store.ListFeature(ctx, metadatav2.ListFeatureOpt{
+	features = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   int16Ptr(entityID + 1),
 		FeatureIDs: &[]int16{featureID},
 	})
 	require.Equal(t, 0, features.Len())
 
-	features = store.ListFeature(ctx, metadatav2.ListFeatureOpt{
+	features = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   &entityID,
 		FeatureIDs: &[]int16{},
 	})
 	require.Equal(t, 0, len(features))
 
-	features = store.ListFeature(ctx, metadatav2.ListFeatureOpt{
+	features = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID: &entityID,
 	})
 	require.Equal(t, 1, len(features))
@@ -171,7 +171,7 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
-	opt := metadatav2.CreateFeatureOpt{
+	opt := metadata.CreateFeatureOpt{
 		Name:        "phone",
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
@@ -181,11 +181,11 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	id, err := store.CreateFeature(ctx, opt)
 	require.NoError(t, err)
 
-	require.Error(t, store.UpdateFeature(ctx, metadatav2.UpdateFeatureOpt{
+	require.Error(t, store.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
 		FeatureID: id + 1,
 	}))
 
-	err = store.UpdateFeature(ctx, metadatav2.UpdateFeatureOpt{
+	err = store.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
 		FeatureID:      id,
 		NewDescription: "new description",
 	})

@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2/postgres"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2/test"
+	metadatav2 "github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/postgres"
+	"github.com/oom-ai/oomstore/internal/database/metadata/test"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/require"
 )
