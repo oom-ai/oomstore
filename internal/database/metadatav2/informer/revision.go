@@ -33,7 +33,7 @@ func (c *RevisionCache) List(opt metadatav2.ListRevisionOpt) typesv2.RevisionLis
 
 	if opt.GroupID != nil {
 		revisions = revisions.Filter(func(r *typesv2.Revision) bool {
-			return r.Group.ID == *opt.GroupID
+			return r.GroupID == *opt.GroupID
 		})
 	}
 	return revisions
@@ -41,6 +41,6 @@ func (c *RevisionCache) List(opt metadatav2.ListRevisionOpt) typesv2.RevisionLis
 
 func (c *RevisionCache) GetGroup(groupID int16) typesv2.RevisionList {
 	return c.Filter(func(r *typesv2.Revision) bool {
-		return r.Group.ID == groupID
+		return r.GroupID == groupID
 	})
 }

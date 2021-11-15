@@ -18,8 +18,22 @@ type FeatureGroup struct {
 	EntityID         int16  `db:"entity_id"`
 	OnlineRevisionID *int32 `db:"online_revision_id"`
 
-	Entity         *Entity
-	OnlineRevision *Revision
+	Entity *Entity
+}
+
+func (fg *FeatureGroup) Copy() *FeatureGroup {
+	if fg == nil {
+		return nil
+	}
+	copied := *fg
+
+	if copied.OnlineRevisionID != nil {
+		id := *copied.OnlineRevisionID
+		copied.OnlineRevisionID = &id
+	}
+	copied.Entity = copied.Entity.Copy()
+
+	return &copied
 }
 
 type FeatureGroupList []*FeatureGroup
@@ -43,17 +57,17 @@ func (l *FeatureGroupList) Filter(filter func(*FeatureGroup) bool) (rs FeatureGr
 }
 
 func (fg *FeatureGroup) String() string {
-	onlineRevision := "<NULL>"
+	onlineRevisionID := "<NULL>"
 
-	if fg.OnlineRevision != nil {
-		onlineRevision = fmt.Sprint(*fg.OnlineRevision)
+	if fg.OnlineRevisionID != nil {
+		onlineRevisionID = fmt.Sprint(*fg.OnlineRevisionID)
 	}
 	return strings.Join([]string{
-		fmt.Sprintf("Name:            %s", fg.Name),
-		fmt.Sprintf("Entity:          %s", fg.Entity.Name),
-		fmt.Sprintf("Description:     %s", fg.Description),
-		fmt.Sprintf("Online Revision: %s", onlineRevision),
-		fmt.Sprintf("CreateTime:      %s", fg.CreateTime.Format(time.RFC3339)),
-		fmt.Sprintf("ModifyTime:      %s", fg.ModifyTime.Format(time.RFC3339)),
+		fmt.Sprintf("Name:             %s", fg.Name),
+		fmt.Sprintf("Entity:           %s", fg.Entity.Name),
+		fmt.Sprintf("Description:      %s", fg.Description),
+		fmt.Sprintf("OnlineRevisionID: %s", onlineRevisionID),
+		fmt.Sprintf("CreateTime:       %s", fg.CreateTime.Format(time.RFC3339)),
+		fmt.Sprintf("ModifyTime:       %s", fg.ModifyTime.Format(time.RFC3339)),
 	}, "\n")
 }

@@ -56,7 +56,7 @@ func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	features := s.metadatav2.ListFeature(ctx, metadatav2.ListFeatureOpt{FeatureIDs: &opt.FeatureIDs})
 
 	features = features.Filter(func(f *typesv2.Feature) bool {
-		return f.Group.OnlineRevisionID != nil
+		return f.OnlineRevisionID() != nil
 	})
 	if len(features) == 0 {
 		return nil, nil
@@ -113,10 +113,11 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 func groupFeaturesByRevisionId(features typesv2.FeatureList) map[int32]typesv2.FeatureList {
 	featureMap := make(map[int32]typesv2.FeatureList)
 	for _, f := range features {
-		if f.Group.OnlineRevisionID == nil {
+		id := f.OnlineRevisionID()
+		if id == nil {
 			continue
 		}
-		featureMap[*f.Group.OnlineRevisionID] = append(featureMap[*f.Group.OnlineRevisionID], f)
+		featureMap[*id] = append(featureMap[*id], f)
 	}
 	return featureMap
 }

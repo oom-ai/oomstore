@@ -16,6 +16,14 @@ type Entity struct {
 	ModifyTime  time.Time `db:"modify_time"`
 }
 
+func (e *Entity) Copy() *Entity {
+	if e == nil {
+		return nil
+	}
+	copied := *e
+	return &copied
+}
+
 type EntityList []*Entity
 
 func (l *EntityList) Find(find func(*Entity) bool) *Entity {

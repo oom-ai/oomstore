@@ -99,14 +99,14 @@ func printFeatureGroupsInASCIITable(groups typesv2.FeatureGroupList) error {
 }
 
 func groupHeader() []string {
-	return []string{"GroupName", "GroupID", "EntityName", "Description", "OnlineRevision", "CreateTime", "ModifyTime"}
+	return []string{"GroupName", "GroupID", "EntityName", "Description", "OnlineRevisionID", "CreateTime", "ModifyTime"}
 }
 
 func groupRecord(g *typesv2.FeatureGroup) []string {
-	onlineRevision := "<NULL>"
-	if g.OnlineRevision != nil {
-		onlineRevision = fmt.Sprint(*g.OnlineRevision)
+	onlineRevisionID := "<NULL>"
+	if g.OnlineRevisionID != nil {
+		onlineRevisionID = fmt.Sprint(*g.OnlineRevisionID)
 	}
-	return []string{g.Name, serializeInt16(g.ID), g.Entity.Name, g.Description, onlineRevision,
+	return []string{g.Name, serializeInt16(g.ID), g.Entity.Name, g.Description, onlineRevisionID,
 		g.CreateTime.Format(time.RFC3339), g.ModifyTime.Format(time.RFC3339)}
 }
