@@ -202,22 +202,6 @@ func TestSync(t *testing.T) {
 	}
 }
 
-func prepareRevision(id int32, revision int64) types.Revision {
-	return types.Revision{
-		ID:        id,
-		Revision:  revision,
-		GroupID:   1,
-		DataTable: fmt.Sprintf("device_info_%d", revision),
-	}
-}
-func prepareGroup(revisionId *int32) types.FeatureGroup {
-	return types.FeatureGroup{
-		Name:             "device_info",
-		OnlineRevisionID: revisionId,
-		EntityID:         1,
-	}
-}
-
 func int16Ptr(i int16) *int16 {
 	return &i
 }
@@ -228,8 +212,4 @@ func int32Ptr(i int32) *int32 {
 
 func stringPtr(s string) *string {
 	return &s
-}
-
-func boolPtr(b bool) *bool {
-	return &b
 }
