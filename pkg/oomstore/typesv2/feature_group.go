@@ -38,6 +38,17 @@ func (fg *FeatureGroup) Copy() *FeatureGroup {
 
 type FeatureGroupList []*FeatureGroup
 
+func (l FeatureGroupList) Copy() FeatureGroupList {
+	if len(l) == 0 {
+		return nil
+	}
+	copied := make(FeatureGroupList, 0, len(l))
+	for _, x := range l {
+		copied = append(copied, x.Copy())
+	}
+	return copied
+}
+
 func (l *FeatureGroupList) Find(find func(*FeatureGroup) bool) *FeatureGroup {
 	for _, g := range *l {
 		if find(g) {

@@ -42,6 +42,17 @@ func (f *Feature) OnlineRevisionID() *int32 {
 
 type FeatureList []*Feature
 
+func (l FeatureList) Copy() FeatureList {
+	if len(l) == 0 {
+		return nil
+	}
+	copied := make(FeatureList, 0, len(l))
+	for _, x := range l {
+		copied = append(copied, x.Copy())
+	}
+	return copied
+}
+
 func (l *FeatureList) Len() int { return len(*l) }
 
 func (l *FeatureList) Names() (names []string) {

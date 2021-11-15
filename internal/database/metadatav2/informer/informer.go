@@ -175,49 +175,17 @@ func (f *Informer) GetRevisionBy(ctx context.Context, groupID int16, revision in
 
 // List
 func (f *Informer) ListEntity(ctx context.Context) typesv2.EntityList {
-	list := f.Cache().Entities.List()
-	if len(list) == 0 {
-		return nil
-	}
-	copied := make(typesv2.EntityList, 0, len(list))
-	for _, x := range list {
-		copied = append(copied, x.Copy())
-	}
-	return copied
+	return f.Cache().Entities.List().Copy()
 }
 
 func (f *Informer) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
-	list := f.Cache().Features.List(opt)
-	if len(list) == 0 {
-		return nil
-	}
-	copied := make(typesv2.FeatureList, 0, len(list))
-	for _, x := range list {
-		copied = append(copied, x.Copy())
-	}
-	return copied
+	return f.Cache().Features.List(opt).Copy()
 }
 
 func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int16) typesv2.FeatureGroupList {
-	list := f.Cache().Groups.List(entityID)
-	if len(list) == 0 {
-		return nil
-	}
-	copied := make(typesv2.FeatureGroupList, 0, len(list))
-	for _, x := range list {
-		copied = append(copied, x.Copy())
-	}
-	return copied
+	return f.Cache().Groups.List(entityID).Copy()
 }
 
 func (f *Informer) ListRevision(ctx context.Context, opt metadatav2.ListRevisionOpt) typesv2.RevisionList {
-	list := f.Cache().Revisions.List(opt)
-	if len(list) == 0 {
-		return nil
-	}
-	copied := make(typesv2.RevisionList, 0, len(list))
-	for _, x := range list {
-		copied = append(copied, x.Copy())
-	}
-	return copied
+	return f.Cache().Revisions.List(opt).Copy()
 }
