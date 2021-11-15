@@ -11,7 +11,6 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,11 +25,11 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 	inconsistentFeatures := prepareFeatures(false, true)
 	consistentFeatures := prepareFeatures(true, true)
 
-	entity := typesv2.Entity{
+	entity := types.Entity{
 		Name:   "device",
 		Length: 10,
 	}
-	revisions := typesv2.RevisionList{
+	revisions := types.RevisionList{
 		{
 			Revision:  1,
 			DataTable: "device_basic_1",
@@ -48,9 +47,9 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 	testCases := []struct {
 		description   string
 		opt           types.GetHistoricalFeatureValuesOpt
-		features      typesv2.FeatureList
-		entity        *typesv2.Entity
-		featureMap    map[string]typesv2.FeatureList
+		features      types.FeatureList
+		entity        *types.Entity
+		featureMap    map[string]types.FeatureList
 		joined        *types.JoinResult
 		expectedError error
 		expected      *types.JoinResult
@@ -83,7 +82,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 			},
 			entity:   &entity,
 			features: consistentFeatures,
-			featureMap: map[string]typesv2.FeatureList{
+			featureMap: map[string]types.FeatureList{
 				"device_basic":    {consistentFeatures[0]},
 				"device_advanced": {consistentFeatures[1]},
 			},
@@ -99,7 +98,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 			},
 			entity:   &entity,
 			features: consistentFeatures,
-			featureMap: map[string]typesv2.FeatureList{
+			featureMap: map[string]types.FeatureList{
 				"device_basic":    {consistentFeatures[0]},
 				"device_advanced": {consistentFeatures[1]},
 			},

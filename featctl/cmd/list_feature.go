@@ -11,7 +11,7 @@ import (
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -72,7 +72,7 @@ func init() {
 	listFeatureOpt.groupName = flags.StringP("group", "g", "", "feature group")
 }
 
-func printFeatures(features typesv2.FeatureList, output string) error {
+func printFeatures(features types.FeatureList, output string) error {
 	switch output {
 	case CSV:
 		return printFeaturesInCSV(features)
@@ -83,7 +83,7 @@ func printFeatures(features typesv2.FeatureList, output string) error {
 	}
 }
 
-func printFeaturesInCSV(features typesv2.FeatureList) error {
+func printFeaturesInCSV(features types.FeatureList) error {
 	w := csv.NewWriter(os.Stdout)
 	if err := w.Write(featureHeader()); err != nil {
 		return err
@@ -98,7 +98,7 @@ func printFeaturesInCSV(features typesv2.FeatureList) error {
 	return nil
 }
 
-func printFeaturesInASCIITable(features typesv2.FeatureList) error {
+func printFeaturesInASCIITable(features types.FeatureList) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(featureHeader())
 	table.SetAutoFormatHeaders(false)
@@ -114,7 +114,7 @@ func featureHeader() []string {
 	return []string{"Name", "Group", "Entity", "Category", "DBValueType", "ValueType", "Description", "OnlineRevisionID", "CreateTime", "ModifyTime"}
 }
 
-func featureRecord(f *typesv2.Feature) []string {
+func featureRecord(f *types.Feature) []string {
 	onlineRevisionID := "<NULL>"
 
 	if f.OnlineRevisionID() != nil {

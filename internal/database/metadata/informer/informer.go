@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 type Cache struct {
@@ -19,10 +19,10 @@ type Cache struct {
 }
 
 func NewCache(
-	entities typesv2.EntityList,
-	features typesv2.FeatureList,
-	groups typesv2.FeatureGroupList,
-	revisions typesv2.RevisionList) *Cache {
+	entities types.EntityList,
+	features types.FeatureList,
+	groups types.FeatureGroupList,
+	revisions types.RevisionList) *Cache {
 	return &Cache{
 		Entities:  &EntityCache{entities},
 		Features:  &FeatureCache{features},
@@ -93,8 +93,8 @@ func (f *Informer) Cache() *Cache {
 }
 
 // Get
-func (f *Informer) GetEntity(ctx context.Context, id int16) (*typesv2.Entity, error) {
-	if entity := f.Cache().Entities.Find(func(e *typesv2.Entity) bool {
+func (f *Informer) GetEntity(ctx context.Context, id int16) (*types.Entity, error) {
+	if entity := f.Cache().Entities.Find(func(e *types.Entity) bool {
 		return e.ID == id
 	}); entity == nil {
 		return nil, fmt.Errorf("feature entity %d not found", id)
@@ -103,8 +103,8 @@ func (f *Informer) GetEntity(ctx context.Context, id int16) (*typesv2.Entity, er
 	}
 }
 
-func (f *Informer) GetEntityByName(ctx context.Context, name string) (*typesv2.Entity, error) {
-	if entity := f.Cache().Entities.Find(func(e *typesv2.Entity) bool {
+func (f *Informer) GetEntityByName(ctx context.Context, name string) (*types.Entity, error) {
+	if entity := f.Cache().Entities.Find(func(e *types.Entity) bool {
 		return e.Name == name
 	}); entity == nil {
 		return nil, fmt.Errorf("feature entity '%s' not found", name)
@@ -113,8 +113,8 @@ func (f *Informer) GetEntityByName(ctx context.Context, name string) (*typesv2.E
 	}
 }
 
-func (f *Informer) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, error) {
-	if feature := f.Cache().Features.Find(func(f *typesv2.Feature) bool {
+func (f *Informer) GetFeature(ctx context.Context, id int16) (*types.Feature, error) {
+	if feature := f.Cache().Features.Find(func(f *types.Feature) bool {
 		return f.ID == id
 	}); feature == nil {
 		return nil, fmt.Errorf("feature %d not found", id)
@@ -123,8 +123,8 @@ func (f *Informer) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, 
 	}
 }
 
-func (f *Informer) GetFeatureByName(ctx context.Context, name string) (*typesv2.Feature, error) {
-	if feature := f.Cache().Features.Find(func(f *typesv2.Feature) bool {
+func (f *Informer) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
+	if feature := f.Cache().Features.Find(func(f *types.Feature) bool {
 		return f.Name == name
 	}); feature == nil {
 		return nil, fmt.Errorf("feature '%s' not found", name)
@@ -133,8 +133,8 @@ func (f *Informer) GetFeatureByName(ctx context.Context, name string) (*typesv2.
 	}
 }
 
-func (f *Informer) GetFeatureGroup(ctx context.Context, id int16) (*typesv2.FeatureGroup, error) {
-	if featureGroup := f.Cache().Groups.Find(func(g *typesv2.FeatureGroup) bool {
+func (f *Informer) GetFeatureGroup(ctx context.Context, id int16) (*types.FeatureGroup, error) {
+	if featureGroup := f.Cache().Groups.Find(func(g *types.FeatureGroup) bool {
 		return g.ID == id
 	}); featureGroup == nil {
 		return nil, fmt.Errorf("feature group %d not found", id)
@@ -143,8 +143,8 @@ func (f *Informer) GetFeatureGroup(ctx context.Context, id int16) (*typesv2.Feat
 	}
 }
 
-func (f *Informer) GetFeatureGroupByName(ctx context.Context, name string) (*typesv2.FeatureGroup, error) {
-	if featureGroup := f.Cache().Groups.Find(func(g *typesv2.FeatureGroup) bool {
+func (f *Informer) GetFeatureGroupByName(ctx context.Context, name string) (*types.FeatureGroup, error) {
+	if featureGroup := f.Cache().Groups.Find(func(g *types.FeatureGroup) bool {
 		return g.Name == name
 	}); featureGroup == nil {
 		return nil, fmt.Errorf("feature group '%s' not found", name)
@@ -153,8 +153,8 @@ func (f *Informer) GetFeatureGroupByName(ctx context.Context, name string) (*typ
 	}
 }
 
-func (f *Informer) GetRevision(ctx context.Context, id int32) (*typesv2.Revision, error) {
-	if revision := f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
+func (f *Informer) GetRevision(ctx context.Context, id int32) (*types.Revision, error) {
+	if revision := f.Cache().Revisions.Find(func(r *types.Revision) bool {
 		return r.ID == id
 	}); revision == nil {
 		return nil, fmt.Errorf("revision not found")
@@ -163,8 +163,8 @@ func (f *Informer) GetRevision(ctx context.Context, id int32) (*typesv2.Revision
 	}
 }
 
-func (f *Informer) GetRevisionBy(ctx context.Context, groupID int16, revision int64) (*typesv2.Revision, error) {
-	if revision := f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
+func (f *Informer) GetRevisionBy(ctx context.Context, groupID int16, revision int64) (*types.Revision, error) {
+	if revision := f.Cache().Revisions.Find(func(r *types.Revision) bool {
 		return r.GroupID == groupID && r.Revision == revision
 	}); revision == nil {
 		return nil, fmt.Errorf("revision not found")
@@ -174,18 +174,18 @@ func (f *Informer) GetRevisionBy(ctx context.Context, groupID int16, revision in
 }
 
 // List
-func (f *Informer) ListEntity(ctx context.Context) typesv2.EntityList {
+func (f *Informer) ListEntity(ctx context.Context) types.EntityList {
 	return f.Cache().Entities.List().Copy()
 }
 
-func (f *Informer) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) typesv2.FeatureList {
+func (f *Informer) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
 	return f.Cache().Features.List(opt).Copy()
 }
 
-func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int16) typesv2.FeatureGroupList {
+func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int16) types.FeatureGroupList {
 	return f.Cache().Groups.List(entityID).Copy()
 }
 
-func (f *Informer) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) typesv2.RevisionList {
+func (f *Informer) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) types.RevisionList {
 	return f.Cache().Revisions.List(opt).Copy()
 }

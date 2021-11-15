@@ -6,25 +6,25 @@ import (
 	"time"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/require"
 )
 
 func sampleCache() *informer.Cache {
-	entity := typesv2.Entity{
+	entity := types.Entity{
 		ID:     1,
 		Length: 10,
 		Name:   "entity",
 	}
-	group := typesv2.FeatureGroup{
+	group := types.FeatureGroup{
 		ID:       100,
 		Name:     "group",
 		Category: "batch",
 		EntityID: entity.ID,
 		Entity:   &entity,
 	}
-	entities := typesv2.EntityList{&entity}
-	groups := typesv2.FeatureGroupList{&group}
+	entities := types.EntityList{&entity}
+	groups := types.FeatureGroupList{&group}
 	return informer.NewCache(entities, nil, groups, nil)
 }
 
