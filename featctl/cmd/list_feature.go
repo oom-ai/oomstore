@@ -111,15 +111,15 @@ func printFeaturesInASCIITable(features typesv2.FeatureList) error {
 }
 
 func featureHeader() []string {
-	return []string{"Name", "Group", "Entity", "Category", "DBValueType", "ValueType", "Description", "OnlineRevision", "CreateTime", "ModifyTime"}
+	return []string{"Name", "Group", "Entity", "Category", "DBValueType", "ValueType", "Description", "OnlineRevisionID", "CreateTime", "ModifyTime"}
 }
 
 func featureRecord(f *typesv2.Feature) []string {
-	onlineRevision := "<NULL>"
+	onlineRevisionID := "<NULL>"
 
-	if f.Group.OnlineRevision != nil {
-		onlineRevision = strconv.FormatInt(f.OnlineRevision().Revision, 10)
+	if f.OnlineRevisionID() != nil {
+		onlineRevisionID = strconv.FormatInt(int64(*f.OnlineRevisionID()), 10)
 	}
 
-	return []string{f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.DBValueType, f.ValueType, f.Description, onlineRevision, f.CreateTime.Format(time.RFC3339), f.ModifyTime.Format(time.RFC3339)}
+	return []string{f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.DBValueType, f.ValueType, f.Description, onlineRevisionID, f.CreateTime.Format(time.RFC3339), f.ModifyTime.Format(time.RFC3339)}
 }

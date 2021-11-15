@@ -19,19 +19,13 @@ type Revision struct {
 }
 
 func (r *Revision) Copy() *Revision {
-	return r.copyWith(nil)
-}
-
-func (r *Revision) copyWith(group *FeatureGroup) *Revision {
 	if r == nil {
 		return nil
 	}
-
 	copied := *r
-	if group != nil {
-		copied.Group = group
-	} else if copied.Group != nil {
-		copied.Group = r.Group.copyWith(&copied)
+
+	if copied.Group != nil {
+		copied.Group = copied.Group.Copy()
 	}
 	return &copied
 }
