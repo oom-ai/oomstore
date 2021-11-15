@@ -33,12 +33,23 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 		wantError      error
 	}{
 		{
-			description: "GetFeatureGroup failed",
+			description: "ListFeature failed",
 			opt:         types.ImportBatchFeaturesOpt{GroupID: 1},
 			mockFunc: func() {
 				metadataStore.EXPECT().
 					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: int16Ptr(1)}).
 					Return(nil)
+			},
+			wantRevisionID: 0,
+			wantError:      fmt.Errorf("no featues under group id: '1'"),
+		},
+		{
+			description: "GetFeatureGroup failed",
+			opt:         types.ImportBatchFeaturesOpt{GroupID: 1},
+			mockFunc: func() {
+				metadataStore.EXPECT().
+					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: int16Ptr(1)}).
+					Return(typesv2.FeatureList{})
 				metadataStore.EXPECT().
 					GetFeatureGroup(gomock.Any(), int16(1)).
 					Return(nil, fmt.Errorf("error"))
@@ -52,16 +63,13 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 			mockFunc: func() {
 				metadataStore.EXPECT().
 					ListFeature(gomock.Any(), gomock.Any()).
-					Return(nil)
+					Return(typesv2.FeatureList{})
 				metadataStore.EXPECT().
 					GetFeatureGroup(gomock.Any(), int16(1)).
-					Return(&typesv2.FeatureGroup{ID: 1, EntityID: 1}, nil)
-				metadataStore.EXPECT().
-					GetEntity(gomock.Any(), int16(1)).
-					Return(nil, fmt.Errorf("error"))
+					Return(&typesv2.FeatureGroup{ID: 1}, nil)
 			},
 			wantRevisionID: 0,
-			wantError:      fmt.Errorf("error"),
+			wantError:      fmt.Errorf("no entity found by group id: '1'"),
 		},
 		{
 			description: "Create Revision failed",
@@ -89,10 +97,7 @@ device,model,price
 					})
 				metadataStore.EXPECT().
 					GetFeatureGroup(gomock.Any(), int16(1)).
-					Return(&typesv2.FeatureGroup{ID: 1, EntityID: 1}, nil)
-				metadataStore.EXPECT().
-					GetEntity(gomock.Any(), int16(1)).
-					Return(&typesv2.Entity{Name: "device"}, nil)
+					Return(&typesv2.FeatureGroup{ID: 1, EntityID: 1, Entity: &typesv2.Entity{Name: "device"}}, nil)
 
 				offlineStore.
 					EXPECT().
@@ -132,6 +137,7 @@ func TestImportBatchFeatures(t *testing.T) {
 		opt              types.ImportBatchFeaturesOpt
 		features         typesv2.FeatureList
 		entityID         int16
+		Entity           typesv2.Entity
 		header           []string
 		revisionID       int32
 		revisionIDIsZero bool
@@ -157,6 +163,7 @@ func TestImportBatchFeatures(t *testing.T) {
 				},
 			},
 			entityID:         1,
+			Entity:           typesv2.Entity{Name: "device"},
 			header:           []string{"device", "model", "price"},
 			revisionID:       1,
 			revisionIDIsZero: false,
@@ -207,6 +214,7 @@ device,model,price
 				},
 			},
 			entityID:         1,
+			Entity:           typesv2.Entity{Name: "device"},
 			header:           []string{"device", "model", "price"},
 			revisionID:       0,
 			revisionIDIsZero: true,
@@ -230,12 +238,8 @@ device,model,price
 				Return(&typesv2.FeatureGroup{
 					ID:       tc.opt.GroupID,
 					EntityID: tc.entityID,
+					Entity:   &tc.Entity,
 				}, nil)
-
-			metadataStore.
-				EXPECT().
-				GetEntity(gomock.Any(), tc.entityID).
-				Return(&typesv2.Entity{ID: tc.entityID, Name: "device"}, nil)
 
 			metadataStore.
 				EXPECT().
@@ -249,7 +253,8 @@ device,model,price
 				GroupID:     tc.opt.GroupID,
 				DataTable:   stringPtr("datatable"),
 				Description: tc.opt.Description,
-			}).AnyTimes().Return(tc.revisionID, nil)
+			}).AnyTimes().
+				Return(tc.revisionID, nil)
 
 			revisionID, err := store.ImportBatchFeatures(context.Background(), tc.opt)
 			if tc.wantError != nil {
@@ -311,10 +316,20 @@ func TestCreateBatchFeature(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().GetFeatureGroup(gomock.Any(), tc.opt.GroupID).Return(&tc.group, nil)
+			metadataStore.EXPECT().
+				GetFeatureGroup(gomock.Any(), tc.opt.GroupID).
+				Return(&tc.group, nil)
+
 			if tc.group.Category == types.BatchFeatureCategory {
-				offlineStore.EXPECT().TypeTag(tc.opt.DBValueType).Return(tc.valueType, nil)
-				metadataStore.EXPECT().CreateFeature(gomock.Any(), tc.opt).Return(int16(1), nil)
+				tc.opt.ValueType = tc.valueType
+
+				offlineStore.EXPECT().
+					TypeTag(tc.opt.DBValueType).
+					Return(tc.valueType, nil)
+
+				metadataStore.EXPECT().
+					CreateFeature(gomock.Any(), tc.opt).
+					Return(int16(0), nil)
 			}
 
 			_, err := store.CreateBatchFeature(context.Background(), tc.opt)
