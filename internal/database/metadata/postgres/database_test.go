@@ -1,74 +1,63 @@
-package postgres
+package postgres_test
 
 import (
 	"context"
 	"sort"
 	"testing"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/postgres"
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func initDB(t *testing.T) {
-	opt := runtime_pg.PostgresDbOpt
-	store, err := Open(&types.PostgresOpt{
-		Host:     opt.Host,
-		Port:     opt.Port,
-		User:     opt.User,
-		Password: opt.Password,
-		Database: "test",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if _, err := store.ExecContext(context.Background(), "drop database if exists oomstore"); err != nil {
-		t.Fatal(err)
-	}
-	store.Close()
-
-	if err := CreateDatabase(context.Background(), runtime_pg.PostgresDbOpt); err != nil {
-		t.Fatal(err)
-	}
+func prepareStore(t *testing.T) (context.Context, metadata.Store) {
+	return prepareDB(t)
 }
 
-func initAndOpenDB(t *testing.T) *DB {
-	initDB(t)
+func prepareDB(t *testing.T) (context.Context, *postgres.DB) {
+	ctx := context.Background()
+	opt := runtime_pg.PostgresDbOpt
+	pg, err := postgres.OpenDB(
+		context.Background(),
+		opt.Host,
+		opt.Port,
+		opt.User,
+		opt.Password,
+		"test",
+	)
+	require.NoError(t, err)
+	_, err = pg.ExecContext(ctx, "drop database if exists oomstore")
+	require.NoError(t, err)
+	pg.Close()
 
-	db, err := Open(&runtime_pg.PostgresDbOpt)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return db
+	err = postgres.CreateDatabase(ctx, runtime_pg.PostgresDbOpt)
+	require.NoError(t, err)
+
+	db, err := postgres.Open(context.Background(), &runtime_pg.PostgresDbOpt)
+	require.NoError(t, err)
+
+	return ctx, db
 }
 
 func TestCreateDatabase(t *testing.T) {
-	ctx := context.Background()
-	if err := CreateDatabase(ctx, runtime_pg.PostgresDbOpt); err != nil {
-		t.Fatal(err)
-	}
-
-	store, err := Open(&runtime_pg.PostgresDbOpt)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ctx, store := prepareDB(t)
 	defer store.Close()
 
 	var tables []string
-	if err = store.SelectContext(ctx, &tables,
+	err := store.SelectContext(ctx, &tables,
 		`SELECT table_name
-FROM information_schema.tables
-WHERE table_schema = 'public'
-ORDER BY table_name;`); err != nil {
-		t.Fatal(err)
-	}
+			FROM information_schema.tables
+			WHERE table_schema = 'public'
+			ORDER BY table_name;`)
+	require.NoError(t, err)
 
 	var wantTables []string
-	for table := range META_TABLE_SCHEMAS {
+	for table := range postgres.META_TABLE_SCHEMAS {
 		wantTables = append(wantTables, table)
 	}
-	for table := range META_VIEW_SCHEMAS {
+	for table := range postgres.META_VIEW_SCHEMAS {
 		wantTables = append(wantTables, table)
 	}
 

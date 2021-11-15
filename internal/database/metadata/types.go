@@ -1,38 +1,80 @@
 package metadata
 
-import "github.com/oom-ai/oomstore/pkg/oomstore/types"
+type RevisionRange struct {
+	MinRevision int64  `db:"min_revision"`
+	MaxRevision int64  `db:"max_revision"`
+	DataTable   string `db:"data_table"`
+}
+
+// Create
+type CreateEntityOpt struct {
+	Name        string
+	Length      int
+	Description string
+}
 
 type CreateFeatureOpt struct {
-	types.CreateFeatureOpt
-	ValueType string
+	Name        string
+	GroupID     int16
+	DBValueType string
+	Description string
+	ValueType   string
 }
 
 type CreateFeatureGroupOpt struct {
-	types.CreateFeatureGroupOpt
-	Category string
+	Name        string
+	EntityID    int16
+	Description string
+	Category    string
 }
 
 type CreateRevisionOpt struct {
 	Revision    int64
-	GroupName   string
-	DataTable   string
-	Description string
+	GroupID     int16
+	DataTable   *string
 	Anchored    bool
+	Description string
 }
 
-type GetRevisionOpt struct {
-	GroupName  *string
-	Revision   *int64
-	RevisionId *int32
+// Update
+type UpdateEntityOpt struct {
+	EntityID       int16
+	NewDescription string
 }
 
-type ListRevisionOpt struct {
-	GroupName  *string
-	DataTables []string
+type UpdateFeatureOpt struct {
+	FeatureID      int16
+	NewDescription string
+}
+
+type UpdateFeatureGroupOpt struct {
+	GroupID             int16
+	NewDescription      *string
+	NewOnlineRevisionID *int32
 }
 
 type UpdateRevisionOpt struct {
-	RevisionID  int64
+	RevisionID  int32
 	NewRevision *int64
 	NewAnchored *bool
+}
+
+// Get
+type GetRevisionOpt struct {
+	GroupID    *int16
+	Revision   *int64
+	RevisionID *int32
+}
+
+// List
+type ListRevisionOpt struct {
+	GroupID    *int16
+	DataTables []string
+}
+
+type ListFeatureOpt struct {
+	EntityID     *int16
+	GroupID      *int16
+	FeatureIDs   *[]int16
+	FeatureNames *[]string
 }

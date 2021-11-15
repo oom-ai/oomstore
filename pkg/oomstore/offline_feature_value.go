@@ -6,7 +6,7 @@ import (
 	"math"
 	"sort"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
@@ -15,7 +15,7 @@ import (
 // GetHistoricalFeatureValues gets point-in-time feature values for each entity row;
 // currently, this API only supports batch features.
 func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.GetHistoricalFeatureValuesOpt) (*types.JoinResult, error) {
-	features := s.metadatav2.ListFeature(ctx, metadatav2.ListFeatureOpt{FeatureIDs: &opt.FeatureIDs})
+	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{FeatureIDs: &opt.FeatureIDs})
 
 	features = features.Filter(func(f *typesv2.Feature) bool {
 		return f.Group.Category == types.BatchFeatureCategory
@@ -33,7 +33,7 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 	}
 
 	featureMap := buildGroupToFeaturesMap(features)
-	revisionRangeMap := make(map[string][]*metadatav2.RevisionRange)
+	revisionRangeMap := make(map[string][]*metadata.RevisionRange)
 	for groupName, featureList := range featureMap {
 		if len(featureList) == 0 {
 			continue
@@ -65,8 +65,8 @@ func buildGroupToFeaturesMap(features typesv2.FeatureList) map[string]typesv2.Fe
 	return groups
 }
 
-func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int16) ([]*metadatav2.RevisionRange, error) {
-	revisions := s.metadatav2.ListRevision(ctx, metadatav2.ListRevisionOpt{GroupID: &groupID})
+func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int16) ([]*metadata.RevisionRange, error) {
+	revisions := s.metadata.ListRevision(ctx, metadata.ListRevisionOpt{GroupID: &groupID})
 	if len(revisions) == 0 {
 		return nil, nil
 	}
@@ -75,16 +75,16 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int16) ([]*m
 		return revisions[i].Revision < revisions[j].Revision
 	})
 
-	var ranges []*metadatav2.RevisionRange
+	var ranges []*metadata.RevisionRange
 	for i := 1; i < len(revisions); i++ {
-		ranges = append(ranges, &metadatav2.RevisionRange{
+		ranges = append(ranges, &metadata.RevisionRange{
 			MinRevision: revisions[i-1].Revision,
 			MaxRevision: revisions[i].Revision,
 			DataTable:   revisions[i-1].DataTable,
 		})
 	}
 
-	return append(ranges, &metadatav2.RevisionRange{
+	return append(ranges, &metadata.RevisionRange{
 		MinRevision: revisions[len(revisions)-1].Revision,
 		MaxRevision: math.MaxInt64,
 		DataTable:   revisions[len(revisions)-1].DataTable,

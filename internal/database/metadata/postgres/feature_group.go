@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"strings"
 
@@ -13,75 +12,52 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) error {
+func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int16, error) {
 	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
-		return fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", opt.Category)
+		return 0, fmt.Errorf("illegal category '%s', should be either 'stream' or 'batch'", opt.Category)
 	}
-	query := "insert into feature_group(name, entity_name, category, description) values($1, $2, $3, $4)"
-	_, err := db.ExecContext(ctx, query, opt.Name, opt.EntityName, opt.Category, opt.Description)
+	var featureGroupId int16
+	query := "insert into feature_group(name, entity_id, category, description) values($1, $2, $3, $4) returning id"
+	err := db.GetContext(ctx, &featureGroupId, query, opt.Name, opt.EntityID, opt.Category, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
-				return fmt.Errorf("feature group %s already exist", opt.Name)
+				return 0, fmt.Errorf("feature group %s already exists", opt.Name)
 			}
 		}
 	}
-	return err
+	return featureGroupId, err
 }
 
-func (db *DB) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
-	query := "SELECT * FROM rich_feature_group WHERE name = $1"
-
-	var group types.FeatureGroup
-	if err := db.GetContext(ctx, &group, query, groupName); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("group %s does not exist", groupName)
-		}
-		return nil, err
-	}
-	return &group, nil
-}
-
-func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
-	var cond []interface{}
-	query := "SELECT * FROM rich_feature_group"
-	if entityName != nil {
-		query = query + " WHERE entity_name = $1"
-		cond = append(cond, *entityName)
-	}
-
-	var groups []*types.FeatureGroup
-	if err := db.SelectContext(ctx, &groups, query, cond...); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, err
-	}
-	return groups, nil
-}
-
-func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error) {
+func (db *DB) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
 	and := make(map[string]interface{})
-	if opt.Description != nil {
-		and["description"] = *opt.Description
+	if opt.NewDescription != nil {
+		and["description"] = *opt.NewDescription
 	}
-	if opt.OnlineRevisionId != nil {
-		and["online_revision_id"] = *opt.OnlineRevisionId
+	if opt.NewOnlineRevisionID != nil {
+		and["online_revision_id"] = *opt.NewOnlineRevisionID
 	}
 	cond, args, err := dbutil.BuildConditions(and, nil)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	args = append(args, opt.GroupName)
+	args = append(args, opt.GroupID)
 
 	if len(cond) == 0 {
-		return 0, fmt.Errorf("invliad option: nothing to update")
+		return fmt.Errorf("invalid option: nothing to update")
 	}
 
-	query := fmt.Sprintf("UPDATE feature_group SET %s WHERE name = $%d", strings.Join(cond, ","), len(cond)+1)
-	if result, err := db.ExecContext(ctx, db.Rebind(query), args...); err != nil {
-		return 0, err
-	} else {
-		return result.RowsAffected()
+	query := fmt.Sprintf("UPDATE feature_group SET %s WHERE id = ?", strings.Join(cond, ","))
+	result, err := db.ExecContext(ctx, db.Rebind(query), args...)
+	if err != nil {
+		return err
 	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected != 1 {
+		return fmt.Errorf("failed to update feature group %d: feature group not found", opt.GroupID)
+	}
+	return nil
 }

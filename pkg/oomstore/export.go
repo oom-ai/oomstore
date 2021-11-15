@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeatureValuesOpt) ([]string, <-chan *types.RawFeatureValueRecord, error) {
-	group, err := s.metadatav2.GetFeatureGroup(ctx, opt.GroupID)
+	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -21,7 +21,7 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 	}
 
 	featureNames := opt.FeatureNames
-	allFeatures := s.ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &opt.GroupID})
+	allFeatures := s.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &opt.GroupID})
 	if err != nil {
 		return nil, nil, err
 	}

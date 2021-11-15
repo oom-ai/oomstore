@@ -6,44 +6,35 @@ import (
 
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
-func (db *DB) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) error {
-	query := "insert into feature_entity(name, length, description) values($1, $2, $3)"
-	_, err := db.ExecContext(ctx, query, opt.Name, opt.Length, opt.Description)
+func (db *DB) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int16, error) {
+	var entityId int16
+	query := "insert into feature_entity(name, length, description) values($1, $2, $3) returning id"
+	err := db.GetContext(ctx, &entityId, query, opt.Name, opt.Length, opt.Description)
 	if er, ok := err.(*pq.Error); ok {
 		if er.Code == pgerrcode.UniqueViolation {
-			return fmt.Errorf("entity %s already exists", opt.Name)
+			return 0, fmt.Errorf("entity %s already exists", opt.Name)
 		}
 	}
-	return err
+	return entityId, err
 }
 
-func (db *DB) GetEntity(ctx context.Context, name string) (*types.Entity, error) {
-	var entity types.Entity
-	query := "select * from feature_entity where name = $1"
-	if err := db.GetContext(ctx, &entity, query, name); err != nil {
-		return nil, err
+func (db *DB) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
+	query := "UPDATE feature_entity SET description = $1 WHERE id = $2"
+	result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.EntityID)
+	if err != nil {
+		return err
 	}
-	return &entity, nil
-}
 
-func (db *DB) ListEntity(ctx context.Context) ([]*types.Entity, error) {
-	query := "select * from feature_entity"
-	entities := make([]*types.Entity, 0)
-
-	if err := db.SelectContext(ctx, &entities, query); err != nil {
-		return nil, err
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
 	}
-	return entities, nil
-}
 
-func (db *DB) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) (int64, error) {
-	query := "UPDATE feature_entity SET description = $1 WHERE name = $2"
-	if result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.EntityName); err != nil {
-		return 0, err
-	} else {
-		return result.RowsAffected()
+	if rowsAffected != 1 {
+		return fmt.Errorf("failed to update entity %d: entity not found", opt.EntityID)
 	}
+	return nil
 }

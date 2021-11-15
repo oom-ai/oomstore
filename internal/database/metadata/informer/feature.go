@@ -1,7 +1,7 @@
 package informer
 
 import (
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
@@ -17,7 +17,7 @@ func (c *FeatureCache) Enrich(groupCache *GroupCache) {
 	}
 }
 
-func (c *FeatureCache) List(opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
+func (c *FeatureCache) List(opt metadata.ListFeatureOpt) typesv2.FeatureList {
 	features := c.FeatureList
 
 	// filter ids

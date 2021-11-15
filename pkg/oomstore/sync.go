@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -24,7 +24,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		return fmt.Errorf("the specific revision was synced to the online store, won't do it again this time")
 	}
 
-	features := s.ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &group.ID})
+	features := s.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &group.ID})
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	}
 
 	// Update the online revision id of the feature group upon sync success
-	if err = s.metadatav2.UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
+	if err = s.metadata.UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
 		GroupID:             group.ID,
 		NewOnlineRevisionID: &revision.ID,
 	}); err != nil {
@@ -65,7 +65,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		newRevision := time.Now().Unix()
 		newChored := true
 		// update revision timestamp using current timestamp
-		if err = s.metadatav2.UpdateRevision(ctx, metadatav2.UpdateRevisionOpt{
+		if err = s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
 			RevisionID:  revision.ID,
 			NewRevision: &newRevision,
 			NewAnchored: &newChored,

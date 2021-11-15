@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2/informer"
+	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/require"
 )

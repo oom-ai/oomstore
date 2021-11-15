@@ -4,11 +4,11 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/spf13/cobra"
 )
 
-var updateGroupOpt metadatav2.UpdateFeatureGroupOpt
+var updateGroupOpt metadata.UpdateFeatureGroupOpt
 
 var updateGroupCmd = &cobra.Command{
 	Use:   "group",

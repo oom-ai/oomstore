@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/require"
 )
 
-func prepareEntity(t *testing.T, ctx context.Context, store metadatav2.Store, name string) int16 {
-	entityId, err := store.CreateEntity(ctx, metadatav2.CreateEntityOpt{
+func prepareEntity(t *testing.T, ctx context.Context, store metadata.Store, name string) int16 {
+	entityId, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		Name:        name,
 		Length:      32,
 		Description: "description",
@@ -26,7 +26,7 @@ func TestGetFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	entityId := prepareEntity(t, ctx, store, "device")
 
-	opt := metadatav2.CreateFeatureGroupOpt{
+	opt := metadata.CreateFeatureGroupOpt{
 		Name:        "device_baseinfo",
 		EntityID:    entityId,
 		Description: "description",
@@ -57,19 +57,19 @@ func TestListFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	deviceEntityId := prepareEntity(t, ctx, store, "device")
 	userEntityId := prepareEntity(t, ctx, store, "user")
 
-	deviceOpt := metadatav2.CreateFeatureGroupOpt{
+	deviceOpt := metadata.CreateFeatureGroupOpt{
 		Name:        "device_baseinfo",
 		EntityID:    deviceEntityId,
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
 	}
-	userBaseOpt := metadatav2.CreateFeatureGroupOpt{
+	userBaseOpt := metadata.CreateFeatureGroupOpt{
 		Name:        "user_baseinfo",
 		EntityID:    userEntityId,
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
 	}
-	userBehaviorOpt := metadatav2.CreateFeatureGroupOpt{
+	userBehaviorOpt := metadata.CreateFeatureGroupOpt{
 		Name:        "user_behaviorinfo",
 		EntityID:    userEntityId,
 		Description: "description",
@@ -96,7 +96,7 @@ func TestCreateFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) 
 
 	entityId := prepareEntity(t, ctx, store, "device")
 
-	opt := metadatav2.CreateFeatureGroupOpt{
+	opt := metadata.CreateFeatureGroupOpt{
 		Name:        "device_baseinfo",
 		EntityID:    entityId,
 		Description: "description",
@@ -124,7 +124,7 @@ func TestUpdateFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) 
 
 	entityId := prepareEntity(t, ctx, store, "device")
 
-	opt := metadatav2.CreateFeatureGroupOpt{
+	opt := metadata.CreateFeatureGroupOpt{
 		Name:        "device_baseinfo",
 		EntityID:    entityId,
 		Description: "description",
@@ -134,13 +134,13 @@ func TestUpdateFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) 
 	require.NoError(t, err)
 
 	// update non-exist feature group
-	require.NotNil(t, store.UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
+	require.NotNil(t, store.UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
 		GroupID: 0,
 	}))
 
 	// update existing feature group
 	description := "new description"
-	require.Nil(t, store.UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
+	require.Nil(t, store.UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
 		GroupID:        featureGroupId,
 		NewDescription: &description,
 	}))

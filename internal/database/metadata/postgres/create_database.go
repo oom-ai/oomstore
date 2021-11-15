@@ -11,29 +11,28 @@ import (
 )
 
 func CreateDatabase(ctx context.Context, opt types.PostgresOpt) (err error) {
-	db, err := OpenWith(opt.Host, opt.Port, opt.User, opt.Password, "")
+	defaultDB, err := OpenDB(ctx, opt.Host, opt.Port, opt.User, opt.Password, "")
+	if err != nil {
+		return
+	}
+	defer defaultDB.Close()
+
+	if _, err = defaultDB.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", opt.Database)); err != nil {
+		return
+	}
+
+	db, err := OpenDB(ctx, opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
 	if err != nil {
 		return
 	}
 	defer db.Close()
-
-	if _, err = db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", opt.Database)); err != nil {
-		return
-	}
-
-	return createMetaSchemas(ctx, opt)
+	return createMetaSchemas(ctx, db)
 }
 
-func createMetaSchemas(ctx context.Context, opt types.PostgresOpt) (err error) {
-	db, err := Open(&opt)
-	if err != nil {
-		return
-	}
-	defer db.Close()
-
+func createMetaSchemas(ctx context.Context, db *sqlx.DB) (err error) {
 	// Use transaction to guarantee the following operations be executed
 	// on the same connection: http://go-database-sql.org/modifying.html
-	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+	return dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create database functions
 		for _, fn := range DB_FUNCTIONS {
 			if _, err = tx.ExecContext(ctx, fn); err != nil {
@@ -44,6 +43,13 @@ func createMetaSchemas(ctx context.Context, opt types.PostgresOpt) (err error) {
 		// create meta tables
 		for _, schema := range META_TABLE_SCHEMAS {
 			if _, err = tx.ExecContext(ctx, schema); err != nil {
+				return err
+			}
+		}
+
+		// create foreign keys
+		for _, stmt := range META_TABLE_FOREIGN_KEYS {
+			if _, err = tx.ExecContext(ctx, stmt); err != nil {
 				return err
 			}
 		}
