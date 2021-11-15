@@ -9,10 +9,11 @@ import_sample > /dev/null
 case='featctl update group works'
 featctl update group phone --description "new description"
 expected='
-Name:            phone
-Entity:          device
-Description:     new description
+Name:             phone
+Entity:           device
+Description:      new description
+OnlineRevisionID: <NULL>
 '
 actual=$(featctl describe group phone)
-ignore() { grep -Ev '^(CreateTime|ModifyTime|Online Revision|Offline Latest Revision|Offline Latest DataTable)' <<<"$1"; }
+ignore() { grep -Ev '^(CreateTime|ModifyTime)' <<<"$1"; }
 assert_eq "$case" "$expected" "$(ignore "$actual")"
