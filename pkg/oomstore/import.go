@@ -44,15 +44,18 @@ func stringSliceEqual(a, b []string) bool {
 func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) (int32, error) {
 	// get columns of the group
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &opt.GroupID})
+	if features == nil {
+		return 0, fmt.Errorf("no featues under group id: '%d'", opt.GroupID)
+	}
 
 	// get entity info
 	group, err := s.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
 		return 0, err
 	}
-	entity, err := s.GetEntity(ctx, group.EntityID)
-	if err != nil {
-		return 0, err
+	entity := group.Entity
+	if entity == nil {
+		return 0, fmt.Errorf("no entity found by group id: '%d'", opt.GroupID)
 	}
 
 	// make sure csv data source has all defined columns
