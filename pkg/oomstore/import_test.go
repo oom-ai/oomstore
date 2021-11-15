@@ -99,11 +99,11 @@ device,model,price
 				offlineStore.
 					EXPECT().
 					Import(gomock.Any(), gomock.Any()).
-					AnyTimes().Return(int64(1), "datatable", nil)
+					AnyTimes().Return(int64(1), nil)
 
 				metadataStore.EXPECT().
 					CreateRevision(gomock.Any(), gomock.Any()).
-					Return(int32(0), fmt.Errorf("error"))
+					Return(int32(0), "", fmt.Errorf("error"))
 			},
 			wantRevisionID: 0,
 			wantError:      fmt.Errorf("error"),
@@ -127,21 +127,21 @@ func TestImportBatchFeatures(t *testing.T) {
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
 	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
+	ctx := context.Background()
 
 	testCases := []struct {
 		description string
 
-		opt              types.ImportBatchFeaturesOpt
-		features         types.FeatureList
-		entityID         int16
-		Entity           types.Entity
-		header           []string
-		revisionID       int32
-		revisionIDIsZero bool
-		wantError        error
+		opt        types.ImportBatchFeaturesOpt
+		features   types.FeatureList
+		entityID   int16
+		Entity     types.Entity
+		header     []string
+		revisionID int32
+		wantError  error
 	}{
 		{
-			description: "import batch feature: succeed",
+			description: "import batch feature, succeed",
 			opt: types.ImportBatchFeaturesOpt{
 				DataSource: types.CsvDataSource{
 					Reader: strings.NewReader(`device,model,price
@@ -159,15 +159,14 @@ func TestImportBatchFeatures(t *testing.T) {
 					Name: "price",
 				},
 			},
-			entityID:         1,
-			Entity:           types.Entity{Name: "device"},
-			header:           []string{"device", "model", "price"},
-			revisionID:       1,
-			revisionIDIsZero: false,
-			wantError:        nil,
+			entityID:   1,
+			Entity:     types.Entity{Name: "device"},
+			header:     []string{"device", "model", "price"},
+			revisionID: 1,
+			wantError:  nil,
 		},
 		{
-			description: "import batch feature: csv data source has duplicated columns",
+			description: "import batch feature, csv data source has duplicated columns",
 			opt: types.ImportBatchFeaturesOpt{
 				GroupID: 1,
 				DataSource: types.CsvDataSource{
@@ -187,14 +186,13 @@ device,model,model
 					Name: "price",
 				},
 			},
-			entityID:         1,
-			header:           []string{"device", "model"},
-			revisionID:       0,
-			revisionIDIsZero: true,
-			wantError:        fmt.Errorf("csv data source has duplicated columns: %v", []string{"device", "model", "model"}),
+			entityID:   1,
+			header:     []string{"device", "model"},
+			revisionID: 0,
+			wantError:  fmt.Errorf("csv data source has duplicated columns: %v", []string{"device", "model", "model"}),
 		},
 		{
-			description: "import batch feature: csv header of the data source doesn't match the feature group schema",
+			description: "import batch feature, csv header of the data source doesn't match the feature group schema",
 			opt: types.ImportBatchFeaturesOpt{
 				DataSource: types.CsvDataSource{
 					Reader: strings.NewReader(`
@@ -210,11 +208,10 @@ device,model,price
 					Name: "model",
 				},
 			},
-			entityID:         1,
-			Entity:           types.Entity{Name: "device"},
-			header:           []string{"device", "model", "price"},
-			revisionID:       0,
-			revisionIDIsZero: true,
+			entityID:   1,
+			Entity:     types.Entity{Name: "device"},
+			header:     []string{"device", "model", "price"},
+			revisionID: 0,
 			wantError: fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v",
 				[]string{"device", "model", "price"},
 				[]string{"device", "model"},
@@ -224,43 +221,38 @@ device,model,price
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			offlineStore.
-				EXPECT().
-				Import(gomock.Any(), gomock.Any()).
-				AnyTimes().Return(int64(1), "datatable", nil)
-
-			metadataStore.
-				EXPECT().
-				GetFeatureGroup(gomock.Any(), tc.opt.GroupID).
+			metadataStore.EXPECT().GetFeatureGroup(ctx, tc.opt.GroupID).
 				Return(&types.FeatureGroup{
 					ID:       tc.opt.GroupID,
 					EntityID: tc.entityID,
 					Entity:   &tc.Entity,
 				}, nil)
 
-			metadataStore.
-				EXPECT().
-				ListFeature(gomock.Any(), metadata.ListFeatureOpt{
-					GroupID: &tc.opt.GroupID,
-				}).
-				Return(tc.features)
+			metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &tc.opt.GroupID}).Return(tc.features)
 
-			metadataStore.EXPECT().CreateRevision(gomock.Any(), metadata.CreateRevisionOpt{
-				Revision:    int64(1),
+			metadataStore.EXPECT().CreateRevision(ctx, metadata.CreateRevisionOpt{
+				Revision:    int64(0),
 				GroupID:     tc.opt.GroupID,
-				DataTable:   stringPtr("datatable"),
 				Description: tc.opt.Description,
-			}).AnyTimes().
-				Return(tc.revisionID, nil)
+			}).Return(tc.revisionID, "data_1_1", nil).AnyTimes()
 
-			revisionID, err := store.ImportBatchFeatures(context.Background(), tc.opt)
+			offlineStore.EXPECT().Import(ctx, gomock.Any()).Return(int64(1000), nil).AnyTimes()
+
+			if tc.opt.Revision == nil {
+				metadataStore.EXPECT().UpdateRevision(ctx, metadata.UpdateRevisionOpt{
+					RevisionID:  tc.revisionID,
+					NewRevision: int64Ptr(1000),
+				}).Return(nil).AnyTimes()
+			}
+
+			revisionID, err := store.ImportBatchFeatures(ctx, tc.opt)
 			if tc.wantError != nil {
 				assert.EqualError(t, err, tc.wantError.Error())
 			} else {
 				assert.NoError(t, err)
 			}
 
-			assert.Equal(t, revisionID == 0, tc.revisionIDIsZero)
+			assert.Equal(t, revisionID, tc.revisionID)
 		})
 	}
 }
