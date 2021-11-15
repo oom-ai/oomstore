@@ -77,7 +77,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			actual, err := store.CreateRevision(ctx, tc.opt)
+			actual, _, err := store.CreateRevision(ctx, tc.opt)
 			require.Equal(t, tc.expected, actual)
 			if tc.expectedError != nil {
 				require.EqualError(t, err, tc.expectedError.Error())
@@ -98,7 +98,7 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	_, groupId := prepareEntityAndGroup(t, ctx, store)
-	revisionId, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	revisionId, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
 		GroupID:   groupId,
 		DataTable: stringPtr("device_info_1000"),
@@ -146,7 +146,7 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	_, groupId := prepareEntityAndGroup(t, ctx, store)
-	revisionId, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	revisionId, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
 		GroupID:   groupId,
 		DataTable: stringPtr("device_info_1000"),
@@ -208,7 +208,7 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	_, groupId := prepareEntityAndGroup(t, ctx, store)
-	revisionId, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	revisionId, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
 		GroupID:   groupId,
 		DataTable: stringPtr("device_info_1000"),
@@ -357,7 +357,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	})
 	require.NoError(t, err)
 	require.NoError(t, store.Refresh())
-	revisionId1, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	revisionId1, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
 		GroupID:   groupId,
 		DataTable: stringPtr("device_info_1000"),
@@ -365,7 +365,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	})
 	require.NoError(t, err)
 
-	revisionId2, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	revisionId2, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  2000,
 		GroupID:   groupId,
 		DataTable: stringPtr("device_info_2000"),
