@@ -30,11 +30,14 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		Name:   "device",
 		Length: 10,
 	}
-	revisionRanges := []*metadatav2.RevisionRange{
+	revisions := typesv2.RevisionList{
 		{
-			MinRevision: 1,
-			MaxRevision: 20,
-			DataTable:   "device_basic_1",
+			Revision:  1,
+			DataTable: "device_basic_1",
+		},
+		{
+			Revision:  20,
+			DataTable: "device_basic_20",
 		},
 	}
 
@@ -108,11 +111,10 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: tc.opt.FeatureIDs}).Return(tc.features, nil)
+			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: &tc.opt.FeatureIDs}).Return(tc.features)
 			if tc.entity != nil {
-				metadatav2Store.EXPECT().GetEntity(gomock.Any(), tc.entity.Name).Return(&entity, nil)
-				for groupName := range tc.featureMap {
-					metadatav2Store.EXPECT().BuildRevisionRanges(gomock.Any(), groupName).Return(revisionRanges, nil).AnyTimes()
+				for _, featureList := range tc.featureMap {
+					metadatav2Store.EXPECT().ListRevision(gomock.Any(), metadatav2.ListRevisionOpt{GroupID: &featureList[0].GroupID}).Return(revisions).AnyTimes()
 				}
 				offlineStore.EXPECT().Join(gomock.Any(), gomock.Any()).Return(tc.joined, nil)
 			}
