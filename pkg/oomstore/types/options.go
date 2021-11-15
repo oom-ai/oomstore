@@ -35,7 +35,6 @@ type CreateFeatureGroupOpt struct {
 }
 
 type ExportFeatureValuesOpt struct {
-	GroupID      int16
 	RevisionID   int32
 	FeatureNames []string
 	Limit        *uint64
