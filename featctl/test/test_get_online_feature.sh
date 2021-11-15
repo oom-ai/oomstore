@@ -18,8 +18,8 @@ assert_eq "$case" "$expected" "$actual"
 
 case="query multiple features"
 expected='
-device,model,price
-6,apple-iphone11,4999
+device,price,model
+6,4999,apple-iphone11
 '
-actual=$(featctl get online-feature --feature model,price -k 6 -o csv)
+actual=$(featctl get online-feature --feature price,model -k 6 -o csv)
 assert_eq "$case" "$expected" "$actual"
