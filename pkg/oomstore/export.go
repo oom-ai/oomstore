@@ -10,18 +10,13 @@ import (
 )
 
 func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeatureValuesOpt) ([]string, <-chan *types.RawFeatureValueRecord, error) {
-	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupID)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	revision, err := s.GetRevision(ctx, opt.RevisionID)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	featureNames := opt.FeatureNames
-	allFeatures := s.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &opt.GroupID})
+	allFeatures := s.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.GroupID})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -37,18 +32,19 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 		}
 	}
 
-	if group.Entity == nil {
-		return nil, nil, fmt.Errorf("failed to get entity id='%d'", group.ID)
+	entity := revision.Group.Entity
+	if entity == nil {
+		return nil, nil, fmt.Errorf("failed to get entity id='%d'", revision.GroupID)
 	}
 
 	stream, err := s.offline.Export(ctx, offline.ExportOpt{
 		DataTable:    revision.DataTable,
-		EntityName:   group.Entity.Name,
+		EntityName:   entity.Name,
 		FeatureNames: featureNames,
 		Limit:        opt.Limit,
 	})
 
-	fields := append([]string{group.Entity.Name}, featureNames...)
+	fields := append([]string{entity.Name}, featureNames...)
 	return fields, stream, err
 }
 
