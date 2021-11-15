@@ -53,7 +53,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 				EntityKey:    "1234",
 			},
 			features:      inconsistentFeatures,
-			expectedError: fmt.Errorf("inconsistent entity type: %v", map[string]string{"device": "price", "user": "age"}),
+			expectedError: fmt.Errorf("expected 1 entity, got 2 entities"),
 			expected:      nil,
 		},
 		{
@@ -66,15 +66,16 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 			entityName:    &entityName,
 			expectedError: nil,
 			expected: types.FeatureValueMap{
-				"price": int64(100),
-				"model": "xiaomi",
+				"price":  int64(100),
+				"model":  "xiaomi",
+				"device": "1234",
 			},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureNames: &tc.opt.FeatureNames}).Return(tc.features, nil)
+			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureNames: &tc.opt.FeatureNames}).Return(tc.features)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().Get(gomock.Any(), gomock.Any()).Return(dbutil.RowMap{
 					"price": int64(100),
@@ -85,7 +86,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 			}
 			actual, err := store.GetOnlineFeatureValues(context.Background(), tc.opt)
 			if tc.expectedError != nil {
-				assert.Error(t, err, tc.expectedError)
+				assert.EqualError(t, err, tc.expectedError.Error())
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.expected, actual)
@@ -132,7 +133,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 				EntityKeys: []string{"1234", "1235"},
 			},
 			features:      inconsistentFeatures,
-			expectedError: fmt.Errorf("inconsistent entity type: %v", map[string]string{"device": "price", "user": "age"}),
+			expectedError: fmt.Errorf("expected 1 entity, got 2 entities"),
 			expected:      nil,
 		},
 		{
@@ -171,7 +172,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: &tc.opt.FeatureIDs}).Return(tc.features, nil)
+			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{FeatureIDs: &tc.opt.FeatureIDs}).Return(tc.features)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().MultiGet(gomock.Any(), gomock.Any()).Return(map[string]dbutil.RowMap{
 					"1234": {
@@ -204,6 +205,14 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 func prepareFeatures(isConsistent bool, isAvailable bool) typesv2.FeatureList {
 	revision1 := int32(1)
 	revision2 := int32(2)
+	entityDevice := &typesv2.Entity{
+		ID:   1,
+		Name: "device",
+	}
+	entityUser := &typesv2.Entity{
+		ID:   2,
+		Name: "user",
+	}
 	features := typesv2.FeatureList{
 		{
 			Name:        "model",
@@ -213,6 +222,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) typesv2.FeatureList {
 				EntityID:         1,
 				OnlineRevisionID: &revision1,
 				Category:         types.BatchFeatureCategory,
+				Entity:           entityDevice,
 			},
 		},
 		{
@@ -223,6 +233,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) typesv2.FeatureList {
 				EntityID:         1,
 				OnlineRevisionID: &revision2,
 				Category:         types.BatchFeatureCategory,
+				Entity:           entityDevice,
 			},
 		},
 		{
@@ -233,6 +244,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) typesv2.FeatureList {
 				EntityID:         2,
 				OnlineRevisionID: &revision2,
 				Category:         types.BatchFeatureCategory,
+				Entity:           entityUser,
 			},
 		},
 	}
