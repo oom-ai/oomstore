@@ -34,13 +34,11 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 
 	featureMap := buildGroupToFeaturesMap(features)
 	revisionRangeMap := make(map[string][]*metadatav2.RevisionRange)
-	for groupName := range featureMap {
-		// TODO: This is slow but I haven't figured out a better way
-		group, err := s.metadatav2.GetFeatureGroupByName(ctx, groupName)
-		if err != nil {
-			return nil, err
+	for groupName, featureList := range featureMap {
+		if len(featureList) == 0 {
+			continue
 		}
-		revisionRanges, err := s.buildRevisionRanges(ctx, group.ID)
+		revisionRanges, err := s.buildRevisionRanges(ctx, featureList[0].GroupID)
 		if err != nil {
 			return nil, err
 		}
