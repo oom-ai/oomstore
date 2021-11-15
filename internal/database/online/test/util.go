@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -18,7 +19,7 @@ type Sample struct {
 	Features typesv2.FeatureList
 	Revision *typesv2.Revision
 	Entity   *typesv2.Entity
-	Data     []typesv2.RawFeatureValueRecord
+	Data     []types.RawFeatureValueRecord
 }
 
 var SampleSmall Sample
@@ -47,7 +48,7 @@ func init() {
 			},
 			Revision: &typesv2.Revision{ID: 3, GroupID: 1},
 			Entity:   &typesv2.Entity{ID: 5, Name: "user", Length: 4},
-			Data: []typesv2.RawFeatureValueRecord{
+			Data: []types.RawFeatureValueRecord{
 				newRecord([]interface{}{"3215", int16(18), "F"}),
 				newRecord([]interface{}{"3216", int16(29), nil}),
 				newRecord([]interface{}{"3217", int16(44), "M"}),
@@ -69,7 +70,7 @@ func init() {
 
 		revision := &typesv2.Revision{ID: 9, GroupID: 2}
 		entity := &typesv2.Entity{ID: 5, Name: "user", Length: 5}
-		var data []typesv2.RawFeatureValueRecord
+		var data []types.RawFeatureValueRecord
 
 		for i := 0; i < 1000; i++ {
 			record := newRecord([]interface{}{
@@ -84,7 +85,7 @@ func init() {
 
 func importSample(t *testing.T, ctx context.Context, store online.Store, samples ...*Sample) {
 	for _, sample := range samples {
-		stream := make(chan *typesv2.RawFeatureValueRecord)
+		stream := make(chan *types.RawFeatureValueRecord)
 		go func(sample *Sample) {
 			defer close(stream)
 			for i := range sample.Data {
@@ -112,6 +113,6 @@ func RandString(n int) string {
 	return string(b)
 }
 
-func newRecord(record []interface{}) typesv2.RawFeatureValueRecord {
-	return typesv2.RawFeatureValueRecord{Record: record}
+func newRecord(record []interface{}) types.RawFeatureValueRecord {
+	return types.RawFeatureValueRecord{Record: record}
 }
