@@ -8,17 +8,11 @@ type GroupCache struct {
 	typesv2.FeatureGroupList
 }
 
-func (c *GroupCache) Enrich(entityCache *EntityCache, revisionCache *RevisionCache) {
+func (c *GroupCache) Enrich(entityCache *EntityCache) {
 	for _, g := range c.FeatureGroupList {
 		g.Entity = entityCache.Find(func(e *typesv2.Entity) bool {
 			return e.ID == g.EntityID
 		})
-
-		if g.OnlineRevisionID != nil {
-			g.OnlineRevision = revisionCache.Find(func(r *typesv2.Revision) bool {
-				return r.ID == *g.OnlineRevisionID
-			})
-		}
 	}
 }
 

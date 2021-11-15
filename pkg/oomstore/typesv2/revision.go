@@ -1,6 +1,8 @@
 package typesv2
 
-import "time"
+import (
+	"time"
+)
 
 type Revision struct {
 	ID        int32  `db:"id"`
@@ -14,6 +16,18 @@ type Revision struct {
 
 	GroupID int16 `db:"group_id"`
 	Group   *FeatureGroup
+}
+
+func (r *Revision) Copy() *Revision {
+	if r == nil {
+		return nil
+	}
+	copied := *r
+
+	if copied.Group != nil {
+		copied.Group = copied.Group.Copy()
+	}
+	return &copied
 }
 
 type RevisionList []*Revision

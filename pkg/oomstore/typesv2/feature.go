@@ -20,12 +20,24 @@ type Feature struct {
 	Group   *FeatureGroup
 }
 
+func (f *Feature) Copy() *Feature {
+	if f == nil {
+		return nil
+	}
+	copied := *f
+
+	if copied.Group != nil {
+		copied.Group = copied.Group.Copy()
+	}
+	return &copied
+}
+
 func (f *Feature) Entity() *Entity {
 	return f.Group.Entity
 }
 
-func (f *Feature) OnlineRevision() *Revision {
-	return f.Group.OnlineRevision
+func (f *Feature) OnlineRevisionID() *int32 {
+	return f.Group.OnlineRevisionID
 }
 
 type FeatureList []*Feature
@@ -65,23 +77,23 @@ func (l *FeatureList) Find(find func(*Feature) bool) *Feature {
 }
 
 func (f *Feature) String() string {
-	onlineRevision := "<NULL>"
+	onlineRevisionID := "<NULL>"
 
-	if f.OnlineRevision() != nil {
-		onlineRevision = fmt.Sprint(*f.OnlineRevision())
+	if f.OnlineRevisionID() != nil {
+		onlineRevisionID = fmt.Sprint(*f.OnlineRevisionID())
 	}
 
 	return strings.Join([]string{
-		fmt.Sprintf("Name:            %s", f.Name),
-		fmt.Sprintf("Group:           %s", f.Group.Name),
-		fmt.Sprintf("Entity:          %s", f.Entity().Name),
-		fmt.Sprintf("Category:        %s", f.Group.Category),
-		fmt.Sprintf("DBValueType:     %s", f.DBValueType),
-		fmt.Sprintf("ValueType:       %s", f.ValueType),
-		fmt.Sprintf("Description:     %s", f.Description),
-		fmt.Sprintf("Online Revision: %s", onlineRevision),
-		fmt.Sprintf("CreateTime:      %s", f.CreateTime.Format(time.RFC3339)),
-		fmt.Sprintf("ModifyTime:      %s", f.ModifyTime.Format(time.RFC3339)),
+		fmt.Sprintf("Name:             %s", f.Name),
+		fmt.Sprintf("Group:            %s", f.Group.Name),
+		fmt.Sprintf("Entity:           %s", f.Entity().Name),
+		fmt.Sprintf("Category:         %s", f.Group.Category),
+		fmt.Sprintf("DBValueType:      %s", f.DBValueType),
+		fmt.Sprintf("ValueType:        %s", f.ValueType),
+		fmt.Sprintf("Description:      %s", f.Description),
+		fmt.Sprintf("OnlineRevisionID: %s", onlineRevisionID),
+		fmt.Sprintf("CreateTime:       %s", f.CreateTime.Format(time.RFC3339)),
+		fmt.Sprintf("ModifyTime:       %s", f.ModifyTime.Format(time.RFC3339)),
 	}, "\n")
 }
 
@@ -94,17 +106,17 @@ func FeatureCsvHeader() string {
 		"DBValueType",
 		"ValueType",
 		"Description",
-		"OnlineRevision",
+		"OnlineRevisionID",
 		"CreateTime",
 		"ModifyTime",
 	}, ",")
 }
 
 func (f *Feature) ToCsvRecord() string {
-	onlineRevision := "<NULL>"
+	onlineRevisionID := "<NULL>"
 
-	if r := f.OnlineRevision(); r != nil {
-		onlineRevision = fmt.Sprint(r.Revision)
+	if r := f.OnlineRevisionID(); r != nil {
+		onlineRevisionID = fmt.Sprint(*r)
 	}
 
 	return strings.Join([]string{
@@ -115,7 +127,7 @@ func (f *Feature) ToCsvRecord() string {
 		f.DBValueType,
 		f.ValueType,
 		f.Description,
-		onlineRevision,
+		onlineRevisionID,
 		f.CreateTime.Format(time.RFC3339),
 		f.ModifyTime.Format(time.RFC3339),
 	}, ",")

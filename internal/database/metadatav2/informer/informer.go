@@ -32,7 +32,7 @@ func NewCache(
 }
 
 func (c *Cache) enrich() {
-	c.Groups.Enrich(c.Entities, c.Revisions)
+	c.Groups.Enrich(c.Entities)
 	c.Features.Enrich(c.Groups)
 	// TODO: caching revision data is not necessary, but currently we do it for simplicity
 	c.Revisions.Enrich(c.Groups)
@@ -99,7 +99,7 @@ func (f *Informer) GetEntity(ctx context.Context, id int16) (*typesv2.Entity, er
 	}); entity == nil {
 		return nil, fmt.Errorf("feature entity %d not found", id)
 	} else {
-		return entity, nil
+		return entity.Copy(), nil
 	}
 }
 
@@ -109,7 +109,7 @@ func (f *Informer) GetEntityByName(ctx context.Context, name string) (*typesv2.E
 	}); entity == nil {
 		return nil, fmt.Errorf("feature entity '%s' not found", name)
 	} else {
-		return entity, nil
+		return entity.Copy(), nil
 	}
 }
 
@@ -119,7 +119,7 @@ func (f *Informer) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, 
 	}); feature == nil {
 		return nil, fmt.Errorf("feature %d not found", id)
 	} else {
-		return feature, nil
+		return feature.Copy(), nil
 	}
 }
 
@@ -129,7 +129,7 @@ func (f *Informer) GetFeatureByName(ctx context.Context, name string) (*typesv2.
 	}); feature == nil {
 		return nil, fmt.Errorf("feature '%s' not found", name)
 	} else {
-		return feature, nil
+		return feature.Copy(), nil
 	}
 }
 
@@ -139,7 +139,7 @@ func (f *Informer) GetFeatureGroup(ctx context.Context, id int16) (*typesv2.Feat
 	}); featureGroup == nil {
 		return nil, fmt.Errorf("feature group %d not found", id)
 	} else {
-		return featureGroup, nil
+		return featureGroup.Copy(), nil
 	}
 }
 
@@ -149,7 +149,7 @@ func (f *Informer) GetFeatureGroupByName(ctx context.Context, name string) (*typ
 	}); featureGroup == nil {
 		return nil, fmt.Errorf("feature group '%s' not found", name)
 	} else {
-		return featureGroup, nil
+		return featureGroup.Copy(), nil
 	}
 }
 
@@ -159,33 +159,65 @@ func (f *Informer) GetRevision(ctx context.Context, id int32) (*typesv2.Revision
 	}); revision == nil {
 		return nil, fmt.Errorf("revision not found")
 	} else {
-		return revision, nil
+		return revision.Copy(), nil
 	}
 }
 
 func (f *Informer) GetRevisionBy(ctx context.Context, groupID int16, revision int64) (*typesv2.Revision, error) {
 	if revision := f.Cache().Revisions.Find(func(r *typesv2.Revision) bool {
-		return r.Group.ID == groupID && r.Revision == revision
+		return r.GroupID == groupID && r.Revision == revision
 	}); revision == nil {
 		return nil, fmt.Errorf("revision not found")
 	} else {
-		return revision, nil
+		return revision.Copy(), nil
 	}
 }
 
 // List
 func (f *Informer) ListEntity(ctx context.Context) typesv2.EntityList {
-	return f.Cache().Entities.List()
+	list := f.Cache().Entities.List()
+	if len(list) == 0 {
+		return nil
+	}
+	copied := make(typesv2.EntityList, 0, len(list))
+	for _, x := range list {
+		copied = append(copied, x.Copy())
+	}
+	return copied
 }
 
 func (f *Informer) ListFeature(ctx context.Context, opt metadatav2.ListFeatureOpt) typesv2.FeatureList {
-	return f.Cache().Features.List(opt)
+	list := f.Cache().Features.List(opt)
+	if len(list) == 0 {
+		return nil
+	}
+	copied := make(typesv2.FeatureList, 0, len(list))
+	for _, x := range list {
+		copied = append(copied, x.Copy())
+	}
+	return copied
 }
 
 func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int16) typesv2.FeatureGroupList {
-	return f.Cache().Groups.List(entityID)
+	list := f.Cache().Groups.List(entityID)
+	if len(list) == 0 {
+		return nil
+	}
+	copied := make(typesv2.FeatureGroupList, 0, len(list))
+	for _, x := range list {
+		copied = append(copied, x.Copy())
+	}
+	return copied
 }
 
 func (f *Informer) ListRevision(ctx context.Context, opt metadatav2.ListRevisionOpt) typesv2.RevisionList {
-	return f.Cache().Revisions.List(opt)
+	list := f.Cache().Revisions.List(opt)
+	if len(list) == 0 {
+		return nil
+	}
+	copied := make(typesv2.RevisionList, 0, len(list))
+	for _, x := range list {
+		copied = append(copied, x.Copy())
+	}
+	return copied
 }
