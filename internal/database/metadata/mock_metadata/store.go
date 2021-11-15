@@ -10,7 +10,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	metadata "github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	types "github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 // MockStore is a mock of Store interface.
@@ -96,12 +96,13 @@ func (mr *MockStoreMockRecorder) CreateFeatureGroup(ctx, opt interface{}) *gomoc
 }
 
 // CreateRevision mocks base method.
-func (m *MockStore) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int32, error) {
+func (m *MockStore) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int32, string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRevision", ctx, opt)
 	ret0, _ := ret[0].(int32)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // CreateRevision indicates an expected call of CreateRevision.
