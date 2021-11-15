@@ -38,9 +38,3 @@ func (c *RevisionCache) List(opt metadata.ListRevisionOpt) types.RevisionList {
 	}
 	return revisions
 }
-
-func (c *RevisionCache) GetGroup(groupID int16) types.RevisionList {
-	return c.Filter(func(r *types.Revision) bool {
-		return r.GroupID == groupID
-	})
-}

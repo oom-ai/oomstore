@@ -18,6 +18,10 @@ func TestGetRevision(t *testing.T) {
 	test.TestGetRevision(t, prepareStore)
 }
 
+func TestGetRevisionBy(t *testing.T) {
+	test.TestGetRevisionBy(t, prepareStore)
+}
+
 func TestListRevision(t *testing.T) {
 	test.TestListRevision(t, prepareStore)
 }
