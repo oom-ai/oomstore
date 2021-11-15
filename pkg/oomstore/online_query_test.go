@@ -33,7 +33,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		entityName    *string
 		features      types.FeatureList
 		expectedError error
-		expected      types.FeatureValueMap
+		expected      *types.FeatureValues
 	}{
 		{
 			description: "no available features, return nil",
@@ -43,7 +43,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 			},
 			features:      unavailableFeatures,
 			expectedError: nil,
-			expected:      types.FeatureValueMap{},
+			expected:      nil,
 		},
 		{
 			description: "inconsistent entity type, fail",
@@ -64,10 +64,14 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 			features:      consistentFeatures,
 			entityName:    &entityName,
 			expectedError: nil,
-			expected: types.FeatureValueMap{
-				"price":  int64(100),
-				"model":  "xiaomi",
-				"device": "1234",
+			expected: &types.FeatureValues{
+				EntityName:   entityName,
+				EntityKey:    "1234",
+				FeatureNames: consistentFeatures.Names(),
+				FeatureValueMap: map[string]interface{}{
+					"price": int64(100),
+					"model": "xiaomi",
+				},
 			},
 		},
 	}

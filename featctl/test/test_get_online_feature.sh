@@ -16,7 +16,15 @@ actual=$(featctl get online-feature --feature model -k 1 -o csv)
 assert_eq "$case" "$expected" "$actual"
 
 
-case="query multiple features"
+case="query multiple features 1"
+expected='
+device,model,price
+6,apple-iphone11,4999
+'
+actual=$(featctl get online-feature --feature model,price -k 6 -o csv)
+assert_eq "$case" "$expected" "$actual"
+
+case="query multiple features 2"
 expected='
 device,price,model
 6,4999,apple-iphone11
