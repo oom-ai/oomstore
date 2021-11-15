@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
-	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -84,7 +84,7 @@ func TestExportFeatureValues(t *testing.T) {
 				}, nil)
 
 			metadatav2Store.EXPECT().
-				ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{GroupID: &tc.opt.GroupID}).
+				ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: &tc.opt.GroupID}).
 				Return(features)
 
 			metadatav2Store.EXPECT().GetRevision(gomock.Any(), revisonID).

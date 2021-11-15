@@ -3,12 +3,12 @@ package oomstore
 import (
 	"context"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
-func (s *OomStore) CreateFeatureGroup(ctx context.Context, opt metadatav2.CreateFeatureGroupOpt) (int16, error) {
+func (s *OomStore) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int16, error) {
 	// Via the oomstore API, we can only create a batch feature group
 	// So we hardcode the category to be batch
 	opt.Category = types.BatchFeatureCategory
@@ -27,6 +27,6 @@ func (s *OomStore) ListFeatureGroup(ctx context.Context, entityID *int16) typesv
 	return s.metadatav2.ListFeatureGroup(ctx, entityID)
 }
 
-func (s *OomStore) UpdateFeatureGroup(ctx context.Context, opt metadatav2.UpdateFeatureGroupOpt) error {
+func (s *OomStore) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
 	return s.metadatav2.UpdateFeatureGroup(ctx, opt)
 }

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/require"
@@ -20,7 +20,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	_, groupId := prepareEntityAndGroup(t, ctx, store)
 	group, err := store.GetFeatureGroup(ctx, groupId)
 	require.NoError(t, err)
-	opt := metadatav2.CreateRevisionOpt{
+	opt := metadata.CreateRevisionOpt{
 		GroupID:     groupId,
 		Revision:    1000,
 		DataTable:   stringPtr("device_info_20211028"),
@@ -29,7 +29,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	testCases := []struct {
 		description      string
-		opt              metadatav2.CreateRevisionOpt
+		opt              metadata.CreateRevisionOpt
 		expectedError    error
 		expected         int32
 		expectedRevision *typesv2.Revision
@@ -51,7 +51,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		},
 		{
 			description: "create revision without data table, use default data table name",
-			opt: metadatav2.CreateRevisionOpt{
+			opt: metadata.CreateRevisionOpt{
 				GroupID:     groupId,
 				Revision:    2000,
 				Description: "description",
@@ -99,7 +99,7 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	_, groupId := prepareEntityAndGroup(t, ctx, store)
-	revisionId, err := store.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
+	revisionId, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
 		GroupID:   groupId,
 		DataTable: stringPtr("device_info_1000"),
@@ -109,12 +109,12 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	testCases := []struct {
 		description string
-		opt         metadatav2.UpdateRevisionOpt
+		opt         metadata.UpdateRevisionOpt
 		expected    error
 	}{
 		{
 			description: "update revision successfully",
-			opt: metadatav2.UpdateRevisionOpt{
+			opt: metadata.UpdateRevisionOpt{
 				RevisionID:  revisionId,
 				NewAnchored: boolPtr(true),
 			},
@@ -122,7 +122,7 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		},
 		{
 			description: "cannot update revision, return err",
-			opt: metadatav2.UpdateRevisionOpt{
+			opt: metadata.UpdateRevisionOpt{
 				RevisionID:  revisionId - 1,
 				NewAnchored: boolPtr(true),
 			},
@@ -147,7 +147,7 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	_, groupId := prepareEntityAndGroup(t, ctx, store)
-	revisionId, err := store.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
+	revisionId, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
 		GroupID:   groupId,
 		DataTable: stringPtr("device_info_1000"),
@@ -209,7 +209,7 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	_, groupId := prepareEntityAndGroup(t, ctx, store)
-	revisionId, err := store.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
+	revisionId, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
 		GroupID:   groupId,
 		DataTable: stringPtr("device_info_1000"),
@@ -232,7 +232,7 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	testCases := []struct {
 		description   string
-		opt           metadatav2.GetRevisionOpt
+		opt           metadata.GetRevisionOpt
 		GroupID       int16
 		Revision      int64
 		expectedError error
@@ -287,33 +287,33 @@ func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	testCases := []struct {
 		description string
-		opt         metadatav2.ListRevisionOpt
+		opt         metadata.ListRevisionOpt
 		expected    typesv2.RevisionList
 	}{
 		{
 			description: "list revision by groupID, succeed",
-			opt: metadatav2.ListRevisionOpt{
+			opt: metadata.ListRevisionOpt{
 				GroupID: &groupId,
 			},
 			expected: revisions,
 		},
 		{
 			description: "list revision by dataTables, succeed",
-			opt: metadatav2.ListRevisionOpt{
+			opt: metadata.ListRevisionOpt{
 				DataTables: []string{"device_info_1000", "device_info_2000"},
 			},
 			expected: revisions,
 		},
 		{
 			description: "list revision by invalid dataTables, return empty list",
-			opt: metadatav2.ListRevisionOpt{
+			opt: metadata.ListRevisionOpt{
 				DataTables: []string{"device_info_3000"},
 			},
 			expected: nilRevisionList,
 		},
 		{
 			description: "list revision by empty dataTables, return empty list",
-			opt: metadatav2.ListRevisionOpt{
+			opt: metadata.ListRevisionOpt{
 				DataTables: []string{},
 				GroupID:    &groupId,
 			},
@@ -342,15 +342,15 @@ func ignoreCreateAndModifyTime(revision *typesv2.Revision) {
 	revision.ModifyTime = time.Time{}
 }
 
-func prepareRevisions(t *testing.T, ctx context.Context, store metadatav2.Store) (int16, int16, []int32, typesv2.RevisionList) {
-	entityID, err := store.CreateEntity(ctx, metadatav2.CreateEntityOpt{
+func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (int16, int16, []int32, typesv2.RevisionList) {
+	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
 		Description: "description",
 	})
 	require.NoError(t, err)
 
-	groupId, err := store.CreateFeatureGroup(ctx, metadatav2.CreateFeatureGroupOpt{
+	groupId, err := store.CreateFeatureGroup(ctx, metadata.CreateFeatureGroupOpt{
 		Name:        "device_info",
 		EntityID:    entityID,
 		Description: "description",
@@ -358,7 +358,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadatav2.Store)
 	})
 	require.NoError(t, err)
 	require.NoError(t, store.Refresh())
-	revisionId1, err := store.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
+	revisionId1, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
 		GroupID:   groupId,
 		DataTable: stringPtr("device_info_1000"),
@@ -366,7 +366,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadatav2.Store)
 	})
 	require.NoError(t, err)
 
-	revisionId2, err := store.CreateRevision(ctx, metadatav2.CreateRevisionOpt{
+	revisionId2, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  2000,
 		GroupID:   groupId,
 		DataTable: stringPtr("device_info_2000"),

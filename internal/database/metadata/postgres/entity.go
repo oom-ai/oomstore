@@ -6,7 +6,7 @@ import (
 
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
-	metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2"
+	metadatav2 "github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
 func (db *DB) CreateEntity(ctx context.Context, opt metadatav2.CreateEntityOpt) (int16, error) {

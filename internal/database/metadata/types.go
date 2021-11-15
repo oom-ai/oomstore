@@ -1,4 +1,4 @@
-package metadatav2
+package metadata
 
 type RevisionRange struct {
 	MinRevision int64  `db:"min_revision"`

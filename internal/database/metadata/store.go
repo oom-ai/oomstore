@@ -1,4 +1,4 @@
-package metadatav2
+package metadata
 
 import (
 	"context"

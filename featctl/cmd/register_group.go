@@ -4,12 +4,12 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/spf13/cobra"
 )
 
 type registerGroupOption struct {
-	metadatav2.CreateFeatureGroupOpt
+	metadata.CreateFeatureGroupOpt
 	entityName string
 }
 

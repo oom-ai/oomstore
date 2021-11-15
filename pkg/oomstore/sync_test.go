@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
-	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2/mock_metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	mock_metadatav2 "github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -87,7 +87,7 @@ func TestSync(t *testing.T) {
 				}
 
 				metadatav2Store.EXPECT().
-					ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &revision.Group.ID}).
+					ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).
 					Return(features)
 
 				stream := make(chan *types.RawFeatureValueRecord)
@@ -111,7 +111,7 @@ func TestSync(t *testing.T) {
 					Return(nil)
 
 				metadatav2Store.EXPECT().
-					UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
+					UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
 						GroupID:             revision.GroupID,
 						NewOnlineRevisionID: int32Ptr(revision.ID),
 					}).
@@ -158,7 +158,7 @@ func TestSync(t *testing.T) {
 				}
 
 				metadatav2Store.EXPECT().
-					ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &revision.Group.ID}).
+					ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).
 					Return(features)
 
 				stream := make(chan *types.RawFeatureValueRecord)
@@ -182,7 +182,7 @@ func TestSync(t *testing.T) {
 					Return(nil)
 
 				metadatav2Store.EXPECT().
-					UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
+					UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
 						GroupID:             revision.GroupID,
 						NewOnlineRevisionID: int32Ptr(revision.ID),
 					}).

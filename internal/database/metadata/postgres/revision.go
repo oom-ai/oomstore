@@ -9,10 +9,10 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
-func (db *DB) CreateRevision(ctx context.Context, opt metadatav2.CreateRevisionOpt) (int32, error) {
+func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int32, error) {
 	var dataTable string
 	if opt.DataTable != nil {
 		dataTable = *opt.DataTable
@@ -53,7 +53,7 @@ func (db *DB) CreateRevision(ctx context.Context, opt metadatav2.CreateRevisionO
 
 // UpdateRevision = MustUpdateRevision
 // If fail to update any row or update more than one row, return error
-func (db *DB) UpdateRevision(ctx context.Context, opt metadatav2.UpdateRevisionOpt) error {
+func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
 	and := make(map[string]interface{})
 	if opt.NewRevision != nil {
 		and["revision"] = *opt.NewRevision

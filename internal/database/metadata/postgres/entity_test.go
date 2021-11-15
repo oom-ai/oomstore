@@ -3,7 +3,7 @@ package postgres_test
 import (
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2/test"
+	"github.com/oom-ai/oomstore/internal/database/metadata/test"
 )
 
 func TestCreateEntity(t *testing.T) {

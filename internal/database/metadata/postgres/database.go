@@ -9,8 +9,8 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	metadatav2 "github.com/oom-ai/oomstore/internal/database/metadatav2"
-	"github.com/oom-ai/oomstore/internal/database/metadatav2/informer"
+	metadatav2 "github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )

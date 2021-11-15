@@ -4,12 +4,12 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/spf13/cobra"
 )
 
 type registerBatchFeatureOption struct {
-	metadatav2.CreateFeatureOpt
+	metadata.CreateFeatureOpt
 	groupName string
 }
 

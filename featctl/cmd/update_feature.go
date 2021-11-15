@@ -4,11 +4,11 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/internal/database/metadatav2"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/spf13/cobra"
 )
 
-var updateFeatureOpt metadatav2.UpdateFeatureOpt
+var updateFeatureOpt metadata.UpdateFeatureOpt
 
 var updateFeatureCmd = &cobra.Command{
 	Use:   "feature",
