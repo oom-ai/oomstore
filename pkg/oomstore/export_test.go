@@ -23,9 +23,7 @@ func TestExportFeatureValues(t *testing.T) {
 
 	store := oomstore.NewOomStore(nil, offlineStore, metadatav2Store)
 
-	dataTable := "device_info_10"
-	prevRevision := int64(5)
-	prevDataTable := "device_info_5"
+	revisonID := int32(5)
 	features := typesv2.FeatureList{
 		{
 			Name:        "model",
@@ -48,6 +46,7 @@ func TestExportFeatureValues(t *testing.T) {
 			opt: types.ExportFeatureValuesOpt{
 				GroupID:      1,
 				FeatureNames: []string{},
+				RevisionID:   revisonID,
 			},
 			stream:   prepareTwoFeatureStream(),
 			expected: [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
@@ -57,6 +56,7 @@ func TestExportFeatureValues(t *testing.T) {
 			opt: types.ExportFeatureValuesOpt{
 				GroupID:      1,
 				FeatureNames: []string{"price"},
+				RevisionID:   revisonID,
 			},
 			stream:   prepareOneFeatureStream(),
 			expected: [][]interface{}{{"1234", int64(100)}, {"1235", int64(200)}, {"1236", int64(300)}, {"1237", int64(240)}},
@@ -66,7 +66,7 @@ func TestExportFeatureValues(t *testing.T) {
 			opt: types.ExportFeatureValuesOpt{
 				GroupID:      1,
 				FeatureNames: []string{"price"},
-				Revision:     &prevRevision,
+				RevisionID:   revisonID,
 			},
 			stream:   prepareTwoFeatureStream(),
 			expected: [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
@@ -75,30 +75,30 @@ func TestExportFeatureValues(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			// mock database methods
-			metadatav2Store.EXPECT().GetFeatureGroup(gomock.Any(), tc.opt.GroupID).Return(&typesv2.FeatureGroup{
-				ID:       1,
-				Name:     "device_info",
-				EntityID: 1,
-			}, nil)
-			metadatav2Store.EXPECT().ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{GroupID: &tc.opt.GroupID}).Return(features)
-
-			dt := dataTable
-			if tc.opt.Revision != nil {
-				dt = prevDataTable
-				metadatav2Store.EXPECT().GetRevision(gomock.Any(), metadatav2.GetRevisionOpt{
-					GroupID:  &tc.opt.GroupID,
-					Revision: tc.opt.Revision,
-				}).Return(&typesv2.Revision{
-					DataTable: prevDataTable,
+			metadatav2Store.EXPECT().GetFeatureGroup(gomock.Any(), tc.opt.GroupID).
+				Return(&typesv2.FeatureGroup{
+					ID:       1,
+					Name:     "device_info",
+					EntityID: 1,
+					Entity:   &typesv2.Entity{Name: "device"},
 				}, nil)
-			}
+
+			metadatav2Store.EXPECT().
+				ListFeature(gomock.Any(), metadatav2.ListFeatureOpt{GroupID: &tc.opt.GroupID}).
+				Return(features)
+
+			metadatav2Store.EXPECT().GetRevision(gomock.Any(), revisonID).
+				Return(&typesv2.Revision{
+					DataTable: "device_info_10",
+				}, nil)
+
 			featureNames := tc.opt.FeatureNames
 			if len(featureNames) == 0 {
 				featureNames = features.Names()
 			}
 
 			offlineStore.EXPECT().Export(gomock.Any(), offline.ExportOpt{
-				DataTable:    dt,
+				DataTable:    "device_info_10",
 				EntityName:   "device",
 				FeatureNames: featureNames,
 				Limit:        tc.opt.Limit,
