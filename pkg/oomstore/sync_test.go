@@ -15,7 +15,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSync(t *testing.T) {
@@ -27,109 +27,178 @@ func TestSync(t *testing.T) {
 	store := oomstore.NewOomStore(onlineStore, offlineStore, metadatav2Store)
 	ctx := context.Background()
 
-	revision1 := prepareRevision(1, 10)
-	revision2 := prepareRevision(2, 20)
-	revision3 := prepareRevision(3, 30)
-	entity := typesv2.Entity{
-		ID:   1,
-		Name: "device",
-	}
-	features := prepareFeatures(true, true)
-	stream := make(chan *types.RawFeatureValueRecord)
-
 	testCases := []struct {
-		description      string
-		opt              types.SyncOpt
-		group            typesv2.FeatureGroup
-		revision         typesv2.Revision
-		previousRevision typesv2.Revision
-		expectedError    error
+		description   string
+		opt           types.SyncOpt
+		mockFn        func()
+		expectedError error
 	}{
 		{
-			description: "user-defined revision, succeed",
+			description: "the specific revision was synced to the online store, won't do it again this time",
 			opt: types.SyncOpt{
-				GroupID:    1,
-				RevisionID: 10,
+				RevisionId: 1,
 			},
-			group:            prepareGroup(int32Ptr(2)),
-			revision:         revision1,
-			previousRevision: revision2,
-			expectedError:    nil,
-		},
-		{
-			description: "latest revision, succeed",
-			opt: types.SyncOpt{
-				GroupID: 1,
+			expectedError: fmt.Errorf("the specific revision was synced to the online store, won't do it again this time"),
+			mockFn: func() {
+				metadatav2Store.EXPECT().
+					GetRevision(ctx, int32(1)).
+					Return(&typesv2.Revision{
+						GroupID: 1,
+						Group: &typesv2.FeatureGroup{
+							ID:               1,
+							OnlineRevisionID: int32Ptr(1),
+						},
+					}, nil)
 			},
-			group:            prepareGroup(int32Ptr(2)),
-			revision:         revision3,
-			previousRevision: revision2,
-			expectedError:    nil,
 		},
 		{
 			description: "no previous revision, succeed",
 			opt: types.SyncOpt{
-				GroupID: 1,
+				RevisionId: 1,
 			},
-			group:         prepareGroup(nil),
-			revision:      revision1,
 			expectedError: nil,
+			mockFn: func() {
+				revision := &typesv2.Revision{
+					GroupID: 2,
+					Group: &typesv2.FeatureGroup{
+						ID:       2,
+						EntityID: 2,
+						Entity: &typesv2.Entity{
+							Name: "entity-name",
+						},
+						OnlineRevisionID: nil,
+					},
+					DataTable: "data-table-name",
+				}
+				metadatav2Store.EXPECT().
+					GetRevision(ctx, int32(1)).
+					Return(revision, nil)
+
+				features := typesv2.FeatureList{
+					{
+						Name: "feature1",
+					},
+					{
+						Name: "feature2",
+					},
+					{
+						Name: "feature3",
+					},
+				}
+
+				metadatav2Store.EXPECT().
+					ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &revision.Group.ID}).
+					Return(features)
+
+				stream := make(chan *types.RawFeatureValueRecord)
+				offlineStore.EXPECT().
+					Export(ctx, offline.ExportOpt{
+						DataTable:    "data-table-name",
+						EntityName:   "entity-name",
+						FeatureNames: features.Names(),
+					}).
+					Return(stream, nil)
+
+				onlineStore.EXPECT().
+					Import(ctx, online.ImportOpt{
+						FeatureList: features,
+						Revision:    revision,
+						Entity: &typesv2.Entity{
+							Name: "entity-name",
+						},
+						Stream: stream,
+					}).
+					Return(nil)
+
+				metadatav2Store.EXPECT().
+					UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
+						GroupID:             revision.GroupID,
+						NewOnlineRevisionID: int32Ptr(revision.ID),
+					}).
+					Return(nil)
+
+				metadatav2Store.EXPECT().
+					UpdateRevision(gomock.Any(), gomock.Any()).
+					Return(nil)
+			},
 		},
 		{
-			description: "already in latest revision, fail",
+			description: "user-defined revision, succeed",
 			opt: types.SyncOpt{
-				GroupID: 1,
+				RevisionId: 1,
 			},
-			group:         prepareGroup(int32Ptr(3)),
-			revision:      revision3,
-			expectedError: fmt.Errorf("online store already in the latest revision"),
+			expectedError: nil,
+			mockFn: func() {
+				revision := &typesv2.Revision{
+					GroupID: 2,
+					Group: &typesv2.FeatureGroup{
+						ID:       2,
+						EntityID: 2,
+						Entity: &typesv2.Entity{
+							Name: "entity-name",
+						},
+						OnlineRevisionID: int32Ptr(100),
+					},
+					DataTable: "data-table-name",
+				}
+				metadatav2Store.EXPECT().
+					GetRevision(ctx, int32(1)).
+					Return(revision, nil)
+
+				features := typesv2.FeatureList{
+					{
+						Name: "feature1",
+					},
+					{
+						Name: "feature2",
+					},
+					{
+						Name: "feature3",
+					},
+				}
+
+				metadatav2Store.EXPECT().
+					ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &revision.Group.ID}).
+					Return(features)
+
+				stream := make(chan *types.RawFeatureValueRecord)
+				offlineStore.EXPECT().
+					Export(ctx, offline.ExportOpt{
+						DataTable:    "data-table-name",
+						EntityName:   "entity-name",
+						FeatureNames: features.Names(),
+					}).
+					Return(stream, nil)
+
+				onlineStore.EXPECT().
+					Import(ctx, online.ImportOpt{
+						FeatureList: features,
+						Revision:    revision,
+						Entity: &typesv2.Entity{
+							Name: "entity-name",
+						},
+						Stream: stream,
+					}).
+					Return(nil)
+
+				metadatav2Store.EXPECT().
+					UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
+						GroupID:             revision.GroupID,
+						NewOnlineRevisionID: int32Ptr(revision.ID),
+					}).
+					Return(nil)
+
+				onlineStore.EXPECT().
+					Purge(ctx, *revision.Group.OnlineRevisionID).
+					Return(nil)
+			},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadatav2Store.EXPECT().GetFeatureGroup(ctx, tc.opt.GroupID).Return(&tc.group, nil)
-			metadatav2Store.EXPECT().GetEntity(ctx, entity.ID).AnyTimes().Return(&entity, nil)
-			metadatav2Store.EXPECT().ListFeature(ctx, metadatav2.ListFeatureOpt{GroupID: &tc.opt.GroupID}).AnyTimes().Return(features, nil)
-
-			metadatav2Store.EXPECT().GetRevision(ctx, metadatav2.GetRevisionOpt{
-				GroupID:    &tc.opt.GroupID,
-				RevisionID: &tc.opt.RevisionID,
-			}).Return(&tc.revision, nil)
-			if tc.expectedError == nil {
-				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
-					DataTable:    tc.revision.DataTable,
-					EntityName:   entity.Name,
-					FeatureNames: features.Names(),
-				}).Return(stream, nil)
-				onlineStore.EXPECT().Import(ctx, online.ImportOpt{
-					FeatureList: features,
-					Revision:    &tc.revision,
-					Entity:      &entity,
-					Stream:      stream,
-				})
-				if tc.group.OnlineRevisionID != nil {
-					metadatav2Store.EXPECT().GetRevision(ctx, metadatav2.GetRevisionOpt{
-						RevisionID: tc.group.OnlineRevisionID,
-					}).Return(&tc.previousRevision, nil)
-					onlineStore.EXPECT().Purge(ctx, &tc.previousRevision).Return(nil)
-				}
-				metadatav2Store.EXPECT().UpdateFeatureGroup(ctx, metadatav2.UpdateFeatureGroupOpt{
-					GroupID:             tc.group.ID,
-					NewOnlineRevisionID: &tc.revision.ID,
-				})
-				metadatav2Store.EXPECT().
-					UpdateRevision(gomock.Any(), gomock.Any()).
-					AnyTimes().
-					Return(int64(0), nil)
-			}
-
-			err := store.Sync(ctx, tc.opt)
-			if tc.expectedError != nil {
-				assert.Error(t, err, tc.expectedError)
-			} else {
-				assert.NoError(t, err)
-			}
+			tc.mockFn()
+			require.Equal(t, tc.expectedError, store.Sync(ctx, tc.opt))
 		})
 	}
 }
@@ -160,4 +229,8 @@ func int32Ptr(i int32) *int32 {
 
 func stringPtr(s string) *string {
 	return &s
+}
+
+func boolPtr(b bool) *bool {
+	return &b
 }
