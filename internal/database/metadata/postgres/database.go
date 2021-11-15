@@ -21,7 +21,7 @@ type DB struct {
 	*informer.Informer
 }
 
-func Open(ctx context.Context, option *types.PostgresOpt) (*DB, error) {
+func Open(ctx context.Context, option *types.PostgresOpt) (*metadata.StoreImpl, error) {
 	db, err := OpenDB(ctx, option.Host, option.Port, option.User, option.Password, option.Database)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,14 @@ func Open(ctx context.Context, option *types.PostgresOpt) (*DB, error) {
 		db.Close()
 		return nil, err
 	}
-	return &DB{DB: db, Informer: informer}, nil
+
+	storeImpl := metadata.NewStoreImpl(db,
+		CreateEntity,
+		UpdateEntity,
+		informer.GetEntity)
+	// ...
+
+	return storeImpl, nil
 }
 
 func OpenDB(ctx context.Context, host, port, user, password, database string) (*sqlx.DB, error) {

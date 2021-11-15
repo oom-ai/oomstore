@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -36,7 +37,16 @@ type Store interface {
 	GetRevisionBy(ctx context.Context, groupID int16, revision int64) (*types.Revision, error)
 	ListRevision(ctx context.Context, opt ListRevisionOpt) types.RevisionList
 
+	// transaction
+	WithTransaction(context.Context, func(context.Context, Store) error) error
 	// refresh
 	Refresh() error
 	io.Closer
+}
+
+type ExtContext interface {
+	GetContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
+	SelectContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
+
+	sqlx.ExtContext
 }
