@@ -12,7 +12,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
-func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int32, error) {
+func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int32, string, error) {
 	var dataTable string
 	if opt.DataTable != nil {
 		dataTable = *opt.DataTable
@@ -31,7 +31,7 @@ func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt
 		}
 		if opt.DataTable == nil {
 			updateQuery := "UPDATE feature_group_revision SET data_table = $1 WHERE id = $2"
-			dataTable := fmt.Sprintf("data_%d_%d", opt.GroupID, revisionId)
+			dataTable = fmt.Sprintf("data_%d_%d", opt.GroupID, revisionId)
 			result, err := tx.ExecContext(ctx, updateQuery, dataTable, revisionId)
 			if err != nil {
 				return err
@@ -48,7 +48,7 @@ func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt
 		return nil
 	})
 
-	return revisionId, err
+	return revisionId, dataTable, err
 }
 
 // UpdateRevision = MustUpdateRevision

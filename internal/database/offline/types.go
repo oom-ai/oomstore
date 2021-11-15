@@ -30,11 +30,12 @@ type JoinOneFeatureGroupOpt struct {
 }
 
 type ImportOpt struct {
-	GroupName string
-	Entity    *types.Entity
-	Features  types.FeatureList
-	Header    []string
-	Revision  *int64
+	GroupName     string
+	Entity        *types.Entity
+	Features      types.FeatureList
+	Header        []string
+	Revision      *int64
+	DataTableName string
 
 	// CsvReader must not contain header
 	CsvReader *csv.Reader
