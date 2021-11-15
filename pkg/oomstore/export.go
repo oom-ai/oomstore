@@ -37,19 +37,18 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 		}
 	}
 
-	entity, err := s.metadatav2.GetEntity(ctx, group.EntityID)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to get entity id=%d: %v", group.EntityID, err)
+	if group.Entity == nil {
+		return nil, nil, fmt.Errorf("failed to get entity id='%d'", group.ID)
 	}
 
 	stream, err := s.offline.Export(ctx, offline.ExportOpt{
 		DataTable:    revision.DataTable,
-		EntityName:   entity.Name,
+		EntityName:   group.Entity.Name,
 		FeatureNames: featureNames,
 		Limit:        opt.Limit,
 	})
 
-	fields := append([]string{entity.Name}, featureNames...)
+	fields := append([]string{group.Entity.Name}, featureNames...)
 	return fields, stream, err
 }
 
