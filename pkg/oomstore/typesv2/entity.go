@@ -26,6 +26,17 @@ func (e *Entity) Copy() *Entity {
 
 type EntityList []*Entity
 
+func (l EntityList) Copy() EntityList {
+	if len(l) == 0 {
+		return nil
+	}
+	copied := make(EntityList, 0, len(l))
+	for _, x := range l {
+		copied = append(copied, x.Copy())
+	}
+	return copied
+}
+
 func (l *EntityList) Find(find func(*Entity) bool) *Entity {
 	for _, e := range *l {
 		if find(e) {
