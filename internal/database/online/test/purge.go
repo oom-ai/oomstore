@@ -12,7 +12,7 @@ func TestPurgeRemovesSpecifiedRevision(t *testing.T, prepareStore PrepareStoreRu
 	defer store.Close()
 	importSample(t, ctx, store, &SampleMedium)
 
-	err := store.Purge(ctx, SampleMedium.Revision)
+	err := store.Purge(ctx, SampleMedium.Revision.ID)
 	require.NoError(t, err)
 
 	for _, record := range SampleMedium.Data {
@@ -32,7 +32,7 @@ func TestPurgeNotRemovesOtherRevisions(t *testing.T, prepareStore PrepareStoreRu
 	defer store.Close()
 	importSample(t, ctx, store, &SampleSmall, &SampleMedium)
 
-	err := store.Purge(ctx, SampleMedium.Revision)
+	err := store.Purge(ctx, SampleMedium.Revision.ID)
 	require.NoError(t, err)
 
 	for _, record := range SampleSmall.Data {
