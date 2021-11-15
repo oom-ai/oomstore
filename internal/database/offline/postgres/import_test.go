@@ -24,8 +24,9 @@ func TestImport(t *testing.T) {
 	}
 
 	opt := offline.ImportOpt{
-		GroupName: "device",
-		Entity:    &entity,
+		GroupName:     "device",
+		Entity:        &entity,
+		DataTableName: "device_1",
 		Features: []*types.Feature{
 			{
 				Name:        "model",
@@ -45,7 +46,7 @@ func TestImport(t *testing.T) {
 	}
 
 	t.Run("invalid db value type", func(t *testing.T) {
-		_, _, err := db.Import(context.Background(), opt)
+		_, err := db.Import(context.Background(), opt)
 		assert.NotNil(t, err)
 	})
 
@@ -53,7 +54,7 @@ func TestImport(t *testing.T) {
 		revision := int64(1234)
 		opt.Features[0].DBValueType = "varchar(32)"
 		opt.Revision = &revision
-		_, tableName, err := db.Import(context.Background(), opt)
+		_, err := db.Import(context.Background(), opt)
 		assert.Nil(t, err)
 
 		type T struct {
@@ -63,7 +64,7 @@ func TestImport(t *testing.T) {
 		}
 		records := make([]T, 0)
 
-		assert.Nil(t, db.SelectContext(context.Background(), &records, fmt.Sprintf("select * from %s", tableName)))
+		assert.Nil(t, db.SelectContext(context.Background(), &records, fmt.Sprintf("select * from %s", opt.DataTableName)))
 		assert.Equal(t, 4, len(records))
 
 		sort.Slice(records, func(i, j int) bool {

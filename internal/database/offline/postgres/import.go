@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -44,9 +43,8 @@ func loadData(tx *sqlx.Tx, ctx context.Context, csvReader *csv.Reader, tableName
 
 }
 
-func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, string, error) {
+func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
 	var revision int64
-	var finalTableName string
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tmpTableName := dbutil.TempTable(opt.GroupName)
@@ -70,12 +68,9 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, string,
 			revision = time.Now().Unix()
 		}
 
-		// generate final data table name
-		finalTableName = opt.GroupName + "_" + strconv.FormatInt(revision, 10)
-
-		rename := fmt.Sprintf("ALTER TABLE %s RENAME TO %s", tmpTableName, finalTableName)
+		rename := fmt.Sprintf("ALTER TABLE %s RENAME TO %s", tmpTableName, opt.DataTableName)
 		_, err = tx.ExecContext(ctx, rename)
 		return err
 	})
-	return revision, finalTableName, err
+	return revision, err
 }
