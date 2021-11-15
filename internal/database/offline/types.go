@@ -5,7 +5,6 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 type ExportOpt struct {
@@ -16,24 +15,24 @@ type ExportOpt struct {
 }
 
 type JoinOpt struct {
-	Entity           typesv2.Entity
+	Entity           types.Entity
 	EntityRows       <-chan types.EntityRow
-	FeatureMap       map[string]typesv2.FeatureList
+	FeatureMap       map[string]types.FeatureList
 	RevisionRangeMap map[string][]*metadata.RevisionRange
 }
 
 type JoinOneFeatureGroupOpt struct {
 	GroupName           string
-	Features            typesv2.FeatureList
+	Features            types.FeatureList
 	RevisionRanges      []*metadata.RevisionRange
-	Entity              typesv2.Entity
+	Entity              types.Entity
 	EntityRowsTableName string
 }
 
 type ImportOpt struct {
 	GroupName string
-	Entity    *typesv2.Entity
-	Features  typesv2.FeatureList
+	Entity    *types.Entity
+	Features  types.FeatureList
 	Header    []string
 	Revision  *int64
 

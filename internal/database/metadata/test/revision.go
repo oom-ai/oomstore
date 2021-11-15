@@ -9,7 +9,6 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,14 +31,14 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		opt              metadata.CreateRevisionOpt
 		expectedError    error
 		expected         int32
-		expectedRevision *typesv2.Revision
+		expectedRevision *types.Revision
 	}{
 		{
 			description:   "create revision successfully, return id",
 			opt:           opt,
 			expectedError: nil,
 			expected:      int32(1),
-			expectedRevision: &typesv2.Revision{
+			expectedRevision: &types.Revision{
 				ID:          1,
 				Revision:    1000,
 				DataTable:   "device_info_20211028",
@@ -58,7 +57,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 			},
 			expectedError: nil,
 			expected:      int32(2),
-			expectedRevision: &typesv2.Revision{
+			expectedRevision: &types.Revision{
 				ID:          2,
 				Revision:    2000,
 				DataTable:   "data_1_2",
@@ -159,7 +158,7 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	group, err := store.GetFeatureGroup(ctx, groupId)
 	require.NoError(t, err)
 
-	revision := typesv2.Revision{
+	revision := types.Revision{
 		ID:        revisionId,
 		Revision:  1000,
 		GroupID:   groupId,
@@ -172,7 +171,7 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		description   string
 		revisionID    int32
 		expectedError error
-		expected      *typesv2.Revision
+		expected      *types.Revision
 	}{
 		{
 			description:   "get revision by revisionId successfully",
@@ -221,7 +220,7 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	group, err := store.GetFeatureGroup(ctx, groupId)
 	require.NoError(t, err)
 
-	revision := typesv2.Revision{
+	revision := types.Revision{
 		ID:        revisionId,
 		Revision:  1000,
 		GroupID:   groupId,
@@ -236,7 +235,7 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		GroupID       int16
 		Revision      int64
 		expectedError error
-		expected      *typesv2.Revision
+		expected      *types.Revision
 	}{
 		{
 			description:   "get revision by groupID and revision successfully",
@@ -282,13 +281,13 @@ func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	_, groupId, _, revisions := prepareRevisions(t, ctx, store)
-	var nilRevisionList typesv2.RevisionList
+	var nilRevisionList types.RevisionList
 	require.NoError(t, store.Refresh())
 
 	testCases := []struct {
 		description string
 		opt         metadata.ListRevisionOpt
-		expected    typesv2.RevisionList
+		expected    types.RevisionList
 	}{
 		{
 			description: "list revision by groupID, succeed",
@@ -337,12 +336,12 @@ func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	}
 }
 
-func ignoreCreateAndModifyTime(revision *typesv2.Revision) {
+func ignoreCreateAndModifyTime(revision *types.Revision) {
 	revision.CreateTime = time.Time{}
 	revision.ModifyTime = time.Time{}
 }
 
-func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (int16, int16, []int32, typesv2.RevisionList) {
+func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (int16, int16, []int32, types.RevisionList) {
 	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
@@ -378,7 +377,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	group, err := store.GetFeatureGroup(ctx, groupId)
 	require.NoError(t, err)
 
-	revision1 := &typesv2.Revision{
+	revision1 := &types.Revision{
 		ID:        revisionId1,
 		Revision:  1000,
 		GroupID:   groupId,
@@ -387,7 +386,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 		Group:     group,
 	}
 
-	revision2 := &typesv2.Revision{
+	revision2 := &types.Revision{
 		ID:        revisionId2,
 		Revision:  2000,
 		GroupID:   groupId,
@@ -396,5 +395,5 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 		Group:     group,
 	}
 
-	return entityID, groupId, []int32{revisionId1, revisionId2}, typesv2.RevisionList{revision1, revision2}
+	return entityID, groupId, []int32{revisionId1, revisionId2}, types.RevisionList{revision1, revision2}
 }

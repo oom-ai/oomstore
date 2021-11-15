@@ -9,7 +9,6 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 // GetHistoricalFeatureValues gets point-in-time feature values for each entity row;
@@ -17,7 +16,7 @@ import (
 func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.GetHistoricalFeatureValuesOpt) (*types.JoinResult, error) {
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{FeatureIDs: &opt.FeatureIDs})
 
-	features = features.Filter(func(f *typesv2.Feature) bool {
+	features = features.Filter(func(f *types.Feature) bool {
 		return f.Group.Category == types.BatchFeatureCategory
 	})
 	if len(features) == 0 {
@@ -54,11 +53,11 @@ func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.Get
 }
 
 // key: group_name, value: slice of features
-func buildGroupToFeaturesMap(features typesv2.FeatureList) map[string]typesv2.FeatureList {
-	groups := make(map[string]typesv2.FeatureList)
+func buildGroupToFeaturesMap(features types.FeatureList) map[string]types.FeatureList {
+	groups := make(map[string]types.FeatureList)
 	for _, f := range features {
 		if _, ok := groups[f.Group.Name]; !ok {
-			groups[f.Group.Name] = typesv2.FeatureList{}
+			groups[f.Group.Name] = types.FeatureList{}
 		}
 		groups[f.Group.Name] = append(groups[f.Group.Name], f)
 	}

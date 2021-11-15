@@ -1,11 +1,13 @@
 package informer
 
-import "github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
+import (
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+)
 
 type EntityCache struct {
-	typesv2.EntityList
+	types.EntityList
 }
 
-func (c *EntityCache) List() typesv2.EntityList {
+func (c *EntityCache) List() types.EntityList {
 	return c.EntityList
 }

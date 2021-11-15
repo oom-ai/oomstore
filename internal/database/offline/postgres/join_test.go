@@ -11,7 +11,6 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/postgres"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -22,7 +21,7 @@ func TestJoin(t *testing.T) {
 	ctx := context.Background()
 
 	// prepare test data
-	entity := &typesv2.Entity{
+	entity := &types.Entity{
 		Name:   "device",
 		Length: 10,
 	}
@@ -38,7 +37,7 @@ func TestJoin(t *testing.T) {
 		{
 			description: "no features",
 			opt: offline.JoinOpt{
-				FeatureMap: make(map[string]typesv2.FeatureList),
+				FeatureMap: make(map[string]types.FeatureList),
 			},
 			expected: nil,
 		},
@@ -89,7 +88,7 @@ func TestJoin(t *testing.T) {
 	}
 }
 
-func prepareTestData(ctx context.Context, db *postgres.DB, t *testing.T, entity *typesv2.Entity, oneGroupFeatures typesv2.FeatureList, twoGroupFeatureMap map[string]typesv2.FeatureList) {
+func prepareTestData(ctx context.Context, db *postgres.DB, t *testing.T, entity *types.Entity, oneGroupFeatures types.FeatureList, twoGroupFeatureMap map[string]types.FeatureList) {
 	schema := dbutil.BuildFeatureDataTableSchema("device_basic_1", entity, oneGroupFeatures)
 	_, err := db.ExecContext(ctx, schema)
 	require.NoError(t, err)
@@ -126,34 +125,34 @@ func insertTestDataToAdvanced(db *postgres.DB, ctx context.Context, tableName st
 	return err
 }
 
-func prepareFeatures(oneGroup bool) (typesv2.FeatureList, map[string]typesv2.FeatureList) {
-	price := &typesv2.Feature{
+func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.FeatureList) {
+	price := &types.Feature{
 		Name:        "price",
 		DBValueType: "INT",
 		GroupID:     1,
 	}
-	model := &typesv2.Feature{
+	model := &types.Feature{
 		Name:        "model",
 		DBValueType: "VARCHAR(32)",
 		GroupID:     1,
 	}
-	isActive := &typesv2.Feature{
+	isActive := &types.Feature{
 		Name:        "is_active",
 		DBValueType: "boolean",
 		GroupID:     2,
 	}
 
 	if oneGroup {
-		features := typesv2.FeatureList{model, price}
-		featureMap := map[string]typesv2.FeatureList{
+		features := types.FeatureList{model, price}
+		featureMap := map[string]types.FeatureList{
 			"device_basic": {
 				model, price,
 			},
 		}
 		return features, featureMap
 	} else {
-		features := typesv2.FeatureList{model, price, isActive}
-		featureMap := map[string]typesv2.FeatureList{
+		features := types.FeatureList{model, price, isActive}
+		featureMap := map[string]types.FeatureList{
 			"device_basic": {
 				model, price,
 			},

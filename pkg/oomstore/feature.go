@@ -6,18 +6,17 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
-func (s *OomStore) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, error) {
+func (s *OomStore) GetFeature(ctx context.Context, id int16) (*types.Feature, error) {
 	return s.metadata.GetFeature(ctx, id)
 }
 
-func (s *OomStore) GetFeatureByName(ctx context.Context, name string) (*typesv2.Feature, error) {
+func (s *OomStore) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
 	return s.metadata.GetFeatureByName(ctx, name)
 }
 
-func (s *OomStore) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) typesv2.FeatureList {
+func (s *OomStore) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
 	return s.metadata.ListFeature(ctx, opt)
 }
 

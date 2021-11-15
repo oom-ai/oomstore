@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -60,7 +60,7 @@ func init() {
 	listFeatureGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func printFeatureGroups(groups []*typesv2.FeatureGroup, output string) error {
+func printFeatureGroups(groups []*types.FeatureGroup, output string) error {
 	switch output {
 	case CSV:
 		return printFeatureGroupsInCSV(groups)
@@ -71,7 +71,7 @@ func printFeatureGroups(groups []*typesv2.FeatureGroup, output string) error {
 	}
 }
 
-func printFeatureGroupsInCSV(groups typesv2.FeatureGroupList) error {
+func printFeatureGroupsInCSV(groups types.FeatureGroupList) error {
 	w := csv.NewWriter(os.Stdout)
 
 	if err := w.Write(groupHeader()); err != nil {
@@ -86,7 +86,7 @@ func printFeatureGroupsInCSV(groups typesv2.FeatureGroupList) error {
 	return nil
 }
 
-func printFeatureGroupsInASCIITable(groups typesv2.FeatureGroupList) error {
+func printFeatureGroupsInASCIITable(groups types.FeatureGroupList) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(groupHeader())
 	table.SetAutoFormatHeaders(false)
@@ -102,7 +102,7 @@ func groupHeader() []string {
 	return []string{"GroupName", "GroupID", "EntityName", "Description", "OnlineRevisionID", "CreateTime", "ModifyTime"}
 }
 
-func groupRecord(g *typesv2.FeatureGroup) []string {
+func groupRecord(g *types.FeatureGroup) []string {
 	onlineRevisionID := "<NULL>"
 	if g.OnlineRevisionID != nil {
 		onlineRevisionID = fmt.Sprint(*g.OnlineRevisionID)

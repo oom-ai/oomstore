@@ -2,26 +2,25 @@ package online
 
 import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 type GetOpt struct {
-	Entity      *typesv2.Entity
+	Entity      *types.Entity
 	RevisionID  int32
 	EntityKey   string
-	FeatureList typesv2.FeatureList
+	FeatureList types.FeatureList
 }
 
 type MultiGetOpt struct {
-	Entity      *typesv2.Entity
+	Entity      *types.Entity
 	RevisionID  int32
 	EntityKeys  []string
-	FeatureList typesv2.FeatureList
+	FeatureList types.FeatureList
 }
 
 type ImportOpt struct {
-	Revision    *typesv2.Revision
-	Entity      *typesv2.Entity
+	Revision    *types.Revision
+	Entity      *types.Entity
 	Stream      <-chan *types.RawFeatureValueRecord
-	FeatureList typesv2.FeatureList
+	FeatureList types.FeatureList
 }
