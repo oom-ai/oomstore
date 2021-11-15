@@ -30,7 +30,7 @@ type Store interface {
 	ListFeatureGroup(ctx context.Context, entityID *int16) types.FeatureGroupList
 
 	// revision
-	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int32, error)
+	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int32, string, error)
 	UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) error
 	GetRevision(ctx context.Context, id int32) (*types.Revision, error)
 	GetRevisionBy(ctx context.Context, groupID int16, revision int64) (*types.Revision, error)

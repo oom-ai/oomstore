@@ -74,27 +74,46 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return 0, fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
-	revision, dataTable, err := s.offline.Import(ctx, offline.ImportOpt{
-		GroupName: group.Name,
-		Entity:    entity,
-		Features:  features,
-		Header:    header,
-		Revision:  opt.Revision,
-		CsvReader: csvReader,
-	})
-	if err != nil {
-		return 0, err
+	var revision int64
+	if opt.Revision != nil {
+		revision = *opt.Revision
 	}
 
-	newRevisionID, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:    revision,
-		GroupID:     group.ID,
-		DataTable:   &dataTable,
+	newRevisionID, dataTableName, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
+		Revision: revision,
+		GroupID:  group.ID,
+		// TODO: support user-defined DataTable
+		DataTable:   nil,
 		Description: opt.Description,
 		Anchored:    opt.Revision != nil,
 	})
 	if err != nil {
 		return 0, err
 	}
+
+	revision, err = s.offline.Import(ctx, offline.ImportOpt{
+		GroupName:     group.Name,
+		Entity:        entity,
+		Features:      features,
+		Header:        header,
+		Revision:      opt.Revision,
+		CsvReader:     csvReader,
+		DataTableName: dataTableName,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	if opt.Revision == nil {
+		if err := s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
+			RevisionID:  newRevisionID,
+			NewRevision: &revision,
+		}); err != nil {
+			return 0, nil
+		}
+	}
+
+	// TODO: clean up revision and data_table if import failed
+
 	return newRevisionID, nil
 }
