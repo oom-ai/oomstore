@@ -15,7 +15,7 @@ import (
 // GetHistoricalFeatureValues gets point-in-time feature values for each entity row;
 // currently, this API only supports batch features.
 func (s *OomStore) GetHistoricalFeatureValues(ctx context.Context, opt types.GetHistoricalFeatureValuesOpt) (*types.JoinResult, error) {
-	features := s.metadatav2.ListFeature(ctx, metadata.ListFeatureOpt{FeatureIDs: &opt.FeatureIDs})
+	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{FeatureIDs: &opt.FeatureIDs})
 
 	features = features.Filter(func(f *typesv2.Feature) bool {
 		return f.Group.Category == types.BatchFeatureCategory
@@ -66,7 +66,7 @@ func buildGroupToFeaturesMap(features typesv2.FeatureList) map[string]typesv2.Fe
 }
 
 func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int16) ([]*metadata.RevisionRange, error) {
-	revisions := s.metadatav2.ListRevision(ctx, metadata.ListRevisionOpt{GroupID: &groupID})
+	revisions := s.metadata.ListRevision(ctx, metadata.ListRevisionOpt{GroupID: &groupID})
 	if len(revisions) == 0 {
 		return nil, nil
 	}

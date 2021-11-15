@@ -10,23 +10,23 @@ import (
 )
 
 func (s *OomStore) GetFeature(ctx context.Context, id int16) (*typesv2.Feature, error) {
-	return s.metadatav2.GetFeature(ctx, id)
+	return s.metadata.GetFeature(ctx, id)
 }
 
 func (s *OomStore) GetFeatureByName(ctx context.Context, name string) (*typesv2.Feature, error) {
-	return s.metadatav2.GetFeatureByName(ctx, name)
+	return s.metadata.GetFeatureByName(ctx, name)
 }
 
 func (s *OomStore) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) typesv2.FeatureList {
-	return s.metadatav2.ListFeature(ctx, opt)
+	return s.metadata.ListFeature(ctx, opt)
 }
 
 func (s *OomStore) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
-	return s.metadatav2.UpdateFeature(ctx, opt)
+	return s.metadata.UpdateFeature(ctx, opt)
 }
 
 func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int16, error) {
-	group, err := s.metadatav2.GetFeatureGroup(ctx, opt.GroupID)
+	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
 		return 0, err
 	}
@@ -37,5 +37,5 @@ func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadata.CreateFe
 	if opt.ValueType, err = s.offline.TypeTag(opt.DBValueType); err != nil {
 		return 0, err
 	}
-	return s.metadatav2.CreateFeature(ctx, opt)
+	return s.metadata.CreateFeature(ctx, opt)
 }

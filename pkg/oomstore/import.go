@@ -43,7 +43,7 @@ func stringSliceEqual(a, b []string) bool {
 
 func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) (int32, error) {
 	// get columns of the group
-	features := s.metadatav2.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &opt.GroupID})
+	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &opt.GroupID})
 
 	// get entity info
 	group, err := s.GetFeatureGroup(ctx, opt.GroupID)
@@ -83,7 +83,7 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 		return 0, err
 	}
 
-	newRevisionID, err := s.metadatav2.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	newRevisionID, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:    revision,
 		GroupID:     group.ID,
 		DataTable:   &dataTable,
