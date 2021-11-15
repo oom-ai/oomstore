@@ -13,10 +13,6 @@ import (
 )
 
 type RowMap = map[string]interface{}
-type RowMapRecord struct {
-	RowMap RowMap
-	Error  error
-}
 
 const (
 	PostgresBatchSize = 10
