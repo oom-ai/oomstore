@@ -8,14 +8,13 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (types.FeatureValueMap, error) {
 	m := make(map[string]interface{})
 
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{FeatureNames: &opt.FeatureNames})
-	features = features.Filter(func(f *typesv2.Feature) bool {
+	features = features.Filter(func(f *types.Feature) bool {
 		return f.Group.OnlineRevisionID != nil
 	})
 	if len(features) == 0 {
@@ -55,7 +54,7 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (types.FeatureDataSet, error) {
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{FeatureIDs: &opt.FeatureIDs})
 
-	features = features.Filter(func(f *typesv2.Feature) bool {
+	features = features.Filter(func(f *types.Feature) bool {
 		return f.OnlineRevisionID() != nil
 	})
 	if len(features) == 0 {
@@ -80,7 +79,7 @@ func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	return buildFeatureDataSet(featureValueMap, features.Names(), opt.EntityKeys)
 }
 
-func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int32]typesv2.FeatureList, entity *typesv2.Entity) (map[string]dbutil.RowMap, error) {
+func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int32]types.FeatureList, entity *types.Entity) (map[string]dbutil.RowMap, error) {
 	// entity_key -> types.RecordMap
 	featureValueMap := make(map[string]dbutil.RowMap)
 
@@ -110,8 +109,8 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
-func groupFeaturesByRevisionId(features typesv2.FeatureList) map[int32]typesv2.FeatureList {
-	featureMap := make(map[int32]typesv2.FeatureList)
+func groupFeaturesByRevisionId(features types.FeatureList) map[int32]types.FeatureList {
+	featureMap := make(map[int32]types.FeatureList)
 	for _, f := range features {
 		id := f.OnlineRevisionID()
 		if id == nil {
@@ -122,8 +121,8 @@ func groupFeaturesByRevisionId(features typesv2.FeatureList) map[int32]typesv2.F
 	return featureMap
 }
 
-func (s *OomStore) getSharedEntity(features typesv2.FeatureList) (*typesv2.Entity, error) {
-	m := make(map[int16]*typesv2.Entity)
+func (s *OomStore) getSharedEntity(features types.FeatureList) (*types.Entity, error) {
+	m := make(map[int16]*types.Entity)
 	for _, f := range features {
 		m[f.Group.EntityID] = f.Group.Entity
 	}

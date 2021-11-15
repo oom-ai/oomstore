@@ -6,7 +6,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -17,11 +17,11 @@ func TestExport(t *testing.T) {
 
 	// make test entities
 	ctx := context.Background()
-	entity := &typesv2.Entity{
+	entity := &types.Entity{
 		Name:   "device",
 		Length: 10,
 	}
-	features := typesv2.FeatureList{
+	features := types.FeatureList{
 		{
 			Name:        "model",
 			DBValueType: "VARCHAR(32)",

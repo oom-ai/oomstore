@@ -2,26 +2,26 @@ package informer
 
 import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 type RevisionCache struct {
-	typesv2.RevisionList
+	types.RevisionList
 }
 
 func (c *RevisionCache) Enrich(groupCache *GroupCache) {
 	for _, r := range c.RevisionList {
-		r.Group = groupCache.Find(func(g *typesv2.FeatureGroup) bool {
+		r.Group = groupCache.Find(func(g *types.FeatureGroup) bool {
 			return g.ID == r.GroupID
 		})
 	}
 }
 
-func (c *RevisionCache) List(opt metadata.ListRevisionOpt) typesv2.RevisionList {
-	var revisions typesv2.RevisionList
+func (c *RevisionCache) List(opt metadata.ListRevisionOpt) types.RevisionList {
+	var revisions types.RevisionList
 	if opt.DataTables != nil {
 		for _, table := range opt.DataTables {
-			if r := c.Find(func(r *typesv2.Revision) bool {
+			if r := c.Find(func(r *types.Revision) bool {
 				return r.DataTable == table
 			}); r != nil {
 				revisions = append(revisions, r)
@@ -32,15 +32,15 @@ func (c *RevisionCache) List(opt metadata.ListRevisionOpt) typesv2.RevisionList 
 	}
 
 	if opt.GroupID != nil {
-		revisions = revisions.Filter(func(r *typesv2.Revision) bool {
+		revisions = revisions.Filter(func(r *types.Revision) bool {
 			return r.GroupID == *opt.GroupID
 		})
 	}
 	return revisions
 }
 
-func (c *RevisionCache) GetGroup(groupID int16) typesv2.RevisionList {
-	return c.Filter(func(r *typesv2.Revision) bool {
+func (c *RevisionCache) GetGroup(groupID int16) types.RevisionList {
+	return c.Filter(func(r *types.Revision) bool {
 		return r.GroupID == groupID
 	})
 }

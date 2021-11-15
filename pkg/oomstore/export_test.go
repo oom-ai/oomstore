@@ -11,7 +11,6 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +23,7 @@ func TestExportFeatureValues(t *testing.T) {
 	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
 
 	revisonID := int32(5)
-	features := typesv2.FeatureList{
+	features := types.FeatureList{
 		{
 			Name:        "model",
 			DBValueType: "VARCHAR(32)",
@@ -76,11 +75,11 @@ func TestExportFeatureValues(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			// mock database methods
 			metadataStore.EXPECT().GetFeatureGroup(gomock.Any(), tc.opt.GroupID).
-				Return(&typesv2.FeatureGroup{
+				Return(&types.FeatureGroup{
 					ID:       1,
 					Name:     "device_info",
 					EntityID: 1,
-					Entity:   &typesv2.Entity{Name: "device"},
+					Entity:   &types.Entity{Name: "device"},
 				}, nil)
 
 			metadataStore.EXPECT().
@@ -88,7 +87,7 @@ func TestExportFeatureValues(t *testing.T) {
 				Return(features)
 
 			metadataStore.EXPECT().GetRevision(gomock.Any(), revisonID).
-				Return(&typesv2.Revision{
+				Return(&types.Revision{
 					DataTable: "device_info_10",
 				}, nil)
 

@@ -14,7 +14,6 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/online/mock_online"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,9 +41,9 @@ func TestSync(t *testing.T) {
 			mockFn: func() {
 				metadataStore.EXPECT().
 					GetRevision(ctx, int32(1)).
-					Return(&typesv2.Revision{
+					Return(&types.Revision{
 						GroupID: 1,
-						Group: &typesv2.FeatureGroup{
+						Group: &types.FeatureGroup{
 							ID:               1,
 							OnlineRevisionID: int32Ptr(1),
 						},
@@ -58,12 +57,12 @@ func TestSync(t *testing.T) {
 			},
 			expectedError: nil,
 			mockFn: func() {
-				revision := &typesv2.Revision{
+				revision := &types.Revision{
 					GroupID: 2,
-					Group: &typesv2.FeatureGroup{
+					Group: &types.FeatureGroup{
 						ID:       2,
 						EntityID: 2,
-						Entity: &typesv2.Entity{
+						Entity: &types.Entity{
 							Name: "entity-name",
 						},
 						OnlineRevisionID: nil,
@@ -74,7 +73,7 @@ func TestSync(t *testing.T) {
 					GetRevision(ctx, int32(1)).
 					Return(revision, nil)
 
-				features := typesv2.FeatureList{
+				features := types.FeatureList{
 					{
 						Name: "feature1",
 					},
@@ -103,7 +102,7 @@ func TestSync(t *testing.T) {
 					Import(ctx, online.ImportOpt{
 						FeatureList: features,
 						Revision:    revision,
-						Entity: &typesv2.Entity{
+						Entity: &types.Entity{
 							Name: "entity-name",
 						},
 						Stream: stream,
@@ -129,12 +128,12 @@ func TestSync(t *testing.T) {
 			},
 			expectedError: nil,
 			mockFn: func() {
-				revision := &typesv2.Revision{
+				revision := &types.Revision{
 					GroupID: 2,
-					Group: &typesv2.FeatureGroup{
+					Group: &types.FeatureGroup{
 						ID:       2,
 						EntityID: 2,
-						Entity: &typesv2.Entity{
+						Entity: &types.Entity{
 							Name: "entity-name",
 						},
 						OnlineRevisionID: int32Ptr(100),
@@ -145,7 +144,7 @@ func TestSync(t *testing.T) {
 					GetRevision(ctx, int32(1)).
 					Return(revision, nil)
 
-				features := typesv2.FeatureList{
+				features := types.FeatureList{
 					{
 						Name: "feature1",
 					},
@@ -174,7 +173,7 @@ func TestSync(t *testing.T) {
 					Import(ctx, online.ImportOpt{
 						FeatureList: features,
 						Revision:    revision,
-						Entity: &typesv2.Entity{
+						Entity: &types.Entity{
 							Name: "entity-name",
 						},
 						Stream: stream,
@@ -203,16 +202,16 @@ func TestSync(t *testing.T) {
 	}
 }
 
-func prepareRevision(id int32, revision int64) typesv2.Revision {
-	return typesv2.Revision{
+func prepareRevision(id int32, revision int64) types.Revision {
+	return types.Revision{
 		ID:        id,
 		Revision:  revision,
 		GroupID:   1,
 		DataTable: fmt.Sprintf("device_info_%d", revision),
 	}
 }
-func prepareGroup(revisionId *int32) typesv2.FeatureGroup {
-	return typesv2.FeatureGroup{
+func prepareGroup(revisionId *int32) types.FeatureGroup {
+	return types.FeatureGroup{
 		Name:             "device_info",
 		OnlineRevisionID: revisionId,
 		EntityID:         1,
