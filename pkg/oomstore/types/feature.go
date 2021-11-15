@@ -107,39 +107,3 @@ func (f *Feature) String() string {
 		fmt.Sprintf("ModifyTime:       %s", f.ModifyTime.Format(time.RFC3339)),
 	}, "\n")
 }
-
-func FeatureCsvHeader() string {
-	return strings.Join([]string{
-		"Name",
-		"Group",
-		"Entity",
-		"Category",
-		"DBValueType",
-		"ValueType",
-		"Description",
-		"OnlineRevisionID",
-		"CreateTime",
-		"ModifyTime",
-	}, ",")
-}
-
-func (f *Feature) ToCsvRecord() string {
-	onlineRevisionID := "<NULL>"
-
-	if r := f.OnlineRevisionID(); r != nil {
-		onlineRevisionID = fmt.Sprint(*r)
-	}
-
-	return strings.Join([]string{
-		f.Name,
-		f.Group.Name,
-		f.Entity().Name,
-		f.Group.Category,
-		f.DBValueType,
-		f.ValueType,
-		f.Description,
-		onlineRevisionID,
-		f.CreateTime.Format(time.RFC3339),
-		f.ModifyTime.Format(time.RFC3339),
-	}, ",")
-}
