@@ -22,9 +22,12 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 		return m, nil
 	}
 
-	entity, err := s.getSharedEntity(ctx, features)
-	if err != nil || entity == nil {
+	entity, err := s.getSharedEntity(features)
+	if err != nil {
 		return m, err
+	}
+	if entity == nil {
+		return m, fmt.Errorf("failed to get shared entity")
 	}
 	featureMap := groupFeaturesByRevisionId(features)
 
@@ -53,15 +56,18 @@ func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	features := s.metadatav2.ListFeature(ctx, metadatav2.ListFeatureOpt{FeatureIDs: &opt.FeatureIDs})
 
 	features = features.Filter(func(f *typesv2.Feature) bool {
-		return f.OnlineRevision() != nil
+		return f.Group.OnlineRevisionID != nil
 	})
 	if len(features) == 0 {
 		return nil, nil
 	}
 
-	entity, err := s.getSharedEntity(ctx, features)
-	if err != nil || entity == nil {
+	entity, err := s.getSharedEntity(features)
+	if err != nil {
 		return nil, err
+	}
+	if entity == nil {
+		return nil, fmt.Errorf("failed to get shared entity")
 	}
 	featureMap := groupFeaturesByRevisionId(features)
 
@@ -107,28 +113,25 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 func groupFeaturesByRevisionId(features typesv2.FeatureList) map[int32]typesv2.FeatureList {
 	featureMap := make(map[int32]typesv2.FeatureList)
 	for _, f := range features {
-		if f.OnlineRevision() == nil {
+		if f.Group.OnlineRevisionID == nil {
 			continue
 		}
-		featureMap[f.OnlineRevision().ID] = append(featureMap[f.OnlineRevision().ID], f)
+		featureMap[*f.Group.OnlineRevisionID] = append(featureMap[*f.Group.OnlineRevisionID], f)
 	}
 	return featureMap
 }
 
-func (s *OomStore) getSharedEntity(ctx context.Context, features typesv2.FeatureList) (*typesv2.Entity, error) {
-	m := make(map[int16]interface{})
+func (s *OomStore) getSharedEntity(features typesv2.FeatureList) (*typesv2.Entity, error) {
+	m := make(map[int16]*typesv2.Entity)
 	for _, f := range features {
-		m[f.Group.EntityID] = struct{}{}
+		m[f.Group.EntityID] = f.Group.Entity
 	}
-	if len(m) > 1 {
-		return nil, fmt.Errorf("inconsistent entity type: %v", m)
+	if len(m) != 1 {
+		return nil, fmt.Errorf("expected 1 entity, got %d entities", len(m))
 	}
-	for entityID := range m {
-		if entity, err := s.GetEntity(ctx, entityID); err != nil {
-			return nil, err
-		} else {
-			return entity, nil
-		}
+
+	for _, entity := range m {
+		return entity, nil
 	}
 	return nil, nil
 }
