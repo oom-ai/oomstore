@@ -11,23 +11,26 @@ import (
 )
 
 func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (*types.FeatureValues, error) {
-	m := make(map[string]interface{})
-
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{FeatureNames: &opt.FeatureNames})
-	features = features.Filter(func(f *types.Feature) bool {
-		return f.Group.OnlineRevisionID != nil
-	})
-	if len(features) == 0 {
-		return nil, nil
-	}
-
 	entity, err := s.getSharedEntity(features)
 	if err != nil {
 		return nil, err
 	}
-	if entity == nil {
-		return nil, fmt.Errorf("failed to get shared entity")
+	features = features.Filter(func(f *types.Feature) bool {
+		return f.Group.OnlineRevisionID != nil
+	})
+
+	rs := types.FeatureValues{
+		EntityName:      entity.Name,
+		EntityKey:       opt.EntityKey,
+		FeatureNames:    opt.FeatureNames,
+		FeatureValueMap: make(map[string]interface{}),
 	}
+
+	if len(features) == 0 {
+		return &rs, nil
+	}
+
 	featureMap := groupFeaturesByRevisionId(features)
 
 	for onlineRevisionId, features := range featureMap {
@@ -44,15 +47,10 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 			return nil, err
 		}
 		for featureName, featureValue := range featureValues {
-			m[featureName] = featureValue
+			rs.FeatureValueMap[featureName] = featureValue
 		}
 	}
-	return &types.FeatureValues{
-		EntityName:      entity.Name,
-		EntityKey:       opt.EntityKey,
-		FeatureNames:    opt.FeatureNames,
-		FeatureValueMap: m,
-	}, nil
+	return &rs, nil
 }
 
 func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (types.FeatureDataSet, error) {
@@ -136,7 +134,7 @@ func (s *OomStore) getSharedEntity(features types.FeatureList) (*types.Entity, e
 	for _, entity := range m {
 		return entity, nil
 	}
-	return nil, nil
+	return nil, fmt.Errorf("expected 1 entity, got 0")
 }
 
 func buildFeatureDataSet(valueMap map[string]dbutil.RowMap, featureNames []string, entityKeys []string) (types.FeatureDataSet, error) {
