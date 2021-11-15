@@ -17,9 +17,6 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 
 	featureNames := opt.FeatureNames
 	allFeatures := s.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.GroupID})
-	if err != nil {
-		return nil, nil, err
-	}
 
 	allFeatureNames := allFeatures.Names()
 	if len(featureNames) == 0 {
