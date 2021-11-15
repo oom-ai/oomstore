@@ -10,24 +10,27 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (types.FeatureValueMap, error) {
-	m := make(map[string]interface{})
-
+func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnlineFeatureValuesOpt) (*types.FeatureValues, error) {
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{FeatureNames: &opt.FeatureNames})
+	entity, err := s.getSharedEntity(features)
+	if err != nil {
+		return nil, err
+	}
 	features = features.Filter(func(f *types.Feature) bool {
 		return f.Group.OnlineRevisionID != nil
 	})
-	if len(features) == 0 {
-		return m, nil
+
+	rs := types.FeatureValues{
+		EntityName:      entity.Name,
+		EntityKey:       opt.EntityKey,
+		FeatureNames:    opt.FeatureNames,
+		FeatureValueMap: make(map[string]interface{}),
 	}
 
-	entity, err := s.getSharedEntity(features)
-	if err != nil {
-		return m, err
+	if len(features) == 0 {
+		return &rs, nil
 	}
-	if entity == nil {
-		return m, fmt.Errorf("failed to get shared entity")
-	}
+
 	featureMap := groupFeaturesByRevisionId(features)
 
 	for onlineRevisionId, features := range featureMap {
@@ -41,14 +44,13 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 			FeatureList: features,
 		})
 		if err != nil {
-			return m, err
+			return nil, err
 		}
 		for featureName, featureValue := range featureValues {
-			m[featureName] = featureValue
+			rs.FeatureValueMap[featureName] = featureValue
 		}
 	}
-	m[entity.Name] = opt.EntityKey
-	return m, nil
+	return &rs, nil
 }
 
 func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.MultiGetOnlineFeatureValuesOpt) (types.FeatureDataSet, error) {
@@ -103,7 +105,6 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 			for fn, fv := range m {
 				featureValueMap[entityKey][fn] = fv
 			}
-			featureValueMap[entityKey][entity.Name] = entityKey
 		}
 	}
 	return featureValueMap, nil
@@ -133,7 +134,7 @@ func (s *OomStore) getSharedEntity(features types.FeatureList) (*types.Entity, e
 	for _, entity := range m {
 		return entity, nil
 	}
-	return nil, nil
+	return nil, fmt.Errorf("expected 1 entity, got 0")
 }
 
 func buildFeatureDataSet(valueMap map[string]dbutil.RowMap, featureNames []string, entityKeys []string) (types.FeatureDataSet, error) {

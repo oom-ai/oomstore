@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sort"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cast"
@@ -25,12 +24,12 @@ var getOnlineFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		featureValueMap, err := oomStore.GetOnlineFeatureValues(ctx, getOnlineFeatureOpt)
+		featureValues, err := oomStore.GetOnlineFeatureValues(ctx, getOnlineFeatureOpt)
 		if err != nil {
 			log.Fatalf("failed getting online features: %v", err)
 		}
 
-		if err := printOnlineFeatures(featureValueMap, *getOutput); err != nil {
+		if err := printOnlineFeatures(featureValues, *getOutput); err != nil {
 			log.Fatalf("failed printing online feature values, error %v\n", err)
 		}
 	},
@@ -48,26 +47,25 @@ func init() {
 	_ = getOnlineFeatureCmd.MarkFlagRequired("feature")
 }
 
-func printOnlineFeatures(featureValueMap types.FeatureValueMap, output string) error {
+func printOnlineFeatures(featureValues *types.FeatureValues, output string) error {
 	switch output {
 	case CSV:
-		return printOnlineFeaturesInCSV(featureValueMap)
+		return printOnlineFeaturesInCSV(featureValues)
 	case ASCIITable:
-		return printOnlineFeaturesInASCIITable(featureValueMap)
+		return printOnlineFeaturesInASCIITable(featureValues)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
 }
 
-func printOnlineFeaturesInCSV(featureValueMap types.FeatureValueMap) error {
+func printOnlineFeaturesInCSV(featureValues *types.FeatureValues) error {
+	header := append([]string{featureValues.EntityName}, featureValues.FeatureNames...)
+	record := append([]string{featureValues.EntityKey}, cast.ToStringSlice(featureValues.FeatureValueSlice())...)
+
 	w := csv.NewWriter(os.Stdout)
-	header := onlineFeatureHeader(featureValueMap)
 	if err := w.Write(header); err != nil {
 		return err
 	}
-
-	record := onlineFeatureRecord(featureValueMap, header)
-
 	if err := w.Write(record); err != nil {
 		return err
 	}
@@ -75,31 +73,14 @@ func printOnlineFeaturesInCSV(featureValueMap types.FeatureValueMap) error {
 	return nil
 }
 
-func printOnlineFeaturesInASCIITable(featureValueMap types.FeatureValueMap) error {
-	table := tablewriter.NewWriter(os.Stdout)
-	header := onlineFeatureHeader(featureValueMap)
-	table.SetHeader(header)
-	table.SetAutoFormatHeaders(false)
+func printOnlineFeaturesInASCIITable(featureValues *types.FeatureValues) error {
+	header := append([]string{featureValues.EntityName}, featureValues.FeatureNames...)
+	record := append([]string{featureValues.EntityKey}, cast.ToStringSlice(featureValues.FeatureValueSlice())...)
 
-	record := onlineFeatureRecord(featureValueMap, header)
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetAutoFormatHeaders(false)
+	table.SetHeader(header)
 	table.Append(record)
 	table.Render()
 	return nil
-}
-
-func onlineFeatureHeader(featureValueMap types.FeatureValueMap) []string {
-	header := make([]string, 0, len(featureValueMap))
-	for featureNames := range featureValueMap {
-		header = append(header, featureNames)
-	}
-	sort.Strings(header)
-	return header
-}
-
-func onlineFeatureRecord(featureValueMap types.FeatureValueMap, header []string) []string {
-	record := make([]string, 0, len(header))
-	for _, featureName := range header {
-		record = append(record, cast.ToString(featureValueMap[featureName]))
-	}
-	return record
 }
