@@ -67,7 +67,7 @@ import_sample() {
 sync() {
     info "sync sample data to online store"
     echo $1
-    featctl sync phone -r $1
+    featctl sync $1
 }
 
 execute_sql() {
