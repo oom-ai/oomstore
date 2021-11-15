@@ -99,7 +99,7 @@ device,model,price
 					})
 				metadataStore.EXPECT().
 					GetFeatureGroup(gomock.Any(), int16(1)).
-					Return(&types.FeatureGroup{ID: 1, EntityID: 1, Entity: &typesv2.Entity{Name: "device"}}, nil)
+					Return(&types.FeatureGroup{ID: 1, EntityID: 1, Entity: &types.Entity{Name: "device"}}, nil)
 				metadataStore.EXPECT().
 					GetEntity(gomock.Any(), int16(1)).
 					Return(&types.Entity{Name: "device"}, nil)
