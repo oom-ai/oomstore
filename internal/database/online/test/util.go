@@ -10,15 +10,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 type PrepareStoreRuntimeFunc func() (context.Context, online.Store)
 
 type Sample struct {
-	Features typesv2.FeatureList
-	Revision *typesv2.Revision
-	Entity   *typesv2.Entity
+	Features types.FeatureList
+	Revision *types.Revision
+	Entity   *types.Entity
 	Data     []types.RawFeatureValueRecord
 }
 
@@ -30,24 +29,24 @@ func init() {
 
 	{
 		SampleSmall = Sample{
-			Features: typesv2.FeatureList{
-				&typesv2.Feature{
+			Features: types.FeatureList{
+				&types.Feature{
 					ID:          1,
 					Name:        "age",
 					GroupID:     1,
-					ValueType:   typesv2.INT16,
+					ValueType:   types.INT16,
 					DBValueType: "smallint",
 				},
-				&typesv2.Feature{
+				&types.Feature{
 					ID:          2,
 					Name:        "gender",
 					GroupID:     1,
-					ValueType:   typesv2.STRING,
+					ValueType:   types.STRING,
 					DBValueType: "varchar(1)",
 				},
 			},
-			Revision: &typesv2.Revision{ID: 3, GroupID: 1},
-			Entity:   &typesv2.Entity{ID: 5, Name: "user", Length: 4},
+			Revision: &types.Revision{ID: 3, GroupID: 1},
+			Entity:   &types.Entity{ID: 5, Name: "user", Length: 4},
 			Data: []types.RawFeatureValueRecord{
 				newRecord([]interface{}{"3215", int16(18), "F"}),
 				newRecord([]interface{}{"3216", int16(29), nil}),
@@ -58,18 +57,18 @@ func init() {
 	}
 
 	{
-		features := typesv2.FeatureList{
-			&typesv2.Feature{
+		features := types.FeatureList{
+			&types.Feature{
 				ID:          2,
 				Name:        "charge",
 				GroupID:     2,
-				ValueType:   typesv2.FLOAT64,
+				ValueType:   types.FLOAT64,
 				DBValueType: "float8",
 			},
 		}
 
-		revision := &typesv2.Revision{ID: 9, GroupID: 2}
-		entity := &typesv2.Entity{ID: 5, Name: "user", Length: 5}
+		revision := &types.Revision{ID: 9, GroupID: 2}
+		entity := &types.Entity{ID: 5, Name: "user", Length: 5}
 		var data []types.RawFeatureValueRecord
 
 		for i := 0; i < 1000; i++ {

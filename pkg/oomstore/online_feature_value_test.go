@@ -12,7 +12,6 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/online/mock_online"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,7 +31,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		description   string
 		opt           types.GetOnlineFeatureValuesOpt
 		entityName    *string
-		features      typesv2.FeatureList
+		features      types.FeatureList
 		expectedError error
 		expected      types.FeatureValueMap
 	}{
@@ -112,7 +111,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		description   string
 		opt           types.MultiGetOnlineFeatureValuesOpt
 		entityName    *string
-		features      typesv2.FeatureList
+		features      types.FeatureList
 		expectedError error
 		expected      types.FeatureDataSet
 	}{
@@ -202,23 +201,23 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 	}
 }
 
-func prepareFeatures(isConsistent bool, isAvailable bool) typesv2.FeatureList {
+func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 	revision1 := int32(1)
 	revision2 := int32(2)
-	entityDevice := &typesv2.Entity{
+	entityDevice := &types.Entity{
 		ID:   1,
 		Name: "device",
 	}
-	entityUser := &typesv2.Entity{
+	entityUser := &types.Entity{
 		ID:   2,
 		Name: "user",
 	}
-	features := typesv2.FeatureList{
+	features := types.FeatureList{
 		{
 			Name:        "model",
 			DBValueType: "VARCHAR(32)",
 			GroupID:     1,
-			Group: &typesv2.FeatureGroup{
+			Group: &types.FeatureGroup{
 				EntityID:         1,
 				OnlineRevisionID: &revision1,
 				Category:         types.BatchFeatureCategory,
@@ -229,7 +228,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) typesv2.FeatureList {
 			Name:        "price",
 			DBValueType: "INT",
 			GroupID:     2,
-			Group: &typesv2.FeatureGroup{
+			Group: &types.FeatureGroup{
 				EntityID:         1,
 				OnlineRevisionID: &revision2,
 				Category:         types.BatchFeatureCategory,
@@ -240,7 +239,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) typesv2.FeatureList {
 			Name:        "age",
 			DBValueType: "INT",
 			GroupID:     3,
-			Group: &typesv2.FeatureGroup{
+			Group: &types.FeatureGroup{
 				EntityID:         2,
 				OnlineRevisionID: &revision2,
 				Category:         types.BatchFeatureCategory,

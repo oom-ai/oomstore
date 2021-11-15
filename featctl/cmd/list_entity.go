@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -40,7 +40,7 @@ func init() {
 	listCmd.AddCommand(listEntityCmd)
 }
 
-func printEntities(entities typesv2.EntityList, output string) error {
+func printEntities(entities types.EntityList, output string) error {
 	switch output {
 	case CSV:
 		return printEntitiesInCSV(entities)
@@ -51,7 +51,7 @@ func printEntities(entities typesv2.EntityList, output string) error {
 	}
 }
 
-func printEntitiesInCSV(entities typesv2.EntityList) error {
+func printEntitiesInCSV(entities types.EntityList) error {
 	w := csv.NewWriter(os.Stdout)
 	if err := w.Write(entityHeader()); err != nil {
 		return err
@@ -66,7 +66,7 @@ func printEntitiesInCSV(entities typesv2.EntityList) error {
 	return nil
 }
 
-func printEntitiesInASCIITable(entities typesv2.EntityList) error {
+func printEntitiesInASCIITable(entities types.EntityList) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(entityHeader())
 	table.SetAutoFormatHeaders(false)
@@ -78,7 +78,7 @@ func printEntitiesInASCIITable(entities typesv2.EntityList) error {
 	return nil
 }
 
-func entityRecord(entity *typesv2.Entity) []string {
+func entityRecord(entity *types.Entity) []string {
 	return []string{entity.Name, strconv.Itoa(entity.Length), entity.Description, entity.CreateTime.Format(time.RFC3339),
 		entity.ModifyTime.Format(time.RFC3339)}
 }

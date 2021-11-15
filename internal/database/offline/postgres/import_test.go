@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -18,7 +18,7 @@ func TestImport(t *testing.T) {
 	db := initAndOpenDB(t)
 	defer db.Close()
 
-	entity := typesv2.Entity{
+	entity := types.Entity{
 		Name:   "device",
 		Length: 16,
 	}
@@ -26,7 +26,7 @@ func TestImport(t *testing.T) {
 	opt := offline.ImportOpt{
 		GroupName: "device",
 		Entity:    &entity,
-		Features: []*typesv2.Feature{
+		Features: []*types.Feature{
 			{
 				Name:        "model",
 				DBValueType: "invalid-db-value-type"},

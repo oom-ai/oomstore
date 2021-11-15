@@ -12,7 +12,6 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
 )
 
 var _ metadata.Store = &DB{}
@@ -64,22 +63,22 @@ func (db *DB) Close() error {
 func list(ctx context.Context, db *sqlx.DB) (*informer.Cache, error) {
 	var cache *informer.Cache
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
-		entities := typesv2.EntityList{}
+		entities := types.EntityList{}
 		if err := tx.SelectContext(ctx, &entities, `SELECT * FROM "feature_entity"`); err != nil {
 			return err
 		}
 
-		features := typesv2.FeatureList{}
+		features := types.FeatureList{}
 		if err := tx.SelectContext(ctx, &features, `SELECT * FROM "feature"`); err != nil {
 			return err
 		}
 
-		groups := typesv2.FeatureGroupList{}
+		groups := types.FeatureGroupList{}
 		if err := tx.SelectContext(ctx, &groups, `SELECT * FROM "feature_group"`); err != nil {
 			return err
 		}
 
-		revisions := typesv2.RevisionList{}
+		revisions := types.RevisionList{}
 		if err := tx.SelectContext(ctx, &revisions, `SELECT * FROM "feature_group_revision"`); err != nil {
 			return err
 		}

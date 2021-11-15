@@ -1,4 +1,4 @@
-package typesv2
+package types
 
 import (
 	"time"

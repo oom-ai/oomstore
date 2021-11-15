@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/oom-ai/oomstore/pkg/oomstore/typesv2"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
@@ -59,7 +59,7 @@ func init() {
 	listRevisionOpt.groupName = flags.StringP("group", "g", "", "feature group")
 }
 
-func printRevisions(revisions []*typesv2.Revision, output string) error {
+func printRevisions(revisions []*types.Revision, output string) error {
 	switch output {
 	case CSV:
 		return printRevisionsInCSV(revisions)
@@ -70,7 +70,7 @@ func printRevisions(revisions []*typesv2.Revision, output string) error {
 	}
 }
 
-func printRevisionsInCSV(revisions []*typesv2.Revision) error {
+func printRevisionsInCSV(revisions []*types.Revision) error {
 	w := csv.NewWriter(os.Stdout)
 
 	if err := w.Write(revisionHeader()); err != nil {
@@ -86,7 +86,7 @@ func printRevisionsInCSV(revisions []*typesv2.Revision) error {
 	return nil
 }
 
-func printRevisionsInASCIITable(revisions []*typesv2.Revision) error {
+func printRevisionsInASCIITable(revisions []*types.Revision) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(revisionHeader())
 	table.SetAutoFormatHeaders(false)
@@ -102,7 +102,7 @@ func revisionHeader() []string {
 	return []string{"Revision", "RevisionID", "GroupName", "DataTable", "Description", "CreateTime", "ModifyTime"}
 }
 
-func revisionRecord(r *typesv2.Revision) []string {
+func revisionRecord(r *types.Revision) []string {
 	return []string{strconv.Itoa(int(r.Revision)), serializeInt32(r.ID), r.Group.Name, r.DataTable, r.Description,
 		r.CreateTime.Format(time.RFC3339), r.ModifyTime.Format(time.RFC3339)}
 }
