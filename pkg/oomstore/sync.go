@@ -20,7 +20,6 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 
 	group := revision.Group
 	prevOnlineRevisionID := group.OnlineRevisionID
-
 	if prevOnlineRevisionID != nil && *prevOnlineRevisionID == opt.RevisionId {
 		return fmt.Errorf("the specific revision was synced to the online store, won't do it again this time")
 	}
