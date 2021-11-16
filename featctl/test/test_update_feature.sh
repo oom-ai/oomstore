@@ -14,7 +14,7 @@ Group:            phone
 Entity:           device
 Category:         batch
 DBValueType:      int
-ValueType:        int32
+ValueType:        int64
 Description:      new description
 OnlineRevisionID: <NULL>
 '

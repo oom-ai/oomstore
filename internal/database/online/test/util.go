@@ -34,7 +34,7 @@ func init() {
 					ID:          1,
 					Name:        "age",
 					GroupID:     1,
-					ValueType:   types.INT16,
+					ValueType:   types.INT64,
 					DBValueType: "smallint",
 				},
 				&types.Feature{
@@ -48,9 +48,9 @@ func init() {
 			Revision: &types.Revision{ID: 3, GroupID: 1},
 			Entity:   &types.Entity{ID: 5, Name: "user", Length: 4},
 			Data: []types.RawFeatureValueRecord{
-				newRecord([]interface{}{"3215", int16(18), "F"}),
-				newRecord([]interface{}{"3216", int16(29), nil}),
-				newRecord([]interface{}{"3217", int16(44), "M"}),
+				newRecord([]interface{}{"3215", int64(18), "F"}),
+				newRecord([]interface{}{"3216", int64(29), nil}),
+				newRecord([]interface{}{"3217", int64(44), "M"}),
 			},
 		}
 
