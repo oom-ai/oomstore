@@ -5,14 +5,15 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgerrcode"
+	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
-func (db *DB) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int16, error) {
+func createEntityTx(ctx context.Context, tx *sqlx.Tx, opt metadata.CreateEntityOpt) (int16, error) {
 	var entityId int16
 	query := "insert into feature_entity(name, length, description) values($1, $2, $3) returning id"
-	err := db.GetContext(ctx, &entityId, query, opt.Name, opt.Length, opt.Description)
+	err := tx.GetContext(ctx, &entityId, query, opt.Name, opt.Length, opt.Description)
 	if er, ok := err.(*pq.Error); ok {
 		if er.Code == pgerrcode.UniqueViolation {
 			return 0, fmt.Errorf("entity %s already exists", opt.Name)
@@ -21,9 +22,9 @@ func (db *DB) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (i
 	return entityId, err
 }
 
-func (db *DB) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
+func updateEntityTx(ctx context.Context, tx *sqlx.Tx, opt metadata.UpdateEntityOpt) error {
 	query := "UPDATE feature_entity SET description = $1 WHERE id = $2"
-	result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.EntityID)
+	result, err := tx.ExecContext(ctx, query, opt.NewDescription, opt.EntityID)
 	if err != nil {
 		return err
 	}

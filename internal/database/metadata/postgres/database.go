@@ -11,6 +11,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
+	"github.com/oom-ai/oomstore/internal/database/metadata/txproxy"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -19,6 +20,7 @@ var _ metadata.Store = &DB{}
 type DB struct {
 	*sqlx.DB
 	*informer.Informer
+	*txproxy.TxProxy
 }
 
 func Open(ctx context.Context, option *types.PostgresOpt) (*DB, error) {
@@ -35,7 +37,23 @@ func Open(ctx context.Context, option *types.PostgresOpt) (*DB, error) {
 		db.Close()
 		return nil, err
 	}
-	return &DB{DB: db, Informer: informer}, nil
+
+	txproxy := &txproxy.TxProxy{
+		BeginTxFn: db.BeginTxx,
+
+		CreateEntityTx: createEntityTx,
+		UpdateEntityTx: updateEntityTx,
+
+		CreateFeatureTx: createFeatureTx,
+		UpdateFeatureTx: updateFeatureTx,
+
+		CreateFeatureGroupTx: createFeatureGroupTx,
+		UpdateFeatureGroupTx: updateFeatureGroupTx,
+
+		CreateRevisionTx: createRevisionTx,
+		UpdateRevisionTx: updateRevisionTx,
+	}
+	return &DB{DB: db, Informer: informer, TxProxy: txproxy}, nil
 }
 
 func OpenDB(ctx context.Context, host, port, user, password, database string) (*sqlx.DB, error) {
