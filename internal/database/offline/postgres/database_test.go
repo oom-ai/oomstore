@@ -5,12 +5,19 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/postgres"
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/stretchr/testify/require"
 )
 
-func initDB(t *testing.T) {
+func prepareStore(t *testing.T) (context.Context, offline.Store) {
+	return prepareDB(t)
+}
+
+func prepareDB(t *testing.T) (context.Context, *postgres.DB) {
+	ctx := context.Background()
 	opt := runtime_pg.PostgresDbOpt
 	store, err := postgres.Open(&types.PostgresOpt{
 		Host:     opt.Host,
@@ -19,26 +26,16 @@ func initDB(t *testing.T) {
 		Password: opt.Password,
 		Database: "test",
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer store.Close()
 
-	if _, err := store.ExecContext(context.Background(), fmt.Sprintf("drop database if exists %s", opt.Database)); err != nil {
-		t.Fatal(err)
-	}
+	_, err = store.ExecContext(context.Background(), fmt.Sprintf("DROP DATABASE IF EXISTS %s", opt.Database))
+	require.NoError(t, err)
 
-	if _, err = store.ExecContext(context.Background(), fmt.Sprintf("CREATE DATABASE %s", opt.Database)); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func initAndOpenDB(t *testing.T) *postgres.DB {
-	initDB(t)
+	_, err = store.ExecContext(context.Background(), fmt.Sprintf("CREATE DATABASE %s", opt.Database))
+	require.NoError(t, err)
 
 	db, err := postgres.Open(&runtime_pg.PostgresDbOpt)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return db
+	require.NoError(t, err)
+	return ctx, db
 }
