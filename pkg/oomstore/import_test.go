@@ -39,7 +39,7 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 					Return(nil)
 			},
 			wantRevisionID: 0,
-			wantError:      fmt.Errorf("no featues under group id: '1'"),
+			wantError:      fmt.Errorf("no features under group id: '1'"),
 		},
 		{
 			description: "GetFeatureGroup failed",
