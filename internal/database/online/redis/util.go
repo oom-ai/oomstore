@@ -18,21 +18,10 @@ func SerializeByTag(i interface{}, typeTag string) (s string, err error) {
 	switch typeTag {
 	case types.STRING:
 		return i.(string), nil
-
-	case types.INT8:
-		return strconv.FormatInt(int64(i.(int8)), SeralizeIntBase), nil
-	case types.INT16:
-		return strconv.FormatInt(int64(i.(int16)), SeralizeIntBase), nil
-	case types.INT32:
-		return strconv.FormatInt(int64(i.(int32)), SeralizeIntBase), nil
 	case types.INT64:
 		return strconv.FormatInt(int64(i.(int64)), SeralizeIntBase), nil
-
-	case types.FLOAT32:
-		return strconv.FormatFloat(float64(i.(float32)), 'f', -1, 32), nil
 	case types.FLOAT64:
 		return strconv.FormatFloat(i.(float64), 'f', -1, 64), nil
-
 	case types.BOOL:
 		if i.(bool) {
 			return "1", nil
@@ -111,22 +100,10 @@ func DeserializeByTag(i interface{}, typeTag string) (interface{}, error) {
 	case types.STRING:
 		return s, nil
 
-	case types.INT8:
-		x, err := strconv.ParseInt(s, SeralizeIntBase, 8)
-		return int8(x), err
-	case types.INT16:
-		x, err := strconv.ParseInt(s, SeralizeIntBase, 16)
-		return int16(x), err
-	case types.INT32:
-		x, err := strconv.ParseInt(s, SeralizeIntBase, 32)
-		return int32(x), err
 	case types.INT64:
 		x, err := strconv.ParseInt(s, SeralizeIntBase, 64)
 		return x, err
 
-	case types.FLOAT32:
-		x, err := strconv.ParseFloat(s, 32)
-		return float32(x), err
 	case types.FLOAT64:
 		x, err := strconv.ParseFloat(s, 64)
 		return x, err
