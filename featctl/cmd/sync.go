@@ -31,6 +31,6 @@ func init() {
 
 	flags := syncCmd.Flags()
 
-	flags.Int32VarP(&syncOpt.RevisionId, "revision-id", "r", 0, "group revision id")
+	flags.IntVarP(&syncOpt.RevisionId, "revision-id", "r", 0, "group revision id")
 	_ = syncCmd.MarkFlagRequired("revision-id")
 }

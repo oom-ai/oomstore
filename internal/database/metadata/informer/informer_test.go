@@ -45,13 +45,13 @@ func TestInformer(t *testing.T) {
 	group, err := informer.GetFeatureGroup(ctx, 100)
 	require.NoError(t, err)
 
-	require.Equal(t, int16(100), group.ID)
+	require.Equal(t, 100, group.ID)
 	require.Equal(t, "group", group.Name)
 	require.Equal(t, "batch", group.Category)
-	require.Equal(t, int16(1), group.EntityID)
+	require.Equal(t, 1, group.EntityID)
 
 	require.NotNil(t, group.Entity)
-	require.Equal(t, int16(1), group.Entity.ID)
+	require.Equal(t, 1, group.Entity.ID)
 	require.Equal(t, 10, group.Entity.Length)
 	require.Equal(t, "entity", group.Entity.Name)
 }
@@ -68,7 +68,7 @@ func TestInformerDeepCopyGet(t *testing.T) {
 
 	entity, err = informer.GetEntity(ctx, 1)
 	require.NoError(t, err)
-	require.Equal(t, int16(1), entity.ID)
+	require.Equal(t, 1, entity.ID)
 	require.Equal(t, 10, entity.Length)
 	require.Equal(t, "entity", entity.Name)
 }
@@ -85,7 +85,7 @@ func TestInformerDeepCopyList(t *testing.T) {
 
 	entity, err := informer.GetEntity(ctx, 1)
 	require.NoError(t, err)
-	require.Equal(t, int16(1), entity.ID)
+	require.Equal(t, 1, entity.ID)
 	require.Equal(t, 10, entity.Length)
 	require.Equal(t, "entity", entity.Name)
 }

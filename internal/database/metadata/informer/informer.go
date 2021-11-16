@@ -93,7 +93,7 @@ func (f *Informer) Cache() *Cache {
 }
 
 // Get
-func (f *Informer) GetEntity(ctx context.Context, id int16) (*types.Entity, error) {
+func (f *Informer) GetEntity(ctx context.Context, id int) (*types.Entity, error) {
 	if entity := f.Cache().Entities.Find(func(e *types.Entity) bool {
 		return e.ID == id
 	}); entity == nil {
@@ -113,7 +113,7 @@ func (f *Informer) GetEntityByName(ctx context.Context, name string) (*types.Ent
 	}
 }
 
-func (f *Informer) GetFeature(ctx context.Context, id int16) (*types.Feature, error) {
+func (f *Informer) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	if feature := f.Cache().Features.Find(func(f *types.Feature) bool {
 		return f.ID == id
 	}); feature == nil {
@@ -133,7 +133,7 @@ func (f *Informer) GetFeatureByName(ctx context.Context, name string) (*types.Fe
 	}
 }
 
-func (f *Informer) GetFeatureGroup(ctx context.Context, id int16) (*types.FeatureGroup, error) {
+func (f *Informer) GetFeatureGroup(ctx context.Context, id int) (*types.FeatureGroup, error) {
 	if featureGroup := f.Cache().Groups.Find(func(g *types.FeatureGroup) bool {
 		return g.ID == id
 	}); featureGroup == nil {
@@ -153,7 +153,7 @@ func (f *Informer) GetFeatureGroupByName(ctx context.Context, name string) (*typ
 	}
 }
 
-func (f *Informer) GetRevision(ctx context.Context, id int32) (*types.Revision, error) {
+func (f *Informer) GetRevision(ctx context.Context, id int) (*types.Revision, error) {
 	if revision := f.Cache().Revisions.Find(func(r *types.Revision) bool {
 		return r.ID == id
 	}); revision == nil {
@@ -163,7 +163,7 @@ func (f *Informer) GetRevision(ctx context.Context, id int32) (*types.Revision, 
 	}
 }
 
-func (f *Informer) GetRevisionBy(ctx context.Context, groupID int16, revision int64) (*types.Revision, error) {
+func (f *Informer) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
 	if revision := f.Cache().Revisions.Find(func(r *types.Revision) bool {
 		return r.GroupID == groupID && r.Revision == revision
 	}); revision == nil {
@@ -182,7 +182,7 @@ func (f *Informer) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt)
 	return f.Cache().Features.List(opt).Copy()
 }
 
-func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int16) types.FeatureGroupList {
+func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int) types.FeatureGroupList {
 	return f.Cache().Groups.List(entityID).Copy()
 }
 

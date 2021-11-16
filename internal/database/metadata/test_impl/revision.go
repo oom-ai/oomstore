@@ -30,14 +30,14 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		description      string
 		opt              metadata.CreateRevisionOpt
 		expectedError    error
-		expected         int32
+		expected         int
 		expectedRevision *types.Revision
 	}{
 		{
 			description:   "create revision successfully, return id",
 			opt:           opt,
 			expectedError: nil,
-			expected:      int32(1),
+			expected:      1,
 			expectedRevision: &types.Revision{
 				ID:          1,
 				Revision:    1000,
@@ -56,7 +56,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 				Description: "description",
 			},
 			expectedError: nil,
-			expected:      int32(2),
+			expected:      2,
 			expectedRevision: &types.Revision{
 				ID:          2,
 				Revision:    2000,
@@ -71,7 +71,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 			description:   "create existing revision, return error",
 			opt:           opt,
 			expectedError: fmt.Errorf("revision already exists: groupId=%d, revision=1000", groupId),
-			expected:      int32(0),
+			expected:      0,
 		},
 	}
 
@@ -169,7 +169,7 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	testCases := []struct {
 		description   string
-		revisionID    int32
+		revisionID    int
 		expectedError error
 		expected      *types.Revision
 	}{
@@ -232,7 +232,7 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	testCases := []struct {
 		description   string
 		opt           metadata.GetRevisionOpt
-		GroupID       int16
+		GroupID       int
 		Revision      int64
 		expectedError error
 		expected      *types.Revision
@@ -341,7 +341,7 @@ func ignoreCreateAndModifyTime(revision *types.Revision) {
 	revision.ModifyTime = time.Time{}
 }
 
-func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (int16, int16, []int32, types.RevisionList) {
+func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (int, int, []int, types.RevisionList) {
 	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
@@ -395,5 +395,5 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 		Group:     group,
 	}
 
-	return entityID, groupId, []int32{revisionId1, revisionId2}, types.RevisionList{revision1, revision2}
+	return entityID, groupId, []int{revisionId1, revisionId2}, types.RevisionList{revision1, revision2}
 }

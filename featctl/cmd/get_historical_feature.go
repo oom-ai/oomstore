@@ -36,7 +36,7 @@ func init() {
 
 	flags.StringSliceVar(&getHistoricalFeatureOpt.FeatureNames, "feature", nil, "select feature names")
 
-	flags.Int32VarP(&getHistoricalFeatureOpt.RevisionID, "revision-id", "r", 0, "group revision id")
+	flags.IntVarP(&getHistoricalFeatureOpt.RevisionID, "revision-id", "r", 0, "group revision id")
 	_ = getHistoricalFeatureCmd.MarkFlagRequired("revision-id")
 
 	getHistoricalFeatureOpt.Limit = flags.Uint64P("limit", "l", 0, "max records to export")

@@ -57,6 +57,6 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	return err
 }
 
-func getOnlineBatchTableName(revisionId int32) string {
+func getOnlineBatchTableName(revisionId int) string {
 	return fmt.Sprintf("batch_%d", revisionId)
 }
