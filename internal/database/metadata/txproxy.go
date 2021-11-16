@@ -53,6 +53,27 @@ type TxProxy struct {
 	UpdateRevisionTx func(context.Context, *sqlx.Tx, UpdateRevisionOpt) error
 }
 
+func (tp *TxProxy) WithTransaction(ctx context.Context, fn func(tx *Tx) error) error {
+	tx, err := tp.BeginTxFn(ctx, nil)
+	if err != nil {
+		return nil
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			// a panic occurred, rollback and repanic
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			// something went wrong, rollback
+			_ = tx.Rollback()
+		} else {
+			// all good, commit
+			err = tx.Commit()
+		}
+	}()
+	return fn(&Tx{Tx: tx, TxProxy: tp})
+}
+
 func (tp *TxProxy) CreateEntity(ctx context.Context, opt CreateEntityOpt) (int16, error) {
 	var id int16
 	err := tp.WithTransaction(ctx, func(tx *Tx) (err error) {
@@ -112,25 +133,4 @@ func (tp *TxProxy) UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) er
 	return tp.WithTransaction(ctx, func(tx *Tx) error {
 		return tx.UpdateRevision(ctx, opt)
 	})
-}
-
-func (tp *TxProxy) WithTransaction(ctx context.Context, fn func(tx *Tx) error) error {
-	tx, err := tp.BeginTxFn(ctx, nil)
-	if err != nil {
-		return nil
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			// a panic occurred, rollback and repanic
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			// something went wrong, rollback
-			_ = tx.Rollback()
-		} else {
-			// all good, commit
-			err = tx.Commit()
-		}
-	}()
-	return fn(&Tx{Tx: tx, TxProxy: tp})
 }
