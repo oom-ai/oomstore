@@ -45,7 +45,7 @@ type Store interface {
 	io.Closer
 }
 
-type ExecContext interface {
+type SqlxContext interface {
 	GetContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
 	SelectContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
 	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
