@@ -14,20 +14,6 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) error {
-	if err := db.validateDataType(ctx, opt.DBValueType); err != nil {
-		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
-	}
-	return createFeature(ctx, db, opt)
-}
-
-func (tx *Tx) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) error {
-	if err := tx.validateDataType(ctx, opt.DBValueType); err != nil {
-		return fmt.Errorf("err when validating value_type input, details: %s", err.Error())
-	}
-	return createFeature(ctx, tx, opt)
-}
-
 func createFeature(ctx context.Context, ext metadata.ExtContext, opt metadata.CreateFeatureOpt) error {
 	query := "INSERT INTO feature(name, group_name, db_value_type, value_type, description) VALUES ($1, $2, $3, $4, $5)"
 	_, err := ext.ExecContext(ctx, query, opt.FeatureName, opt.GroupName, opt.DBValueType, opt.ValueType, opt.Description)
@@ -41,14 +27,6 @@ func createFeature(ctx context.Context, ext metadata.ExtContext, opt metadata.Cr
 	return err
 }
 
-func (db *DB) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
-	return getFeature(ctx, db, featureName)
-}
-
-func (tx *Tx) GetFeature(ctx context.Context, featureName string) (*types.Feature, error) {
-	return getFeature(ctx, tx, featureName)
-}
-
 func getFeature(ctx context.Context, ext metadata.ExtContext, featureName string) (*types.Feature, error) {
 	var feature types.Feature
 	query := `SELECT * FROM "rich_feature" WHERE name = $1`
@@ -56,14 +34,6 @@ func getFeature(ctx context.Context, ext metadata.ExtContext, featureName string
 		return nil, err
 	}
 	return &feature, nil
-}
-
-func (db *DB) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
-	return listFeature(ctx, db, opt)
-}
-
-func (tx *Tx) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
-	return listFeature(ctx, tx, opt)
 }
 
 func listFeature(ctx context.Context, ext metadata.ExtContext, opt types.ListFeatureOpt) (types.FeatureList, error) {
@@ -80,14 +50,6 @@ func listFeature(ctx context.Context, ext metadata.ExtContext, opt types.ListFea
 		return nil, err
 	}
 	return features, nil
-}
-
-func (db *DB) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error) {
-	return updateFeature(ctx, db, opt)
-}
-
-func (tx *Tx) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) (int64, error) {
-	return updateFeature(ctx, tx, opt)
 }
 
 func updateFeature(ctx context.Context, ext metadata.ExtContext, opt types.UpdateFeatureOpt) (int64, error) {
@@ -115,15 +77,6 @@ func buildListFeatureCond(opt types.ListFeatureOpt) ([]string, []interface{}, er
 		in["name"] = opt.FeatureNames
 	}
 	return dbutil.BuildConditions(and, in)
-}
-
-func (db *DB) validateDataType(ctx context.Context, dataType string) error {
-	return dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
-		return validateDataType(ctx, tx, dataType)
-	})
-}
-func (tx *Tx) validateDataType(ctx context.Context, dataType string) error {
-	return validateDataType(ctx, tx.Tx, dataType)
 }
 
 func validateDataType(ctx context.Context, tx *sqlx.Tx, dataType string) error {

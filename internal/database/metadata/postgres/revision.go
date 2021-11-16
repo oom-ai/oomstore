@@ -13,14 +13,6 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) ([]*types.Revision, error) {
-	return listRevision(ctx, db, opt)
-}
-
-func (tx *Tx) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) ([]*types.Revision, error) {
-	return listRevision(ctx, tx, opt)
-}
-
 func listRevision(ctx context.Context, ext metadata.ExtContext, opt metadata.ListRevisionOpt) ([]*types.Revision, error) {
 	var revisions []*types.Revision
 	query := "SELECT * FROM feature_group_revision"
@@ -53,14 +45,6 @@ func buildListRevisionCond(opt metadata.ListRevisionOpt) ([]string, []interface{
 	return dbutil.BuildConditions(and, in)
 }
 
-func (db *DB) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*types.Revision, error) {
-	return getRevision(ctx, db, opt)
-}
-
-func (tx *Tx) GetRevision(ctx context.Context, opt metadata.GetRevisionOpt) (*types.Revision, error) {
-	return getRevision(ctx, tx, opt)
-}
-
 func getRevision(ctx context.Context, ext metadata.ExtContext, opt metadata.GetRevisionOpt) (*types.Revision, error) {
 	and := make(map[string]interface{})
 	if opt.GroupName != nil {
@@ -88,14 +72,6 @@ func getRevision(ctx context.Context, ext metadata.ExtContext, opt metadata.GetR
 	return &rs, nil
 }
 
-func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) (int64, error) {
-	return updateRevision(ctx, db, opt)
-}
-
-func (tx *Tx) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) (int64, error) {
-	return updateRevision(ctx, tx, opt)
-}
-
 func updateRevision(ctx context.Context, ext metadata.ExtContext, opt metadata.UpdateRevisionOpt) (int64, error) {
 	and := make(map[string]interface{})
 	if opt.NewRevision != nil {
@@ -121,14 +97,6 @@ func updateRevision(ctx context.Context, ext metadata.ExtContext, opt metadata.U
 	}
 }
 
-func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (*types.Revision, error) {
-	return createRevision(ctx, db, opt)
-}
-
-func (tx *Tx) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (*types.Revision, error) {
-	return createRevision(ctx, tx, opt)
-}
-
 func createRevision(ctx context.Context, ext metadata.ExtContext, opt metadata.CreateRevisionOpt) (*types.Revision, error) {
 	query := "INSERT INTO feature_group_revision(group_name, revision, data_table, anchored, description) VALUES ($1, $2, $3, $4, $5) RETURNING *"
 	var revision types.Revision
@@ -143,14 +111,6 @@ func createRevision(ctx context.Context, ext metadata.ExtContext, opt metadata.C
 	return &revision, nil
 }
 
-func (db *DB) GetLatestRevision(ctx context.Context, groupName string) (*types.Revision, error) {
-	return getLatestRevision(ctx, db, groupName)
-}
-
-func (tx *Tx) GetLatestRevision(ctx context.Context, groupName string) (*types.Revision, error) {
-	return getLatestRevision(ctx, tx, groupName)
-}
-
 func getLatestRevision(ctx context.Context, ext metadata.ExtContext, groupName string) (*types.Revision, error) {
 	query := "SELECT * FROM feature_group_revision WHERE group_name = $1 ORDER BY create_time DESC LIMIT 1"
 	var revision types.Revision
@@ -158,14 +118,6 @@ func getLatestRevision(ctx context.Context, ext metadata.ExtContext, groupName s
 		return nil, err
 	}
 	return &revision, nil
-}
-
-func (db *DB) BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error) {
-	return buildRevisionRanges(ctx, db, groupName)
-}
-
-func (tx *Tx) BuildRevisionRanges(ctx context.Context, groupName string) ([]*types.RevisionRange, error) {
-	return buildRevisionRanges(ctx, tx, groupName)
 }
 
 func buildRevisionRanges(ctx context.Context, ext metadata.ExtContext, groupName string) ([]*types.RevisionRange, error) {

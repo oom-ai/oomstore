@@ -13,14 +13,6 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) error {
-	return createFeatureGroup(ctx, db, opt)
-}
-
-func (tx *Tx) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) error {
-	return createFeatureGroup(ctx, tx, opt)
-}
-
 func createFeatureGroup(ctx context.Context, ext metadata.ExtContext, opt metadata.CreateFeatureGroupOpt) error {
 	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
 		return fmt.Errorf("illegal category %s, should be either 'stream' or 'batch'", opt.Category)
@@ -37,14 +29,6 @@ func createFeatureGroup(ctx context.Context, ext metadata.ExtContext, opt metada
 	return err
 }
 
-func (db *DB) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
-	return getFeatureGroup(ctx, db, groupName)
-}
-
-func (tx *Tx) GetFeatureGroup(ctx context.Context, groupName string) (*types.FeatureGroup, error) {
-	return getFeatureGroup(ctx, tx, groupName)
-}
-
 func getFeatureGroup(ctx context.Context, ext metadata.ExtContext, groupName string) (*types.FeatureGroup, error) {
 	query := "SELECT * FROM rich_feature_group WHERE name = $1"
 
@@ -56,14 +40,6 @@ func getFeatureGroup(ctx context.Context, ext metadata.ExtContext, groupName str
 		return nil, err
 	}
 	return &group, nil
-}
-
-func (db *DB) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
-	return listFeatureGroup(ctx, db, entityName)
-}
-
-func (tx *Tx) ListFeatureGroup(ctx context.Context, entityName *string) ([]*types.FeatureGroup, error) {
-	return listFeatureGroup(ctx, tx, entityName)
 }
 
 func listFeatureGroup(ctx context.Context, ext metadata.ExtContext, entityName *string) ([]*types.FeatureGroup, error) {
@@ -82,14 +58,6 @@ func listFeatureGroup(ctx context.Context, ext metadata.ExtContext, entityName *
 		return nil, err
 	}
 	return groups, nil
-}
-
-func (db *DB) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error) {
-	return updateFeatureGroup(ctx, db, opt)
-}
-
-func (tx *Tx) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) (int64, error) {
-	return updateFeatureGroup(ctx, tx, opt)
 }
 
 func updateFeatureGroup(ctx context.Context, ext metadata.ExtContext, opt types.UpdateFeatureGroupOpt) (int64, error) {
