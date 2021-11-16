@@ -40,12 +40,12 @@ func TestSync(t *testing.T) {
 			expectedError: fmt.Errorf("the specific revision was synced to the online store, won't do it again this time"),
 			mockFn: func() {
 				metadataStore.EXPECT().
-					GetRevision(ctx, int32(1)).
+					GetRevision(ctx, 1).
 					Return(&types.Revision{
 						GroupID: 1,
 						Group: &types.FeatureGroup{
 							ID:               1,
-							OnlineRevisionID: int32Ptr(1),
+							OnlineRevisionID: intPtr(1),
 						},
 					}, nil)
 			},
@@ -70,7 +70,7 @@ func TestSync(t *testing.T) {
 					DataTable: "data-table-name",
 				}
 				metadataStore.EXPECT().
-					GetRevision(ctx, int32(1)).
+					GetRevision(ctx, 1).
 					Return(revision, nil)
 
 				features := types.FeatureList{
@@ -112,7 +112,7 @@ func TestSync(t *testing.T) {
 				metadataStore.EXPECT().
 					UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
 						GroupID:             revision.GroupID,
-						NewOnlineRevisionID: int32Ptr(revision.ID),
+						NewOnlineRevisionID: intPtr(revision.ID),
 					}).
 					Return(nil)
 
@@ -136,12 +136,12 @@ func TestSync(t *testing.T) {
 						Entity: &types.Entity{
 							Name: "entity-name",
 						},
-						OnlineRevisionID: int32Ptr(100),
+						OnlineRevisionID: intPtr(100),
 					},
 					DataTable: "data-table-name",
 				}
 				metadataStore.EXPECT().
-					GetRevision(ctx, int32(1)).
+					GetRevision(ctx, 1).
 					Return(revision, nil)
 
 				features := types.FeatureList{
@@ -183,7 +183,7 @@ func TestSync(t *testing.T) {
 				metadataStore.EXPECT().
 					UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
 						GroupID:             revision.GroupID,
-						NewOnlineRevisionID: int32Ptr(revision.ID),
+						NewOnlineRevisionID: intPtr(revision.ID),
 					}).
 					Return(nil)
 
@@ -202,11 +202,7 @@ func TestSync(t *testing.T) {
 	}
 }
 
-func int16Ptr(i int16) *int16 {
-	return &i
-}
-
-func int32Ptr(i int32) *int32 {
+func intPtr(i int) *int {
 	return &i
 }
 

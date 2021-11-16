@@ -33,7 +33,7 @@ var listRevisionCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		var groupID *int16
+		var groupID *int
 
 		if listRevisionOpt.groupName != nil {
 			group, err := oomStore.GetFeatureGroupByName(ctx, *listRevisionOpt.groupName)
@@ -103,6 +103,6 @@ func revisionHeader() []string {
 }
 
 func revisionRecord(r *types.Revision) []string {
-	return []string{strconv.Itoa(int(r.Revision)), serializeInt32(r.ID), r.Group.Name, r.DataTable, r.Description,
+	return []string{strconv.Itoa(int(r.Revision)), strconv.Itoa(r.ID), r.Group.Name, r.DataTable, r.Description,
 		r.CreateTime.Format(time.RFC3339), r.ModifyTime.Format(time.RFC3339)}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type Entity struct {
-	ID     int16  `db:"id"`
+	ID     int    `db:"id"`
 	Name   string `db:"name"`
 	Length int    `db:"length"`
 

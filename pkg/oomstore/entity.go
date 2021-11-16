@@ -7,7 +7,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (s *OomStore) GetEntity(ctx context.Context, id int16) (*types.Entity, error) {
+func (s *OomStore) GetEntity(ctx context.Context, id int) (*types.Entity, error) {
 	return s.metadata.GetEntity(ctx, id)
 }
 
@@ -19,7 +19,7 @@ func (s *OomStore) ListEntity(ctx context.Context) types.EntityList {
 	return s.metadata.ListEntity(ctx)
 }
 
-func (s *OomStore) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int16, error) {
+func (s *OomStore) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
 	return s.metadata.CreateEntity(ctx, opt)
 }
 

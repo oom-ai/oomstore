@@ -12,11 +12,11 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func createFeatureGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateFeatureGroupOpt) (int16, error) {
+func createFeatureGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateFeatureGroupOpt) (int, error) {
 	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
 		return 0, fmt.Errorf("illegal category '%s', should be either 'stream' or 'batch'", opt.Category)
 	}
-	var featureGroupId int16
+	var featureGroupId int
 	query := "insert into feature_group(name, entity_id, category, description) values($1, $2, $3, $4) returning id"
 	err := sqlxCtx.GetContext(ctx, &featureGroupId, query, opt.Name, opt.EntityID, opt.Category, opt.Description)
 	if err != nil {

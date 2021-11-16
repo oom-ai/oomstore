@@ -95,7 +95,7 @@ func (mr *MockStoreMockRecorder) MultiGet(ctx, opt interface{}) *gomock.Call {
 }
 
 // Purge mocks base method.
-func (m *MockStore) Purge(ctx context.Context, revisionID int32) error {
+func (m *MockStore) Purge(ctx context.Context, revisionID int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Purge", ctx, revisionID)
 	ret0, _ := ret[0].(error)

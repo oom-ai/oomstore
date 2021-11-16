@@ -35,13 +35,13 @@ type CreateFeatureGroupOpt struct {
 }
 
 type ExportFeatureValuesOpt struct {
-	RevisionID   int32
+	RevisionID   int
 	FeatureNames []string
 	Limit        *uint64
 }
 
 type ImportBatchFeaturesOpt struct {
-	GroupID     int16
+	GroupID     int
 	Description string
 	DataSource  CsvDataSource
 	Revision    *int64
@@ -58,12 +58,12 @@ type GetOnlineFeatureValuesOpt struct {
 }
 
 type MultiGetOnlineFeatureValuesOpt struct {
-	FeatureIDs []int16
+	FeatureIDs []int
 	EntityKeys []string
 }
 
 type GetHistoricalFeatureValuesOpt struct {
-	FeatureIDs []int16
+	FeatureIDs []int
 	EntityRows <-chan EntityRow
 }
 
@@ -75,15 +75,15 @@ type UpdateEntityOpt struct {
 type UpdateFeatureGroupOpt struct {
 	GroupName        string
 	Description      *string
-	OnlineRevisionId *int32
+	OnlineRevisionId *int
 }
 
 type SyncOpt struct {
-	RevisionId int32
+	RevisionId int
 }
 
 type GetRevisionOpt struct {
 	GroupName  *string
 	Revision   *int64
-	RevisionId *int32
+	RevisionId *int
 }

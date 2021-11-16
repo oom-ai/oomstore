@@ -6,14 +6,14 @@ import (
 
 type GetOpt struct {
 	Entity      *types.Entity
-	RevisionID  int32
+	RevisionID  int
 	EntityKey   string
 	FeatureList types.FeatureList
 }
 
 type MultiGetOpt struct {
 	Entity      *types.Entity
-	RevisionID  int32
+	RevisionID  int
 	EntityKeys  []string
 	FeatureList types.FeatureList
 }

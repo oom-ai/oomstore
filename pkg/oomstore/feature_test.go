@@ -76,7 +76,7 @@ func TestCreateBatchFeature(t *testing.T) {
 
 				metadataStore.EXPECT().
 					CreateFeature(gomock.Any(), tc.opt).
-					Return(int16(0), nil)
+					Return(0, nil)
 			}
 
 			_, err := store.CreateBatchFeature(context.Background(), tc.opt)
