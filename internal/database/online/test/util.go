@@ -34,7 +34,7 @@ func init() {
 					ID:          1,
 					Name:        "age",
 					GroupID:     1,
-					ValueType:   types.INT16,
+					ValueType:   types.INT64,
 					DBValueType: "smallint",
 				},
 				&types.Feature{

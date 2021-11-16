@@ -17,7 +17,7 @@ func TestValueTypeTag(t *testing.T) {
 		},
 		{
 			"int",
-			types.INT32,
+			types.INT64,
 		},
 		{
 			"varchar(32)",
