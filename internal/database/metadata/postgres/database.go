@@ -15,9 +15,15 @@ import (
 )
 
 var _ metadata.Store = &DB{}
+var _ metadata.Store = &Tx{}
 
 type DB struct {
 	*sqlx.DB
+	*informer.Informer
+}
+
+type Tx struct {
+	*sqlx.Tx
 	*informer.Informer
 }
 
@@ -86,4 +92,33 @@ func list(ctx context.Context, db *sqlx.DB) (*informer.Cache, error) {
 		return nil
 	})
 	return cache, err
+}
+
+func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, metadata.Store) error) (err error) {
+	tx, err := db.BeginTxx(ctx, nil)
+	if err != nil {
+		return
+	}
+
+	txStore := &Tx{Tx: tx}
+
+	defer func() {
+		if p := recover(); p != nil {
+			// a panic occurred, rollback and repanic
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			// something went wrong, rollback
+			_ = tx.Rollback()
+		} else {
+			// all good, commit
+			err = tx.Commit()
+		}
+	}()
+
+	return fn(ctx, txStore)
+}
+
+func (tx *Tx) WithTransaction(ctx context.Context, fn func(context.Context, metadata.Store) error) (err error) {
+	return fn(ctx, tx)
 }

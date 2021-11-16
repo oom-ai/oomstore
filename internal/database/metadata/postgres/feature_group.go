@@ -12,13 +12,13 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int16, error) {
+func createFeatureGroup(ctx context.Context, exec metadata.ExecContext, opt metadata.CreateFeatureGroupOpt) (int16, error) {
 	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
 		return 0, fmt.Errorf("illegal category '%s', should be either 'stream' or 'batch'", opt.Category)
 	}
 	var featureGroupId int16
 	query := "insert into feature_group(name, entity_id, category, description) values($1, $2, $3, $4) returning id"
-	err := db.GetContext(ctx, &featureGroupId, query, opt.Name, opt.EntityID, opt.Category, opt.Description)
+	err := exec.GetContext(ctx, &featureGroupId, query, opt.Name, opt.EntityID, opt.Category, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
@@ -29,7 +29,7 @@ func (db *DB) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeature
 	return featureGroupId, err
 }
 
-func (db *DB) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
+func updateFeatureGroup(ctx context.Context, exec metadata.ExecContext, opt metadata.UpdateFeatureGroupOpt) error {
 	and := make(map[string]interface{})
 	if opt.NewDescription != nil {
 		and["description"] = *opt.NewDescription
@@ -48,7 +48,7 @@ func (db *DB) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeature
 	}
 
 	query := fmt.Sprintf("UPDATE feature_group SET %s WHERE id = ?", strings.Join(cond, ","))
-	result, err := db.ExecContext(ctx, db.Rebind(query), args...)
+	result, err := exec.ExecContext(ctx, exec.Rebind(query), args...)
 	if err != nil {
 		return err
 	}
