@@ -14,7 +14,7 @@ func TestValueTypeTag(t *testing.T) {
 	}{
 		{
 			"bit varying",
-			types.BYTE_ARRAY,
+			types.BYTES,
 		},
 		{
 			"int",
