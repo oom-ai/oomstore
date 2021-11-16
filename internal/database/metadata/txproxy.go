@@ -8,33 +8,33 @@ import (
 )
 
 type Tx struct {
-	*sqlx.Tx
-	*TxProxy
+	tx *sqlx.Tx
+	tp *TxProxy
 }
 
 func (tx *Tx) CreateEntity(ctx context.Context, opt CreateEntityOpt) (int16, error) {
-	return tx.CreateEntityTx(ctx, tx.Tx, opt)
+	return tx.tp.CreateEntityTx(ctx, tx.tx, opt)
 }
 func (tx *Tx) UpdateEntity(ctx context.Context, opt UpdateEntityOpt) error {
-	return tx.UpdateEntityTx(ctx, tx.Tx, opt)
+	return tx.tp.UpdateEntityTx(ctx, tx.tx, opt)
 }
 func (tx *Tx) CreateFeature(ctx context.Context, opt CreateFeatureOpt) (int16, error) {
-	return tx.CreateFeatureTx(ctx, tx.Tx, opt)
+	return tx.tp.CreateFeatureTx(ctx, tx.tx, opt)
 }
 func (tx *Tx) UpdateFeature(ctx context.Context, opt UpdateFeatureOpt) error {
-	return tx.UpdateFeatureTx(ctx, tx.Tx, opt)
+	return tx.tp.UpdateFeatureTx(ctx, tx.tx, opt)
 }
 func (tx *Tx) CreateFeatureGroup(ctx context.Context, opt CreateFeatureGroupOpt) (int16, error) {
-	return tx.CreateFeatureGroupTx(ctx, tx.Tx, opt)
+	return tx.tp.CreateFeatureGroupTx(ctx, tx.tx, opt)
 }
 func (tx *Tx) UpdateFeatureGroup(ctx context.Context, opt UpdateFeatureGroupOpt) error {
-	return tx.UpdateFeatureGroupTx(ctx, tx.Tx, opt)
+	return tx.tp.UpdateFeatureGroupTx(ctx, tx.tx, opt)
 }
 func (tx *Tx) CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int32, string, error) {
-	return tx.CreateRevisionTx(ctx, tx.Tx, opt)
+	return tx.tp.CreateRevisionTx(ctx, tx.tx, opt)
 }
 func (tx *Tx) UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) error {
-	return tx.UpdateRevisionTx(ctx, tx.Tx, opt)
+	return tx.tp.UpdateRevisionTx(ctx, tx.tx, opt)
 }
 
 type TxProxy struct {
@@ -71,7 +71,7 @@ func (tp *TxProxy) WithTransaction(ctx context.Context, fn func(tx *Tx) error) e
 			err = tx.Commit()
 		}
 	}()
-	return fn(&Tx{Tx: tx, TxProxy: tp})
+	return fn(&Tx{tx: tx, tp: tp})
 }
 
 func (tp *TxProxy) CreateEntity(ctx context.Context, opt CreateEntityOpt) (int16, error) {
