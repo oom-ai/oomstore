@@ -56,7 +56,7 @@ type TxProxy struct {
 func (tp *TxProxy) WithTransaction(ctx context.Context, fn func(tx *Tx) error) error {
 	tx, err := tp.BeginTxFn(ctx, nil)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer func() {
 		if p := recover(); p != nil {
