@@ -8,6 +8,36 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
+type Tx struct {
+	*sqlx.Tx
+	*TxProxy
+}
+
+func (tx *Tx) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int16, error) {
+	return tx.CreateEntityTx(ctx, tx.Tx, opt)
+}
+func (tx *Tx) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
+	return tx.UpdateEntityTx(ctx, tx.Tx, opt)
+}
+func (tx *Tx) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int16, error) {
+	return tx.CreateFeatureTx(ctx, tx.Tx, opt)
+}
+func (tx *Tx) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
+	return tx.UpdateFeatureTx(ctx, tx.Tx, opt)
+}
+func (tx *Tx) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int16, error) {
+	return tx.CreateFeatureGroupTx(ctx, tx.Tx, opt)
+}
+func (tx *Tx) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
+	return tx.UpdateFeatureGroupTx(ctx, tx.Tx, opt)
+}
+func (tx *Tx) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int32, string, error) {
+	return tx.CreateRevisionTx(ctx, tx.Tx, opt)
+}
+func (tx *Tx) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
+	return tx.UpdateRevisionTx(ctx, tx.Tx, opt)
+}
+
 type TxProxy struct {
 	BeginTxFn func(context.Context, *sql.TxOptions) (*sqlx.Tx, error)
 
@@ -24,69 +54,69 @@ type TxProxy struct {
 	UpdateRevisionTx func(context.Context, *sqlx.Tx, metadata.UpdateRevisionOpt) error
 }
 
-func (t *TxProxy) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int16, error) {
+func (tp *TxProxy) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int16, error) {
 	var id int16
-	err := t.WithTransaction(ctx, func(tx *sqlx.Tx) (err error) {
-		id, err = t.CreateEntityTx(ctx, tx, opt)
+	err := tp.WithTransaction(ctx, func(tx *Tx) (err error) {
+		id, err = tx.CreateEntity(ctx, opt)
 		return err
 	})
 	return id, err
 }
 
-func (t *TxProxy) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
-	return t.WithTransaction(ctx, func(tx *sqlx.Tx) error {
-		return t.UpdateEntityTx(ctx, tx, opt)
+func (tp *TxProxy) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
+	return tp.WithTransaction(ctx, func(tx *Tx) error {
+		return tx.UpdateEntity(ctx, opt)
 	})
 }
 
-func (t *TxProxy) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int16, error) {
+func (tp *TxProxy) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int16, error) {
 	var id int16
-	err := t.WithTransaction(ctx, func(tx *sqlx.Tx) (err error) {
-		id, err = t.CreateFeatureTx(ctx, tx, opt)
+	err := tp.WithTransaction(ctx, func(tx *Tx) (err error) {
+		id, err = tx.CreateFeature(ctx, opt)
 		return err
 	})
 	return id, err
 }
 
-func (t *TxProxy) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
-	return t.WithTransaction(ctx, func(tx *sqlx.Tx) error {
-		return t.UpdateFeatureTx(ctx, tx, opt)
+func (tp *TxProxy) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
+	return tp.WithTransaction(ctx, func(tx *Tx) error {
+		return tx.UpdateFeature(ctx, opt)
 	})
 }
 
-func (t *TxProxy) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int16, error) {
+func (tp *TxProxy) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int16, error) {
 	var id int16
-	err := t.WithTransaction(ctx, func(tx *sqlx.Tx) (err error) {
-		id, err = t.CreateFeatureGroupTx(ctx, tx, opt)
+	err := tp.WithTransaction(ctx, func(tx *Tx) (err error) {
+		id, err = tx.CreateFeatureGroup(ctx, opt)
 		return err
 	})
 	return id, err
 }
 
-func (t *TxProxy) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
-	return t.WithTransaction(ctx, func(tx *sqlx.Tx) error {
-		return t.UpdateFeatureGroupTx(ctx, tx, opt)
+func (tp *TxProxy) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
+	return tp.WithTransaction(ctx, func(tx *Tx) error {
+		return tx.UpdateFeatureGroup(ctx, opt)
 	})
 }
 
-func (t *TxProxy) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int32, string, error) {
+func (tp *TxProxy) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int32, string, error) {
 	var id int32
 	var dataTable string
-	err := t.WithTransaction(ctx, func(tx *sqlx.Tx) (err error) {
-		id, dataTable, err = t.CreateRevisionTx(ctx, tx, opt)
+	err := tp.WithTransaction(ctx, func(tx *Tx) (err error) {
+		id, dataTable, err = tx.CreateRevision(ctx, opt)
 		return err
 	})
 	return id, dataTable, err
 }
 
-func (t *TxProxy) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
-	return t.WithTransaction(ctx, func(tx *sqlx.Tx) error {
-		return t.UpdateRevisionTx(ctx, tx, opt)
+func (tp *TxProxy) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
+	return tp.WithTransaction(ctx, func(tx *Tx) error {
+		return tx.UpdateRevision(ctx, opt)
 	})
 }
 
-func (t *TxProxy) WithTransaction(ctx context.Context, fn func(tx *sqlx.Tx) error) error {
-	tx, err := t.BeginTxFn(ctx, nil)
+func (tp *TxProxy) WithTransaction(ctx context.Context, fn func(tx *Tx) error) error {
+	tx, err := tp.BeginTxFn(ctx, nil)
 	if err != nil {
 		return nil
 	}
@@ -103,5 +133,5 @@ func (t *TxProxy) WithTransaction(ctx context.Context, fn func(tx *sqlx.Tx) erro
 			err = tx.Commit()
 		}
 	}()
-	return fn(tx)
+	return fn(&Tx{Tx: tx, TxProxy: tp})
 }
