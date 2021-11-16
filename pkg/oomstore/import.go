@@ -45,7 +45,7 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	// get columns of the group
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &opt.GroupID})
 	if features == nil {
-		return 0, fmt.Errorf("no featues under group id: '%d'", opt.GroupID)
+		return 0, fmt.Errorf("no features under group id: '%d'", opt.GroupID)
 	}
 
 	// get entity info
