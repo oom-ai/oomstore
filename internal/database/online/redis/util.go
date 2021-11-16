@@ -18,9 +18,9 @@ func SerializeByTag(i interface{}, typeTag string) (s string, err error) {
 	switch typeTag {
 	case types.STRING:
 		return i.(string), nil
-	case types.INT8, types.INT16, types.INT32, types.INT64:
+	case types.INT64:
 		return strconv.FormatInt(int64(i.(int64)), SeralizeIntBase), nil
-	case types.FLOAT32, types.FLOAT64:
+	case types.FLOAT64:
 		return strconv.FormatFloat(i.(float64), 'f', -1, 64), nil
 	case types.BOOL:
 		if i.(bool) {
@@ -100,11 +100,11 @@ func DeserializeByTag(i interface{}, typeTag string) (interface{}, error) {
 	case types.STRING:
 		return s, nil
 
-	case types.INT8, types.INT16, types.INT32, types.INT64:
+	case types.INT64:
 		x, err := strconv.ParseInt(s, SeralizeIntBase, 64)
 		return x, err
 
-	case types.FLOAT32, types.FLOAT64:
+	case types.FLOAT64:
 		x, err := strconv.ParseFloat(s, 64)
 		return x, err
 
