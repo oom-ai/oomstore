@@ -49,4 +49,6 @@ type StoreWrite interface {
 	// revision
 	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int32, string, error)
 	UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) error
+
+	WithTransaction(ctx context.Context, fn func(tx *Tx) error) error
 }
