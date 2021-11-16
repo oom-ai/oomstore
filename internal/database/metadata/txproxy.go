@@ -74,13 +74,12 @@ func (tp *TxProxy) WithTransaction(ctx context.Context, fn func(tx *Tx) error) e
 	return fn(&Tx{tx: tx, tp: tp})
 }
 
-func (tp *TxProxy) CreateEntity(ctx context.Context, opt CreateEntityOpt) (int16, error) {
-	var id int16
-	err := tp.WithTransaction(ctx, func(tx *Tx) (err error) {
+func (tp *TxProxy) CreateEntity(ctx context.Context, opt CreateEntityOpt) (id int16, err error) {
+	err = tp.WithTransaction(ctx, func(tx *Tx) (err error) {
 		id, err = tx.CreateEntity(ctx, opt)
 		return err
 	})
-	return id, err
+	return
 }
 
 func (tp *TxProxy) UpdateEntity(ctx context.Context, opt UpdateEntityOpt) error {
@@ -89,13 +88,12 @@ func (tp *TxProxy) UpdateEntity(ctx context.Context, opt UpdateEntityOpt) error 
 	})
 }
 
-func (tp *TxProxy) CreateFeature(ctx context.Context, opt CreateFeatureOpt) (int16, error) {
-	var id int16
-	err := tp.WithTransaction(ctx, func(tx *Tx) (err error) {
+func (tp *TxProxy) CreateFeature(ctx context.Context, opt CreateFeatureOpt) (id int16, err error) {
+	err = tp.WithTransaction(ctx, func(tx *Tx) (err error) {
 		id, err = tx.CreateFeature(ctx, opt)
 		return err
 	})
-	return id, err
+	return
 }
 
 func (tp *TxProxy) UpdateFeature(ctx context.Context, opt UpdateFeatureOpt) error {
@@ -104,13 +102,12 @@ func (tp *TxProxy) UpdateFeature(ctx context.Context, opt UpdateFeatureOpt) erro
 	})
 }
 
-func (tp *TxProxy) CreateFeatureGroup(ctx context.Context, opt CreateFeatureGroupOpt) (int16, error) {
-	var id int16
-	err := tp.WithTransaction(ctx, func(tx *Tx) (err error) {
+func (tp *TxProxy) CreateFeatureGroup(ctx context.Context, opt CreateFeatureGroupOpt) (id int16, err error) {
+	err = tp.WithTransaction(ctx, func(tx *Tx) (err error) {
 		id, err = tx.CreateFeatureGroup(ctx, opt)
 		return err
 	})
-	return id, err
+	return
 }
 
 func (tp *TxProxy) UpdateFeatureGroup(ctx context.Context, opt UpdateFeatureGroupOpt) error {
@@ -119,10 +116,8 @@ func (tp *TxProxy) UpdateFeatureGroup(ctx context.Context, opt UpdateFeatureGrou
 	})
 }
 
-func (tp *TxProxy) CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int32, string, error) {
-	var id int32
-	var dataTable string
-	err := tp.WithTransaction(ctx, func(tx *Tx) (err error) {
+func (tp *TxProxy) CreateRevision(ctx context.Context, opt CreateRevisionOpt) (id int32, dataTable string, err error) {
+	err = tp.WithTransaction(ctx, func(tx *Tx) (err error) {
 		id, dataTable, err = tx.CreateRevision(ctx, opt)
 		return err
 	})
