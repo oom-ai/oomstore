@@ -11,7 +11,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
-func createRevision(ctx context.Context, exec metadata.ExecContext, opt metadata.CreateRevisionOpt) (int32, string, error) {
+func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateRevisionOpt) (int32, string, error) {
 	var dataTable string
 	if opt.DataTable != nil {
 		dataTable = *opt.DataTable
@@ -19,7 +19,7 @@ func createRevision(ctx context.Context, exec metadata.ExecContext, opt metadata
 
 	var revisionId int32
 	insertQuery := "INSERT INTO feature_group_revision(group_id, revision, data_table, anchored, description) VALUES ($1, $2, $3, $4, $5) RETURNING id"
-	if err := exec.GetContext(ctx, &revisionId, insertQuery, opt.GroupID, opt.Revision, dataTable, opt.Anchored, opt.Description); err != nil {
+	if err := sqlxCtx.GetContext(ctx, &revisionId, insertQuery, opt.GroupID, opt.Revision, dataTable, opt.Anchored, opt.Description); err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
 				return 0, "", fmt.Errorf("revision already exists: groupId=%d, revision=%d", opt.GroupID, opt.Revision)
@@ -30,7 +30,7 @@ func createRevision(ctx context.Context, exec metadata.ExecContext, opt metadata
 	if opt.DataTable == nil {
 		updateQuery := "UPDATE feature_group_revision SET data_table = $1 WHERE id = $2"
 		dataTable = fmt.Sprintf("data_%d_%d", opt.GroupID, revisionId)
-		result, err := exec.ExecContext(ctx, updateQuery, dataTable, revisionId)
+		result, err := sqlxCtx.ExecContext(ctx, updateQuery, dataTable, revisionId)
 		if err != nil {
 			return 0, "", err
 		}
@@ -48,7 +48,7 @@ func createRevision(ctx context.Context, exec metadata.ExecContext, opt metadata
 
 // UpdateRevision = MustUpdateRevision
 // If fail to update any row or update more than one row, return error
-func updateRevision(ctx context.Context, exec metadata.ExecContext, opt metadata.UpdateRevisionOpt) error {
+func updateRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateRevisionOpt) error {
 	and := make(map[string]interface{})
 	if opt.NewRevision != nil {
 		and["revision"] = *opt.NewRevision
@@ -66,7 +66,7 @@ func updateRevision(ctx context.Context, exec metadata.ExecContext, opt metadata
 	args = append(args, opt.RevisionID)
 
 	query := fmt.Sprintf("UPDATE feature_group_revision SET %s WHERE id = ?", strings.Join(cond, ","))
-	result, err := exec.ExecContext(ctx, exec.Rebind(query), args...)
+	result, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(query), args...)
 	if err != nil {
 		return err
 	}
