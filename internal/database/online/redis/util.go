@@ -19,7 +19,7 @@ func SerializeByTag(i interface{}, typeTag string) (s string, err error) {
 	case types.STRING:
 		return i.(string), nil
 	case types.INT64:
-		return strconv.FormatInt(int64(i.(int64)), SeralizeIntBase), nil
+		return strconv.FormatInt(int64(i.(int64)), SerializeIntBase), nil
 	case types.FLOAT64:
 		return strconv.FormatFloat(i.(float64), 'f', -1, 64), nil
 	case types.BOOL:
@@ -29,12 +29,12 @@ func SerializeByTag(i interface{}, typeTag string) (s string, err error) {
 			return "0", nil
 		}
 	case types.TIME:
-		return strconv.FormatInt(i.(time.Time).UnixMilli(), SeralizeIntBase), nil
+		return strconv.FormatInt(i.(time.Time).UnixMilli(), SerializeIntBase), nil
 
 	case types.BYTE_ARRAY:
 		return string(i.([]byte)), nil
 	default:
-		return "", fmt.Errorf("unable to seralize %#v of type %T to string", i, i)
+		return "", fmt.Errorf("unable to serialize %#v of type %T to string", i, i)
 	}
 }
 
@@ -46,15 +46,15 @@ func SerializeByValue(i interface{}) (string, error) {
 		return string(s), nil
 
 	case int:
-		return strconv.FormatInt(int64(s), SeralizeIntBase), nil
+		return strconv.FormatInt(int64(s), SerializeIntBase), nil
 	case int64:
-		return strconv.FormatInt(int64(s), SeralizeIntBase), nil
+		return strconv.FormatInt(int64(s), SerializeIntBase), nil
 	case int32:
-		return strconv.FormatInt(int64(s), SeralizeIntBase), nil
+		return strconv.FormatInt(int64(s), SerializeIntBase), nil
 	case int16:
-		return strconv.FormatInt(int64(s), SeralizeIntBase), nil
+		return strconv.FormatInt(int64(s), SerializeIntBase), nil
 	case int8:
-		return strconv.FormatInt(int64(s), SeralizeIntBase), nil
+		return strconv.FormatInt(int64(s), SerializeIntBase), nil
 
 	case float64:
 		return strconv.FormatFloat(s, 'f', -1, 64), nil
@@ -62,15 +62,15 @@ func SerializeByValue(i interface{}) (string, error) {
 		return strconv.FormatFloat(float64(s), 'f', -1, 32), nil
 
 	case uint:
-		return strconv.FormatUint(uint64(s), SeralizeIntBase), nil
+		return strconv.FormatUint(uint64(s), SerializeIntBase), nil
 	case uint64:
-		return strconv.FormatUint(uint64(s), SeralizeIntBase), nil
+		return strconv.FormatUint(uint64(s), SerializeIntBase), nil
 	case uint32:
-		return strconv.FormatUint(uint64(s), SeralizeIntBase), nil
+		return strconv.FormatUint(uint64(s), SerializeIntBase), nil
 	case uint16:
-		return strconv.FormatUint(uint64(s), SeralizeIntBase), nil
+		return strconv.FormatUint(uint64(s), SerializeIntBase), nil
 	case uint8:
-		return strconv.FormatUint(uint64(s), SeralizeIntBase), nil
+		return strconv.FormatUint(uint64(s), SerializeIntBase), nil
 
 	case time.Time:
 		return SerializeByValue(s.UnixMilli())
@@ -82,7 +82,7 @@ func SerializeByValue(i interface{}) (string, error) {
 		}
 
 	default:
-		return "", fmt.Errorf("unable to seralize %#v of type %T to string", i, i)
+		return "", fmt.Errorf("unable to serialize %#v of type %T to string", i, i)
 	}
 }
 
@@ -101,7 +101,7 @@ func DeserializeByTag(i interface{}, typeTag string) (interface{}, error) {
 		return s, nil
 
 	case types.INT64:
-		x, err := strconv.ParseInt(s, SeralizeIntBase, 64)
+		x, err := strconv.ParseInt(s, SerializeIntBase, 64)
 		return x, err
 
 	case types.FLOAT64:
@@ -117,7 +117,7 @@ func DeserializeByTag(i interface{}, typeTag string) (interface{}, error) {
 			return nil, fmt.Errorf("invalid bool value: %s", s)
 		}
 	case types.TIME:
-		x, err := strconv.ParseInt(s, SeralizeIntBase, 64)
+		x, err := strconv.ParseInt(s, SerializeIntBase, 64)
 		return time.UnixMilli(x), err
 
 	case types.BYTE_ARRAY:
