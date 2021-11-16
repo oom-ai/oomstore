@@ -1,4 +1,4 @@
-onestore: &onestore
+store: &pg
   backend: postgres
   postgres:
     host: 127.0.0.1
@@ -7,6 +7,6 @@ onestore: &onestore
     password: postgres
     database: oomstore_test
 
-online-store: *onestore
-offline-store: *onestore
-metadata-store: *onestore
+online-store: *pg
+offline-store: *pg
+metadata-store: *pg
