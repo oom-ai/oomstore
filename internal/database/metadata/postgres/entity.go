@@ -9,10 +9,10 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
-func (db *DB) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int16, error) {
+func createEntity(ctx context.Context, exec metadata.ExecContext, opt metadata.CreateEntityOpt) (int16, error) {
 	var entityId int16
 	query := "insert into feature_entity(name, length, description) values($1, $2, $3) returning id"
-	err := db.GetContext(ctx, &entityId, query, opt.Name, opt.Length, opt.Description)
+	err := exec.GetContext(ctx, &entityId, query, opt.Name, opt.Length, opt.Description)
 	if er, ok := err.(*pq.Error); ok {
 		if er.Code == pgerrcode.UniqueViolation {
 			return 0, fmt.Errorf("entity %s already exists", opt.Name)
@@ -21,9 +21,9 @@ func (db *DB) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (i
 	return entityId, err
 }
 
-func (db *DB) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
+func updateEntity(ctx context.Context, exec metadata.ExecContext, opt metadata.UpdateEntityOpt) error {
 	query := "UPDATE feature_entity SET description = $1 WHERE id = $2"
-	result, err := db.ExecContext(ctx, query, opt.NewDescription, opt.EntityID)
+	result, err := exec.ExecContext(ctx, query, opt.NewDescription, opt.EntityID)
 	if err != nil {
 		return err
 	}
