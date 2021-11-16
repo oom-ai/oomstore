@@ -2,6 +2,7 @@ package metadata
 
 import (
 	"context"
+	"database/sql"
 	"io"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -36,7 +37,19 @@ type Store interface {
 	GetRevisionBy(ctx context.Context, groupID int16, revision int64) (*types.Revision, error)
 	ListRevision(ctx context.Context, opt ListRevisionOpt) types.RevisionList
 
+	// transaction
+	WithTransaction(ctx context.Context, fn func(context.Context, Store) error) error
+
 	// refresh
 	Refresh() error
 	io.Closer
+}
+
+type SqlxContext interface {
+	GetContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
+	SelectContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
+	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
+
+	DriverName() string
+	Rebind(string) string
 }
