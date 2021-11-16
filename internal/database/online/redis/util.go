@@ -31,7 +31,7 @@ func SerializeByTag(i interface{}, typeTag string) (s string, err error) {
 	case types.TIME:
 		return strconv.FormatInt(i.(time.Time).UnixMilli(), SerializeIntBase), nil
 
-	case types.BYTE_ARRAY:
+	case types.BYTES:
 		return string(i.([]byte)), nil
 	default:
 		return "", fmt.Errorf("unable to serialize %#v of type %T to string", i, i)
@@ -120,7 +120,7 @@ func DeserializeByTag(i interface{}, typeTag string) (interface{}, error) {
 		x, err := strconv.ParseInt(s, SerializeIntBase, 64)
 		return time.UnixMilli(x), err
 
-	case types.BYTE_ARRAY:
+	case types.BYTES:
 		return []byte(s), nil
 	default:
 		return "", fmt.Errorf("unsupported type tag: %s", typeTag)

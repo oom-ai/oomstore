@@ -1,10 +1,10 @@
 package types
 
 const (
-	STRING     = "string"
-	INT64      = "int64"
-	FLOAT64    = "float64"
-	BOOL       = "bool"
-	TIME       = "time"
-	BYTE_ARRAY = "byte_array"
+	STRING  = "string"
+	INT64   = "int64"
+	FLOAT64 = "float64"
+	BOOL    = "bool"
+	TIME    = "time"
+	BYTES   = "bytes"
 )
