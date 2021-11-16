@@ -77,11 +77,7 @@ func getFeatureValueMapFromRows(rows *sqlx.Rows, features types.FeatureList) (ma
 func deserializeIntoRowMap(values []interface{}, features types.FeatureList) (dbutil.RowMap, error) {
 	rs := map[string]interface{}{}
 	for i := range values {
-		v, err := DeserializeByTag(values[i], features[i].ValueType)
-		if err != nil {
-			return nil, err
-		}
-		rs[features[i].Name] = v
+		rs[features[i].Name] = values[i]
 	}
 	return rs, nil
 }
