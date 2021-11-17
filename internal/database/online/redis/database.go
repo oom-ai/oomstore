@@ -9,7 +9,7 @@ import (
 )
 
 const PipelineBatchSize = 10
-const SeralizeIntBase = 36
+const SerializeIntBase = 36
 
 var _ online.Store = &DB{}
 

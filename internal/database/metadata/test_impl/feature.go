@@ -11,7 +11,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Store) (int16, int16) {
+func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Store) (int, int) {
 	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		Name:        "device",
 		Length:      32,
@@ -144,19 +144,19 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, 1, features.Len())
 
 	features = store.ListFeature(ctx, metadata.ListFeatureOpt{
-		FeatureIDs: &[]int16{featureID},
+		FeatureIDs: &[]int{featureID},
 	})
 	require.Equal(t, 1, features.Len())
 
 	features = store.ListFeature(ctx, metadata.ListFeatureOpt{
-		EntityID:   int16Ptr(entityID + 1),
-		FeatureIDs: &[]int16{featureID},
+		EntityID:   intPtr(entityID + 1),
+		FeatureIDs: &[]int{featureID},
 	})
 	require.Equal(t, 0, features.Len())
 
 	features = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   &entityID,
-		FeatureIDs: &[]int16{},
+		FeatureIDs: &[]int{},
 	})
 	require.Equal(t, 0, len(features))
 

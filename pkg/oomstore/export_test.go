@@ -22,7 +22,7 @@ func TestExportFeatureValues(t *testing.T) {
 
 	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
 
-	revisonID := int32(5)
+	revisonID := 5
 	features := types.FeatureList{
 		{
 			Name:        "model",

@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func prepareEntity(t *testing.T, ctx context.Context, store metadata.Store, name string) int16 {
+func prepareEntity(t *testing.T, ctx context.Context, store metadata.Store, name string) int {
 	entityId, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		Name:        name,
 		Length:      32,
@@ -87,7 +87,7 @@ func TestListFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, 1, len(store.ListFeatureGroup(ctx, &deviceGroupID)))
 	require.Equal(t, 2, len(store.ListFeatureGroup(ctx, &userGroupID)))
 	require.Equal(t, 3, len(store.ListFeatureGroup(ctx, nil)))
-	require.Equal(t, 0, len(store.ListFeatureGroup(ctx, int16Ptr(0))))
+	require.Equal(t, 0, len(store.ListFeatureGroup(ctx, intPtr(0))))
 }
 
 func TestCreateFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -105,7 +105,7 @@ func TestCreateFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) 
 
 	// create successfully
 	featureGroupId, err := store.CreateFeatureGroup(ctx, opt)
-	require.NotEqual(t, int16(0), featureGroupId)
+	require.NotEqual(t, 0, featureGroupId)
 	require.NoError(t, err)
 
 	// cannot create feature group with same name

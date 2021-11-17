@@ -52,10 +52,10 @@ func (mr *MockStoreMockRecorder) Close() *gomock.Call {
 }
 
 // CreateEntity mocks base method.
-func (m *MockStore) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int16, error) {
+func (m *MockStore) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEntity", ctx, opt)
-	ret0, _ := ret[0].(int16)
+	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -67,10 +67,10 @@ func (mr *MockStoreMockRecorder) CreateEntity(ctx, opt interface{}) *gomock.Call
 }
 
 // CreateFeature mocks base method.
-func (m *MockStore) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int16, error) {
+func (m *MockStore) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFeature", ctx, opt)
-	ret0, _ := ret[0].(int16)
+	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -82,10 +82,10 @@ func (mr *MockStoreMockRecorder) CreateFeature(ctx, opt interface{}) *gomock.Cal
 }
 
 // CreateFeatureGroup mocks base method.
-func (m *MockStore) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int16, error) {
+func (m *MockStore) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFeatureGroup", ctx, opt)
-	ret0, _ := ret[0].(int16)
+	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -97,10 +97,10 @@ func (mr *MockStoreMockRecorder) CreateFeatureGroup(ctx, opt interface{}) *gomoc
 }
 
 // CreateRevision mocks base method.
-func (m *MockStore) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int32, string, error) {
+func (m *MockStore) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRevision", ctx, opt)
-	ret0, _ := ret[0].(int32)
+	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(string)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
@@ -113,7 +113,7 @@ func (mr *MockStoreMockRecorder) CreateRevision(ctx, opt interface{}) *gomock.Ca
 }
 
 // GetEntity mocks base method.
-func (m *MockStore) GetEntity(ctx context.Context, id int16) (*types.Entity, error) {
+func (m *MockStore) GetEntity(ctx context.Context, id int) (*types.Entity, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEntity", ctx, id)
 	ret0, _ := ret[0].(*types.Entity)
@@ -143,7 +143,7 @@ func (mr *MockStoreMockRecorder) GetEntityByName(ctx, name interface{}) *gomock.
 }
 
 // GetFeature mocks base method.
-func (m *MockStore) GetFeature(ctx context.Context, id int16) (*types.Feature, error) {
+func (m *MockStore) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeature", ctx, id)
 	ret0, _ := ret[0].(*types.Feature)
@@ -173,7 +173,7 @@ func (mr *MockStoreMockRecorder) GetFeatureByName(ctx, name interface{}) *gomock
 }
 
 // GetFeatureGroup mocks base method.
-func (m *MockStore) GetFeatureGroup(ctx context.Context, id int16) (*types.FeatureGroup, error) {
+func (m *MockStore) GetFeatureGroup(ctx context.Context, id int) (*types.FeatureGroup, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeatureGroup", ctx, id)
 	ret0, _ := ret[0].(*types.FeatureGroup)
@@ -203,7 +203,7 @@ func (mr *MockStoreMockRecorder) GetFeatureGroupByName(ctx, name interface{}) *g
 }
 
 // GetRevision mocks base method.
-func (m *MockStore) GetRevision(ctx context.Context, id int32) (*types.Revision, error) {
+func (m *MockStore) GetRevision(ctx context.Context, id int) (*types.Revision, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRevision", ctx, id)
 	ret0, _ := ret[0].(*types.Revision)
@@ -218,7 +218,7 @@ func (mr *MockStoreMockRecorder) GetRevision(ctx, id interface{}) *gomock.Call {
 }
 
 // GetRevisionBy mocks base method.
-func (m *MockStore) GetRevisionBy(ctx context.Context, groupID int16, revision int64) (*types.Revision, error) {
+func (m *MockStore) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRevisionBy", ctx, groupID, revision)
 	ret0, _ := ret[0].(*types.Revision)
@@ -261,7 +261,7 @@ func (mr *MockStoreMockRecorder) ListFeature(ctx, opt interface{}) *gomock.Call 
 }
 
 // ListFeatureGroup mocks base method.
-func (m *MockStore) ListFeatureGroup(ctx context.Context, entityID *int16) types.FeatureGroupList {
+func (m *MockStore) ListFeatureGroup(ctx context.Context, entityID *int) types.FeatureGroupList {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListFeatureGroup", ctx, entityID)
 	ret0, _ := ret[0].(types.FeatureGroupList)

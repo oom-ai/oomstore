@@ -16,7 +16,7 @@ func (c *GroupCache) Enrich(entityCache *EntityCache) {
 	}
 }
 
-func (c *GroupCache) List(entityID *int16) types.FeatureGroupList {
+func (c *GroupCache) List(entityID *int) types.FeatureGroupList {
 	if entityID == nil {
 		return c.FeatureGroupList
 	}

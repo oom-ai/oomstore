@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/olekukonko/tablewriter"
@@ -35,7 +36,7 @@ var listFeatureGroupCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		var entityID *int16
+		var entityID *int
 
 		if listFeatureGroupOpt.entityName != nil {
 			entity, err := oomStore.GetEntityByName(ctx, *listFeatureGroupOpt.entityName)
@@ -107,6 +108,6 @@ func groupRecord(g *types.FeatureGroup) []string {
 	if g.OnlineRevisionID != nil {
 		onlineRevisionID = fmt.Sprint(*g.OnlineRevisionID)
 	}
-	return []string{g.Name, serializeInt16(g.ID), g.Entity.Name, g.Description, onlineRevisionID,
+	return []string{g.Name, strconv.Itoa(g.ID), g.Entity.Name, g.Description, onlineRevisionID,
 		g.CreateTime.Format(time.RFC3339), g.ModifyTime.Format(time.RFC3339)}
 }

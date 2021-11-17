@@ -5,7 +5,7 @@ import (
 )
 
 type Revision struct {
-	ID        int32  `db:"id"`
+	ID        int    `db:"id"`
 	Revision  int64  `db:"revision"`
 	DataTable string `db:"data_table"`
 	Anchored  bool   `db:"anchored"`
@@ -14,7 +14,7 @@ type Revision struct {
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
 
-	GroupID int16 `db:"group_id"`
+	GroupID int `db:"group_id"`
 	Group   *FeatureGroup
 }
 

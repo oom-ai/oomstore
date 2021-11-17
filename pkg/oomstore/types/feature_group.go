@@ -7,7 +7,7 @@ import (
 )
 
 type FeatureGroup struct {
-	ID       int16  `db:"id"`
+	ID       int    `db:"id"`
 	Name     string `db:"name"`
 	Category string `db:"category"`
 
@@ -15,8 +15,8 @@ type FeatureGroup struct {
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
 
-	EntityID         int16  `db:"entity_id"`
-	OnlineRevisionID *int32 `db:"online_revision_id"`
+	EntityID         int  `db:"entity_id"`
+	OnlineRevisionID *int `db:"online_revision_id"`
 
 	Entity *Entity
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type Feature struct {
-	ID          int16  `db:"id"`
+	ID          int    `db:"id"`
 	Name        string `db:"name"`
 	ValueType   string `db:"value_type"`
 	DBValueType string `db:"db_value_type"`
@@ -16,7 +16,7 @@ type Feature struct {
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
 
-	GroupID int16 `db:"group_id"`
+	GroupID int `db:"group_id"`
 	Group   *FeatureGroup
 }
 
@@ -36,7 +36,7 @@ func (f *Feature) Entity() *Entity {
 	return f.Group.Entity
 }
 
-func (f *Feature) OnlineRevisionID() *int32 {
+func (f *Feature) OnlineRevisionID() *int {
 	return f.Group.OnlineRevisionID
 }
 
@@ -62,7 +62,7 @@ func (l *FeatureList) Names() (names []string) {
 	return
 }
 
-func (l *FeatureList) Ids() (ids []int16) {
+func (l *FeatureList) Ids() (ids []int) {
 	for _, f := range *l {
 		ids = append(ids, f.ID)
 	}
