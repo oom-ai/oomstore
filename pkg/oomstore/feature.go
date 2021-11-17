@@ -20,8 +20,15 @@ func (s *OomStore) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt)
 	return s.metadata.ListFeature(ctx, opt)
 }
 
-func (s *OomStore) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
-	return s.metadata.UpdateFeature(ctx, opt)
+func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
+	feature, err := s.metadata.GetFeatureByName(ctx, opt.FeatureName)
+	if err != nil {
+		return err
+	}
+	return s.metadata.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
+		FeatureID:      feature.ID,
+		NewDescription: opt.NewDescription,
+	})
 }
 
 func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatureOpt) (int, error) {
