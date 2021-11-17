@@ -280,47 +280,27 @@ func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	_, groupID, _, revisions := prepareRevisions(t, ctx, store)
-	var nilRevisionList types.RevisionList
 	require.NoError(t, store.Refresh())
 
 	testCases := []struct {
 		description string
-		opt         metadata.ListRevisionOpt
+		groupID     *int
 		expected    types.RevisionList
 	}{
 		{
+			description: "list revision, succeed",
+			groupID:     nil,
+			expected:    revisions,
+		},
+		{
 			description: "list revision by groupID, succeed",
-			opt: metadata.ListRevisionOpt{
-				GroupID: &groupID,
-			},
-			expected: revisions,
-		},
-		{
-			description: "list revision by dataTables, succeed",
-			opt: metadata.ListRevisionOpt{
-				DataTables: []string{"device_info_1000", "device_info_2000"},
-			},
-			expected: revisions,
-		},
-		{
-			description: "list revision by invalid dataTables, return empty list",
-			opt: metadata.ListRevisionOpt{
-				DataTables: []string{"device_info_3000"},
-			},
-			expected: nilRevisionList,
-		},
-		{
-			description: "list revision by empty dataTables, return empty list",
-			opt: metadata.ListRevisionOpt{
-				DataTables: []string{},
-				GroupID:    &groupID,
-			},
-			expected: nilRevisionList,
+			groupID:     &groupID,
+			expected:    revisions,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			actual := store.ListRevision(ctx, tc.opt)
+			actual := store.ListRevision(ctx, tc.groupID)
 			for _, item := range actual {
 				ignoreCreateAndModifyTime(item)
 			}

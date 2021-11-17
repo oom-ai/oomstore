@@ -113,7 +113,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 			metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureIDs: &tc.opt.FeatureIDs}).Return(tc.features)
 			if tc.entity != nil {
 				for _, featureList := range tc.featureMap {
-					metadataStore.EXPECT().ListRevision(gomock.Any(), metadata.ListRevisionOpt{GroupID: &featureList[0].GroupID}).Return(revisions).AnyTimes()
+					metadataStore.EXPECT().ListRevision(gomock.Any(), &featureList[0].GroupID).Return(revisions).AnyTimes()
 				}
 				offlineStore.EXPECT().Join(gomock.Any(), gomock.Any()).Return(tc.joined, nil)
 			}

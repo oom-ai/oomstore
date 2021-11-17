@@ -186,6 +186,6 @@ func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int) types.Fe
 	return f.Cache().Groups.List(entityID).Copy()
 }
 
-func (f *Informer) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) types.RevisionList {
-	return f.Cache().Revisions.List(opt).Copy()
+func (f *Informer) ListRevision(ctx context.Context, groupID *int) types.RevisionList {
+	return f.Cache().Revisions.List(groupID).Copy()
 }
