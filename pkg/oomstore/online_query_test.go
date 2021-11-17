@@ -29,7 +29,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 
 	testCases := []struct {
 		description   string
-		opt           types.GetOnlineFeatureValuesOpt
+		opt           types.OnlineGetOpt
 		entityName    *string
 		features      types.FeatureList
 		expectedError error
@@ -37,7 +37,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 	}{
 		{
 			description: "no available features",
-			opt: types.GetOnlineFeatureValuesOpt{
+			opt: types.OnlineGetOpt{
 				FeatureNames: unavailableFeatures.Names(),
 				EntityKey:    "1234",
 			},
@@ -52,7 +52,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		},
 		{
 			description: "inconsistent entity type, fail",
-			opt: types.GetOnlineFeatureValuesOpt{
+			opt: types.OnlineGetOpt{
 				FeatureNames: inconsistentFeatures.Names(),
 				EntityKey:    "1234",
 			},
@@ -62,7 +62,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 		},
 		{
 			description: "consistent entity type, succeed",
-			opt: types.GetOnlineFeatureValuesOpt{
+			opt: types.OnlineGetOpt{
 				FeatureNames: consistentFeatures.Names(),
 				EntityKey:    "1234",
 			},
@@ -92,7 +92,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 					"model": "xiaomi",
 				}, nil)
 			}
-			actual, err := store.GetOnlineFeatureValues(context.Background(), tc.opt)
+			actual, err := store.OnlineGet(context.Background(), tc.opt)
 			if tc.expectedError != nil {
 				assert.EqualError(t, err, tc.expectedError.Error())
 			} else {
@@ -118,7 +118,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 
 	testCases := []struct {
 		description   string
-		opt           types.MultiGetOnlineFeatureValuesOpt
+		opt           types.OnlineMultiGetOpt
 		entityName    *string
 		features      types.FeatureList
 		expectedError error
@@ -126,7 +126,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 	}{
 		{
 			description: "no available features, return nil",
-			opt: types.MultiGetOnlineFeatureValuesOpt{
+			opt: types.OnlineMultiGetOpt{
 				FeatureIDs: unavailableFeatures.IDs(),
 				EntityKeys: []string{"1234", "1235"},
 			},
@@ -136,7 +136,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		},
 		{
 			description: "inconsistent entity type, fail",
-			opt: types.MultiGetOnlineFeatureValuesOpt{
+			opt: types.OnlineMultiGetOpt{
 				FeatureIDs: inconsistentFeatures.IDs(),
 				EntityKeys: []string{"1234", "1235"},
 			},
@@ -146,7 +146,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		},
 		{
 			description: "consistent entity type, succeed",
-			opt: types.MultiGetOnlineFeatureValuesOpt{
+			opt: types.OnlineMultiGetOpt{
 				FeatureIDs: consistentFeatures.IDs(),
 				EntityKeys: []string{"1234", "1235"},
 			},
@@ -199,7 +199,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 					},
 				}, nil)
 			}
-			actual, err := store.MultiGetOnlineFeatureValues(context.Background(), tc.opt)
+			actual, err := store.OnlineMultiGet(context.Background(), tc.opt)
 			if tc.expectedError != nil {
 				assert.Error(t, err, tc.expectedError)
 			} else {

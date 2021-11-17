@@ -12,30 +12,30 @@ import (
 	"github.com/spf13/cast"
 )
 
-func getHistoricalFeature(ctx context.Context, store *oomstore.OomStore, opt types.ExportFeatureValuesOpt, output string) error {
+func export(ctx context.Context, store *oomstore.OomStore, opt types.ExportFeatureValuesOpt, output string) error {
 	fields, stream, err := store.ExportFeatureValues(ctx, opt)
 	if err != nil {
 		return err
 	}
 
-	if err := printHistoricalFeatures(fields, stream, output); err != nil {
+	if err := printExportResult(fields, stream, output); err != nil {
 		return fmt.Errorf("failed printing historical features: %+v", err)
 	}
 	return nil
 }
 
-func printHistoricalFeatures(fields []string, stream <-chan *types.RawFeatureValueRecord, output string) error {
+func printExportResult(fields []string, stream <-chan *types.RawFeatureValueRecord, output string) error {
 	switch output {
 	case CSV:
-		return printHistoricalFeaturesInCSV(fields, stream)
+		return printExportResultInCSV(fields, stream)
 	case ASCIITable:
-		return printHistoricalFeaturesInASCIITable(fields, stream)
+		return printExportResultInASCIITable(fields, stream)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
 }
 
-func printHistoricalFeaturesInCSV(fields []string, stream <-chan *types.RawFeatureValueRecord) error {
+func printExportResultInCSV(fields []string, stream <-chan *types.RawFeatureValueRecord) error {
 	w := csv.NewWriter(os.Stdout)
 	defer w.Flush()
 
@@ -53,7 +53,7 @@ func printHistoricalFeaturesInCSV(fields []string, stream <-chan *types.RawFeatu
 	return nil
 }
 
-func printHistoricalFeaturesInASCIITable(fields []string, stream <-chan *types.RawFeatureValueRecord) error {
+func printExportResultInASCIITable(fields []string, stream <-chan *types.RawFeatureValueRecord) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(fields)
 	table.SetAutoFormatHeaders(false)

@@ -46,7 +46,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 
 	testCases := []struct {
 		description   string
-		opt           types.GetHistoricalFeatureValuesOpt
+		opt           types.JoinOpt
 		features      types.FeatureList
 		entity        *types.Entity
 		featureMap    map[string]types.FeatureList
@@ -56,7 +56,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 	}{
 		{
 			description: "no valid features, return nil",
-			opt: types.GetHistoricalFeatureValuesOpt{
+			opt: types.JoinOpt{
 				FeatureIDs: streamFeatures.IDs(),
 				EntityRows: entityRows,
 			},
@@ -66,7 +66,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		},
 		{
 			description: "inconsistent features, return nil",
-			opt: types.GetHistoricalFeatureValuesOpt{
+			opt: types.JoinOpt{
 				FeatureIDs: inconsistentFeatures.IDs(),
 				EntityRows: entityRows,
 			},
@@ -76,7 +76,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		},
 		{
 			description: "nil joined, return nil",
-			opt: types.GetHistoricalFeatureValuesOpt{
+			opt: types.JoinOpt{
 				FeatureIDs: consistentFeatures.IDs(),
 				EntityRows: entityRows,
 			},
@@ -92,7 +92,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		},
 		{
 			description: "consistent entity type, succeed",
-			opt: types.GetHistoricalFeatureValuesOpt{
+			opt: types.JoinOpt{
 				FeatureIDs: consistentFeatures.IDs(),
 				EntityRows: entityRows,
 			},
@@ -118,7 +118,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 				offlineStore.EXPECT().Join(gomock.Any(), gomock.Any()).Return(tc.joined, nil)
 			}
 
-			actual, err := store.GetHistoricalFeatureValues(context.Background(), tc.opt)
+			actual, err := store.Join(context.Background(), tc.opt)
 			if tc.expectedError != nil {
 				assert.Error(t, err, tc.expectedError)
 			} else if tc.expected == nil {
