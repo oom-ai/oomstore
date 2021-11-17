@@ -24,18 +24,17 @@ func TestCreateBatchFeature(t *testing.T) {
 
 	testCases := []struct {
 		description string
-		opt         metadata.CreateFeatureOpt
+		opt         types.CreateFeatureOpt
 		valueType   string
 		group       types.FeatureGroup
 		expectError bool
 	}{
 		{
 			description: "create batch feature, succeed",
-			opt: metadata.CreateFeatureOpt{
-				Name:        "model",
+			opt: types.CreateFeatureOpt{
+				FeatureName: "model",
 				GroupID:     1,
 				DBValueType: "VARCHAR(32)",
-				ValueType:   types.STRING,
 			},
 			valueType: types.STRING,
 			group: types.FeatureGroup{
@@ -46,11 +45,10 @@ func TestCreateBatchFeature(t *testing.T) {
 		},
 		{
 			description: "create stream feature, fail",
-			opt: metadata.CreateFeatureOpt{
-				Name:        "model",
+			opt: types.CreateFeatureOpt{
+				FeatureName: "model",
 				GroupID:     1,
 				DBValueType: "BIGINT",
-				ValueType:   types.INT64,
 			},
 			valueType: types.INT64,
 			group: types.FeatureGroup{
@@ -68,17 +66,13 @@ func TestCreateBatchFeature(t *testing.T) {
 				Return(&tc.group, nil)
 
 			if tc.group.Category == types.BatchFeatureCategory {
-				tc.opt.ValueType = tc.valueType
-
-				offlineStore.EXPECT().
-					TypeTag(tc.opt.DBValueType).
-					Return(tc.valueType, nil)
-
-				metadataStore.EXPECT().
-					CreateFeature(gomock.Any(), tc.opt).
-					Return(0, nil)
+				metadataOpt := metadata.CreateFeatureOpt{
+					CreateFeatureOpt: tc.opt,
+					ValueType:        tc.valueType,
+				}
+				offlineStore.EXPECT().TypeTag(tc.opt.DBValueType).Return(tc.valueType, nil)
+				metadataStore.EXPECT().CreateFeature(gomock.Any(), metadataOpt).Return(0, nil)
 			}
-
 			_, err := store.CreateBatchFeature(context.Background(), tc.opt)
 			if tc.expectError {
 				assert.Error(t, err, fmt.Errorf("expected batch feature group, got %s feature group", tc.group.Category))
