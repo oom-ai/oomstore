@@ -7,11 +7,19 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (s *OomStore) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int, error) {
-	// Via the oomstore API, we can only create a batch feature group
-	// So we hardcode the category to be batch
-	opt.Category = types.BatchFeatureCategory
-	return s.metadata.CreateFeatureGroup(ctx, opt)
+func (s *OomStore) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt) (int, error) {
+	entity, err := s.metadata.GetEntityByName(ctx, opt.EntityName)
+	if err != nil {
+		return 0, err
+	}
+	return s.metadata.CreateFeatureGroup(ctx, metadata.CreateFeatureGroupOpt{
+		GroupName:   opt.GroupName,
+		EntityID:    entity.ID,
+		Description: opt.Description,
+		// Via the oomstore API, we can only create a batch feature group
+		// So we hardcode the category to be batch
+		Category: types.BatchFeatureCategory,
+	})
 }
 
 func (s *OomStore) GetFeatureGroup(ctx context.Context, id int) (*types.FeatureGroup, error) {

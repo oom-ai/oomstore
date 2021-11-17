@@ -4,36 +4,24 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
-type registerGroupOption struct {
-	metadata.CreateFeatureGroupOpt
-	entityName string
-}
-
-var registerGroupOpt registerGroupOption
-
+var registerGroupOpt types.CreateFeatureGroupOpt
 var registerGroupCmd = &cobra.Command{
 	Use:   "group",
 	Short: "register a new feature group",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
-		registerGroupOpt.Name = args[0]
+		registerGroupOpt.GroupName = args[0]
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		entity, err := oomStore.GetEntityByName(ctx, registerGroupOpt.entityName)
-		if err != nil {
-			log.Fatalf("failed to get entity name='%s': %v", registerGroupOpt.entityName, err)
-		}
-		registerGroupOpt.EntityID = entity.ID
-
-		if _, err := oomStore.CreateFeatureGroup(ctx, registerGroupOpt.CreateFeatureGroupOpt); err != nil {
+		if _, err := oomStore.CreateFeatureGroup(ctx, registerGroupOpt); err != nil {
 			log.Fatalf("failed registering new group: %v\n", err)
 		}
 	},
@@ -44,7 +32,7 @@ func init() {
 
 	flags := registerGroupCmd.Flags()
 
-	flags.StringVarP(&registerGroupOpt.entityName, "entity", "e", "", "entity name")
+	flags.StringVarP(&registerGroupOpt.EntityName, "entity", "e", "", "entity name")
 	_ = registerGroupCmd.MarkFlagRequired("entity")
 
 	flags.StringVarP(&registerGroupOpt.Description, "description", "d", "", "group description")
