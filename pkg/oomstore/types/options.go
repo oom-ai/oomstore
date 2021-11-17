@@ -52,12 +52,12 @@ type CsvDataSource struct {
 	Delimiter string
 }
 
-type GetOnlineFeatureValuesOpt struct {
+type OnlineGetOpt struct {
 	FeatureNames []string
 	EntityKey    string
 }
 
-type MultiGetOnlineFeatureValuesOpt struct {
+type OnlineMultiGetOpt struct {
 	FeatureIDs []int
 	EntityKeys []string
 }
