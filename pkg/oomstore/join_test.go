@@ -57,7 +57,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "no valid features, return nil",
 			opt: types.GetHistoricalFeatureValuesOpt{
-				FeatureIDs: streamFeatures.Ids(),
+				FeatureIDs: streamFeatures.IDs(),
 				EntityRows: entityRows,
 			},
 			features:      streamFeatures,
@@ -67,7 +67,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "inconsistent features, return nil",
 			opt: types.GetHistoricalFeatureValuesOpt{
-				FeatureIDs: inconsistentFeatures.Ids(),
+				FeatureIDs: inconsistentFeatures.IDs(),
 				EntityRows: entityRows,
 			},
 			features:      inconsistentFeatures,
@@ -77,7 +77,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "nil joined, return nil",
 			opt: types.GetHistoricalFeatureValuesOpt{
-				FeatureIDs: consistentFeatures.Ids(),
+				FeatureIDs: consistentFeatures.IDs(),
 				EntityRows: entityRows,
 			},
 			entity:   &entity,
@@ -93,7 +93,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.GetHistoricalFeatureValuesOpt{
-				FeatureIDs: consistentFeatures.Ids(),
+				FeatureIDs: consistentFeatures.IDs(),
 				EntityRows: entityRows,
 			},
 			entity:   &entity,

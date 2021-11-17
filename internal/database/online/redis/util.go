@@ -127,8 +127,8 @@ func DeserializeByTag(i interface{}, typeTag string) (interface{}, error) {
 	}
 }
 
-func SerializeRedisKey(revisionId int, entityKey interface{}) (string, error) {
-	prefix, err := SerializeByValue(revisionId)
+func SerializeRedisKey(revisionID int, entityKey interface{}) (string, error) {
+	prefix, err := SerializeByValue(revisionID)
 	if err != nil {
 		return "", err
 	}

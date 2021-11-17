@@ -32,15 +32,15 @@ func (db *DB) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) 
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
 	var (
-		revisionId int
+		revisionID int
 		dataTable  string
 		err        error
 	)
 	err = db.WithTransaction(ctx, func(c context.Context, s metadata.Store) error {
-		revisionId, dataTable, err = createRevision(ctx, db, opt)
+		revisionID, dataTable, err = createRevision(ctx, db, opt)
 		return err
 	})
-	return revisionId, dataTable, err
+	return revisionID, dataTable, err
 }
 
 func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {

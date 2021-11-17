@@ -62,7 +62,7 @@ func (l *FeatureList) Names() (names []string) {
 	return
 }
 
-func (l *FeatureList) Ids() (ids []int) {
+func (l *FeatureList) IDs() (ids []int) {
 	for _, f := range *l {
 		ids = append(ids, f.ID)
 	}
