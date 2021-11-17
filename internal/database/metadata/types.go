@@ -56,13 +56,6 @@ type UpdateRevisionOpt struct {
 	NewAnchored *bool
 }
 
-// Get
-type GetRevisionOpt struct {
-	GroupID    *int
-	Revision   *int64
-	RevisionID *int
-}
-
 // List
 type ListRevisionOpt struct {
 	GroupID    *int
