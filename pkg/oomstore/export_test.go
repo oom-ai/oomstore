@@ -21,7 +21,7 @@ func TestExportFeatureValues(t *testing.T) {
 
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
+	store := oomstore.TEST__New(nil, offlineStore, metadataStore)
 
 	revisionID := 5
 	features := types.FeatureList{
