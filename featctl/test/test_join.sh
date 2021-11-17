@@ -26,11 +26,11 @@ entity_key,unix_time,model,price
 2,${before_unix_time},,
 "
 
-actual=$(featctl join historical-feature \
+actual=$(featctl join \
     --feature model,price \
     --input-file entity_rows.csv \
     --output csv
-    )
+)
 
 sorted_expected=$(echo "$expected"|sort)
 sorted_actual=$(echo "$actual"|sort)
