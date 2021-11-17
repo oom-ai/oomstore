@@ -46,12 +46,20 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.WriteStore) error {
 			return s.applyFeature(ctx, tx, feature)
 		})
-	case "group":
+	case "featuregroup", "group":
 		var group apply.FeatureGroup
 		if err := mapstructure.Decode(data, &group); err != nil {
 			return err
 		}
-		return s.applyGroup(ctx, group)
+		entity, err := s.metadata.GetEntityByName(ctx, group.EntityName)
+		if err != nil {
+			return err
+		}
+		group.EntityID = entity.ID
+
+		return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.WriteStore) error {
+			return s.applyGroup(ctx, tx, group)
+		})
 	default:
 		return fmt.Errorf("invalid kind %s", kind)
 	}
@@ -62,8 +70,47 @@ func (s *OomStore) applyEntity(ctx context.Context, entity apply.Entity) error {
 	return nil
 }
 
-func (s *OomStore) applyGroup(ctx context.Context, group apply.FeatureGroup) error {
-	fmt.Printf("apply group!")
+func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, newGroup apply.FeatureGroup) error {
+	groupExist := true
+
+	group, err := s.metadata.GetGroupByName(ctx, newGroup.Name)
+	if err != nil {
+		if err.Error() != fmt.Sprintf("feature group '%s' not found", newGroup.Name) {
+			return err
+		}
+		groupExist = false
+	}
+
+	var groupID int
+	if !groupExist {
+		if groupID, err = txStore.CreateGroup(ctx, metadata.CreateGroupOpt{
+			GroupName:   newGroup.Name,
+			EntityID:    newGroup.EntityID,
+			Category:    newGroup.Category,
+			Description: newGroup.Description,
+		}); err != nil {
+			return err
+		}
+	} else {
+		groupID = group.ID
+		if newGroup.Description != group.Description {
+			if err = txStore.UpdateGroup(ctx, metadata.UpdateGroupOpt{
+				GroupID:        groupID,
+				NewDescription: &newGroup.Description,
+			}); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(newGroup.Features) != 0 {
+		for _, feature := range newGroup.Features {
+			feature.GroupID = groupID
+			if err = s.applyFeature(ctx, txStore, feature); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
