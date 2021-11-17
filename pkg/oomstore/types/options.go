@@ -62,7 +62,7 @@ type MultiGetOnlineFeatureValuesOpt struct {
 	EntityKeys []string
 }
 
-type GetHistoricalFeatureValuesOpt struct {
+type JoinOpt struct {
 	FeatureIDs []int
 	EntityRows <-chan EntityRow
 }
