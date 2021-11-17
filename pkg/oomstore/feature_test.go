@@ -20,7 +20,7 @@ func TestCreateBatchFeature(t *testing.T) {
 	defer ctrl.Finish()
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
+	store := oomstore.TEST__New(nil, offlineStore, metadataStore)
 
 	testCases := []struct {
 		description string
