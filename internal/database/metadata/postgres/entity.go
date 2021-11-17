@@ -12,10 +12,10 @@ import (
 func createEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateEntityOpt) (int, error) {
 	var entityId int
 	query := "insert into feature_entity(name, length, description) values($1, $2, $3) returning id"
-	err := sqlxCtx.GetContext(ctx, &entityId, query, opt.Name, opt.Length, opt.Description)
+	err := sqlxCtx.GetContext(ctx, &entityId, query, opt.EntityName, opt.Length, opt.Description)
 	if er, ok := err.(*pq.Error); ok {
 		if er.Code == pgerrcode.UniqueViolation {
-			return 0, fmt.Errorf("entity %s already exists", opt.Name)
+			return 0, fmt.Errorf("entity %s already exists", opt.EntityName)
 		}
 	}
 	return entityId, err

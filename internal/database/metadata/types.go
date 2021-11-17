@@ -10,9 +10,7 @@ type RevisionRange struct {
 
 // Create
 type CreateEntityOpt struct {
-	Name        string
-	Length      int
-	Description string
+	types.CreateEntityOpt
 }
 
 type CreateFeatureOpt struct {
