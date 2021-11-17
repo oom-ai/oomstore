@@ -13,9 +13,11 @@ import (
 
 func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Store) (int, int) {
 	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "description",
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  "device",
+			Length:      32,
+			Description: "description",
+		},
 	})
 	require.NoError(t, err)
 
