@@ -12,9 +12,11 @@ import (
 
 func prepareEntity(t *testing.T, ctx context.Context, store metadata.Store, name string) int {
 	entityId, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
-		Name:        name,
-		Length:      32,
-		Description: "description",
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  name,
+			Length:      32,
+			Description: "description",
+		},
 	})
 	require.NoError(t, err)
 	return entityId

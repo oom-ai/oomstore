@@ -343,9 +343,11 @@ func ignoreCreateAndModifyTime(revision *types.Revision) {
 
 func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (int, int, []int, types.RevisionList) {
 	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "description",
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  "device",
+			Length:      32,
+			Description: "description",
+		},
 	})
 	require.NoError(t, err)
 

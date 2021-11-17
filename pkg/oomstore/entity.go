@@ -19,10 +19,19 @@ func (s *OomStore) ListEntity(ctx context.Context) types.EntityList {
 	return s.metadata.ListEntity(ctx)
 }
 
-func (s *OomStore) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
-	return s.metadata.CreateEntity(ctx, opt)
+func (s *OomStore) CreateEntity(ctx context.Context, opt types.CreateEntityOpt) (int, error) {
+	return s.metadata.CreateEntity(ctx, metadata.CreateEntityOpt{
+		CreateEntityOpt: opt,
+	})
 }
 
-func (s *OomStore) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
-	return s.metadata.UpdateEntity(ctx, opt)
+func (s *OomStore) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) error {
+	entity, err := s.metadata.GetEntityByName(ctx, opt.EntityName)
+	if err != nil {
+		return err
+	}
+	return s.metadata.UpdateEntity(ctx, metadata.UpdateEntityOpt{
+		EntityID:       entity.ID,
+		NewDescription: opt.NewDescription,
+	})
 }
