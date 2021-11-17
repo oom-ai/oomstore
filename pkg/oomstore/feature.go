@@ -24,7 +24,7 @@ func (s *OomStore) UpdateFeature(ctx context.Context, opt metadata.UpdateFeature
 	return s.metadata.UpdateFeature(ctx, opt)
 }
 
-func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
+func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatureOpt) (int, error) {
 	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
 		return 0, err
@@ -33,8 +33,12 @@ func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadata.CreateFe
 		return 0, fmt.Errorf("expected batch feature group, got %s feature group", group.Category)
 	}
 
-	if opt.ValueType, err = s.offline.TypeTag(opt.DBValueType); err != nil {
+	valueType, err := s.offline.TypeTag(opt.DBValueType)
+	if err != nil {
 		return 0, err
 	}
-	return s.metadata.CreateFeature(ctx, opt)
+	return s.metadata.CreateFeature(ctx, metadata.CreateFeatureOpt{
+		CreateFeatureOpt: opt,
+		ValueType:        valueType,
+	})
 }
