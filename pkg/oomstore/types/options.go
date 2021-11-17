@@ -6,7 +6,7 @@ import (
 
 type CreateFeatureOpt struct {
 	FeatureName string
-	GroupID     string
+	GroupID     int
 	DBValueType string
 	Description string
 }
