@@ -17,12 +17,13 @@ import (
 func TestExportFeatureValues(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+	ctx := context.Background()
+
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-
 	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
 
-	revisonID := 5
+	revisionID := 5
 	features := types.FeatureList{
 		{
 			Name:        "model",
@@ -44,7 +45,7 @@ func TestExportFeatureValues(t *testing.T) {
 			description: "no features",
 			opt: types.ExportFeatureValuesOpt{
 				FeatureNames: []string{},
-				RevisionID:   revisonID,
+				RevisionID:   revisionID,
 			},
 			stream:   prepareTwoFeatureStream(),
 			expected: [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
@@ -53,7 +54,7 @@ func TestExportFeatureValues(t *testing.T) {
 			description: "provide one feature",
 			opt: types.ExportFeatureValuesOpt{
 				FeatureNames: []string{"price"},
-				RevisionID:   revisonID,
+				RevisionID:   revisionID,
 			},
 			stream:   prepareOneFeatureStream(),
 			expected: [][]interface{}{{"1234", int64(100)}, {"1235", int64(200)}, {"1236", int64(300)}, {"1237", int64(240)}},
@@ -62,7 +63,7 @@ func TestExportFeatureValues(t *testing.T) {
 			description: "provide revision",
 			opt: types.ExportFeatureValuesOpt{
 				FeatureNames: []string{"price"},
-				RevisionID:   revisonID,
+				RevisionID:   revisionID,
 			},
 			stream:   prepareTwoFeatureStream(),
 			expected: [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
@@ -75,19 +76,19 @@ func TestExportFeatureValues(t *testing.T) {
 				GroupID:   1,
 				DataTable: "device_info_10",
 				Group: &types.FeatureGroup{
+					Name:     "device_info",
 					ID:       1,
 					EntityID: 1,
 					Entity:   &types.Entity{Name: "device"},
 				},
 			}
 
-			metadataStore.EXPECT().
-				GetRevision(gomock.Any(), tc.opt.RevisionID).
-				Return(&revision, nil)
-
-			metadataStore.EXPECT().
-				ListFeature(gomock.Any(), gomock.Any()).
-				Return(features)
+			metadataStore.EXPECT().GetRevision(ctx, tc.opt.RevisionID).Return(&revision, nil)
+			metadataStore.EXPECT().GetFeatureGroupByName(ctx, "device_info").Return(&types.FeatureGroup{
+				Name: "device_info",
+				ID:   1,
+			}, nil)
+			metadataStore.EXPECT().ListFeature(gomock.Any(), gomock.Any()).Return(features)
 
 			featureNames := tc.opt.FeatureNames
 			if len(featureNames) == 0 {
