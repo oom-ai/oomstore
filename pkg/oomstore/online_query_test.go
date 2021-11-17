@@ -211,8 +211,8 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 }
 
 func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
-	revision1 := int32(1)
-	revision2 := int32(2)
+	revision1 := 1
+	revision2 := 2
 	entityDevice := &types.Entity{
 		ID:   1,
 		Name: "device",

@@ -11,13 +11,13 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
-func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateRevisionOpt) (int32, string, error) {
+func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateRevisionOpt) (int, string, error) {
 	var dataTable string
 	if opt.DataTable != nil {
 		dataTable = *opt.DataTable
 	}
 
-	var revisionId int32
+	var revisionId int
 	insertQuery := "INSERT INTO feature_group_revision(group_id, revision, data_table, anchored, description) VALUES ($1, $2, $3, $4, $5) RETURNING id"
 	if err := sqlxCtx.GetContext(ctx, &revisionId, insertQuery, opt.GroupID, opt.Revision, dataTable, opt.Anchored, opt.Description); err != nil {
 		if e2, ok := err.(*pq.Error); ok {

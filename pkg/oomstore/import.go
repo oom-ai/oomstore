@@ -41,7 +41,7 @@ func stringSliceEqual(a, b []string) bool {
 	return true
 }
 
-func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) (int32, error) {
+func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatchFeaturesOpt) (int, error) {
 	// get columns of the group
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &opt.GroupID})
 	if features == nil {

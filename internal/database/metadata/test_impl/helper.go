@@ -4,7 +4,7 @@ func boolPtr(i bool) *bool {
 	return &i
 }
 
-func int16Ptr(i int16) *int16 {
+func intPtr(i int) *int {
 	return &i
 }
 

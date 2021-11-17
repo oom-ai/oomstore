@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-func (db *DB) Purge(ctx context.Context, revisionID int32) error {
+func (db *DB) Purge(ctx context.Context, revisionID int) error {
 	prefix, err := SerializeByValue(revisionID)
 	if err != nil {
 		return nil

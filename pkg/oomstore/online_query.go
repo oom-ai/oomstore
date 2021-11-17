@@ -81,7 +81,7 @@ func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	return buildFeatureDataSet(featureValueMap, features.Names(), opt.EntityKeys)
 }
 
-func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int32]types.FeatureList, entity *types.Entity) (map[string]dbutil.RowMap, error) {
+func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int]types.FeatureList, entity *types.Entity) (map[string]dbutil.RowMap, error) {
 	// entity_key -> types.RecordMap
 	featureValueMap := make(map[string]dbutil.RowMap)
 
@@ -110,8 +110,8 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
-func groupFeaturesByRevisionId(features types.FeatureList) map[int32]types.FeatureList {
-	featureMap := make(map[int32]types.FeatureList)
+func groupFeaturesByRevisionId(features types.FeatureList) map[int]types.FeatureList {
+	featureMap := make(map[int]types.FeatureList)
 	for _, f := range features {
 		id := f.OnlineRevisionID()
 		if id == nil {
@@ -123,7 +123,7 @@ func groupFeaturesByRevisionId(features types.FeatureList) map[int32]types.Featu
 }
 
 func (s *OomStore) getSharedEntity(features types.FeatureList) (*types.Entity, error) {
-	m := make(map[int16]*types.Entity)
+	m := make(map[int]*types.Entity)
 	for _, f := range features {
 		m[f.Group.EntityID] = f.Group.Entity
 	}

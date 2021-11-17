@@ -27,7 +27,7 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 		description    string
 		opt            types.ImportBatchFeaturesOpt
 		mockFunc       func()
-		wantRevisionID int32
+		wantRevisionID int
 		wantError      error
 	}{
 		{
@@ -35,7 +35,7 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 			opt:         types.ImportBatchFeaturesOpt{GroupID: 1},
 			mockFunc: func() {
 				metadataStore.EXPECT().
-					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: int16Ptr(1)}).
+					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
 					Return(nil)
 			},
 			wantRevisionID: 0,
@@ -46,10 +46,10 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 			opt:         types.ImportBatchFeaturesOpt{GroupID: 1},
 			mockFunc: func() {
 				metadataStore.EXPECT().
-					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: int16Ptr(1)}).
+					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
 					Return(types.FeatureList{})
 				metadataStore.EXPECT().
-					GetFeatureGroup(gomock.Any(), int16(1)).
+					GetFeatureGroup(gomock.Any(), 1).
 					Return(nil, fmt.Errorf("error"))
 			},
 			wantRevisionID: 0,
@@ -63,7 +63,7 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 					ListFeature(gomock.Any(), gomock.Any()).
 					Return(types.FeatureList{})
 				metadataStore.EXPECT().
-					GetFeatureGroup(gomock.Any(), int16(1)).
+					GetFeatureGroup(gomock.Any(), 1).
 					Return(&types.FeatureGroup{ID: 1, EntityID: 1}, nil)
 			},
 			wantRevisionID: 0,
@@ -84,7 +84,7 @@ device,model,price
 			},
 			mockFunc: func() {
 				metadataStore.EXPECT().
-					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: int16Ptr(1)}).
+					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
 					Return(types.FeatureList{
 						{
 							Name: "model",
@@ -94,7 +94,7 @@ device,model,price
 						},
 					})
 				metadataStore.EXPECT().
-					GetFeatureGroup(gomock.Any(), int16(1)).
+					GetFeatureGroup(gomock.Any(), 1).
 					Return(&types.FeatureGroup{ID: 1, EntityID: 1, Entity: &types.Entity{Name: "device"}}, nil)
 				offlineStore.
 					EXPECT().
@@ -103,7 +103,7 @@ device,model,price
 
 				metadataStore.EXPECT().
 					CreateRevision(gomock.Any(), gomock.Any()).
-					Return(int32(0), "", fmt.Errorf("error"))
+					Return(0, "", fmt.Errorf("error"))
 			},
 			wantRevisionID: 0,
 			wantError:      fmt.Errorf("error"),
@@ -134,10 +134,10 @@ func TestImportBatchFeatures(t *testing.T) {
 
 		opt        types.ImportBatchFeaturesOpt
 		features   types.FeatureList
-		entityID   int16
+		entityID   int
 		Entity     types.Entity
 		header     []string
-		revisionID int32
+		revisionID int
 		wantError  error
 	}{
 		{
@@ -231,7 +231,7 @@ device,model,price
 			metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &tc.opt.GroupID}).Return(tc.features)
 
 			metadataStore.EXPECT().CreateRevision(ctx, metadata.CreateRevisionOpt{
-				Revision:    int64(0),
+				Revision:    0,
 				GroupID:     tc.opt.GroupID,
 				Description: tc.opt.Description,
 			}).Return(tc.revisionID, "data_1_1", nil).AnyTimes()

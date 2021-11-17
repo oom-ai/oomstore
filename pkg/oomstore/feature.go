@@ -8,7 +8,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (s *OomStore) GetFeature(ctx context.Context, id int16) (*types.Feature, error) {
+func (s *OomStore) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	return s.metadata.GetFeature(ctx, id)
 }
 
@@ -24,7 +24,7 @@ func (s *OomStore) UpdateFeature(ctx context.Context, opt metadata.UpdateFeature
 	return s.metadata.UpdateFeature(ctx, opt)
 }
 
-func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int16, error) {
+func (s *OomStore) CreateBatchFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
 	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupID)
 	if err != nil {
 		return 0, err
