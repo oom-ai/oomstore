@@ -81,19 +81,19 @@ func (mr *MockStoreMockRecorder) CreateFeature(ctx, opt interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFeature", reflect.TypeOf((*MockStore)(nil).CreateFeature), ctx, opt)
 }
 
-// CreateFeatureGroup mocks base method.
-func (m *MockStore) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int, error) {
+// CreateGroup mocks base method.
+func (m *MockStore) CreateGroup(ctx context.Context, opt metadata.CreateGroupOpt) (int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateFeatureGroup", ctx, opt)
+	ret := m.ctrl.Call(m, "CreateGroup", ctx, opt)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CreateFeatureGroup indicates an expected call of CreateFeatureGroup.
-func (mr *MockStoreMockRecorder) CreateFeatureGroup(ctx, opt interface{}) *gomock.Call {
+// CreateGroup indicates an expected call of CreateGroup.
+func (mr *MockStoreMockRecorder) CreateGroup(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFeatureGroup", reflect.TypeOf((*MockStore)(nil).CreateFeatureGroup), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGroup", reflect.TypeOf((*MockStore)(nil).CreateGroup), ctx, opt)
 }
 
 // CreateRevision mocks base method.
@@ -172,34 +172,34 @@ func (mr *MockStoreMockRecorder) GetFeatureByName(ctx, name interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockStore)(nil).GetFeatureByName), ctx, name)
 }
 
-// GetFeatureGroup mocks base method.
-func (m *MockStore) GetFeatureGroup(ctx context.Context, id int) (*types.FeatureGroup, error) {
+// GetGroup mocks base method.
+func (m *MockStore) GetGroup(ctx context.Context, id int) (*types.Group, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFeatureGroup", ctx, id)
-	ret0, _ := ret[0].(*types.FeatureGroup)
+	ret := m.ctrl.Call(m, "GetGroup", ctx, id)
+	ret0, _ := ret[0].(*types.Group)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetFeatureGroup indicates an expected call of GetFeatureGroup.
-func (mr *MockStoreMockRecorder) GetFeatureGroup(ctx, id interface{}) *gomock.Call {
+// GetGroup indicates an expected call of GetGroup.
+func (mr *MockStoreMockRecorder) GetGroup(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroup", reflect.TypeOf((*MockStore)(nil).GetFeatureGroup), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroup", reflect.TypeOf((*MockStore)(nil).GetGroup), ctx, id)
 }
 
-// GetFeatureGroupByName mocks base method.
-func (m *MockStore) GetFeatureGroupByName(ctx context.Context, name string) (*types.FeatureGroup, error) {
+// GetGroupByName mocks base method.
+func (m *MockStore) GetGroupByName(ctx context.Context, name string) (*types.Group, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFeatureGroupByName", ctx, name)
-	ret0, _ := ret[0].(*types.FeatureGroup)
+	ret := m.ctrl.Call(m, "GetGroupByName", ctx, name)
+	ret0, _ := ret[0].(*types.Group)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetFeatureGroupByName indicates an expected call of GetFeatureGroupByName.
-func (mr *MockStoreMockRecorder) GetFeatureGroupByName(ctx, name interface{}) *gomock.Call {
+// GetGroupByName indicates an expected call of GetGroupByName.
+func (mr *MockStoreMockRecorder) GetGroupByName(ctx, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroupByName", reflect.TypeOf((*MockStore)(nil).GetFeatureGroupByName), ctx, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupByName", reflect.TypeOf((*MockStore)(nil).GetGroupByName), ctx, name)
 }
 
 // GetRevision mocks base method.
@@ -260,18 +260,18 @@ func (mr *MockStoreMockRecorder) ListFeature(ctx, opt interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFeature", reflect.TypeOf((*MockStore)(nil).ListFeature), ctx, opt)
 }
 
-// ListFeatureGroup mocks base method.
-func (m *MockStore) ListFeatureGroup(ctx context.Context, entityID *int) types.FeatureGroupList {
+// ListGroup mocks base method.
+func (m *MockStore) ListGroup(ctx context.Context, entityID *int) types.GroupList {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListFeatureGroup", ctx, entityID)
-	ret0, _ := ret[0].(types.FeatureGroupList)
+	ret := m.ctrl.Call(m, "ListGroup", ctx, entityID)
+	ret0, _ := ret[0].(types.GroupList)
 	return ret0
 }
 
-// ListFeatureGroup indicates an expected call of ListFeatureGroup.
-func (mr *MockStoreMockRecorder) ListFeatureGroup(ctx, entityID interface{}) *gomock.Call {
+// ListGroup indicates an expected call of ListGroup.
+func (mr *MockStoreMockRecorder) ListGroup(ctx, entityID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFeatureGroup", reflect.TypeOf((*MockStore)(nil).ListFeatureGroup), ctx, entityID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockStore)(nil).ListGroup), ctx, entityID)
 }
 
 // ListRevision mocks base method.
@@ -330,18 +330,18 @@ func (mr *MockStoreMockRecorder) UpdateFeature(ctx, opt interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFeature", reflect.TypeOf((*MockStore)(nil).UpdateFeature), ctx, opt)
 }
 
-// UpdateFeatureGroup mocks base method.
-func (m *MockStore) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
+// UpdateGroup mocks base method.
+func (m *MockStore) UpdateGroup(ctx context.Context, opt metadata.UpdateGroupOpt) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateFeatureGroup", ctx, opt)
+	ret := m.ctrl.Call(m, "UpdateGroup", ctx, opt)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// UpdateFeatureGroup indicates an expected call of UpdateFeatureGroup.
-func (mr *MockStoreMockRecorder) UpdateFeatureGroup(ctx, opt interface{}) *gomock.Call {
+// UpdateGroup indicates an expected call of UpdateGroup.
+func (mr *MockStoreMockRecorder) UpdateGroup(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFeatureGroup", reflect.TypeOf((*MockStore)(nil).UpdateFeatureGroup), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateGroup", reflect.TypeOf((*MockStore)(nil).UpdateGroup), ctx, opt)
 }
 
 // UpdateRevision mocks base method.
@@ -455,34 +455,34 @@ func (mr *MockReadStoreMockRecorder) GetFeatureByName(ctx, name interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockReadStore)(nil).GetFeatureByName), ctx, name)
 }
 
-// GetFeatureGroup mocks base method.
-func (m *MockReadStore) GetFeatureGroup(ctx context.Context, id int) (*types.FeatureGroup, error) {
+// GetGroup mocks base method.
+func (m *MockReadStore) GetGroup(ctx context.Context, id int) (*types.Group, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFeatureGroup", ctx, id)
-	ret0, _ := ret[0].(*types.FeatureGroup)
+	ret := m.ctrl.Call(m, "GetGroup", ctx, id)
+	ret0, _ := ret[0].(*types.Group)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetFeatureGroup indicates an expected call of GetFeatureGroup.
-func (mr *MockReadStoreMockRecorder) GetFeatureGroup(ctx, id interface{}) *gomock.Call {
+// GetGroup indicates an expected call of GetGroup.
+func (mr *MockReadStoreMockRecorder) GetGroup(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroup", reflect.TypeOf((*MockReadStore)(nil).GetFeatureGroup), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroup", reflect.TypeOf((*MockReadStore)(nil).GetGroup), ctx, id)
 }
 
-// GetFeatureGroupByName mocks base method.
-func (m *MockReadStore) GetFeatureGroupByName(ctx context.Context, name string) (*types.FeatureGroup, error) {
+// GetGroupByName mocks base method.
+func (m *MockReadStore) GetGroupByName(ctx context.Context, name string) (*types.Group, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFeatureGroupByName", ctx, name)
-	ret0, _ := ret[0].(*types.FeatureGroup)
+	ret := m.ctrl.Call(m, "GetGroupByName", ctx, name)
+	ret0, _ := ret[0].(*types.Group)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetFeatureGroupByName indicates an expected call of GetFeatureGroupByName.
-func (mr *MockReadStoreMockRecorder) GetFeatureGroupByName(ctx, name interface{}) *gomock.Call {
+// GetGroupByName indicates an expected call of GetGroupByName.
+func (mr *MockReadStoreMockRecorder) GetGroupByName(ctx, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroupByName", reflect.TypeOf((*MockReadStore)(nil).GetFeatureGroupByName), ctx, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupByName", reflect.TypeOf((*MockReadStore)(nil).GetGroupByName), ctx, name)
 }
 
 // GetRevision mocks base method.
@@ -543,18 +543,18 @@ func (mr *MockReadStoreMockRecorder) ListFeature(ctx, opt interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFeature", reflect.TypeOf((*MockReadStore)(nil).ListFeature), ctx, opt)
 }
 
-// ListFeatureGroup mocks base method.
-func (m *MockReadStore) ListFeatureGroup(ctx context.Context, entityID *int) types.FeatureGroupList {
+// ListGroup mocks base method.
+func (m *MockReadStore) ListGroup(ctx context.Context, entityID *int) types.GroupList {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListFeatureGroup", ctx, entityID)
-	ret0, _ := ret[0].(types.FeatureGroupList)
+	ret := m.ctrl.Call(m, "ListGroup", ctx, entityID)
+	ret0, _ := ret[0].(types.GroupList)
 	return ret0
 }
 
-// ListFeatureGroup indicates an expected call of ListFeatureGroup.
-func (mr *MockReadStoreMockRecorder) ListFeatureGroup(ctx, entityID interface{}) *gomock.Call {
+// ListGroup indicates an expected call of ListGroup.
+func (mr *MockReadStoreMockRecorder) ListGroup(ctx, entityID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFeatureGroup", reflect.TypeOf((*MockReadStore)(nil).ListFeatureGroup), ctx, entityID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockReadStore)(nil).ListGroup), ctx, entityID)
 }
 
 // ListRevision mocks base method.
@@ -638,19 +638,19 @@ func (mr *MockWriteStoreMockRecorder) CreateFeature(ctx, opt interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFeature", reflect.TypeOf((*MockWriteStore)(nil).CreateFeature), ctx, opt)
 }
 
-// CreateFeatureGroup mocks base method.
-func (m *MockWriteStore) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int, error) {
+// CreateGroup mocks base method.
+func (m *MockWriteStore) CreateGroup(ctx context.Context, opt metadata.CreateGroupOpt) (int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateFeatureGroup", ctx, opt)
+	ret := m.ctrl.Call(m, "CreateGroup", ctx, opt)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CreateFeatureGroup indicates an expected call of CreateFeatureGroup.
-func (mr *MockWriteStoreMockRecorder) CreateFeatureGroup(ctx, opt interface{}) *gomock.Call {
+// CreateGroup indicates an expected call of CreateGroup.
+func (mr *MockWriteStoreMockRecorder) CreateGroup(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFeatureGroup", reflect.TypeOf((*MockWriteStore)(nil).CreateFeatureGroup), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGroup", reflect.TypeOf((*MockWriteStore)(nil).CreateGroup), ctx, opt)
 }
 
 // CreateRevision mocks base method.
@@ -697,18 +697,18 @@ func (mr *MockWriteStoreMockRecorder) UpdateFeature(ctx, opt interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFeature", reflect.TypeOf((*MockWriteStore)(nil).UpdateFeature), ctx, opt)
 }
 
-// UpdateFeatureGroup mocks base method.
-func (m *MockWriteStore) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
+// UpdateGroup mocks base method.
+func (m *MockWriteStore) UpdateGroup(ctx context.Context, opt metadata.UpdateGroupOpt) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateFeatureGroup", ctx, opt)
+	ret := m.ctrl.Call(m, "UpdateGroup", ctx, opt)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// UpdateFeatureGroup indicates an expected call of UpdateFeatureGroup.
-func (mr *MockWriteStoreMockRecorder) UpdateFeatureGroup(ctx, opt interface{}) *gomock.Call {
+// UpdateGroup indicates an expected call of UpdateGroup.
+func (mr *MockWriteStoreMockRecorder) UpdateGroup(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFeatureGroup", reflect.TypeOf((*MockWriteStore)(nil).UpdateFeatureGroup), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateGroup", reflect.TypeOf((*MockWriteStore)(nil).UpdateGroup), ctx, opt)
 }
 
 // UpdateRevision mocks base method.

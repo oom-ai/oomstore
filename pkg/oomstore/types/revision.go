@@ -15,7 +15,7 @@ type Revision struct {
 	ModifyTime  time.Time `db:"modify_time"`
 
 	GroupID int `db:"group_id"`
-	Group   *FeatureGroup
+	Group   *Group
 }
 
 func (r *Revision) Copy() *Revision {

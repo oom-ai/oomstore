@@ -21,7 +21,7 @@ type Cache struct {
 func NewCache(
 	entities types.EntityList,
 	features types.FeatureList,
-	groups types.FeatureGroupList,
+	groups types.GroupList,
 	revisions types.RevisionList) *Cache {
 	return &Cache{
 		Entities:  &EntityCache{entities},
@@ -133,23 +133,23 @@ func (f *Informer) GetFeatureByName(ctx context.Context, name string) (*types.Fe
 	}
 }
 
-func (f *Informer) GetFeatureGroup(ctx context.Context, id int) (*types.FeatureGroup, error) {
-	if featureGroup := f.Cache().Groups.Find(func(g *types.FeatureGroup) bool {
+func (f *Informer) GetGroup(ctx context.Context, id int) (*types.Group, error) {
+	if group := f.Cache().Groups.Find(func(g *types.Group) bool {
 		return g.ID == id
-	}); featureGroup == nil {
+	}); group == nil {
 		return nil, fmt.Errorf("feature group %d not found", id)
 	} else {
-		return featureGroup.Copy(), nil
+		return group.Copy(), nil
 	}
 }
 
-func (f *Informer) GetFeatureGroupByName(ctx context.Context, name string) (*types.FeatureGroup, error) {
-	if featureGroup := f.Cache().Groups.Find(func(g *types.FeatureGroup) bool {
+func (f *Informer) GetGroupByName(ctx context.Context, name string) (*types.Group, error) {
+	if group := f.Cache().Groups.Find(func(g *types.Group) bool {
 		return g.Name == name
-	}); featureGroup == nil {
+	}); group == nil {
 		return nil, fmt.Errorf("feature group '%s' not found", name)
 	} else {
-		return featureGroup.Copy(), nil
+		return group.Copy(), nil
 	}
 }
 
@@ -182,7 +182,7 @@ func (f *Informer) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt)
 	return f.Cache().Features.List(opt).Copy()
 }
 
-func (f *Informer) ListFeatureGroup(ctx context.Context, entityID *int) types.FeatureGroupList {
+func (f *Informer) ListGroup(ctx context.Context, entityID *int) types.GroupList {
 	return f.Cache().Groups.List(entityID).Copy()
 }
 

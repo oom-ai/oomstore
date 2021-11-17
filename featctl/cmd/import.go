@@ -31,7 +31,7 @@ var importCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if group, err := oomStore.GetFeatureGroupByName(ctx, importOpt.groupName); err != nil {
+		if group, err := oomStore.GetGroupByName(ctx, importOpt.groupName); err != nil {
 			log.Fatalf("failed to get feature group name=%s: %v", importOpt.groupName, err)
 		} else {
 			importOpt.GroupID = group.ID

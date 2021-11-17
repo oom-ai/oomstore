@@ -32,7 +32,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 		if !ok {
 			continue
 		}
-		joinedTableName, err := db.joinOneFeatureGroup(ctx, offline.JoinOneFeatureGroupOpt{
+		joinedTableName, err := db.joinOneGroup(ctx, offline.JoinOneGroupOpt{
 			GroupName:           groupName,
 			Entity:              opt.Entity,
 			Features:            featureList,
@@ -52,7 +52,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	return db.readJoinedTable(ctx, entityRowsTableName, tableNames, tableToFeatureMap)
 }
 
-func (db *DB) joinOneFeatureGroup(ctx context.Context, opt offline.JoinOneFeatureGroupOpt) (string, error) {
+func (db *DB) joinOneGroup(ctx context.Context, opt offline.JoinOneGroupOpt) (string, error) {
 	if len(opt.Features) == 0 {
 		return "", nil
 	}

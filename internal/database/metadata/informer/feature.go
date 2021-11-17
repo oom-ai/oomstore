@@ -11,7 +11,7 @@ type FeatureCache struct {
 
 func (c *FeatureCache) Enrich(groupCache *GroupCache) {
 	for _, f := range c.FeatureList {
-		f.Group = groupCache.Find(func(g *types.FeatureGroup) bool {
+		f.Group = groupCache.Find(func(g *types.Group) bool {
 			return g.ID == f.GroupID
 		})
 	}

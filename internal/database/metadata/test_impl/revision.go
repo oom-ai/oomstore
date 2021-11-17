@@ -17,7 +17,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
-	group, err := store.GetFeatureGroup(ctx, groupID)
+	group, err := store.GetGroup(ctx, groupID)
 	require.NoError(t, err)
 	opt := metadata.CreateRevisionOpt{
 		GroupID:     groupID,
@@ -155,7 +155,7 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.NoError(t, err)
 
 	require.NoError(t, store.Refresh())
-	group, err := store.GetFeatureGroup(ctx, groupID)
+	group, err := store.GetGroup(ctx, groupID)
 	require.NoError(t, err)
 
 	revision := types.Revision{
@@ -217,7 +217,7 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.NoError(t, err)
 
 	require.NoError(t, store.Refresh())
-	group, err := store.GetFeatureGroup(ctx, groupID)
+	group, err := store.GetGroup(ctx, groupID)
 	require.NoError(t, err)
 
 	revision := types.Revision{
@@ -330,7 +330,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	})
 	require.NoError(t, err)
 
-	groupID, err := store.CreateFeatureGroup(ctx, metadata.CreateFeatureGroupOpt{
+	groupID, err := store.CreateGroup(ctx, metadata.CreateGroupOpt{
 		GroupName:   "device_info",
 		EntityID:    entityID,
 		Description: "description",
@@ -355,7 +355,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	require.NoError(t, err)
 
 	require.NoError(t, store.Refresh())
-	group, err := store.GetFeatureGroup(ctx, groupID)
+	group, err := store.GetGroup(ctx, groupID)
 	require.NoError(t, err)
 
 	revision1 := &types.Revision{
