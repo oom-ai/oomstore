@@ -30,7 +30,9 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		if err := mapstructure.Decode(data, &entity); err != nil {
 			return err
 		}
-		return s.applyEntity(ctx, entity)
+		return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.WriteStore) error {
+			return s.applyEntity(ctx, tx, entity)
+		})
 	case "feature":
 		var feature apply.Feature
 		if err := mapstructure.Decode(data, &feature); err != nil {
@@ -65,8 +67,50 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 	}
 }
 
-func (s *OomStore) applyEntity(ctx context.Context, entity apply.Entity) error {
-	fmt.Printf("apply entity!")
+func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore, newEntity apply.Entity) error {
+	entityExist := true
+
+	entity, err := s.metadata.GetEntityByName(ctx, newEntity.Name)
+	if err != nil {
+		if err.Error() != fmt.Sprintf("feature entity '%s' not found", newEntity.Name) {
+			return err
+		}
+		entityExist = false
+	}
+
+	var entityID int
+	if !entityExist {
+		if entityID, err = txStore.CreateEntity(ctx, metadata.CreateEntityOpt{
+			CreateEntityOpt: types.CreateEntityOpt{
+				EntityName:  newEntity.Name,
+				Length:      newEntity.Length,
+				Description: newEntity.Description,
+			},
+		}); err != nil {
+			return err
+		}
+	} else {
+		entityID = entity.ID
+		if newEntity.Description != entity.Description {
+			if err = txStore.UpdateEntity(ctx, metadata.UpdateEntityOpt{
+				EntityID:       entityID,
+				NewDescription: newEntity.Description,
+			}); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(newEntity.BatchFeatures) != 0 {
+		for _, batchFeature := range newEntity.BatchFeatures {
+			batchFeature.EntityID = entityID
+			batchFeature.Category = types.BatchFeatureCategory
+			batchFeature.Name = batchFeature.Group
+			if err = s.applyGroup(ctx, txStore, batchFeature); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
