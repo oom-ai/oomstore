@@ -352,7 +352,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	require.NoError(t, err)
 
 	groupID, err := store.CreateFeatureGroup(ctx, metadata.CreateFeatureGroupOpt{
-		Name:        "device_info",
+		GroupName:   "device_info",
 		EntityID:    entityID,
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
