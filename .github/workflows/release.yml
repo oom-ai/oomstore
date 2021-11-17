@@ -1,4 +1,4 @@
-name: pre-release
+name: goreleaser
 
 on:
   push:
@@ -6,21 +6,23 @@ on:
       - "v*"
 
 jobs:
-  pre-release:
+  goreleaser:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2
-      with:
-        go-version: '1.17'
-    - name: Build
-      run: |
-        cd featctl && make release
-
-    - uses: marvinpinto/action-automatic-releases@latest
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: true
-        files: |
-          featctl/build/*
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          distribution: goreleaser
+          version: latest
+          workdir: featctl
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
