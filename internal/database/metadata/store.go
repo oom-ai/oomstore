@@ -9,13 +9,13 @@ import (
 )
 
 type Store interface {
-	StoreRead
-	StoreWrite
+	ReadStore
+	WriteStore
 
 	io.Closer
 }
 
-type StoreRead interface {
+type ReadStore interface {
 	GetEntity(ctx context.Context, id int) (*types.Entity, error)
 	GetEntityByName(ctx context.Context, name string) (*types.Entity, error)
 	ListEntity(ctx context.Context) types.EntityList
@@ -36,7 +36,7 @@ type StoreRead interface {
 	Refresh() error
 }
 
-type StoreWrite interface {
+type WriteStore interface {
 	// entity
 	CreateEntity(ctx context.Context, opt CreateEntityOpt) (int, error)
 	UpdateEntity(ctx context.Context, opt UpdateEntityOpt) error
@@ -54,7 +54,7 @@ type StoreWrite interface {
 	UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) error
 
 	// transaction
-	WithTransaction(ctx context.Context, fn func(context.Context, StoreWrite) error) error
+	WithTransaction(ctx context.Context, fn func(context.Context, WriteStore) error) error
 }
 
 type SqlxContext interface {

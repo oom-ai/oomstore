@@ -15,7 +15,7 @@ import (
 )
 
 var _ metadata.Store = &DB{}
-var _ metadata.StoreWrite = &Tx{}
+var _ metadata.WriteStore = &Tx{}
 
 type DB struct {
 	*sqlx.DB
@@ -93,7 +93,7 @@ func list(ctx context.Context, db *sqlx.DB) (*informer.Cache, error) {
 	return cache, err
 }
 
-func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, metadata.StoreWrite) error) (err error) {
+func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, metadata.WriteStore) error) (err error) {
 	tx, err := db.BeginTxx(ctx, nil)
 	if err != nil {
 		return
@@ -118,6 +118,6 @@ func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, meta
 	return fn(ctx, txStore)
 }
 
-func (tx *Tx) WithTransaction(ctx context.Context, fn func(context.Context, metadata.StoreWrite) error) (err error) {
+func (tx *Tx) WithTransaction(ctx context.Context, fn func(context.Context, metadata.WriteStore) error) (err error) {
 	return fn(ctx, tx)
 }

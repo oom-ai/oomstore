@@ -359,7 +359,7 @@ func (mr *MockStoreMockRecorder) UpdateRevision(ctx, opt interface{}) *gomock.Ca
 }
 
 // WithTransaction mocks base method.
-func (m *MockStore) WithTransaction(ctx context.Context, fn func(context.Context, metadata.StoreWrite) error) error {
+func (m *MockStore) WithTransaction(ctx context.Context, fn func(context.Context, metadata.WriteStore) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WithTransaction", ctx, fn)
 	ret0, _ := ret[0].(error)
@@ -372,31 +372,31 @@ func (mr *MockStoreMockRecorder) WithTransaction(ctx, fn interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithTransaction", reflect.TypeOf((*MockStore)(nil).WithTransaction), ctx, fn)
 }
 
-// MockStoreRead is a mock of StoreRead interface.
-type MockStoreRead struct {
+// MockReadStore is a mock of ReadStore interface.
+type MockReadStore struct {
 	ctrl     *gomock.Controller
-	recorder *MockStoreReadMockRecorder
+	recorder *MockReadStoreMockRecorder
 }
 
-// MockStoreReadMockRecorder is the mock recorder for MockStoreRead.
-type MockStoreReadMockRecorder struct {
-	mock *MockStoreRead
+// MockReadStoreMockRecorder is the mock recorder for MockReadStore.
+type MockReadStoreMockRecorder struct {
+	mock *MockReadStore
 }
 
-// NewMockStoreRead creates a new mock instance.
-func NewMockStoreRead(ctrl *gomock.Controller) *MockStoreRead {
-	mock := &MockStoreRead{ctrl: ctrl}
-	mock.recorder = &MockStoreReadMockRecorder{mock}
+// NewMockReadStore creates a new mock instance.
+func NewMockReadStore(ctrl *gomock.Controller) *MockReadStore {
+	mock := &MockReadStore{ctrl: ctrl}
+	mock.recorder = &MockReadStoreMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockStoreRead) EXPECT() *MockStoreReadMockRecorder {
+func (m *MockReadStore) EXPECT() *MockReadStoreMockRecorder {
 	return m.recorder
 }
 
 // GetEntity mocks base method.
-func (m *MockStoreRead) GetEntity(ctx context.Context, id int) (*types.Entity, error) {
+func (m *MockReadStore) GetEntity(ctx context.Context, id int) (*types.Entity, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEntity", ctx, id)
 	ret0, _ := ret[0].(*types.Entity)
@@ -405,13 +405,13 @@ func (m *MockStoreRead) GetEntity(ctx context.Context, id int) (*types.Entity, e
 }
 
 // GetEntity indicates an expected call of GetEntity.
-func (mr *MockStoreReadMockRecorder) GetEntity(ctx, id interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) GetEntity(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEntity", reflect.TypeOf((*MockStoreRead)(nil).GetEntity), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEntity", reflect.TypeOf((*MockReadStore)(nil).GetEntity), ctx, id)
 }
 
 // GetEntityByName mocks base method.
-func (m *MockStoreRead) GetEntityByName(ctx context.Context, name string) (*types.Entity, error) {
+func (m *MockReadStore) GetEntityByName(ctx context.Context, name string) (*types.Entity, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEntityByName", ctx, name)
 	ret0, _ := ret[0].(*types.Entity)
@@ -420,13 +420,13 @@ func (m *MockStoreRead) GetEntityByName(ctx context.Context, name string) (*type
 }
 
 // GetEntityByName indicates an expected call of GetEntityByName.
-func (mr *MockStoreReadMockRecorder) GetEntityByName(ctx, name interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) GetEntityByName(ctx, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEntityByName", reflect.TypeOf((*MockStoreRead)(nil).GetEntityByName), ctx, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEntityByName", reflect.TypeOf((*MockReadStore)(nil).GetEntityByName), ctx, name)
 }
 
 // GetFeature mocks base method.
-func (m *MockStoreRead) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
+func (m *MockReadStore) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeature", ctx, id)
 	ret0, _ := ret[0].(*types.Feature)
@@ -435,13 +435,13 @@ func (m *MockStoreRead) GetFeature(ctx context.Context, id int) (*types.Feature,
 }
 
 // GetFeature indicates an expected call of GetFeature.
-func (mr *MockStoreReadMockRecorder) GetFeature(ctx, id interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) GetFeature(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeature", reflect.TypeOf((*MockStoreRead)(nil).GetFeature), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeature", reflect.TypeOf((*MockReadStore)(nil).GetFeature), ctx, id)
 }
 
 // GetFeatureByName mocks base method.
-func (m *MockStoreRead) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
+func (m *MockReadStore) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeatureByName", ctx, name)
 	ret0, _ := ret[0].(*types.Feature)
@@ -450,13 +450,13 @@ func (m *MockStoreRead) GetFeatureByName(ctx context.Context, name string) (*typ
 }
 
 // GetFeatureByName indicates an expected call of GetFeatureByName.
-func (mr *MockStoreReadMockRecorder) GetFeatureByName(ctx, name interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) GetFeatureByName(ctx, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockStoreRead)(nil).GetFeatureByName), ctx, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockReadStore)(nil).GetFeatureByName), ctx, name)
 }
 
 // GetFeatureGroup mocks base method.
-func (m *MockStoreRead) GetFeatureGroup(ctx context.Context, id int) (*types.FeatureGroup, error) {
+func (m *MockReadStore) GetFeatureGroup(ctx context.Context, id int) (*types.FeatureGroup, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeatureGroup", ctx, id)
 	ret0, _ := ret[0].(*types.FeatureGroup)
@@ -465,13 +465,13 @@ func (m *MockStoreRead) GetFeatureGroup(ctx context.Context, id int) (*types.Fea
 }
 
 // GetFeatureGroup indicates an expected call of GetFeatureGroup.
-func (mr *MockStoreReadMockRecorder) GetFeatureGroup(ctx, id interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) GetFeatureGroup(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroup", reflect.TypeOf((*MockStoreRead)(nil).GetFeatureGroup), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroup", reflect.TypeOf((*MockReadStore)(nil).GetFeatureGroup), ctx, id)
 }
 
 // GetFeatureGroupByName mocks base method.
-func (m *MockStoreRead) GetFeatureGroupByName(ctx context.Context, name string) (*types.FeatureGroup, error) {
+func (m *MockReadStore) GetFeatureGroupByName(ctx context.Context, name string) (*types.FeatureGroup, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeatureGroupByName", ctx, name)
 	ret0, _ := ret[0].(*types.FeatureGroup)
@@ -480,13 +480,13 @@ func (m *MockStoreRead) GetFeatureGroupByName(ctx context.Context, name string) 
 }
 
 // GetFeatureGroupByName indicates an expected call of GetFeatureGroupByName.
-func (mr *MockStoreReadMockRecorder) GetFeatureGroupByName(ctx, name interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) GetFeatureGroupByName(ctx, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroupByName", reflect.TypeOf((*MockStoreRead)(nil).GetFeatureGroupByName), ctx, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureGroupByName", reflect.TypeOf((*MockReadStore)(nil).GetFeatureGroupByName), ctx, name)
 }
 
 // GetRevision mocks base method.
-func (m *MockStoreRead) GetRevision(ctx context.Context, id int) (*types.Revision, error) {
+func (m *MockReadStore) GetRevision(ctx context.Context, id int) (*types.Revision, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRevision", ctx, id)
 	ret0, _ := ret[0].(*types.Revision)
@@ -495,13 +495,13 @@ func (m *MockStoreRead) GetRevision(ctx context.Context, id int) (*types.Revisio
 }
 
 // GetRevision indicates an expected call of GetRevision.
-func (mr *MockStoreReadMockRecorder) GetRevision(ctx, id interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) GetRevision(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevision", reflect.TypeOf((*MockStoreRead)(nil).GetRevision), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevision", reflect.TypeOf((*MockReadStore)(nil).GetRevision), ctx, id)
 }
 
 // GetRevisionBy mocks base method.
-func (m *MockStoreRead) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
+func (m *MockReadStore) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRevisionBy", ctx, groupID, revision)
 	ret0, _ := ret[0].(*types.Revision)
@@ -510,13 +510,13 @@ func (m *MockStoreRead) GetRevisionBy(ctx context.Context, groupID int, revision
 }
 
 // GetRevisionBy indicates an expected call of GetRevisionBy.
-func (mr *MockStoreReadMockRecorder) GetRevisionBy(ctx, groupID, revision interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) GetRevisionBy(ctx, groupID, revision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevisionBy", reflect.TypeOf((*MockStoreRead)(nil).GetRevisionBy), ctx, groupID, revision)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevisionBy", reflect.TypeOf((*MockReadStore)(nil).GetRevisionBy), ctx, groupID, revision)
 }
 
 // ListEntity mocks base method.
-func (m *MockStoreRead) ListEntity(ctx context.Context) types.EntityList {
+func (m *MockReadStore) ListEntity(ctx context.Context) types.EntityList {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListEntity", ctx)
 	ret0, _ := ret[0].(types.EntityList)
@@ -524,13 +524,13 @@ func (m *MockStoreRead) ListEntity(ctx context.Context) types.EntityList {
 }
 
 // ListEntity indicates an expected call of ListEntity.
-func (mr *MockStoreReadMockRecorder) ListEntity(ctx interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) ListEntity(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListEntity", reflect.TypeOf((*MockStoreRead)(nil).ListEntity), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListEntity", reflect.TypeOf((*MockReadStore)(nil).ListEntity), ctx)
 }
 
 // ListFeature mocks base method.
-func (m *MockStoreRead) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
+func (m *MockReadStore) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListFeature", ctx, opt)
 	ret0, _ := ret[0].(types.FeatureList)
@@ -538,13 +538,13 @@ func (m *MockStoreRead) ListFeature(ctx context.Context, opt metadata.ListFeatur
 }
 
 // ListFeature indicates an expected call of ListFeature.
-func (mr *MockStoreReadMockRecorder) ListFeature(ctx, opt interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) ListFeature(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFeature", reflect.TypeOf((*MockStoreRead)(nil).ListFeature), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFeature", reflect.TypeOf((*MockReadStore)(nil).ListFeature), ctx, opt)
 }
 
 // ListFeatureGroup mocks base method.
-func (m *MockStoreRead) ListFeatureGroup(ctx context.Context, entityID *int) types.FeatureGroupList {
+func (m *MockReadStore) ListFeatureGroup(ctx context.Context, entityID *int) types.FeatureGroupList {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListFeatureGroup", ctx, entityID)
 	ret0, _ := ret[0].(types.FeatureGroupList)
@@ -552,13 +552,13 @@ func (m *MockStoreRead) ListFeatureGroup(ctx context.Context, entityID *int) typ
 }
 
 // ListFeatureGroup indicates an expected call of ListFeatureGroup.
-func (mr *MockStoreReadMockRecorder) ListFeatureGroup(ctx, entityID interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) ListFeatureGroup(ctx, entityID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFeatureGroup", reflect.TypeOf((*MockStoreRead)(nil).ListFeatureGroup), ctx, entityID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFeatureGroup", reflect.TypeOf((*MockReadStore)(nil).ListFeatureGroup), ctx, entityID)
 }
 
 // ListRevision mocks base method.
-func (m *MockStoreRead) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) types.RevisionList {
+func (m *MockReadStore) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) types.RevisionList {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListRevision", ctx, opt)
 	ret0, _ := ret[0].(types.RevisionList)
@@ -566,13 +566,13 @@ func (m *MockStoreRead) ListRevision(ctx context.Context, opt metadata.ListRevis
 }
 
 // ListRevision indicates an expected call of ListRevision.
-func (mr *MockStoreReadMockRecorder) ListRevision(ctx, opt interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) ListRevision(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRevision", reflect.TypeOf((*MockStoreRead)(nil).ListRevision), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRevision", reflect.TypeOf((*MockReadStore)(nil).ListRevision), ctx, opt)
 }
 
 // Refresh mocks base method.
-func (m *MockStoreRead) Refresh() error {
+func (m *MockReadStore) Refresh() error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Refresh")
 	ret0, _ := ret[0].(error)
@@ -580,36 +580,36 @@ func (m *MockStoreRead) Refresh() error {
 }
 
 // Refresh indicates an expected call of Refresh.
-func (mr *MockStoreReadMockRecorder) Refresh() *gomock.Call {
+func (mr *MockReadStoreMockRecorder) Refresh() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Refresh", reflect.TypeOf((*MockStoreRead)(nil).Refresh))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Refresh", reflect.TypeOf((*MockReadStore)(nil).Refresh))
 }
 
-// MockStoreWrite is a mock of StoreWrite interface.
-type MockStoreWrite struct {
+// MockWriteStore is a mock of WriteStore interface.
+type MockWriteStore struct {
 	ctrl     *gomock.Controller
-	recorder *MockStoreWriteMockRecorder
+	recorder *MockWriteStoreMockRecorder
 }
 
-// MockStoreWriteMockRecorder is the mock recorder for MockStoreWrite.
-type MockStoreWriteMockRecorder struct {
-	mock *MockStoreWrite
+// MockWriteStoreMockRecorder is the mock recorder for MockWriteStore.
+type MockWriteStoreMockRecorder struct {
+	mock *MockWriteStore
 }
 
-// NewMockStoreWrite creates a new mock instance.
-func NewMockStoreWrite(ctrl *gomock.Controller) *MockStoreWrite {
-	mock := &MockStoreWrite{ctrl: ctrl}
-	mock.recorder = &MockStoreWriteMockRecorder{mock}
+// NewMockWriteStore creates a new mock instance.
+func NewMockWriteStore(ctrl *gomock.Controller) *MockWriteStore {
+	mock := &MockWriteStore{ctrl: ctrl}
+	mock.recorder = &MockWriteStoreMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockStoreWrite) EXPECT() *MockStoreWriteMockRecorder {
+func (m *MockWriteStore) EXPECT() *MockWriteStoreMockRecorder {
 	return m.recorder
 }
 
 // CreateEntity mocks base method.
-func (m *MockStoreWrite) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
+func (m *MockWriteStore) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEntity", ctx, opt)
 	ret0, _ := ret[0].(int)
@@ -618,13 +618,13 @@ func (m *MockStoreWrite) CreateEntity(ctx context.Context, opt metadata.CreateEn
 }
 
 // CreateEntity indicates an expected call of CreateEntity.
-func (mr *MockStoreWriteMockRecorder) CreateEntity(ctx, opt interface{}) *gomock.Call {
+func (mr *MockWriteStoreMockRecorder) CreateEntity(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEntity", reflect.TypeOf((*MockStoreWrite)(nil).CreateEntity), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEntity", reflect.TypeOf((*MockWriteStore)(nil).CreateEntity), ctx, opt)
 }
 
 // CreateFeature mocks base method.
-func (m *MockStoreWrite) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
+func (m *MockWriteStore) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFeature", ctx, opt)
 	ret0, _ := ret[0].(int)
@@ -633,13 +633,13 @@ func (m *MockStoreWrite) CreateFeature(ctx context.Context, opt metadata.CreateF
 }
 
 // CreateFeature indicates an expected call of CreateFeature.
-func (mr *MockStoreWriteMockRecorder) CreateFeature(ctx, opt interface{}) *gomock.Call {
+func (mr *MockWriteStoreMockRecorder) CreateFeature(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFeature", reflect.TypeOf((*MockStoreWrite)(nil).CreateFeature), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFeature", reflect.TypeOf((*MockWriteStore)(nil).CreateFeature), ctx, opt)
 }
 
 // CreateFeatureGroup mocks base method.
-func (m *MockStoreWrite) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int, error) {
+func (m *MockWriteStore) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFeatureGroup", ctx, opt)
 	ret0, _ := ret[0].(int)
@@ -648,13 +648,13 @@ func (m *MockStoreWrite) CreateFeatureGroup(ctx context.Context, opt metadata.Cr
 }
 
 // CreateFeatureGroup indicates an expected call of CreateFeatureGroup.
-func (mr *MockStoreWriteMockRecorder) CreateFeatureGroup(ctx, opt interface{}) *gomock.Call {
+func (mr *MockWriteStoreMockRecorder) CreateFeatureGroup(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFeatureGroup", reflect.TypeOf((*MockStoreWrite)(nil).CreateFeatureGroup), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFeatureGroup", reflect.TypeOf((*MockWriteStore)(nil).CreateFeatureGroup), ctx, opt)
 }
 
 // CreateRevision mocks base method.
-func (m *MockStoreWrite) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
+func (m *MockWriteStore) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRevision", ctx, opt)
 	ret0, _ := ret[0].(int)
@@ -664,13 +664,13 @@ func (m *MockStoreWrite) CreateRevision(ctx context.Context, opt metadata.Create
 }
 
 // CreateRevision indicates an expected call of CreateRevision.
-func (mr *MockStoreWriteMockRecorder) CreateRevision(ctx, opt interface{}) *gomock.Call {
+func (mr *MockWriteStoreMockRecorder) CreateRevision(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRevision", reflect.TypeOf((*MockStoreWrite)(nil).CreateRevision), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRevision", reflect.TypeOf((*MockWriteStore)(nil).CreateRevision), ctx, opt)
 }
 
 // UpdateEntity mocks base method.
-func (m *MockStoreWrite) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
+func (m *MockWriteStore) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateEntity", ctx, opt)
 	ret0, _ := ret[0].(error)
@@ -678,13 +678,13 @@ func (m *MockStoreWrite) UpdateEntity(ctx context.Context, opt metadata.UpdateEn
 }
 
 // UpdateEntity indicates an expected call of UpdateEntity.
-func (mr *MockStoreWriteMockRecorder) UpdateEntity(ctx, opt interface{}) *gomock.Call {
+func (mr *MockWriteStoreMockRecorder) UpdateEntity(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEntity", reflect.TypeOf((*MockStoreWrite)(nil).UpdateEntity), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEntity", reflect.TypeOf((*MockWriteStore)(nil).UpdateEntity), ctx, opt)
 }
 
 // UpdateFeature mocks base method.
-func (m *MockStoreWrite) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
+func (m *MockWriteStore) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateFeature", ctx, opt)
 	ret0, _ := ret[0].(error)
@@ -692,13 +692,13 @@ func (m *MockStoreWrite) UpdateFeature(ctx context.Context, opt metadata.UpdateF
 }
 
 // UpdateFeature indicates an expected call of UpdateFeature.
-func (mr *MockStoreWriteMockRecorder) UpdateFeature(ctx, opt interface{}) *gomock.Call {
+func (mr *MockWriteStoreMockRecorder) UpdateFeature(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFeature", reflect.TypeOf((*MockStoreWrite)(nil).UpdateFeature), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFeature", reflect.TypeOf((*MockWriteStore)(nil).UpdateFeature), ctx, opt)
 }
 
 // UpdateFeatureGroup mocks base method.
-func (m *MockStoreWrite) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
+func (m *MockWriteStore) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateFeatureGroup", ctx, opt)
 	ret0, _ := ret[0].(error)
@@ -706,13 +706,13 @@ func (m *MockStoreWrite) UpdateFeatureGroup(ctx context.Context, opt metadata.Up
 }
 
 // UpdateFeatureGroup indicates an expected call of UpdateFeatureGroup.
-func (mr *MockStoreWriteMockRecorder) UpdateFeatureGroup(ctx, opt interface{}) *gomock.Call {
+func (mr *MockWriteStoreMockRecorder) UpdateFeatureGroup(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFeatureGroup", reflect.TypeOf((*MockStoreWrite)(nil).UpdateFeatureGroup), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFeatureGroup", reflect.TypeOf((*MockWriteStore)(nil).UpdateFeatureGroup), ctx, opt)
 }
 
 // UpdateRevision mocks base method.
-func (m *MockStoreWrite) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
+func (m *MockWriteStore) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateRevision", ctx, opt)
 	ret0, _ := ret[0].(error)
@@ -720,13 +720,13 @@ func (m *MockStoreWrite) UpdateRevision(ctx context.Context, opt metadata.Update
 }
 
 // UpdateRevision indicates an expected call of UpdateRevision.
-func (mr *MockStoreWriteMockRecorder) UpdateRevision(ctx, opt interface{}) *gomock.Call {
+func (mr *MockWriteStoreMockRecorder) UpdateRevision(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRevision", reflect.TypeOf((*MockStoreWrite)(nil).UpdateRevision), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRevision", reflect.TypeOf((*MockWriteStore)(nil).UpdateRevision), ctx, opt)
 }
 
 // WithTransaction mocks base method.
-func (m *MockStoreWrite) WithTransaction(ctx context.Context, fn func(context.Context, metadata.StoreWrite) error) error {
+func (m *MockWriteStore) WithTransaction(ctx context.Context, fn func(context.Context, metadata.WriteStore) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WithTransaction", ctx, fn)
 	ret0, _ := ret[0].(error)
@@ -734,9 +734,9 @@ func (m *MockStoreWrite) WithTransaction(ctx context.Context, fn func(context.Co
 }
 
 // WithTransaction indicates an expected call of WithTransaction.
-func (mr *MockStoreWriteMockRecorder) WithTransaction(ctx, fn interface{}) *gomock.Call {
+func (mr *MockWriteStoreMockRecorder) WithTransaction(ctx, fn interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithTransaction", reflect.TypeOf((*MockStoreWrite)(nil).WithTransaction), ctx, fn)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithTransaction", reflect.TypeOf((*MockWriteStore)(nil).WithTransaction), ctx, fn)
 }
 
 // MockSqlxContext is a mock of SqlxContext interface.
