@@ -22,7 +22,6 @@ func buildTestDataTable(ctx context.Context, t *testing.T, store offline.Store, 
 		header = append(header, f.Name)
 	}
 	opt := offline.ImportOpt{
-		GroupName:     "device_info",
 		Entity:        entity,
 		DataTableName: dataTable,
 		Features:      features,

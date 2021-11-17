@@ -23,7 +23,6 @@ func TestImport(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	dataTable := "data_1_1"
 
 	opt := offline.ImportOpt{
-		GroupName:     "device",
 		Entity:        &entity,
 		DataTableName: dataTable,
 		Features: []*types.Feature{

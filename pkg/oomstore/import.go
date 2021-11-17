@@ -92,7 +92,6 @@ func (s *OomStore) ImportBatchFeatures(ctx context.Context, opt types.ImportBatc
 	}
 
 	revision, err = s.offline.Import(ctx, offline.ImportOpt{
-		GroupName:     group.Name,
 		Entity:        entity,
 		Features:      features,
 		Header:        header,
