@@ -36,7 +36,7 @@ var listRevisionCmd = &cobra.Command{
 		var groupID *int
 
 		if listRevisionOpt.groupName != nil {
-			group, err := oomStore.GetFeatureGroupByName(ctx, *listRevisionOpt.groupName)
+			group, err := oomStore.GetGroupByName(ctx, *listRevisionOpt.groupName)
 			if err != nil {
 				log.Fatalf("failed to get feature group name=%s: %v", *listRevisionOpt.groupName, err)
 			}

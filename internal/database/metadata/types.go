@@ -18,7 +18,7 @@ type CreateFeatureOpt struct {
 	ValueType string
 }
 
-type CreateFeatureGroupOpt struct {
+type CreateGroupOpt struct {
 	GroupName   string
 	EntityID    int
 	Description string
@@ -44,7 +44,7 @@ type UpdateFeatureOpt struct {
 	NewDescription string
 }
 
-type UpdateFeatureGroupOpt struct {
+type UpdateGroupOpt struct {
 	GroupID             int
 	NewDescription      *string
 	NewOnlineRevisionID *int

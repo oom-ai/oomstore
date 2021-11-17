@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var registerGroupOpt types.CreateFeatureGroupOpt
+var registerGroupOpt types.CreateGroupOpt
 var registerGroupCmd = &cobra.Command{
 	Use:   "group",
 	Short: "register a new feature group",
@@ -21,7 +21,7 @@ var registerGroupCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if _, err := oomStore.CreateFeatureGroup(ctx, registerGroupOpt); err != nil {
+		if _, err := oomStore.CreateGroup(ctx, registerGroupOpt); err != nil {
 			log.Fatalf("failed registering new group: %v\n", err)
 		}
 	},

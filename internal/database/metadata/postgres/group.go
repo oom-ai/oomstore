@@ -12,13 +12,13 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func createFeatureGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateFeatureGroupOpt) (int, error) {
+func createGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateGroupOpt) (int, error) {
 	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
 		return 0, fmt.Errorf("illegal category '%s', should be either 'stream' or 'batch'", opt.Category)
 	}
-	var featureGroupID int
+	var groupID int
 	query := "insert into feature_group(name, entity_id, category, description) values($1, $2, $3, $4) returning id"
-	err := sqlxCtx.GetContext(ctx, &featureGroupID, query, opt.GroupName, opt.EntityID, opt.Category, opt.Description)
+	err := sqlxCtx.GetContext(ctx, &groupID, query, opt.GroupName, opt.EntityID, opt.Category, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
@@ -26,10 +26,10 @@ func createFeatureGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt m
 			}
 		}
 	}
-	return featureGroupID, err
+	return groupID, err
 }
 
-func updateFeatureGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateFeatureGroupOpt) error {
+func updateGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateGroupOpt) error {
 	and := make(map[string]interface{})
 	if opt.NewDescription != nil {
 		and["description"] = *opt.NewDescription

@@ -49,7 +49,7 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 	}
 
 	// get entity info
-	group, err := s.GetFeatureGroup(ctx, opt.GroupID)
+	group, err := s.GetGroup(ctx, opt.GroupID)
 	if err != nil {
 		return 0, err
 	}

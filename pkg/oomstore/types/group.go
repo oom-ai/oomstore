@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type FeatureGroup struct {
+type Group struct {
 	ID       int    `db:"id"`
 	Name     string `db:"name"`
 	Category string `db:"category"`
@@ -21,7 +21,7 @@ type FeatureGroup struct {
 	Entity *Entity
 }
 
-func (fg *FeatureGroup) Copy() *FeatureGroup {
+func (fg *Group) Copy() *Group {
 	if fg == nil {
 		return nil
 	}
@@ -36,20 +36,20 @@ func (fg *FeatureGroup) Copy() *FeatureGroup {
 	return &copied
 }
 
-type FeatureGroupList []*FeatureGroup
+type GroupList []*Group
 
-func (l FeatureGroupList) Copy() FeatureGroupList {
+func (l GroupList) Copy() GroupList {
 	if len(l) == 0 {
 		return nil
 	}
-	copied := make(FeatureGroupList, 0, len(l))
+	copied := make(GroupList, 0, len(l))
 	for _, x := range l {
 		copied = append(copied, x.Copy())
 	}
 	return copied
 }
 
-func (l *FeatureGroupList) Find(find func(*FeatureGroup) bool) *FeatureGroup {
+func (l *GroupList) Find(find func(*Group) bool) *Group {
 	for _, g := range *l {
 		if find(g) {
 			return g
@@ -58,7 +58,7 @@ func (l *FeatureGroupList) Find(find func(*FeatureGroup) bool) *FeatureGroup {
 	return nil
 }
 
-func (l *FeatureGroupList) Filter(filter func(*FeatureGroup) bool) (rs FeatureGroupList) {
+func (l *GroupList) Filter(filter func(*Group) bool) (rs GroupList) {
 	for _, g := range *l {
 		if filter(g) {
 			rs = append(rs, g)
@@ -67,7 +67,7 @@ func (l *FeatureGroupList) Filter(filter func(*FeatureGroup) bool) (rs FeatureGr
 	return
 }
 
-func (fg *FeatureGroup) String() string {
+func (fg *Group) String() string {
 	onlineRevisionID := "<NULL>"
 
 	if fg.OnlineRevisionID != nil {

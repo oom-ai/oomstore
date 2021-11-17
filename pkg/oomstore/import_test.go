@@ -42,14 +42,14 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 			wantError:      fmt.Errorf("no features under group id: '1'"),
 		},
 		{
-			description: "GetFeatureGroup failed",
+			description: "GetGroup failed",
 			opt:         types.ImportOpt{GroupID: 1},
 			mockFunc: func() {
 				metadataStore.EXPECT().
 					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
 					Return(types.FeatureList{})
 				metadataStore.EXPECT().
-					GetFeatureGroup(gomock.Any(), 1).
+					GetGroup(gomock.Any(), 1).
 					Return(nil, fmt.Errorf("error"))
 			},
 			wantRevisionID: 0,
@@ -63,8 +63,8 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 					ListFeature(gomock.Any(), gomock.Any()).
 					Return(types.FeatureList{})
 				metadataStore.EXPECT().
-					GetFeatureGroup(gomock.Any(), 1).
-					Return(&types.FeatureGroup{ID: 1, EntityID: 1}, nil)
+					GetGroup(gomock.Any(), 1).
+					Return(&types.Group{ID: 1, EntityID: 1}, nil)
 			},
 			wantRevisionID: 0,
 			wantError:      fmt.Errorf("no entity found by group id: '1'"),
@@ -94,8 +94,8 @@ device,model,price
 						},
 					})
 				metadataStore.EXPECT().
-					GetFeatureGroup(gomock.Any(), 1).
-					Return(&types.FeatureGroup{ID: 1, EntityID: 1, Entity: &types.Entity{Name: "device"}}, nil)
+					GetGroup(gomock.Any(), 1).
+					Return(&types.Group{ID: 1, EntityID: 1, Entity: &types.Entity{Name: "device"}}, nil)
 				offlineStore.
 					EXPECT().
 					Import(gomock.Any(), gomock.Any()).
@@ -221,8 +221,8 @@ device,model,price
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().GetFeatureGroup(ctx, tc.opt.GroupID).
-				Return(&types.FeatureGroup{
+			metadataStore.EXPECT().GetGroup(ctx, tc.opt.GroupID).
+				Return(&types.Group{
 					ID:       tc.opt.GroupID,
 					EntityID: tc.entityID,
 					Entity:   &tc.Entity,

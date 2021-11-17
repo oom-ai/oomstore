@@ -17,7 +17,7 @@ type Feature struct {
 	ModifyTime  time.Time `db:"modify_time"`
 
 	GroupID int `db:"group_id"`
-	Group   *FeatureGroup
+	Group   *Group
 }
 
 func (f *Feature) Copy() *Feature {
