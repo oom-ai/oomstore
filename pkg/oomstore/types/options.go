@@ -29,7 +29,7 @@ type CreateEntityOpt struct {
 }
 
 type CreateFeatureGroupOpt struct {
-	Name        string
+	GroupName   string
 	EntityName  string
 	Description string
 }
