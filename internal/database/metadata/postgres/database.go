@@ -69,7 +69,7 @@ func list(ctx context.Context, db *sqlx.DB) (*informer.Cache, error) {
 	var cache *informer.Cache
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		entities := types.EntityList{}
-		if err := tx.SelectContext(ctx, &entities, `SELECT * FROM "feature_entity"`); err != nil {
+		if err := tx.SelectContext(ctx, &entities, `SELECT * FROM "entity"`); err != nil {
 			return err
 		}
 
