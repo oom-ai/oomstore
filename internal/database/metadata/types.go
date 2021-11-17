@@ -1,5 +1,7 @@
 package metadata
 
+import "github.com/oom-ai/oomstore/pkg/oomstore/types"
+
 type RevisionRange struct {
 	MinRevision int64  `db:"min_revision"`
 	MaxRevision int64  `db:"max_revision"`
@@ -14,11 +16,8 @@ type CreateEntityOpt struct {
 }
 
 type CreateFeatureOpt struct {
-	Name        string
-	GroupID     int
-	DBValueType string
-	Description string
-	ValueType   string
+	types.CreateFeatureOpt
+	ValueType string
 }
 
 type CreateFeatureGroupOpt struct {
