@@ -10,7 +10,7 @@ case='featctl describe entity works'
 expected='
 Name:        device
 Length:      32
-Description:
+Description: device
 CreateTime:
 ModifyTime:
 '
