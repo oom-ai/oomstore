@@ -1,17 +1,18 @@
-package redis
+package redis_test
 
 import (
 	"context"
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/internal/database/online/redis"
 	"github.com/oom-ai/oomstore/internal/database/online/test_impl"
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_redis"
 )
 
 func prepareStore() (context.Context, online.Store) {
 	ctx := context.Background()
-	store := Open(&runtime_redis.RedisDbOpt)
+	store := redis.Open(&runtime_redis.RedisDbOpt)
 	if _, err := store.FlushDB(ctx).Result(); err != nil {
 		panic(err)
 	}
