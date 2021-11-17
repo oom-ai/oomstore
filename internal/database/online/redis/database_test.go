@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/test"
+	"github.com/oom-ai/oomstore/internal/database/online/test_impl"
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_redis"
 )
 
@@ -20,25 +20,25 @@ func prepareStore() (context.Context, online.Store) {
 }
 
 func TestOpen(t *testing.T) {
-	test.TestOpen(t, prepareStore)
+	test_impl.TestOpen(t, prepareStore)
 }
 
 func TestGetExisted(t *testing.T) {
-	test.TestGetExisted(t, prepareStore)
+	test_impl.TestGetExisted(t, prepareStore)
 }
 
 func TestGetNotExistedEntityKey(t *testing.T) {
-	test.TestGetNotExistedEntityKey(t, prepareStore)
+	test_impl.TestGetNotExistedEntityKey(t, prepareStore)
 }
 
 func TestMultiGet(t *testing.T) {
-	test.TestMultiGet(t, prepareStore)
+	test_impl.TestMultiGet(t, prepareStore)
 }
 
 func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
-	test.TestPurgeRemovesSpecifiedRevision(t, prepareStore)
+	test_impl.TestPurgeRemovesSpecifiedRevision(t, prepareStore)
 }
 
 func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
-	test.TestPurgeNotRemovesOtherRevisions(t, prepareStore)
+	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore)
 }
