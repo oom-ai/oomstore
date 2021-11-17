@@ -81,9 +81,3 @@ type UpdateFeatureGroupOpt struct {
 type SyncOpt struct {
 	RevisionID int
 }
-
-type GetRevisionOpt struct {
-	GroupName  *string
-	Revision   *int64
-	RevisionID *int
-}
