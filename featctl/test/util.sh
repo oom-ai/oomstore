@@ -46,11 +46,13 @@ assert_eq() {
 
 # register features for the sample data
 register_features() {
-    featctl register entity device --length 32
-    featctl register entity user --length 64 --description "all users"
-    featctl register group phone --entity device
-    featctl register batch-feature price --group phone --db-value-type "int"
-    featctl register batch-feature model --group phone --db-value-type "varchar(32)"
+    featctl register entity device --length 32     --description "device"
+    featctl register entity user   --length 64     --description "user"
+
+    featctl register group phone --entity device --description "phone"
+
+    featctl register batch-feature price --group phone --db-value-type "int"         --description "price"
+    featctl register batch-feature model --group phone --db-value-type "varchar(32)" --description "model"
 }
 
 # import sample data
@@ -60,14 +62,13 @@ import_sample() {
     --group phone \
     --delimiter "," \
     --input-file device.csv \
-    --description 'test data' |grep -o '[0-9]\+'
+    --description 'test data' | grep -o '[0-9]\+'
 }
 
 # sync feature values from offline store to online store
 sync() {
     info "sync sample data to online store"
-    echo $1
-    featctl sync -r $1
+    featctl sync -r "$1"
 }
 
 execute_sql() {
