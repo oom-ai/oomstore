@@ -1,4 +1,4 @@
-package postgres
+package postgres_test
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/internal/database/online/postgres"
 	"github.com/oom-ai/oomstore/internal/database/online/test_impl"
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -14,12 +15,12 @@ import (
 func prepareStore() (context.Context, online.Store) {
 	ctx := context.Background()
 	opt := runtime_pg.PostgresDbOpt
-	store, err := Open(&types.PostgresOpt{
+	store, err := postgres.Open(&types.PostgresOpt{
 		Host:     opt.Host,
 		Port:     opt.Port,
 		User:     opt.User,
 		Password: opt.Password,
-		Database: "test_impl",
+		Database: "test",
 	})
 	if err != nil {
 		panic(err)
@@ -35,7 +36,7 @@ func prepareStore() (context.Context, online.Store) {
 		panic(err)
 	}
 
-	store, err = Open(&opt)
+	store, err = postgres.Open(&opt)
 	if err != nil {
 		panic(err)
 	}

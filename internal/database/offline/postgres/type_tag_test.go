@@ -1,8 +1,9 @@
-package postgres
+package postgres_test
 
 import (
 	"testing"
 
+	"github.com/oom-ai/oomstore/internal/database/offline/postgres"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -28,7 +29,7 @@ func TestValueTypeTag(t *testing.T) {
 			types.TIME,
 		},
 	} {
-		actual, err := TypeTag(tt.input)
+		actual, err := postgres.TypeTag(tt.input)
 		if err != nil {
 			t.Fatal(err)
 		}
