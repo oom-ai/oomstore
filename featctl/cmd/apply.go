@@ -3,12 +3,18 @@ package cmd
 import (
 	"context"
 	"log"
+	"os"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
+
+	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 )
 
-var applyOpt types.ApplyOpt
+type ApplyOption struct {
+	Filepath string
+}
+
+var applyOpt ApplyOption
 
 var applyCmd = &cobra.Command{
 	Use:   "apply",
@@ -18,7 +24,13 @@ var applyCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if err := oomStore.Apply(ctx, applyOpt); err != nil {
+		file, err := os.Open(applyOpt.Filepath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+
+		if err := oomStore.Apply(ctx, apply.ApplyOpt{R: file}); err != nil {
 			log.Fatalf("apply failed: %v", err)
 		}
 
