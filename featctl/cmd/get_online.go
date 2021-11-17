@@ -16,8 +16,8 @@ import (
 
 var onlineGetOpt types.OnlineGetOpt
 
-var getOnlineFeatureCmd = &cobra.Command{
-	Use:   "online-feature",
+var getOnlineCmd = &cobra.Command{
+	Use:   "online",
 	Short: "get online feature values",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
@@ -36,15 +36,15 @@ var getOnlineFeatureCmd = &cobra.Command{
 }
 
 func init() {
-	getCmd.AddCommand(getOnlineFeatureCmd)
+	getCmd.AddCommand(getOnlineCmd)
 
-	flags := getOnlineFeatureCmd.Flags()
+	flags := getOnlineCmd.Flags()
 
 	flags.StringVarP(&onlineGetOpt.EntityKey, "entity-key", "k", "", "entity keys")
-	_ = getOnlineFeatureCmd.MarkFlagRequired("entity")
+	_ = getOnlineCmd.MarkFlagRequired("entity")
 
 	flags.StringSliceVar(&onlineGetOpt.FeatureNames, "feature", nil, "feature names")
-	_ = getOnlineFeatureCmd.MarkFlagRequired("feature")
+	_ = getOnlineCmd.MarkFlagRequired("feature")
 }
 
 func printOnlineFeatures(featureValues *types.FeatureValues, output string) error {
