@@ -48,8 +48,8 @@ var META_TABLE_SCHEMAS = map[string]string{
 		);
 		COMMENT ON COLUMN feature_group.category IS 'group category: batch, stream ...';
 		`,
-	"feature_entity": `
-		CREATE TABLE feature_entity (
+	"entity": `
+		CREATE TABLE entity (
 			id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 			name        VARCHAR(32) NOT     NULL,
 			length      SMALLINT    NOT     NULL,
@@ -58,7 +58,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 			modify_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP,
 			UNIQUE (name)
 		);
-		COMMENT ON COLUMN feature_entity.length IS 'feature entity value max length';
+		COMMENT ON COLUMN entity.length IS 'feature entity value max length';
 		`,
 	"feature_group_revision": `
 		CREATE TABLE feature_group_revision (
@@ -88,7 +88,7 @@ var META_TABLE_FOREIGN_KEYS = map[string]string{
 		ALTER TABLE feature_group
 		ADD CONSTRAINT fk_entity
 				FOREIGN KEY(entity_id)
-				REFERENCES feature_entity(id),
+				REFERENCES entity(id),
 		ADD CONSTRAINT fk_online_revision
 				FOREIGN KEY(online_revision_id)
 				REFERENCES feature_group_revision(id)

@@ -11,7 +11,7 @@ import (
 
 func createEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateEntityOpt) (int, error) {
 	var entityID int
-	query := "insert into feature_entity(name, length, description) values($1, $2, $3) returning id"
+	query := "insert into entity(name, length, description) values($1, $2, $3) returning id"
 	err := sqlxCtx.GetContext(ctx, &entityID, query, opt.EntityName, opt.Length, opt.Description)
 	if er, ok := err.(*pq.Error); ok {
 		if er.Code == pgerrcode.UniqueViolation {
@@ -22,7 +22,7 @@ func createEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadat
 }
 
 func updateEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateEntityOpt) error {
-	query := "UPDATE feature_entity SET description = $1 WHERE id = $2"
+	query := "UPDATE entity SET description = $1 WHERE id = $2"
 	result, err := sqlxCtx.ExecContext(ctx, query, opt.NewDescription, opt.EntityID)
 	if err != nil {
 		return err
