@@ -26,6 +26,8 @@ archives:
       windows: Windows
       386: i386
       amd64: x86_64
+    files:
+      - none*
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -34,5 +36,10 @@ changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
+      - '^Merge'
+      - '^Update'
+      - '^docs[:(]'
+      - '^test[:(]'
+      - '^chore[:(]'
+      - '^refactor[:(]'
+      - '^ci[:(]'
