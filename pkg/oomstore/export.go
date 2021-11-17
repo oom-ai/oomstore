@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -16,7 +15,12 @@ func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeat
 	}
 
 	featureNames := opt.FeatureNames
-	allFeatures := s.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.GroupID})
+	allFeatures, err := s.ListFeature(ctx, types.ListFeatureOpt{
+		GroupName: &revision.Group.Name,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
 
 	allFeatureNames := allFeatures.Names()
 	if len(featureNames) == 0 {

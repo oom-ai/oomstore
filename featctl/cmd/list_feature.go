@@ -10,28 +10,21 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
-type listFeatureOption struct {
-	metadata.ListFeatureOpt
-	entityName *string
-	groupName  *string
-}
-
-var listFeatureOpt listFeatureOption
+var listFeatureOpt types.ListFeatureOpt
 
 var listFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "list all existing features given a specific group",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
-			listFeatureOpt.entityName = nil
+			listFeatureOpt.EntityName = nil
 		}
 		if !cmd.Flags().Changed("group") {
-			listFeatureOpt.groupName = nil
+			listFeatureOpt.GroupName = nil
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -39,23 +32,10 @@ var listFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if listFeatureOpt.entityName != nil {
-			entity, err := oomStore.GetEntityByName(ctx, *listFeatureOpt.entityName)
-			if err != nil {
-				log.Fatalf("failed to get entity name='%s': %v", *listFeatureOpt.entityName, err)
-			}
-			listFeatureOpt.EntityID = &entity.ID
+		features, err := oomStore.ListFeature(ctx, listFeatureOpt)
+		if err != nil {
+			log.Fatalf("failed listing features, error %v\n", err)
 		}
-
-		if listFeatureOpt.groupName != nil {
-			group, err := oomStore.GetFeatureGroupByName(ctx, *listFeatureOpt.groupName)
-			if err != nil {
-				log.Fatalf("failed to get feature group name='%s': %v", *listFeatureOpt.groupName, err)
-			}
-			listFeatureOpt.GroupID = &group.ID
-		}
-
-		features := oomStore.ListFeature(ctx, listFeatureOpt.ListFeatureOpt)
 
 		// print features to stdout
 		if err := printFeatures(features, *listOutput); err != nil {
@@ -68,8 +48,8 @@ func init() {
 	listCmd.AddCommand(listFeatureCmd)
 
 	flags := listFeatureCmd.Flags()
-	listFeatureOpt.entityName = flags.StringP("entity", "e", "", "entity")
-	listFeatureOpt.groupName = flags.StringP("group", "g", "", "feature group")
+	listFeatureOpt.EntityName = flags.StringP("entity", "e", "", "entity")
+	listFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
 }
 
 func printFeatures(features types.FeatureList, output string) error {

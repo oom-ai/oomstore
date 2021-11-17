@@ -20,11 +20,21 @@ import (
 func TestSync(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+	ctx := context.Background()
+
 	onlineStore := mock_online.NewMockStore(ctrl)
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
 	store := oomstore.NewOomStore(onlineStore, offlineStore, metadataStore)
-	ctx := context.Background()
+
+	features := types.FeatureList{
+		{
+			Name: "feature1",
+		},
+		{
+			Name: "feature2",
+		},
+	}
 
 	testCases := []struct {
 		description   string
@@ -39,15 +49,13 @@ func TestSync(t *testing.T) {
 			},
 			expectedError: fmt.Errorf("the specific revision was synced to the online store, won't do it again this time"),
 			mockFn: func() {
-				metadataStore.EXPECT().
-					GetRevision(ctx, 1).
-					Return(&types.Revision{
-						GroupID: 1,
-						Group: &types.FeatureGroup{
-							ID:               1,
-							OnlineRevisionID: intPtr(1),
-						},
-					}, nil)
+				metadataStore.EXPECT().GetRevision(ctx, 1).Return(&types.Revision{
+					GroupID: 1,
+					Group: &types.FeatureGroup{
+						ID:               1,
+						OnlineRevisionID: intPtr(1),
+					},
+				}, nil)
 			},
 		},
 		{
@@ -57,139 +65,76 @@ func TestSync(t *testing.T) {
 			},
 			expectedError: nil,
 			mockFn: func() {
-				revision := &types.Revision{
-					GroupID: 2,
-					Group: &types.FeatureGroup{
-						ID:       2,
-						EntityID: 2,
-						Entity: &types.Entity{
-							Name: "entity-name",
-						},
-						OnlineRevisionID: nil,
-					},
-					DataTable: "data-table-name",
-				}
-				metadataStore.EXPECT().
-					GetRevision(ctx, 1).
-					Return(revision, nil)
-
-				features := types.FeatureList{
-					{
-						Name: "feature1",
-					},
-					{
-						Name: "feature2",
-					},
-					{
-						Name: "feature3",
-					},
-				}
-
-				metadataStore.EXPECT().
-					ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).
-					Return(features)
+				revision := buildRevision()
+				metadataStore.EXPECT().GetRevision(ctx, 1).Return(revision, nil)
+				metadataStore.EXPECT().GetFeatureGroupByName(ctx, "device_info").Return(&types.FeatureGroup{
+					Name: "device_info",
+					ID:   1,
+				}, nil)
+				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
 
 				stream := make(chan *types.RawFeatureValueRecord)
-				offlineStore.EXPECT().
-					Export(ctx, offline.ExportOpt{
-						DataTable:    "data-table-name",
-						EntityName:   "entity-name",
-						FeatureNames: features.Names(),
-					}).
-					Return(stream, nil)
+				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
+					DataTable:    "data-table-name",
+					EntityName:   "device",
+					FeatureNames: features.Names(),
+				}).Return(stream, nil)
 
-				onlineStore.EXPECT().
-					Import(ctx, online.ImportOpt{
-						FeatureList: features,
-						Revision:    revision,
-						Entity: &types.Entity{
-							Name: "entity-name",
-						},
-						Stream: stream,
-					}).
-					Return(nil)
+				onlineStore.EXPECT().Import(ctx, online.ImportOpt{
+					FeatureList: features,
+					Revision:    revision,
+					Entity: &types.Entity{
+						Name: "device",
+					},
+					Stream: stream,
+				}).Return(nil)
 
-				metadataStore.EXPECT().
-					UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
-						GroupID:             revision.GroupID,
-						NewOnlineRevisionID: intPtr(revision.ID),
-					}).
-					Return(nil)
+				metadataStore.EXPECT().UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
+					GroupID:             revision.GroupID,
+					NewOnlineRevisionID: intPtr(revision.ID),
+				}).Return(nil)
 
-				metadataStore.EXPECT().
-					UpdateRevision(gomock.Any(), gomock.Any()).
-					Return(nil)
+				metadataStore.EXPECT().UpdateRevision(gomock.Any(), gomock.Any()).Return(nil)
 			},
 		},
 		{
-			description: "user-defined revision, succeed",
+			description: "purge previous revision, succeed",
 			opt: types.SyncOpt{
 				RevisionId: 1,
 			},
 			expectedError: nil,
 			mockFn: func() {
-				revision := &types.Revision{
-					GroupID: 2,
-					Group: &types.FeatureGroup{
-						ID:       2,
-						EntityID: 2,
-						Entity: &types.Entity{
-							Name: "entity-name",
-						},
-						OnlineRevisionID: intPtr(100),
-					},
-					DataTable: "data-table-name",
-				}
-				metadataStore.EXPECT().
-					GetRevision(ctx, 1).
-					Return(revision, nil)
-
-				features := types.FeatureList{
-					{
-						Name: "feature1",
-					},
-					{
-						Name: "feature2",
-					},
-					{
-						Name: "feature3",
-					},
-				}
-
-				metadataStore.EXPECT().
-					ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).
-					Return(features)
+				revision := buildRevision()
+				revision.Group.OnlineRevisionID = intPtr(0)
+				metadataStore.EXPECT().GetRevision(ctx, 1).Return(revision, nil)
+				metadataStore.EXPECT().GetFeatureGroupByName(ctx, "device_info").Return(&types.FeatureGroup{
+					Name: "device_info",
+					ID:   1,
+				}, nil)
+				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
 
 				stream := make(chan *types.RawFeatureValueRecord)
-				offlineStore.EXPECT().
-					Export(ctx, offline.ExportOpt{
-						DataTable:    "data-table-name",
-						EntityName:   "entity-name",
-						FeatureNames: features.Names(),
-					}).
-					Return(stream, nil)
+				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
+					DataTable:    "data-table-name",
+					EntityName:   "device",
+					FeatureNames: features.Names(),
+				}).Return(stream, nil)
 
-				onlineStore.EXPECT().
-					Import(ctx, online.ImportOpt{
-						FeatureList: features,
-						Revision:    revision,
-						Entity: &types.Entity{
-							Name: "entity-name",
-						},
-						Stream: stream,
-					}).
-					Return(nil)
+				onlineStore.EXPECT().Import(ctx, online.ImportOpt{
+					FeatureList: features,
+					Revision:    revision,
+					Entity: &types.Entity{
+						Name: "device",
+					},
+					Stream: stream,
+				}).Return(nil)
 
-				metadataStore.EXPECT().
-					UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
-						GroupID:             revision.GroupID,
-						NewOnlineRevisionID: intPtr(revision.ID),
-					}).
-					Return(nil)
+				metadataStore.EXPECT().UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
+					GroupID:             revision.GroupID,
+					NewOnlineRevisionID: intPtr(revision.ID),
+				}).Return(nil)
 
-				onlineStore.EXPECT().
-					Purge(ctx, *revision.Group.OnlineRevisionID).
-					Return(nil)
+				onlineStore.EXPECT().Purge(ctx, *revision.Group.OnlineRevisionID).Return(nil)
 			},
 		},
 	}
@@ -208,4 +153,21 @@ func intPtr(i int) *int {
 
 func int64Ptr(i int64) *int64 {
 	return &i
+}
+
+func buildRevision() *types.Revision {
+	return &types.Revision{
+		ID:      1,
+		GroupID: 1,
+		Group: &types.FeatureGroup{
+			Name:     "device_info",
+			ID:       1,
+			EntityID: 2,
+			Entity: &types.Entity{
+				Name: "device",
+			},
+			OnlineRevisionID: nil,
+		},
+		DataTable: "data-table-name",
+	}
 }
