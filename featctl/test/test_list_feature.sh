@@ -8,8 +8,8 @@ import_sample > /dev/null
 
 case='featctl list feature works'
 expected='Name,Group,Entity,Category,DBValueType,ValueType,Description,OnlineRevisionID
-model,phone,device,batch,varchar(32),string,,<NULL>
-price,phone,device,batch,int,int64,,<NULL>
+model,phone,device,batch,varchar(32),string,model,<NULL>
+price,phone,device,batch,int,int64,price,<NULL>
 '
 actual=$(featctl list feature -o csv)
 ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }

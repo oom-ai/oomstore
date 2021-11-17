@@ -7,8 +7,8 @@ init_store
 register_features
 
 case='featctl list group works'
-expected='GroupName,GroupID,EntityName,Description,OnlineRevision,CreateTime,ModifyTime
-phone,1,device,,<NULL>,<NULL>,,2021-10-19T04:01:20Z,2021-10-19T04:01:20Z
+expected='GroupName,GroupID,EntityName,Description
+phone,1,device,phone
 '
 actual=$(featctl list group -o csv)
 ignore_time() { cut -d ',' -f 1-4 <<<"$1"; }
