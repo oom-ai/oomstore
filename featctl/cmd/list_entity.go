@@ -19,7 +19,7 @@ var listEntityCmd = &cobra.Command{
 	Short: "list all existing entities",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("limit") {
-			getHistoricalFeatureOpt.Limit = nil
+			exportOpt.Limit = nil
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
