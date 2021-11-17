@@ -56,12 +56,6 @@ type UpdateRevisionOpt struct {
 	NewAnchored *bool
 }
 
-// List
-type ListRevisionOpt struct {
-	GroupID    *int
-	DataTables []string
-}
-
 type ListFeatureOpt struct {
 	EntityID     *int
 	GroupID      *int
