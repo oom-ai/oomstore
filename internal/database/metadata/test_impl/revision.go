@@ -231,7 +231,6 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	testCases := []struct {
 		description   string
-		opt           metadata.GetRevisionOpt
 		GroupID       int
 		Revision      int64
 		expectedError error
