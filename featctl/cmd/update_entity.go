@@ -4,29 +4,26 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
-var updateEntityOpt metadata.UpdateEntityOpt
+var updateEntityOpt types.UpdateEntityOpt
 
 var updateEntityCmd = &cobra.Command{
 	Use:   "entity",
 	Short: "update a specified entity",
 	Args:  cobra.ExactArgs(1),
+	PreRun: func(cmd *cobra.Command, args []string) {
+		updateEntityOpt.EntityName = args[0]
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		entityName := args[0]
-		entity, err := oomStore.GetEntityByName(ctx, entityName)
-		if err != nil {
-			log.Fatalf("failed to get entity by name=%s: %v", entityName, err)
-		}
-		updateEntityOpt.EntityID = entity.ID
 		if err := oomStore.UpdateEntity(ctx, updateEntityOpt); err != nil {
-			log.Fatalf("failed to update entity id=%d, err %v\n", updateEntityOpt.EntityID, err)
+			log.Fatalf("failed to update entity id=%s, err %v\n", updateEntityOpt.EntityName, err)
 		}
 	},
 }
