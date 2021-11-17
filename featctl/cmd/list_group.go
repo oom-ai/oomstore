@@ -14,13 +14,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type listFeatureGroupOption struct {
+type listGroupOption struct {
 	entityName *string
 }
 
-var listFeatureGroupOpt listFeatureGroupOption
+var listGroupOpt listGroupOption
 
-var listFeatureGroupCmd = &cobra.Command{
+var listGroupCmd = &cobra.Command{
 	Use:   "group",
 	Short: "list feature groups",
 	Example: `1. featctl list group
@@ -28,7 +28,7 @@ var listFeatureGroupCmd = &cobra.Command{
 `,
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
-			listFeatureGroupOpt.entityName = nil
+			listGroupOpt.entityName = nil
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -38,41 +38,41 @@ var listFeatureGroupCmd = &cobra.Command{
 
 		var entityID *int
 
-		if listFeatureGroupOpt.entityName != nil {
-			entity, err := oomStore.GetEntityByName(ctx, *listFeatureGroupOpt.entityName)
+		if listGroupOpt.entityName != nil {
+			entity, err := oomStore.GetEntityByName(ctx, *listGroupOpt.entityName)
 			if err != nil {
-				log.Fatalf("failed to get entity name='%s': %v", *listFeatureGroupOpt.entityName, err)
+				log.Fatalf("failed to get entity name='%s': %v", *listGroupOpt.entityName, err)
 			}
 			entityID = &entity.ID
 		}
 
-		groups := oomStore.ListFeatureGroup(ctx, entityID)
-		if err := printFeatureGroups(groups, *listOutput); err != nil {
+		groups := oomStore.ListGroup(ctx, entityID)
+		if err := printGroups(groups, *listOutput); err != nil {
 			log.Fatalf("failed printing feature groups, error %v\n", err)
 		}
 	},
 }
 
 func init() {
-	listCmd.AddCommand(listFeatureGroupCmd)
+	listCmd.AddCommand(listGroupCmd)
 
-	flags := listFeatureGroupCmd.Flags()
+	flags := listGroupCmd.Flags()
 
-	listFeatureGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
+	listGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func printFeatureGroups(groups []*types.FeatureGroup, output string) error {
+func printGroups(groups []*types.Group, output string) error {
 	switch output {
 	case CSV:
-		return printFeatureGroupsInCSV(groups)
+		return printGroupsInCSV(groups)
 	case ASCIITable:
-		return printFeatureGroupsInASCIITable(groups)
+		return printGroupsInASCIITable(groups)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
 }
 
-func printFeatureGroupsInCSV(groups types.FeatureGroupList) error {
+func printGroupsInCSV(groups types.GroupList) error {
 	w := csv.NewWriter(os.Stdout)
 
 	if err := w.Write(groupHeader()); err != nil {
@@ -87,7 +87,7 @@ func printFeatureGroupsInCSV(groups types.FeatureGroupList) error {
 	return nil
 }
 
-func printFeatureGroupsInASCIITable(groups types.FeatureGroupList) error {
+func printGroupsInASCIITable(groups types.GroupList) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(groupHeader())
 	table.SetAutoFormatHeaders(false)
@@ -103,7 +103,7 @@ func groupHeader() []string {
 	return []string{"GroupName", "GroupID", "EntityName", "Description", "OnlineRevisionID", "CreateTime", "ModifyTime"}
 }
 
-func groupRecord(g *types.FeatureGroup) []string {
+func groupRecord(g *types.Group) []string {
 	onlineRevisionID := "<NULL>"
 	if g.OnlineRevisionID != nil {
 		onlineRevisionID = fmt.Sprint(*g.OnlineRevisionID)

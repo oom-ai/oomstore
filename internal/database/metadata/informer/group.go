@@ -5,22 +5,22 @@ import (
 )
 
 type GroupCache struct {
-	types.FeatureGroupList
+	types.GroupList
 }
 
 func (c *GroupCache) Enrich(entityCache *EntityCache) {
-	for _, g := range c.FeatureGroupList {
+	for _, g := range c.GroupList {
 		g.Entity = entityCache.Find(func(e *types.Entity) bool {
 			return e.ID == g.EntityID
 		})
 	}
 }
 
-func (c *GroupCache) List(entityID *int) types.FeatureGroupList {
+func (c *GroupCache) List(entityID *int) types.GroupList {
 	if entityID == nil {
-		return c.FeatureGroupList
+		return c.GroupList
 	}
-	return c.FeatureGroupList.Filter(func(g *types.FeatureGroup) bool {
+	return c.GroupList.Filter(func(g *types.Group) bool {
 		return g.Entity.ID == *entityID
 	})
 }

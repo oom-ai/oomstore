@@ -78,7 +78,7 @@ func list(ctx context.Context, db *sqlx.DB) (*informer.Cache, error) {
 			return err
 		}
 
-		groups := types.FeatureGroupList{}
+		groups := types.GroupList{}
 		if err := tx.SelectContext(ctx, &groups, `SELECT * FROM "feature_group"`); err != nil {
 			return err
 		}

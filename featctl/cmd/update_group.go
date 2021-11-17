@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var updateGroupOpt types.UpdateFeatureGroupOpt
+var updateGroupOpt types.UpdateGroupOpt
 
 var updateGroupCmd = &cobra.Command{
 	Use:   "group",
@@ -22,7 +22,7 @@ var updateGroupCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if err := oomStore.UpdateFeatureGroup(ctx, updateGroupOpt); err != nil {
+		if err := oomStore.UpdateGroup(ctx, updateGroupOpt); err != nil {
 			log.Fatalf("failed updating group %s, err %v\n", updateGroupOpt.GroupName, err)
 		}
 	},

@@ -51,7 +51,7 @@ func TestSync(t *testing.T) {
 			mockFn: func() {
 				metadataStore.EXPECT().GetRevision(ctx, 1).Return(&types.Revision{
 					GroupID: 1,
-					Group: &types.FeatureGroup{
+					Group: &types.Group{
 						ID:               1,
 						OnlineRevisionID: intPtr(1),
 					},
@@ -67,7 +67,7 @@ func TestSync(t *testing.T) {
 			mockFn: func() {
 				revision := buildRevision()
 				metadataStore.EXPECT().GetRevision(ctx, 1).Return(revision, nil)
-				metadataStore.EXPECT().GetFeatureGroupByName(ctx, "device_info").Return(&types.FeatureGroup{
+				metadataStore.EXPECT().GetGroupByName(ctx, "device_info").Return(&types.Group{
 					Name: "device_info",
 					ID:   1,
 				}, nil)
@@ -89,7 +89,7 @@ func TestSync(t *testing.T) {
 					Stream: stream,
 				}).Return(nil)
 
-				metadataStore.EXPECT().UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
+				metadataStore.EXPECT().UpdateGroup(ctx, metadata.UpdateGroupOpt{
 					GroupID:             revision.GroupID,
 					NewOnlineRevisionID: intPtr(revision.ID),
 				}).Return(nil)
@@ -107,7 +107,7 @@ func TestSync(t *testing.T) {
 				revision := buildRevision()
 				revision.Group.OnlineRevisionID = intPtr(0)
 				metadataStore.EXPECT().GetRevision(ctx, 1).Return(revision, nil)
-				metadataStore.EXPECT().GetFeatureGroupByName(ctx, "device_info").Return(&types.FeatureGroup{
+				metadataStore.EXPECT().GetGroupByName(ctx, "device_info").Return(&types.Group{
 					Name: "device_info",
 					ID:   1,
 				}, nil)
@@ -129,7 +129,7 @@ func TestSync(t *testing.T) {
 					Stream: stream,
 				}).Return(nil)
 
-				metadataStore.EXPECT().UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
+				metadataStore.EXPECT().UpdateGroup(ctx, metadata.UpdateGroupOpt{
 					GroupID:             revision.GroupID,
 					NewOnlineRevisionID: intPtr(revision.ID),
 				}).Return(nil)
@@ -159,7 +159,7 @@ func buildRevision() *types.Revision {
 	return &types.Revision{
 		ID:      1,
 		GroupID: 1,
-		Group: &types.FeatureGroup{
+		Group: &types.Group{
 			Name:     "device_info",
 			ID:       1,
 			EntityID: 2,

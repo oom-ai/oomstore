@@ -16,7 +16,7 @@ func sampleCache() *informer.Cache {
 		Length: 10,
 		Name:   "entity",
 	}
-	group := types.FeatureGroup{
+	group := types.Group{
 		ID:       100,
 		Name:     "group",
 		Category: "batch",
@@ -24,7 +24,7 @@ func sampleCache() *informer.Cache {
 		Entity:   &entity,
 	}
 	entities := types.EntityList{&entity}
-	groups := types.FeatureGroupList{&group}
+	groups := types.GroupList{&group}
 	return informer.NewCache(entities, nil, groups, nil)
 }
 
@@ -42,7 +42,7 @@ func TestInformer(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	group, err := informer.GetFeatureGroup(ctx, 100)
+	group, err := informer.GetGroup(ctx, 100)
 	require.NoError(t, err)
 
 	require.Equal(t, 100, group.ID)

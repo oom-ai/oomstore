@@ -28,7 +28,7 @@ var registerBatchFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		group, err := oomStore.GetFeatureGroupByName(ctx, registerBatchFeatureOpt.groupName)
+		group, err := oomStore.GetGroupByName(ctx, registerBatchFeatureOpt.groupName)
 		if err != nil {
 			log.Fatalf("failed to get feature group name=%s: %v", registerBatchFeatureOpt.groupName, err)
 		}

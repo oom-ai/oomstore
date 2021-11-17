@@ -226,7 +226,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 			Name:        "model",
 			DBValueType: "VARCHAR(32)",
 			GroupID:     1,
-			Group: &types.FeatureGroup{
+			Group: &types.Group{
 				EntityID:         1,
 				OnlineRevisionID: &revision1,
 				Category:         types.BatchFeatureCategory,
@@ -237,7 +237,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 			Name:        "price",
 			DBValueType: "INT",
 			GroupID:     2,
-			Group: &types.FeatureGroup{
+			Group: &types.Group{
 				EntityID:         1,
 				OnlineRevisionID: &revision2,
 				Category:         types.BatchFeatureCategory,
@@ -248,7 +248,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 			Name:        "age",
 			DBValueType: "INT",
 			GroupID:     3,
-			Group: &types.FeatureGroup{
+			Group: &types.Group{
 				EntityID:         2,
 				OnlineRevisionID: &revision2,
 				Category:         types.BatchFeatureCategory,

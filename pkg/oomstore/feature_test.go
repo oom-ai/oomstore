@@ -26,7 +26,7 @@ func TestCreateBatchFeature(t *testing.T) {
 		description string
 		opt         types.CreateFeatureOpt
 		valueType   string
-		group       types.FeatureGroup
+		group       types.Group
 		expectError bool
 	}{
 		{
@@ -37,7 +37,7 @@ func TestCreateBatchFeature(t *testing.T) {
 				DBValueType: "VARCHAR(32)",
 			},
 			valueType: types.STRING,
-			group: types.FeatureGroup{
+			group: types.Group{
 				Name:     "device_info",
 				Category: types.BatchFeatureCategory,
 			},
@@ -51,7 +51,7 @@ func TestCreateBatchFeature(t *testing.T) {
 				DBValueType: "BIGINT",
 			},
 			valueType: types.INT64,
-			group: types.FeatureGroup{
+			group: types.Group{
 				Name:     "device_info",
 				Category: types.StreamFeatureCategory,
 			},
@@ -62,7 +62,7 @@ func TestCreateBatchFeature(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			metadataStore.EXPECT().
-				GetFeatureGroup(gomock.Any(), tc.opt.GroupID).
+				GetGroup(gomock.Any(), tc.opt.GroupID).
 				Return(&tc.group, nil)
 
 			if tc.group.Category == types.BatchFeatureCategory {
