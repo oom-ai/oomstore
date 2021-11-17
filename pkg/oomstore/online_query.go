@@ -31,15 +31,15 @@ func (s *OomStore) GetOnlineFeatureValues(ctx context.Context, opt types.GetOnli
 		return &rs, nil
 	}
 
-	featureMap := groupFeaturesByRevisionId(features)
+	featureMap := groupFeaturesByRevisionID(features)
 
-	for onlineRevisionId, features := range featureMap {
+	for onlineRevisionID, features := range featureMap {
 		if len(features) == 0 {
 			continue
 		}
 		featureValues, err := s.online.Get(ctx, online.GetOpt{
 			Entity:      entity,
-			RevisionID:  onlineRevisionId,
+			RevisionID:  onlineRevisionID,
 			EntityKey:   opt.EntityKey,
 			FeatureList: features,
 		})
@@ -70,7 +70,7 @@ func (s *OomStore) MultiGetOnlineFeatureValues(ctx context.Context, opt types.Mu
 	if entity == nil {
 		return nil, fmt.Errorf("failed to get shared entity")
 	}
-	featureMap := groupFeaturesByRevisionId(features)
+	featureMap := groupFeaturesByRevisionID(features)
 
 	// entity_key -> feature_name -> feature_value
 	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, featureMap, entity)
@@ -85,13 +85,13 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	// entity_key -> types.RecordMap
 	featureValueMap := make(map[string]dbutil.RowMap)
 
-	for onlineRevisionId, features := range featureMap {
+	for onlineRevisionID, features := range featureMap {
 		if len(features) == 0 {
 			continue
 		}
 		featureValues, err := s.online.MultiGet(ctx, online.MultiGetOpt{
 			Entity:      entity,
-			RevisionID:  onlineRevisionId,
+			RevisionID:  onlineRevisionID,
 			EntityKeys:  entityKeys,
 			FeatureList: features,
 		})
@@ -110,7 +110,7 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 	return featureValueMap, nil
 }
 
-func groupFeaturesByRevisionId(features types.FeatureList) map[int]types.FeatureList {
+func groupFeaturesByRevisionID(features types.FeatureList) map[int]types.FeatureList {
 	featureMap := make(map[int]types.FeatureList)
 	for _, f := range features {
 		id := f.OnlineRevisionID()

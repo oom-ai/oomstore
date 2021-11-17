@@ -13,16 +13,16 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		return nil, err
 	}
 
-	featureIds := []string{}
+	featureIDs := []string{}
 	for _, f := range opt.FeatureList {
 		id, err := SerializeByValue(f.ID)
 		if err != nil {
 			return nil, err
 		}
-		featureIds = append(featureIds, id)
+		featureIDs = append(featureIDs, id)
 	}
 
-	values, err := db.HMGet(ctx, key, featureIds...).Result()
+	values, err := db.HMGet(ctx, key, featureIDs...).Result()
 	if err != nil {
 		return nil, err
 	}

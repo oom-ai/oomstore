@@ -10,15 +10,15 @@ import (
 )
 
 func createEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateEntityOpt) (int, error) {
-	var entityId int
+	var entityID int
 	query := "insert into feature_entity(name, length, description) values($1, $2, $3) returning id"
-	err := sqlxCtx.GetContext(ctx, &entityId, query, opt.EntityName, opt.Length, opt.Description)
+	err := sqlxCtx.GetContext(ctx, &entityID, query, opt.EntityName, opt.Length, opt.Description)
 	if er, ok := err.(*pq.Error); ok {
 		if er.Code == pgerrcode.UniqueViolation {
 			return 0, fmt.Errorf("entity %s already exists", opt.EntityName)
 		}
 	}
-	return entityId, err
+	return entityID, err
 }
 
 func updateEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateEntityOpt) error {

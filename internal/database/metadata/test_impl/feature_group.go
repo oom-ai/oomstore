@@ -11,7 +11,7 @@ import (
 )
 
 func prepareEntity(t *testing.T, ctx context.Context, store metadata.Store, name string) int {
-	entityId, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
+	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  name,
 			Length:      32,
@@ -19,18 +19,18 @@ func prepareEntity(t *testing.T, ctx context.Context, store metadata.Store, name
 		},
 	})
 	require.NoError(t, err)
-	return entityId
+	return entityID
 }
 
 func TestGetFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	entityId := prepareEntity(t, ctx, store, "device")
+	entityID := prepareEntity(t, ctx, store, "device")
 
 	opt := metadata.CreateFeatureGroupOpt{
 		Name:        "device_baseinfo",
-		EntityID:    entityId,
+		EntityID:    entityID,
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
 	}
@@ -56,24 +56,24 @@ func TestListFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	deviceEntityId := prepareEntity(t, ctx, store, "device")
-	userEntityId := prepareEntity(t, ctx, store, "user")
+	deviceEntityID := prepareEntity(t, ctx, store, "device")
+	userEntityID := prepareEntity(t, ctx, store, "user")
 
 	deviceOpt := metadata.CreateFeatureGroupOpt{
 		Name:        "device_baseinfo",
-		EntityID:    deviceEntityId,
+		EntityID:    deviceEntityID,
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
 	}
 	userBaseOpt := metadata.CreateFeatureGroupOpt{
 		Name:        "user_baseinfo",
-		EntityID:    userEntityId,
+		EntityID:    userEntityID,
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
 	}
 	userBehaviorOpt := metadata.CreateFeatureGroupOpt{
 		Name:        "user_behaviorinfo",
-		EntityID:    userEntityId,
+		EntityID:    userEntityID,
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
 	}
@@ -96,18 +96,18 @@ func TestCreateFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) 
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	entityId := prepareEntity(t, ctx, store, "device")
+	entityID := prepareEntity(t, ctx, store, "device")
 
 	opt := metadata.CreateFeatureGroupOpt{
 		Name:        "device_baseinfo",
-		EntityID:    entityId,
+		EntityID:    entityID,
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
 	}
 
 	// create successfully
-	featureGroupId, err := store.CreateFeatureGroup(ctx, opt)
-	require.NotEqual(t, 0, featureGroupId)
+	featureGroupID, err := store.CreateFeatureGroup(ctx, opt)
+	require.NotEqual(t, 0, featureGroupID)
 	require.NoError(t, err)
 
 	// cannot create feature group with same name
@@ -124,15 +124,15 @@ func TestUpdateFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) 
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	entityId := prepareEntity(t, ctx, store, "device")
+	entityID := prepareEntity(t, ctx, store, "device")
 
 	opt := metadata.CreateFeatureGroupOpt{
 		Name:        "device_baseinfo",
-		EntityID:    entityId,
+		EntityID:    entityID,
 		Description: "description",
 		Category:    types.BatchFeatureCategory,
 	}
-	featureGroupId, err := store.CreateFeatureGroup(ctx, opt)
+	featureGroupID, err := store.CreateFeatureGroup(ctx, opt)
 	require.NoError(t, err)
 
 	// update non-exist feature group
@@ -143,7 +143,7 @@ func TestUpdateFeatureGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) 
 	// update existing feature group
 	description := "new description"
 	require.Nil(t, store.UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
-		GroupID:        featureGroupId,
+		GroupID:        featureGroupID,
 		NewDescription: &description,
 	}))
 }

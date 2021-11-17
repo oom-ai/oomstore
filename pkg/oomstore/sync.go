@@ -13,14 +13,14 @@ import (
 
 // Move a certain feature group revision data from offline to online store
 func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
-	revision, err := s.GetRevision(ctx, opt.RevisionId)
+	revision, err := s.GetRevision(ctx, opt.RevisionID)
 	if err != nil {
 		return err
 	}
 
 	group := revision.Group
 	prevOnlineRevisionID := group.OnlineRevisionID
-	if prevOnlineRevisionID != nil && *prevOnlineRevisionID == opt.RevisionId {
+	if prevOnlineRevisionID != nil && *prevOnlineRevisionID == opt.RevisionID {
 		return fmt.Errorf("the specific revision was synced to the online store, won't do it again this time")
 	}
 

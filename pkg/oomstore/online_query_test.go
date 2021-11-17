@@ -127,7 +127,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "no available features, return nil",
 			opt: types.MultiGetOnlineFeatureValuesOpt{
-				FeatureIDs: unavailableFeatures.Ids(),
+				FeatureIDs: unavailableFeatures.IDs(),
 				EntityKeys: []string{"1234", "1235"},
 			},
 			features:      unavailableFeatures,
@@ -137,7 +137,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "inconsistent entity type, fail",
 			opt: types.MultiGetOnlineFeatureValuesOpt{
-				FeatureIDs: inconsistentFeatures.Ids(),
+				FeatureIDs: inconsistentFeatures.IDs(),
 				EntityKeys: []string{"1234", "1235"},
 			},
 			features:      inconsistentFeatures,
@@ -147,7 +147,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.MultiGetOnlineFeatureValuesOpt{
-				FeatureIDs: consistentFeatures.Ids(),
+				FeatureIDs: consistentFeatures.IDs(),
 				EntityKeys: []string{"1234", "1235"},
 			},
 			features:      consistentFeatures,
