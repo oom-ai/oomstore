@@ -30,7 +30,6 @@ type JoinOneFeatureGroupOpt struct {
 }
 
 type ImportOpt struct {
-	GroupName     string
 	Entity        *types.Entity
 	Features      types.FeatureList
 	Header        []string
