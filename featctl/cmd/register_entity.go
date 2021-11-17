@@ -4,18 +4,18 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 
-var registerEntityOpt metadata.CreateEntityOpt
+var registerEntityOpt types.CreateEntityOpt
 
 var registerEntityCmd = &cobra.Command{
 	Use:   "entity",
 	Short: "register a new entity",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
-		registerEntityOpt.Name = args[0]
+		registerEntityOpt.EntityName = args[0]
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
