@@ -40,7 +40,7 @@ type ExportFeatureValuesOpt struct {
 	Limit        *uint64
 }
 
-type ImportBatchFeaturesOpt struct {
+type ImportOpt struct {
 	GroupID     int
 	Description string
 	DataSource  CsvDataSource
@@ -52,17 +52,17 @@ type CsvDataSource struct {
 	Delimiter string
 }
 
-type GetOnlineFeatureValuesOpt struct {
+type OnlineGetOpt struct {
 	FeatureNames []string
 	EntityKey    string
 }
 
-type MultiGetOnlineFeatureValuesOpt struct {
+type OnlineMultiGetOpt struct {
 	FeatureIDs []int
 	EntityKeys []string
 }
 
-type GetHistoricalFeatureValuesOpt struct {
+type JoinOpt struct {
 	FeatureIDs []int
 	EntityRows <-chan EntityRow
 }

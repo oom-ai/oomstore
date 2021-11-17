@@ -17,11 +17,6 @@ import (
 var listEntityCmd = &cobra.Command{
 	Use:   "entity",
 	Short: "list all existing entities",
-	PreRun: func(cmd *cobra.Command, args []string) {
-		if !cmd.Flags().Changed("limit") {
-			getHistoricalFeatureOpt.Limit = nil
-		}
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
