@@ -23,7 +23,7 @@ type UpdateFeatureOpt struct {
 }
 
 type CreateEntityOpt struct {
-	Name        string
+	EntityName  string
 	Length      int
 	Description string
 }
