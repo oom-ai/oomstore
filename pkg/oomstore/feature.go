@@ -16,8 +16,25 @@ func (s *OomStore) GetFeatureByName(ctx context.Context, name string) (*types.Fe
 	return s.metadata.GetFeatureByName(ctx, name)
 }
 
-func (s *OomStore) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
-	return s.metadata.ListFeature(ctx, opt)
+func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
+	metadataOpt := metadata.ListFeatureOpt{
+		FeatureNames: opt.FeatureNames,
+	}
+	if opt.EntityName != nil {
+		entity, err := s.metadata.GetEntityByName(ctx, *opt.EntityName)
+		if err != nil {
+			return nil, err
+		}
+		metadataOpt.EntityID = &entity.ID
+	}
+	if opt.GroupName != nil {
+		group, err := s.metadata.GetFeatureGroupByName(ctx, *opt.GroupName)
+		if err != nil {
+			return nil, err
+		}
+		metadataOpt.GroupID = &group.ID
+	}
+	return s.metadata.ListFeature(ctx, metadataOpt), nil
 }
 
 func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
