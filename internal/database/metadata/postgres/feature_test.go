@@ -3,33 +3,33 @@ package postgres_test
 import (
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata/test"
+	"github.com/oom-ai/oomstore/internal/database/metadata/test_impl"
 )
 
 func TestCreateFeature(t *testing.T) {
-	test.TestCreateFeature(t, prepareStore)
+	test_impl.TestCreateFeature(t, prepareStore)
 }
 
 func TestCreateFeatureWithSameName(t *testing.T) {
-	test.TestCreateFeatureWithSameName(t, prepareStore)
+	test_impl.TestCreateFeatureWithSameName(t, prepareStore)
 }
 
 func TestCreateFeatureWithSQLKeywrod(t *testing.T) {
-	test.TestCreateFeatureWithSQLKeywrod(t, prepareStore)
+	test_impl.TestCreateFeatureWithSQLKeywrod(t, prepareStore)
 }
 
 func TestCreateFeatureWithInvalidDataType(t *testing.T) {
-	test.TestCreateFeatureWithInvalidDataType(t, prepareStore)
+	test_impl.TestCreateFeatureWithInvalidDataType(t, prepareStore)
 }
 
 func TestGetFeature(t *testing.T) {
-	test.TestGetFeature(t, prepareStore)
+	test_impl.TestGetFeature(t, prepareStore)
 }
 
 func TestListFeature(t *testing.T) {
-	test.TestListFeature(t, prepareStore)
+	test_impl.TestListFeature(t, prepareStore)
 }
 
 func TestUpdateFeature(t *testing.T) {
-	test.TestUpdateFeature(t, prepareStore)
+	test_impl.TestUpdateFeature(t, prepareStore)
 }
