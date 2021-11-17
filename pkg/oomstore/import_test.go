@@ -21,7 +21,7 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
+	store := oomstore.TEST__New(nil, offlineStore, metadataStore)
 
 	testCases := []struct {
 		description    string
@@ -126,7 +126,7 @@ func TestImportBatchFeatures(t *testing.T) {
 
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(nil, offlineStore, metadataStore)
+	store := oomstore.TEST__New(nil, offlineStore, metadataStore)
 	ctx := context.Background()
 
 	testCases := []struct {
