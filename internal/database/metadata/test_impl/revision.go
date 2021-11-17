@@ -16,11 +16,11 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	_, groupId := prepareEntityAndGroup(t, ctx, store)
-	group, err := store.GetFeatureGroup(ctx, groupId)
+	_, groupID := prepareEntityAndGroup(t, ctx, store)
+	group, err := store.GetFeatureGroup(ctx, groupID)
 	require.NoError(t, err)
 	opt := metadata.CreateRevisionOpt{
-		GroupID:     groupId,
+		GroupID:     groupID,
 		Revision:    1000,
 		DataTable:   stringPtr("device_info_20211028"),
 		Description: "description",
@@ -44,14 +44,14 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 				DataTable:   "device_info_20211028",
 				Anchored:    false,
 				Description: "description",
-				GroupID:     groupId,
+				GroupID:     groupID,
 				Group:       group,
 			},
 		},
 		{
 			description: "create revision without data table, use default data table name",
 			opt: metadata.CreateRevisionOpt{
-				GroupID:     groupId,
+				GroupID:     groupID,
 				Revision:    2000,
 				Description: "description",
 			},
@@ -63,14 +63,14 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 				DataTable:   "data_1_2",
 				Anchored:    false,
 				Description: "description",
-				GroupID:     groupId,
+				GroupID:     groupID,
 				Group:       group,
 			},
 		},
 		{
 			description:   "create existing revision, return error",
 			opt:           opt,
-			expectedError: fmt.Errorf("revision already exists: groupId=%d, revision=1000", groupId),
+			expectedError: fmt.Errorf("revision already exists: groupID=%d, revision=1000", groupID),
 			expected:      0,
 		},
 	}
@@ -97,10 +97,10 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	_, groupId := prepareEntityAndGroup(t, ctx, store)
-	revisionId, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	_, groupID := prepareEntityAndGroup(t, ctx, store)
+	revisionID, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
-		GroupID:   groupId,
+		GroupID:   groupID,
 		DataTable: stringPtr("device_info_1000"),
 		Anchored:  false,
 	})
@@ -114,7 +114,7 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		{
 			description: "update revision successfully",
 			opt: metadata.UpdateRevisionOpt{
-				RevisionID:  revisionId,
+				RevisionID:  revisionID,
 				NewAnchored: boolPtr(true),
 			},
 			expected: nil,
@@ -122,10 +122,10 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		{
 			description: "cannot update revision, return err",
 			opt: metadata.UpdateRevisionOpt{
-				RevisionID:  revisionId - 1,
+				RevisionID:  revisionID - 1,
 				NewAnchored: boolPtr(true),
 			},
-			expected: fmt.Errorf("failed to update revision %d: revision not found", revisionId-1),
+			expected: fmt.Errorf("failed to update revision %d: revision not found", revisionID-1),
 		},
 	}
 
@@ -145,23 +145,23 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	_, groupId := prepareEntityAndGroup(t, ctx, store)
-	revisionId, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	_, groupID := prepareEntityAndGroup(t, ctx, store)
+	revisionID, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
-		GroupID:   groupId,
+		GroupID:   groupID,
 		DataTable: stringPtr("device_info_1000"),
 		Anchored:  false,
 	})
 	require.NoError(t, err)
 
 	require.NoError(t, store.Refresh())
-	group, err := store.GetFeatureGroup(ctx, groupId)
+	group, err := store.GetFeatureGroup(ctx, groupID)
 	require.NoError(t, err)
 
 	revision := types.Revision{
-		ID:        revisionId,
+		ID:        revisionID,
 		Revision:  1000,
-		GroupID:   groupId,
+		GroupID:   groupID,
 		DataTable: "device_info_1000",
 		Anchored:  false,
 		Group:     group,
@@ -174,8 +174,8 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		expected      *types.Revision
 	}{
 		{
-			description:   "get revision by revisionId successfully",
-			revisionID:    revisionId,
+			description:   "get revision by revisionID successfully",
+			revisionID:    revisionID,
 			expectedError: nil,
 			expected:      &revision,
 		},
@@ -207,23 +207,23 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	_, groupId := prepareEntityAndGroup(t, ctx, store)
-	revisionId, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	_, groupID := prepareEntityAndGroup(t, ctx, store)
+	revisionID, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
-		GroupID:   groupId,
+		GroupID:   groupID,
 		DataTable: stringPtr("device_info_1000"),
 		Anchored:  false,
 	})
 	require.NoError(t, err)
 
 	require.NoError(t, store.Refresh())
-	group, err := store.GetFeatureGroup(ctx, groupId)
+	group, err := store.GetFeatureGroup(ctx, groupID)
 	require.NoError(t, err)
 
 	revision := types.Revision{
-		ID:        revisionId,
+		ID:        revisionID,
 		Revision:  1000,
-		GroupID:   groupId,
+		GroupID:   groupID,
 		DataTable: "device_info_1000",
 		Anchored:  false,
 		Group:     group,
@@ -239,14 +239,14 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	}{
 		{
 			description:   "get revision by groupID and revision successfully",
-			GroupID:       groupId,
+			GroupID:       groupID,
 			Revision:      revision.Revision,
 			expectedError: nil,
 			expected:      &revision,
 		},
 		{
 			description:   "try to get not existed revision, return error",
-			GroupID:       groupId,
+			GroupID:       groupID,
 			Revision:      0,
 			expectedError: fmt.Errorf("revision not found"),
 			expected:      nil,
@@ -280,7 +280,7 @@ func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	_, groupId, _, revisions := prepareRevisions(t, ctx, store)
+	_, groupID, _, revisions := prepareRevisions(t, ctx, store)
 	var nilRevisionList types.RevisionList
 	require.NoError(t, store.Refresh())
 
@@ -292,7 +292,7 @@ func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		{
 			description: "list revision by groupID, succeed",
 			opt: metadata.ListRevisionOpt{
-				GroupID: &groupId,
+				GroupID: &groupID,
 			},
 			expected: revisions,
 		},
@@ -314,7 +314,7 @@ func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 			description: "list revision by empty dataTables, return empty list",
 			opt: metadata.ListRevisionOpt{
 				DataTables: []string{},
-				GroupID:    &groupId,
+				GroupID:    &groupID,
 			},
 			expected: nilRevisionList,
 		},
@@ -351,7 +351,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	})
 	require.NoError(t, err)
 
-	groupId, err := store.CreateFeatureGroup(ctx, metadata.CreateFeatureGroupOpt{
+	groupID, err := store.CreateFeatureGroup(ctx, metadata.CreateFeatureGroupOpt{
 		Name:        "device_info",
 		EntityID:    entityID,
 		Description: "description",
@@ -359,43 +359,43 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	})
 	require.NoError(t, err)
 	require.NoError(t, store.Refresh())
-	revisionId1, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	revisionID1, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  1000,
-		GroupID:   groupId,
+		GroupID:   groupID,
 		DataTable: stringPtr("device_info_1000"),
 		Anchored:  false,
 	})
 	require.NoError(t, err)
 
-	revisionId2, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	revisionID2, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:  2000,
-		GroupID:   groupId,
+		GroupID:   groupID,
 		DataTable: stringPtr("device_info_2000"),
 		Anchored:  false,
 	})
 	require.NoError(t, err)
 
 	require.NoError(t, store.Refresh())
-	group, err := store.GetFeatureGroup(ctx, groupId)
+	group, err := store.GetFeatureGroup(ctx, groupID)
 	require.NoError(t, err)
 
 	revision1 := &types.Revision{
-		ID:        revisionId1,
+		ID:        revisionID1,
 		Revision:  1000,
-		GroupID:   groupId,
+		GroupID:   groupID,
 		DataTable: "device_info_1000",
 		Anchored:  false,
 		Group:     group,
 	}
 
 	revision2 := &types.Revision{
-		ID:        revisionId2,
+		ID:        revisionID2,
 		Revision:  2000,
-		GroupID:   groupId,
+		GroupID:   groupID,
 		DataTable: "device_info_2000",
 		Anchored:  false,
 		Group:     group,
 	}
 
-	return entityID, groupId, []int{revisionId1, revisionId2}, types.RevisionList{revision1, revision2}
+	return entityID, groupID, []int{revisionID1, revisionID2}, types.RevisionList{revision1, revision2}
 }

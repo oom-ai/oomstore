@@ -45,7 +45,7 @@ func TestSync(t *testing.T) {
 		{
 			description: "the specific revision was synced to the online store, won't do it again this time",
 			opt: types.SyncOpt{
-				RevisionId: 1,
+				RevisionID: 1,
 			},
 			expectedError: fmt.Errorf("the specific revision was synced to the online store, won't do it again this time"),
 			mockFn: func() {
@@ -61,7 +61,7 @@ func TestSync(t *testing.T) {
 		{
 			description: "no previous revision, succeed",
 			opt: types.SyncOpt{
-				RevisionId: 1,
+				RevisionID: 1,
 			},
 			expectedError: nil,
 			mockFn: func() {
@@ -100,7 +100,7 @@ func TestSync(t *testing.T) {
 		{
 			description: "purge previous revision, succeed",
 			opt: types.SyncOpt{
-				RevisionId: 1,
+				RevisionID: 1,
 			},
 			expectedError: nil,
 			mockFn: func() {

@@ -33,7 +33,7 @@ func joinHistoricalFeatures(ctx context.Context, store *oomstore.OomStore, opt J
 	}
 
 	joinResult, err := store.GetHistoricalFeatureValues(ctx, types.GetHistoricalFeatureValuesOpt{
-		FeatureIDs: features.Ids(),
+		FeatureIDs: features.IDs(),
 		EntityRows: entityRows,
 	})
 	if err != nil {
