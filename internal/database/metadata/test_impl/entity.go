@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
@@ -14,17 +15,21 @@ func TestCreateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	opt := metadata.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "description",
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  "device",
+			Length:      32,
+			Description: "description",
+		},
 	}
 	_, err := store.CreateEntity(ctx, opt)
 	require.NoError(t, err)
 
 	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "description",
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  "device",
+			Length:      32,
+			Description: "description",
+		},
 	})
 	require.Equal(t, err, fmt.Errorf("entity device already exists"))
 }
@@ -34,9 +39,11 @@ func TestGetEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	opt := metadata.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "description",
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  "device",
+			Length:      32,
+			Description: "description",
+		},
 	}
 
 	id, err := store.CreateEntity(ctx, opt)
@@ -46,7 +53,7 @@ func TestGetEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	entity, err := store.GetEntity(ctx, id)
 	require.NoError(t, err)
-	require.Equal(t, opt.Name, entity.Name)
+	require.Equal(t, opt.EntityName, entity.Name)
 	require.Equal(t, opt.Length, entity.Length)
 	require.Equal(t, opt.Description, entity.Description)
 
@@ -59,9 +66,11 @@ func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	id, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "description",
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  "device",
+			Length:      32,
+			Description: "description",
+		},
 	})
 	require.NoError(t, err)
 
@@ -92,9 +101,11 @@ func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, 0, len(entitys))
 
 	_, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
-		Name:        "device",
-		Length:      32,
-		Description: "description",
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  "device",
+			Length:      32,
+			Description: "description",
+		},
 	})
 	require.NoError(t, err)
 
@@ -103,9 +114,11 @@ func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	entitys = store.ListEntity(ctx)
 	require.Equal(t, 1, len(entitys))
 	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
-		Name:        "user",
-		Length:      16,
-		Description: "description",
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  "user",
+			Length:      16,
+			Description: "description",
+		},
 	})
 	require.NoError(t, err)
 
