@@ -14,7 +14,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-var getOnlineFeatureOpt types.GetOnlineFeatureValuesOpt
+var onlineGetOpt types.OnlineGetOpt
 
 var getOnlineFeatureCmd = &cobra.Command{
 	Use:   "online-feature",
@@ -24,7 +24,7 @@ var getOnlineFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		featureValues, err := oomStore.GetOnlineFeatureValues(ctx, getOnlineFeatureOpt)
+		featureValues, err := oomStore.OnlineGet(ctx, onlineGetOpt)
 		if err != nil {
 			log.Fatalf("failed getting online features: %v", err)
 		}
@@ -40,10 +40,10 @@ func init() {
 
 	flags := getOnlineFeatureCmd.Flags()
 
-	flags.StringVarP(&getOnlineFeatureOpt.EntityKey, "entity-key", "k", "", "entity keys")
+	flags.StringVarP(&onlineGetOpt.EntityKey, "entity-key", "k", "", "entity keys")
 	_ = getOnlineFeatureCmd.MarkFlagRequired("entity")
 
-	flags.StringSliceVar(&getOnlineFeatureOpt.FeatureNames, "feature", nil, "feature names")
+	flags.StringSliceVar(&onlineGetOpt.FeatureNames, "feature", nil, "feature names")
 	_ = getOnlineFeatureCmd.MarkFlagRequired("feature")
 }
 
