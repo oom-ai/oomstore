@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"encoding/csv"
-	"fmt"
 	"io"
 	"time"
 
@@ -47,15 +46,14 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 	var revision int64
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		tmpTableName := dbutil.TempTable(opt.GroupName)
-		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, opt.Entity, opt.Features)
+		schema := dbutil.BuildFeatureDataTableSchema(opt.DataTableName, opt.Entity, opt.Features)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return err
 		}
 
 		// populate the data table
-		err = loadData(tx, ctx, opt.CsvReader, tmpTableName, opt.Header)
+		err = loadData(tx, ctx, opt.CsvReader, opt.DataTableName, opt.Header)
 		if err != nil {
 			return err
 		}
@@ -67,10 +65,7 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 			// generate revision using current timestamp
 			revision = time.Now().Unix()
 		}
-
-		rename := fmt.Sprintf("ALTER TABLE %s RENAME TO %s", tmpTableName, opt.DataTableName)
-		_, err = tx.ExecContext(ctx, rename)
-		return err
+		return nil
 	})
 	return revision, err
 }
