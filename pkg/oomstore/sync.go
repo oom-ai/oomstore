@@ -11,7 +11,10 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-// Move a certain feature group revision data from offline to online store
+// Sync a particular revision of a feature group from offline to online store.
+// It is a streaming process - it writes to online store while reading from offline store.
+// This helps get rid of unwanted out-of-memory errors,
+// where size of the particular revision outgrows memory limit of your machine.
 func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	revision, err := s.GetRevision(ctx, opt.RevisionID)
 	if err != nil {
