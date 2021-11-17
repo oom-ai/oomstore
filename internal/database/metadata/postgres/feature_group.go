@@ -18,11 +18,11 @@ func createFeatureGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt m
 	}
 	var featureGroupID int
 	query := "insert into feature_group(name, entity_id, category, description) values($1, $2, $3, $4) returning id"
-	err := sqlxCtx.GetContext(ctx, &featureGroupID, query, opt.Name, opt.EntityID, opt.Category, opt.Description)
+	err := sqlxCtx.GetContext(ctx, &featureGroupID, query, opt.GroupName, opt.EntityID, opt.Category, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
-				return 0, fmt.Errorf("feature group %s already exists", opt.Name)
+				return 0, fmt.Errorf("feature group %s already exists", opt.GroupName)
 			}
 		}
 	}
