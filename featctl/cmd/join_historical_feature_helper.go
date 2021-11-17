@@ -14,12 +14,12 @@ import (
 	"github.com/spf13/cast"
 )
 
-type JoinHistoricalFeaturesOpt struct {
+type JoinOpt struct {
 	InputFilePath string
 	FeatureNames  []string
 }
 
-func joinHistoricalFeatures(ctx context.Context, store *oomstore.OomStore, opt JoinHistoricalFeaturesOpt, output string) error {
+func join(ctx context.Context, store *oomstore.OomStore, opt JoinOpt, output string) error {
 	entityRows, err := getEntityRowsFromInputFile(opt.InputFilePath)
 	if err != nil {
 		return err
@@ -32,7 +32,7 @@ func joinHistoricalFeatures(ctx context.Context, store *oomstore.OomStore, opt J
 		return nil
 	}
 
-	joinResult, err := store.GetHistoricalFeatureValues(ctx, types.GetHistoricalFeatureValuesOpt{
+	joinResult, err := store.Join(ctx, types.JoinOpt{
 		FeatureIDs: features.IDs(),
 		EntityRows: entityRows,
 	})
@@ -40,7 +40,7 @@ func joinHistoricalFeatures(ctx context.Context, store *oomstore.OomStore, opt J
 		return err
 	}
 
-	if err := printJoinedHistoricalFeatures(joinResult, output); err != nil {
+	if err := printJoinResult(joinResult, output); err != nil {
 		return err
 	}
 
@@ -90,18 +90,18 @@ func getEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, e
 	return entityRows, nil
 }
 
-func printJoinedHistoricalFeatures(joinResult *types.JoinResult, output string) error {
+func printJoinResult(joinResult *types.JoinResult, output string) error {
 	switch output {
 	case CSV:
-		return printJoinedHistoricalFeaturesInCSV(joinResult)
+		return printJoinResultInCSV(joinResult)
 	case ASCIITable:
-		return printJoinedHistoricalFeaturesInASCIITable(joinResult)
+		return printJoinResultInASCIITable(joinResult)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
 }
 
-func printJoinedHistoricalFeaturesInCSV(joinResult *types.JoinResult) error {
+func printJoinResultInCSV(joinResult *types.JoinResult) error {
 	w := csv.NewWriter(os.Stdout)
 	defer w.Flush()
 	if err := w.Write(joinResult.Header); err != nil {
@@ -115,7 +115,7 @@ func printJoinedHistoricalFeaturesInCSV(joinResult *types.JoinResult) error {
 	return nil
 }
 
-func printJoinedHistoricalFeaturesInASCIITable(joinResult *types.JoinResult) error {
+func printJoinResultInASCIITable(joinResult *types.JoinResult) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(joinResult.Header)
 	table.SetAutoFormatHeaders(false)

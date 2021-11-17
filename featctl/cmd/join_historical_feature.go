@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var joinHistoricalFeatureOpt JoinHistoricalFeaturesOpt
+var joinHistoricalFeatureOpt JoinOpt
 var joinHistoricalFeatureOutput *string
 
 var joinHistoricalFeatureCmd = &cobra.Command{
@@ -23,7 +23,7 @@ var joinHistoricalFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if err := joinHistoricalFeatures(ctx, oomStore, joinHistoricalFeatureOpt, *joinHistoricalFeatureOutput); err != nil {
+		if err := join(ctx, oomStore, joinHistoricalFeatureOpt, *joinHistoricalFeatureOutput); err != nil {
 			log.Fatalf("failed joining historical features: %v\n", err)
 		}
 	},
