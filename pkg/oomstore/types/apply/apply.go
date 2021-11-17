@@ -9,6 +9,7 @@ type ApplyOpt struct {
 type Feature struct {
 	Kind        string `mapstructure:"kind"`
 	Name        string `mapstructure:"name"`
+	GroupID     int
 	GroupName   string `mapstructure:"group-name"`
 	DBValueType string `mapstructure:"db-type-value"`
 	Description string `mapstructure:"description"`

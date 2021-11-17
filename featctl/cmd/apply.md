@@ -8,22 +8,26 @@ apply 的效果是：接受一个资源（entity，group，feature）文件，�
 kind: Entity
 name: user
 length: 8
-description: a description
+description: entity user description
 batch-features:
 - group: device
-  description: a description
+  description: group device description
   features:
   - name: model
     db-type-value: varchar(16)
+    description: device model info
   - name: price
-    db_type_value: int
+    db-type-value: int
+    description: device price
 - group: user
-  description: a description
+  description: group user description
   features:
   - name: age
     db-type-value: int
+    description: user age
   - name: gender
     db-type-value: int
+    description: 'user gender'
 stream-features:
 - name: c
   db-type-value: xxx
@@ -38,6 +42,24 @@ name: account
 entity_name: user
 category: batch
 description: 'user account info'
+---
+kind: FeatureGroup
+name: account
+entity-name: user
+category: batch
+description: 'user account info'
+features:
+- name: model
+  db-type-value: varchar(16)
+  description: 'device info'
+- name: price
+  db-type-value: int
+---
+kind: Feature
+name: model
+group-name: device
+category: batch
+description: 'device info'
 ---
 ```
 
