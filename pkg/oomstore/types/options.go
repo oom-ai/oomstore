@@ -14,7 +14,7 @@ type CreateFeatureOpt struct {
 type ListFeatureOpt struct {
 	EntityName   *string
 	GroupName    *string
-	FeatureNames []string
+	FeatureNames *[]string
 }
 
 type UpdateFeatureOpt struct {
