@@ -40,7 +40,7 @@ type ExportFeatureValuesOpt struct {
 	Limit        *uint64
 }
 
-type ImportBatchFeaturesOpt struct {
+type ImportOpt struct {
 	GroupID     int
 	Description string
 	DataSource  CsvDataSource

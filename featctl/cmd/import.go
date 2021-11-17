@@ -11,7 +11,7 @@ import (
 )
 
 type importOption struct {
-	types.ImportBatchFeaturesOpt
+	types.ImportOpt
 	FilePath  string
 	groupName string
 }
@@ -46,7 +46,7 @@ var importCmd = &cobra.Command{
 		importOpt.DataSource.Reader = file
 
 		log.Println("importing features ...")
-		revisionID, err := oomStore.ImportBatchFeatures(ctx, importOpt.ImportBatchFeaturesOpt)
+		revisionID, err := oomStore.Import(ctx, importOpt.ImportOpt)
 		if err != nil {
 			log.Fatalf("failed importing features: %v\n", err)
 		}

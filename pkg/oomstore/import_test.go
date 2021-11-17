@@ -25,14 +25,14 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 
 	testCases := []struct {
 		description    string
-		opt            types.ImportBatchFeaturesOpt
+		opt            types.ImportOpt
 		mockFunc       func()
 		wantRevisionID int
 		wantError      error
 	}{
 		{
 			description: "ListFeature failed",
-			opt:         types.ImportBatchFeaturesOpt{GroupID: 1},
+			opt:         types.ImportOpt{GroupID: 1},
 			mockFunc: func() {
 				metadataStore.EXPECT().
 					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
@@ -43,7 +43,7 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 		},
 		{
 			description: "GetFeatureGroup failed",
-			opt:         types.ImportBatchFeaturesOpt{GroupID: 1},
+			opt:         types.ImportOpt{GroupID: 1},
 			mockFunc: func() {
 				metadataStore.EXPECT().
 					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
@@ -57,7 +57,7 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 		},
 		{
 			description: "GetEntity failed",
-			opt:         types.ImportBatchFeaturesOpt{GroupID: 1},
+			opt:         types.ImportOpt{GroupID: 1},
 			mockFunc: func() {
 				metadataStore.EXPECT().
 					ListFeature(gomock.Any(), gomock.Any()).
@@ -71,7 +71,7 @@ func TestImportBatchFeatureWithDependencyError(t *testing.T) {
 		},
 		{
 			description: "Create Revision failed",
-			opt: types.ImportBatchFeaturesOpt{
+			opt: types.ImportOpt{
 				DataSource: types.CsvDataSource{
 					Reader: strings.NewReader(`
 device,model,price
@@ -113,7 +113,7 @@ device,model,price
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			tc.mockFunc()
-			revisionID, err := store.ImportBatchFeatures(context.Background(), tc.opt)
+			revisionID, err := store.Import(context.Background(), tc.opt)
 			assert.Equal(t, tc.wantError, err)
 			assert.Equal(t, tc.wantRevisionID, revisionID)
 		})
@@ -132,7 +132,7 @@ func TestImportBatchFeatures(t *testing.T) {
 	testCases := []struct {
 		description string
 
-		opt        types.ImportBatchFeaturesOpt
+		opt        types.ImportOpt
 		features   types.FeatureList
 		entityID   int
 		Entity     types.Entity
@@ -142,7 +142,7 @@ func TestImportBatchFeatures(t *testing.T) {
 	}{
 		{
 			description: "import batch feature, succeed",
-			opt: types.ImportBatchFeaturesOpt{
+			opt: types.ImportOpt{
 				DataSource: types.CsvDataSource{
 					Reader: strings.NewReader(`device,model,price
 1234,xiaomi,200
@@ -167,7 +167,7 @@ func TestImportBatchFeatures(t *testing.T) {
 		},
 		{
 			description: "import batch feature, csv data source has duplicated columns",
-			opt: types.ImportBatchFeaturesOpt{
+			opt: types.ImportOpt{
 				GroupID: 1,
 				DataSource: types.CsvDataSource{
 					Reader: strings.NewReader(`
@@ -193,7 +193,7 @@ device,model,model
 		},
 		{
 			description: "import batch feature, csv header of the data source doesn't match the feature group schema",
-			opt: types.ImportBatchFeaturesOpt{
+			opt: types.ImportOpt{
 				DataSource: types.CsvDataSource{
 					Reader: strings.NewReader(`
 device,model,price
@@ -245,7 +245,7 @@ device,model,price
 				}).Return(nil).AnyTimes()
 			}
 
-			revisionID, err := store.ImportBatchFeatures(ctx, tc.opt)
+			revisionID, err := store.Import(ctx, tc.opt)
 			if tc.wantError != nil {
 				assert.EqualError(t, err, tc.wantError.Error())
 			} else {
