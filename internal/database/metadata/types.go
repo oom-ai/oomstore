@@ -19,7 +19,7 @@ type CreateFeatureOpt struct {
 }
 
 type CreateFeatureGroupOpt struct {
-	Name        string
+	GroupName   string
 	EntityID    int
 	Description string
 	Category    string
