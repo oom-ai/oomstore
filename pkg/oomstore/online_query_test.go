@@ -20,7 +20,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 	defer ctrl.Finish()
 	onlineStore := mock_online.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(onlineStore, nil, metadataStore)
+	store := oomstore.TEST__New(onlineStore, nil, metadataStore)
 
 	entityName := "device"
 	consistentFeatures := prepareFeatures(true, true)
@@ -109,7 +109,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 	onlineStore := mock_online.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
 
-	store := oomstore.NewOomStore(onlineStore, nil, metadataStore)
+	store := oomstore.TEST__New(onlineStore, nil, metadataStore)
 
 	entityName := "device"
 	consistentFeatures := prepareFeatures(true, true)

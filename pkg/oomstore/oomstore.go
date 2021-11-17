@@ -18,7 +18,7 @@ type OomStore struct {
 	metadata metadata.Store
 }
 
-func NewOomStore(online online.Store, offline offline.Store, metadata metadata.Store) *OomStore {
+func TEST__New(online online.Store, offline offline.Store, metadata metadata.Store) *OomStore {
 	return &OomStore{
 		online:   online,
 		offline:  offline,

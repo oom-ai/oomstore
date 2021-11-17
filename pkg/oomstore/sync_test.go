@@ -25,7 +25,7 @@ func TestSync(t *testing.T) {
 	onlineStore := mock_online.NewMockStore(ctrl)
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-	store := oomstore.NewOomStore(onlineStore, offlineStore, metadataStore)
+	store := oomstore.TEST__New(onlineStore, offlineStore, metadataStore)
 
 	features := types.FeatureList{
 		{
