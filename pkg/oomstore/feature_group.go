@@ -34,6 +34,14 @@ func (s *OomStore) ListFeatureGroup(ctx context.Context, entityID *int) types.Fe
 	return s.metadata.ListFeatureGroup(ctx, entityID)
 }
 
-func (s *OomStore) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
-	return s.metadata.UpdateFeatureGroup(ctx, opt)
+func (s *OomStore) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
+	group, err := s.metadata.GetFeatureGroupByName(ctx, opt.GroupName)
+	if err != nil {
+		return err
+	}
+	return s.metadata.UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
+		GroupID:             group.ID,
+		NewDescription:      opt.NewDescription,
+		NewOnlineRevisionID: opt.NewOnlineRevisionID,
+	})
 }

@@ -73,9 +73,9 @@ type UpdateEntityOpt struct {
 }
 
 type UpdateFeatureGroupOpt struct {
-	GroupName        string
-	Description      *string
-	OnlineRevisionID *int
+	GroupName           string
+	NewDescription      *string
+	NewOnlineRevisionID *int
 }
 
 type SyncOpt struct {
