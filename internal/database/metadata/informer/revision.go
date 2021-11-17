@@ -10,7 +10,7 @@ type RevisionCache struct {
 
 func (c *RevisionCache) Enrich(groupCache *GroupCache) {
 	for _, r := range c.RevisionList {
-		r.Group = groupCache.Find(func(g *types.FeatureGroup) bool {
+		r.Group = groupCache.Find(func(g *types.Group) bool {
 			return g.ID == r.GroupID
 		})
 	}

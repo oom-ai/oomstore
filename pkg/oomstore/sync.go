@@ -51,7 +51,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	}
 
 	// Update the online revision id of the feature group upon sync success
-	if err = s.metadata.UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
+	if err = s.metadata.UpdateGroup(ctx, metadata.UpdateGroupOpt{
 		GroupID:             group.ID,
 		NewOnlineRevisionID: &revision.ID,
 	}); err != nil {

@@ -21,7 +21,7 @@ type JoinOpt struct {
 	RevisionRangeMap map[string][]*metadata.RevisionRange
 }
 
-type JoinOneFeatureGroupOpt struct {
+type JoinOneGroupOpt struct {
 	GroupName           string
 	Features            types.FeatureList
 	RevisionRanges      []*metadata.RevisionRange

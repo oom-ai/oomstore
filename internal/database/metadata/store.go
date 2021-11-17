@@ -24,9 +24,9 @@ type ReadStore interface {
 	GetFeatureByName(ctx context.Context, name string) (*types.Feature, error)
 	ListFeature(ctx context.Context, opt ListFeatureOpt) types.FeatureList
 
-	GetFeatureGroup(ctx context.Context, id int) (*types.FeatureGroup, error)
-	GetFeatureGroupByName(ctx context.Context, name string) (*types.FeatureGroup, error)
-	ListFeatureGroup(ctx context.Context, entityID *int) types.FeatureGroupList
+	GetGroup(ctx context.Context, id int) (*types.Group, error)
+	GetGroupByName(ctx context.Context, name string) (*types.Group, error)
+	ListGroup(ctx context.Context, entityID *int) types.GroupList
 
 	GetRevision(ctx context.Context, id int) (*types.Revision, error)
 	GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error)
@@ -46,8 +46,8 @@ type WriteStore interface {
 	UpdateFeature(ctx context.Context, opt UpdateFeatureOpt) error
 
 	// feature group
-	CreateFeatureGroup(ctx context.Context, opt CreateFeatureGroupOpt) (int, error)
-	UpdateFeatureGroup(ctx context.Context, opt UpdateFeatureGroupOpt) error
+	CreateGroup(ctx context.Context, opt CreateGroupOpt) (int, error)
+	UpdateGroup(ctx context.Context, opt UpdateGroupOpt) error
 
 	// revision
 	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int, string, error)

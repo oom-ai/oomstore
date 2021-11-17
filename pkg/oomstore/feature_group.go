@@ -7,12 +7,12 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (s *OomStore) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatureGroupOpt) (int, error) {
+func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (int, error) {
 	entity, err := s.metadata.GetEntityByName(ctx, opt.EntityName)
 	if err != nil {
 		return 0, err
 	}
-	return s.metadata.CreateFeatureGroup(ctx, metadata.CreateFeatureGroupOpt{
+	return s.metadata.CreateGroup(ctx, metadata.CreateGroupOpt{
 		GroupName:   opt.GroupName,
 		EntityID:    entity.ID,
 		Description: opt.Description,
@@ -22,24 +22,24 @@ func (s *OomStore) CreateFeatureGroup(ctx context.Context, opt types.CreateFeatu
 	})
 }
 
-func (s *OomStore) GetFeatureGroup(ctx context.Context, id int) (*types.FeatureGroup, error) {
-	return s.metadata.GetFeatureGroup(ctx, id)
+func (s *OomStore) GetGroup(ctx context.Context, id int) (*types.Group, error) {
+	return s.metadata.GetGroup(ctx, id)
 }
 
-func (s *OomStore) GetFeatureGroupByName(ctx context.Context, name string) (*types.FeatureGroup, error) {
-	return s.metadata.GetFeatureGroupByName(ctx, name)
+func (s *OomStore) GetGroupByName(ctx context.Context, name string) (*types.Group, error) {
+	return s.metadata.GetGroupByName(ctx, name)
 }
 
-func (s *OomStore) ListFeatureGroup(ctx context.Context, entityID *int) types.FeatureGroupList {
-	return s.metadata.ListFeatureGroup(ctx, entityID)
+func (s *OomStore) ListGroup(ctx context.Context, entityID *int) types.GroupList {
+	return s.metadata.ListGroup(ctx, entityID)
 }
 
-func (s *OomStore) UpdateFeatureGroup(ctx context.Context, opt types.UpdateFeatureGroupOpt) error {
-	group, err := s.metadata.GetFeatureGroupByName(ctx, opt.GroupName)
+func (s *OomStore) UpdateGroup(ctx context.Context, opt types.UpdateGroupOpt) error {
+	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return err
 	}
-	return s.metadata.UpdateFeatureGroup(ctx, metadata.UpdateFeatureGroupOpt{
+	return s.metadata.UpdateGroup(ctx, metadata.UpdateGroupOpt{
 		GroupID:             group.ID,
 		NewDescription:      opt.NewDescription,
 		NewOnlineRevisionID: opt.NewOnlineRevisionID,

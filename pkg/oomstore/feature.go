@@ -28,7 +28,7 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 		metadataOpt.EntityID = &entity.ID
 	}
 	if opt.GroupName != nil {
-		group, err := s.metadata.GetFeatureGroupByName(ctx, *opt.GroupName)
+		group, err := s.metadata.GetGroupByName(ctx, *opt.GroupName)
 		if err != nil {
 			return nil, err
 		}
@@ -49,7 +49,7 @@ func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt
 }
 
 func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatureOpt) (int, error) {
-	group, err := s.metadata.GetFeatureGroup(ctx, opt.GroupID)
+	group, err := s.metadata.GetGroup(ctx, opt.GroupID)
 	if err != nil {
 		return 0, err
 	}

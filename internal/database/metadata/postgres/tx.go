@@ -14,12 +14,12 @@ func (tx *Tx) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) er
 	return updateEntity(ctx, tx, opt)
 }
 
-func (tx *Tx) CreateFeatureGroup(ctx context.Context, opt metadata.CreateFeatureGroupOpt) (int, error) {
-	return createFeatureGroup(ctx, tx, opt)
+func (tx *Tx) CreateGroup(ctx context.Context, opt metadata.CreateGroupOpt) (int, error) {
+	return createGroup(ctx, tx, opt)
 }
 
-func (tx *Tx) UpdateFeatureGroup(ctx context.Context, opt metadata.UpdateFeatureGroupOpt) error {
-	return updateFeatureGroup(ctx, tx, opt)
+func (tx *Tx) UpdateGroup(ctx context.Context, opt metadata.UpdateGroupOpt) error {
+	return updateGroup(ctx, tx, opt)
 }
 
 func (tx *Tx) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {

@@ -21,7 +21,7 @@ func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Sto
 	})
 	require.NoError(t, err)
 
-	groupID, err := store.CreateFeatureGroup(ctx, metadata.CreateFeatureGroupOpt{
+	groupID, err := store.CreateGroup(ctx, metadata.CreateGroupOpt{
 		GroupName:   "device_info",
 		EntityID:    entityID,
 		Description: "description",

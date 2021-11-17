@@ -75,7 +75,7 @@ func TestExportFeatureValues(t *testing.T) {
 				ID:        1,
 				GroupID:   1,
 				DataTable: "device_info_10",
-				Group: &types.FeatureGroup{
+				Group: &types.Group{
 					Name:     "device_info",
 					ID:       1,
 					EntityID: 1,
@@ -84,7 +84,7 @@ func TestExportFeatureValues(t *testing.T) {
 			}
 
 			metadataStore.EXPECT().GetRevision(ctx, tc.opt.RevisionID).Return(&revision, nil)
-			metadataStore.EXPECT().GetFeatureGroupByName(ctx, "device_info").Return(&types.FeatureGroup{
+			metadataStore.EXPECT().GetGroupByName(ctx, "device_info").Return(&types.Group{
 				Name: "device_info",
 				ID:   1,
 			}, nil)

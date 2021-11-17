@@ -28,7 +28,7 @@ type CreateEntityOpt struct {
 	Description string
 }
 
-type CreateFeatureGroupOpt struct {
+type CreateGroupOpt struct {
 	GroupName   string
 	EntityName  string
 	Description string
@@ -72,7 +72,7 @@ type UpdateEntityOpt struct {
 	NewDescription string
 }
 
-type UpdateFeatureGroupOpt struct {
+type UpdateGroupOpt struct {
 	GroupName           string
 	NewDescription      *string
 	NewOnlineRevisionID *int
