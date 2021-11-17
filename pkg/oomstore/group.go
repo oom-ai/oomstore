@@ -7,6 +7,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
+// Create meetadata of a feature group.
 func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (int, error) {
 	entity, err := s.metadata.GetEntityByName(ctx, opt.EntityName)
 	if err != nil {
@@ -22,18 +23,22 @@ func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (i
 	})
 }
 
+// Get metadata of a feature group by ID.
 func (s *OomStore) GetGroup(ctx context.Context, id int) (*types.Group, error) {
 	return s.metadata.GetGroup(ctx, id)
 }
 
+// Get metadata of a feature group by name.
 func (s *OomStore) GetGroupByName(ctx context.Context, name string) (*types.Group, error) {
 	return s.metadata.GetGroupByName(ctx, name)
 }
 
+// List metadata of feature groups under the same entity.
 func (s *OomStore) ListGroup(ctx context.Context, entityID *int) types.GroupList {
 	return s.metadata.ListGroup(ctx, entityID)
 }
 
+// Update metadata of a feature group.
 func (s *OomStore) UpdateGroup(ctx context.Context, opt types.UpdateGroupOpt) error {
 	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
