@@ -39,11 +39,11 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 				return err
 			}
 
-			featureId, err := SerializeByValue(opt.FeatureList[i].ID)
+			featureID, err := SerializeByValue(opt.FeatureList[i].ID)
 			if err != nil {
 				return err
 			}
-			featureValues[featureId] = featureValue
+			featureValues[featureID] = featureValue
 		}
 
 		pipe.HSet(ctx, key, featureValues)

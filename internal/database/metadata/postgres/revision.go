@@ -17,20 +17,20 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 		dataTable = *opt.DataTable
 	}
 
-	var revisionId int
+	var revisionID int
 	insertQuery := "INSERT INTO feature_group_revision(group_id, revision, data_table, anchored, description) VALUES ($1, $2, $3, $4, $5) RETURNING id"
-	if err := sqlxCtx.GetContext(ctx, &revisionId, insertQuery, opt.GroupID, opt.Revision, dataTable, opt.Anchored, opt.Description); err != nil {
+	if err := sqlxCtx.GetContext(ctx, &revisionID, insertQuery, opt.GroupID, opt.Revision, dataTable, opt.Anchored, opt.Description); err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
-				return 0, "", fmt.Errorf("revision already exists: groupId=%d, revision=%d", opt.GroupID, opt.Revision)
+				return 0, "", fmt.Errorf("revision already exists: groupID=%d, revision=%d", opt.GroupID, opt.Revision)
 			}
 		}
 		return 0, "", err
 	}
 	if opt.DataTable == nil {
 		updateQuery := "UPDATE feature_group_revision SET data_table = $1 WHERE id = $2"
-		dataTable = fmt.Sprintf("data_%d_%d", opt.GroupID, revisionId)
-		result, err := sqlxCtx.ExecContext(ctx, updateQuery, dataTable, revisionId)
+		dataTable = fmt.Sprintf("data_%d_%d", opt.GroupID, revisionID)
+		result, err := sqlxCtx.ExecContext(ctx, updateQuery, dataTable, revisionID)
 		if err != nil {
 			return 0, "", err
 		}
@@ -39,11 +39,11 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 			return 0, "", err
 		}
 		if rowsAffected != 1 {
-			return 0, "", fmt.Errorf("failed to update revision %d: revision not found", revisionId)
+			return 0, "", fmt.Errorf("failed to update revision %d: revision not found", revisionID)
 		}
 	}
 
-	return revisionId, dataTable, nil
+	return revisionID, dataTable, nil
 }
 
 // UpdateRevision = MustUpdateRevision

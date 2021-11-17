@@ -75,15 +75,15 @@ type UpdateEntityOpt struct {
 type UpdateFeatureGroupOpt struct {
 	GroupName        string
 	Description      *string
-	OnlineRevisionId *int
+	OnlineRevisionID *int
 }
 
 type SyncOpt struct {
-	RevisionId int
+	RevisionID int
 }
 
 type GetRevisionOpt struct {
 	GroupName  *string
 	Revision   *int64
-	RevisionId *int
+	RevisionID *int
 }

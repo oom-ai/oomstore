@@ -16,9 +16,9 @@ func createFeatureGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt m
 	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
 		return 0, fmt.Errorf("illegal category '%s', should be either 'stream' or 'batch'", opt.Category)
 	}
-	var featureGroupId int
+	var featureGroupID int
 	query := "insert into feature_group(name, entity_id, category, description) values($1, $2, $3, $4) returning id"
-	err := sqlxCtx.GetContext(ctx, &featureGroupId, query, opt.Name, opt.EntityID, opt.Category, opt.Description)
+	err := sqlxCtx.GetContext(ctx, &featureGroupID, query, opt.Name, opt.EntityID, opt.Category, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
@@ -26,7 +26,7 @@ func createFeatureGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt m
 			}
 		}
 	}
-	return featureGroupId, err
+	return featureGroupID, err
 }
 
 func updateFeatureGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateFeatureGroupOpt) error {
