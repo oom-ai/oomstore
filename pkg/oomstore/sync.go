@@ -24,7 +24,9 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		return fmt.Errorf("the specific revision was synced to the online store, won't do it again this time")
 	}
 
-	features := s.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &group.ID})
+	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
+		GroupName: &group.Name,
+	})
 	if err != nil {
 		return err
 	}
