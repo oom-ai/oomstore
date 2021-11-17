@@ -30,7 +30,7 @@ type ReadStore interface {
 
 	GetRevision(ctx context.Context, id int) (*types.Revision, error)
 	GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error)
-	ListRevision(ctx context.Context, opt ListRevisionOpt) types.RevisionList
+	ListRevision(ctx context.Context, groupID *int) types.RevisionList
 
 	// refresh
 	Refresh() error

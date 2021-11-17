@@ -275,17 +275,17 @@ func (mr *MockStoreMockRecorder) ListFeatureGroup(ctx, entityID interface{}) *go
 }
 
 // ListRevision mocks base method.
-func (m *MockStore) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) types.RevisionList {
+func (m *MockStore) ListRevision(ctx context.Context, groupID *int) types.RevisionList {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListRevision", ctx, opt)
+	ret := m.ctrl.Call(m, "ListRevision", ctx, groupID)
 	ret0, _ := ret[0].(types.RevisionList)
 	return ret0
 }
 
 // ListRevision indicates an expected call of ListRevision.
-func (mr *MockStoreMockRecorder) ListRevision(ctx, opt interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) ListRevision(ctx, groupID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRevision", reflect.TypeOf((*MockStore)(nil).ListRevision), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRevision", reflect.TypeOf((*MockStore)(nil).ListRevision), ctx, groupID)
 }
 
 // Refresh mocks base method.
@@ -558,17 +558,17 @@ func (mr *MockReadStoreMockRecorder) ListFeatureGroup(ctx, entityID interface{})
 }
 
 // ListRevision mocks base method.
-func (m *MockReadStore) ListRevision(ctx context.Context, opt metadata.ListRevisionOpt) types.RevisionList {
+func (m *MockReadStore) ListRevision(ctx context.Context, groupID *int) types.RevisionList {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListRevision", ctx, opt)
+	ret := m.ctrl.Call(m, "ListRevision", ctx, groupID)
 	ret0, _ := ret[0].(types.RevisionList)
 	return ret0
 }
 
 // ListRevision indicates an expected call of ListRevision.
-func (mr *MockReadStoreMockRecorder) ListRevision(ctx, opt interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) ListRevision(ctx, groupID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRevision", reflect.TypeOf((*MockReadStore)(nil).ListRevision), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRevision", reflect.TypeOf((*MockReadStore)(nil).ListRevision), ctx, groupID)
 }
 
 // Refresh mocks base method.
