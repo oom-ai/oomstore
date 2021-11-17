@@ -16,9 +16,10 @@ type Feature struct {
 }
 
 type FeatureGroup struct {
-	Kind        string    `mapstructure:"kind"`
-	Group       string    `mapstructure:"group"`
-	Name        string    `mapstructure:"name"`
+	Kind        string `mapstructure:"kind"`
+	Group       string `mapstructure:"group"`
+	Name        string `mapstructure:"name"`
+	EntityID    int
 	EntityName  string    `mapstructure:"entity_name"`
 	Category    string    `mapstructure:"category"`
 	Description string    `mapstructure:"description"`
