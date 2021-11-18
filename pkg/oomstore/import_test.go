@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestImportBatchFeatureWithDependencyError(t *testing.T) {
+func TestImportWithDependencyError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -120,7 +120,7 @@ device,model,price
 	}
 }
 
-func TestImportBatchFeatures(t *testing.T) {
+func TestImport(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
