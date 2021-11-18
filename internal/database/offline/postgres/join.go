@@ -125,9 +125,6 @@ func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, t
 	if err != nil {
 		return nil, err
 	}
-	if err := db.dropTemporaryTables(ctx, tableNames); err != nil {
-		return nil, err
-	}
 	header, err := rows.Columns()
 	if err != nil {
 		return nil, err
