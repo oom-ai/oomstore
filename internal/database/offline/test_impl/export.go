@@ -14,7 +14,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	dataTable := "data_1_1"
+	dataTable := "offline_1_1"
 	features := []*types.Feature{
 		{
 			Name:        "model",

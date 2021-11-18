@@ -20,7 +20,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		Name:   "device",
 		Length: 16,
 	}
-	dataTable := "data_1_1"
+	dataTable := "offline_1_1"
 
 	opt := offline.ImportOpt{
 		Entity:        &entity,
