@@ -12,8 +12,8 @@ import (
 	"github.com/spf13/cast"
 )
 
-func export(ctx context.Context, store *oomstore.OomStore, opt types.ExportFeatureValuesOpt, output string) error {
-	fields, stream, err := store.ExportFeatureValues(ctx, opt)
+func export(ctx context.Context, store *oomstore.OomStore, opt types.ExportOpt, output string) error {
+	fields, stream, err := store.Export(ctx, opt)
 	if err != nil {
 		return err
 	}

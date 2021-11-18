@@ -34,7 +34,7 @@ type CreateGroupOpt struct {
 	Description string
 }
 
-type ExportFeatureValuesOpt struct {
+type ExportOpt struct {
 	RevisionID   int
 	FeatureNames []string
 	Limit        *uint64

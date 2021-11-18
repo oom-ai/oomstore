@@ -9,7 +9,7 @@ import (
 )
 
 var exportOutput *string
-var exportOpt types.ExportFeatureValuesOpt
+var exportOpt types.ExportOpt
 
 var exportCmd = &cobra.Command{
 	Use:   "export",
