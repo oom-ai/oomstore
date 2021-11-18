@@ -234,7 +234,7 @@ device,model,price
 				Revision:    0,
 				GroupID:     tc.opt.GroupID,
 				Description: tc.opt.Description,
-			}).Return(tc.revisionID, "data_1_1", nil).AnyTimes()
+			}).Return(tc.revisionID, "offline_1_1", nil).AnyTimes()
 
 			offlineStore.EXPECT().Import(ctx, gomock.Any()).Return(int64(1000), nil).AnyTimes()
 

@@ -49,7 +49,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		}
 
 		// rename the tmp table to final table
-		finalTableName := getOnlineBatchTableName(opt.Revision.ID)
+		finalTableName := getOnlineTableName(opt.Revision.ID)
 		rename := fmt.Sprintf(`ALTER TABLE "%s" RENAME TO "%s"`, tmpTableName, finalTableName)
 		_, err = tx.ExecContext(ctx, rename)
 		return err
@@ -57,6 +57,6 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	return err
 }
 
-func getOnlineBatchTableName(revisionID int) string {
-	return fmt.Sprintf("batch_%d", revisionID)
+func getOnlineTableName(revisionID int) string {
+	return fmt.Sprintf("online_%d", revisionID)
 }
