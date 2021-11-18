@@ -8,6 +8,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
+// Export feature values of a particular revision.
 func (s *OomStore) ExportFeatureValues(ctx context.Context, opt types.ExportFeatureValuesOpt) ([]string, <-chan *types.RawFeatureValueRecord, error) {
 	revision, err := s.GetRevision(ctx, opt.RevisionID)
 	if err != nil {
