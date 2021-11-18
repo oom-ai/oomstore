@@ -127,8 +127,8 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "no available features, return nil",
 			opt: types.OnlineMultiGetOpt{
-				FeatureIDs: unavailableFeatures.IDs(),
-				EntityKeys: []string{"1234", "1235"},
+				FeatureNames: unavailableFeatures.Names(),
+				EntityKeys:   []string{"1234", "1235"},
 			},
 			features:      unavailableFeatures,
 			expectedError: nil,
@@ -137,8 +137,8 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "inconsistent entity type, fail",
 			opt: types.OnlineMultiGetOpt{
-				FeatureIDs: inconsistentFeatures.IDs(),
-				EntityKeys: []string{"1234", "1235"},
+				FeatureNames: inconsistentFeatures.Names(),
+				EntityKeys:   []string{"1234", "1235"},
 			},
 			features:      inconsistentFeatures,
 			expectedError: fmt.Errorf("expected 1 entity, got 2 entities"),
@@ -147,8 +147,8 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.OnlineMultiGetOpt{
-				FeatureIDs: consistentFeatures.IDs(),
-				EntityKeys: []string{"1234", "1235"},
+				FeatureNames: consistentFeatures.Names(),
+				EntityKeys:   []string{"1234", "1235"},
 			},
 			features:      consistentFeatures,
 			entityName:    &entityName,
@@ -180,7 +180,7 @@ func TestMultiGetOnlineFeatureValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureIDs: &tc.opt.FeatureIDs}).Return(tc.features)
+			metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureNames: &tc.opt.FeatureNames}).Return(tc.features)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().MultiGet(gomock.Any(), gomock.Any()).Return(map[string]dbutil.RowMap{
 					"1234": {
