@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetOnlineFeatureValues(t *testing.T) {
+func TestOnlineGet(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	onlineStore := mock_online.NewMockStore(ctrl)
@@ -103,7 +103,7 @@ func TestGetOnlineFeatureValues(t *testing.T) {
 	}
 }
 
-func TestMultiGetOnlineFeatureValues(t *testing.T) {
+func TestOnlineMultiGet(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	onlineStore := mock_online.NewMockStore(ctrl)

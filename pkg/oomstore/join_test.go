@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetHistoricalFeatureValues(t *testing.T) {
+func TestJoin(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	offlineStore := mock_offline.NewMockStore(ctrl)
