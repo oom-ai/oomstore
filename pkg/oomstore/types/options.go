@@ -41,7 +41,7 @@ type ExportFeatureValuesOpt struct {
 }
 
 type ImportOpt struct {
-	GroupID     int
+	GroupName   string
 	Description string
 	DataSource  CsvDataSource
 	Revision    *int64
