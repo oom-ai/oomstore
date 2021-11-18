@@ -3,159 +3,137 @@ package oomstore
 import (
 	"context"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 	"gopkg.in/yaml.v3"
+
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 )
 
 func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
-	data := make(map[string]interface{})
-	if err := yaml.NewDecoder(opt.R).Decode(data); err != nil {
+	stage, err := buildApplyStage(ctx, opt)
+	if err != nil {
 		return err
 	}
 
-	var kind string
-	if k, ok := data["kind"]; ok {
-		kind = k.(string)
-	} else {
-		return fmt.Errorf("Invalid data missing variable kind")
-	}
+	return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.WriteStore) error {
+		var (
+			entityMp = make(map[string]int) // entity name -> entity id
+			groupMp  = make(map[string]int) // group name -> group id
+		)
 
-	switch strings.ToLower(kind) {
-	case "entity":
-		var entity apply.Entity
-		if err := mapstructure.Decode(data, &entity); err != nil {
-			return err
-		}
-		return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.WriteStore) error {
-			return s.applyEntity(ctx, tx, entity)
-		})
-	case "feature":
-		var feature apply.Feature
-		if err := mapstructure.Decode(data, &feature); err != nil {
-			return err
+		// apply entity
+		for _, entity := range stage.NewEntities {
+			if entityMp[entity.Name], err = s.applyEntity(ctx, tx, entity); err != nil {
+				return err
+			}
 		}
 
-		group, err := s.metadata.GetGroupByName(ctx, feature.GroupName)
-		if err != nil {
-			return err
-		}
-		feature.GroupID = group.ID
+		// apply group
+		for _, group := range stage.NewGroups {
+			if _, exist := entityMp[group.EntityName]; !exist {
+				var entity *types.Entity
+				if entity, err = s.metadata.GetEntityByName(c, group.EntityName); err != nil {
+					return err
+				}
+				entityMp[group.EntityName] = entity.ID
+			}
 
-		return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.WriteStore) error {
-			return s.applyFeature(ctx, tx, feature)
-		})
-	case "featuregroup", "group":
-		var group apply.FeatureGroup
-		if err := mapstructure.Decode(data, &group); err != nil {
-			return err
+			group.EntityID = entityMp[group.EntityName]
+			group.Category = types.BatchFeatureCategory
+			if groupMp[group.Name], err = s.applyGroup(ctx, tx, group); err != nil {
+				return err
+			}
 		}
-		entity, err := s.metadata.GetEntityByName(ctx, group.EntityName)
-		if err != nil {
-			return err
-		}
-		group.EntityID = entity.ID
 
-		return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.WriteStore) error {
-			return s.applyGroup(ctx, tx, group)
-		})
-	default:
-		return fmt.Errorf("invalid kind %s", kind)
-	}
+		// apply feature
+		for _, feature := range stage.NewFeatures {
+			if _, exist := groupMp[feature.GroupName]; !exist {
+				var group *types.Group
+				if group, err = s.metadata.GetGroupByName(ctx, feature.GroupName); err != nil {
+					return err
+				}
+				groupMp[feature.GroupName] = group.ID
+			}
+
+			feature.GroupID = groupMp[feature.GroupName]
+			if err := s.applyFeature(ctx, tx, feature); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
-func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore, newEntity apply.Entity) error {
+func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore, newEntity apply.Entity) (int, error) {
 	entityExist := true
 
 	entity, err := s.metadata.GetEntityByName(ctx, newEntity.Name)
 	if err != nil {
 		if err.Error() != fmt.Sprintf("feature entity '%s' not found", newEntity.Name) {
-			return err
+			return 0, err
 		}
 		entityExist = false
 	}
 
-	var entityID int
 	if !entityExist {
-		if entityID, err = txStore.CreateEntity(ctx, metadata.CreateEntityOpt{
+		return txStore.CreateEntity(ctx, metadata.CreateEntityOpt{
 			CreateEntityOpt: types.CreateEntityOpt{
 				EntityName:  newEntity.Name,
 				Length:      newEntity.Length,
 				Description: newEntity.Description,
 			},
-		}); err != nil {
-			return err
-		}
-	} else {
-		entityID = entity.ID
-		if newEntity.Description != entity.Description {
-			if err = txStore.UpdateEntity(ctx, metadata.UpdateEntityOpt{
-				EntityID:       entityID,
-				NewDescription: newEntity.Description,
-			}); err != nil {
-				return err
-			}
+		})
+	}
+
+	if newEntity.Description != entity.Description {
+		err = txStore.UpdateEntity(ctx, metadata.UpdateEntityOpt{
+			EntityID:       entity.ID,
+			NewDescription: newEntity.Description,
+		})
+		if err != nil {
+			return 0, err
 		}
 	}
 
-	if len(newEntity.BatchFeatures) != 0 {
-		for _, batchFeature := range newEntity.BatchFeatures {
-			batchFeature.EntityID = entityID
-			batchFeature.Category = types.BatchFeatureCategory
-			batchFeature.Name = batchFeature.Group
-			if err = s.applyGroup(ctx, txStore, batchFeature); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
+	return entity.ID, nil
 }
 
-func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, newGroup apply.FeatureGroup) error {
+func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, newGroup apply.Group) (int, error) {
 	groupExist := true
 
 	group, err := s.metadata.GetGroupByName(ctx, newGroup.Name)
 	if err != nil {
 		if err.Error() != fmt.Sprintf("feature group '%s' not found", newGroup.Name) {
-			return err
+			return 0, err
 		}
 		groupExist = false
 	}
 
-	var groupID int
 	if !groupExist {
-		if groupID, err = txStore.CreateGroup(ctx, metadata.CreateGroupOpt{
+		return txStore.CreateGroup(ctx, metadata.CreateGroupOpt{
 			GroupName:   newGroup.Name,
 			EntityID:    newGroup.EntityID,
 			Category:    newGroup.Category,
 			Description: newGroup.Description,
-		}); err != nil {
-			return err
-		}
-	} else {
-		groupID = group.ID
-		if newGroup.Description != group.Description {
-			if err = txStore.UpdateGroup(ctx, metadata.UpdateGroupOpt{
-				GroupID:        groupID,
-				NewDescription: &newGroup.Description,
-			}); err != nil {
-				return err
-			}
-		}
+		})
 	}
 
-	if len(newGroup.Features) != 0 {
-		for _, feature := range newGroup.Features {
-			feature.GroupID = groupID
-			if err = s.applyFeature(ctx, txStore, feature); err != nil {
-				return err
-			}
+	if newGroup.Description != group.Description {
+		err = txStore.UpdateGroup(ctx, metadata.UpdateGroupOpt{
+			GroupID:        group.ID,
+			NewDescription: &newGroup.Description,
+		})
+		if err != nil {
+			return 0, err
 		}
+
 	}
-	return nil
+	return group.ID, nil
 }
 
 func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.WriteStore, newFeature apply.Feature) error {
@@ -192,4 +170,72 @@ func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.WriteStore
 		})
 	}
 	return nil
+}
+
+func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage, error) {
+	var (
+		status = apply.NewApplyStage()
+	)
+
+	decoder := yaml.NewDecoder(opt.R)
+	for {
+		data := make(map[string]interface{})
+		if err := decoder.Decode(data); err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				return nil, err
+			}
+		}
+
+		var kind string
+		if k, ok := data["kind"]; ok {
+			kind = k.(string)
+		} else {
+			return nil, fmt.Errorf("invalid yaml: missing kind")
+		}
+
+		switch strings.ToLower(kind) {
+		case "entity":
+			var entity apply.Entity
+			if err := mapstructure.Decode(data, &entity); err != nil {
+				return nil, err
+			}
+
+			status.NewEntities = append(status.NewEntities, entity)
+			for _, group := range entity.BatchFeatures {
+				group.EntityName = entity.Name
+				group.Name = group.Group
+
+				status.NewGroups = append(status.NewGroups, group)
+				for _, feature := range group.Features {
+					feature.GroupName = group.Group
+					status.NewFeatures = append(status.NewFeatures, feature)
+				}
+			}
+		case "group":
+			var group apply.Group
+			if err := mapstructure.Decode(data, &group); err != nil {
+				return nil, err
+			}
+
+			group.Group = group.Name
+			status.NewGroups = append(status.NewGroups, group)
+			for _, feature := range group.Features {
+				feature.GroupName = group.Name
+				status.NewFeatures = append(status.NewFeatures, feature)
+			}
+
+		case "feature":
+			var feature apply.Feature
+			if err := mapstructure.Decode(data, &feature); err != nil {
+				return nil, err
+			}
+			status.NewFeatures = append(status.NewFeatures, feature)
+
+		default:
+			return nil, fmt.Errorf("invalid kind '%s'", kind)
+		}
+	}
+	return status, nil
 }

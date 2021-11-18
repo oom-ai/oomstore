@@ -36,13 +36,13 @@ description: 'User ID'
 ---
 kind: FeatureGroup
 name: account
-entity_name: user
+entity-name: user
 category: batch
 description: 'user account info'
 ---
 kind: FeatureGroup
 name: user-device
-entity_name: device
+entity-name: device
 category: batch
 description: 'phone info'
 features:
