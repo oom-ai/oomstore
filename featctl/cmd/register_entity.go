@@ -11,7 +11,7 @@ import (
 var registerEntityOpt types.CreateEntityOpt
 
 var registerEntityCmd = &cobra.Command{
-	Use:   "entity",
+	Use:   "entity <entity_name>",
 	Short: "register a new entity",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {

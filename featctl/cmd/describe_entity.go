@@ -9,7 +9,7 @@ import (
 )
 
 var describeEntityCmd = &cobra.Command{
-	Use:   "entity",
+	Use:   "entity <entity_name>",
 	Short: "show details of a specific entity",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
