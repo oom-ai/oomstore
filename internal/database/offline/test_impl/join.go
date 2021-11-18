@@ -24,15 +24,15 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	oneGroupFeatures, oneGroupFeatureMap := prepareFeatures(true)
 	twoGroupFeatures, twoGroupFeatureMap := prepareFeatures(false)
 
-	buildTestDataTable(ctx, t, store, oneGroupFeatures, "data_1_1", csv.NewReader(strings.NewReader(`
+	buildTestDataTable(ctx, t, store, oneGroupFeatures, "offline_1_1", csv.NewReader(strings.NewReader(`
 1234,xiaomi,100
 1235,apple,200
 `)))
-	buildTestDataTable(ctx, t, store, oneGroupFeatures, "data_1_2", csv.NewReader(strings.NewReader(`
+	buildTestDataTable(ctx, t, store, oneGroupFeatures, "offline_1_2", csv.NewReader(strings.NewReader(`
 1234,galaxy,300
 1235,oneplus,240
 `)))
-	buildTestDataTable(ctx, t, store, twoGroupFeatures[2:], "data_2_1", csv.NewReader(strings.NewReader(`
+	buildTestDataTable(ctx, t, store, twoGroupFeatures[2:], "offline_2_1", csv.NewReader(strings.NewReader(`
 1234,true
 1235,false
 `)))
@@ -138,19 +138,19 @@ func prepareRevisionRanges(oneGroup bool) map[string][]*metadata.RevisionRange {
 		{
 			MinRevision: 1,
 			MaxRevision: 15,
-			DataTable:   "data_1_1",
+			DataTable:   "offline_1_1",
 		},
 		{
 			MinRevision: 15,
 			MaxRevision: 25,
-			DataTable:   "data_1_2",
+			DataTable:   "offline_1_2",
 		},
 	}
 	advanced := []*metadata.RevisionRange{
 		{
 			MinRevision: 5,
 			MaxRevision: math.MaxInt64,
-			DataTable:   "data_2_1",
+			DataTable:   "offline_2_1",
 		},
 	}
 	if oneGroup {
