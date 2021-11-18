@@ -37,13 +37,13 @@ func TestExport(t *testing.T) {
 
 	testCases := []struct {
 		description string
-		opt         types.ExportFeatureValuesOpt
+		opt         types.ExportOpt
 		stream      <-chan *types.RawFeatureValueRecord
 		expected    [][]interface{}
 	}{
 		{
 			description: "no features",
-			opt: types.ExportFeatureValuesOpt{
+			opt: types.ExportOpt{
 				FeatureNames: []string{},
 				RevisionID:   revisionID,
 			},
@@ -52,7 +52,7 @@ func TestExport(t *testing.T) {
 		},
 		{
 			description: "provide one feature",
-			opt: types.ExportFeatureValuesOpt{
+			opt: types.ExportOpt{
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
@@ -61,7 +61,7 @@ func TestExport(t *testing.T) {
 		},
 		{
 			description: "provide revision",
-			opt: types.ExportFeatureValuesOpt{
+			opt: types.ExportOpt{
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
@@ -103,7 +103,7 @@ func TestExport(t *testing.T) {
 			}).Return(tc.stream, nil)
 
 			// execute and compare results
-			_, actual, err := store.ExportFeatureValues(context.Background(), tc.opt)
+			_, actual, err := store.Export(context.Background(), tc.opt)
 			assert.NoError(t, err)
 			values := make([][]interface{}, 0)
 			for ele := range actual {
