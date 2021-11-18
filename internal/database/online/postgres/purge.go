@@ -6,7 +6,7 @@ import (
 )
 
 func (db *DB) Purge(ctx context.Context, revisionID int) error {
-	query := fmt.Sprintf(`DROP TABLE IF EXISTS "%s";`, getOnlineBatchTableName(revisionID))
+	query := fmt.Sprintf(`DROP TABLE IF EXISTS "%s";`, getOnlineTableName(revisionID))
 	if _, err := db.ExecContext(ctx, query); err != nil {
 		return err
 	}
