@@ -60,7 +60,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 			expectedRevision: &types.Revision{
 				ID:          2,
 				Revision:    2000,
-				DataTable:   "data_1_2",
+				DataTable:   "offline_1_2",
 				Anchored:    false,
 				Description: "description",
 				GroupID:     groupID,
