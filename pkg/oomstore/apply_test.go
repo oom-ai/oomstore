@@ -35,7 +35,7 @@ stream-features:
 - name: c
   db-type-value: xxx
 `
-	store := oomstore.NewOomStore(nil, nil, nil)
+	store := oomstore.TEST__New(nil, nil, nil)
 
 	require.Nil(t, store.Apply(context.Background(), apply.ApplyOpt{
 		R: strings.NewReader(entityYamlData),
