@@ -11,7 +11,9 @@ import (
 )
 
 func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*types.FeatureValues, error) {
-	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{FeatureNames: &opt.FeatureNames})
+	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+		FeatureNames: &opt.FeatureNames,
+	})
 	entity, err := s.getSharedEntity(features)
 	if err != nil {
 		return nil, err
@@ -54,7 +56,9 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 }
 
 func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetOpt) (types.FeatureDataSet, error) {
-	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{FeatureIDs: &opt.FeatureIDs})
+	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+		FeatureNames: &opt.FeatureNames,
+	})
 
 	features = features.Filter(func(f *types.Feature) bool {
 		return f.OnlineRevisionID() != nil

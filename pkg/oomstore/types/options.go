@@ -58,8 +58,8 @@ type OnlineGetOpt struct {
 }
 
 type OnlineMultiGetOpt struct {
-	FeatureIDs []int
-	EntityKeys []string
+	FeatureNames []string
+	EntityKeys   []string
 }
 
 type JoinOpt struct {
