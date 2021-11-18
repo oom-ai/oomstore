@@ -15,7 +15,7 @@ import (
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
 	featureNames := opt.FeatureList.Names()
-	tableName := getOnlineBatchTableName(opt.RevisionID)
+	tableName := getOnlineTableName(opt.RevisionID)
 	query := fmt.Sprintf(`SELECT %s FROM "%s" WHERE "%s" = $1`, dbutil.Quote(`"`, featureNames...), tableName, opt.Entity.Name)
 
 	record, err := db.QueryRowxContext(ctx, query, opt.EntityKey).SliceScan()
@@ -41,7 +41,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
 	featureNames := opt.FeatureList.Names()
-	tableName := getOnlineBatchTableName(opt.RevisionID)
+	tableName := getOnlineTableName(opt.RevisionID)
 	query := fmt.Sprintf(`SELECT "%s", %s FROM "%s" WHERE "%s" in (?);`, opt.Entity.Name, dbutil.Quote(`"`, featureNames...), tableName, opt.Entity.Name)
 	sql, args, err := sqlx.In(query, opt.EntityKeys)
 	if err != nil {
