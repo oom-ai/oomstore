@@ -1,0 +1,12 @@
+coverage:
+  status:
+    project:
+      default:
+          # the required coverage value (auto compares coverage to the previous base commit)
+        target: auto
+          # this allows a 50% drop from the previous base commit coverage
+        threshold: 50%
+    patch:
+      default:
+        target: auto
+        threshold: 50%
