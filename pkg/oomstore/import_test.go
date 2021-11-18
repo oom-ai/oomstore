@@ -31,43 +31,39 @@ func TestImportWithDependencyError(t *testing.T) {
 		wantError      error
 	}{
 		{
-			description: "ListFeature failed",
-			opt:         types.ImportOpt{GroupID: 1},
-			mockFunc: func() {
-				metadataStore.EXPECT().
-					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
-					Return(nil)
-			},
-			wantRevisionID: 0,
-			wantError:      fmt.Errorf("no features under group id: '1'"),
-		},
-		{
 			description: "GetGroup failed",
-			opt:         types.ImportOpt{GroupID: 1},
+			opt: types.ImportOpt{
+				GroupName: "device_info",
+			},
 			mockFunc: func() {
-				metadataStore.EXPECT().
-					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
-					Return(types.FeatureList{})
-				metadataStore.EXPECT().
-					GetGroup(gomock.Any(), 1).
-					Return(nil, fmt.Errorf("error"))
+				metadataStore.EXPECT().GetGroupByName(gomock.Any(), "device_info").Return(nil, fmt.Errorf("error"))
 			},
 			wantRevisionID: 0,
 			wantError:      fmt.Errorf("error"),
 		},
 		{
-			description: "GetEntity failed",
-			opt:         types.ImportOpt{GroupID: 1},
+			description: "ListFeature failed",
+			opt: types.ImportOpt{
+				GroupName: "device_info",
+			},
 			mockFunc: func() {
-				metadataStore.EXPECT().
-					ListFeature(gomock.Any(), gomock.Any()).
-					Return(types.FeatureList{})
-				metadataStore.EXPECT().
-					GetGroup(gomock.Any(), 1).
-					Return(&types.Group{ID: 1, EntityID: 1}, nil)
+				metadataStore.EXPECT().GetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1}, nil)
+				metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).Return(nil)
 			},
 			wantRevisionID: 0,
-			wantError:      fmt.Errorf("no entity found by group id: '1'"),
+			wantError:      fmt.Errorf("no features under group: device_info"),
+		},
+		{
+			description: "GetEntity failed",
+			opt: types.ImportOpt{
+				GroupName: "device_info",
+			},
+			mockFunc: func() {
+				metadataStore.EXPECT().GetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1, EntityID: 1}, nil)
+				metadataStore.EXPECT().ListFeature(gomock.Any(), gomock.Any()).Return(types.FeatureList{})
+			},
+			wantRevisionID: 0,
+			wantError:      fmt.Errorf("no entity found by group: device_info"),
 		},
 		{
 			description: "Create Revision failed",
@@ -80,11 +76,11 @@ device,model,price
 `),
 					Delimiter: ",",
 				},
-				GroupID: 1,
+				GroupName: "device_info",
 			},
 			mockFunc: func() {
-				metadataStore.EXPECT().
-					ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
+				metadataStore.EXPECT().GetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1, EntityID: 1, Entity: &types.Entity{Name: "device"}}, nil)
+				metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
 					Return(types.FeatureList{
 						{
 							Name: "model",
@@ -93,17 +89,9 @@ device,model,price
 							Name: "price",
 						},
 					})
-				metadataStore.EXPECT().
-					GetGroup(gomock.Any(), 1).
-					Return(&types.Group{ID: 1, EntityID: 1, Entity: &types.Entity{Name: "device"}}, nil)
-				offlineStore.
-					EXPECT().
-					Import(gomock.Any(), gomock.Any()).
-					AnyTimes().Return(int64(1), nil)
+				offlineStore.EXPECT().Import(gomock.Any(), gomock.Any()).AnyTimes().Return(int64(1), nil)
 
-				metadataStore.EXPECT().
-					CreateRevision(gomock.Any(), gomock.Any()).
-					Return(0, "", fmt.Errorf("error"))
+				metadataStore.EXPECT().CreateRevision(gomock.Any(), gomock.Any()).Return(0, "", fmt.Errorf("error"))
 			},
 			wantRevisionID: 0,
 			wantError:      fmt.Errorf("error"),
@@ -114,7 +102,7 @@ device,model,price
 		t.Run(tc.description, func(t *testing.T) {
 			tc.mockFunc()
 			revisionID, err := store.Import(context.Background(), tc.opt)
-			assert.Equal(t, tc.wantError, err)
+			assert.EqualError(t, err, tc.wantError.Error())
 			assert.Equal(t, tc.wantRevisionID, revisionID)
 		})
 	}
@@ -168,7 +156,7 @@ func TestImport(t *testing.T) {
 		{
 			description: "import batch feature, csv data source has duplicated columns",
 			opt: types.ImportOpt{
-				GroupID: 1,
+				GroupName: "device",
 				DataSource: types.CsvDataSource{
 					Reader: strings.NewReader(`
 device,model,model
@@ -221,18 +209,18 @@ device,model,price
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().GetGroup(ctx, tc.opt.GroupID).
-				Return(&types.Group{
-					ID:       tc.opt.GroupID,
-					EntityID: tc.entityID,
-					Entity:   &tc.Entity,
-				}, nil)
+			metadataStore.EXPECT().GetGroupByName(ctx, tc.opt.GroupName).Return(&types.Group{
+				ID:       1,
+				Name:     tc.opt.GroupName,
+				EntityID: tc.entityID,
+				Entity:   &tc.Entity,
+			}, nil)
 
-			metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &tc.opt.GroupID}).Return(tc.features)
+			metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: intPtr(1)}).Return(tc.features)
 
 			metadataStore.EXPECT().CreateRevision(ctx, metadata.CreateRevisionOpt{
 				Revision:    0,
-				GroupID:     tc.opt.GroupID,
+				GroupID:     1,
 				Description: tc.opt.Description,
 			}).Return(tc.revisionID, "offline_1_1", nil).AnyTimes()
 
