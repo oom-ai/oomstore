@@ -1,3 +1,6 @@
+project_name: featctl
+release:
+  prerelease: auto
 before:
   hooks:
     - go mod tidy
