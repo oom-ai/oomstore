@@ -42,20 +42,21 @@ func stringSliceEqual(a, b []string) bool {
 }
 
 func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
-	// get columns of the group
-	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &opt.GroupID})
-	if features == nil {
-		return 0, fmt.Errorf("no features under group id: '%d'", opt.GroupID)
-	}
-
-	// get entity info
-	group, err := s.GetGroup(ctx, opt.GroupID)
+	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return 0, err
 	}
+
+	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+		GroupID: &group.ID,
+	})
+	if features == nil {
+		return 0, fmt.Errorf("no features under group: %s", opt.GroupName)
+	}
+
 	entity := group.Entity
 	if entity == nil {
-		return 0, fmt.Errorf("no entity found by group id: '%d'", opt.GroupID)
+		return 0, fmt.Errorf("no entity found by group: %s", opt.GroupName)
 	}
 
 	// make sure csv data source has all defined columns
