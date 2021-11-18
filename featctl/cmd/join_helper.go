@@ -25,16 +25,9 @@ func join(ctx context.Context, store *oomstore.OomStore, opt JoinOpt, output str
 		return err
 	}
 
-	features, err := store.ListFeature(ctx, types.ListFeatureOpt{
-		FeatureNames: &opt.FeatureNames,
-	})
-	if err != nil {
-		return nil
-	}
-
 	joinResult, err := store.Join(ctx, types.JoinOpt{
-		FeatureIDs: features.IDs(),
-		EntityRows: entityRows,
+		FeatureNames: opt.FeatureNames,
+		EntityRows:   entityRows,
 	})
 	if err != nil {
 		return err

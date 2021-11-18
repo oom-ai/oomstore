@@ -63,8 +63,8 @@ type OnlineMultiGetOpt struct {
 }
 
 type JoinOpt struct {
-	FeatureIDs []int
-	EntityRows <-chan EntityRow
+	FeatureNames []string
+	EntityRows   <-chan EntityRow
 }
 
 type UpdateEntityOpt struct {
