@@ -10,10 +10,9 @@ import (
 
 var registerBatchFeatureOpt types.CreateFeatureOpt
 var registerBatchFeatureCmd = &cobra.Command{
-	Use:     "batch-feature",
-	Short:   "register a new batch feature",
-	Example: `featctl register feature model --group device --value-type "varchar(30)" --description 'phone model'`,
-	Args:    cobra.ExactArgs(1),
+	Use:   "batch-feature <feature_name>",
+	Short: "register a new batch feature",
+	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		registerBatchFeatureOpt.FeatureName = args[0]
 	},
