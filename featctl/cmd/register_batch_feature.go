@@ -8,13 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type registerBatchFeatureOption struct {
-	types.CreateFeatureOpt
-	groupName string
-}
-
-var registerBatchFeatureOpt registerBatchFeatureOption
-
+var registerBatchFeatureOpt types.CreateFeatureOpt
 var registerBatchFeatureCmd = &cobra.Command{
 	Use:     "batch-feature",
 	Short:   "register a new batch feature",
@@ -28,13 +22,7 @@ var registerBatchFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		group, err := oomStore.GetGroupByName(ctx, registerBatchFeatureOpt.groupName)
-		if err != nil {
-			log.Fatalf("failed to get feature group name=%s: %v", registerBatchFeatureOpt.groupName, err)
-		}
-		registerBatchFeatureOpt.GroupID = group.ID
-
-		if _, err := oomStore.CreateBatchFeature(ctx, registerBatchFeatureOpt.CreateFeatureOpt); err != nil {
+		if _, err := oomStore.CreateBatchFeature(ctx, registerBatchFeatureOpt); err != nil {
 			log.Fatalf("failed registering new feature: %v\n", err)
 		}
 	},
@@ -45,7 +33,7 @@ func init() {
 
 	flags := registerBatchFeatureCmd.Flags()
 
-	flags.StringVarP(&registerBatchFeatureOpt.groupName, "group", "g", "", "feature group")
+	flags.StringVarP(&registerBatchFeatureOpt.GroupName, "group", "g", "", "feature group")
 	_ = registerBatchFeatureCmd.MarkFlagRequired("group")
 
 	flags.StringVarP(&registerBatchFeatureOpt.DBValueType, "db-value-type", "", "", "feature value type in database")

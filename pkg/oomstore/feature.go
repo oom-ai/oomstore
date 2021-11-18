@@ -49,7 +49,7 @@ func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt
 }
 
 func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatureOpt) (int, error) {
-	group, err := s.metadata.GetGroup(ctx, opt.GroupID)
+	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return 0, err
 	}
@@ -62,7 +62,10 @@ func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatu
 		return 0, err
 	}
 	return s.metadata.CreateFeature(ctx, metadata.CreateFeatureOpt{
-		CreateFeatureOpt: opt,
-		ValueType:        valueType,
+		FeatureName: opt.FeatureName,
+		GroupID:     group.ID,
+		DBValueType: opt.DBValueType,
+		ValueType:   valueType,
+		Description: opt.Description,
 	})
 }
