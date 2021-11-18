@@ -38,13 +38,11 @@ func TestCreateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
 	opt := metadata.CreateFeatureOpt{
-		CreateFeatureOpt: types.CreateFeatureOpt{
-			FeatureName: "phone",
-			GroupID:     groupID,
-			DBValueType: "varchar(16)",
-			Description: "description",
-		},
-		ValueType: "string",
+		FeatureName: "phone",
+		GroupID:     groupID,
+		DBValueType: "varchar(16)",
+		Description: "description",
+		ValueType:   "string",
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
@@ -57,11 +55,9 @@ func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreRuntim
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
 	opt := metadata.CreateFeatureOpt{
-		CreateFeatureOpt: types.CreateFeatureOpt{
-			FeatureName: "phone",
-			GroupID:     groupID,
-			DBValueType: "varchar(16)",
-		},
+		FeatureName: "phone",
+		GroupID:     groupID,
+		DBValueType: "varchar(16)",
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
@@ -77,12 +73,10 @@ func TestCreateFeatureWithSQLKeywrod(t *testing.T, prepareStore PrepareStoreRunt
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
 	opt := metadata.CreateFeatureOpt{
-		CreateFeatureOpt: types.CreateFeatureOpt{
-			FeatureName: "user",
-			GroupID:     groupID,
-			DBValueType: "int",
-			Description: "order",
-		},
+		FeatureName: "user",
+		GroupID:     groupID,
+		DBValueType: "int",
+		Description: "order",
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
@@ -95,11 +89,9 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStor
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
 	_, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
-		CreateFeatureOpt: types.CreateFeatureOpt{
-			FeatureName: "model",
-			GroupID:     groupID,
-			DBValueType: "invalid_type",
-		},
+		FeatureName: "model",
+		GroupID:     groupID,
+		DBValueType: "invalid_type",
 	})
 	require.Error(t, err)
 }
@@ -110,13 +102,11 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
 	id, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
-		CreateFeatureOpt: types.CreateFeatureOpt{
-			FeatureName: "phone",
-			GroupID:     groupID,
-			DBValueType: "varchar(16)",
-			Description: "description",
-		},
-		ValueType: "string",
+		FeatureName: "phone",
+		GroupID:     groupID,
+		DBValueType: "varchar(16)",
+		Description: "description",
+		ValueType:   "string",
 	})
 	require.NoError(t, err)
 
@@ -142,13 +132,11 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, 0, features.Len())
 
 	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
-		CreateFeatureOpt: types.CreateFeatureOpt{
-			FeatureName: "phone",
-			GroupID:     groupID,
-			DBValueType: "varchar(16)",
-			Description: "description",
-		},
-		ValueType: "string",
+		FeatureName: "phone",
+		GroupID:     groupID,
+		DBValueType: "varchar(16)",
+		Description: "description",
+		ValueType:   "string",
 	})
 	require.NoError(t, err)
 
@@ -186,13 +174,11 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
 	opt := metadata.CreateFeatureOpt{
-		CreateFeatureOpt: types.CreateFeatureOpt{
-			FeatureName: "phone",
-			GroupID:     groupID,
-			DBValueType: "varchar(16)",
-			Description: "description",
-		},
-		ValueType: "string",
+		FeatureName: "phone",
+		GroupID:     groupID,
+		DBValueType: "varchar(16)",
+		Description: "description",
+		ValueType:   "string",
 	}
 	id, err := store.CreateFeature(ctx, opt)
 	require.NoError(t, err)

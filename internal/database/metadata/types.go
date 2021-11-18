@@ -14,8 +14,11 @@ type CreateEntityOpt struct {
 }
 
 type CreateFeatureOpt struct {
-	types.CreateFeatureOpt
-	ValueType string
+	FeatureName string
+	GroupID     int
+	DBValueType string
+	Description string
+	ValueType   string
 }
 
 type CreateGroupOpt struct {
