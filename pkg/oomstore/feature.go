@@ -8,14 +8,17 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
+// Get metadata of a feature by ID.
 func (s *OomStore) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	return s.metadata.GetFeature(ctx, id)
 }
 
+// Get metadata of a feature by name.
 func (s *OomStore) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
 	return s.metadata.GetFeatureByName(ctx, name)
 }
 
+// List metadata of features meeting particular criteria.
 func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
 	metadataOpt := metadata.ListFeatureOpt{
 		FeatureNames: opt.FeatureNames,
@@ -37,6 +40,7 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 	return s.metadata.ListFeature(ctx, metadataOpt), nil
 }
 
+// Update metadata of a feature.
 func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
 	feature, err := s.metadata.GetFeatureByName(ctx, opt.FeatureName)
 	if err != nil {
@@ -48,6 +52,7 @@ func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt
 	})
 }
 
+// Create metadata of a batch feature.
 func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatureOpt) (int, error) {
 	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {

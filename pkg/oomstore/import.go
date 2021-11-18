@@ -10,37 +10,8 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func hasDup(a []string) bool {
-	s := make(map[string]bool)
-	for _, e := range a {
-		if s[e] {
-			return true
-		}
-		s[e] = true
-	}
-	return false
-}
-
-func stringSliceEqual(a, b []string) bool {
-	ma := make(map[string]bool)
-	mb := make(map[string]bool)
-	for _, e := range a {
-		ma[e] = true
-	}
-	for _, e := range b {
-		mb[e] = true
-	}
-	if len(ma) != len(mb) {
-		return false
-	}
-	for k := range mb {
-		if _, ok := ma[k]; !ok {
-			return false
-		}
-	}
-	return true
-}
-
+// Import a CSV data source into the feature store as a new revision.
+// In the future we want to support more diverse data sources.
 func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
 	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
@@ -116,4 +87,35 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 	// TODO: clean up revision and data_table if import failed
 
 	return newRevisionID, nil
+}
+
+func hasDup(a []string) bool {
+	s := make(map[string]bool)
+	for _, e := range a {
+		if s[e] {
+			return true
+		}
+		s[e] = true
+	}
+	return false
+}
+
+func stringSliceEqual(a, b []string) bool {
+	ma := make(map[string]bool)
+	mb := make(map[string]bool)
+	for _, e := range a {
+		ma[e] = true
+	}
+	for _, e := range b {
+		mb[e] = true
+	}
+	if len(ma) != len(mb) {
+		return false
+	}
+	for k := range mb {
+		if _, ok := ma[k]; !ok {
+			return false
+		}
+	}
+	return true
 }

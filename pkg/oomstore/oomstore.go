@@ -12,20 +12,16 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
+// Combine online store, offline store, and metadata store instances in one place.
 type OomStore struct {
 	online   online.Store
 	offline  offline.Store
 	metadata metadata.Store
 }
 
-func TEST__New(online online.Store, offline offline.Store, metadata metadata.Store) *OomStore {
-	return &OomStore{
-		online:   online,
-		offline:  offline,
-		metadata: metadata,
-	}
-}
-
+// Return an OomStore instance given the configuration.
+// Under the hood, it setups connections to the underlying databases.
+// You should always use this method to create a new OomStore instance in code.
 func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 	onlineStore, err := database.OpenOnlineStore(opt.OnlineStore)
 	if err != nil {
@@ -47,6 +43,7 @@ func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 	}, nil
 }
 
+// Create a new OomStore instance.
 func Create(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 	if err := database.CreateMetadataDatabase(ctx, opt.MetadataStore); err != nil {
 		return nil, err
@@ -54,6 +51,7 @@ func Create(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 	return Open(ctx, opt)
 }
 
+// Close the connections to underlying databases.
 func (s *OomStore) Close() error {
 	errs := []error{}
 
@@ -67,4 +65,14 @@ func (s *OomStore) Close() error {
 		return fmt.Errorf("failed closing store: %v", errs)
 	}
 	return nil
+}
+
+// Return an OomStore instance for internal test purpose ONLY.
+// You should NOT use this method directly in any of your code.
+func TEST__New(online online.Store, offline offline.Store, metadata metadata.Store) *OomStore {
+	return &OomStore{
+		online:   online,
+		offline:  offline,
+		metadata: metadata,
+	}
 }
