@@ -17,8 +17,8 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	columns := append([]string{opt.Entity.Name}, opt.FeatureList.Names()...)
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		tmpTableName := dbutil.TempTable(fmt.Sprintf("import_revision_%d", opt.Revision.ID))
-		schema := dbutil.BuildFeatureDataTableSchema(tmpTableName, opt.Entity, opt.FeatureList)
+		tableName := getOnlineTableName(opt.Revision.ID)
+		schema := dbutil.BuildFeatureDataTableSchema(tableName, opt.Entity, opt.FeatureList)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return err
@@ -37,22 +37,17 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			records = append(records, record)
 
 			if len(records) == PostgresBatchSize {
-				if err := dbutil.InsertRecordsToTableTx(tx, ctx, tmpTableName, records, columns); err != nil {
+				if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns); err != nil {
 					return err
 				}
 				records = make([]interface{}, 0, PostgresBatchSize)
 			}
 		}
 
-		if err := dbutil.InsertRecordsToTableTx(tx, ctx, tmpTableName, records, columns); err != nil {
+		if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns); err != nil {
 			return err
 		}
-
-		// rename the tmp table to final table
-		finalTableName := getOnlineTableName(opt.Revision.ID)
-		rename := fmt.Sprintf(`ALTER TABLE "%s" RENAME TO "%s"`, tmpTableName, finalTableName)
-		_, err = tx.ExecContext(ctx, rename)
-		return err
+		return nil
 	})
 	return err
 }
