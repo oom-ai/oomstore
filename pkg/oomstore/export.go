@@ -36,7 +36,7 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) ([]string, <
 
 	entity := revision.Group.Entity
 	if entity == nil {
-		return nil, nil, fmt.Errorf("failed to get entity id='%d'", revision.GroupID)
+		return nil, nil, fmt.Errorf("failed to get entity id=%d", revision.GroupID)
 	}
 
 	stream, err := s.offline.Export(ctx, offline.ExportOpt{
