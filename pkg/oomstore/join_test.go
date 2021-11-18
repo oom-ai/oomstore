@@ -57,8 +57,8 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "no valid features, return nil",
 			opt: types.JoinOpt{
-				FeatureIDs: streamFeatures.IDs(),
-				EntityRows: entityRows,
+				FeatureNames: streamFeatures.Names(),
+				EntityRows:   entityRows,
 			},
 			features:      streamFeatures,
 			expectedError: nil,
@@ -67,8 +67,8 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "inconsistent features, return nil",
 			opt: types.JoinOpt{
-				FeatureIDs: inconsistentFeatures.IDs(),
-				EntityRows: entityRows,
+				FeatureNames: inconsistentFeatures.Names(),
+				EntityRows:   entityRows,
 			},
 			features:      inconsistentFeatures,
 			expectedError: fmt.Errorf("inconsistent entity type: %v", map[string]string{"device": "price", "user": "age"}),
@@ -77,8 +77,8 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "nil joined, return nil",
 			opt: types.JoinOpt{
-				FeatureIDs: consistentFeatures.IDs(),
-				EntityRows: entityRows,
+				FeatureNames: consistentFeatures.Names(),
+				EntityRows:   entityRows,
 			},
 			entity:   &entity,
 			features: consistentFeatures,
@@ -93,8 +93,8 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.JoinOpt{
-				FeatureIDs: consistentFeatures.IDs(),
-				EntityRows: entityRows,
+				FeatureNames: consistentFeatures.Names(),
+				EntityRows:   entityRows,
 			},
 			entity:   &entity,
 			features: consistentFeatures,
@@ -110,7 +110,7 @@ func TestGetHistoricalFeatureValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureIDs: &tc.opt.FeatureIDs}).Return(tc.features)
+			metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureNames: &tc.opt.FeatureNames}).Return(tc.features)
 			if tc.entity != nil {
 				for _, featureList := range tc.featureMap {
 					metadataStore.EXPECT().ListRevision(gomock.Any(), &featureList[0].GroupID).Return(revisions).AnyTimes()
