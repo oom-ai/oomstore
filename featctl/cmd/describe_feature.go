@@ -9,7 +9,7 @@ import (
 )
 
 var describeFeatureCmd = &cobra.Command{
-	Use:   "feature",
+	Use:   "feature <feature_name>",
 	Short: "show details of a specific feature",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

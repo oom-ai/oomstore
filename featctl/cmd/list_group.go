@@ -23,9 +23,6 @@ var listGroupOpt listGroupOption
 var listGroupCmd = &cobra.Command{
 	Use:   "group",
 	Short: "list feature groups",
-	Example: `1. featctl list group
-2. featctl list group --entity device
-`,
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
 			listGroupOpt.entityName = nil

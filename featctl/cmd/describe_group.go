@@ -9,7 +9,7 @@ import (
 )
 
 var describeGroupCmd = &cobra.Command{
-	Use:   "group",
+	Use:   "group <group_name>",
 	Short: "show details of a specific group",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
