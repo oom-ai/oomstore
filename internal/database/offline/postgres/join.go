@@ -134,10 +134,15 @@ func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, t
 	}
 
 	data := make(chan []interface{})
-	var scanErr error
+	var scanErr, dropErr error
 	go func() {
-		defer rows.Close()
-		defer close(data)
+		defer func() {
+			if err := db.dropTemporaryTables(ctx, tableNames); err != nil {
+				dropErr = err
+			}
+			defer rows.Close()
+			defer close(data)
+		}()
 		for rows.Next() {
 			record, err := rows.SliceScan()
 			if err != nil {
@@ -146,10 +151,15 @@ func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, t
 			data <- record
 		}
 	}()
+
+	// TODO: return errors through channel
+	if scanErr != nil {
+		return nil, scanErr
+	}
 	return &types.JoinResult{
 		Header: header,
 		Data:   data,
-	}, scanErr
+	}, dropErr
 }
 
 func (db *DB) dropTemporaryTables(ctx context.Context, tableNames []string) error {
