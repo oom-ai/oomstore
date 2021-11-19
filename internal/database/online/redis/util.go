@@ -11,7 +11,7 @@ import (
 func SerializeByTag(i interface{}, typeTag string) (s string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("%v", r)
+			err = fmt.Errorf("failed to serailize by tag: %v", r)
 		}
 	}()
 
