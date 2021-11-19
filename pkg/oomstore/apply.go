@@ -10,6 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 )
@@ -74,7 +75,7 @@ func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore,
 
 	entity, err := s.metadata.GetEntityByName(ctx, newEntity.Name)
 	if err != nil {
-		if err.Error() != fmt.Sprintf("feature entity '%s' not found", newEntity.Name) {
+		if !errdefs.IsNotFound(err) {
 			return 0, err
 		}
 		entityExist = false
@@ -108,7 +109,7 @@ func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, 
 
 	group, err := s.metadata.GetGroupByName(ctx, newGroup.Name)
 	if err != nil {
-		if err.Error() != fmt.Sprintf("feature group '%s' not found", newGroup.Name) {
+		if !errdefs.IsNotFound(err) {
 			return 0, err
 		}
 		groupExist = false
@@ -141,7 +142,7 @@ func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.WriteStore
 
 	feature, err := s.metadata.GetFeatureByName(ctx, newFeature.Name)
 	if err != nil {
-		if err.Error() != fmt.Sprintf("feature '%s' not found", newFeature.Name) {
+		if !errdefs.IsNotFound(err) {
 			return err
 		}
 		featureExist = false
