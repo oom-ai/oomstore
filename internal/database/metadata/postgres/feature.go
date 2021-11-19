@@ -28,6 +28,10 @@ func createFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metada
 }
 
 func updateFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateFeatureOpt) error {
+	if opt.NewDescription == nil {
+		return fmt.Errorf("invalid option: nothing to update")
+	}
+
 	query := "UPDATE feature SET description = $1 WHERE id = $2"
 	result, err := sqlxCtx.ExecContext(ctx, query, opt.NewDescription, opt.FeatureID)
 	if err != nil {

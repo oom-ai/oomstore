@@ -76,7 +76,7 @@ func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.UpdateEntity(ctx, metadata.UpdateEntityOpt{
 		EntityID:       id,
-		NewDescription: "new description",
+		NewDescription: stringPtr("new description"),
 	}))
 
 	require.NoError(t, store.Refresh())
@@ -87,7 +87,7 @@ func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.Error(t, store.UpdateEntity(ctx, metadata.UpdateEntityOpt{
 		EntityID:       id + 1,
-		NewDescription: "new description",
+		NewDescription: stringPtr("new description"),
 	}))
 }
 
