@@ -14,19 +14,19 @@ batch-features:
   description: a description
   features:
   - name: model
-    db-type-value: varchar(16)
+    db-value-type: varchar(16)
     description: 'device model info'
   - name: price
-    db-type-value: int
+    db-value-type: int
     description: 'device price'
 - group: user
   description: a description
   features:
   - name: age
-    db-type-value: int
+    db-value-type: int
     description: 'user age'
   - name: gender
-    db-type-value: int
+    db-value-type: int
     description: 'user gender'
 ---
 kind: Entity
@@ -47,13 +47,13 @@ category: batch
 description: 'phone info'
 features:
 - name: model
-  db-type-value: varchar(16)
+  db-value-type: varchar(16)
   description: 'device model info'
 - name: price
-  db-type-value: int
+  db-value-type: int
   description: 'device price'
 - name: radio
-  db-type-value: int
+  db-value-type: int
   description: 'radio info'
 ---
 kind: Feature
