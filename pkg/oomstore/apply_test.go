@@ -21,19 +21,19 @@ batch-features:
   description: a description
   features:
   - name: model
-    db-type-value: varchar(16)
+    db-value-type: varchar(16)
   - name: price
-    db_type_value: int
+    db-value-type: int
 -  group: user
    description: a description
    features:
    - name: age
-     db-type-value: int
+     db-value-type: int
    - name: gender
-     db-type-value: int
+     db-value-type: int
 stream-features:
 - name: c
-  db-type-value: xxx
+  db-value-type: xxx
 `
 	store := oomstore.TEST__New(nil, nil, nil)
 
