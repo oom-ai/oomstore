@@ -182,7 +182,7 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		{
 			description:   "try to get not existed revision, return error",
 			revisionID:    0,
-			expectedError: fmt.Errorf("revision not found"),
+			expectedError: fmt.Errorf("revision 0 not found"),
 			expected:      nil,
 		},
 	}
@@ -247,14 +247,14 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 			description:   "try to get not existed revision, return error",
 			GroupID:       groupID,
 			Revision:      0,
-			expectedError: fmt.Errorf("revision not found"),
+			expectedError: fmt.Errorf("revision not found by group %d and revision 0", groupID),
 			expected:      nil,
 		},
 		{
 			description:   "try to get revision for a not existed group, return error",
 			GroupID:       0,
 			Revision:      revision.Revision,
-			expectedError: fmt.Errorf("revision not found"),
+			expectedError: fmt.Errorf("revision not found by group 0 and revision %d", revision.Revision),
 			expected:      nil,
 		},
 	}
