@@ -9,7 +9,7 @@ import (
 )
 
 // Export feature values of a particular revision.
-func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) ([]string, <-chan *types.RawFeatureValueRecord, error) {
+func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) ([]string, <-chan *types.ExportRecord, error) {
 	revision, err := s.GetRevision(ctx, opt.RevisionID)
 	if err != nil {
 		return nil, nil, err

@@ -18,7 +18,7 @@ type Sample struct {
 	Features types.FeatureList
 	Revision *types.Revision
 	Entity   *types.Entity
-	Data     []types.RawFeatureValueRecord
+	Data     []types.ExportRecord
 }
 
 var SampleSmall Sample
@@ -47,7 +47,7 @@ func init() {
 			},
 			Revision: &types.Revision{ID: 3, GroupID: 1},
 			Entity:   &types.Entity{ID: 5, Name: "user", Length: 4},
-			Data: []types.RawFeatureValueRecord{
+			Data: []types.ExportRecord{
 				newRecord([]interface{}{"3215", int64(18), "F"}),
 				newRecord([]interface{}{"3216", int64(29), nil}),
 				newRecord([]interface{}{"3217", int64(44), "M"}),
@@ -69,7 +69,7 @@ func init() {
 
 		revision := &types.Revision{ID: 9, GroupID: 2}
 		entity := &types.Entity{ID: 5, Name: "user", Length: 5}
-		var data []types.RawFeatureValueRecord
+		var data []types.ExportRecord
 
 		for i := 0; i < 1000; i++ {
 			record := newRecord([]interface{}{
@@ -84,7 +84,7 @@ func init() {
 
 func importSample(t *testing.T, ctx context.Context, store online.Store, samples ...*Sample) {
 	for _, sample := range samples {
-		stream := make(chan *types.RawFeatureValueRecord)
+		stream := make(chan *types.ExportRecord)
 		go func(sample *Sample) {
 			defer close(stream)
 			for i := range sample.Data {
@@ -112,6 +112,6 @@ func RandString(n int) string {
 	return string(b)
 }
 
-func newRecord(record []interface{}) types.RawFeatureValueRecord {
-	return types.RawFeatureValueRecord{Record: record}
+func newRecord(record []interface{}) types.ExportRecord {
+	return types.ExportRecord{Record: record}
 }

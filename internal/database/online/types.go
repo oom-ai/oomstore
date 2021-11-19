@@ -21,6 +21,6 @@ type MultiGetOpt struct {
 type ImportOpt struct {
 	Revision    *types.Revision
 	Entity      *types.Entity
-	Stream      <-chan *types.RawFeatureValueRecord
+	Stream      <-chan *types.ExportRecord
 	FeatureList types.FeatureList
 }
