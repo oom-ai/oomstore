@@ -81,7 +81,3 @@ type UpdateGroupOpt struct {
 type SyncOpt struct {
 	RevisionID int
 }
-
-type ApplyOpt struct {
-	Filepath string
-}

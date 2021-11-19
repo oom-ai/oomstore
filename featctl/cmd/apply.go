@@ -11,7 +11,7 @@ import (
 )
 
 type ApplyOption struct {
-	Filepath string
+	FilePath string
 }
 
 var applyOpt ApplyOption
@@ -24,7 +24,7 @@ var applyCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		file, err := os.Open(applyOpt.Filepath)
+		file, err := os.Open(applyOpt.FilePath)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -43,5 +43,5 @@ func init() {
 
 	flags := applyCmd.Flags()
 
-	flags.StringVarP(&applyOpt.Filepath, "filepath", "f", "", "filepath")
+	flags.StringVarP(&applyOpt.FilePath, "filepath", "f", "", "filepath")
 }
