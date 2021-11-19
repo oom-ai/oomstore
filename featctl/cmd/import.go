@@ -57,7 +57,6 @@ func init() {
 	_ = importCmd.MarkFlagRequired("group")
 
 	flags.StringVar(&importOpt.Description, "description", "", "revision description")
-	_ = importCmd.MarkFlagRequired("description")
 
 	flags.StringVar(&importOpt.FilePath, "input-file", "", "input csv file")
 	_ = importCmd.MarkFlagRequired("input-file")

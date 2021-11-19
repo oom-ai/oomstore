@@ -22,6 +22,10 @@ func createEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadat
 }
 
 func updateEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateEntityOpt) error {
+	if opt.NewDescription == nil {
+		return fmt.Errorf("invalid option: nothing to update")
+	}
+
 	query := "UPDATE entity SET description = $1 WHERE id = $2"
 	result, err := sqlxCtx.ExecContext(ctx, query, opt.NewDescription, opt.EntityID)
 	if err != nil {
