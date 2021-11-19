@@ -23,16 +23,16 @@ func NewFeatureDataSet() FeatureDataSet {
 	return make(map[string][]FeatureKV)
 }
 
-type RawFeatureValueRecord struct {
+type ExportRecord struct {
 	Record []interface{}
 	Error  error
 }
 
-func (r *RawFeatureValueRecord) EntityKey() string {
+func (r *ExportRecord) EntityKey() string {
 	return r.Record[0].(string)
 }
 
-func (r *RawFeatureValueRecord) ValueAt(i int) interface{} {
+func (r *ExportRecord) ValueAt(i int) interface{} {
 	return r.Record[i+1]
 }
 
