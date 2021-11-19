@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -97,7 +98,7 @@ func (f *Informer) GetEntity(ctx context.Context, id int) (*types.Entity, error)
 	if entity := f.Cache().Entities.Find(func(e *types.Entity) bool {
 		return e.ID == id
 	}); entity == nil {
-		return nil, fmt.Errorf("feature entity %d not found", id)
+		return nil, errdefs.NotFound(fmt.Errorf("feature entity %d not found", id))
 	} else {
 		return entity.Copy(), nil
 	}
@@ -107,7 +108,7 @@ func (f *Informer) GetEntityByName(ctx context.Context, name string) (*types.Ent
 	if entity := f.Cache().Entities.Find(func(e *types.Entity) bool {
 		return e.Name == name
 	}); entity == nil {
-		return nil, fmt.Errorf("feature entity '%s' not found", name)
+		return nil, errdefs.NotFound(fmt.Errorf("feature entity '%s' not found", name))
 	} else {
 		return entity.Copy(), nil
 	}
@@ -117,7 +118,7 @@ func (f *Informer) GetFeature(ctx context.Context, id int) (*types.Feature, erro
 	if feature := f.Cache().Features.Find(func(f *types.Feature) bool {
 		return f.ID == id
 	}); feature == nil {
-		return nil, fmt.Errorf("feature %d not found", id)
+		return nil, errdefs.NotFound(fmt.Errorf("feature %d not found", id))
 	} else {
 		return feature.Copy(), nil
 	}
@@ -127,7 +128,7 @@ func (f *Informer) GetFeatureByName(ctx context.Context, name string) (*types.Fe
 	if feature := f.Cache().Features.Find(func(f *types.Feature) bool {
 		return f.Name == name
 	}); feature == nil {
-		return nil, fmt.Errorf("feature '%s' not found", name)
+		return nil, errdefs.NotFound(fmt.Errorf("feature '%s' not found", name))
 	} else {
 		return feature.Copy(), nil
 	}
@@ -137,7 +138,7 @@ func (f *Informer) GetGroup(ctx context.Context, id int) (*types.Group, error) {
 	if group := f.Cache().Groups.Find(func(g *types.Group) bool {
 		return g.ID == id
 	}); group == nil {
-		return nil, fmt.Errorf("feature group %d not found", id)
+		return nil, errdefs.NotFound(fmt.Errorf("feature group %d not found", id))
 	} else {
 		return group.Copy(), nil
 	}
@@ -147,7 +148,7 @@ func (f *Informer) GetGroupByName(ctx context.Context, name string) (*types.Grou
 	if group := f.Cache().Groups.Find(func(g *types.Group) bool {
 		return g.Name == name
 	}); group == nil {
-		return nil, fmt.Errorf("feature group '%s' not found", name)
+		return nil, errdefs.NotFound(fmt.Errorf("feature group '%s' not found", name))
 	} else {
 		return group.Copy(), nil
 	}
@@ -157,17 +158,17 @@ func (f *Informer) GetRevision(ctx context.Context, id int) (*types.Revision, er
 	if revision := f.Cache().Revisions.Find(func(r *types.Revision) bool {
 		return r.ID == id
 	}); revision == nil {
-		return nil, fmt.Errorf("revision not found")
+		return nil, errdefs.NotFound(fmt.Errorf("revision %d not found", id))
 	} else {
 		return revision.Copy(), nil
 	}
 }
 
-func (f *Informer) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
+func (f *Informer) GetRevisionBy(ctx context.Context, groupID int, revisionID int64) (*types.Revision, error) {
 	if revision := f.Cache().Revisions.Find(func(r *types.Revision) bool {
-		return r.GroupID == groupID && r.Revision == revision
+		return r.GroupID == groupID && r.Revision == revisionID
 	}); revision == nil {
-		return nil, fmt.Errorf("revision not found")
+		return nil, errdefs.NotFound(fmt.Errorf("revision not found by group %d and revision %d", groupID, revisionID))
 	} else {
 		return revision.Copy(), nil
 	}
