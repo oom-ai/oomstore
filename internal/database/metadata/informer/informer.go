@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/oom-ai/oomstore/internal/database"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -97,7 +98,7 @@ func (f *Informer) GetEntity(ctx context.Context, id int) (*types.Entity, error)
 	if entity := f.Cache().Entities.Find(func(e *types.Entity) bool {
 		return e.ID == id
 	}); entity == nil {
-		return nil, fmt.Errorf("feature entity %d not found", id)
+		return nil, database.NewNotFoundError("entity", id)
 	} else {
 		return entity.Copy(), nil
 	}
