@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/oom-ai/oomstore/internal/database"
 	"gopkg.in/yaml.v3"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
@@ -74,10 +75,11 @@ func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore,
 
 	entity, err := s.metadata.GetEntityByName(ctx, newEntity.Name)
 	if err != nil {
-		if err.Error() != fmt.Sprintf("feature entity '%s' not found", newEntity.Name) {
+		if database.IsNotFound(err) {
+			entityExist = false
+		} else {
 			return 0, err
 		}
-		entityExist = false
 	}
 
 	if !entityExist {
