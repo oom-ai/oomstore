@@ -9,7 +9,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan *types.RawFeatureValueRecord, error) {
+func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan *types.ExportRecord, error) {
 	fields := append([]string{opt.EntityName}, opt.FeatureNames...)
 	query := fmt.Sprintf("select %s from %s", dbutil.Quote(`"`, fields...), opt.DataTable)
 	if opt.Limit != nil {
@@ -21,13 +21,13 @@ func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan *types.
 		return nil, err
 	}
 
-	stream := make(chan *types.RawFeatureValueRecord)
+	stream := make(chan *types.ExportRecord)
 	go func() {
 		defer rows.Close()
 		defer close(stream)
 		for rows.Next() {
 			record, err := rows.SliceScan()
-			stream <- &types.RawFeatureValueRecord{
+			stream <- &types.ExportRecord{
 				Record: record,
 				Error:  err,
 			}

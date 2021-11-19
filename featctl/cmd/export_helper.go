@@ -24,7 +24,7 @@ func export(ctx context.Context, store *oomstore.OomStore, opt types.ExportOpt, 
 	return nil
 }
 
-func printExportResult(fields []string, stream <-chan *types.RawFeatureValueRecord, output string) error {
+func printExportResult(fields []string, stream <-chan *types.ExportRecord, output string) error {
 	switch output {
 	case CSV:
 		return printExportResultInCSV(fields, stream)
@@ -35,7 +35,7 @@ func printExportResult(fields []string, stream <-chan *types.RawFeatureValueReco
 	}
 }
 
-func printExportResultInCSV(fields []string, stream <-chan *types.RawFeatureValueRecord) error {
+func printExportResultInCSV(fields []string, stream <-chan *types.ExportRecord) error {
 	w := csv.NewWriter(os.Stdout)
 	defer w.Flush()
 
@@ -53,7 +53,7 @@ func printExportResultInCSV(fields []string, stream <-chan *types.RawFeatureValu
 	return nil
 }
 
-func printExportResultInASCIITable(fields []string, stream <-chan *types.RawFeatureValueRecord) error {
+func printExportResultInASCIITable(fields []string, stream <-chan *types.ExportRecord) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(fields)
 	table.SetAutoFormatHeaders(false)
