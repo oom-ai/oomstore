@@ -93,7 +93,7 @@ func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore,
 	if newEntity.Description != entity.Description {
 		err = txStore.UpdateEntity(ctx, metadata.UpdateEntityOpt{
 			EntityID:       entity.ID,
-			NewDescription: newEntity.Description,
+			NewDescription: &newEntity.Description,
 		})
 		if err != nil {
 			return 0, err
@@ -166,7 +166,7 @@ func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.WriteStore
 	if newFeature.Description != feature.Description {
 		return txStore.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
 			FeatureID:      feature.ID,
-			NewDescription: newFeature.Description,
+			NewDescription: &newFeature.Description,
 		})
 	}
 	return nil
