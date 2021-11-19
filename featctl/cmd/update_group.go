@@ -16,6 +16,9 @@ var updateGroupCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		updateGroupOpt.GroupName = args[0]
+		if !cmd.Flags().Changed("description") {
+			updateGroupOpt.NewDescription = nil
+		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
@@ -34,5 +37,4 @@ func init() {
 	flags := updateGroupCmd.Flags()
 
 	updateGroupOpt.NewDescription = flags.StringP("description", "d", "", "new group description")
-	_ = updateGroupCmd.MarkFlagRequired("description")
 }

@@ -39,12 +39,12 @@ type CreateRevisionOpt struct {
 // Update
 type UpdateEntityOpt struct {
 	EntityID       int
-	NewDescription string
+	NewDescription *string
 }
 
 type UpdateFeatureOpt struct {
 	FeatureID      int
-	NewDescription string
+	NewDescription *string
 }
 
 type UpdateGroupOpt struct {

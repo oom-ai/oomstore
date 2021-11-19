@@ -19,7 +19,7 @@ type ListFeatureOpt struct {
 
 type UpdateFeatureOpt struct {
 	FeatureName    string
-	NewDescription string
+	NewDescription *string
 }
 
 type CreateEntityOpt struct {
@@ -69,7 +69,7 @@ type JoinOpt struct {
 
 type UpdateEntityOpt struct {
 	EntityName     string
-	NewDescription string
+	NewDescription *string
 }
 
 type UpdateGroupOpt struct {

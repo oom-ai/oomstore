@@ -16,6 +16,9 @@ var updateFeatureCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		updateFeatureOpt.FeatureName = args[0]
+		if !cmd.Flags().Changed("description") {
+			updateFeatureOpt.NewDescription = nil
+		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
@@ -33,6 +36,5 @@ func init() {
 
 	flags := updateFeatureCmd.Flags()
 
-	flags.StringVarP(&updateFeatureOpt.NewDescription, "description", "d", "", "new feature description")
-	_ = updateFeatureCmd.MarkFlagRequired("description")
+	updateFeatureOpt.NewDescription = flags.StringP("description", "d", "", "new feature description")
 }
