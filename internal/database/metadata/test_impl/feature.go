@@ -189,7 +189,7 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	err = store.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
 		FeatureID:      id,
-		NewDescription: "new description",
+		NewDescription: stringPtr("new description"),
 	})
 	require.NoError(t, err)
 
