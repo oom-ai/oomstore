@@ -25,7 +25,7 @@ type Feature struct {
 	Name        string `mapstructure:"name"`
 	GroupID     int
 	GroupName   string `mapstructure:"group-name"`
-	DBValueType string `mapstructure:"db-type-value"`
+	DBValueType string `mapstructure:"db-value-type"`
 	Description string `mapstructure:"description"`
 }
 
@@ -46,6 +46,6 @@ type Entity struct {
 	Length      int    `mapstructure:"length"`
 	Description string `mapstructure:"description"`
 
-	BatchFeatures []Group   `mapstructure:"batch-features"`
-	StreamFeature []Feature `mapstructure:"stream-features"`
+	BatchFeatures  []Group   `mapstructure:"batch-features"`
+	StreamFeatures []Feature `mapstructure:"stream-features"`
 }
