@@ -57,7 +57,7 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 }
 
 // Get online features of multiple entity instances.
-func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetOpt) (types.FeatureDataSet, error) {
+func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetOpt) (map[string]*types.FeatureValues, error) {
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureNames: &opt.FeatureNames,
 	})
@@ -84,7 +84,19 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 		return nil, err
 	}
 
-	return buildFeatureDataSet(featureValueMap, features.Names(), opt.EntityKeys)
+	result := make(map[string]*types.FeatureValues)
+	for _, entityKey := range opt.EntityKeys {
+		result[entityKey] = &types.FeatureValues{
+			EntityName:      entity.Name,
+			EntityKey:       entityKey,
+			FeatureNames:    opt.FeatureNames,
+			FeatureValueMap: make(map[string]interface{}),
+		}
+		for featureName, featureValue := range featureValueMap[entityKey] {
+			result[entityKey].FeatureValueMap[featureName] = featureValue
+		}
+	}
+	return result, nil
 }
 
 func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int]types.FeatureList, entity *types.Entity) (map[string]dbutil.RowMap, error) {
@@ -141,20 +153,4 @@ func (s *OomStore) getSharedEntity(features types.FeatureList) (*types.Entity, e
 		return entity, nil
 	}
 	return nil, fmt.Errorf("expected 1 entity, got 0")
-}
-
-func buildFeatureDataSet(valueMap map[string]dbutil.RowMap, featureNames []string, entityKeys []string) (types.FeatureDataSet, error) {
-	fds := types.NewFeatureDataSet()
-	for _, entityKey := range entityKeys {
-		fds[entityKey] = make([]types.FeatureKV, 0)
-		// TODO: double check the logic doesn't change
-		for _, fn := range featureNames {
-			if fv, ok := valueMap[entityKey][fn]; ok {
-				fds[entityKey] = append(fds[entityKey], types.NewFeatureKV(fn, fv))
-			} else {
-				return nil, fmt.Errorf("missing feature %s for entity %s", fn, entityKey)
-			}
-		}
-	}
-	return fds, nil
 }
