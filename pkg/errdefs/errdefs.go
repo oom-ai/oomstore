@@ -2,8 +2,6 @@ package errdefs
 
 type errNotFound struct{ error }
 
-func (errNotFound) NotFound() {}
-
 func (e errNotFound) Unwrap() error {
 	return e.error
 }
