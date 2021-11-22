@@ -5,24 +5,6 @@ const (
 	StreamFeatureCategory = "stream"
 )
 
-type FeatureKV struct {
-	FeatureName  string
-	FeatureValue interface{}
-}
-
-func NewFeatureKV(name string, value interface{}) FeatureKV {
-	return FeatureKV{
-		FeatureName:  name,
-		FeatureValue: value,
-	}
-}
-
-type FeatureDataSet map[string][]FeatureKV
-
-func NewFeatureDataSet() FeatureDataSet {
-	return make(map[string][]FeatureKV)
-}
-
 type ExportRecord struct {
 	Record []interface{}
 	Error  error
