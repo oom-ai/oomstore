@@ -71,6 +71,10 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 }
 
 func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore, newEntity apply.Entity) (int, error) {
+	if err := newEntity.Validate(); err != nil {
+		return 0, err
+	}
+
 	entity, err := s.metadata.GetEntityByName(ctx, newEntity.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
@@ -99,6 +103,10 @@ func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore,
 }
 
 func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, newGroup apply.Group) (int, error) {
+	if err := newGroup.Validate(); err != nil {
+		return 0, err
+	}
+
 	group, err := s.metadata.GetGroupByName(ctx, newGroup.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
@@ -126,6 +134,10 @@ func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, 
 }
 
 func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.WriteStore, newFeature apply.Feature) error {
+	if err := newFeature.Validate(); err != nil {
+		return err
+	}
+
 	feature, err := s.metadata.GetFeatureByName(ctx, newFeature.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
