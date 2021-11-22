@@ -71,17 +71,11 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 }
 
 func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore, newEntity apply.Entity) (int, error) {
-	entityExist := true
-
 	entity, err := s.metadata.GetEntityByName(ctx, newEntity.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return 0, err
 		}
-		entityExist = false
-	}
-
-	if !entityExist {
 		return txStore.CreateEntity(ctx, metadata.CreateEntityOpt{
 			CreateEntityOpt: types.CreateEntityOpt{
 				EntityName:  newEntity.Name,
@@ -105,17 +99,11 @@ func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore,
 }
 
 func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, newGroup apply.Group) (int, error) {
-	groupExist := true
-
 	group, err := s.metadata.GetGroupByName(ctx, newGroup.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return 0, err
 		}
-		groupExist = false
-	}
-
-	if !groupExist {
 		return txStore.CreateGroup(ctx, metadata.CreateGroupOpt{
 			GroupName:   newGroup.Name,
 			EntityID:    newGroup.EntityID,
@@ -138,22 +126,15 @@ func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, 
 }
 
 func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.WriteStore, newFeature apply.Feature) error {
-	featureExist := true
-
 	feature, err := s.metadata.GetFeatureByName(ctx, newFeature.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return err
 		}
-		featureExist = false
-	}
-
-	valueType, err := s.offline.TypeTag(newFeature.DBValueType)
-	if err != nil {
-		return err
-	}
-
-	if !featureExist {
+		valueType, err := s.offline.TypeTag(newFeature.DBValueType)
+		if err != nil {
+			return err
+		}
 		_, err = txStore.CreateFeature(ctx, metadata.CreateFeatureOpt{
 			FeatureName: newFeature.Name,
 			GroupID:     newFeature.GroupID,
