@@ -38,7 +38,7 @@ func TestExport(t *testing.T) {
 	testCases := []struct {
 		description string
 		opt         types.ExportOpt
-		stream      <-chan *types.RawFeatureValueRecord
+		stream      <-chan *types.ExportRecord
 		expected    [][]interface{}
 	}{
 		{
@@ -115,40 +115,40 @@ func TestExport(t *testing.T) {
 	}
 }
 
-func prepareTwoFeatureStream() chan *types.RawFeatureValueRecord {
-	stream := make(chan *types.RawFeatureValueRecord)
+func prepareTwoFeatureStream() chan *types.ExportRecord {
+	stream := make(chan *types.ExportRecord)
 	go func() {
 		defer close(stream)
-		stream <- &types.RawFeatureValueRecord{
+		stream <- &types.ExportRecord{
 			Record: []interface{}{"1234", "xiaomi", int64(100)},
 		}
-		stream <- &types.RawFeatureValueRecord{
+		stream <- &types.ExportRecord{
 			Record: []interface{}{"1235", "apple", int64(200)},
 		}
-		stream <- &types.RawFeatureValueRecord{
+		stream <- &types.ExportRecord{
 			Record: []interface{}{"1236", "huawei", int64(300)},
 		}
-		stream <- &types.RawFeatureValueRecord{
+		stream <- &types.ExportRecord{
 			Record: []interface{}{"1237", "oneplus", int64(240)},
 		}
 	}()
 	return stream
 }
 
-func prepareOneFeatureStream() chan *types.RawFeatureValueRecord {
-	stream := make(chan *types.RawFeatureValueRecord)
+func prepareOneFeatureStream() chan *types.ExportRecord {
+	stream := make(chan *types.ExportRecord)
 	go func() {
 		defer close(stream)
-		stream <- &types.RawFeatureValueRecord{
+		stream <- &types.ExportRecord{
 			Record: []interface{}{"1234", int64(100)},
 		}
-		stream <- &types.RawFeatureValueRecord{
+		stream <- &types.ExportRecord{
 			Record: []interface{}{"1235", int64(200)},
 		}
-		stream <- &types.RawFeatureValueRecord{
+		stream <- &types.ExportRecord{
 			Record: []interface{}{"1236", int64(300)},
 		}
-		stream <- &types.RawFeatureValueRecord{
+		stream <- &types.ExportRecord{
 			Record: []interface{}{"1237", int64(240)},
 		}
 	}()
