@@ -12,3 +12,16 @@ func NotFound(err error) error {
 	}
 	return errNotFound{err}
 }
+
+type errInvalidAttribute struct{ error }
+
+func (e errInvalidAttribute) Unwrap() error {
+	return e.error
+}
+
+func InvalidAttribute(err error) error {
+	if err == nil || IsInvalidAttribute(err) {
+		return err
+	}
+	return errInvalidAttribute{err}
+}
