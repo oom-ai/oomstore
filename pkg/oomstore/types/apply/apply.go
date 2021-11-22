@@ -1,6 +1,11 @@
 package apply
 
-import "io"
+import (
+	"fmt"
+	"io"
+
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+)
 
 type ApplyOpt struct {
 	R io.Reader
@@ -29,6 +34,16 @@ type Feature struct {
 	Description string `mapstructure:"description"`
 }
 
+func (f *Feature) Validate() error {
+	if f.Name == "" {
+		return errdefs.InvalidAttribute(fmt.Errorf("the name of feature should not be empty"))
+	}
+	if f.DBValueType == "" {
+		return errdefs.InvalidAttribute(fmt.Errorf("the db value type of feature should not be empty"))
+	}
+	return nil
+}
+
 type Group struct {
 	Kind        string `mapstructure:"kind"`
 	Group       string `mapstructure:"group"`
@@ -40,6 +55,13 @@ type Group struct {
 	Features    []Feature `mapstructure:"features"`
 }
 
+func (g *Group) Validate() error {
+	if g.Name == "" {
+		return errdefs.InvalidAttribute(fmt.Errorf("the name of group should not be empty"))
+	}
+	return nil
+}
+
 type Entity struct {
 	Kind        string `mapstructure:"kind"`
 	Name        string `mapstructure:"name"`
@@ -48,4 +70,11 @@ type Entity struct {
 
 	BatchFeatures  []Group   `mapstructure:"batch-features"`
 	StreamFeatures []Feature `mapstructure:"stream-features"`
+}
+
+func (e *Entity) Validate() error {
+	if e.Name == "" {
+		return errdefs.InvalidAttribute(fmt.Errorf("the name of entity should not be empty"))
+	}
+	return nil
 }
