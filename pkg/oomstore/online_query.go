@@ -14,24 +14,23 @@ import (
 func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*types.FeatureValues, error) {
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureNames: &opt.FeatureNames,
+	}).Filter(func(f *types.Feature) bool {
+		return f.Group.OnlineRevisionID != nil
 	})
+	if len(features) == 0 {
+		return nil, nil
+	}
+
 	entity, err := getSharedEntity(features)
 	if err != nil {
 		return nil, err
 	}
-	features = features.Filter(func(f *types.Feature) bool {
-		return f.Group.OnlineRevisionID != nil
-	})
 
 	rs := types.FeatureValues{
 		EntityName:      entity.Name,
 		EntityKey:       opt.EntityKey,
 		FeatureNames:    opt.FeatureNames,
 		FeatureValueMap: make(map[string]interface{}),
-	}
-
-	if len(features) == 0 {
-		return &rs, nil
 	}
 
 	featureMap := groupFeaturesByRevisionID(features)
