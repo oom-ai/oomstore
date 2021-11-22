@@ -73,7 +73,7 @@ func TestSync(t *testing.T) {
 				}, nil)
 				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
 
-				stream := make(chan *types.RawFeatureValueRecord)
+				stream := make(chan *types.ExportRecord)
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
 					DataTable:    "data-table-name",
 					EntityName:   "device",
@@ -113,7 +113,7 @@ func TestSync(t *testing.T) {
 				}, nil)
 				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
 
-				stream := make(chan *types.RawFeatureValueRecord)
+				stream := make(chan *types.ExportRecord)
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
 					DataTable:    "data-table-name",
 					EntityName:   "device",
