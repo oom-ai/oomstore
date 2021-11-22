@@ -122,7 +122,7 @@ func TestOnlineMultiGet(t *testing.T) {
 		entityName    *string
 		features      types.FeatureList
 		expectedError error
-		expected      types.FeatureDataSet
+		expected      map[string]*types.FeatureValues
 	}{
 		{
 			description: "no available features, return nil",
@@ -153,25 +153,23 @@ func TestOnlineMultiGet(t *testing.T) {
 			features:      consistentFeatures,
 			entityName:    &entityName,
 			expectedError: nil,
-			expected: types.FeatureDataSet{
-				"1234": []types.FeatureKV{
-					{
-						FeatureName:  "model",
-						FeatureValue: "xiaomi",
-					},
-					{
-						FeatureName:  "price",
-						FeatureValue: int64(100),
+			expected: map[string]*types.FeatureValues{
+				"1234": {
+					EntityName:   "device",
+					EntityKey:    "1234",
+					FeatureNames: consistentFeatures.Names(),
+					FeatureValueMap: map[string]interface{}{
+						"model": "xiaomi",
+						"price": int64(100),
 					},
 				},
-				"1235": []types.FeatureKV{
-					{
-						FeatureName:  "model",
-						FeatureValue: "apple",
-					},
-					{
-						FeatureName:  "price",
-						FeatureValue: int64(200),
+				"1235": {
+					EntityName:   "device",
+					EntityKey:    "1235",
+					FeatureNames: consistentFeatures.Names(),
+					FeatureValueMap: map[string]interface{}{
+						"model": "apple",
+						"price": int64(200),
 					},
 				},
 			},
