@@ -1,0 +1,84 @@
+syntax = "proto3";
+package oomd;
+option go_package = "/codegen";
+
+import "status.proto";
+import "google/protobuf/any.proto";
+
+service OomD {
+  rpc OnlineGet(OnlineGetRequest) returns (OnlineGetResponse) {}
+  rpc OnlineMultiGet(OnlineMultiGetRequest) returns (OnlineMultiGetResponse) {}
+  rpc Sync(SyncRequest) returns (SyncResponse) {}
+
+  rpc Import(stream ImportRequest) returns (ImportResponse) {}
+  rpc Join(JoinRequest) returns (stream JoinResponse) {}
+
+  rpc ImportByFile(ImportByFileRequest) returns (ImportResponse) {}
+  rpc JoinByFile(JoinRequest) returns (JoinByFileResponse) {}
+}
+
+message OnlineGetRequest {
+  string entity_key = 1;
+  repeated string feature_names = 2;
+}
+
+message FeatureValueMap {
+  map<string, google.protobuf.Any> map = 1;
+}
+
+message OnlineGetResponse {
+  google.rpc.Status status = 1;
+  FeatureValueMap result = 2;
+}
+
+message OnlineMultiGetRequest {
+  repeated string entity_keys = 1;
+  repeated string feature_names = 2;
+}
+
+message OnlineMultiGetResponse {
+  google.rpc.Status status = 1;
+  map<string, FeatureValueMap> result = 2;
+}
+
+message SyncRequest {
+  int32 revision_id = 1;
+}
+message SyncResponse {
+  google.rpc.Status status = 1;
+}
+
+message ImportRequest {
+  string group_name = 1;
+  string description = 2;
+  optional int64 revision = 3;
+  repeated google.protobuf.Any row = 4;
+}
+
+message ImportResponse {
+  google.rpc.Status status = 1;
+  int64 revision_id = 2;
+}
+
+message ImportByFileRequest {
+  string group_name = 1;
+  string description = 2;
+  optional int64 revision = 3;
+  string file_path = 4;
+  string delimiter = 5;
+}
+
+message JoinRequest {
+  repeated string feature_names = 1;
+  string input_file_path = 2;
+}
+message JoinResponse {
+  google.rpc.Status status = 1;
+  repeated string header = 2;
+  repeated google.protobuf.Any row = 3;
+}
+
+message JoinByFileResponse {
+  google.rpc.Status status = 1;
+  string output_file_path = 2;
+}
