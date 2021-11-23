@@ -1,15 +1,19 @@
-package oomd
+package main
 
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
+	"log"
+	"net"
 
 	"github.com/oom-ai/oomstore/oomd/codegen"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	code "google.golang.org/genproto/googleapis/rpc/code"
 	status "google.golang.org/genproto/googleapis/rpc/status"
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -125,4 +129,56 @@ func buildStatus(code code.Code, message string) *status.Status {
 		Code:    int32(code),
 		Message: message,
 	}
+}
+
+// The methods below serves the temporary testing purpose
+// We should add more formal tests soon
+func newServer() *server {
+	store, err := oomstore.Open(context.Background(), buildOomStoreConfig())
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &server{oomstore: store}
+}
+
+func buildOomStoreConfig() types.OomStoreConfig {
+	return types.OomStoreConfig{
+		MetadataStore: types.MetadataStoreConfig{
+			Backend:  types.POSTGRES,
+			Postgres: getPostgresOpt(),
+		},
+		OnlineStore: types.OnlineStoreConfig{
+			Backend:  types.POSTGRES,
+			Postgres: getPostgresOpt(),
+		},
+		OfflineStore: types.OfflineStoreConfig{
+			Backend:  types.POSTGRES,
+			Postgres: getPostgresOpt(),
+		},
+	}
+}
+
+func getPostgresOpt() *types.PostgresOpt {
+	return &types.PostgresOpt{
+		Host:     "127.0.0.1",
+		Port:     "5432",
+		User:     "postgres",
+		Password: "postgres",
+		Database: "oomstore",
+	}
+}
+
+var (
+	port = flag.Int("port", 50051, "The server port")
+)
+
+func main() {
+	flag.Parse()
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	grpcServer := grpc.NewServer()
+	codegen.RegisterOomDServer(grpcServer, newServer())
+	grpcServer.Serve(lis)
 }
