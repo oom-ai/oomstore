@@ -22,3 +22,15 @@ repos:
   - id: golangci-lint
   # - id: go-cyclo
     # args: [-over=20]
+- repo: local
+  hooks:
+  - id: codegen
+    name: generate code
+    pass_filenames: false
+    language: system
+    always_run: true
+    entry: >
+      sh -c '
+        make codegen &&
+        git add oomd/codegen
+      '
