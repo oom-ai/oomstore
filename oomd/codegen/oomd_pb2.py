@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z\010/codegen',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\noomd.proto\x12\x04oomd\x1a\x0cstatus.proto\x1a\x19google/protobuf/any.proto\"=\n\x10OnlineGetRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x15\n\rfeature_names\x18\x02 \x03(\t\"\x80\x01\n\x0f\x46\x65\x61tureValueMap\x12+\n\x03map\x18\x01 \x03(\x0b\x32\x1e.oomd.FeatureValueMap.MapEntry\x1a@\n\x08MapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12#\n\x05value\x18\x02 \x01(\x0b\x32\x14.google.protobuf.Any:\x02\x38\x01\"^\n\x11OnlineGetResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12%\n\x06result\x18\x02 \x01(\x0b\x32\x15.oomd.FeatureValueMap\"C\n\x15OnlineMultiGetRequest\x12\x13\n\x0b\x65ntity_keys\x18\x01 \x03(\t\x12\x15\n\rfeature_names\x18\x02 \x03(\t\"\xbc\x01\n\x16OnlineMultiGetResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x38\n\x06result\x18\x02 \x03(\x0b\x32(.oomd.OnlineMultiGetResponse.ResultEntry\x1a\x44\n\x0bResultEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.oomd.FeatureValueMap:\x02\x38\x01\"\"\n\x0bSyncRequest\x12\x13\n\x0brevision_id\x18\x01 \x01(\x05\"2\n\x0cSyncResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\"\x7f\n\rImportRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12!\n\x03row\x18\x04 \x03(\x0b\x32\x14.google.protobuf.AnyB\x0b\n\t_revision\"I\n\x0eImportResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x13\n\x0brevision_id\x18\x02 \x01(\x03\"\x88\x01\n\x13ImportByFileRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x11\n\tfile_path\x18\x04 \x01(\t\x12\x11\n\tdelimiter\x18\x05 \x01(\tB\x0b\n\t_revision\"2\n\tEntityRow\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x11\n\tunix_time\x18\x02 \x01(\x03\"I\n\x0bJoinRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12#\n\nentity_row\x18\x02 \x01(\x0b\x32\x0f.oomd.EntityRow\"l\n\x0cJoinResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x0e\n\x06header\x18\x02 \x03(\t\x12(\n\njoined_row\x18\x03 \x03(\x0b\x32\x14.google.protobuf.Any\"]\n\x11JoinByFileRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x17\n\x0finput_file_path\x18\x02 \x01(\t\x12\x18\n\x10output_file_path\x18\x03 \x01(\t\"8\n\x12JoinByFileResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status2\xba\x03\n\x04OomD\x12>\n\tOnlineGet\x12\x16.oomd.OnlineGetRequest\x1a\x17.oomd.OnlineGetResponse\"\x00\x12M\n\x0eOnlineMultiGet\x12\x1b.oomd.OnlineMultiGetRequest\x1a\x1c.oomd.OnlineMultiGetResponse\"\x00\x12/\n\x04Sync\x12\x11.oomd.SyncRequest\x1a\x12.oomd.SyncResponse\"\x00\x12\x37\n\x06Import\x12\x13.oomd.ImportRequest\x1a\x14.oomd.ImportResponse\"\x00(\x01\x12\x33\n\x04Join\x12\x11.oomd.JoinRequest\x1a\x12.oomd.JoinResponse\"\x00(\x01\x30\x01\x12\x41\n\x0cImportByFile\x12\x19.oomd.ImportByFileRequest\x1a\x14.oomd.ImportResponse\"\x00\x12\x41\n\nJoinByFile\x12\x17.oomd.JoinByFileRequest\x1a\x18.oomd.JoinByFileResponse\"\x00\x42\nZ\x08/codegenb\x06proto3'
+  serialized_pb=b'\n\noomd.proto\x12\x04oomd\x1a\x0cstatus.proto\x1a\x19google/protobuf/any.proto\"=\n\x10OnlineGetRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x15\n\rfeature_names\x18\x02 \x03(\t\"\x80\x01\n\x0f\x46\x65\x61tureValueMap\x12+\n\x03map\x18\x01 \x03(\x0b\x32\x1e.oomd.FeatureValueMap.MapEntry\x1a@\n\x08MapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12#\n\x05value\x18\x02 \x01(\x0b\x32\x14.google.protobuf.Any:\x02\x38\x01\"^\n\x11OnlineGetResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12%\n\x06result\x18\x02 \x01(\x0b\x32\x15.oomd.FeatureValueMap\"C\n\x15OnlineMultiGetRequest\x12\x13\n\x0b\x65ntity_keys\x18\x01 \x03(\t\x12\x15\n\rfeature_names\x18\x02 \x03(\t\"\xbc\x01\n\x16OnlineMultiGetResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x38\n\x06result\x18\x02 \x03(\x0b\x32(.oomd.OnlineMultiGetResponse.ResultEntry\x1a\x44\n\x0bResultEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.oomd.FeatureValueMap:\x02\x38\x01\"\"\n\x0bSyncRequest\x12\x13\n\x0brevision_id\x18\x01 \x01(\x05\"2\n\x0cSyncResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\"\x7f\n\rImportRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12!\n\x03row\x18\x04 \x03(\x0b\x32\x14.google.protobuf.AnyB\x0b\n\t_revision\"I\n\x0eImportResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x13\n\x0brevision_id\x18\x02 \x01(\x03\"\x8e\x01\n\x13ImportByFileRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x17\n\x0finput_file_path\x18\x04 \x01(\t\x12\x11\n\tdelimiter\x18\x05 \x01(\tB\x0b\n\t_revision\"2\n\tEntityRow\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x11\n\tunix_time\x18\x02 \x01(\x03\"I\n\x0bJoinRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12#\n\nentity_row\x18\x02 \x01(\x0b\x32\x0f.oomd.EntityRow\"l\n\x0cJoinResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x0e\n\x06header\x18\x02 \x03(\t\x12(\n\njoined_row\x18\x03 \x03(\x0b\x32\x14.google.protobuf.Any\"]\n\x11JoinByFileRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x17\n\x0finput_file_path\x18\x02 \x01(\t\x12\x18\n\x10output_file_path\x18\x03 \x01(\t\"8\n\x12JoinByFileResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status2\xba\x03\n\x04OomD\x12>\n\tOnlineGet\x12\x16.oomd.OnlineGetRequest\x1a\x17.oomd.OnlineGetResponse\"\x00\x12M\n\x0eOnlineMultiGet\x12\x1b.oomd.OnlineMultiGetRequest\x1a\x1c.oomd.OnlineMultiGetResponse\"\x00\x12/\n\x04Sync\x12\x11.oomd.SyncRequest\x1a\x12.oomd.SyncResponse\"\x00\x12\x37\n\x06Import\x12\x13.oomd.ImportRequest\x1a\x14.oomd.ImportResponse\"\x00(\x01\x12\x33\n\x04Join\x12\x11.oomd.JoinRequest\x1a\x12.oomd.JoinResponse\"\x00(\x01\x30\x01\x12\x41\n\x0cImportByFile\x12\x19.oomd.ImportByFileRequest\x1a\x14.oomd.ImportResponse\"\x00\x12\x41\n\nJoinByFile\x12\x17.oomd.JoinByFileRequest\x1a\x18.oomd.JoinByFileResponse\"\x00\x42\nZ\x08/codegenb\x06proto3'
   ,
   dependencies=[status__pb2.DESCRIPTOR,google_dot_protobuf_dot_any__pb2.DESCRIPTOR,])
 
@@ -483,7 +483,7 @@ _IMPORTBYFILEREQUEST = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='file_path', full_name='oomd.ImportByFileRequest.file_path', index=3,
+      name='input_file_path', full_name='oomd.ImportByFileRequest.input_file_path', index=3,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -514,7 +514,7 @@ _IMPORTBYFILEREQUEST = _descriptor.Descriptor(
     fields=[]),
   ],
   serialized_start=904,
-  serialized_end=1040,
+  serialized_end=1046,
 )
 
 
@@ -552,8 +552,8 @@ _ENTITYROW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1042,
-  serialized_end=1092,
+  serialized_start=1048,
+  serialized_end=1098,
 )
 
 
@@ -591,8 +591,8 @@ _JOINREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1094,
-  serialized_end=1167,
+  serialized_start=1100,
+  serialized_end=1173,
 )
 
 
@@ -637,8 +637,8 @@ _JOINRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1169,
-  serialized_end=1277,
+  serialized_start=1175,
+  serialized_end=1283,
 )
 
 
@@ -683,8 +683,8 @@ _JOINBYFILEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1279,
-  serialized_end=1372,
+  serialized_start=1285,
+  serialized_end=1378,
 )
 
 
@@ -715,8 +715,8 @@ _JOINBYFILERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1374,
-  serialized_end=1430,
+  serialized_start=1380,
+  serialized_end=1436,
 )
 
 _FEATUREVALUEMAP_MAPENTRY.fields_by_name['value'].message_type = google_dot_protobuf_dot_any__pb2._ANY
@@ -891,8 +891,8 @@ _OOMD = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1433,
-  serialized_end=1875,
+  serialized_start=1439,
+  serialized_end=1881,
   methods=[
   _descriptor.MethodDescriptor(
     name='OnlineGet',
