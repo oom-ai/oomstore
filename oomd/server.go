@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net"
 
@@ -94,8 +95,69 @@ func (s *server) Sync(ctx context.Context, req *codegen.SyncRequest) (*codegen.S
 	}, nil
 }
 
-func (s *server) Import(codegen.OomD_ImportServer) error {
-	panic("implement me")
+func generateBytesFrom(rows []*anypb.Any) []byte {
+	var res []byte
+	for _, row := range rows {
+		res = append(res, row.Value...)
+	}
+	return res
+}
+
+func (s *server) Import(stream codegen.OomD_ImportServer) error {
+	firstReq, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+
+	reader, writer := io.Pipe()
+
+	go func() {
+		defer func() {
+			_ = writer.Close()
+		}()
+
+		if _, err := writer.Write(generateBytesFrom(firstReq.Row)); err != nil {
+			return
+		}
+
+		for {
+			req, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Println(err)
+				break
+			}
+			if _, err := writer.Write(generateBytesFrom(req.Row)); err != nil {
+				return
+			}
+		}
+	}()
+
+	revisionID, err := s.oomstore.Import(context.Background(), types.ImportOpt{
+		GroupName:   firstReq.GroupName,
+		Revision:    firstReq.Revision,
+		Description: firstReq.Description,
+		DataSource: types.CsvDataSource{
+			Reader:    reader,
+			Delimiter: ",",
+		},
+	})
+	if err != nil {
+		return stream.SendAndClose(&codegen.ImportResponse{
+			Status: &status.Status{
+				Code:    int32(code.Code_INTERNAL),
+				Message: err.Error(),
+			},
+		})
+	}
+	return stream.SendAndClose(&codegen.ImportResponse{
+		Status: &status.Status{
+			Code: int32(code.Code_OK),
+		},
+		RevisionId: int64(revisionID),
+	})
 }
 
 func (s *server) Join(*codegen.JoinRequest, codegen.OomD_JoinServer) error {
