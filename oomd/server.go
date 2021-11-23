@@ -180,5 +180,7 @@ func main() {
 	}
 	grpcServer := grpc.NewServer()
 	codegen.RegisterOomDServer(grpcServer, newServer())
-	grpcServer.Serve(lis)
+	if err := grpcServer.Serve(lis); err != nil {
+		panic(err)
+	}
 }
