@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v3"
@@ -189,7 +188,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 			return nil, fmt.Errorf("invalid yaml: missing kind")
 		}
 
-		switch strings.ToLower(kind) {
+		switch kind {
 		case "entity":
 			var entity apply.Entity
 			if err := mapstructure.Decode(data, &entity); err != nil {

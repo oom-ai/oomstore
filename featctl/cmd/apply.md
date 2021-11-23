@@ -5,62 +5,63 @@ apply 的效果是：接受一个资源（entity，group，feature）文件，�
 下面是几种资源文件的例子：
 
 ```yaml
-kind: Entity
+kind: entity
 name: user
 length: 8
-description: entity description
+description: 'description'
 batch-features:
 - group: device
   description: a description
   features:
   - name: model
     db-value-type: varchar(16)
-    description: 'device model info'
+    description: 'description'
   - name: price
     db-value-type: int
-    description: 'device price'
+    description: 'description'
 - group: user
   description: a description
   features:
   - name: age
     db-value-type: int
-    description: 'user age'
+    description: 'description'
   - name: gender
     db-value-type: int
-    description: 'user gender'
+    description: 'description'
 ---
-kind: Entity
-name: user
-length: 8
-description: 'User ID'
+kind: entity
+name: device
+length: 16
+description: 'description'
 ---
-kind: FeatureGroup
-name: account
+kind: group
+name: device
 entity-name: user
 category: batch
-description: 'user account info'
+description: 'description'
 ---
-kind: FeatureGroup
-name: user-device
-entity-name: device
+kind: group
+name: device
+entity-name: user
 category: batch
-description: 'phone info'
+description: 'description'
 features:
 - name: model
   db-value-type: varchar(16)
-  description: 'device model info'
+  description: 'description'
 - name: price
   db-value-type: int
-  description: 'device price'
+  description: 'description'
 - name: radio
   db-value-type: int
-  description: 'radio info'
+  description: 'description'
 ---
-kind: Feature
+kind: feature
 name: model
 group-name: device
 category: batch
-description: 'device info'
+db-value-type: varchar(16)
+description: 'description'
 ---
 ```
 
