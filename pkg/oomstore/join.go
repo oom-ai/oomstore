@@ -2,13 +2,18 @@ package oomstore
 
 import (
 	"context"
+	"encoding/csv"
 	"fmt"
+	"io"
 	"math"
+	"os"
 	"sort"
+	"strconv"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/spf13/cast"
 )
 
 // Get point-in-time correct feature values for each entity row.
@@ -54,6 +59,24 @@ func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) (*types.JoinResu
 	})
 }
 
+// Get point-in-time correct feature values for each entity row.
+// The method is similar to Join, except that both input and output are files on disk.
+func (s *OomStore) JoinByFile(ctx context.Context, opt types.JoinByFileOpt) error {
+	entityRows, err := GetEntityRowsFromInputFile(opt.InputFilePath)
+	if err != nil {
+		return err
+	}
+
+	joinResult, err := s.Join(ctx, types.JoinOpt{
+		FeatureNames: opt.FeatureNames,
+		EntityRows:   entityRows,
+	})
+	if err != nil {
+		return err
+	}
+	return writeToFile(opt.OutputFilePath, joinResult)
+}
+
 // key: group_name, value: slice of features
 func buildGroupToFeaturesMap(features types.FeatureList) map[string]types.FeatureList {
 	groups := make(map[string]types.FeatureList)
@@ -90,4 +113,75 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int) ([]*met
 		MaxRevision: math.MaxInt64,
 		DataTable:   revisions[len(revisions)-1].DataTable,
 	}), nil
+}
+
+func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, error) {
+	input, err := os.Open(inputFilePath)
+	if err != nil {
+		return nil, err
+	}
+	entityRows := make(chan types.EntityRow)
+	var readErr error
+	go func() {
+		defer close(entityRows)
+		defer input.Close()
+		reader := csv.NewReader(input)
+		var i int64
+		for {
+			line, err := reader.Read()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				readErr = err
+				return
+			}
+			if len(line) != 2 {
+				readErr = fmt.Errorf("expected 2 values per row, got %d value(s) at row %d", len(line), i)
+				return
+			}
+			unixTime, err := strconv.Atoi(line[1])
+			if err != nil {
+				readErr = err
+				return
+			}
+			entityRows <- types.EntityRow{
+				EntityKey: line[0],
+				UnixTime:  int64(unixTime),
+			}
+			i++
+		}
+	}()
+	if readErr != nil {
+		return nil, readErr
+	}
+	return entityRows, nil
+}
+
+func writeToFile(outputFilePath string, joinResult *types.JoinResult) error {
+	file, err := os.Create(outputFilePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	w := csv.NewWriter(file)
+	defer w.Flush()
+
+	if err := w.Write(joinResult.Header); err != nil {
+		return err
+	}
+	for row := range joinResult.Data {
+		if err := w.Write(joinRecord(row)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func joinRecord(row []interface{}) []string {
+	record := make([]string, 0, len(row))
+	for _, value := range row {
+		record = append(record, cast.ToString(value))
+	}
+	return record
 }
