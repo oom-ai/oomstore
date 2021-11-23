@@ -50,7 +50,7 @@ assert_eq "featctl list group" "$(sort <<< "$group_expected")" "$(ignore_time "$
 init_store
 
 cat > "$TMPFILE" <<EOF
-kind: Entity
+kind: entity
 name: user
 length: 8
 description: 'description'
