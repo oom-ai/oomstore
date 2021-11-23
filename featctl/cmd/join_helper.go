@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"io"
 	"os"
-	"strconv"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -20,7 +18,7 @@ type JoinOpt struct {
 }
 
 func join(ctx context.Context, store *oomstore.OomStore, opt JoinOpt, output string) error {
-	entityRows, err := getEntityRowsFromInputFile(opt.InputFilePath)
+	entityRows, err := oomstore.GetEntityRowsFromInputFile(opt.InputFilePath)
 	if err != nil {
 		return err
 	}
@@ -38,49 +36,6 @@ func join(ctx context.Context, store *oomstore.OomStore, opt JoinOpt, output str
 	}
 
 	return nil
-}
-
-func getEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, error) {
-	input, err := os.Open(inputFilePath)
-	if err != nil {
-		return nil, err
-	}
-	entityRows := make(chan types.EntityRow)
-	var readErr error
-	go func() {
-		defer close(entityRows)
-		defer input.Close()
-		reader := csv.NewReader(input)
-		var i int64
-		for {
-			line, err := reader.Read()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				readErr = err
-				return
-			}
-			if len(line) != 2 {
-				readErr = fmt.Errorf("expected 2 values per row, got %d value(s) at row %d", len(line), i)
-				return
-			}
-			unixTime, err := strconv.Atoi(line[1])
-			if err != nil {
-				readErr = err
-				return
-			}
-			entityRows <- types.EntityRow{
-				EntityKey: line[0],
-				UnixTime:  int64(unixTime),
-			}
-			i++
-		}
-	}()
-	if readErr != nil {
-		return nil, readErr
-	}
-	return entityRows, nil
 }
 
 func printJoinResult(joinResult *types.JoinResult, output string) error {
