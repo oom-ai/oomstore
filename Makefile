@@ -26,8 +26,8 @@ codegen:
 		--python_out=oomd/codegen \
 		--grpc-python_out=oomd/codegen \
 		oomd/oomd.proto
-	sed -i '' "s|import status_pb2|from . import status_pb2|g" oomd/codegen/oomd_pb2.py
-	sed -i '' "s|import oomd_pb2|from . import oomd_pb2|g" oomd/codegen/oomd_pb2_grpc.py
+	perl -pi -e s,"import status_pb2","from . import status_pb2",g oomd/codegen/oomd_pb2.py
+	perl -pi -e s,"import oomd_pb2","from . import oomd_pb2",g oomd/codegen/oomd_pb2_grpc.py
 
 .PHONY: build
 build: featctl
