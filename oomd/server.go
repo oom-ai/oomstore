@@ -106,8 +106,21 @@ func (s *server) ImportByFile(context.Context, *codegen.ImportByFileRequest) (*c
 	panic("implement me")
 }
 
-func (s *server) JoinByFile(context.Context, *codegen.JoinByFileRequest) (*codegen.JoinByFileResponse, error) {
-	panic("implement me")
+func (s *server) JoinByFile(ctx context.Context, req *codegen.JoinByFileRequest) (*codegen.JoinByFileResponse, error) {
+	err := s.oomstore.JoinByFile(ctx, types.JoinByFileOpt{
+		FeatureNames:   req.FeatureNames,
+		InputFilePath:  req.InputFilePath,
+		OutputFilePath: req.OutputFilePath,
+	})
+	if err != nil {
+		return &codegen.JoinByFileResponse{
+			Status: buildStatus(code.Code_INTERNAL, err.Error()),
+		}, err
+	}
+
+	return &codegen.JoinByFileResponse{
+		Status: buildStatus(code.Code_OK, ""),
+	}, nil
 }
 
 func convertFeatureValueMap(m map[string]interface{}) (map[string]*anypb.Any, error) {
