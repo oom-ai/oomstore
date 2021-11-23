@@ -62,8 +62,21 @@ func (s *server) OnlineMultiGet(ctx context.Context, req *codegen.OnlineMultiGet
 	panic("implement me")
 }
 
-func (s *server) Sync(context.Context, *codegen.SyncRequest) (*codegen.SyncResponse, error) {
-	panic("implement me")
+func (s *server) Sync(ctx context.Context, req *codegen.SyncRequest) (*codegen.SyncResponse, error) {
+	if err := s.oomstore.Sync(ctx, types.SyncOpt{RevisionID: int(req.RevisionId)}); err != nil {
+		return &codegen.SyncResponse{
+			Status: &status.Status{
+				Code:    int32(code.Code_INTERNAL),
+				Message: err.Error(),
+			},
+		}, err
+	}
+
+	return &codegen.SyncResponse{
+		Status: &status.Status{
+			Code: int32(code.Code_OK),
+		},
+	}, nil
 }
 
 func (s *server) Import(codegen.OomD_ImportServer) error {
