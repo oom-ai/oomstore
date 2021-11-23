@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import oomd_pb2 as oomd__pb2
+from . import oomd_pb2 as oomd__pb2
 
 
 class OomDStub(object):
