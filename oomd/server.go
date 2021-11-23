@@ -26,26 +26,18 @@ func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (
 	})
 	if err != nil {
 		return &codegen.OnlineGetResponse{
-			Status: &status.Status{
-				Code:    int32(code.Code_INTERNAL),
-				Message: fmt.Sprintf("failed at OnlineGet, err=%+v", err),
-			},
-		}, fmt.Errorf("failed at OnlineGet, err=%+v", err)
+			Status: buildStatus(code.Code_INTERNAL, err.Error()),
+		}, err
 	}
 
 	anyMap, err := convertFeatureValueMap(result.FeatureValueMap)
 	if err != nil {
 		return &codegen.OnlineGetResponse{
-			Status: &status.Status{
-				Code:    int32(code.Code_INTERNAL),
-				Message: err.Error(),
-			},
+			Status: buildStatus(code.Code_INTERNAL, err.Error()),
 		}, err
 	}
 	return &codegen.OnlineGetResponse{
-		Status: &status.Status{
-			Code: int32(code.Code_OK),
-		},
+		Status: buildStatus(code.Code_OK, ""),
 		Result: &codegen.FeatureValueMap{
 			Map: anyMap,
 		},
@@ -59,11 +51,8 @@ func (s *server) OnlineMultiGet(ctx context.Context, req *codegen.OnlineMultiGet
 	})
 	if err != nil {
 		return &codegen.OnlineMultiGetResponse{
-			Status: &status.Status{
-				Code:    int32(code.Code_INTERNAL),
-				Message: fmt.Sprintf("failed at OnlineMultiGet, err=%+v", err),
-			},
-		}, fmt.Errorf("failed at OnlineMultiGet, err=%+v", err)
+			Status: buildStatus(code.Code_INTERNAL, err.Error()),
+		}, err
 	}
 
 	resultMap := make(map[string]*codegen.FeatureValueMap)
@@ -71,10 +60,7 @@ func (s *server) OnlineMultiGet(ctx context.Context, req *codegen.OnlineMultiGet
 		anyMap, err := convertFeatureValueMap(featureValues.FeatureValueMap)
 		if err != nil {
 			return &codegen.OnlineMultiGetResponse{
-				Status: &status.Status{
-					Code:    int32(code.Code_INTERNAL),
-					Message: err.Error(),
-				},
+				Status: buildStatus(code.Code_INTERNAL, err.Error()),
 			}, err
 		}
 		resultMap[entityKey] = &codegen.FeatureValueMap{
@@ -82,9 +68,7 @@ func (s *server) OnlineMultiGet(ctx context.Context, req *codegen.OnlineMultiGet
 		}
 	}
 	return &codegen.OnlineMultiGetResponse{
-		Status: &status.Status{
-			Code: int32(code.Code_OK),
-		},
+		Status: buildStatus(code.Code_OK, ""),
 		Result: resultMap,
 	}, nil
 }
@@ -121,4 +105,11 @@ func convertFeatureValueMap(m map[string]interface{}) (map[string]*anypb.Any, er
 		}
 	}
 	return anyMap, nil
+}
+
+func buildStatus(code code.Code, message string) *status.Status {
+	return &status.Status{
+		Code:    int32(code),
+		Message: message,
+	}
 }
