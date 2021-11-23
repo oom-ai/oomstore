@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"io"
 	"io/ioutil"
 	"log"
 	"time"
@@ -28,6 +29,8 @@ func main() {
 		OnlineGet()
 	case "import":
 		Import()
+	case "join":
+		Join()
 	default:
 		log.Fatalf("invalid function: %s", *function)
 	}
@@ -46,6 +49,45 @@ func OnlineGet() {
 		log.Fatalf("could not get: %v", err)
 	}
 	log.Printf("Got: %v", r)
+}
+
+func Join() {
+	c, cancel := prepareOomDClient(*addr)
+	defer cancel()
+
+	// Contact the server and print out its response.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	joinClient, err := c.Join(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	joinClient.Send(&codegen.JoinRequest{
+		FeatureNames: []string{"state", "credit_score", "account_age_days", "has_2fa_installed", "transaction_count_7d", "transaction_count_30d"},
+		EntityRow: &codegen.EntityRow{
+			EntityKey: "1001",
+			UnixTime:  1950049136,
+		},
+	})
+	joinClient.Send(&codegen.JoinRequest{
+		FeatureNames: []string{"state", "credit_score", "account_age_days", "has_2fa_installed", "transaction_count_7d", "transaction_count_30d"},
+		EntityRow: &codegen.EntityRow{
+			EntityKey: "1002",
+			UnixTime:  1950236233,
+		},
+	})
+	joinClient.CloseSend()
+	for {
+		res, err := joinClient.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			panic(err)
+		}
+		log.Printf("Join Got: %v\n", res)
+	}
 }
 
 func Import() {
