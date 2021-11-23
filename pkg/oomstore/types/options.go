@@ -47,9 +47,21 @@ type ImportOpt struct {
 	Revision    *int64
 }
 
+type ImportByFileOpt struct {
+	GroupName   string
+	Description string
+	DataSource  CsvDataSourceWithFile
+	Revision    *int64
+}
+
 type CsvDataSource struct {
 	Reader    io.Reader
 	Delimiter string
+}
+
+type CsvDataSourceWithFile struct {
+	InputFilePath string
+	Delimiter     string
 }
 
 type OnlineGetOpt struct {

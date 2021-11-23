@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
+	"os"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -87,6 +88,25 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 	// TODO: clean up revision and data_table if import failed
 
 	return newRevisionID, nil
+}
+
+// ImportByFile is similar to Import, the only difference is that it takes in InputFilePath
+// as an argument.
+func (s *OomStore) ImportByFile(ctx context.Context, opt types.ImportByFileOpt) (int, error) {
+	file, err := os.Open(opt.DataSource.InputFilePath)
+	if err != nil {
+		return 0, err
+	}
+	defer file.Close()
+	return s.Import(ctx, types.ImportOpt{
+		GroupName:   opt.GroupName,
+		Description: opt.Description,
+		DataSource: types.CsvDataSource{
+			Reader:    file,
+			Delimiter: opt.DataSource.Delimiter,
+		},
+		Revision: opt.Revision,
+	})
 }
 
 func hasDup(a []string) bool {
