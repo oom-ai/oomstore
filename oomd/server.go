@@ -161,7 +161,57 @@ func (s *server) Import(stream codegen.OomD_ImportServer) error {
 }
 
 func (s *server) Join(stream codegen.OomD_JoinServer) error {
-	panic("implement me")
+	firstReq, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+
+	entityRows := make(chan types.EntityRow)
+
+	joinResult, err := s.oomstore.Join(context.Background(), types.JoinOpt{
+		FeatureNames: firstReq.FeatureNames,
+		EntityRows:   entityRows,
+	})
+	if err != nil {
+		return err
+	}
+
+	var sendErr error
+	go func() {
+		for row := range joinResult.Data {
+			joinedRow, err := convertJoinedRow(row)
+			if err != nil {
+				sendErr = err
+				break
+			}
+			err = stream.Send(&codegen.JoinResponse{
+				Status:    buildStatus(code.Code_OK, ""),
+				Header:    joinResult.Header,
+				JoinedRow: joinedRow,
+			})
+			if err != nil {
+				sendErr = err
+				break
+			}
+		}
+	}()
+
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		if sendErr != nil {
+			return sendErr
+		}
+		entityRows <- types.EntityRow{
+			EntityKey: req.EntityRow.EntityKey,
+			UnixTime:  req.EntityRow.UnixTime,
+		}
+	}
 }
 
 func (s *server) ImportByFile(context.Context, *codegen.ImportByFileRequest) (*codegen.ImportResponse, error) {
@@ -204,6 +254,20 @@ func buildStatus(code code.Code, message string) *status.Status {
 		Code:    int32(code),
 		Message: message,
 	}
+}
+
+func convertJoinedRow(row []interface{}) ([]*anypb.Any, error) {
+	res := make([]*anypb.Any, 0, len(row))
+	for _, value := range row {
+		bytes, err := json.Marshal(value)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal %v", value)
+		}
+		res = append(res, &anypb.Any{
+			Value: bytes,
+		})
+	}
+	return res, nil
 }
 
 // The methods below serves the temporary testing purpose
