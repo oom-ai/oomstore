@@ -98,7 +98,7 @@ func (s *server) Import(codegen.OomD_ImportServer) error {
 	panic("implement me")
 }
 
-func (s *server) Join(*codegen.JoinRequest, codegen.OomD_JoinServer) error {
+func (s *server) Join(stream codegen.OomD_JoinServer) error {
 	panic("implement me")
 }
 
@@ -106,7 +106,7 @@ func (s *server) ImportByFile(context.Context, *codegen.ImportByFileRequest) (*c
 	panic("implement me")
 }
 
-func (s *server) JoinByFile(context.Context, *codegen.JoinRequest) (*codegen.JoinByFileResponse, error) {
+func (s *server) JoinByFile(context.Context, *codegen.JoinByFileRequest) (*codegen.JoinByFileResponse, error) {
 	panic("implement me")
 }
 
