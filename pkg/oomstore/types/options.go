@@ -67,6 +67,12 @@ type JoinOpt struct {
 	EntityRows   <-chan EntityRow
 }
 
+type JoinByFileOpt struct {
+	FeatureNames   []string
+	InputFilePath  string
+	OutputFilePath string
+}
+
 type UpdateEntityOpt struct {
 	EntityName     string
 	NewDescription *string
