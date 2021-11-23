@@ -34,7 +34,7 @@ class OomDStub(object):
                 request_serializer=oomd__pb2.ImportRequest.SerializeToString,
                 response_deserializer=oomd__pb2.ImportResponse.FromString,
                 )
-        self.Join = channel.unary_stream(
+        self.Join = channel.stream_stream(
                 '/oomd.OomD/Join',
                 request_serializer=oomd__pb2.JoinRequest.SerializeToString,
                 response_deserializer=oomd__pb2.JoinResponse.FromString,
@@ -46,7 +46,7 @@ class OomDStub(object):
                 )
         self.JoinByFile = channel.unary_unary(
                 '/oomd.OomD/JoinByFile',
-                request_serializer=oomd__pb2.JoinRequest.SerializeToString,
+                request_serializer=oomd__pb2.JoinByFileRequest.SerializeToString,
                 response_deserializer=oomd__pb2.JoinByFileResponse.FromString,
                 )
 
@@ -78,7 +78,7 @@ class OomDServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def Join(self, request, context):
+    def Join(self, request_iterator, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -119,7 +119,7 @@ def add_OomDServicer_to_server(servicer, server):
                     request_deserializer=oomd__pb2.ImportRequest.FromString,
                     response_serializer=oomd__pb2.ImportResponse.SerializeToString,
             ),
-            'Join': grpc.unary_stream_rpc_method_handler(
+            'Join': grpc.stream_stream_rpc_method_handler(
                     servicer.Join,
                     request_deserializer=oomd__pb2.JoinRequest.FromString,
                     response_serializer=oomd__pb2.JoinResponse.SerializeToString,
@@ -131,7 +131,7 @@ def add_OomDServicer_to_server(servicer, server):
             ),
             'JoinByFile': grpc.unary_unary_rpc_method_handler(
                     servicer.JoinByFile,
-                    request_deserializer=oomd__pb2.JoinRequest.FromString,
+                    request_deserializer=oomd__pb2.JoinByFileRequest.FromString,
                     response_serializer=oomd__pb2.JoinByFileResponse.SerializeToString,
             ),
     }
@@ -213,7 +213,7 @@ class OomD(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def Join(request,
+    def Join(request_iterator,
             target,
             options=(),
             channel_credentials=None,
@@ -223,7 +223,7 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/oomd.OomD/Join',
+        return grpc.experimental.stream_stream(request_iterator, target, '/oomd.OomD/Join',
             oomd__pb2.JoinRequest.SerializeToString,
             oomd__pb2.JoinResponse.FromString,
             options, channel_credentials,
@@ -258,7 +258,7 @@ class OomD(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/oomd.OomD/JoinByFile',
-            oomd__pb2.JoinRequest.SerializeToString,
+            oomd__pb2.JoinByFileRequest.SerializeToString,
             oomd__pb2.JoinByFileResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

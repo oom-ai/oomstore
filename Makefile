@@ -12,6 +12,21 @@ info:
 	@echo "VERSION: $(VERSION)"
 	@echo "COMMIT:  $(COMMIT)"
 
+.PHONY: codegen
+codegen:
+	@docker run --rm -v $$(pwd):/oomstore -w /oomstore rvolosatovs/protoc \
+		--experimental_allow_proto3_optional \
+		-I=oomd \
+		--go_out=oomd \
+		--go-grpc_out=oomd \
+		oomd/oomd.proto
+	@docker run --rm -v $$(pwd):/oomstore -w /oomstore rvolosatovs/protoc \
+		--experimental_allow_proto3_optional \
+		-I=oomd \
+		--python_out=oomd/codegen \
+		--grpc-python_out=oomd/codegen \
+		oomd/oomd.proto
+
 .PHONY: build
 build: featctl
 
