@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"flag"
+	"io/ioutil"
 	"log"
 	"time"
 
+	"github.com/golang/protobuf/ptypes/any"
 	"github.com/oom-ai/oomstore/oomd/codegen"
 	"google.golang.org/grpc"
 )
@@ -30,7 +32,33 @@ func main() {
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.OnlineGet(ctx, &codegen.OnlineGetRequest{EntityKey: "1001", FeatureNames: []string{"state", "has_2fa_installed"}})
+
+	importClient, err := c.Import(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	inbytes, err := ioutil.ReadFile("path-to-data-file")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := importClient.Send(&codegen.ImportRequest{
+		GroupName:   "please input your group name",
+		Description: "please input you description",
+		Row: []*any.Any{{
+			Value: inbytes,
+		}},
+	}); err != nil {
+		log.Fatal(err)
+	}
+
+	importRes, err := importClient.CloseAndRecv()
+	if err != nil {
+		panic(err)
+	}
+	log.Printf("Import Got: %v", importRes)
+
+	r, err := c.OnlineGet(ctx, &codegen.OnlineGetRequest{EntityKey: "1", FeatureNames: []string{"model"}})
 	if err != nil {
 		log.Fatalf("could not get: %v", err)
 	}
