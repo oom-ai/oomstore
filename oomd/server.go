@@ -164,8 +164,27 @@ func (s *server) Join(stream codegen.OomD_JoinServer) error {
 	panic("implement me")
 }
 
-func (s *server) ImportByFile(context.Context, *codegen.ImportByFileRequest) (*codegen.ImportResponse, error) {
-	panic("implement me")
+func (s *server) ImportByFile(ctx context.Context, req *codegen.ImportByFileRequest) (*codegen.ImportResponse, error) {
+	revisionID, err := s.oomstore.ImportByFile(ctx, types.ImportByFileOpt{
+		GroupName:   req.GroupName,
+		Description: req.Description,
+		Revision:    req.Revision,
+		DataSource: types.CsvDataSourceWithFile{
+			InputFilePath: req.InputFilePath,
+			Delimiter:     ",",
+		},
+	})
+	if err != nil {
+		return &codegen.ImportResponse{
+			Status:     buildStatus(code.Code_INTERNAL, err.Error()),
+			RevisionId: int64(revisionID),
+		}, err
+	}
+
+	return &codegen.ImportResponse{
+		Status:     buildStatus(code.Code_OK, ""),
+		RevisionId: int64(revisionID),
+	}, nil
 }
 
 func (s *server) JoinByFile(ctx context.Context, req *codegen.JoinByFileRequest) (*codegen.JoinByFileResponse, error) {
