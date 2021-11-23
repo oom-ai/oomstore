@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v3"
@@ -168,7 +167,7 @@ func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.WriteStore
 
 func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage, error) {
 	var (
-		status = apply.NewApplyStage()
+		stage = apply.NewApplyStage()
 	)
 
 	decoder := yaml.NewDecoder(opt.R)
@@ -189,22 +188,42 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 			return nil, fmt.Errorf("invalid yaml: missing kind")
 		}
 
-		switch strings.ToLower(kind) {
+		switch kind {
 		case "entity":
 			var entity apply.Entity
 			if err := mapstructure.Decode(data, &entity); err != nil {
 				return nil, err
 			}
 
-			status.NewEntities = append(status.NewEntities, entity)
-			for _, group := range entity.BatchFeatures {
-				group.EntityName = entity.Name
-				group.Name = group.Group
+			// We don't want entity.BatchFeature to have values.
+			// The whole stage should be a flat structure, not a nested structure.
+			stage.NewEntities = append(stage.NewEntities, apply.Entity{
+				Kind:        entity.Kind,
+				Name:        entity.Name,
+				Length:      entity.Length,
+				Description: entity.Description,
+			})
 
-				status.NewGroups = append(status.NewGroups, group)
+			for _, group := range entity.BatchFeatures {
+				// We don't want group.Features to have values.
+				// The whole stage should be a flat structure, not a nested structure.
+				stage.NewGroups = append(stage.NewGroups, apply.Group{
+					Kind:        "group",
+					Name:        group.Group,
+					Group:       group.Group,
+					EntityName:  entity.Name,
+					Category:    group.Category,
+					Description: group.Description,
+				})
+
 				for _, feature := range group.Features {
-					feature.GroupName = group.Group
-					status.NewFeatures = append(status.NewFeatures, feature)
+					stage.NewFeatures = append(stage.NewFeatures, apply.Feature{
+						Kind:        "feature",
+						Name:        feature.Name,
+						GroupName:   group.Group,
+						DBValueType: feature.DBValueType,
+						Description: feature.Description,
+					})
 				}
 			}
 		case "group":
@@ -213,11 +232,25 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 				return nil, err
 			}
 
-			group.Group = group.Name
-			status.NewGroups = append(status.NewGroups, group)
+			// We don't want group.Features to have values.
+			// The whole stage should be a flat structure, not a nested structure.
+			stage.NewGroups = append(stage.NewGroups, apply.Group{
+				Kind:        "group",
+				Name:        group.Name,
+				Group:       group.Name,
+				EntityName:  group.EntityName,
+				Category:    group.Category,
+				Description: group.Description,
+			})
+
 			for _, feature := range group.Features {
-				feature.GroupName = group.Name
-				status.NewFeatures = append(status.NewFeatures, feature)
+				stage.NewFeatures = append(stage.NewFeatures, apply.Feature{
+					Kind:        "feature",
+					Name:        feature.Name,
+					GroupName:   group.Name,
+					DBValueType: feature.DBValueType,
+					Description: feature.Description,
+				})
 			}
 
 		case "feature":
@@ -225,11 +258,11 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 			if err := mapstructure.Decode(data, &feature); err != nil {
 				return nil, err
 			}
-			status.NewFeatures = append(status.NewFeatures, feature)
+			stage.NewFeatures = append(stage.NewFeatures, feature)
 
 		default:
 			return nil, fmt.Errorf("invalid kind '%s'", kind)
 		}
 	}
-	return status, nil
+	return stage, nil
 }
