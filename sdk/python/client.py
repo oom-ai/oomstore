@@ -22,7 +22,7 @@ class Client(object):
 
         self.addr = "127.0.0.1:%d" % port
 
-        # wait for oomed started
+        # wait for oomd to start
         time.sleep(2)
 
     def __del__(self):
