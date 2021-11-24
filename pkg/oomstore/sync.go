@@ -83,6 +83,9 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 
 	// Now we can delete the online data corresponding to the previous revision
 	if prevOnlineRevisionID != nil {
+		if opt.PurgeDelay > 0 {
+			time.Sleep(time.Duration(opt.PurgeDelay) * time.Second)
+		}
 		return s.online.Purge(ctx, *prevOnlineRevisionID)
 	}
 
