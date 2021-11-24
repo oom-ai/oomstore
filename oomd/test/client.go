@@ -1,13 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"flag"
-	"io/ioutil"
 	"log"
+	"os"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/any"
 	"github.com/oom-ai/oomstore/oomd/codegen"
 	"google.golang.org/grpc"
 )
@@ -61,17 +61,24 @@ func Import() {
 		log.Fatal(err)
 	}
 
-	inbytes, err := ioutil.ReadFile("path-to-data-file")
+	file, err := os.Open("input_file_path")
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := importClient.Send(&codegen.ImportRequest{
-		GroupName:   "please input your group name",
-		Description: "please input you description",
-		Row: []*any.Any{{
-			Value: inbytes,
-		}},
-	}); err != nil {
+	defer file.Close()
+	fileScanner := bufio.NewScanner(file)
+
+	for fileScanner.Scan() {
+		if err := importClient.Send(&codegen.ImportRequest{
+			GroupName:   "please input your group name",
+			Description: "please input you description",
+			Row:         fileScanner.Bytes(),
+		}); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if err := fileScanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 
