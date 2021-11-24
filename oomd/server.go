@@ -2,14 +2,13 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"time"
 
 	code "google.golang.org/genproto/googleapis/rpc/code"
 	status "google.golang.org/genproto/googleapis/rpc/status"
-	"google.golang.org/protobuf/types/known/anypb"
 
 	"github.com/oom-ai/oomstore/oomd/codegen"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -33,7 +32,7 @@ func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (
 		}, err
 	}
 
-	anyMap, err := convertFeatureValueMap(result.FeatureValueMap)
+	valueMap, err := convertToValueMap(result.FeatureValueMap)
 	if err != nil {
 		return &codegen.OnlineGetResponse{
 			Status: buildStatus(code.Code_INTERNAL, err.Error()),
@@ -42,7 +41,7 @@ func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (
 	return &codegen.OnlineGetResponse{
 		Status: buildStatus(code.Code_OK, ""),
 		Result: &codegen.FeatureValueMap{
-			Map: anyMap,
+			Map: valueMap,
 		},
 	}, nil
 }
@@ -60,14 +59,14 @@ func (s *server) OnlineMultiGet(ctx context.Context, req *codegen.OnlineMultiGet
 
 	resultMap := make(map[string]*codegen.FeatureValueMap)
 	for entityKey, featureValues := range result {
-		anyMap, err := convertFeatureValueMap(featureValues.FeatureValueMap)
+		valueMap, err := convertToValueMap(featureValues.FeatureValueMap)
 		if err != nil {
 			return &codegen.OnlineMultiGetResponse{
 				Status: buildStatus(code.Code_INTERNAL, err.Error()),
 			}, err
 		}
 		resultMap[entityKey] = &codegen.FeatureValueMap{
-			Map: anyMap,
+			Map: valueMap,
 		}
 	}
 	return &codegen.OnlineMultiGetResponse{
@@ -93,14 +92,6 @@ func (s *server) Sync(ctx context.Context, req *codegen.SyncRequest) (*codegen.S
 	}, nil
 }
 
-func generateBytesFrom(rows []*anypb.Any) []byte {
-	var res []byte
-	for _, row := range rows {
-		res = append(res, row.Value...)
-	}
-	return res
-}
-
 func (s *server) Import(stream codegen.OomD_ImportServer) error {
 	firstReq, err := stream.Recv()
 	if err != nil {
@@ -114,7 +105,7 @@ func (s *server) Import(stream codegen.OomD_ImportServer) error {
 			_ = writer.Close()
 		}()
 
-		if _, err := writer.Write(generateBytesFrom(firstReq.Row)); err != nil {
+		if _, err := writer.Write(firstReq.Row); err != nil {
 			return
 		}
 
@@ -127,7 +118,7 @@ func (s *server) Import(stream codegen.OomD_ImportServer) error {
 				log.Println(err)
 				break
 			}
-			if _, err := writer.Write(generateBytesFrom(req.Row)); err != nil {
+			if _, err := writer.Write(req.Row); err != nil {
 				return
 			}
 		}
@@ -202,23 +193,64 @@ func (s *server) JoinByFile(ctx context.Context, req *codegen.JoinByFileRequest)
 	}, nil
 }
 
-func convertFeatureValueMap(m map[string]interface{}) (map[string]*anypb.Any, error) {
-	anyMap := make(map[string]*anypb.Any)
-	for key, value := range m {
-		bytes, err := json.Marshal(value)
+func convertToValueMap(m map[string]interface{}) (map[string]*codegen.Value, error) {
+	valueMap := make(map[string]*codegen.Value)
+	for key, i := range m {
+		value, err := convertInterfaceToValue(i)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal %v", value)
+			return nil, err
 		}
-		anyMap[key] = &anypb.Any{
-			Value: bytes,
-		}
+		valueMap[key] = value
 	}
-	return anyMap, nil
+	return valueMap, nil
 }
 
 func buildStatus(code code.Code, message string) *status.Status {
 	return &status.Status{
 		Code:    int32(code),
 		Message: message,
+	}
+}
+
+func convertInterfaceToValue(i interface{}) (*codegen.Value, error) {
+	switch s := i.(type) {
+	case int64:
+		return &codegen.Value{
+			Kind: &codegen.Value_Int64Value{
+				Int64Value: s,
+			},
+		}, nil
+	case float64:
+		return &codegen.Value{
+			Kind: &codegen.Value_DoubleValue{
+				DoubleValue: s,
+			},
+		}, nil
+	case string:
+		return &codegen.Value{
+			Kind: &codegen.Value_StringValue{
+				StringValue: s,
+			},
+		}, nil
+	case bool:
+		return &codegen.Value{
+			Kind: &codegen.Value_BoolValue{
+				BoolValue: s,
+			},
+		}, nil
+	case time.Time:
+		return &codegen.Value{
+			Kind: &codegen.Value_UnixTimestampValue{
+				UnixTimestampValue: s.UnixMilli(),
+			},
+		}, nil
+	case []byte:
+		return &codegen.Value{
+			Kind: &codegen.Value_BytesValue{
+				BytesValue: s,
+			},
+		}, nil
+	default:
+		return nil, fmt.Errorf("unsupported value type %v", i)
 	}
 }
