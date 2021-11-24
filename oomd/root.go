@@ -29,7 +29,7 @@ var port int
 // rootCmd represents the base command when called without and subcommands
 var rootCmd = &cobra.Command{
 	Use:     "oomd",
-	Short:   "a cli tool that lets you start oom feature store grpc backend.",
+	Short:   "oomstore daemon",
 	Version: version.String(),
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
