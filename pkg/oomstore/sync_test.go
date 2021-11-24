@@ -89,12 +89,7 @@ func TestSync(t *testing.T) {
 					Stream: stream,
 				}).Return(nil)
 
-				metadataStore.EXPECT().UpdateGroup(ctx, metadata.UpdateGroupOpt{
-					GroupID:             revision.GroupID,
-					NewOnlineRevisionID: intPtr(revision.ID),
-				}).Return(nil)
-
-				metadataStore.EXPECT().UpdateRevision(gomock.Any(), gomock.Any()).Return(nil)
+				metadataStore.EXPECT().WithTransaction(ctx, gomock.Any()).Return(nil)
 			},
 		},
 		{
@@ -129,11 +124,7 @@ func TestSync(t *testing.T) {
 					Stream: stream,
 				}).Return(nil)
 
-				metadataStore.EXPECT().UpdateGroup(ctx, metadata.UpdateGroupOpt{
-					GroupID:             revision.GroupID,
-					NewOnlineRevisionID: intPtr(revision.ID),
-				}).Return(nil)
-
+				metadataStore.EXPECT().WithTransaction(ctx, gomock.Any()).Return(nil)
 				onlineStore.EXPECT().Purge(ctx, *revision.Group.OnlineRevisionID).Return(nil)
 			},
 		},
