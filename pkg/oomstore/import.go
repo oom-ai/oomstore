@@ -14,6 +14,9 @@ import (
 // Import a CSV data source into the feature store as a new revision.
 // In the future we want to support more diverse data sources.
 func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
+	if err := s.metadata.Refresh(); err != nil {
+		return 0, fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return 0, err

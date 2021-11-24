@@ -15,7 +15,7 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureNames: &opt.FeatureNames,
 	})
-	entity, err := s.getSharedEntity(features)
+	entity, err := getSharedEntity(features)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 		return nil, nil
 	}
 
-	entity, err := s.getSharedEntity(features)
+	entity, err := getSharedEntity(features)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func groupFeaturesByRevisionID(features types.FeatureList) map[int]types.Feature
 	return featureMap
 }
 
-func (s *OomStore) getSharedEntity(features types.FeatureList) (*types.Entity, error) {
+func getSharedEntity(features types.FeatureList) (*types.Entity, error) {
 	m := make(map[int]*types.Entity)
 	for _, f := range features {
 		m[f.Group.EntityID] = f.Group.Entity

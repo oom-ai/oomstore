@@ -16,6 +16,9 @@ import (
 // This helps get rid of unwanted out-of-memory errors,
 // where size of the particular revision outgrows memory limit of your machine.
 func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
+	if err := s.metadata.Refresh(); err != nil {
+		return fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	revision, err := s.GetRevision(ctx, opt.RevisionID)
 	if err != nil {
 		return err
