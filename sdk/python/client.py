@@ -3,6 +3,10 @@ import codegen.oomd_pb2
 import codegen.oomd_pb2_grpc
 import time
 
+# Convert google.protobuf.pyext._message.MessageMapContainer object to Python dictionary
+def map_container_to_dict(map_container):
+    return dict({k: getattr(v, v.WhichOneof('kind')) for k, v in map_container.items()})
+
 class Client(object):
     def __init__(self):
         pass
@@ -11,13 +15,13 @@ class Client(object):
         with grpc.insecure_channel('localhost:50051') as channel:
             stub = codegen.oomd_pb2_grpc.OomDStub(channel)
             response = stub.OnlineGet(codegen.oomd_pb2.OnlineGetRequest(entity_key=entity_key, feature_names=feature_names))
-        return response.result
+        return map_container_to_dict(response.result.map)
 
     def online_multi_get(self, entity_keys, feature_names):
         with grpc.insecure_channel('localhost:50051') as channel:
             stub = codegen.oomd_pb2_grpc.OomDStub(channel)
             response = stub.OnlineMultiGet(codegen.oomd_pb2.OnlineMultiGetRequest(entity_keys=entity_keys, feature_names=feature_names))
-        return response.result
+        return dict({entity_key: map_container_to_dict(values.map) for entity_key, values in response.result.items()})
 
     def sync(self, revision_id):
         with grpc.insecure_channel('localhost:50051') as channel:
@@ -45,4 +49,5 @@ if __name__ == "__main__":
     client.sync(revision_id1)
     client.sync(revision_id2)
     print(client.online_get(entity_key="1006", feature_names=["state", "credit_score", "account_age_days", "has_2fa_installed", "transaction_count_7d", "transaction_count_30d"]))
+    print(client.online_multi_get(entity_keys=["1006", "1007"], feature_names=["state", "credit_score", "account_age_days", "has_2fa_installed", "transaction_count_7d", "transaction_count_30d"]))
     client.join_by_file(feature_names=["state", "credit_score", "account_age_days", "has_2fa_installed", "transaction_count_7d", "transaction_count_30d"], input_file_path='/tmp/label.csv', output_file_path='/tmp/joined.csv')
