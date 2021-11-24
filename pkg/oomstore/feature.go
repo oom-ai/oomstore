@@ -10,16 +10,25 @@ import (
 
 // Get metadata of a feature by ID.
 func (s *OomStore) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
+	if err := s.metadata.Refresh(); err != nil {
+		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	return s.metadata.GetFeature(ctx, id)
 }
 
 // Get metadata of a feature by name.
 func (s *OomStore) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
+	if err := s.metadata.Refresh(); err != nil {
+		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	return s.metadata.GetFeatureByName(ctx, name)
 }
 
 // List metadata of features meeting particular criteria.
 func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
+	if err := s.metadata.Refresh(); err != nil {
+		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	metadataOpt := metadata.ListFeatureOpt{
 		FeatureNames: opt.FeatureNames,
 	}
@@ -42,6 +51,9 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 
 // Update metadata of a feature.
 func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
+	if err := s.metadata.Refresh(); err != nil {
+		return fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	feature, err := s.metadata.GetFeatureByName(ctx, opt.FeatureName)
 	if err != nil {
 		return err
@@ -54,6 +66,9 @@ func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt
 
 // Create metadata of a batch feature.
 func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatureOpt) (int, error) {
+	if err := s.metadata.Refresh(); err != nil {
+		return 0, fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return 0, err

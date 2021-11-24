@@ -19,6 +19,9 @@ import (
 // Get point-in-time correct feature values for each entity row.
 // Currently, this API only supports batch features.
 func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) (*types.JoinResult, error) {
+	if err := s.metadata.Refresh(); err != nil {
+		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureNames: &opt.FeatureNames,
 	})
@@ -30,7 +33,7 @@ func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) (*types.JoinResu
 		return nil, nil
 	}
 
-	entity, err := s.getSharedEntity(features)
+	entity, err := getSharedEntity(features)
 	if err != nil {
 		return nil, err
 	}
