@@ -189,7 +189,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 		}
 
 		switch kind {
-		case "entity":
+		case "Entity":
 			var entity apply.Entity
 			if err := mapstructure.Decode(data, &entity); err != nil {
 				return nil, err
@@ -208,7 +208,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 				// We don't want group.Features to have values.
 				// The whole stage should be a flat structure, not a nested structure.
 				stage.NewGroups = append(stage.NewGroups, apply.Group{
-					Kind:        "group",
+					Kind:        "Group",
 					Name:        group.Group,
 					Group:       group.Group,
 					EntityName:  entity.Name,
@@ -218,7 +218,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 
 				for _, feature := range group.Features {
 					stage.NewFeatures = append(stage.NewFeatures, apply.Feature{
-						Kind:        "feature",
+						Kind:        "Feature",
 						Name:        feature.Name,
 						GroupName:   group.Group,
 						DBValueType: feature.DBValueType,
@@ -226,7 +226,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 					})
 				}
 			}
-		case "group":
+		case "Group":
 			var group apply.Group
 			if err := mapstructure.Decode(data, &group); err != nil {
 				return nil, err
@@ -235,7 +235,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 			// We don't want group.Features to have values.
 			// The whole stage should be a flat structure, not a nested structure.
 			stage.NewGroups = append(stage.NewGroups, apply.Group{
-				Kind:        "group",
+				Kind:        "Group",
 				Name:        group.Name,
 				Group:       group.Name,
 				EntityName:  group.EntityName,
@@ -245,7 +245,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 
 			for _, feature := range group.Features {
 				stage.NewFeatures = append(stage.NewFeatures, apply.Feature{
-					Kind:        "feature",
+					Kind:        "Feature",
 					Name:        feature.Name,
 					GroupName:   group.Name,
 					DBValueType: feature.DBValueType,
@@ -253,7 +253,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 				})
 			}
 
-		case "feature":
+		case "Feature":
 			var feature apply.Feature
 			if err := mapstructure.Decode(data, &feature); err != nil {
 				return nil, err
