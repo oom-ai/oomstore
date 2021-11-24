@@ -12,7 +12,7 @@ import (
 	"github.com/adrg/xdg"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	"github.com/oom-ai/oomstore/oomd/codegen"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
