@@ -33,4 +33,6 @@ func init() {
 
 	flags.IntVarP(&syncOpt.RevisionID, "revision-id", "r", 0, "group revision id")
 	_ = syncCmd.MarkFlagRequired("revision-id")
+
+	flags.IntVarP(&syncOpt.PurgeDelay, "purge-delay", "", 0, "wait time in seconds before purging the old revision")
 }
