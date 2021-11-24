@@ -15,6 +15,9 @@ import (
 )
 
 func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
+	if err := s.metadata.Refresh(); err != nil {
+		return fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	stage, err := buildApplyStage(ctx, opt)
 	if err != nil {
 		return err
