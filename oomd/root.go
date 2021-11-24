@@ -21,7 +21,7 @@ import (
 )
 
 var cfgFile string
-var defaultCfgFile = filepath.Join(xdg.Home, ".config", "oomd", "config.yaml")
+var defaultCfgFile = filepath.Join(xdg.Home, ".config", "oomstore", "config.yaml")
 
 var oomStoreCfg types.OomStoreConfig
 var port int
