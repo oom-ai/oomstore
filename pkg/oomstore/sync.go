@@ -56,30 +56,38 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		return err
 	}
 
-	// Update the online revision id of the feature group upon sync success
-	if err = s.metadata.UpdateGroup(ctx, metadata.UpdateGroupOpt{
-		GroupID:             group.ID,
-		NewOnlineRevisionID: &revision.ID,
+	if err = s.metadata.WithTransaction(ctx, func(ctx context.Context, tx metadata.WriteStore) error {
+		// Update the online revision id of the feature group upon sync success
+		if err := tx.UpdateGroup(ctx, metadata.UpdateGroupOpt{
+			GroupID:             group.ID,
+			NewOnlineRevisionID: &revision.ID,
+		}); err != nil {
+			return err
+		}
+		if !revision.Anchored {
+			newRevision := time.Now().Unix()
+			newChored := true
+			// Update revision timestamp using current timestamp
+			if err = tx.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
+				RevisionID:  revision.ID,
+				NewRevision: &newRevision,
+				NewAnchored: &newChored,
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
 	}); err != nil {
 		return err
 	}
 
 	// Now we can delete the online data corresponding to the previous revision
 	if prevOnlineRevisionID != nil {
+		if opt.PurgeDelay > 0 {
+			time.Sleep(time.Duration(opt.PurgeDelay) * time.Second)
+		}
 		return s.online.Purge(ctx, *prevOnlineRevisionID)
 	}
 
-	if !revision.Anchored {
-		newRevision := time.Now().Unix()
-		newChored := true
-		// update revision timestamp using current timestamp
-		if err = s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
-			RevisionID:  revision.ID,
-			NewRevision: &newRevision,
-			NewAnchored: &newChored,
-		}); err != nil {
-			return err
-		}
-	}
 	return nil
 }

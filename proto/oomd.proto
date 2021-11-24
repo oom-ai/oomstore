@@ -60,6 +60,7 @@ message OnlineMultiGetResponse {
 
 message SyncRequest {
   int32 revision_id = 1;
+  int32 purge_delay = 2;
 }
 message SyncResponse {
   google.rpc.Status status = 1;
