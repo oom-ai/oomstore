@@ -8,7 +8,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-// Create meetadata of a feature group.
+// Create metadata of a feature group.
 func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (int, error) {
 	if err := s.metadata.Refresh(); err != nil {
 		return 0, fmt.Errorf("failed to refresh informer, err=%+v", err)
