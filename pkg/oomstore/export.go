@@ -10,6 +10,9 @@ import (
 
 // Export feature values of a particular revision.
 func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) ([]string, <-chan *types.ExportRecord, error) {
+	if err := s.metadata.Refresh(); err != nil {
+		return nil, nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	revision, err := s.GetRevision(ctx, opt.RevisionID)
 	if err != nil {
 		return nil, nil, err

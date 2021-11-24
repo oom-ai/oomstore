@@ -100,6 +100,7 @@ device,model,price
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
+			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 			tc.mockFunc()
 			revisionID, err := store.Import(context.Background(), tc.opt)
 			assert.EqualError(t, err, tc.wantError.Error())
@@ -209,6 +210,7 @@ device,model,price
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
+			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 			metadataStore.EXPECT().GetGroupByName(ctx, tc.opt.GroupName).Return(&types.Group{
 				ID:       1,
 				Name:     tc.opt.GroupName,

@@ -71,6 +71,7 @@ func TestExport(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
+			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 			revision := types.Revision{
 				ID:        1,
 				GroupID:   1,

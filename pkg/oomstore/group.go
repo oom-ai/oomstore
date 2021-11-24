@@ -2,13 +2,17 @@ package oomstore
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-// Create meetadata of a feature group.
+// Create metadata of a feature group.
 func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (int, error) {
+	if err := s.metadata.Refresh(); err != nil {
+		return 0, fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	entity, err := s.metadata.GetEntityByName(ctx, opt.EntityName)
 	if err != nil {
 		return 0, err
@@ -25,21 +29,31 @@ func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (i
 
 // Get metadata of a feature group by ID.
 func (s *OomStore) GetGroup(ctx context.Context, id int) (*types.Group, error) {
+	if err := s.metadata.Refresh(); err != nil {
+		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	return s.metadata.GetGroup(ctx, id)
 }
 
 // Get metadata of a feature group by name.
 func (s *OomStore) GetGroupByName(ctx context.Context, name string) (*types.Group, error) {
+	if err := s.metadata.Refresh(); err != nil {
+		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	return s.metadata.GetGroupByName(ctx, name)
 }
 
 // List metadata of feature groups under the same entity.
 func (s *OomStore) ListGroup(ctx context.Context, entityID *int) types.GroupList {
+	_ = s.metadata.Refresh()
 	return s.metadata.ListGroup(ctx, entityID)
 }
 
 // Update metadata of a feature group.
 func (s *OomStore) UpdateGroup(ctx context.Context, opt types.UpdateGroupOpt) error {
+	if err := s.metadata.Refresh(); err != nil {
+		return fmt.Errorf("failed to refresh informer, err=%+v", err)
+	}
 	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return err
