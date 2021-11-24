@@ -9,18 +9,18 @@ init_store
 trap 'rm -f "$TMPFILE"' EXIT
 TMPFILE=$(mktemp) || exit 1
 cat > "$TMPFILE" <<EOF
-kind: entity
+kind: Entity
 name: user
 length: 8
 description: 'description'
 ---
-kind: group
+kind: Group
 name: device
 entity-name: user
 category: batch
 description: 'description'
 ---
-kind: group
+kind: Group
 name: account
 entity-name: user
 category: batch
@@ -42,12 +42,12 @@ assert_eq "featctl list group" "$(sort <<< "$group_expected")" "$(ignore_time "$
 init_store
 
 cat > "$TMPFILE" <<EOF
-kind: entity
+kind: Entity
 name: user
 length: 8
 description: 'description'
 ---
-kind: group
+kind: Group
 name: device
 entity-name: user
 category: batch
