@@ -1,4 +1,4 @@
 /.idea
 /build
 /coverage.out
-**/__pycache__/
+__pycache__/
