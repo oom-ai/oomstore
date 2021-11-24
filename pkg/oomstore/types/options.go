@@ -98,4 +98,5 @@ type UpdateGroupOpt struct {
 
 type SyncOpt struct {
 	RevisionID int
+	PurgeDelay int
 }
