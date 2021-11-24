@@ -8,7 +8,7 @@ TMPFILE=$(mktemp) || exit 1
 init_store
 
 cat > "$TMPFILE" <<EOF
-kind: entity
+kind: Entity
 name: user
 length: 8
 description: 'description'
@@ -16,12 +16,12 @@ batch-features:
 - group: student
   description: student feature group
 ---
-kind: entity
+kind: Entity
 name: device
 length: 16
 description: 'description'
 ---
-kind: entity
+kind: Entity
 name: test
 length: 32
 description: 'description'
@@ -50,7 +50,7 @@ assert_eq "featctl list group" "$(sort <<< "$group_expected")" "$(ignore_time "$
 init_store
 
 cat > "$TMPFILE" <<EOF
-kind: entity
+kind: Entity
 name: user
 length: 8
 description: 'description'

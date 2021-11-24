@@ -5,7 +5,7 @@ apply 的效果是：接受一个资源（entity，group，feature）文件，�
 下面是几种资源文件的例子：
 
 ```yaml
-kind: entity
+kind: Entity
 name: user
 length: 8
 description: 'description'
@@ -29,18 +29,18 @@ batch-features:
     db-value-type: int
     description: 'description'
 ---
-kind: entity
+kind: Entity
 name: device
 length: 16
 description: 'description'
 ---
-kind: group
+kind: Group
 name: device
 entity-name: user
 category: batch
 description: 'description'
 ---
-kind: group
+kind: Group
 name: device
 entity-name: user
 category: batch
@@ -56,7 +56,7 @@ features:
   db-value-type: int
   description: 'description'
 ---
-kind: feature
+kind: Feature
 name: model
 group-name: device
 category: batch

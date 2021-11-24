@@ -9,25 +9,25 @@ init_store
 trap 'rm -f "$TMPFILE"' EXIT
 TMPFILE=$(mktemp) || exit 1
 cat > "$TMPFILE" <<EOF
-kind: entity
+kind: Entity
 name: user
 length: 8
 description: 'description'
 ---
-kind: group
+kind: Group
 name: device
 entity-name: user
 category: batch
 description: 'description'
 ---
-kind: feature
+kind: Feature
 name: model
 group-name: device
 category: batch
 db-value-type: varchar(16)
 description: 'description'
 ---
-kind: feature
+kind: Feature
 name: price
 group-name: device
 category: batch

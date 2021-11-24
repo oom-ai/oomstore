@@ -21,7 +21,7 @@ func TestBuildApplyStage(t *testing.T) {
 		{
 			description: "invalid yaml: msissng kind",
 			opt: apply.ApplyOpt{R: strings.NewReader(`
-# kind: entity
+# kind: Entity
 name: user
 length: 8
 description: 'User ID'
@@ -32,18 +32,18 @@ description: 'User ID'
 		{
 			description: "invalid kind",
 			opt: apply.ApplyOpt{R: strings.NewReader(`
-kind: entit
+kind: Entit
 name: user
 length: 8
 description: 'description'
 `)},
 			wantStage: nil,
-			wantErr:   fmt.Errorf("invalid kind 'entit'"),
+			wantErr:   fmt.Errorf("invalid kind 'Entit'"),
 		},
 		{
 			description: "single entity",
 			opt: apply.ApplyOpt{R: strings.NewReader(`
-kind: entity
+kind: Entity
 name: user
 length: 8
 description: 'description'
@@ -51,7 +51,7 @@ description: 'description'
 			wantStage: &apply.ApplyStage{
 				NewEntities: []apply.Entity{
 					{
-						Kind:        "entity",
+						Kind:        "Entity",
 						Name:        "user",
 						Length:      8,
 						Description: "description",
@@ -65,31 +65,31 @@ description: 'description'
 		{
 			description: "has many simple objects",
 			opt: apply.ApplyOpt{R: strings.NewReader(`
-kind: entity
+kind: Entity
 name: user
 length: 8
 description: 'description'
 ---
-kind: group
+kind: Group
 name: account
 entity-name: user
 category: batch
 description: 'description'
 ---
-kind: group
+kind: Group
 name: device
 entity-name: user
 category: batch
 description: 'description'
 ---
-kind: feature
+kind: Feature
 name: model
 group-name: device
 category: batch
 db-value-type: varchar(16)
 description: 'description'
 ---
-kind: feature
+kind: Feature
 name: price
 group-name: device
 category: batch
@@ -99,14 +99,14 @@ description: 'description'
 			wantStage: &apply.ApplyStage{
 				NewEntities: []apply.Entity{
 					{
-						Kind:        "entity",
+						Kind:        "Entity",
 						Name:        "user",
 						Length:      8,
 						Description: "description",
 					},
 				}, NewGroups: []apply.Group{
 					{
-						Kind:        "group",
+						Kind:        "Group",
 						Name:        "account",
 						Group:       "account",
 						EntityName:  "user",
@@ -114,7 +114,7 @@ description: 'description'
 						Description: "description",
 					},
 					{
-						Kind:        "group",
+						Kind:        "Group",
 						Name:        "device",
 						Group:       "device",
 						EntityName:  "user",
@@ -124,14 +124,14 @@ description: 'description'
 				},
 				NewFeatures: []apply.Feature{
 					{
-						Kind:        "feature",
+						Kind:        "Feature",
 						Name:        "model",
 						GroupName:   "device",
 						DBValueType: "varchar(16)",
 						Description: "description",
 					},
 					{
-						Kind:        "feature",
+						Kind:        "Feature",
 						Name:        "price",
 						GroupName:   "device",
 						DBValueType: "int",
@@ -144,7 +144,7 @@ description: 'description'
 		{
 			description: "complex group",
 			opt: apply.ApplyOpt{R: strings.NewReader(`
-kind: group
+kind: Group
 name: device
 entity-name: user
 category: batch
@@ -161,7 +161,7 @@ features:
 				NewEntities: []apply.Entity{},
 				NewGroups: []apply.Group{
 					{
-						Kind:        "group",
+						Kind:        "Group",
 						Name:        "device",
 						Group:       "device",
 						EntityName:  "user",
@@ -171,7 +171,7 @@ features:
 				},
 				NewFeatures: []apply.Feature{
 					{
-						Kind:        "feature",
+						Kind:        "Feature",
 						Name:        "model",
 						GroupName:   "device",
 						DBValueType: "varchar(16)",
@@ -179,7 +179,7 @@ features:
 					},
 					{
 
-						Kind:        "feature",
+						Kind:        "Feature",
 						Name:        "price",
 						GroupName:   "device",
 						DBValueType: "int",
@@ -192,7 +192,7 @@ features:
 		{
 			description: "complex entity",
 			opt: apply.ApplyOpt{R: strings.NewReader(`
-kind: entity
+kind: Entity
 name: user
 length: 8
 description: 'description'
@@ -219,7 +219,7 @@ batch-features:
 			wantStage: &apply.ApplyStage{
 				NewEntities: []apply.Entity{
 					{
-						Kind:        "entity",
+						Kind:        "Entity",
 						Name:        "user",
 						Length:      8,
 						Description: "description",
@@ -227,14 +227,14 @@ batch-features:
 				},
 				NewGroups: []apply.Group{
 					{
-						Kind:        "group",
+						Kind:        "Group",
 						Name:        "device",
 						Group:       "device",
 						EntityName:  "user",
 						Description: "description",
 					},
 					{
-						Kind:        "group",
+						Kind:        "Group",
 						Name:        "user",
 						Group:       "user",
 						EntityName:  "user",
@@ -243,7 +243,7 @@ batch-features:
 				},
 				NewFeatures: []apply.Feature{
 					{
-						Kind:        "feature",
+						Kind:        "Feature",
 						Name:        "model",
 						GroupName:   "device",
 						DBValueType: "varchar(16)",
@@ -251,21 +251,21 @@ batch-features:
 					},
 					{
 
-						Kind:        "feature",
+						Kind:        "Feature",
 						Name:        "price",
 						GroupName:   "device",
 						DBValueType: "int",
 						Description: "description",
 					},
 					{
-						Kind:        "feature",
+						Kind:        "Feature",
 						Name:        "age",
 						GroupName:   "user",
 						DBValueType: "int",
 						Description: "description",
 					},
 					{
-						Kind:        "feature",
+						Kind:        "Feature",
 						Name:        "gender",
 						GroupName:   "user",
 						DBValueType: "int",
