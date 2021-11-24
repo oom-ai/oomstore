@@ -141,6 +141,7 @@ func TestSync(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
+			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 			tc.mockFn()
 			require.Equal(t, tc.expectedError, store.Sync(ctx, tc.opt))
 		})

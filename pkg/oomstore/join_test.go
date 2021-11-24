@@ -110,6 +110,7 @@ func TestJoin(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
+			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 			metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureNames: &tc.opt.FeatureNames}).Return(tc.features)
 			if tc.entity != nil {
 				for _, featureList := range tc.featureMap {
