@@ -1,7 +1,6 @@
 import grpc
 import codegen.oomd_pb2
 import codegen.oomd_pb2_grpc
-import time
 
 # Convert google.protobuf.pyext._message.MessageMapContainer object to Python dictionary
 def map_container_to_dict(map_container):
@@ -45,7 +44,6 @@ if __name__ == "__main__":
     client = Client()
     revision_id1 = client.import_by_file(group_name='account', description='sample account data', input_file_path='/tmp/account.csv', delimiter=',')
     revision_id2 = client.import_by_file(group_name='transaction_stats', description='sample transaction stat data', input_file_path='/tmp/transaction_stats.csv', delimiter=',')
-    time.sleep(10)
     client.sync(revision_id1)
     client.sync(revision_id2)
     print(client.online_get(entity_key="1006", feature_names=["state", "credit_score", "account_age_days", "has_2fa_installed", "transaction_count_7d", "transaction_count_30d"]))
