@@ -20,7 +20,7 @@ class Client(object):
             logging.error(e)
             sys.exit(1)
 
-        self.addr = "localhost:%d" % port
+        self.addr = "127.0.0.1:%d" % port
 
         # wait for oomed started
         time.sleep(2)
