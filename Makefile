@@ -26,8 +26,13 @@ codegen:
 		--python_out=sdk/python/codegen \
 		--grpc-python_out=sdk/python/codegen \
 		proto/oomd.proto
-	perl -pi -e s,"import status_pb2","from . import status_pb2",g sdk/python/codegen/oomd_pb2.py
-	perl -pi -e s,"import oomd_pb2","from . import oomd_pb2",g sdk/python/codegen/oomd_pb2_grpc.py
+	@docker run --rm -v $$(pwd):/oomstore -w /oomstore rvolosatovs/protoc \
+		--experimental_allow_proto3_optional \
+		-I=proto \
+		--descriptor_set_out=proto/oomd.protoset \
+		--include_imports proto/oomd.proto
+	@perl -pi -e s,"import status_pb2","from . import status_pb2",g sdk/python/codegen/oomd_pb2.py
+	@perl -pi -e s,"import oomd_pb2","from . import oomd_pb2",g sdk/python/codegen/oomd_pb2_grpc.py
 
 .PHONY: build
 build: featctl
