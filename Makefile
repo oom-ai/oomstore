@@ -35,11 +35,15 @@ codegen:
 	@perl -pi -e s,"import oomd_pb2","from . import oomd_pb2",g sdk/python/codegen/oomd_pb2_grpc.py
 
 .PHONY: build
-build: featctl
+build: featctl oomd
 
 .PHONY: featctl
 featctl:
 	$(MAKE) -C featctl build
+
+.PHONY: oomd
+oomd:
+	$(MAKE) -C oomd build
 
 .PHONY: test
 test:
