@@ -40,7 +40,10 @@ jobs:
         curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
         sh -s -- -b ~/bin ${{ env.golangci-lint-version }}
     - uses: actions/setup-python@v2
-    - uses: pre-commit/action@v2.0.3
+    - name: Run pre-commit
+      run: |
+        pip install pre-commit &&
+        pre-commit run --all --show-diff-on-failure
 
   test:
     runs-on: ubuntu-latest
