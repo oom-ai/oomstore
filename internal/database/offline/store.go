@@ -9,7 +9,7 @@ import (
 
 type Store interface {
 	Join(ctx context.Context, opt JoinOpt) (*types.JoinResult, error)
-	Export(ctx context.Context, opt ExportOpt) (<-chan *types.ExportRecord, error)
+	Export(ctx context.Context, opt ExportOpt) (<-chan types.ExportRecord, <-chan error)
 	Import(ctx context.Context, opt ImportOpt) (int64, error)
 
 	TypeTag(dbType string) (string, error)
