@@ -3,3 +3,4 @@
 /coverage.out
 __pycache__/
 *.protoset
+venv
