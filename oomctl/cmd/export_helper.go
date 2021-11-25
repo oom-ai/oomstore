@@ -13,58 +13,52 @@ import (
 )
 
 func export(ctx context.Context, store *oomstore.OomStore, opt types.ExportOpt, output string) error {
-	fields, stream, err := store.Export(ctx, opt)
+	exportResult, err := store.Export(ctx, opt)
 	if err != nil {
 		return err
 	}
-
-	if err := printExportResult(fields, stream, output); err != nil {
+	if err := printExportResult(exportResult, output); err != nil {
 		return fmt.Errorf("failed printing historical features: %+v", err)
 	}
 	return nil
 }
 
-func printExportResult(fields []string, stream <-chan *types.ExportRecord, output string) error {
+func printExportResult(exportResult *types.ExportResult, output string) error {
 	switch output {
 	case CSV:
-		return printExportResultInCSV(fields, stream)
+		return printExportResultInCSV(exportResult)
 	case ASCIITable:
-		return printExportResultInASCIITable(fields, stream)
+		return printExportResultInASCIITable(exportResult)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
 }
 
-func printExportResultInCSV(fields []string, stream <-chan *types.ExportRecord) error {
+func printExportResultInCSV(exportResult *types.ExportResult) error {
 	w := csv.NewWriter(os.Stdout)
 	defer w.Flush()
 
-	if err := w.Write(fields); err != nil {
+	if err := w.Write(exportResult.Header); err != nil {
 		return err
 	}
-	for item := range stream {
-		if item.Error != nil {
-			return item.Error
-		}
-		if err := w.Write(cast.ToStringSlice(item.Record)); err != nil {
+
+	for row := range exportResult.Data {
+		if err := w.Write(cast.ToStringSlice([]interface{}(row))); err != nil {
 			return err
 		}
 	}
-	return nil
+	return exportResult.CheckStreamError()
 }
 
-func printExportResultInASCIITable(fields []string, stream <-chan *types.ExportRecord) error {
+func printExportResultInASCIITable(exportResult *types.ExportResult) error {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader(fields)
+	table.SetHeader(exportResult.Header)
 	table.SetAutoFormatHeaders(false)
 
-	for item := range stream {
-		if item.Error != nil {
-			return item.Error
-		}
-		table.Append(cast.ToStringSlice(item.Record))
+	for row := range exportResult.Data {
+		table.Append(cast.ToStringSlice([]interface{}(row)))
 	}
 
 	table.Render()
-	return nil
+	return exportResult.CheckStreamError()
 }
