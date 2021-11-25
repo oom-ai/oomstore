@@ -10,10 +10,13 @@ service OomD {
   rpc Sync(SyncRequest) returns (SyncResponse) {}
 
   rpc Import(stream ImportRequest) returns (ImportResponse) {}
-  rpc Join(stream JoinRequest) returns (stream JoinResponse) {}
-
   rpc ImportByFile(ImportByFileRequest) returns (ImportResponse) {}
+
+  rpc Join(stream JoinRequest) returns (stream JoinResponse) {}
   rpc JoinByFile(JoinByFileRequest) returns (JoinByFileResponse) {}
+
+  rpc Export(ExportRequest) returns (stream ExportResponse) {}
+  rpc ExportByFile(ExportByFileRequest) returns (ExportByFileResponse) {}
 }
 
 message Value {
@@ -109,5 +112,28 @@ message JoinByFileRequest {
 }
 
 message JoinByFileResponse {
+  google.rpc.Status status = 1;
+}
+
+message ExportRequest {
+  repeated string feature_names = 1;
+  int32 revision_id = 2;
+  optional uint64 limit = 3;
+}
+
+message ExportResponse {
+  google.rpc.Status status = 1;
+  repeated string header = 2;
+  repeated Value row = 3;
+}
+
+message ExportByFileRequest {
+  repeated string feature_names = 1;
+  int32 revision_id = 2;
+  optional uint64 limit = 3;
+  string output_file_path = 4;
+}
+
+message ExportByFileResponse {
   google.rpc.Status status = 1;
 }

@@ -7,12 +7,11 @@ import (
 	"log"
 	"time"
 
-	code "google.golang.org/genproto/googleapis/rpc/code"
-	status "google.golang.org/genproto/googleapis/rpc/status"
-
 	"github.com/oom-ai/oomstore/oomd/codegen"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	code "google.golang.org/genproto/googleapis/rpc/code"
+	status "google.golang.org/genproto/googleapis/rpc/status"
 )
 
 type server struct {
@@ -191,6 +190,14 @@ func (s *server) JoinByFile(ctx context.Context, req *codegen.JoinByFileRequest)
 	return &codegen.JoinByFileResponse{
 		Status: buildStatus(code.Code_OK, ""),
 	}, nil
+}
+
+func (s *server) Export(req *codegen.ExportRequest, stream codegen.OomD_ExportServer) error {
+	panic("implement me")
+}
+
+func (s *server) ExportByFile(ctx context.Context, req *codegen.ExportByFileRequest) (*codegen.ExportByFileResponse, error) {
+	panic("implement me")
 }
 
 func convertToValueMap(m map[string]interface{}) (map[string]*codegen.Value, error) {
