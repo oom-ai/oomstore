@@ -48,9 +48,9 @@ func init() {
 			Revision: &types.Revision{ID: 3, GroupID: 1},
 			Entity:   &types.Entity{ID: 5, Name: "user", Length: 4},
 			Data: []types.ExportRecord{
-				newRecord([]interface{}{"3215", int64(18), "F"}),
-				newRecord([]interface{}{"3216", int64(29), nil}),
-				newRecord([]interface{}{"3217", int64(44), "M"}),
+				[]interface{}{"3215", int64(18), "F"},
+				[]interface{}{"3216", int64(29), nil},
+				[]interface{}{"3217", int64(44), "M"},
 			},
 		}
 
@@ -72,10 +72,7 @@ func init() {
 		var data []types.ExportRecord
 
 		for i := 0; i < 1000; i++ {
-			record := newRecord([]interface{}{
-				RandString(entity.Length),
-				rand.Float64(),
-			})
+			record := []interface{}{RandString(entity.Length), rand.Float64()}
 			data = append(data, record)
 		}
 		SampleMedium = Sample{features, revision, entity, data}
@@ -84,19 +81,19 @@ func init() {
 
 func importSample(t *testing.T, ctx context.Context, store online.Store, samples ...*Sample) {
 	for _, sample := range samples {
-		stream := make(chan *types.ExportRecord)
+		stream := make(chan types.ExportRecord)
 		go func(sample *Sample) {
 			defer close(stream)
 			for i := range sample.Data {
-				stream <- &sample.Data[i]
+				stream <- sample.Data[i]
 			}
 		}(sample)
 
 		err := store.Import(ctx, online.ImportOpt{
-			FeatureList: sample.Features,
-			Revision:    sample.Revision,
-			Entity:      sample.Entity,
-			Stream:      stream,
+			FeatureList:  sample.Features,
+			Revision:     sample.Revision,
+			Entity:       sample.Entity,
+			ExportStream: stream,
 		})
 		require.NoError(t, err)
 	}
@@ -110,8 +107,4 @@ func RandString(n int) string {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
 	return string(b)
-}
-
-func newRecord(record []interface{}) types.ExportRecord {
-	return types.ExportRecord{Record: record}
 }
