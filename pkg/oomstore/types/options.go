@@ -45,14 +45,14 @@ type ExportByFileOpt struct {
 	OutputFilePath string
 }
 
-type ImportOpt struct {
+type ChannelImport struct {
 	GroupName   string
 	Description string
 	DataSource  CsvDataSource
 	Revision    *int64
 }
 
-type ImportByFileOpt struct {
+type ImportOpt struct {
 	GroupName   string
 	Description string
 	DataSource  CsvDataSourceWithFile
