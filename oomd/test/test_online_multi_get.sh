@@ -6,6 +6,12 @@ prepare_store
 prepare_oomd
 
 case="query single feature"
+arg='
+{
+    "entity_keys": ["19", "50", "78"],
+    "feature_names": ["state"]
+}
+'
 expected='
 {
   "status": {},
@@ -34,16 +40,16 @@ expected='
   }
 }
 '
-actual=$(grpcurl -protoset ../../proto/oomd.protoset -plaintext -d @ localhost:50051 oomd.OomD/OnlineMultiGet <<EOF
-{
-    "entity_keys": ["19", "50", "78"],
-    "feature_names": ["state"]
-}
-EOF
-)
+actual=$(testgrpc OnlineMultiGet <<<"$arg")
 assert_json_eq "$case" "$expected" "$actual"
 
 case="query multiple features"
+arg='
+{
+    "entity_keys": ["48", "74"],
+    "feature_names": ["state", "credit_score", "transaction_count_7d", "transaction_count_30d"]
+}
+'
 expected='
 {
   "status": {},
@@ -83,11 +89,5 @@ expected='
   }
 }
 '
-actual=$(grpcurl -protoset ../../proto/oomd.protoset -plaintext -d @ localhost:50051 oomd.OomD/OnlineMultiGet <<EOF
-{
-    "entity_keys": ["48", "74"],
-    "feature_names": ["state", "credit_score", "transaction_count_7d", "transaction_count_30d"]
-}
-EOF
-)
+actual=$(testgrpc OnlineMultiGet <<<"$arg")
 assert_json_eq "$case" "$expected" "$actual"
