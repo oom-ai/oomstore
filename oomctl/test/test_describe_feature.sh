@@ -6,7 +6,7 @@ init_store
 register_features
 import_sample > /dev/null
 
-case='featctl describe feature works'
+case='oomctl describe feature works'
 expected='
 Name:             price
 Group:            phone
@@ -19,7 +19,7 @@ OnlineRevisionID: <NULL>
 CreateTime:       2021-11-17T11:16:37Z
 ModifyTime:       2021-11-17T11:16:37Z
 '
-actual=$(featctl describe feature price)
+actual=$(oomctl describe feature price)
 ignore_time() { grep -Ev '^(CreateTime|ModifyTime)' <<<"$1"; }
 
 assert_eq "$case" "$(ignore_time "$expected")" "$(ignore_time "$actual")"

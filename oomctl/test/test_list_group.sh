@@ -6,10 +6,10 @@ source ./util.sh
 init_store
 register_features
 
-case='featctl list group works'
+case='oomctl list group works'
 expected='GroupName,GroupID,EntityName,Description
 phone,1,device,phone
 '
-actual=$(featctl list group -o csv)
+actual=$(oomctl list group -o csv)
 ignore_time() { cut -d ',' -f 1-4 <<<"$1"; }
 assert_eq "$case" "$(ignore_time "$expected" | sort)" "$(ignore_time "$actual" | sort)"
