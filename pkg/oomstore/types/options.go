@@ -40,6 +40,11 @@ type ExportOpt struct {
 	Limit        *uint64
 }
 
+type ExportByFileOpt struct {
+	ExportOpt
+	OutputFilePath string
+}
+
 type ImportOpt struct {
 	GroupName   string
 	Description string

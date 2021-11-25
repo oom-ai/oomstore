@@ -2,10 +2,13 @@ package oomstore
 
 import (
 	"context"
+	"encoding/csv"
 	"fmt"
+	"os"
 
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/spf13/cast"
 )
 
 /*
@@ -64,6 +67,30 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) (*types.Expo
 	return types.NewExportResult(header, stream, exportErr), nil
 }
 
+func (s *OomStore) ExportByFile(ctx context.Context, opt types.ExportByFileOpt) error {
+	exportResult, err := s.Export(ctx, opt.ExportOpt)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(opt.OutputFilePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	w := csv.NewWriter(file)
+	defer w.Flush()
+
+	if err := w.Write(exportResult.Header); err != nil {
+		return err
+	}
+	for row := range exportResult.Data {
+		if err := w.Write(cast.ToStringSlice([]interface{}(row))); err != nil {
+			return err
+		}
+	}
+	return exportResult.CheckStreamError()
+}
 func contains(slice []string, item string) bool {
 	for _, s := range slice {
 		if s == item {
