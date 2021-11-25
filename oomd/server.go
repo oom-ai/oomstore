@@ -123,7 +123,7 @@ func (s *server) Import(stream codegen.OomD_ImportServer) error {
 		}
 	}()
 
-	revisionID, err := s.oomstore.Import(context.Background(), types.ImportOpt{
+	revisionID, err := s.oomstore.ChannelImport(context.Background(), types.ChannelImport{
 		GroupName:   firstReq.GroupName,
 		Revision:    firstReq.Revision,
 		Description: firstReq.Description,
@@ -153,7 +153,7 @@ func (s *server) Join(stream codegen.OomD_JoinServer) error {
 }
 
 func (s *server) ImportByFile(ctx context.Context, req *codegen.ImportByFileRequest) (*codegen.ImportResponse, error) {
-	revisionID, err := s.oomstore.ImportByFile(ctx, types.ImportByFileOpt{
+	revisionID, err := s.oomstore.Import(ctx, types.ImportOpt{
 		GroupName:   req.GroupName,
 		Description: req.Description,
 		Revision:    req.Revision,
