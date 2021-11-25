@@ -19,7 +19,7 @@ expected='
   "revisionId": "3"
 }
 '
-actual=$(testgrpc Import <<<"$arg")
+actual=$(testgrpc ChannelImport <<<"$arg")
 assert_json_eq "$case" "$expected" "$actual"
 
 case="data actually imported"
