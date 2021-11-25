@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestJoin(t *testing.T) {
+func TestChannelJoin(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	offlineStore := mock_offline.NewMockStore(ctrl)
@@ -46,7 +46,7 @@ func TestJoin(t *testing.T) {
 
 	testCases := []struct {
 		description   string
-		opt           types.JoinOpt
+		opt           types.ChannelJoinOpt
 		features      types.FeatureList
 		entity        *types.Entity
 		featureMap    map[string]types.FeatureList
@@ -56,7 +56,7 @@ func TestJoin(t *testing.T) {
 	}{
 		{
 			description: "no valid features, return nil",
-			opt: types.JoinOpt{
+			opt: types.ChannelJoinOpt{
 				FeatureNames: streamFeatures.Names(),
 				EntityRows:   entityRows,
 			},
@@ -66,7 +66,7 @@ func TestJoin(t *testing.T) {
 		},
 		{
 			description: "inconsistent features, return nil",
-			opt: types.JoinOpt{
+			opt: types.ChannelJoinOpt{
 				FeatureNames: inconsistentFeatures.Names(),
 				EntityRows:   entityRows,
 			},
@@ -76,7 +76,7 @@ func TestJoin(t *testing.T) {
 		},
 		{
 			description: "nil joined, return nil",
-			opt: types.JoinOpt{
+			opt: types.ChannelJoinOpt{
 				FeatureNames: consistentFeatures.Names(),
 				EntityRows:   entityRows,
 			},
@@ -92,7 +92,7 @@ func TestJoin(t *testing.T) {
 		},
 		{
 			description: "consistent entity type, succeed",
-			opt: types.JoinOpt{
+			opt: types.ChannelJoinOpt{
 				FeatureNames: consistentFeatures.Names(),
 				EntityRows:   entityRows,
 			},
@@ -119,7 +119,7 @@ func TestJoin(t *testing.T) {
 				offlineStore.EXPECT().Join(gomock.Any(), gomock.Any()).Return(tc.joined, nil)
 			}
 
-			actual, err := store.Join(context.Background(), tc.opt)
+			actual, err := store.ChannelJoin(context.Background(), tc.opt)
 			if tc.expectedError != nil {
 				assert.Error(t, err, tc.expectedError)
 			} else if tc.expected == nil {

@@ -18,7 +18,7 @@ import (
 
 // Get point-in-time correct feature values for each entity row.
 // Currently, this API only supports batch features.
-func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) (*types.JoinResult, error) {
+func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*types.JoinResult, error) {
 	if err := s.metadata.Refresh(); err != nil {
 		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
@@ -64,13 +64,13 @@ func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) (*types.JoinResu
 
 // Get point-in-time correct feature values for each entity row.
 // The method is similar to Join, except that both input and output are files on disk.
-func (s *OomStore) JoinByFile(ctx context.Context, opt types.JoinByFileOpt) error {
+func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) error {
 	entityRows, err := GetEntityRowsFromInputFile(opt.InputFilePath)
 	if err != nil {
 		return err
 	}
 
-	joinResult, err := s.Join(ctx, types.JoinOpt{
+	joinResult, err := s.ChannelJoin(ctx, types.ChannelJoinOpt{
 		FeatureNames: opt.FeatureNames,
 		EntityRows:   entityRows,
 	})
