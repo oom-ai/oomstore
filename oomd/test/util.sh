@@ -67,6 +67,17 @@ assert_json_eq() {
   fi
 }
 
+import_sample() {
+    local group=$1
+    local file=$2
+    info "import sample data '$file' into group '$group'..."
+    oomctl import \
+        --group "$group" \
+        --input-file \
+        "$file" \
+        --description 'sample account data' >/dev/null
+}
+
 prepare_store() {
     info "initialize feature store"
     execute_sql 'drop database if exists oomstore_test'
@@ -77,16 +88,8 @@ prepare_store() {
     oomctl apply -f ./data/schema.yaml
 
     info "import sample data to offline store..."
-    oomctl import \
-        --group account \
-        --input-file \
-        ./data/account.csv \
-        --description 'sample account data' >/dev/null
-    oomctl import \
-        --group transaction_stats \
-        --input-file \
-        ./data/transaction_stats.csv \
-        --description 'sample transaction_stats data' >/dev/null
+    import_sample account ./data/account_100.csv
+    import_sample transaction_stats ./data/transaction_stats_100.csv
 
     info "sync sample data to online store"
     oomctl sync -r 1
