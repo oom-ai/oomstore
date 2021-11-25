@@ -176,7 +176,7 @@ func (s *server) ImportByFile(ctx context.Context, req *codegen.ImportByFileRequ
 }
 
 func (s *server) JoinByFile(ctx context.Context, req *codegen.JoinByFileRequest) (*codegen.JoinByFileResponse, error) {
-	err := s.oomstore.JoinByFile(ctx, types.JoinByFileOpt{
+	err := s.oomstore.Join(ctx, types.JoinOpt{
 		FeatureNames:   req.FeatureNames,
 		InputFilePath:  req.InputFilePath,
 		OutputFilePath: req.OutputFilePath,

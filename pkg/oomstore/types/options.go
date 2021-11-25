@@ -79,12 +79,12 @@ type OnlineMultiGetOpt struct {
 	EntityKeys   []string
 }
 
-type JoinOpt struct {
+type ChannelJoinOpt struct {
 	FeatureNames []string
 	EntityRows   <-chan EntityRow
 }
 
-type JoinByFileOpt struct {
+type JoinOpt struct {
 	FeatureNames   []string
 	InputFilePath  string
 	OutputFilePath string
