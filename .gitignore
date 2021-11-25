@@ -1,5 +1,5 @@
 /.idea
 /build
-/coverage.out
+coverage.out
 __pycache__/
 *.protoset
