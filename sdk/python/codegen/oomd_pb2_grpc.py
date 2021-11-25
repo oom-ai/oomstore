@@ -29,35 +29,35 @@ class OomDStub(object):
                 request_serializer=oomd__pb2.SyncRequest.SerializeToString,
                 response_deserializer=oomd__pb2.SyncResponse.FromString,
                 )
-        self.Import = channel.stream_unary(
+        self.ChannelImport = channel.stream_unary(
+                '/oomd.OomD/ChannelImport',
+                request_serializer=oomd__pb2.ChannelImportRequest.SerializeToString,
+                response_deserializer=oomd__pb2.ImportResponse.FromString,
+                )
+        self.Import = channel.unary_unary(
                 '/oomd.OomD/Import',
                 request_serializer=oomd__pb2.ImportRequest.SerializeToString,
                 response_deserializer=oomd__pb2.ImportResponse.FromString,
                 )
-        self.ImportByFile = channel.unary_unary(
-                '/oomd.OomD/ImportByFile',
-                request_serializer=oomd__pb2.ImportByFileRequest.SerializeToString,
-                response_deserializer=oomd__pb2.ImportResponse.FromString,
+        self.ChannelJoin = channel.stream_stream(
+                '/oomd.OomD/ChannelJoin',
+                request_serializer=oomd__pb2.ChannelJoinRequest.SerializeToString,
+                response_deserializer=oomd__pb2.ChannelJoinResponse.FromString,
                 )
-        self.Join = channel.stream_stream(
+        self.Join = channel.unary_unary(
                 '/oomd.OomD/Join',
                 request_serializer=oomd__pb2.JoinRequest.SerializeToString,
                 response_deserializer=oomd__pb2.JoinResponse.FromString,
                 )
-        self.JoinByFile = channel.unary_unary(
-                '/oomd.OomD/JoinByFile',
-                request_serializer=oomd__pb2.JoinByFileRequest.SerializeToString,
-                response_deserializer=oomd__pb2.JoinByFileResponse.FromString,
+        self.ChannelExport = channel.unary_stream(
+                '/oomd.OomD/ChannelExport',
+                request_serializer=oomd__pb2.ChannelExportRequest.SerializeToString,
+                response_deserializer=oomd__pb2.ChannelExportResponse.FromString,
                 )
-        self.Export = channel.unary_stream(
+        self.Export = channel.unary_unary(
                 '/oomd.OomD/Export',
                 request_serializer=oomd__pb2.ExportRequest.SerializeToString,
                 response_deserializer=oomd__pb2.ExportResponse.FromString,
-                )
-        self.ExportByFile = channel.unary_unary(
-                '/oomd.OomD/ExportByFile',
-                request_serializer=oomd__pb2.ExportByFileRequest.SerializeToString,
-                response_deserializer=oomd__pb2.ExportByFileResponse.FromString,
                 )
 
 
@@ -82,37 +82,37 @@ class OomDServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def Import(self, request_iterator, context):
+    def ChannelImport(self, request_iterator, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ImportByFile(self, request, context):
+    def Import(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def Join(self, request_iterator, context):
+    def ChannelJoin(self, request_iterator, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def JoinByFile(self, request, context):
+    def Join(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ChannelExport(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def Export(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def ExportByFile(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -136,35 +136,35 @@ def add_OomDServicer_to_server(servicer, server):
                     request_deserializer=oomd__pb2.SyncRequest.FromString,
                     response_serializer=oomd__pb2.SyncResponse.SerializeToString,
             ),
-            'Import': grpc.stream_unary_rpc_method_handler(
+            'ChannelImport': grpc.stream_unary_rpc_method_handler(
+                    servicer.ChannelImport,
+                    request_deserializer=oomd__pb2.ChannelImportRequest.FromString,
+                    response_serializer=oomd__pb2.ImportResponse.SerializeToString,
+            ),
+            'Import': grpc.unary_unary_rpc_method_handler(
                     servicer.Import,
                     request_deserializer=oomd__pb2.ImportRequest.FromString,
                     response_serializer=oomd__pb2.ImportResponse.SerializeToString,
             ),
-            'ImportByFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.ImportByFile,
-                    request_deserializer=oomd__pb2.ImportByFileRequest.FromString,
-                    response_serializer=oomd__pb2.ImportResponse.SerializeToString,
+            'ChannelJoin': grpc.stream_stream_rpc_method_handler(
+                    servicer.ChannelJoin,
+                    request_deserializer=oomd__pb2.ChannelJoinRequest.FromString,
+                    response_serializer=oomd__pb2.ChannelJoinResponse.SerializeToString,
             ),
-            'Join': grpc.stream_stream_rpc_method_handler(
+            'Join': grpc.unary_unary_rpc_method_handler(
                     servicer.Join,
                     request_deserializer=oomd__pb2.JoinRequest.FromString,
                     response_serializer=oomd__pb2.JoinResponse.SerializeToString,
             ),
-            'JoinByFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.JoinByFile,
-                    request_deserializer=oomd__pb2.JoinByFileRequest.FromString,
-                    response_serializer=oomd__pb2.JoinByFileResponse.SerializeToString,
+            'ChannelExport': grpc.unary_stream_rpc_method_handler(
+                    servicer.ChannelExport,
+                    request_deserializer=oomd__pb2.ChannelExportRequest.FromString,
+                    response_serializer=oomd__pb2.ChannelExportResponse.SerializeToString,
             ),
-            'Export': grpc.unary_stream_rpc_method_handler(
+            'Export': grpc.unary_unary_rpc_method_handler(
                     servicer.Export,
                     request_deserializer=oomd__pb2.ExportRequest.FromString,
                     response_serializer=oomd__pb2.ExportResponse.SerializeToString,
-            ),
-            'ExportByFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.ExportByFile,
-                    request_deserializer=oomd__pb2.ExportByFileRequest.FromString,
-                    response_serializer=oomd__pb2.ExportByFileResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -228,7 +228,7 @@ class OomD(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def Import(request_iterator,
+    def ChannelImport(request_iterator,
             target,
             options=(),
             channel_credentials=None,
@@ -238,14 +238,31 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(request_iterator, target, '/oomd.OomD/Import',
+        return grpc.experimental.stream_unary(request_iterator, target, '/oomd.OomD/ChannelImport',
+            oomd__pb2.ChannelImportRequest.SerializeToString,
+            oomd__pb2.ImportResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Import(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/Import',
             oomd__pb2.ImportRequest.SerializeToString,
             oomd__pb2.ImportResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def ImportByFile(request,
+    def ChannelJoin(request_iterator,
             target,
             options=(),
             channel_credentials=None,
@@ -255,14 +272,14 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/ImportByFile',
-            oomd__pb2.ImportByFileRequest.SerializeToString,
-            oomd__pb2.ImportResponse.FromString,
+        return grpc.experimental.stream_stream(request_iterator, target, '/oomd.OomD/ChannelJoin',
+            oomd__pb2.ChannelJoinRequest.SerializeToString,
+            oomd__pb2.ChannelJoinResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def Join(request_iterator,
+    def Join(request,
             target,
             options=(),
             channel_credentials=None,
@@ -272,14 +289,14 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/oomd.OomD/Join',
+        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/Join',
             oomd__pb2.JoinRequest.SerializeToString,
             oomd__pb2.JoinResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def JoinByFile(request,
+    def ChannelExport(request,
             target,
             options=(),
             channel_credentials=None,
@@ -289,9 +306,9 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/JoinByFile',
-            oomd__pb2.JoinByFileRequest.SerializeToString,
-            oomd__pb2.JoinByFileResponse.FromString,
+        return grpc.experimental.unary_stream(request, target, '/oomd.OomD/ChannelExport',
+            oomd__pb2.ChannelExportRequest.SerializeToString,
+            oomd__pb2.ChannelExportResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -306,25 +323,8 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/oomd.OomD/Export',
+        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/Export',
             oomd__pb2.ExportRequest.SerializeToString,
             oomd__pb2.ExportResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def ExportByFile(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/ExportByFile',
-            oomd__pb2.ExportByFileRequest.SerializeToString,
-            oomd__pb2.ExportByFileResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

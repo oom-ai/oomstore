@@ -91,7 +91,7 @@ func (s *server) Sync(ctx context.Context, req *codegen.SyncRequest) (*codegen.S
 	}, nil
 }
 
-func (s *server) Import(stream codegen.OomD_ImportServer) error {
+func (s *server) ChannelImport(stream codegen.OomD_ChannelImportServer) error {
 	firstReq, err := stream.Recv()
 	if err != nil {
 		return err
@@ -148,11 +148,7 @@ func (s *server) Import(stream codegen.OomD_ImportServer) error {
 	})
 }
 
-func (s *server) Join(stream codegen.OomD_JoinServer) error {
-	panic("implement me")
-}
-
-func (s *server) ImportByFile(ctx context.Context, req *codegen.ImportByFileRequest) (*codegen.ImportResponse, error) {
+func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codegen.ImportResponse, error) {
 	revisionID, err := s.oomstore.Import(ctx, types.ImportOpt{
 		GroupName:   req.GroupName,
 		Description: req.Description,
@@ -175,28 +171,32 @@ func (s *server) ImportByFile(ctx context.Context, req *codegen.ImportByFileRequ
 	}, nil
 }
 
-func (s *server) JoinByFile(ctx context.Context, req *codegen.JoinByFileRequest) (*codegen.JoinByFileResponse, error) {
+func (s *server) ChannelJoin(stream codegen.OomD_ChannelJoinServer) error {
+	panic("implement me")
+}
+
+func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.JoinResponse, error) {
 	err := s.oomstore.Join(ctx, types.JoinOpt{
 		FeatureNames:   req.FeatureNames,
 		InputFilePath:  req.InputFilePath,
 		OutputFilePath: req.OutputFilePath,
 	})
 	if err != nil {
-		return &codegen.JoinByFileResponse{
+		return &codegen.JoinResponse{
 			Status: buildStatus(code.Code_INTERNAL, err.Error()),
 		}, err
 	}
 
-	return &codegen.JoinByFileResponse{
+	return &codegen.JoinResponse{
 		Status: buildStatus(code.Code_OK, ""),
 	}, nil
 }
 
-func (s *server) Export(req *codegen.ExportRequest, stream codegen.OomD_ExportServer) error {
+func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen.OomD_ChannelExportServer) error {
 	panic("implement me")
 }
 
-func (s *server) ExportByFile(ctx context.Context, req *codegen.ExportByFileRequest) (*codegen.ExportByFileResponse, error) {
+func (s *server) Export(ctx context.Context, req *codegen.ExportRequest) (*codegen.ExportResponse, error) {
 	panic("implement me")
 }
 
