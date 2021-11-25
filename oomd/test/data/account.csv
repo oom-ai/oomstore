@@ -1,0 +1,101 @@
+user,state,credit_score,account_age_days,has_2fa_installed
+1,Colorado,673,90,true
+2,Nevada,618,309,false
+3,Arkansas,534,324,true
+4,New Jersey,671,45,true
+5,Pennsylvania,622,112,true
+6,Pennsylvania,682,22,true
+7,Pennsylvania,544,168,false
+8,Texas,589,68,false
+9,Ohio,628,317,false
+10,Missouri,673,281,false
+11,Minnesota,670,140,false
+12,Mississippi,592,2,false
+13,Arkansas,694,136,false
+14,Maine,748,295,true
+15,Hawaii,552,218,true
+16,New Mexico,700,95,true
+17,Oklahoma,654,332,false
+18,South Carolina,605,71,true
+19,Illinois,597,280,false
+20,Georgia,607,118,false
+21,Oklahoma,595,232,true
+22,New Hampshire,626,336,false
+23,Kansas,544,171,false
+24,South Carolina,718,210,false
+25,Minnesota,737,19,true
+26,Oregon,508,70,false
+27,Oregon,682,217,false
+28,Michigan,604,91,true
+29,Maryland,691,259,true
+30,Iowa,500,123,false
+31,Connecticut,502,133,true
+32,New Jersey,618,290,false
+33,Wyoming,523,109,true
+34,Colorado,655,50,true
+35,Connecticut,583,226,true
+36,Oregon,539,182,false
+37,Mississippi,748,235,false
+38,Texas,735,307,false
+39,New Jersey,573,250,false
+40,Maine,633,10,false
+41,Wisconsin,540,159,true
+42,Maryland,675,140,true
+43,Oregon,509,245,false
+44,Utah,691,296,false
+45,Iowa,738,200,true
+46,Texas,593,175,true
+47,Vermont,645,24,false
+48,Indiana,708,310,false
+49,Nevada,601,240,false
+50,Hawaii,737,109,true
+51,South Carolina,723,122,false
+52,Michigan,512,363,false
+53,Delaware,510,312,false
+54,New Hampshire,658,342,true
+55,Texas,664,173,false
+56,New York,661,130,true
+57,Alaska,618,245,true
+58,Kentucky,705,93,false
+59,New Jersey,590,269,false
+60,Kansas,642,93,true
+61,North Carolina,576,267,false
+62,Missouri,568,281,false
+63,Wyoming,566,354,true
+64,New Jersey,608,97,false
+65,Ohio,683,297,true
+66,Rhode Island,577,269,true
+67,New Mexico,723,288,true
+68,New Mexico,606,15,false
+69,North Dakota,714,157,false
+70,Idaho,583,104,false
+71,Missouri,521,187,false
+72,Iowa,519,179,true
+73,Montana,699,33,true
+74,Ohio,703,166,false
+75,South Carolina,686,224,false
+76,Pennsylvania,615,256,false
+77,New Jersey,737,353,false
+78,Tennessee,579,246,false
+79,New York,612,92,true
+80,Louisiana,581,248,false
+81,North Dakota,631,343,true
+82,Kentucky,618,4,true
+83,New Hampshire,524,264,false
+84,Washington,729,6,false
+85,New York,565,350,false
+86,Connecticut,671,314,false
+87,Kentucky,733,339,false
+88,Arizona,649,45,true
+89,California,729,217,false
+90,Kansas,725,58,true
+91,Colorado,643,335,true
+92,Ohio,608,211,true
+93,Arizona,553,306,false
+94,Georgia,589,178,true
+95,California,687,277,true
+96,Wyoming,569,345,true
+97,Tennessee,501,79,false
+98,Alaska,575,45,true
+99,Rhode Island,612,106,true
+100,Louisiana,550,93,false
