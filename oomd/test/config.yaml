@@ -1,0 +1,12 @@
+store: &pg
+  backend: postgres
+  postgres:
+    host: 127.0.0.1
+    port: 5432
+    user: postgres
+    password: postgres
+    database: oomstore_test
+
+online-store: *pg
+offline-store: *pg
+metadata-store: *pg

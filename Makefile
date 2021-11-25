@@ -50,8 +50,9 @@ test:
 	@go test -race -coverprofile=coverage.out -covermode=atomic ./...
 
 .PHONY: integration-test
-integration-test:
+integration-test: codegen
 	$(MAKE) -C featctl integration-test
+	$(MAKE) -C oomd    integration-test
 
 .PHONY: lint
 lint:
