@@ -172,7 +172,57 @@ func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codeg
 }
 
 func (s *server) ChannelJoin(stream codegen.OomD_ChannelJoinServer) error {
-	panic("implement me")
+	firstReq, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+
+	entityRows := make(chan types.EntityRow)
+
+	joinResult, err := s.oomstore.ChannelJoin(context.Background(), types.ChannelJoinOpt{
+		FeatureNames: firstReq.FeatureNames,
+		EntityRows:   entityRows,
+	})
+	if err != nil {
+		return err
+	}
+
+	var sendErr error
+	go func() {
+		for row := range joinResult.Data {
+			joinedRow, err := convertJoinedRow(row)
+			if err != nil {
+				sendErr = err
+				break
+			}
+			err = stream.Send(&codegen.ChannelJoinResponse{
+				Status:    buildStatus(code.Code_OK, ""),
+				Header:    joinResult.Header,
+				JoinedRow: joinedRow,
+			})
+			if err != nil {
+				sendErr = err
+				break
+			}
+		}
+	}()
+
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		if sendErr != nil {
+			return sendErr
+		}
+		entityRows <- types.EntityRow{
+			EntityKey: req.EntityRow.EntityKey,
+			UnixTime:  req.EntityRow.UnixTime,
+		}
+	}
 }
 
 func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.JoinResponse, error) {
@@ -315,4 +365,16 @@ func convertInterfaceToValue(i interface{}) (*codegen.Value, error) {
 	default:
 		return nil, fmt.Errorf("unsupported value type %v", i)
 	}
+}
+
+func convertJoinedRow(row []interface{}) ([]*codegen.Value, error) {
+	res := make([]*codegen.Value, 0, len(row))
+	for _, value := range row {
+		v, err := convertInterfaceToValue(value)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal %v", value)
+		}
+		res = append(res, v)
+	}
+	return res, nil
 }
