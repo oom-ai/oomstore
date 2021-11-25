@@ -9,14 +9,14 @@ service OomD {
   rpc OnlineMultiGet(OnlineMultiGetRequest) returns (OnlineMultiGetResponse) {}
   rpc Sync(SyncRequest) returns (SyncResponse) {}
 
-  rpc Import(stream ImportRequest) returns (ImportResponse) {}
-  rpc ImportByFile(ImportByFileRequest) returns (ImportResponse) {}
+  rpc ChannelImport(stream ChannelImportRequest) returns (ImportResponse) {}
+  rpc Import(ImportRequest) returns (ImportResponse) {}
 
-  rpc Join(stream JoinRequest) returns (stream JoinResponse) {}
-  rpc JoinByFile(JoinByFileRequest) returns (JoinByFileResponse) {}
+  rpc ChannelJoin(stream ChannelJoinRequest) returns (stream ChannelJoinResponse) {}
+  rpc Join(JoinRequest) returns (JoinResponse) {}
 
-  rpc Export(ExportRequest) returns (stream ExportResponse) {}
-  rpc ExportByFile(ExportByFileRequest) returns (ExportByFileResponse) {}
+  rpc ChannelExport(ChannelExportRequest) returns (stream ChannelExportResponse) {}
+  rpc Export(ExportRequest) returns (ExportResponse) {}
 }
 
 message Value {
@@ -69,7 +69,7 @@ message SyncResponse {
   google.rpc.Status status = 1;
 }
 
-message ImportRequest {
+message ChannelImportRequest {
   string group_name = 1;
   string description = 2;
   optional int64 revision = 3;
@@ -81,7 +81,7 @@ message ImportResponse {
   int64 revision_id = 2;
 }
 
-message ImportByFileRequest {
+message ImportRequest {
   string group_name = 1;
   string description = 2;
   optional int64 revision = 3;
@@ -94,46 +94,46 @@ message EntityRow {
   int64 unix_time = 2;
 }
 
-message JoinRequest {
+message ChannelJoinRequest {
   repeated string feature_names = 1;
   EntityRow entity_row = 2;
 }
 
-message JoinResponse {
+message ChannelJoinResponse {
   google.rpc.Status status = 1;
   repeated string header = 2;
   repeated Value joined_row = 3;
 }
 
-message JoinByFileRequest {
+message JoinRequest {
   repeated string feature_names = 1;
   string input_file_path = 2;
   string output_file_path = 3;
 }
 
-message JoinByFileResponse {
+message JoinResponse {
   google.rpc.Status status = 1;
+}
+
+message ChannelExportRequest {
+  repeated string feature_names = 1;
+  int32 revision_id = 2;
+  optional uint64 limit = 3;
+}
+
+message ChannelExportResponse {
+  google.rpc.Status status = 1;
+  repeated string header = 2;
+  repeated Value row = 3;
 }
 
 message ExportRequest {
   repeated string feature_names = 1;
   int32 revision_id = 2;
   optional uint64 limit = 3;
-}
-
-message ExportResponse {
-  google.rpc.Status status = 1;
-  repeated string header = 2;
-  repeated Value row = 3;
-}
-
-message ExportByFileRequest {
-  repeated string feature_names = 1;
-  int32 revision_id = 2;
-  optional uint64 limit = 3;
   string output_file_path = 4;
 }
 
-message ExportByFileResponse {
+message ExportResponse {
   google.rpc.Status status = 1;
 }

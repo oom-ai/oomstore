@@ -34,25 +34,27 @@ type CreateGroupOpt struct {
 	Description string
 }
 
-type ExportOpt struct {
+type ChannelExportOpt struct {
 	RevisionID   int
 	FeatureNames []string
 	Limit        *uint64
 }
 
-type ExportByFileOpt struct {
-	ExportOpt
+type ExportOpt struct {
+	RevisionID     int
+	FeatureNames   []string
+	Limit          *uint64
 	OutputFilePath string
 }
 
-type ImportOpt struct {
+type ChannelImport struct {
 	GroupName   string
 	Description string
 	DataSource  CsvDataSource
 	Revision    *int64
 }
 
-type ImportByFileOpt struct {
+type ImportOpt struct {
 	GroupName   string
 	Description string
 	DataSource  CsvDataSourceWithFile
@@ -79,12 +81,12 @@ type OnlineMultiGetOpt struct {
 	EntityKeys   []string
 }
 
-type JoinOpt struct {
+type ChannelJoinOpt struct {
 	FeatureNames []string
 	EntityRows   <-chan EntityRow
 }
 
-type JoinByFileOpt struct {
+type JoinOpt struct {
 	FeatureNames   []string
 	InputFilePath  string
 	OutputFilePath string

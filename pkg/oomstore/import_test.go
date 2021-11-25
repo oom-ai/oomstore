@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestImportWithDependencyError(t *testing.T) {
+func TestChannelImportWithDependencyError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -25,14 +25,14 @@ func TestImportWithDependencyError(t *testing.T) {
 
 	testCases := []struct {
 		description    string
-		opt            types.ImportOpt
+		opt            types.ChannelImport
 		mockFunc       func()
 		wantRevisionID int
 		wantError      error
 	}{
 		{
 			description: "GetGroup failed",
-			opt: types.ImportOpt{
+			opt: types.ChannelImport{
 				GroupName: "device_info",
 			},
 			mockFunc: func() {
@@ -43,7 +43,7 @@ func TestImportWithDependencyError(t *testing.T) {
 		},
 		{
 			description: "ListFeature failed",
-			opt: types.ImportOpt{
+			opt: types.ChannelImport{
 				GroupName: "device_info",
 			},
 			mockFunc: func() {
@@ -55,7 +55,7 @@ func TestImportWithDependencyError(t *testing.T) {
 		},
 		{
 			description: "GetEntity failed",
-			opt: types.ImportOpt{
+			opt: types.ChannelImport{
 				GroupName: "device_info",
 			},
 			mockFunc: func() {
@@ -67,7 +67,7 @@ func TestImportWithDependencyError(t *testing.T) {
 		},
 		{
 			description: "Create Revision failed",
-			opt: types.ImportOpt{
+			opt: types.ChannelImport{
 				DataSource: types.CsvDataSource{
 					Reader: strings.NewReader(`
 device,model,price
@@ -102,14 +102,14 @@ device,model,price
 		t.Run(tc.description, func(t *testing.T) {
 			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 			tc.mockFunc()
-			revisionID, err := store.Import(context.Background(), tc.opt)
+			revisionID, err := store.ChannelImport(context.Background(), tc.opt)
 			assert.EqualError(t, err, tc.wantError.Error())
 			assert.Equal(t, tc.wantRevisionID, revisionID)
 		})
 	}
 }
 
-func TestImport(t *testing.T) {
+func TestChannelImport(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -121,7 +121,7 @@ func TestImport(t *testing.T) {
 	testCases := []struct {
 		description string
 
-		opt        types.ImportOpt
+		opt        types.ChannelImport
 		features   types.FeatureList
 		entityID   int
 		Entity     types.Entity
@@ -131,7 +131,7 @@ func TestImport(t *testing.T) {
 	}{
 		{
 			description: "import batch feature, succeed",
-			opt: types.ImportOpt{
+			opt: types.ChannelImport{
 				DataSource: types.CsvDataSource{
 					Reader: strings.NewReader(`device,model,price
 1234,xiaomi,200
@@ -156,7 +156,7 @@ func TestImport(t *testing.T) {
 		},
 		{
 			description: "import batch feature, csv data source has duplicated columns",
-			opt: types.ImportOpt{
+			opt: types.ChannelImport{
 				GroupName: "device",
 				DataSource: types.CsvDataSource{
 					Reader: strings.NewReader(`
@@ -182,7 +182,7 @@ device,model,model
 		},
 		{
 			description: "import batch feature, csv header of the data source doesn't match the feature group schema",
-			opt: types.ImportOpt{
+			opt: types.ChannelImport{
 				DataSource: types.CsvDataSource{
 					Reader: strings.NewReader(`
 device,model,price
@@ -235,7 +235,7 @@ device,model,price
 				}).Return(nil).AnyTimes()
 			}
 
-			revisionID, err := store.Import(ctx, tc.opt)
+			revisionID, err := store.ChannelImport(ctx, tc.opt)
 			if tc.wantError != nil {
 				assert.EqualError(t, err, tc.wantError.Error())
 			} else {

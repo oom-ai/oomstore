@@ -23,7 +23,7 @@ func join(ctx context.Context, store *oomstore.OomStore, opt JoinOpt, output str
 		return err
 	}
 
-	joinResult, err := store.Join(ctx, types.JoinOpt{
+	joinResult, err := store.ChannelJoin(ctx, types.ChannelJoinOpt{
 		FeatureNames: opt.FeatureNames,
 		EntityRows:   entityRows,
 	})

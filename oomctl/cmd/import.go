@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var importOpt types.ImportByFileOpt
+var importOpt types.ImportOpt
 var importCmd = &cobra.Command{
 	Use:   "import",
 	Short: "import feature data from a csv file",
@@ -24,7 +24,7 @@ var importCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		log.Println("importing features ...")
-		revisionID, err := oomStore.ImportByFile(ctx, importOpt)
+		revisionID, err := oomStore.Import(ctx, importOpt)
 		if err != nil {
 			log.Fatalf("failed importing features: %v\n", err)
 		}
