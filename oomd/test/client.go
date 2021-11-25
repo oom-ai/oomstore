@@ -56,7 +56,7 @@ func Import() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	importClient, err := c.Import(ctx)
+	importClient, err := c.ChannelImport(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -69,7 +69,7 @@ func Import() {
 	fileScanner := bufio.NewScanner(file)
 
 	for fileScanner.Scan() {
-		if err := importClient.Send(&codegen.ImportRequest{
+		if err := importClient.Send(&codegen.ChannelImportRequest{
 			GroupName:   "please input your group name",
 			Description: "please input you description",
 			Row:         fileScanner.Bytes(),

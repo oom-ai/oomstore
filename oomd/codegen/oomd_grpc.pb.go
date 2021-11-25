@@ -21,12 +21,12 @@ type OomDClient interface {
 	OnlineGet(ctx context.Context, in *OnlineGetRequest, opts ...grpc.CallOption) (*OnlineGetResponse, error)
 	OnlineMultiGet(ctx context.Context, in *OnlineMultiGetRequest, opts ...grpc.CallOption) (*OnlineMultiGetResponse, error)
 	Sync(ctx context.Context, in *SyncRequest, opts ...grpc.CallOption) (*SyncResponse, error)
-	Import(ctx context.Context, opts ...grpc.CallOption) (OomD_ImportClient, error)
-	ImportByFile(ctx context.Context, in *ImportByFileRequest, opts ...grpc.CallOption) (*ImportResponse, error)
-	Join(ctx context.Context, opts ...grpc.CallOption) (OomD_JoinClient, error)
-	JoinByFile(ctx context.Context, in *JoinByFileRequest, opts ...grpc.CallOption) (*JoinByFileResponse, error)
-	Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (OomD_ExportClient, error)
-	ExportByFile(ctx context.Context, in *ExportByFileRequest, opts ...grpc.CallOption) (*ExportByFileResponse, error)
+	ChannelImport(ctx context.Context, opts ...grpc.CallOption) (OomD_ChannelImportClient, error)
+	Import(ctx context.Context, in *ImportRequest, opts ...grpc.CallOption) (*ImportResponse, error)
+	ChannelJoin(ctx context.Context, opts ...grpc.CallOption) (OomD_ChannelJoinClient, error)
+	Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error)
+	ChannelExport(ctx context.Context, in *ChannelExportRequest, opts ...grpc.CallOption) (OomD_ChannelExportClient, error)
+	Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (*ExportResponse, error)
 }
 
 type oomDClient struct {
@@ -64,30 +64,30 @@ func (c *oomDClient) Sync(ctx context.Context, in *SyncRequest, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *oomDClient) Import(ctx context.Context, opts ...grpc.CallOption) (OomD_ImportClient, error) {
-	stream, err := c.cc.NewStream(ctx, &OomD_ServiceDesc.Streams[0], "/oomd.OomD/Import", opts...)
+func (c *oomDClient) ChannelImport(ctx context.Context, opts ...grpc.CallOption) (OomD_ChannelImportClient, error) {
+	stream, err := c.cc.NewStream(ctx, &OomD_ServiceDesc.Streams[0], "/oomd.OomD/ChannelImport", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &oomDImportClient{stream}
+	x := &oomDChannelImportClient{stream}
 	return x, nil
 }
 
-type OomD_ImportClient interface {
-	Send(*ImportRequest) error
+type OomD_ChannelImportClient interface {
+	Send(*ChannelImportRequest) error
 	CloseAndRecv() (*ImportResponse, error)
 	grpc.ClientStream
 }
 
-type oomDImportClient struct {
+type oomDChannelImportClient struct {
 	grpc.ClientStream
 }
 
-func (x *oomDImportClient) Send(m *ImportRequest) error {
+func (x *oomDChannelImportClient) Send(m *ChannelImportRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *oomDImportClient) CloseAndRecv() (*ImportResponse, error) {
+func (x *oomDChannelImportClient) CloseAndRecv() (*ImportResponse, error) {
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
@@ -98,61 +98,61 @@ func (x *oomDImportClient) CloseAndRecv() (*ImportResponse, error) {
 	return m, nil
 }
 
-func (c *oomDClient) ImportByFile(ctx context.Context, in *ImportByFileRequest, opts ...grpc.CallOption) (*ImportResponse, error) {
+func (c *oomDClient) Import(ctx context.Context, in *ImportRequest, opts ...grpc.CallOption) (*ImportResponse, error) {
 	out := new(ImportResponse)
-	err := c.cc.Invoke(ctx, "/oomd.OomD/ImportByFile", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/oomd.OomD/Import", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *oomDClient) Join(ctx context.Context, opts ...grpc.CallOption) (OomD_JoinClient, error) {
-	stream, err := c.cc.NewStream(ctx, &OomD_ServiceDesc.Streams[1], "/oomd.OomD/Join", opts...)
+func (c *oomDClient) ChannelJoin(ctx context.Context, opts ...grpc.CallOption) (OomD_ChannelJoinClient, error) {
+	stream, err := c.cc.NewStream(ctx, &OomD_ServiceDesc.Streams[1], "/oomd.OomD/ChannelJoin", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &oomDJoinClient{stream}
+	x := &oomDChannelJoinClient{stream}
 	return x, nil
 }
 
-type OomD_JoinClient interface {
-	Send(*JoinRequest) error
-	Recv() (*JoinResponse, error)
+type OomD_ChannelJoinClient interface {
+	Send(*ChannelJoinRequest) error
+	Recv() (*ChannelJoinResponse, error)
 	grpc.ClientStream
 }
 
-type oomDJoinClient struct {
+type oomDChannelJoinClient struct {
 	grpc.ClientStream
 }
 
-func (x *oomDJoinClient) Send(m *JoinRequest) error {
+func (x *oomDChannelJoinClient) Send(m *ChannelJoinRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *oomDJoinClient) Recv() (*JoinResponse, error) {
-	m := new(JoinResponse)
+func (x *oomDChannelJoinClient) Recv() (*ChannelJoinResponse, error) {
+	m := new(ChannelJoinResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (c *oomDClient) JoinByFile(ctx context.Context, in *JoinByFileRequest, opts ...grpc.CallOption) (*JoinByFileResponse, error) {
-	out := new(JoinByFileResponse)
-	err := c.cc.Invoke(ctx, "/oomd.OomD/JoinByFile", in, out, opts...)
+func (c *oomDClient) Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error) {
+	out := new(JoinResponse)
+	err := c.cc.Invoke(ctx, "/oomd.OomD/Join", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *oomDClient) Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (OomD_ExportClient, error) {
-	stream, err := c.cc.NewStream(ctx, &OomD_ServiceDesc.Streams[2], "/oomd.OomD/Export", opts...)
+func (c *oomDClient) ChannelExport(ctx context.Context, in *ChannelExportRequest, opts ...grpc.CallOption) (OomD_ChannelExportClient, error) {
+	stream, err := c.cc.NewStream(ctx, &OomD_ServiceDesc.Streams[2], "/oomd.OomD/ChannelExport", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &oomDExportClient{stream}
+	x := &oomDChannelExportClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -162,26 +162,26 @@ func (c *oomDClient) Export(ctx context.Context, in *ExportRequest, opts ...grpc
 	return x, nil
 }
 
-type OomD_ExportClient interface {
-	Recv() (*ExportResponse, error)
+type OomD_ChannelExportClient interface {
+	Recv() (*ChannelExportResponse, error)
 	grpc.ClientStream
 }
 
-type oomDExportClient struct {
+type oomDChannelExportClient struct {
 	grpc.ClientStream
 }
 
-func (x *oomDExportClient) Recv() (*ExportResponse, error) {
-	m := new(ExportResponse)
+func (x *oomDChannelExportClient) Recv() (*ChannelExportResponse, error) {
+	m := new(ChannelExportResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (c *oomDClient) ExportByFile(ctx context.Context, in *ExportByFileRequest, opts ...grpc.CallOption) (*ExportByFileResponse, error) {
-	out := new(ExportByFileResponse)
-	err := c.cc.Invoke(ctx, "/oomd.OomD/ExportByFile", in, out, opts...)
+func (c *oomDClient) Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (*ExportResponse, error) {
+	out := new(ExportResponse)
+	err := c.cc.Invoke(ctx, "/oomd.OomD/Export", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -195,12 +195,12 @@ type OomDServer interface {
 	OnlineGet(context.Context, *OnlineGetRequest) (*OnlineGetResponse, error)
 	OnlineMultiGet(context.Context, *OnlineMultiGetRequest) (*OnlineMultiGetResponse, error)
 	Sync(context.Context, *SyncRequest) (*SyncResponse, error)
-	Import(OomD_ImportServer) error
-	ImportByFile(context.Context, *ImportByFileRequest) (*ImportResponse, error)
-	Join(OomD_JoinServer) error
-	JoinByFile(context.Context, *JoinByFileRequest) (*JoinByFileResponse, error)
-	Export(*ExportRequest, OomD_ExportServer) error
-	ExportByFile(context.Context, *ExportByFileRequest) (*ExportByFileResponse, error)
+	ChannelImport(OomD_ChannelImportServer) error
+	Import(context.Context, *ImportRequest) (*ImportResponse, error)
+	ChannelJoin(OomD_ChannelJoinServer) error
+	Join(context.Context, *JoinRequest) (*JoinResponse, error)
+	ChannelExport(*ChannelExportRequest, OomD_ChannelExportServer) error
+	Export(context.Context, *ExportRequest) (*ExportResponse, error)
 	mustEmbedUnimplementedOomDServer()
 }
 
@@ -217,23 +217,23 @@ func (UnimplementedOomDServer) OnlineMultiGet(context.Context, *OnlineMultiGetRe
 func (UnimplementedOomDServer) Sync(context.Context, *SyncRequest) (*SyncResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Sync not implemented")
 }
-func (UnimplementedOomDServer) Import(OomD_ImportServer) error {
-	return status.Errorf(codes.Unimplemented, "method Import not implemented")
+func (UnimplementedOomDServer) ChannelImport(OomD_ChannelImportServer) error {
+	return status.Errorf(codes.Unimplemented, "method ChannelImport not implemented")
 }
-func (UnimplementedOomDServer) ImportByFile(context.Context, *ImportByFileRequest) (*ImportResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ImportByFile not implemented")
+func (UnimplementedOomDServer) Import(context.Context, *ImportRequest) (*ImportResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Import not implemented")
 }
-func (UnimplementedOomDServer) Join(OomD_JoinServer) error {
-	return status.Errorf(codes.Unimplemented, "method Join not implemented")
+func (UnimplementedOomDServer) ChannelJoin(OomD_ChannelJoinServer) error {
+	return status.Errorf(codes.Unimplemented, "method ChannelJoin not implemented")
 }
-func (UnimplementedOomDServer) JoinByFile(context.Context, *JoinByFileRequest) (*JoinByFileResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method JoinByFile not implemented")
+func (UnimplementedOomDServer) Join(context.Context, *JoinRequest) (*JoinResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Join not implemented")
 }
-func (UnimplementedOomDServer) Export(*ExportRequest, OomD_ExportServer) error {
-	return status.Errorf(codes.Unimplemented, "method Export not implemented")
+func (UnimplementedOomDServer) ChannelExport(*ChannelExportRequest, OomD_ChannelExportServer) error {
+	return status.Errorf(codes.Unimplemented, "method ChannelExport not implemented")
 }
-func (UnimplementedOomDServer) ExportByFile(context.Context, *ExportByFileRequest) (*ExportByFileResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ExportByFile not implemented")
+func (UnimplementedOomDServer) Export(context.Context, *ExportRequest) (*ExportResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Export not implemented")
 }
 func (UnimplementedOomDServer) mustEmbedUnimplementedOomDServer() {}
 
@@ -302,129 +302,129 @@ func _OomD_Sync_Handler(srv interface{}, ctx context.Context, dec func(interface
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OomD_Import_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(OomDServer).Import(&oomDImportServer{stream})
+func _OomD_ChannelImport_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(OomDServer).ChannelImport(&oomDChannelImportServer{stream})
 }
 
-type OomD_ImportServer interface {
+type OomD_ChannelImportServer interface {
 	SendAndClose(*ImportResponse) error
-	Recv() (*ImportRequest, error)
+	Recv() (*ChannelImportRequest, error)
 	grpc.ServerStream
 }
 
-type oomDImportServer struct {
+type oomDChannelImportServer struct {
 	grpc.ServerStream
 }
 
-func (x *oomDImportServer) SendAndClose(m *ImportResponse) error {
+func (x *oomDChannelImportServer) SendAndClose(m *ImportResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *oomDImportServer) Recv() (*ImportRequest, error) {
-	m := new(ImportRequest)
+func (x *oomDChannelImportServer) Recv() (*ChannelImportRequest, error) {
+	m := new(ChannelImportRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func _OomD_ImportByFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ImportByFileRequest)
+func _OomD_Import_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImportRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OomDServer).ImportByFile(ctx, in)
+		return srv.(OomDServer).Import(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/oomd.OomD/ImportByFile",
+		FullMethod: "/oomd.OomD/Import",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OomDServer).ImportByFile(ctx, req.(*ImportByFileRequest))
+		return srv.(OomDServer).Import(ctx, req.(*ImportRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OomD_Join_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(OomDServer).Join(&oomDJoinServer{stream})
+func _OomD_ChannelJoin_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(OomDServer).ChannelJoin(&oomDChannelJoinServer{stream})
 }
 
-type OomD_JoinServer interface {
-	Send(*JoinResponse) error
-	Recv() (*JoinRequest, error)
+type OomD_ChannelJoinServer interface {
+	Send(*ChannelJoinResponse) error
+	Recv() (*ChannelJoinRequest, error)
 	grpc.ServerStream
 }
 
-type oomDJoinServer struct {
+type oomDChannelJoinServer struct {
 	grpc.ServerStream
 }
 
-func (x *oomDJoinServer) Send(m *JoinResponse) error {
+func (x *oomDChannelJoinServer) Send(m *ChannelJoinResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *oomDJoinServer) Recv() (*JoinRequest, error) {
-	m := new(JoinRequest)
+func (x *oomDChannelJoinServer) Recv() (*ChannelJoinRequest, error) {
+	m := new(ChannelJoinRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func _OomD_JoinByFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(JoinByFileRequest)
+func _OomD_Join_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JoinRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OomDServer).JoinByFile(ctx, in)
+		return srv.(OomDServer).Join(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/oomd.OomD/JoinByFile",
+		FullMethod: "/oomd.OomD/Join",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OomDServer).JoinByFile(ctx, req.(*JoinByFileRequest))
+		return srv.(OomDServer).Join(ctx, req.(*JoinRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OomD_Export_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ExportRequest)
+func _OomD_ChannelExport_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ChannelExportRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(OomDServer).Export(m, &oomDExportServer{stream})
+	return srv.(OomDServer).ChannelExport(m, &oomDChannelExportServer{stream})
 }
 
-type OomD_ExportServer interface {
-	Send(*ExportResponse) error
+type OomD_ChannelExportServer interface {
+	Send(*ChannelExportResponse) error
 	grpc.ServerStream
 }
 
-type oomDExportServer struct {
+type oomDChannelExportServer struct {
 	grpc.ServerStream
 }
 
-func (x *oomDExportServer) Send(m *ExportResponse) error {
+func (x *oomDChannelExportServer) Send(m *ChannelExportResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _OomD_ExportByFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ExportByFileRequest)
+func _OomD_Export_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExportRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OomDServer).ExportByFile(ctx, in)
+		return srv.(OomDServer).Export(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/oomd.OomD/ExportByFile",
+		FullMethod: "/oomd.OomD/Export",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OomDServer).ExportByFile(ctx, req.(*ExportByFileRequest))
+		return srv.(OomDServer).Export(ctx, req.(*ExportRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -449,33 +449,33 @@ var OomD_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _OomD_Sync_Handler,
 		},
 		{
-			MethodName: "ImportByFile",
-			Handler:    _OomD_ImportByFile_Handler,
+			MethodName: "Import",
+			Handler:    _OomD_Import_Handler,
 		},
 		{
-			MethodName: "JoinByFile",
-			Handler:    _OomD_JoinByFile_Handler,
+			MethodName: "Join",
+			Handler:    _OomD_Join_Handler,
 		},
 		{
-			MethodName: "ExportByFile",
-			Handler:    _OomD_ExportByFile_Handler,
+			MethodName: "Export",
+			Handler:    _OomD_Export_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "Import",
-			Handler:       _OomD_Import_Handler,
+			StreamName:    "ChannelImport",
+			Handler:       _OomD_ChannelImport_Handler,
 			ClientStreams: true,
 		},
 		{
-			StreamName:    "Join",
-			Handler:       _OomD_Join_Handler,
+			StreamName:    "ChannelJoin",
+			Handler:       _OomD_ChannelJoin_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
 		{
-			StreamName:    "Export",
-			Handler:       _OomD_Export_Handler,
+			StreamName:    "ChannelExport",
+			Handler:       _OomD_ChannelExport_Handler,
 			ServerStreams: true,
 		},
 	},
