@@ -75,6 +75,7 @@ import_sample() {
     info "import sample data '$file' into group '$group'..."
     oomctl import \
         --group "$group" \
+        --revision "$(date +%s%N)" \
         --input-file \
         "$file" \
         --description 'sample account data' >/dev/null
@@ -99,7 +100,7 @@ prepare_store() {
 }
 
 testgrpc() {
-    grpcurl --import-path "$PROTO_DIR" --proto "$PROTO_DIR/oomd.proto" -plaintext -d @ localhost:50051 "oomd.OomD/$1"
+    grpcurl --import-path "$PROTO_DIR" --proto "$PROTO_DIR/oomd.proto" -plaintext -d @ localhost:50051 "oomd.OomD/$1" "${@:1:}"
 }
 
 prepare_oomd() {
