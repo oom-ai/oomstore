@@ -1,8 +1,8 @@
 import sys
 import grpc
 import logging
-import codegen.oomd_pb2
-import codegen.oomd_pb2_grpc
+from .codegen import oomd_pb2
+from .codegen import oomd_pb2_grpc
 import time
 from pathlib import Path
 from subprocess import Popen
