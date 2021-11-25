@@ -84,7 +84,7 @@ func (s *OomStore) ChannelImport(ctx context.Context, opt types.ChannelImport) (
 			RevisionID:  newRevisionID,
 			NewRevision: &revision,
 		}); err != nil {
-			return 0, nil
+			return 0, err
 		}
 	}
 
