@@ -73,7 +73,7 @@ func TestSync(t *testing.T) {
 				}, nil)
 				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
 
-				stream := make(chan *types.ExportRecord)
+				stream := make(chan types.ExportRecord)
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
 					DataTable:    "data-table-name",
 					EntityName:   "device",
@@ -86,7 +86,7 @@ func TestSync(t *testing.T) {
 					Entity: &types.Entity{
 						Name: "device",
 					},
-					Stream: stream,
+					ExportStream: stream,
 				}).Return(nil)
 
 				metadataStore.EXPECT().WithTransaction(ctx, gomock.Any()).Return(nil)
@@ -108,7 +108,7 @@ func TestSync(t *testing.T) {
 				}, nil)
 				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
 
-				stream := make(chan *types.ExportRecord)
+				stream := make(chan types.ExportRecord)
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
 					DataTable:    "data-table-name",
 					EntityName:   "device",
@@ -121,7 +121,7 @@ func TestSync(t *testing.T) {
 					Entity: &types.Entity{
 						Name: "device",
 					},
-					Stream: stream,
+					ExportStream: stream,
 				}).Return(nil)
 
 				metadataStore.EXPECT().WithTransaction(ctx, gomock.Any()).Return(nil)

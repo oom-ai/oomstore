@@ -38,20 +38,18 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	}
 
 	// Move data from offline to online store
-	stream, err := s.offline.Export(ctx, offline.ExportOpt{
+	exportStream, exportError := s.offline.Export(ctx, offline.ExportOpt{
 		DataTable:    revision.DataTable,
 		EntityName:   group.Entity.Name,
 		FeatureNames: features.Names(),
 	})
-	if err != nil {
-		return err
-	}
 
 	if err = s.online.Import(ctx, online.ImportOpt{
-		FeatureList: features,
-		Revision:    revision,
-		Entity:      group.Entity,
-		Stream:      stream,
+		FeatureList:  features,
+		Revision:     revision,
+		Entity:       group.Entity,
+		ExportStream: exportStream,
+		ExportError:  exportError,
 	}); err != nil {
 		return err
 	}
