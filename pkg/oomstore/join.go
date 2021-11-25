@@ -77,7 +77,7 @@ func (s *OomStore) JoinByFile(ctx context.Context, opt types.JoinByFileOpt) erro
 	if err != nil {
 		return err
 	}
-	return writeToFile(opt.OutputFilePath, joinResult)
+	return writeJoinResultToFile(opt.OutputFilePath, joinResult)
 }
 
 // key: group_name, value: slice of features
@@ -161,7 +161,7 @@ func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, e
 	return entityRows, nil
 }
 
-func writeToFile(outputFilePath string, joinResult *types.JoinResult) error {
+func writeJoinResultToFile(outputFilePath string, joinResult *types.JoinResult) error {
 	file, err := os.Create(outputFilePath)
 	if err != nil {
 		return err
