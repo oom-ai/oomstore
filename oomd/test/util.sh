@@ -3,7 +3,7 @@ set -euo pipefail
 SDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 PATH="$SDIR/../build:$PATH"
-PATH="$SDIR/../../featctl/build:$PATH"
+PATH="$SDIR/../../oomctl/build:$PATH"
 
 info() { printf "$(date +'%Y/%m/%d %H:%M:%S') [info] %s\n" "$*" >&2; }
 erro() { printf "$(date +'%Y/%m/%d %H:%M:%S') %b[erro]%b %s\n" '\e[0;31m\033[1m' '\e[0m' "$*" >&2; }
@@ -72,25 +72,25 @@ prepare_store() {
     execute_sql 'drop database if exists oomstore_test'
 
     # initialize feature store
-    featctl init
+    oomctl init
     info "create oomstore schema..."
-    featctl apply -f ./data/schema.yaml
+    oomctl apply -f ./data/schema.yaml
 
     info "import sample data to offline store..."
-    featctl import \
+    oomctl import \
         --group account \
         --input-file \
         ./data/account.csv \
         --description 'sample account data' >/dev/null
-    featctl import \
+    oomctl import \
         --group transaction_stats \
         --input-file \
         ./data/transaction_stats.csv \
         --description 'sample transaction_stats data' >/dev/null
 
     info "sync sample data to online store"
-    featctl sync -r 1
-    featctl sync -r 2
+    oomctl sync -r 1
+    oomctl sync -r 2
 }
 
 prepare_oomd() {

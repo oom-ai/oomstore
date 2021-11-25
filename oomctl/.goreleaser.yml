@@ -1,4 +1,4 @@
-project_name: featctl
+project_name: oomctl
 release:
   prerelease: auto
 before:

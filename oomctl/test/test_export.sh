@@ -18,7 +18,7 @@ expected='device,price
 8,6500
 9,4500
 '
-actual=$(featctl export --feature price --revision-id 1 -o csv)
+actual=$(oomctl export --feature price --revision-id 1 -o csv)
 assert_eq "$case" "$expected" "$actual"
 
 case='get with limit'
@@ -29,5 +29,5 @@ expected='device,price
 4,1999
 5,999
 '
-actual=$(featctl export --feature price --revision-id 1 --limit 5 -o csv)
+actual=$(oomctl export --feature price --revision-id 1 --limit 5 -o csv)
 assert_eq "$case" "$expected" "$actual"
