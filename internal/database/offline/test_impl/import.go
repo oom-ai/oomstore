@@ -56,17 +56,16 @@ func TestImport(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		_, err := store.Import(ctx, opt)
 		assert.NoError(t, err)
 
-		stream, err := store.Export(ctx, offline.ExportOpt{
+		stream, errch := store.Export(ctx, offline.ExportOpt{
 			DataTable:    dataTable,
 			EntityName:   entity.Name,
 			FeatureNames: []string{"model", "price"},
 		})
-		assert.NoError(t, err)
-
 		records := make([][]interface{}, 0)
-		for ele := range stream {
-			records = append(records, ele.Record)
+		for row := range stream {
+			records = append(records, row)
 		}
+		assert.NoError(t, <-errch)
 		sort.Slice(records, func(i, j int) bool {
 			return cast.ToString(records[i][0]) < cast.ToString(records[j][0])
 		})
