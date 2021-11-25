@@ -22,9 +22,11 @@ type OomDClient interface {
 	OnlineMultiGet(ctx context.Context, in *OnlineMultiGetRequest, opts ...grpc.CallOption) (*OnlineMultiGetResponse, error)
 	Sync(ctx context.Context, in *SyncRequest, opts ...grpc.CallOption) (*SyncResponse, error)
 	Import(ctx context.Context, opts ...grpc.CallOption) (OomD_ImportClient, error)
-	Join(ctx context.Context, opts ...grpc.CallOption) (OomD_JoinClient, error)
 	ImportByFile(ctx context.Context, in *ImportByFileRequest, opts ...grpc.CallOption) (*ImportResponse, error)
+	Join(ctx context.Context, opts ...grpc.CallOption) (OomD_JoinClient, error)
 	JoinByFile(ctx context.Context, in *JoinByFileRequest, opts ...grpc.CallOption) (*JoinByFileResponse, error)
+	Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (OomD_ExportClient, error)
+	ExportByFile(ctx context.Context, in *ExportByFileRequest, opts ...grpc.CallOption) (*ExportByFileResponse, error)
 }
 
 type oomDClient struct {
@@ -96,6 +98,15 @@ func (x *oomDImportClient) CloseAndRecv() (*ImportResponse, error) {
 	return m, nil
 }
 
+func (c *oomDClient) ImportByFile(ctx context.Context, in *ImportByFileRequest, opts ...grpc.CallOption) (*ImportResponse, error) {
+	out := new(ImportResponse)
+	err := c.cc.Invoke(ctx, "/oomd.OomD/ImportByFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *oomDClient) Join(ctx context.Context, opts ...grpc.CallOption) (OomD_JoinClient, error) {
 	stream, err := c.cc.NewStream(ctx, &OomD_ServiceDesc.Streams[1], "/oomd.OomD/Join", opts...)
 	if err != nil {
@@ -127,18 +138,50 @@ func (x *oomDJoinClient) Recv() (*JoinResponse, error) {
 	return m, nil
 }
 
-func (c *oomDClient) ImportByFile(ctx context.Context, in *ImportByFileRequest, opts ...grpc.CallOption) (*ImportResponse, error) {
-	out := new(ImportResponse)
-	err := c.cc.Invoke(ctx, "/oomd.OomD/ImportByFile", in, out, opts...)
+func (c *oomDClient) JoinByFile(ctx context.Context, in *JoinByFileRequest, opts ...grpc.CallOption) (*JoinByFileResponse, error) {
+	out := new(JoinByFileResponse)
+	err := c.cc.Invoke(ctx, "/oomd.OomD/JoinByFile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *oomDClient) JoinByFile(ctx context.Context, in *JoinByFileRequest, opts ...grpc.CallOption) (*JoinByFileResponse, error) {
-	out := new(JoinByFileResponse)
-	err := c.cc.Invoke(ctx, "/oomd.OomD/JoinByFile", in, out, opts...)
+func (c *oomDClient) Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (OomD_ExportClient, error) {
+	stream, err := c.cc.NewStream(ctx, &OomD_ServiceDesc.Streams[2], "/oomd.OomD/Export", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &oomDExportClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type OomD_ExportClient interface {
+	Recv() (*ExportResponse, error)
+	grpc.ClientStream
+}
+
+type oomDExportClient struct {
+	grpc.ClientStream
+}
+
+func (x *oomDExportClient) Recv() (*ExportResponse, error) {
+	m := new(ExportResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *oomDClient) ExportByFile(ctx context.Context, in *ExportByFileRequest, opts ...grpc.CallOption) (*ExportByFileResponse, error) {
+	out := new(ExportByFileResponse)
+	err := c.cc.Invoke(ctx, "/oomd.OomD/ExportByFile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -153,9 +196,11 @@ type OomDServer interface {
 	OnlineMultiGet(context.Context, *OnlineMultiGetRequest) (*OnlineMultiGetResponse, error)
 	Sync(context.Context, *SyncRequest) (*SyncResponse, error)
 	Import(OomD_ImportServer) error
-	Join(OomD_JoinServer) error
 	ImportByFile(context.Context, *ImportByFileRequest) (*ImportResponse, error)
+	Join(OomD_JoinServer) error
 	JoinByFile(context.Context, *JoinByFileRequest) (*JoinByFileResponse, error)
+	Export(*ExportRequest, OomD_ExportServer) error
+	ExportByFile(context.Context, *ExportByFileRequest) (*ExportByFileResponse, error)
 	mustEmbedUnimplementedOomDServer()
 }
 
@@ -175,14 +220,20 @@ func (UnimplementedOomDServer) Sync(context.Context, *SyncRequest) (*SyncRespons
 func (UnimplementedOomDServer) Import(OomD_ImportServer) error {
 	return status.Errorf(codes.Unimplemented, "method Import not implemented")
 }
-func (UnimplementedOomDServer) Join(OomD_JoinServer) error {
-	return status.Errorf(codes.Unimplemented, "method Join not implemented")
-}
 func (UnimplementedOomDServer) ImportByFile(context.Context, *ImportByFileRequest) (*ImportResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ImportByFile not implemented")
 }
+func (UnimplementedOomDServer) Join(OomD_JoinServer) error {
+	return status.Errorf(codes.Unimplemented, "method Join not implemented")
+}
 func (UnimplementedOomDServer) JoinByFile(context.Context, *JoinByFileRequest) (*JoinByFileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method JoinByFile not implemented")
+}
+func (UnimplementedOomDServer) Export(*ExportRequest, OomD_ExportServer) error {
+	return status.Errorf(codes.Unimplemented, "method Export not implemented")
+}
+func (UnimplementedOomDServer) ExportByFile(context.Context, *ExportByFileRequest) (*ExportByFileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ExportByFile not implemented")
 }
 func (UnimplementedOomDServer) mustEmbedUnimplementedOomDServer() {}
 
@@ -277,6 +328,24 @@ func (x *oomDImportServer) Recv() (*ImportRequest, error) {
 	return m, nil
 }
 
+func _OomD_ImportByFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImportByFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OomDServer).ImportByFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/oomd.OomD/ImportByFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OomDServer).ImportByFile(ctx, req.(*ImportByFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _OomD_Join_Handler(srv interface{}, stream grpc.ServerStream) error {
 	return srv.(OomDServer).Join(&oomDJoinServer{stream})
 }
@@ -303,24 +372,6 @@ func (x *oomDJoinServer) Recv() (*JoinRequest, error) {
 	return m, nil
 }
 
-func _OomD_ImportByFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ImportByFileRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(OomDServer).ImportByFile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/oomd.OomD/ImportByFile",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OomDServer).ImportByFile(ctx, req.(*ImportByFileRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _OomD_JoinByFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(JoinByFileRequest)
 	if err := dec(in); err != nil {
@@ -335,6 +386,45 @@ func _OomD_JoinByFile_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(OomDServer).JoinByFile(ctx, req.(*JoinByFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OomD_Export_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ExportRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(OomDServer).Export(m, &oomDExportServer{stream})
+}
+
+type OomD_ExportServer interface {
+	Send(*ExportResponse) error
+	grpc.ServerStream
+}
+
+type oomDExportServer struct {
+	grpc.ServerStream
+}
+
+func (x *oomDExportServer) Send(m *ExportResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _OomD_ExportByFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExportByFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OomDServer).ExportByFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/oomd.OomD/ExportByFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OomDServer).ExportByFile(ctx, req.(*ExportByFileRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -366,6 +456,10 @@ var OomD_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "JoinByFile",
 			Handler:    _OomD_JoinByFile_Handler,
 		},
+		{
+			MethodName: "ExportByFile",
+			Handler:    _OomD_ExportByFile_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
@@ -378,6 +472,11 @@ var OomD_ServiceDesc = grpc.ServiceDesc{
 			Handler:       _OomD_Join_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
+		},
+		{
+			StreamName:    "Export",
+			Handler:       _OomD_Export_Handler,
+			ServerStreams: true,
 		},
 	},
 	Metadata: "oomd.proto",

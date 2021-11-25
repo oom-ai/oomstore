@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z\010/codegen',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\noomd.proto\x12\x04oomd\x1a\x0cstatus.proto\"\xa3\x01\n\x05Value\x12\x15\n\x0bint64_value\x18\x01 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x02 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x03 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x04 \x01(\x08H\x00\x12\x1e\n\x14unix_timestamp_value\x18\x05 \x01(\x03H\x00\x12\x15\n\x0b\x62ytes_value\x18\x06 \x01(\x0cH\x00\x42\x06\n\x04kind\"=\n\x10OnlineGetRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x15\n\rfeature_names\x18\x02 \x03(\t\"w\n\x0f\x46\x65\x61tureValueMap\x12+\n\x03map\x18\x01 \x03(\x0b\x32\x1e.oomd.FeatureValueMap.MapEntry\x1a\x37\n\x08MapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1a\n\x05value\x18\x02 \x01(\x0b\x32\x0b.oomd.Value:\x02\x38\x01\"^\n\x11OnlineGetResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12%\n\x06result\x18\x02 \x01(\x0b\x32\x15.oomd.FeatureValueMap\"C\n\x15OnlineMultiGetRequest\x12\x13\n\x0b\x65ntity_keys\x18\x01 \x03(\t\x12\x15\n\rfeature_names\x18\x02 \x03(\t\"\xbc\x01\n\x16OnlineMultiGetResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x38\n\x06result\x18\x02 \x03(\x0b\x32(.oomd.OnlineMultiGetResponse.ResultEntry\x1a\x44\n\x0bResultEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.oomd.FeatureValueMap:\x02\x38\x01\"7\n\x0bSyncRequest\x12\x13\n\x0brevision_id\x18\x01 \x01(\x05\x12\x13\n\x0bpurge_delay\x18\x02 \x01(\x05\"2\n\x0cSyncResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\"i\n\rImportRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x0b\n\x03row\x18\x04 \x01(\x0c\x42\x0b\n\t_revision\"I\n\x0eImportResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x13\n\x0brevision_id\x18\x02 \x01(\x03\"\x8e\x01\n\x13ImportByFileRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x17\n\x0finput_file_path\x18\x04 \x01(\t\x12\x11\n\tdelimiter\x18\x05 \x01(\tB\x0b\n\t_revision\"2\n\tEntityRow\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x11\n\tunix_time\x18\x02 \x01(\x03\"I\n\x0bJoinRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12#\n\nentity_row\x18\x02 \x01(\x0b\x32\x0f.oomd.EntityRow\"c\n\x0cJoinResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x0e\n\x06header\x18\x02 \x03(\t\x12\x1f\n\njoined_row\x18\x03 \x03(\x0b\x32\x0b.oomd.Value\"]\n\x11JoinByFileRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x17\n\x0finput_file_path\x18\x02 \x01(\t\x12\x18\n\x10output_file_path\x18\x03 \x01(\t\"8\n\x12JoinByFileResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status2\xba\x03\n\x04OomD\x12>\n\tOnlineGet\x12\x16.oomd.OnlineGetRequest\x1a\x17.oomd.OnlineGetResponse\"\x00\x12M\n\x0eOnlineMultiGet\x12\x1b.oomd.OnlineMultiGetRequest\x1a\x1c.oomd.OnlineMultiGetResponse\"\x00\x12/\n\x04Sync\x12\x11.oomd.SyncRequest\x1a\x12.oomd.SyncResponse\"\x00\x12\x37\n\x06Import\x12\x13.oomd.ImportRequest\x1a\x14.oomd.ImportResponse\"\x00(\x01\x12\x33\n\x04Join\x12\x11.oomd.JoinRequest\x1a\x12.oomd.JoinResponse\"\x00(\x01\x30\x01\x12\x41\n\x0cImportByFile\x12\x19.oomd.ImportByFileRequest\x1a\x14.oomd.ImportResponse\"\x00\x12\x41\n\nJoinByFile\x12\x17.oomd.JoinByFileRequest\x1a\x18.oomd.JoinByFileResponse\"\x00\x42\nZ\x08/codegenb\x06proto3'
+  serialized_pb=b'\n\noomd.proto\x12\x04oomd\x1a\x0cstatus.proto\"\xa3\x01\n\x05Value\x12\x15\n\x0bint64_value\x18\x01 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x02 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x03 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x04 \x01(\x08H\x00\x12\x1e\n\x14unix_timestamp_value\x18\x05 \x01(\x03H\x00\x12\x15\n\x0b\x62ytes_value\x18\x06 \x01(\x0cH\x00\x42\x06\n\x04kind\"=\n\x10OnlineGetRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x15\n\rfeature_names\x18\x02 \x03(\t\"w\n\x0f\x46\x65\x61tureValueMap\x12+\n\x03map\x18\x01 \x03(\x0b\x32\x1e.oomd.FeatureValueMap.MapEntry\x1a\x37\n\x08MapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1a\n\x05value\x18\x02 \x01(\x0b\x32\x0b.oomd.Value:\x02\x38\x01\"^\n\x11OnlineGetResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12%\n\x06result\x18\x02 \x01(\x0b\x32\x15.oomd.FeatureValueMap\"C\n\x15OnlineMultiGetRequest\x12\x13\n\x0b\x65ntity_keys\x18\x01 \x03(\t\x12\x15\n\rfeature_names\x18\x02 \x03(\t\"\xbc\x01\n\x16OnlineMultiGetResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x38\n\x06result\x18\x02 \x03(\x0b\x32(.oomd.OnlineMultiGetResponse.ResultEntry\x1a\x44\n\x0bResultEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.oomd.FeatureValueMap:\x02\x38\x01\"7\n\x0bSyncRequest\x12\x13\n\x0brevision_id\x18\x01 \x01(\x05\x12\x13\n\x0bpurge_delay\x18\x02 \x01(\x05\"2\n\x0cSyncResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\"i\n\rImportRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x0b\n\x03row\x18\x04 \x01(\x0c\x42\x0b\n\t_revision\"I\n\x0eImportResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x13\n\x0brevision_id\x18\x02 \x01(\x03\"\x8e\x01\n\x13ImportByFileRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x17\n\x0finput_file_path\x18\x04 \x01(\t\x12\x11\n\tdelimiter\x18\x05 \x01(\tB\x0b\n\t_revision\"2\n\tEntityRow\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x11\n\tunix_time\x18\x02 \x01(\x03\"I\n\x0bJoinRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12#\n\nentity_row\x18\x02 \x01(\x0b\x32\x0f.oomd.EntityRow\"c\n\x0cJoinResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x0e\n\x06header\x18\x02 \x03(\t\x12\x1f\n\njoined_row\x18\x03 \x03(\x0b\x32\x0b.oomd.Value\"]\n\x11JoinByFileRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x17\n\x0finput_file_path\x18\x02 \x01(\t\x12\x18\n\x10output_file_path\x18\x03 \x01(\t\"8\n\x12JoinByFileResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\"Y\n\rExportRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x13\n\x0brevision_id\x18\x02 \x01(\x05\x12\x12\n\x05limit\x18\x03 \x01(\x04H\x00\x88\x01\x01\x42\x08\n\x06_limit\"^\n\x0e\x45xportResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x0e\n\x06header\x18\x02 \x03(\t\x12\x18\n\x03row\x18\x03 \x03(\x0b\x32\x0b.oomd.Value\"y\n\x13\x45xportByFileRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x13\n\x0brevision_id\x18\x02 \x01(\x05\x12\x12\n\x05limit\x18\x03 \x01(\x04H\x00\x88\x01\x01\x12\x18\n\x10output_file_path\x18\x04 \x01(\tB\x08\n\x06_limit\":\n\x14\x45xportByFileResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status2\xbc\x04\n\x04OomD\x12>\n\tOnlineGet\x12\x16.oomd.OnlineGetRequest\x1a\x17.oomd.OnlineGetResponse\"\x00\x12M\n\x0eOnlineMultiGet\x12\x1b.oomd.OnlineMultiGetRequest\x1a\x1c.oomd.OnlineMultiGetResponse\"\x00\x12/\n\x04Sync\x12\x11.oomd.SyncRequest\x1a\x12.oomd.SyncResponse\"\x00\x12\x37\n\x06Import\x12\x13.oomd.ImportRequest\x1a\x14.oomd.ImportResponse\"\x00(\x01\x12\x41\n\x0cImportByFile\x12\x19.oomd.ImportByFileRequest\x1a\x14.oomd.ImportResponse\"\x00\x12\x33\n\x04Join\x12\x11.oomd.JoinRequest\x1a\x12.oomd.JoinResponse\"\x00(\x01\x30\x01\x12\x41\n\nJoinByFile\x12\x17.oomd.JoinByFileRequest\x1a\x18.oomd.JoinByFileResponse\"\x00\x12\x37\n\x06\x45xport\x12\x13.oomd.ExportRequest\x1a\x14.oomd.ExportResponse\"\x00\x30\x01\x12G\n\x0c\x45xportByFile\x12\x19.oomd.ExportByFileRequest\x1a\x1a.oomd.ExportByFileResponse\"\x00\x42\nZ\x08/codegenb\x06proto3'
   ,
   dependencies=[status__pb2.DESCRIPTOR,])
 
@@ -797,6 +797,193 @@ _JOINBYFILERESPONSE = _descriptor.Descriptor(
   serialized_end=1555,
 )
 
+
+_EXPORTREQUEST = _descriptor.Descriptor(
+  name='ExportRequest',
+  full_name='oomd.ExportRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='feature_names', full_name='oomd.ExportRequest.feature_names', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='revision_id', full_name='oomd.ExportRequest.revision_id', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='limit', full_name='oomd.ExportRequest.limit', index=2,
+      number=3, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='_limit', full_name='oomd.ExportRequest._limit',
+      index=0, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
+  ],
+  serialized_start=1557,
+  serialized_end=1646,
+)
+
+
+_EXPORTRESPONSE = _descriptor.Descriptor(
+  name='ExportResponse',
+  full_name='oomd.ExportResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='status', full_name='oomd.ExportResponse.status', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='header', full_name='oomd.ExportResponse.header', index=1,
+      number=2, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='row', full_name='oomd.ExportResponse.row', index=2,
+      number=3, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1648,
+  serialized_end=1742,
+)
+
+
+_EXPORTBYFILEREQUEST = _descriptor.Descriptor(
+  name='ExportByFileRequest',
+  full_name='oomd.ExportByFileRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='feature_names', full_name='oomd.ExportByFileRequest.feature_names', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='revision_id', full_name='oomd.ExportByFileRequest.revision_id', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='limit', full_name='oomd.ExportByFileRequest.limit', index=2,
+      number=3, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='output_file_path', full_name='oomd.ExportByFileRequest.output_file_path', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='_limit', full_name='oomd.ExportByFileRequest._limit',
+      index=0, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
+  ],
+  serialized_start=1744,
+  serialized_end=1865,
+)
+
+
+_EXPORTBYFILERESPONSE = _descriptor.Descriptor(
+  name='ExportByFileResponse',
+  full_name='oomd.ExportByFileResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='status', full_name='oomd.ExportByFileResponse.status', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1867,
+  serialized_end=1925,
+)
+
 _VALUE.oneofs_by_name['kind'].fields.append(
   _VALUE.fields_by_name['int64_value'])
 _VALUE.fields_by_name['int64_value'].containing_oneof = _VALUE.oneofs_by_name['kind']
@@ -836,6 +1023,15 @@ _JOINREQUEST.fields_by_name['entity_row'].message_type = _ENTITYROW
 _JOINRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
 _JOINRESPONSE.fields_by_name['joined_row'].message_type = _VALUE
 _JOINBYFILERESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
+_EXPORTREQUEST.oneofs_by_name['_limit'].fields.append(
+  _EXPORTREQUEST.fields_by_name['limit'])
+_EXPORTREQUEST.fields_by_name['limit'].containing_oneof = _EXPORTREQUEST.oneofs_by_name['_limit']
+_EXPORTRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
+_EXPORTRESPONSE.fields_by_name['row'].message_type = _VALUE
+_EXPORTBYFILEREQUEST.oneofs_by_name['_limit'].fields.append(
+  _EXPORTBYFILEREQUEST.fields_by_name['limit'])
+_EXPORTBYFILEREQUEST.fields_by_name['limit'].containing_oneof = _EXPORTBYFILEREQUEST.oneofs_by_name['_limit']
+_EXPORTBYFILERESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
 DESCRIPTOR.message_types_by_name['Value'] = _VALUE
 DESCRIPTOR.message_types_by_name['OnlineGetRequest'] = _ONLINEGETREQUEST
 DESCRIPTOR.message_types_by_name['FeatureValueMap'] = _FEATUREVALUEMAP
@@ -852,6 +1048,10 @@ DESCRIPTOR.message_types_by_name['JoinRequest'] = _JOINREQUEST
 DESCRIPTOR.message_types_by_name['JoinResponse'] = _JOINRESPONSE
 DESCRIPTOR.message_types_by_name['JoinByFileRequest'] = _JOINBYFILEREQUEST
 DESCRIPTOR.message_types_by_name['JoinByFileResponse'] = _JOINBYFILERESPONSE
+DESCRIPTOR.message_types_by_name['ExportRequest'] = _EXPORTREQUEST
+DESCRIPTOR.message_types_by_name['ExportResponse'] = _EXPORTRESPONSE
+DESCRIPTOR.message_types_by_name['ExportByFileRequest'] = _EXPORTBYFILEREQUEST
+DESCRIPTOR.message_types_by_name['ExportByFileResponse'] = _EXPORTBYFILERESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Value = _reflection.GeneratedProtocolMessageType('Value', (_message.Message,), {
@@ -982,6 +1182,34 @@ JoinByFileResponse = _reflection.GeneratedProtocolMessageType('JoinByFileRespons
   })
 _sym_db.RegisterMessage(JoinByFileResponse)
 
+ExportRequest = _reflection.GeneratedProtocolMessageType('ExportRequest', (_message.Message,), {
+  'DESCRIPTOR' : _EXPORTREQUEST,
+  '__module__' : 'oomd_pb2'
+  # @@protoc_insertion_point(class_scope:oomd.ExportRequest)
+  })
+_sym_db.RegisterMessage(ExportRequest)
+
+ExportResponse = _reflection.GeneratedProtocolMessageType('ExportResponse', (_message.Message,), {
+  'DESCRIPTOR' : _EXPORTRESPONSE,
+  '__module__' : 'oomd_pb2'
+  # @@protoc_insertion_point(class_scope:oomd.ExportResponse)
+  })
+_sym_db.RegisterMessage(ExportResponse)
+
+ExportByFileRequest = _reflection.GeneratedProtocolMessageType('ExportByFileRequest', (_message.Message,), {
+  'DESCRIPTOR' : _EXPORTBYFILEREQUEST,
+  '__module__' : 'oomd_pb2'
+  # @@protoc_insertion_point(class_scope:oomd.ExportByFileRequest)
+  })
+_sym_db.RegisterMessage(ExportByFileRequest)
+
+ExportByFileResponse = _reflection.GeneratedProtocolMessageType('ExportByFileResponse', (_message.Message,), {
+  'DESCRIPTOR' : _EXPORTBYFILERESPONSE,
+  '__module__' : 'oomd_pb2'
+  # @@protoc_insertion_point(class_scope:oomd.ExportByFileResponse)
+  })
+_sym_db.RegisterMessage(ExportByFileResponse)
+
 
 DESCRIPTOR._options = None
 _FEATUREVALUEMAP_MAPENTRY._options = None
@@ -994,8 +1222,8 @@ _OOMD = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1558,
-  serialized_end=2000,
+  serialized_start=1928,
+  serialized_end=2500,
   methods=[
   _descriptor.MethodDescriptor(
     name='OnlineGet',
@@ -1038,22 +1266,22 @@ _OOMD = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
-    name='Join',
-    full_name='oomd.OomD.Join',
+    name='ImportByFile',
+    full_name='oomd.OomD.ImportByFile',
     index=4,
     containing_service=None,
-    input_type=_JOINREQUEST,
-    output_type=_JOINRESPONSE,
+    input_type=_IMPORTBYFILEREQUEST,
+    output_type=_IMPORTRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
-    name='ImportByFile',
-    full_name='oomd.OomD.ImportByFile',
+    name='Join',
+    full_name='oomd.OomD.Join',
     index=5,
     containing_service=None,
-    input_type=_IMPORTBYFILEREQUEST,
-    output_type=_IMPORTRESPONSE,
+    input_type=_JOINREQUEST,
+    output_type=_JOINRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
@@ -1064,6 +1292,26 @@ _OOMD = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_JOINBYFILEREQUEST,
     output_type=_JOINBYFILERESPONSE,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='Export',
+    full_name='oomd.OomD.Export',
+    index=7,
+    containing_service=None,
+    input_type=_EXPORTREQUEST,
+    output_type=_EXPORTRESPONSE,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='ExportByFile',
+    full_name='oomd.OomD.ExportByFile',
+    index=8,
+    containing_service=None,
+    input_type=_EXPORTBYFILEREQUEST,
+    output_type=_EXPORTBYFILERESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
