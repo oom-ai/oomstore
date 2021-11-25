@@ -59,13 +59,13 @@ class Client(object):
             stub.Sync(codegen.oomd_pb2.SyncRequest(revision_id=revision_id))
         return
 
-    def import_by_file(
+    def import_(
         self, group_name, description, input_file_path, delimiter, revision=None
     ):
         with grpc.insecure_channel(self.addr) as channel:
             stub = codegen.oomd_pb2_grpc.OomDStub(channel)
-            response = stub.ImportByFile(
-                codegen.oomd_pb2.ImportByFileRequest(
+            response = stub.Import(
+                codegen.oomd_pb2.ImportRequest(
                     group_name=group_name,
                     description=description,
                     input_file_path=input_file_path,
@@ -75,11 +75,11 @@ class Client(object):
             )
         return response.revision_id
 
-    def join_by_file(self, feature_names, input_file_path, output_file_path):
+    def join(self, feature_names, input_file_path, output_file_path):
         with grpc.insecure_channel(self.addr) as channel:
             stub = codegen.oomd_pb2_grpc.OomDStub(channel)
-            stub.JoinByFile(
-                codegen.oomd_pb2.JoinByFileRequest(
+            stub.Join(
+                codegen.oomd_pb2.JoinRequest(
                     feature_names=feature_names,
                     input_file_path=input_file_path,
                     output_file_path=output_file_path,
@@ -91,13 +91,13 @@ class Client(object):
 if __name__ == "__main__":
     config_path = "%s/.config/oomstore/config.yaml" % str(Path.home())
     client = Client(50051, config_path)
-    revision_id1 = client.import_by_file(
+    revision_id1 = client.import_(
         group_name="account",
         description="sample account data",
         input_file_path="/tmp/account.csv",
         delimiter=",",
     )
-    revision_id2 = client.import_by_file(
+    revision_id2 = client.import_(
         group_name="transaction_stats",
         description="sample transaction stat data",
         input_file_path="/tmp/transaction_stats.csv",
@@ -131,7 +131,7 @@ if __name__ == "__main__":
             ],
         )
     )
-    client.join_by_file(
+    client.join(
         feature_names=[
             "state",
             "credit_score",

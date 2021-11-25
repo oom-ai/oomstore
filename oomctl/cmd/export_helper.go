@@ -12,8 +12,8 @@ import (
 	"github.com/spf13/cast"
 )
 
-func export(ctx context.Context, store *oomstore.OomStore, opt types.ExportOpt, output string) error {
-	exportResult, err := store.Export(ctx, opt)
+func export(ctx context.Context, store *oomstore.OomStore, opt types.ChannelExportOpt, output string) error {
+	exportResult, err := store.ChannelExport(ctx, opt)
 	if err != nil {
 		return err
 	}

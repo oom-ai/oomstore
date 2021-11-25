@@ -15,7 +15,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func TestExport(t *testing.T) {
+func TestChannelExport(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	ctx := context.Background()
@@ -38,14 +38,14 @@ func TestExport(t *testing.T) {
 
 	testCases := []struct {
 		description  string
-		opt          types.ExportOpt
+		opt          types.ChannelExportOpt
 		exportStream <-chan types.ExportRecord
 		exportError  <-chan error
 		expected     [][]interface{}
 	}{
 		{
 			description: "no features",
-			opt: types.ExportOpt{
+			opt: types.ChannelExportOpt{
 				FeatureNames: []string{},
 				RevisionID:   revisionID,
 			},
@@ -54,7 +54,7 @@ func TestExport(t *testing.T) {
 		},
 		{
 			description: "provide one feature",
-			opt: types.ExportOpt{
+			opt: types.ChannelExportOpt{
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
@@ -63,7 +63,7 @@ func TestExport(t *testing.T) {
 		},
 		{
 			description: "provide revision",
-			opt: types.ExportOpt{
+			opt: types.ChannelExportOpt{
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
@@ -72,7 +72,7 @@ func TestExport(t *testing.T) {
 		},
 		{
 			description: "empty stream",
-			opt: types.ExportOpt{
+			opt: types.ChannelExportOpt{
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
@@ -116,7 +116,7 @@ func TestExport(t *testing.T) {
 			}).Return(tc.exportStream, tc.exportError)
 
 			// execute and compare results
-			actual, err := store.Export(context.Background(), tc.opt)
+			actual, err := store.ChannelExport(context.Background(), tc.opt)
 			assert.NoError(t, err)
 			values := make([][]interface{}, 0)
 			for row := range actual.Data {

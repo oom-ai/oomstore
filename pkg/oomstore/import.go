@@ -11,9 +11,9 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-// Import a CSV data source into the feature store as a new revision.
+// ChannelImport a CSV data source into the feature store as a new revision.
 // In the future we want to support more diverse data sources.
-func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
+func (s *OomStore) ChannelImport(ctx context.Context, opt types.ChannelImport) (int, error) {
 	if err := s.metadata.Refresh(); err != nil {
 		return 0, fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
@@ -93,15 +93,15 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 	return newRevisionID, nil
 }
 
-// ImportByFile is similar to Import, the only difference is that it takes in InputFilePath
+// Import is similar to ChannelImport, the only difference is that it takes in InputFilePath
 // as an argument.
-func (s *OomStore) ImportByFile(ctx context.Context, opt types.ImportByFileOpt) (int, error) {
+func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
 	file, err := os.Open(opt.DataSource.InputFilePath)
 	if err != nil {
 		return 0, err
 	}
 	defer file.Close()
-	return s.Import(ctx, types.ImportOpt{
+	return s.ChannelImport(ctx, types.ChannelImport{
 		GroupName:   opt.GroupName,
 		Description: opt.Description,
 		DataSource: types.CsvDataSource{
