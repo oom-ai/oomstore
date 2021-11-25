@@ -2,6 +2,7 @@ package oomstore_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -36,10 +37,11 @@ func TestExport(t *testing.T) {
 	}
 
 	testCases := []struct {
-		description string
-		opt         types.ExportOpt
-		stream      <-chan *types.ExportRecord
-		expected    [][]interface{}
+		description  string
+		opt          types.ExportOpt
+		exportStream <-chan types.ExportRecord
+		exportError  <-chan error
+		expected     [][]interface{}
 	}{
 		{
 			description: "no features",
@@ -47,8 +49,8 @@ func TestExport(t *testing.T) {
 				FeatureNames: []string{},
 				RevisionID:   revisionID,
 			},
-			stream:   prepareTwoFeatureStream(),
-			expected: [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
+			exportStream: prepareTwoFeatureStream(),
+			expected:     [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
 		},
 		{
 			description: "provide one feature",
@@ -56,8 +58,8 @@ func TestExport(t *testing.T) {
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
-			stream:   prepareOneFeatureStream(),
-			expected: [][]interface{}{{"1234", int64(100)}, {"1235", int64(200)}, {"1236", int64(300)}, {"1237", int64(240)}},
+			exportStream: prepareOneFeatureStream(),
+			expected:     [][]interface{}{{"1234", int64(100)}, {"1235", int64(200)}, {"1236", int64(300)}, {"1237", int64(240)}},
 		},
 		{
 			description: "provide revision",
@@ -65,8 +67,18 @@ func TestExport(t *testing.T) {
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
-			stream:   prepareTwoFeatureStream(),
-			expected: [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
+			exportStream: prepareTwoFeatureStream(),
+			expected:     [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
+		},
+		{
+			description: "empty stream",
+			opt: types.ExportOpt{
+				FeatureNames: []string{"price"},
+				RevisionID:   revisionID,
+			},
+			exportStream: prepareEmptyStream(),
+			exportError:  prepareExportError(),
+			expected:     [][]interface{}{},
 		},
 	}
 	for _, tc := range testCases {
@@ -101,57 +113,62 @@ func TestExport(t *testing.T) {
 				EntityName:   "device",
 				FeatureNames: featureNames,
 				Limit:        tc.opt.Limit,
-			}).Return(tc.stream, nil)
+			}).Return(tc.exportStream, tc.exportError)
 
 			// execute and compare results
-			_, actual, err := store.Export(context.Background(), tc.opt)
+			actual, err := store.Export(context.Background(), tc.opt)
 			assert.NoError(t, err)
 			values := make([][]interface{}, 0)
-			for ele := range actual {
-				values = append(values, ele.Record)
-				assert.NoError(t, ele.Error)
+			for row := range actual.Data {
+				values = append(values, row)
+			}
+			if tc.exportError != nil {
+				assert.Error(t, actual.CheckStreamError())
+			} else {
+				assert.NoError(t, actual.CheckStreamError())
 			}
 			assert.Equal(t, tc.expected, values)
 		})
 	}
 }
 
-func prepareTwoFeatureStream() chan *types.ExportRecord {
-	stream := make(chan *types.ExportRecord)
+func prepareTwoFeatureStream() chan types.ExportRecord {
+	stream := make(chan types.ExportRecord)
 	go func() {
 		defer close(stream)
-		stream <- &types.ExportRecord{
-			Record: []interface{}{"1234", "xiaomi", int64(100)},
-		}
-		stream <- &types.ExportRecord{
-			Record: []interface{}{"1235", "apple", int64(200)},
-		}
-		stream <- &types.ExportRecord{
-			Record: []interface{}{"1236", "huawei", int64(300)},
-		}
-		stream <- &types.ExportRecord{
-			Record: []interface{}{"1237", "oneplus", int64(240)},
-		}
+		stream <- []interface{}{"1234", "xiaomi", int64(100)}
+		stream <- []interface{}{"1235", "apple", int64(200)}
+		stream <- []interface{}{"1236", "huawei", int64(300)}
+		stream <- []interface{}{"1237", "oneplus", int64(240)}
 	}()
 	return stream
 }
 
-func prepareOneFeatureStream() chan *types.ExportRecord {
-	stream := make(chan *types.ExportRecord)
+func prepareOneFeatureStream() chan types.ExportRecord {
+	stream := make(chan types.ExportRecord)
 	go func() {
 		defer close(stream)
-		stream <- &types.ExportRecord{
-			Record: []interface{}{"1234", int64(100)},
-		}
-		stream <- &types.ExportRecord{
-			Record: []interface{}{"1235", int64(200)},
-		}
-		stream <- &types.ExportRecord{
-			Record: []interface{}{"1236", int64(300)},
-		}
-		stream <- &types.ExportRecord{
-			Record: []interface{}{"1237", int64(240)},
-		}
+		stream <- []interface{}{"1234", int64(100)}
+		stream <- []interface{}{"1235", int64(200)}
+		stream <- []interface{}{"1236", int64(300)}
+		stream <- []interface{}{"1237", int64(240)}
 	}()
 	return stream
+}
+
+func prepareEmptyStream() chan types.ExportRecord {
+	stream := make(chan types.ExportRecord)
+	go func() {
+		defer close(stream)
+	}()
+	return stream
+}
+
+func prepareExportError() <-chan error {
+	err := make(chan error, 1)
+	go func() {
+		defer close(err)
+		err <- fmt.Errorf("error")
+	}()
+	return err
 }
