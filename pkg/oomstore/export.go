@@ -8,7 +8,19 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-// Export feature values of a particular revision.
+/*
+Export feature values of a particular revision.
+Usage Example:
+	exportResult, err := store.Export(ctx, opt)
+	if err != nil {
+		return err
+	}
+	for row := range exportResult.Data {
+		fmt.Println(cast.ToStringSlice([]interface{}(row)))
+	}
+	// Attention: call CheckStreamError after consuming exportResult.Data channel
+	return exportResult.CheckStreamError()
+*/
 func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) (*types.ExportResult, error) {
 	if err := s.metadata.Refresh(); err != nil {
 		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
