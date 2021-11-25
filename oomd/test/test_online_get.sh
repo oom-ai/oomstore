@@ -6,7 +6,8 @@ prepare_store
 prepare_oomd
 
 case="query single feature"
-expected='{
+expected='
+{
   "status": {
 
   },
