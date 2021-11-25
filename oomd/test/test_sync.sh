@@ -6,16 +6,16 @@ prepare_store
 prepare_oomd
 
 case="it works"
+arg='
+{
+    "revision_id": "3"
+}
+'
 expected='
 {
   "status": {}
 }
 '
 import_sample account ./data/account_10.csv
-actual=$(grpcurl -protoset ../../proto/oomd.protoset -plaintext -d @ localhost:50051 oomd.OomD/Sync <<EOF
-{
-    "revision_id": "3"
-}
-EOF
-)
+actual=$(testgrpc Sync <<<"$arg")
 assert_json_eq "$case" "$expected" "$actual"

@@ -5,6 +5,8 @@ SDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 PATH="$SDIR/../build:$PATH"
 PATH="$SDIR/../../oomctl/build:$PATH"
 
+PROTO_DIR="$SDIR/../../proto"
+
 info() { printf "$(date +'%Y/%m/%d %H:%M:%S') [info] %s\n" "$*" >&2; }
 erro() { printf "$(date +'%Y/%m/%d %H:%M:%S') %b[erro]%b %s\n" '\e[0;31m\033[1m' '\e[0m' "$*" >&2; }
 
@@ -94,6 +96,10 @@ prepare_store() {
     info "sync sample data to online store"
     oomctl sync -r 1
     oomctl sync -r 2
+}
+
+testgrpc() {
+    grpcurl --import-path "$PROTO_DIR" --proto "$PROTO_DIR/oomd.proto" -plaintext -d @ localhost:50051 "oomd.OomD/$1"
 }
 
 prepare_oomd() {
