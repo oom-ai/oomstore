@@ -9,33 +9,33 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan *types.ExportRecord, error) {
+func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
 	fields := append([]string{opt.EntityName}, opt.FeatureNames...)
 	query := fmt.Sprintf("select %s from %s", dbutil.Quote(`"`, fields...), opt.DataTable)
 	if opt.Limit != nil {
 		query += fmt.Sprintf(" LIMIT %d", *opt.Limit)
 	}
+	stream := make(chan types.ExportRecord)
+	errs := make(chan error, 1) // at most 1 error
 
-	rows, err := db.QueryxContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	stream := make(chan *types.ExportRecord)
 	go func() {
-		defer rows.Close()
 		defer close(stream)
+		defer close(errs)
+		rows, err := db.QueryxContext(ctx, query)
+		if err != nil {
+			errs <- err
+			return
+		}
+		defer rows.Close()
 		for rows.Next() {
 			record, err := rows.SliceScan()
-			stream <- &types.ExportRecord{
-				Record: record,
-				Error:  err,
-			}
 			if err != nil {
+				errs <- fmt.Errorf("failed at rows.SliceScan, err=%v", err)
 				return
 			}
+			stream <- record
 		}
 	}()
 
-	return stream, nil
+	return stream, errs
 }

@@ -26,11 +26,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 		// populate the data table
 		records := make([]interface{}, 0, PostgresBatchSize)
-		for item := range opt.Stream {
-			if item.Error != nil {
-				return item.Error
-			}
-			record := item.Record
+		for record := range opt.ExportStream {
 			if len(record) != len(opt.FeatureList)+1 {
 				return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.FeatureList)+1, len(record))
 			}
@@ -46,6 +42,9 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 		if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns); err != nil {
 			return err
+		}
+		if opt.ExportError != nil {
+			return <-opt.ExportError
 		}
 		return nil
 	})

@@ -58,14 +58,13 @@ func TestExport(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			actual, err := store.Export(ctx, tc.opt)
-			assert.NoError(t, err)
+			actual, errs := store.Export(ctx, tc.opt)
 			values := make([][]interface{}, 0)
-			for ele := range actual {
-				values = append(values, ele.Record)
-				assert.NoError(t, ele.Error)
+			for row := range actual {
+				values = append(values, row)
 			}
 			assert.Equal(t, tc.expected, values)
+			assert.NoError(t, <-errs)
 		})
 	}
 }
