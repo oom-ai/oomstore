@@ -84,7 +84,7 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 			RevisionID:  newRevisionID,
 			NewRevision: &revision,
 		}); err != nil {
-			return 0, nil
+			return 0, err
 		}
 	}
 
