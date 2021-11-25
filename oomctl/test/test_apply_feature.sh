@@ -35,11 +35,11 @@ db-value-type: int
 description: 'description'
 EOF
 
-featctl apply -f "$TMPFILE"
+oomctl apply -f "$TMPFILE"
 feature_expected='Name,Group,Entity,Category,DBValueType,ValueType,Description,OnlineRevisionID
 model,device,user,batch,varchar(16),string,description,<NULL>
 price,device,user,batch,int,int64,description,<NULL>
 '
-feature_actual=$(featctl list feature -o csv)
+feature_actual=$(oomctl list feature -o csv)
 ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }
-assert_eq "featctl list feature" "$(sort <<< "$feature_expected")" "$(ignore_time "$feature_actual" | sort)"
+assert_eq "oomctl list feature" "$(sort <<< "$feature_expected")" "$(ignore_time "$feature_actual" | sort)"

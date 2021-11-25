@@ -5,8 +5,8 @@ source ./util.sh
 init_store
 register_features
 
-case='featctl import using absolute path'
-featctl import \
+case='oomctl import using absolute path'
+oomctl import \
     --group phone \
     --input-file "$(pwd)/device.csv" \
     --description 'test data' > /dev/null

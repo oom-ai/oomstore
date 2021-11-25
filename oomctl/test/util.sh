@@ -46,19 +46,19 @@ assert_eq() {
 
 # register features for the sample data
 register_features() {
-    featctl register entity device --length 32     --description "device"
-    featctl register entity user   --length 64     --description "user"
+    oomctl register entity device --length 32     --description "device"
+    oomctl register entity user   --length 64     --description "user"
 
-    featctl register group phone --entity device --description "phone"
+    oomctl register group phone --entity device --description "phone"
 
-    featctl register batch-feature price --group phone --db-value-type "int"         --description "price"
-    featctl register batch-feature model --group phone --db-value-type "varchar(32)" --description "model"
+    oomctl register batch-feature price --group phone --db-value-type "int"         --description "price"
+    oomctl register batch-feature model --group phone --db-value-type "varchar(32)" --description "model"
 }
 
 # import sample data
 import_sample() {
     info "import sample data to offline store..."
-    featctl import \
+    oomctl import \
     --group phone \
     --delimiter "," \
     --input-file device.csv \
@@ -68,7 +68,7 @@ import_sample() {
 # sync feature values from offline store to online store
 sync() {
     info "sync sample data to online store"
-    featctl sync -r "$1"
+    oomctl sync -r "$1"
 }
 
 execute_sql() {
@@ -82,5 +82,5 @@ init_store() {
     execute_sql 'drop database if exists oomstore_test'
 
     # initialize feature store
-    featctl init
+    oomctl init
 }

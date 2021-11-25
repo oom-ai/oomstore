@@ -6,14 +6,13 @@ init_store
 register_features
 import_sample > /dev/null
 
-case='featctl update group works'
-featctl update group phone --description "new description"
+case='oomctl update entity works'
+oomctl update entity device --description "new description"
 expected='
-Name:             phone
-Entity:           device
-Description:      new description
-OnlineRevisionID: <NULL>
+Name:        device
+Length:      32
+Description: new description
 '
-actual=$(featctl describe group phone)
+actual=$(oomctl describe entity device)
 ignore() { grep -Ev '^(CreateTime|ModifyTime)' <<<"$1"; }
 assert_eq "$case" "$expected" "$(ignore "$actual")"
