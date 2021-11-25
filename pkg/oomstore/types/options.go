@@ -34,14 +34,16 @@ type CreateGroupOpt struct {
 	Description string
 }
 
-type ExportOpt struct {
+type ChannelExportOpt struct {
 	RevisionID   int
 	FeatureNames []string
 	Limit        *uint64
 }
 
-type ExportByFileOpt struct {
-	ExportOpt
+type ExportOpt struct {
+	RevisionID     int
+	FeatureNames   []string
+	Limit          *uint64
 	OutputFilePath string
 }
 

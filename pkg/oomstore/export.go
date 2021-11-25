@@ -24,7 +24,7 @@ Usage Example:
 	// Attention: call CheckStreamError after consuming exportResult.Data channel
 	return exportResult.CheckStreamError()
 */
-func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) (*types.ExportResult, error) {
+func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt) (*types.ExportResult, error) {
 	if err := s.metadata.Refresh(); err != nil {
 		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
@@ -67,8 +67,12 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) (*types.Expo
 	return types.NewExportResult(header, stream, exportErr), nil
 }
 
-func (s *OomStore) ExportByFile(ctx context.Context, opt types.ExportByFileOpt) error {
-	exportResult, err := s.Export(ctx, opt.ExportOpt)
+func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
+	exportResult, err := s.ChannelExport(ctx, types.ChannelExportOpt{
+		RevisionID:   opt.RevisionID,
+		FeatureNames: opt.FeatureNames,
+		Limit:        opt.Limit,
+	})
 	if err != nil {
 		return err
 	}
