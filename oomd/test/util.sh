@@ -75,7 +75,7 @@ import_sample() {
     info "import sample data '$file' into group '$group'..."
     oomctl import \
         --group "$group" \
-        --revision "$(date +%s%N)" \
+        --revision "$(perl -MTime::HiRes=time -E 'say int(time * 1000)')" \
         --input-file \
         "$file" \
         --description 'sample account data' >/dev/null
