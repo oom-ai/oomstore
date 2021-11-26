@@ -7,7 +7,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2
@@ -17,7 +21,11 @@ jobs:
       run: make build
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     env:
       golangci-lint-version: 'v1.42.1'
     steps:
@@ -46,7 +54,11 @@ jobs:
         pre-commit run --all --show-diff-on-failure
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     services:
       postgres:
         image: postgres:14.0-alpine
