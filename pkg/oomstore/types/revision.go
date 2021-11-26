@@ -43,8 +43,8 @@ func (l RevisionList) Copy() RevisionList {
 	return copied
 }
 
-func (l *RevisionList) Find(find func(*Revision) bool) *Revision {
-	for _, r := range *l {
+func (l RevisionList) Find(find func(*Revision) bool) *Revision {
+	for _, r := range l {
 		if find(r) {
 			return r
 		}
@@ -52,8 +52,8 @@ func (l *RevisionList) Find(find func(*Revision) bool) *Revision {
 	return nil
 }
 
-func (l *RevisionList) Filter(filter func(*Revision) bool) (rs RevisionList) {
-	for _, r := range *l {
+func (l RevisionList) Filter(filter func(*Revision) bool) (rs RevisionList) {
+	for _, r := range l {
 		if filter(r) {
 			rs = append(rs, r)
 		}

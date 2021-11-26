@@ -49,8 +49,8 @@ func (l GroupList) Copy() GroupList {
 	return copied
 }
 
-func (l *GroupList) Find(find func(*Group) bool) *Group {
-	for _, g := range *l {
+func (l GroupList) Find(find func(*Group) bool) *Group {
+	for _, g := range l {
 		if find(g) {
 			return g
 		}
@@ -58,8 +58,8 @@ func (l *GroupList) Find(find func(*Group) bool) *Group {
 	return nil
 }
 
-func (l *GroupList) Filter(filter func(*Group) bool) (rs GroupList) {
-	for _, g := range *l {
+func (l GroupList) Filter(filter func(*Group) bool) (rs GroupList) {
+	for _, g := range l {
 		if filter(g) {
 			rs = append(rs, g)
 		}
