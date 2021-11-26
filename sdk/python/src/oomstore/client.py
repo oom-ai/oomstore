@@ -87,6 +87,31 @@ class Client(object):
             )
         return
 
+    def export(self, feature_names, revision_id, output_file_path, limit=None):
+        with grpc.insecure_channel(self.addr) as channel:
+            stub = codegen.oomd_pb2_grpc.OomDStub(channel)
+            stub.Export(
+                codegen.oomd_pb2.ExportRequest(
+                    feature_names=feature_names,
+                    revision_id=revision_id,
+                    output_file_path=output_file_path,
+                    limit=limit
+                )
+            )
+        return
+
+    def channel_export(self, feature_names, revision_id, limit=None):
+        with grpc.insecure_channel(self.addr) as channel:
+            stub = codegen.oomd_pb2_grpc.OomDStub(channel)
+            response_channel = stub.ChannelExport(
+                codegen.oomd_pb2.ExportRequest(
+                    feature_names=feature_names,
+                    revision_id=revision_id,
+                    limit=limit
+                )
+            )
+        return response_channel
+
 
 if __name__ == "__main__":
     config_path = "%s/.config/oomstore/config.yaml" % str(Path.home())
