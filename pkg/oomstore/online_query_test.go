@@ -43,12 +43,7 @@ func TestOnlineGet(t *testing.T) {
 			},
 			features:      unavailableFeatures,
 			expectedError: nil,
-			expected: &types.FeatureValues{
-				EntityName:      entityName,
-				EntityKey:       "1234",
-				FeatureNames:    consistentFeatures.Names(),
-				FeatureValueMap: map[string]interface{}{},
-			},
+			expected:      nil,
 		},
 		{
 			description: "inconsistent entity type, fail",
