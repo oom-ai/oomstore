@@ -29,6 +29,9 @@ jobs:
     env:
       golangci-lint-version: 'v1.42.1'
     steps:
+    - name: Install docker
+      run: brew install docker
+      if: runner.os == 'macOS'
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2
       with:
@@ -72,6 +75,9 @@ jobs:
           --health-timeout=2s
           --health-retries=3
     steps:
+    - name: Install docker
+      run: brew install docker
+      if: runner.os == 'macOS'
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2
       with:
