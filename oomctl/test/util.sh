@@ -58,8 +58,10 @@ register_features() {
 # import sample data
 import_sample() {
     info "import sample data to offline store..."
+    local revision=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
     oomctl import \
     --group phone \
+    --revision "$revision" \
     --delimiter "," \
     --input-file device.csv \
     --description 'test data' | grep -o '[0-9]\+'

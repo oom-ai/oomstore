@@ -8,23 +8,23 @@ register_features
 # clean up the tmp file
 trap 'command rm -rf entity_rows.csv' EXIT INT TERM HUP
 
-before_unix_time_ms=$(date +%s000)
-echo "1,${before_unix_time_ms}" >> entity_rows.csv
-echo "2,${before_unix_time_ms}" >> entity_rows.csv
-sleep 1
-import_sample > /dev/null
-sleep 1
-after_unix_time_ms=$(date +%s000)
-echo "1,${after_unix_time_ms}" >> entity_rows.csv
-echo "2,${after_unix_time_ms}" >> entity_rows.csv
+t1=50
+t2=100
+cat <<-EOF > entity_rows.csv
+1,$t1
+2,$t1
+1,$t2
+2,$t2
+EOF
 
+import_sample 80
 case='oomctl join historical-feature'
 expected="
 entity_key,unix_time,model,price
-1,${after_unix_time_ms},xiaomi-mix3,3999
-2,${after_unix_time_ms},huawei-p40,5299
-1,${before_unix_time_ms},,
-2,${before_unix_time_ms},,
+1,$t1,,
+2,$t1,,
+1,$t2,xiaomi-mix3,3999
+2,$t2,huawei-p40,5299
 "
 
 actual=$(oomctl join \
