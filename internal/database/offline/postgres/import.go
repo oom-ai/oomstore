@@ -63,7 +63,7 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 			revision = *opt.Revision
 		} else {
 			// generate revision using current timestamp
-			revision = time.Now().Unix()
+			revision = time.Now().UnixMilli()
 		}
 		return nil
 	})
