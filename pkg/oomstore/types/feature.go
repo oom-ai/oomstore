@@ -69,8 +69,8 @@ func (l *FeatureList) IDs() (ids []int) {
 	return
 }
 
-func (l *FeatureList) Filter(filter func(*Feature) bool) (rs FeatureList) {
-	for _, f := range *l {
+func (l FeatureList) Filter(filter func(*Feature) bool) (rs FeatureList) {
+	for _, f := range l {
 		if filter(f) {
 			rs = append(rs, f)
 		}
@@ -78,8 +78,8 @@ func (l *FeatureList) Filter(filter func(*Feature) bool) (rs FeatureList) {
 	return
 }
 
-func (l *FeatureList) Find(find func(*Feature) bool) *Feature {
-	for _, f := range *l {
+func (l FeatureList) Find(find func(*Feature) bool) *Feature {
+	for _, f := range l {
 		if find(f) {
 			return f
 		}
