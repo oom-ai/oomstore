@@ -192,32 +192,32 @@ func prepareEntityRows(isEmpty bool) <-chan types.EntityRow {
 }
 
 func prepareResult(oneGroup bool) *types.JoinResult {
-	header := []string{"entity_key", "unix_time", "model", "price", "is_active"}
+	header := []string{"entity_key", "unix_milli", "model", "price", "is_active"}
 	values := []map[string]interface{}{
 		{
 			"entity_key": "1234",
-			"unix_time":  int64(10),
+			"unix_milli": int64(10),
 			"model":      "xiaomi",
 			"price":      int64(100),
 			"is_active":  true,
 		},
 		{
 			"entity_key": "1234",
-			"unix_time":  int64(20),
+			"unix_milli": int64(20),
 			"model":      "galaxy",
 			"price":      int64(300),
 			"is_active":  true,
 		},
 		{
 			"entity_key": "1235",
-			"unix_time":  int64(5),
+			"unix_milli": int64(5),
 			"model":      "apple",
 			"price":      int64(200),
 			"is_active":  false,
 		},
 		{
 			"entity_key": "1235",
-			"unix_time":  int64(15),
+			"unix_milli": int64(15),
 			"model":      "oneplus",
 			"price":      int64(240),
 			"is_active":  false,

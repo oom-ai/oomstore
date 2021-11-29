@@ -64,15 +64,15 @@ func (db *DB) joinOneGroup(ctx context.Context, opt offline.JoinOneGroupOpt) (st
 
 	// Step 2: iterate each table range, join entity_rows table and each data tables
 	joinQuery := `
-		INSERT INTO "%s"(entity_key, unix_time, %s)
+		INSERT INTO "%s"(entity_key, unix_milli, %s)
 		SELECT
 			l.entity_key AS entity_key,
-			l.unix_time AS unix_time,
+			l.unix_milli AS unix_milli,
 			%s
 		FROM "%s" AS l
 		LEFT JOIN "%s" AS r
 		ON l.entity_key = r.%s
-		WHERE l.unix_time >= $1 AND l.unix_time < $2;
+		WHERE l.unix_milli >= $1 AND l.unix_milli < $2;
 	`
 	featureNamesStr := dbutil.Quote(`"`, opt.Features.Names()...)
 	for _, r := range opt.RevisionRanges {
@@ -94,17 +94,17 @@ func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, t
 	/*
 		SELECT
 		entity_rows_table.entity_key,
-			entity_rows_table.unix_time,
+			entity_rows_table.unix_milli,
 			joined_table_1.feature_1,
 			joined_table_1.feature_2,
 			joined_table_2.feature_3
 		FROM entity_rows_table
 		LEFT JOIN joined_table_1
-		ON entity_rows_table.entity_key = joined_table_1.entity_key AND entity_rows_table.unix_time = joined_table_1.unix_time
+		ON entity_rows_table.entity_key = joined_table_1.entity_key AND entity_rows_table.unix_milli = joined_table_1.unix_milli
 		LEFT JOIN joined_table_2
-		ON entity_rows_table.entity_key = joined_table_2.entity_key AND entity_rows_table.unix_time = joined_table_2.unix_time;
+		ON entity_rows_table.entity_key = joined_table_2.entity_key AND entity_rows_table.unix_milli = joined_table_2.unix_milli;
 	*/
-	fields := []string{fmt.Sprintf("%s.entity_key, %s.unix_time", entityRowsTableName, entityRowsTableName)}
+	fields := []string{fmt.Sprintf("%s.entity_key, %s.unix_milli", entityRowsTableName, entityRowsTableName)}
 	for _, tableName := range tableNames {
 		for _, f := range featureMap[tableName] {
 			fields = append(fields, fmt.Sprintf("%s.%s", tableName, f.Name))
@@ -116,7 +116,7 @@ func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, t
 		if i == 0 {
 			continue
 		}
-		query = fmt.Sprintf("%s LEFT JOIN %s ON %s.unix_time = %s.unix_time AND %s.entity_key = %s.entity_key",
+		query = fmt.Sprintf("%s LEFT JOIN %s ON %s.unix_milli = %s.unix_milli AND %s.entity_key = %s.entity_key",
 			query, tableNames[i], tableNames[i-1], tableNames[i], tableNames[i-1], tableNames[i])
 	}
 

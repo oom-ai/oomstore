@@ -19,11 +19,11 @@ func (db *DB) createTableJoined(ctx context.Context, features types.FeatureList,
 	schema := `
 		CREATE TABLE %s (
 			entity_key  VARCHAR(%d) NOT NULL,
-			unix_time   BIGINT NOT NULL,
+			unix_milli  BIGINT NOT NULL,
 			%s
 		);
 	`
-	index := fmt.Sprintf(`CREATE INDEX ON %s (unix_time, entity_key)`, tableName)
+	index := fmt.Sprintf(`CREATE INDEX ON %s (unix_milli, entity_key)`, tableName)
 
 	var columnDefs []string
 	for _, f := range features {
@@ -45,7 +45,7 @@ func (db *DB) createAndImportTableEntityRows(ctx context.Context, entity types.E
 	schema := fmt.Sprintf(`
 		CREATE TABLE %s (
 			entity_key  VARCHAR(%d) NOT NULL,
-			unix_time   BIGINT NOT NULL
+			unix_milli  BIGINT NOT NULL
 		);
 	`, tableName, entity.Length)
 
@@ -59,7 +59,7 @@ func (db *DB) createAndImportTableEntityRows(ctx context.Context, entity types.E
 	}
 
 	// create index
-	index := fmt.Sprintf(`CREATE INDEX ON %s (unix_time, entity_key)`, tableName)
+	index := fmt.Sprintf(`CREATE INDEX ON %s (unix_milli, entity_key)`, tableName)
 	if _, err := db.ExecContext(ctx, index); err != nil {
 		return "", err
 	}
@@ -68,7 +68,7 @@ func (db *DB) createAndImportTableEntityRows(ctx context.Context, entity types.E
 
 func (db *DB) insertEntityRows(ctx context.Context, tableName string, entityRows <-chan types.EntityRow) error {
 	records := make([]interface{}, 0, PostgresBatchSize)
-	columns := []string{"entity_key", "unix_time"}
+	columns := []string{"entity_key", "unix_milli"}
 	for entityRow := range entityRows {
 		records = append(records, []interface{}{entityRow.EntityKey, entityRow.UnixMilli})
 
