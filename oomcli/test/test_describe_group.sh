@@ -6,20 +6,15 @@ init_store
 register_features
 import_sample > /dev/null
 
-case='oomctl describe feature works'
+case='oomcli describe group works'
 expected='
-Name:             price
-Group:            phone
+Name:             phone
 Entity:           device
-Category:         batch
-DBValueType:      int
-ValueType:        int64
-Description:      price
+Description:      phone
 OnlineRevisionID: <NULL>
-CreateTime:       2021-11-17T11:16:37Z
-ModifyTime:       2021-11-17T11:16:37Z
+CreateTime:       2021-11-17T11:24:03Z
+ModifyTime:       2021-11-17T11:24:03Z
 '
-actual=$(oomctl describe feature price)
+actual=$(oomcli describe group phone)
 ignore_time() { grep -Ev '^(CreateTime|ModifyTime)' <<<"$1"; }
-
 assert_eq "$case" "$(ignore_time "$expected")" "$(ignore_time "$actual")"

@@ -3,7 +3,7 @@ set -euo pipefail
 SDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 PATH="$SDIR/../build:$PATH"
-PATH="$SDIR/../../oomctl/build:$PATH"
+PATH="$SDIR/../../oomcli/build:$PATH"
 
 PROTO_DIR="$SDIR/../../proto"
 
@@ -15,7 +15,7 @@ RST=$(tput sgr0    2>/dev/null || true)
 GRN=$(tput setaf 2 2>/dev/null || true)
 YLW=$(tput setaf 3 2>/dev/null || true)
 
-export FEATCTL_CONFIG="$SDIR/config.yaml"
+export OOMCLI_CONFIG="$SDIR/config.yaml"
 export OOMD_CONFIG="$SDIR/config.yaml"
 
 trim() {
@@ -73,7 +73,7 @@ import_sample() {
     local group=$1
     local file=$2
     info "import sample data '$file' into group '$group'..."
-    oomctl import \
+    oomcli import \
         --group "$group" \
         --revision "$(perl -MTime::HiRes=time -E 'say int(time * 1000)')" \
         --input-file \
@@ -86,17 +86,17 @@ prepare_store() {
     execute_sql 'drop database if exists oomstore_test'
 
     # initialize feature store
-    oomctl init
+    oomcli init
     info "create oomstore schema..."
-    oomctl apply -f ./data/schema.yaml
+    oomcli apply -f ./data/schema.yaml
 
     info "import sample data to offline store..."
     import_sample account ./data/account_100.csv
     import_sample transaction_stats ./data/transaction_stats_100.csv
 
     info "sync sample data to online store"
-    oomctl sync -r 1
-    oomctl sync -r 2
+    oomcli sync -r 1
+    oomcli sync -r 2
 }
 
 testgrpc() {

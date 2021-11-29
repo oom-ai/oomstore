@@ -18,7 +18,7 @@ cat <<-EOF > entity_rows.csv
 EOF
 
 import_sample 80
-case='oomctl join historical-feature'
+case='oomcli join historical-feature'
 expected="
 entity_key,unix_milli,model,price
 1,$t1,,
@@ -27,7 +27,7 @@ entity_key,unix_milli,model,price
 2,$t2,huawei-p40,5299
 "
 
-actual=$(oomctl join \
+actual=$(oomcli join \
     --feature model,price \
     --input-file entity_rows.csv \
     --output csv

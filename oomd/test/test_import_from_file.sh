@@ -28,6 +28,6 @@ expected='
 user,state,credit_score,account_age_days,has_2fa_installed
 10,Idaho,693,212,true
 '
-oomctl sync -r 3
-actual=$(oomctl get online --feature state,credit_score,account_age_days,has_2fa_installed -k 10 -o csv)
+oomcli sync -r 3
+actual=$(oomcli get online --feature state,credit_score,account_age_days,has_2fa_installed -k 10 -o csv)
 assert_eq "$case" "$expected" "$actual"
