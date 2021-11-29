@@ -1,11 +1,12 @@
 import sys
 import grpc
 import logging
-from .codegen import oomagent_pb2
-from .codegen import oomagent_pb2_grpc
 import time
 from pathlib import Path
 from subprocess import Popen
+
+from .codegen import oomagent_pb2
+from .codegen import oomagent_pb2_grpc
 
 # Convert google.protobuf.pyext._message.MessageMapContainer object to Python dictionary
 def map_container_to_dict(map_container):
@@ -15,7 +16,9 @@ def map_container_to_dict(map_container):
 class Client(object):
     def __init__(self, port: int, config_path: str):
         try:
-            self.oomagent = Popen(["oomagent", "--config", config_path])
+            self.oomagent = Popen(
+                ["oomagent", "--config", config_path, "-p", str(port)]
+            )
         except Exception as e:
             logging.error(e)
             sys.exit(1)
@@ -30,9 +33,9 @@ class Client(object):
 
     def online_get(self, entity_key, feature_names):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
+            stub = oomagent_pb2_grpc.OomAgentStub(channel)
             response = stub.OnlineGet(
-                codegen.oomagent_pb2.OnlineGetRequest(
+                oomagent_pb2.OnlineGetRequest(
                     entity_key=entity_key, feature_names=feature_names
                 )
             )
@@ -40,9 +43,9 @@ class Client(object):
 
     def online_multi_get(self, entity_keys, feature_names):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
+            stub = oomagent_pb2_grpc.OomAgentStub(channel)
             response = stub.OnlineMultiGet(
-                codegen.oomagent_pb2.OnlineMultiGetRequest(
+                oomagent_pb2.OnlineMultiGetRequest(
                     entity_keys=entity_keys, feature_names=feature_names
                 )
             )
@@ -53,19 +56,24 @@ class Client(object):
             }
         )
 
-    def sync(self, revision_id):
+    def sync(self, revision_id, purge_delay):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
-            stub.Sync(codegen.oomagent_pb2.SyncRequest(revision_id=revision_id))
+            stub = oomagent_pb2_grpc.OomAgentStub(channel)
+            stub.Sync(
+                oomagent_pb2.SyncRequest(
+                    revision_id=revision_id,
+                    purge_delay=purge_delay,
+                )
+            )
         return
 
     def import_(
         self, group_name, description, input_file_path, delimiter, revision=None
     ):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
+            stub = oomagent_pb2_grpc.OomAgentStub(channel)
             response = stub.Import(
-                codegen.oomagent_pb2.ImportRequest(
+                oomagent_pb2.ImportRequest(
                     group_name=group_name,
                     description=description,
                     input_file_path=input_file_path,
@@ -77,9 +85,9 @@ class Client(object):
 
     def join(self, feature_names, input_file_path, output_file_path):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
+            stub = oomagent_pb2_grpc.OomAgentStub(channel)
             stub.Join(
-                codegen.oomagent_pb2.JoinRequest(
+                oomagent_pb2.JoinRequest(
                     feature_names=feature_names,
                     input_file_path=input_file_path,
                     output_file_path=output_file_path,
@@ -89,82 +97,23 @@ class Client(object):
 
     def export(self, feature_names, revision_id, output_file_path, limit=None):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
+            stub = oomagent_pb2_grpc.OomAgentStub(channel)
             stub.Export(
-                codegen.oomagent_pb2.ExportRequest(
+                oomagent_pb2.ExportRequest(
                     feature_names=feature_names,
                     revision_id=revision_id,
                     output_file_path=output_file_path,
-                    limit=limit
+                    limit=limit,
                 )
             )
         return
 
     def channel_export(self, feature_names, revision_id, limit=None):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
+            stub = oomagent_pb2_grpc.OomAgentStub(channel)
             response_channel = stub.ChannelExport(
-                codegen.oomagent_pb2.ExportRequest(
-                    feature_names=feature_names,
-                    revision_id=revision_id,
-                    limit=limit
+                oomagent_pb2.ExportRequest(
+                    feature_names=feature_names, revision_id=revision_id, limit=limit
                 )
             )
         return response_channel
-
-
-if __name__ == "__main__":
-    config_path = "%s/.config/oomstore/config.yaml" % str(Path.home())
-    client = Client(50051, config_path)
-    revision_id1 = client.import_(
-        group_name="account",
-        description="sample account data",
-        input_file_path="/tmp/account.csv",
-        delimiter=",",
-    )
-    revision_id2 = client.import_(
-        group_name="transaction_stats",
-        description="sample transaction stat data",
-        input_file_path="/tmp/transaction_stats.csv",
-        delimiter=",",
-    )
-    client.sync(revision_id1)
-    client.sync(revision_id2)
-    print(
-        client.online_get(
-            entity_key="1006",
-            feature_names=[
-                "state",
-                "credit_score",
-                "account_age_days",
-                "has_2fa_installed",
-                "transaction_count_7d",
-                "transaction_count_30d",
-            ],
-        )
-    )
-    print(
-        client.online_multi_get(
-            entity_keys=["1006", "1007"],
-            feature_names=[
-                "state",
-                "credit_score",
-                "account_age_days",
-                "has_2fa_installed",
-                "transaction_count_7d",
-                "transaction_count_30d",
-            ],
-        )
-    )
-    client.join(
-        feature_names=[
-            "state",
-            "credit_score",
-            "account_age_days",
-            "has_2fa_installed",
-            "transaction_count_7d",
-            "transaction_count_30d",
-        ],
-        input_file_path="/tmp/label.csv",
-        output_file_path="/tmp/joined.csv",
-    )
