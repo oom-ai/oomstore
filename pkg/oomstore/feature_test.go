@@ -66,7 +66,7 @@ func TestCreateBatchFeature(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
-			metadataStore.EXPECT().GetGroupByName(ctx, tc.opt.GroupName).Return(&tc.group, nil)
+			metadataStore.EXPECT().CacheGetGroupByName(ctx, tc.opt.GroupName).Return(&tc.group, nil)
 
 			if tc.group.Category == types.BatchFeatureCategory {
 				metadataOpt := metadata.CreateFeatureOpt{
