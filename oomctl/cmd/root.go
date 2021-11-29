@@ -49,7 +49,7 @@ func init() {
 
 // initConfig reads in config file
 func initConfig() {
-	if envCfgFile := os.Getenv("FEATCTL_CONFIG"); envCfgFile != "" {
+	if envCfgFile := os.Getenv("OOMCLI_CONFIG"); envCfgFile != "" {
 		cfgFile = envCfgFile
 	}
 	cfgContent, err := ioutil.ReadFile(cfgFile)

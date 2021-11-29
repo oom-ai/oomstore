@@ -15,7 +15,7 @@ RST=$(tput sgr0    2>/dev/null || true)
 GRN=$(tput setaf 2 2>/dev/null || true)
 YLW=$(tput setaf 3 2>/dev/null || true)
 
-export FEATCTL_CONFIG="$SDIR/config.yaml"
+export OOMCLI_CONFIG="$SDIR/config.yaml"
 export OOMD_CONFIG="$SDIR/config.yaml"
 
 trim() {

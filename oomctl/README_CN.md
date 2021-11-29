@@ -176,7 +176,7 @@ device,20210907,device_20210907,定时导入,2021-09-07T15:20:43Z,2021-09-07T15:
 
 ## Config
 
-oomctl 默认读取 `$XDG_CONFIG_HOME/oomctl/config.yaml` 作为配置文件（可通过环境变量`FEATCTL_CONFIG` 或参数 `--config` 指定）：
+oomctl 默认读取 `$XDG_CONFIG_HOME/oomctl/config.yaml` 作为配置文件（可通过环境变量`OOMCLI_CONFIG` 或参数 `--config` 指定）：
 
 ```yaml
 online-store:
