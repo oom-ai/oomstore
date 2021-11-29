@@ -17,7 +17,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
-	group, err := store.GetGroup(ctx, groupID)
+	group, err := store.CacheGetGroup(ctx, groupID)
 	require.NoError(t, err)
 	opt := metadata.CreateRevisionOpt{
 		GroupID:     groupID,
@@ -84,7 +84,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 			} else {
 				require.NoError(t, tc.expectedError)
 				require.NoError(t, store.Refresh())
-				actualRevision, err := store.GetRevision(ctx, tc.expected)
+				actualRevision, err := store.CacheGetRevision(ctx, tc.expected)
 				require.NoError(t, err)
 				ignoreCreateAndModifyTime(actualRevision)
 				require.Equal(t, tc.expectedRevision, actualRevision)
@@ -155,7 +155,7 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.NoError(t, err)
 
 	require.NoError(t, store.Refresh())
-	group, err := store.GetGroup(ctx, groupID)
+	group, err := store.CacheGetGroup(ctx, groupID)
 	require.NoError(t, err)
 
 	revision := types.Revision{
@@ -189,7 +189,7 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			actual, err := store.GetRevision(ctx, tc.revisionID)
+			actual, err := store.CacheGetRevision(ctx, tc.revisionID)
 
 			if tc.expectedError != nil {
 				require.EqualError(t, err, tc.expectedError.Error())
@@ -217,7 +217,7 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.NoError(t, err)
 
 	require.NoError(t, store.Refresh())
-	group, err := store.GetGroup(ctx, groupID)
+	group, err := store.CacheGetGroup(ctx, groupID)
 	require.NoError(t, err)
 
 	revision := types.Revision{
@@ -261,7 +261,7 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			actual, err := store.GetRevisionBy(ctx, tc.GroupID, tc.Revision)
+			actual, err := store.CacheGetRevisionBy(ctx, tc.GroupID, tc.Revision)
 
 			if tc.expectedError != nil {
 				require.EqualError(t, err, tc.expectedError.Error())
@@ -300,7 +300,7 @@ func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			actual := store.ListRevision(ctx, tc.groupID)
+			actual := store.CacheListRevision(ctx, tc.groupID)
 			for _, item := range actual {
 				ignoreCreateAndModifyTime(item)
 			}
@@ -355,7 +355,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	require.NoError(t, err)
 
 	require.NoError(t, store.Refresh())
-	group, err := store.GetGroup(ctx, groupID)
+	group, err := store.CacheGetGroup(ctx, groupID)
 	require.NoError(t, err)
 
 	revision1 := &types.Revision{
