@@ -20,7 +20,7 @@ EOF
 import_sample 80
 case='oomctl join historical-feature'
 expected="
-entity_key,unix_time,model,price
+entity_key,unix_milli,model,price
 1,$t1,,
 2,$t1,,
 1,$t2,xiaomi-mix3,3999

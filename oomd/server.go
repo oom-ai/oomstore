@@ -220,7 +220,7 @@ func (s *server) ChannelJoin(stream codegen.OomD_ChannelJoinServer) error {
 		}
 		entityRows <- types.EntityRow{
 			EntityKey: req.EntityRow.EntityKey,
-			UnixTime:  req.EntityRow.UnixTime,
+			UnixMilli: req.EntityRow.UnixMilli,
 		}
 	}
 }
@@ -352,8 +352,8 @@ func convertInterfaceToValue(i interface{}) (*codegen.Value, error) {
 		}, nil
 	case time.Time:
 		return &codegen.Value{
-			Kind: &codegen.Value_UnixTimestampValue{
-				UnixTimestampValue: s.UnixMilli(),
+			Kind: &codegen.Value_UnixMilliValue{
+				UnixMilliValue: s.UnixMilli(),
 			},
 		}, nil
 	case []byte:
