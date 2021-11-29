@@ -220,7 +220,7 @@ func (s *server) ChannelJoin(stream codegen.OomD_ChannelJoinServer) error {
 		}
 		entityRows <- types.EntityRow{
 			EntityKey: req.EntityRow.EntityKey,
-			UnixTime:  req.EntityRow.UnixTime,
+			UnixMilli: req.EntityRow.UnixTime,
 		}
 	}
 }

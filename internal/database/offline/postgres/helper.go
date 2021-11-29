@@ -70,7 +70,7 @@ func (db *DB) insertEntityRows(ctx context.Context, tableName string, entityRows
 	records := make([]interface{}, 0, PostgresBatchSize)
 	columns := []string{"entity_key", "unix_time"}
 	for entityRow := range entityRows {
-		records = append(records, []interface{}{entityRow.EntityKey, entityRow.UnixTime})
+		records = append(records, []interface{}{entityRow.EntityKey, entityRow.UnixMilli})
 
 		if len(records) == PostgresBatchSize {
 			if err := dbutil.InsertRecordsToTable(db.DB, ctx, tableName, records, columns); err != nil {

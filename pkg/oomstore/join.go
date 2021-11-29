@@ -143,14 +143,14 @@ func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, e
 				readErr = fmt.Errorf("expected 2 values per row, got %d value(s) at row %d", len(line), i)
 				return
 			}
-			unixTime, err := strconv.Atoi(line[1])
+			unixMilli, err := strconv.Atoi(line[1])
 			if err != nil {
 				readErr = err
 				return
 			}
 			entityRows <- types.EntityRow{
 				EntityKey: line[0],
-				UnixTime:  int64(unixTime),
+				UnixMilli: int64(unixMilli),
 			}
 			i++
 		}
