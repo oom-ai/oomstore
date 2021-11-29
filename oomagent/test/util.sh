@@ -16,7 +16,7 @@ GRN=$(tput setaf 2 2>/dev/null || true)
 YLW=$(tput setaf 3 2>/dev/null || true)
 
 export OOMCLI_CONFIG="$SDIR/config.yaml"
-export OOMD_CONFIG="$SDIR/config.yaml"
+export OOMAGENT_CONFIG="$SDIR/config.yaml"
 
 trim() {
     local var="$*"
@@ -100,13 +100,13 @@ prepare_store() {
 }
 
 testgrpc() {
-    grpcurl --import-path "$PROTO_DIR" --proto "$PROTO_DIR/oomd.proto" -plaintext -d @ localhost:50051 "oomd.OomD/$1" "${@:1:}"
+    grpcurl --import-path "$PROTO_DIR" --proto "$PROTO_DIR/oomagent.proto" -plaintext -d @ localhost:50051 "oomagent.OomAgent/$1" "${@:1:}"
 }
 
-prepare_oomd() {
-    info "start oomd server..."
+prepare_oomagent() {
+    info "start oomagent server..."
     trap 'kill $(jobs -p)' EXIT INT TERM HUP
-    oomd &
+    oomagent &
     sleep 1
 }
 
