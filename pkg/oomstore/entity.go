@@ -13,7 +13,7 @@ func (s *OomStore) GetEntity(ctx context.Context, id int) (*types.Entity, error)
 	if err := s.metadata.Refresh(); err != nil {
 		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
-	return s.metadata.GetEntity(ctx, id)
+	return s.metadata.CacheGetEntity(ctx, id)
 }
 
 // Get metadata of an entity by name.
@@ -21,13 +21,13 @@ func (s *OomStore) GetEntityByName(ctx context.Context, name string) (*types.Ent
 	if err := s.metadata.Refresh(); err != nil {
 		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
-	return s.metadata.GetEntityByName(ctx, name)
+	return s.metadata.CacheGetEntityByName(ctx, name)
 }
 
 // List metadata of all entities.
 func (s *OomStore) ListEntity(ctx context.Context) types.EntityList {
 	_ = s.metadata.Refresh()
-	return s.metadata.ListEntity(ctx)
+	return s.metadata.CacheListEntity(ctx)
 }
 
 // Create metadata for an entity.
@@ -45,7 +45,7 @@ func (s *OomStore) UpdateEntity(ctx context.Context, opt types.UpdateEntityOpt) 
 	if err := s.metadata.Refresh(); err != nil {
 		return fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
-	entity, err := s.metadata.GetEntityByName(ctx, opt.EntityName)
+	entity, err := s.metadata.CacheGetEntityByName(ctx, opt.EntityName)
 	if err != nil {
 		return err
 	}

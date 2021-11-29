@@ -12,7 +12,7 @@ import (
 
 // Get online features of a particular entity instance.
 func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*types.FeatureValues, error) {
-	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureNames: &opt.FeatureNames,
 	}).Filter(func(f *types.Feature) bool {
 		return f.Group.OnlineRevisionID != nil
@@ -57,7 +57,7 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 
 // Get online features of multiple entity instances.
 func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetOpt) (map[string]*types.FeatureValues, error) {
-	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureNames: &opt.FeatureNames,
 	})
 

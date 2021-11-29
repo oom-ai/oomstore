@@ -40,7 +40,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		for _, group := range stage.NewGroups {
 			if _, exist := entityMp[group.EntityName]; !exist {
 				var entity *types.Entity
-				if entity, err = s.metadata.GetEntityByName(c, group.EntityName); err != nil {
+				if entity, err = s.metadata.CacheGetEntityByName(c, group.EntityName); err != nil {
 					return err
 				}
 				entityMp[group.EntityName] = entity.ID
@@ -57,7 +57,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		for _, feature := range stage.NewFeatures {
 			if _, exist := groupMp[feature.GroupName]; !exist {
 				var group *types.Group
-				if group, err = s.metadata.GetGroupByName(ctx, feature.GroupName); err != nil {
+				if group, err = s.metadata.CacheGetGroupByName(ctx, feature.GroupName); err != nil {
 					return err
 				}
 				groupMp[feature.GroupName] = group.ID
@@ -77,7 +77,7 @@ func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore,
 		return 0, err
 	}
 
-	entity, err := s.metadata.GetEntityByName(ctx, newEntity.Name)
+	entity, err := s.metadata.CacheGetEntityByName(ctx, newEntity.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return 0, err
@@ -109,7 +109,7 @@ func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, 
 		return 0, err
 	}
 
-	group, err := s.metadata.GetGroupByName(ctx, newGroup.Name)
+	group, err := s.metadata.CacheGetGroupByName(ctx, newGroup.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return 0, err
@@ -140,7 +140,7 @@ func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.WriteStore
 		return err
 	}
 
-	feature, err := s.metadata.GetFeatureByName(ctx, newFeature.Name)
+	feature, err := s.metadata.CacheGetFeatureByName(ctx, newFeature.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return err
