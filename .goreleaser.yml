@@ -1,4 +1,3 @@
-project_name: oomctl
 release:
   prerelease: auto
 before:
@@ -6,7 +5,10 @@ before:
     - go mod tidy
     - go generate ./...
 builds:
-  - env:
+  - main: ./oomctl
+    id: "oomctl"
+    binary: oomctl
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -18,6 +20,22 @@ builds:
         -X github.com/oom-ai/oomstore/version.Version={{.Version}}
         -X github.com/oom-ai/oomstore/version.Commit={{.Commit}}
         -X github.com/oom-ai/oomstore/version.Built={{.CommitDate}}
+  - main: ./oomd
+    id: "oomd"
+    binary: oomd
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    ldflags:
+      - >
+        -s -w
+        -X github.com/oom-ai/oomstore/version.Version={{.Version}}
+        -X github.com/oom-ai/oomstore/version.Commit={{.Commit}}
+        -X github.com/oom-ai/oomstore/version.Built={{.CommitDate}}
+
 archives:
   - replacements:
       darwin: Darwin
@@ -25,20 +43,18 @@ archives:
       windows: Windows
       386: i386
       amd64: x86_64
-    files:
-      - none*
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^Merge'
-      - '^Update'
-      - '^docs[:(]'
-      - '^test[:(]'
-      - '^chore[:(]'
-      - '^refactor[:(]'
-      - '^ci[:(]'
+      - "^Merge"
+      - "^Update"
+      - "^docs[:(]"
+      - "^test[:(]"
+      - "^chore[:(]"
+      - "^refactor[:(]"
+      - "^ci[:(]"
