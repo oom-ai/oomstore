@@ -75,7 +75,10 @@ func (s *server) OnlineMultiGet(ctx context.Context, req *codegen.OnlineMultiGet
 }
 
 func (s *server) Sync(ctx context.Context, req *codegen.SyncRequest) (*codegen.SyncResponse, error) {
-	if err := s.oomstore.Sync(ctx, types.SyncOpt{RevisionID: int(req.RevisionId)}); err != nil {
+	if err := s.oomstore.Sync(ctx, types.SyncOpt{
+		RevisionID: int(req.RevisionId),
+		PurgeDelay: int(req.PurgeDelay),
+	}); err != nil {
 		return &codegen.SyncResponse{
 			Status: &status.Status{
 				Code:    int32(code.Code_INTERNAL),
