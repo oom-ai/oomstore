@@ -134,7 +134,7 @@ func TestChannelJoin(t *testing.T) {
 }
 
 func prepareResult() *types.JoinResult {
-	header := []string{"entity_key", "unix_time", "model", "price"}
+	header := []string{"entity_key", "unix_milli", "model", "price"}
 	data := make(chan []interface{})
 	go func() {
 		defer close(data)
