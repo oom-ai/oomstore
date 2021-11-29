@@ -30,11 +30,11 @@ codegen:
 	@perl -pi -e s,"import oomd_pb2","from . import oomd_pb2",g sdk/python/src/oomstore/codegen/oomd_pb2_grpc.py
 
 .PHONY: build
-build: oomctl oomd
+build: oomcli oomd
 
-.PHONY: oomctl
-oomctl:
-	$(MAKE) -C oomctl build
+.PHONY: oomcli
+oomcli:
+	$(MAKE) -C oomcli build
 
 .PHONY: oomd
 oomd:
@@ -46,7 +46,7 @@ test:
 
 .PHONY: integration-test
 integration-test: codegen
-	$(MAKE) -C oomctl integration-test
+	$(MAKE) -C oomcli integration-test
 	$(MAKE) -C oomd    integration-test
 
 .PHONY: lint
@@ -55,4 +55,4 @@ lint:
 
 .PHONY: clean
 clean:
-	$(MAKE) -C oomctl clean
+	$(MAKE) -C oomcli clean

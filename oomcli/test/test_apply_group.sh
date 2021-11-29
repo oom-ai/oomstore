@@ -27,16 +27,16 @@ category: batch
 description: 'description'
 EOF
 
-oomctl apply -f "$TMPFILE"
+oomcli apply -f "$TMPFILE"
 
 group_expected='
 GroupName,GroupID,EntityName,Description
 device,1,user,description
 account,2,user,description
 '
-group_actual=$(oomctl list group -o csv)
+group_actual=$(oomcli list group -o csv)
 ignore_time() { cut -d ',' -f 1-4 <<<"$1"; }
-assert_eq "oomctl list group" "$(sort <<< "$group_expected")" "$(ignore_time "$group_actual" | sort)"
+assert_eq "oomcli list group" "$(sort <<< "$group_expected")" "$(ignore_time "$group_actual" | sort)"
 
 
 init_store
@@ -64,21 +64,21 @@ features:
   description: 'description'
 EOF
 
-oomctl apply -f "$TMPFILE"
+oomcli apply -f "$TMPFILE"
 
 group_expected='
 GroupName,GroupID,EntityName,Description
 device,1,user,description
 '
-group_actual=$(oomctl list group -o csv)
+group_actual=$(oomcli list group -o csv)
 ignore_time() { cut -d ',' -f 1-4 <<<"$1"; }
-assert_eq "oomctl list group" "$(sort <<< "$group_expected")" "$(ignore_time "$group_actual" | sort)"
+assert_eq "oomcli list group" "$(sort <<< "$group_expected")" "$(ignore_time "$group_actual" | sort)"
 
 feature_expected='Name,Group,Entity,Category,DBValueType,ValueType,Description,OnlineRevisionID
 model,device,user,batch,varchar(16),string,description,<NULL>
 price,device,user,batch,int,int64,description,<NULL>
 radio,device,user,batch,int,int64,description,<NULL>
 '
-feature_actual=$(oomctl list feature -o csv)
+feature_actual=$(oomcli list feature -o csv)
 ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }
-assert_eq "oomctl list feature" "$(sort <<< "$feature_expected")" "$(ignore_time "$feature_actual" | sort)"
+assert_eq "oomcli list feature" "$(sort <<< "$feature_expected")" "$(ignore_time "$feature_actual" | sort)"
