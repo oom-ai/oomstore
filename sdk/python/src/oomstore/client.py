@@ -56,10 +56,15 @@ class Client(object):
             }
         )
 
-    def sync(self, revision_id):
+    def sync(self, revision_id, purge_delay):
         with grpc.insecure_channel(self.addr) as channel:
             stub = oomagent_pb2_grpc.OomAgentStub(channel)
-            stub.Sync(oomagent_pb2.SyncRequest(revision_id=revision_id))
+            stub.Sync(
+                oomagent_pb2.SyncRequest(
+                    revision_id=revision_id,
+                    purge_delay=purge_delay,
+                )
+            )
         return
 
     def import_(
@@ -76,7 +81,6 @@ class Client(object):
                     revision=revision,
                 )
             )
-            print(response)
         return response.revision_id
 
     def join(self, feature_names, input_file_path, output_file_path):
