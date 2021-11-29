@@ -31,7 +31,7 @@ message Value {
     // Represents a boolean value.
     bool bool_value = 4;
     // Represents a unix milliseconds value.
-    int64 unix_timestamp_value = 5;
+    int64 unix_milli_value = 5;
     // Represents a bytes value.
     bytes bytes_value = 6;
   }
@@ -91,7 +91,7 @@ message ImportRequest {
 
 message EntityRow {
   string entity_key = 1;
-  int64 unix_time = 2;
+  int64 unix_milli = 2;
 }
 
 message ChannelJoinRequest {
