@@ -6,7 +6,7 @@ import tempfile
 import shutil
 from pathlib import Path
 
-SOURCE_PATH = str(Path(os.getcwd()).parent.absolute())
+SOURCE_PATH = str(Path(os.path.dirname(__file__)).parent.absolute())
 sys.path.insert(0, SOURCE_PATH)
 
 from oomstore import client
