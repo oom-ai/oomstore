@@ -112,10 +112,10 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	_, err = store.GetFeature(ctx, 0)
+	_, err = store.CacheGetFeature(ctx, 0)
 	require.EqualError(t, err, "feature 0 not found")
 
-	feature, err := store.GetFeature(ctx, id)
+	feature, err := store.CacheGetFeature(ctx, id)
 	require.NoError(t, err)
 	require.Equal(t, "phone", feature.Name)
 	require.Equal(t, "device_info", feature.Group.Name)
@@ -128,7 +128,7 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
 
-	features := store.ListFeature(ctx, metadata.ListFeatureOpt{})
+	features := store.CacheListFeature(ctx, metadata.ListFeatureOpt{})
 	require.Equal(t, 0, features.Len())
 
 	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
@@ -142,27 +142,27 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	features = store.ListFeature(ctx, metadata.ListFeatureOpt{})
+	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{})
 	require.Equal(t, 1, features.Len())
 
-	features = store.ListFeature(ctx, metadata.ListFeatureOpt{
+	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureIDs: &[]int{featureID},
 	})
 	require.Equal(t, 1, features.Len())
 
-	features = store.ListFeature(ctx, metadata.ListFeatureOpt{
+	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   intPtr(entityID + 1),
 		FeatureIDs: &[]int{featureID},
 	})
 	require.Equal(t, 0, features.Len())
 
-	features = store.ListFeature(ctx, metadata.ListFeatureOpt{
+	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   &entityID,
 		FeatureIDs: &[]int{},
 	})
 	require.Equal(t, 0, len(features))
 
-	features = store.ListFeature(ctx, metadata.ListFeatureOpt{
+	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID: &entityID,
 	})
 	require.Equal(t, 1, len(features))
@@ -195,7 +195,7 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	feature, err := store.GetFeature(ctx, id)
+	feature, err := store.CacheGetFeature(ctx, id)
 	require.NoError(t, err)
 	require.Equal(t, "phone", feature.Name)
 	require.Equal(t, "device_info", feature.Group.Name)

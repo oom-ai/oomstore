@@ -16,21 +16,21 @@ type Store interface {
 }
 
 type ReadStore interface {
-	GetEntity(ctx context.Context, id int) (*types.Entity, error)
-	GetEntityByName(ctx context.Context, name string) (*types.Entity, error)
-	ListEntity(ctx context.Context) types.EntityList
+	CacheGetEntity(ctx context.Context, id int) (*types.Entity, error)
+	CacheGetEntityByName(ctx context.Context, name string) (*types.Entity, error)
+	CacheListEntity(ctx context.Context) types.EntityList
 
-	GetFeature(ctx context.Context, id int) (*types.Feature, error)
-	GetFeatureByName(ctx context.Context, name string) (*types.Feature, error)
-	ListFeature(ctx context.Context, opt ListFeatureOpt) types.FeatureList
+	CacheGetFeature(ctx context.Context, id int) (*types.Feature, error)
+	CacheGetFeatureByName(ctx context.Context, name string) (*types.Feature, error)
+	CacheListFeature(ctx context.Context, opt ListFeatureOpt) types.FeatureList
 
-	GetGroup(ctx context.Context, id int) (*types.Group, error)
-	GetGroupByName(ctx context.Context, name string) (*types.Group, error)
-	ListGroup(ctx context.Context, entityID *int) types.GroupList
+	CacheGetGroup(ctx context.Context, id int) (*types.Group, error)
+	CacheGetGroupByName(ctx context.Context, name string) (*types.Group, error)
+	CacheListGroup(ctx context.Context, entityID *int) types.GroupList
 
-	GetRevision(ctx context.Context, id int) (*types.Revision, error)
-	GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error)
-	ListRevision(ctx context.Context, groupID *int) types.RevisionList
+	CacheGetRevision(ctx context.Context, id int) (*types.Revision, error)
+	CacheGetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error)
+	CacheListRevision(ctx context.Context, groupID *int) types.RevisionList
 
 	// refresh
 	Refresh() error

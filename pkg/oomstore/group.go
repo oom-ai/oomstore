@@ -13,7 +13,7 @@ func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (i
 	if err := s.metadata.Refresh(); err != nil {
 		return 0, fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
-	entity, err := s.metadata.GetEntityByName(ctx, opt.EntityName)
+	entity, err := s.metadata.CacheGetEntityByName(ctx, opt.EntityName)
 	if err != nil {
 		return 0, err
 	}
@@ -32,7 +32,7 @@ func (s *OomStore) GetGroup(ctx context.Context, id int) (*types.Group, error) {
 	if err := s.metadata.Refresh(); err != nil {
 		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
-	return s.metadata.GetGroup(ctx, id)
+	return s.metadata.CacheGetGroup(ctx, id)
 }
 
 // Get metadata of a feature group by name.
@@ -40,13 +40,13 @@ func (s *OomStore) GetGroupByName(ctx context.Context, name string) (*types.Grou
 	if err := s.metadata.Refresh(); err != nil {
 		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
-	return s.metadata.GetGroupByName(ctx, name)
+	return s.metadata.CacheGetGroupByName(ctx, name)
 }
 
 // List metadata of feature groups under the same entity.
 func (s *OomStore) ListGroup(ctx context.Context, entityID *int) types.GroupList {
 	_ = s.metadata.Refresh()
-	return s.metadata.ListGroup(ctx, entityID)
+	return s.metadata.CacheListGroup(ctx, entityID)
 }
 
 // Update metadata of a feature group.
@@ -54,7 +54,7 @@ func (s *OomStore) UpdateGroup(ctx context.Context, opt types.UpdateGroupOpt) er
 	if err := s.metadata.Refresh(); err != nil {
 		return fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
-	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
+	group, err := s.metadata.CacheGetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return err
 	}

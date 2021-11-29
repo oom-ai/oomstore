@@ -31,7 +31,7 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 		wantError      error
 	}{
 		{
-			description: "GetGroup failed",
+			description: "CacheGetGroup failed",
 			opt: types.ChannelImport{
 				GroupName: "device_info",
 			},
@@ -42,7 +42,7 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 			wantError:      fmt.Errorf("error"),
 		},
 		{
-			description: "ListFeature failed",
+			description: "CacheListFeature failed",
 			opt: types.ChannelImport{
 				GroupName: "device_info",
 			},
