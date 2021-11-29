@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc"
 	"gopkg.in/yaml.v3"
 
-	"github.com/oom-ai/oomstore/oomd/codegen"
+	"github.com/oom-ai/oomstore/oomagent/codegen"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/version"
@@ -28,7 +28,7 @@ var port int
 
 // rootCmd represents the base command when called without and subcommands
 var rootCmd = &cobra.Command{
-	Use:     "oomd",
+	Use:     "oomagent",
 	Short:   "oomstore daemon",
 	Version: version.String(),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -44,7 +44,7 @@ var rootCmd = &cobra.Command{
 			log.Fatalf("failed to listen: %v", err)
 		}
 		grpcServer := grpc.NewServer()
-		codegen.RegisterOomDServer(grpcServer, &server{oomstore: oomStore})
+		codegen.RegisterOomAgentServer(grpcServer, &server{oomstore: oomStore})
 		if err := grpcServer.Serve(lis); err != nil {
 			panic(err)
 		}
@@ -76,7 +76,7 @@ func init() {
 
 // initConfig reads in config file
 func initConfig() {
-	if envCfgFile := os.Getenv("OOMD_CONFIG"); envCfgFile != "" {
+	if envCfgFile := os.Getenv("OOMAGENT_CONFIG"); envCfgFile != "" {
 		cfgFile = envCfgFile
 	}
 	cfgContent, err := ioutil.ReadFile(cfgFile)

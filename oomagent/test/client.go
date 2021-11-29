@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/oom-ai/oomstore/oomd/codegen"
+	"github.com/oom-ai/oomstore/oomagent/codegen"
 	"google.golang.org/grpc"
 )
 
@@ -34,7 +34,7 @@ func main() {
 }
 
 func OnlineGet() {
-	c, cancel := prepareOomDClient(*addr)
+	c, cancel := prepareOomAgentClient(*addr)
 	defer cancel()
 
 	// Contact the server and print out its response.
@@ -49,7 +49,7 @@ func OnlineGet() {
 }
 
 func Import() {
-	c, cancel := prepareOomDClient(*addr)
+	c, cancel := prepareOomAgentClient(*addr)
 	defer cancel()
 
 	// Contact the server and print out its response.
@@ -89,10 +89,10 @@ func Import() {
 	log.Printf("Import Got: %v", importRes)
 }
 
-func prepareOomDClient(addr string) (c codegen.OomDClient, cancel func()) {
+func prepareOomAgentClient(addr string) (c codegen.OomAgentClient, cancel func()) {
 	conn, err := grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	return codegen.NewOomDClient(conn), func() { conn.Close() }
+	return codegen.NewOomAgentClient(conn), func() { conn.Close() }
 }

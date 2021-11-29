@@ -3,7 +3,7 @@ SDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd) && cd "$SDIR" || exit 1
 source ./util.sh
 
 prepare_store
-prepare_oomd
+prepare_oomagent
 
 case="it works"
 arg='

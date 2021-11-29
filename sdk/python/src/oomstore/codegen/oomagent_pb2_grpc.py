@@ -2,10 +2,10 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from . import oomd_pb2 as oomd__pb2
+from . import oomagent_pb2 as oomagent__pb2
 
 
-class OomDStub(object):
+class OomAgentStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -15,53 +15,53 @@ class OomDStub(object):
             channel: A grpc.Channel.
         """
         self.OnlineGet = channel.unary_unary(
-                '/oomd.OomD/OnlineGet',
-                request_serializer=oomd__pb2.OnlineGetRequest.SerializeToString,
-                response_deserializer=oomd__pb2.OnlineGetResponse.FromString,
+                '/oomagent.OomAgent/OnlineGet',
+                request_serializer=oomagent__pb2.OnlineGetRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.OnlineGetResponse.FromString,
                 )
         self.OnlineMultiGet = channel.unary_unary(
-                '/oomd.OomD/OnlineMultiGet',
-                request_serializer=oomd__pb2.OnlineMultiGetRequest.SerializeToString,
-                response_deserializer=oomd__pb2.OnlineMultiGetResponse.FromString,
+                '/oomagent.OomAgent/OnlineMultiGet',
+                request_serializer=oomagent__pb2.OnlineMultiGetRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.OnlineMultiGetResponse.FromString,
                 )
         self.Sync = channel.unary_unary(
-                '/oomd.OomD/Sync',
-                request_serializer=oomd__pb2.SyncRequest.SerializeToString,
-                response_deserializer=oomd__pb2.SyncResponse.FromString,
+                '/oomagent.OomAgent/Sync',
+                request_serializer=oomagent__pb2.SyncRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.SyncResponse.FromString,
                 )
         self.ChannelImport = channel.stream_unary(
-                '/oomd.OomD/ChannelImport',
-                request_serializer=oomd__pb2.ChannelImportRequest.SerializeToString,
-                response_deserializer=oomd__pb2.ImportResponse.FromString,
+                '/oomagent.OomAgent/ChannelImport',
+                request_serializer=oomagent__pb2.ChannelImportRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.ImportResponse.FromString,
                 )
         self.Import = channel.unary_unary(
-                '/oomd.OomD/Import',
-                request_serializer=oomd__pb2.ImportRequest.SerializeToString,
-                response_deserializer=oomd__pb2.ImportResponse.FromString,
+                '/oomagent.OomAgent/Import',
+                request_serializer=oomagent__pb2.ImportRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.ImportResponse.FromString,
                 )
         self.ChannelJoin = channel.stream_stream(
-                '/oomd.OomD/ChannelJoin',
-                request_serializer=oomd__pb2.ChannelJoinRequest.SerializeToString,
-                response_deserializer=oomd__pb2.ChannelJoinResponse.FromString,
+                '/oomagent.OomAgent/ChannelJoin',
+                request_serializer=oomagent__pb2.ChannelJoinRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.ChannelJoinResponse.FromString,
                 )
         self.Join = channel.unary_unary(
-                '/oomd.OomD/Join',
-                request_serializer=oomd__pb2.JoinRequest.SerializeToString,
-                response_deserializer=oomd__pb2.JoinResponse.FromString,
+                '/oomagent.OomAgent/Join',
+                request_serializer=oomagent__pb2.JoinRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.JoinResponse.FromString,
                 )
         self.ChannelExport = channel.unary_stream(
-                '/oomd.OomD/ChannelExport',
-                request_serializer=oomd__pb2.ChannelExportRequest.SerializeToString,
-                response_deserializer=oomd__pb2.ChannelExportResponse.FromString,
+                '/oomagent.OomAgent/ChannelExport',
+                request_serializer=oomagent__pb2.ChannelExportRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.ChannelExportResponse.FromString,
                 )
         self.Export = channel.unary_unary(
-                '/oomd.OomD/Export',
-                request_serializer=oomd__pb2.ExportRequest.SerializeToString,
-                response_deserializer=oomd__pb2.ExportResponse.FromString,
+                '/oomagent.OomAgent/Export',
+                request_serializer=oomagent__pb2.ExportRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.ExportResponse.FromString,
                 )
 
 
-class OomDServicer(object):
+class OomAgentServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def OnlineGet(self, request, context):
@@ -119,61 +119,61 @@ class OomDServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_OomDServicer_to_server(servicer, server):
+def add_OomAgentServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'OnlineGet': grpc.unary_unary_rpc_method_handler(
                     servicer.OnlineGet,
-                    request_deserializer=oomd__pb2.OnlineGetRequest.FromString,
-                    response_serializer=oomd__pb2.OnlineGetResponse.SerializeToString,
+                    request_deserializer=oomagent__pb2.OnlineGetRequest.FromString,
+                    response_serializer=oomagent__pb2.OnlineGetResponse.SerializeToString,
             ),
             'OnlineMultiGet': grpc.unary_unary_rpc_method_handler(
                     servicer.OnlineMultiGet,
-                    request_deserializer=oomd__pb2.OnlineMultiGetRequest.FromString,
-                    response_serializer=oomd__pb2.OnlineMultiGetResponse.SerializeToString,
+                    request_deserializer=oomagent__pb2.OnlineMultiGetRequest.FromString,
+                    response_serializer=oomagent__pb2.OnlineMultiGetResponse.SerializeToString,
             ),
             'Sync': grpc.unary_unary_rpc_method_handler(
                     servicer.Sync,
-                    request_deserializer=oomd__pb2.SyncRequest.FromString,
-                    response_serializer=oomd__pb2.SyncResponse.SerializeToString,
+                    request_deserializer=oomagent__pb2.SyncRequest.FromString,
+                    response_serializer=oomagent__pb2.SyncResponse.SerializeToString,
             ),
             'ChannelImport': grpc.stream_unary_rpc_method_handler(
                     servicer.ChannelImport,
-                    request_deserializer=oomd__pb2.ChannelImportRequest.FromString,
-                    response_serializer=oomd__pb2.ImportResponse.SerializeToString,
+                    request_deserializer=oomagent__pb2.ChannelImportRequest.FromString,
+                    response_serializer=oomagent__pb2.ImportResponse.SerializeToString,
             ),
             'Import': grpc.unary_unary_rpc_method_handler(
                     servicer.Import,
-                    request_deserializer=oomd__pb2.ImportRequest.FromString,
-                    response_serializer=oomd__pb2.ImportResponse.SerializeToString,
+                    request_deserializer=oomagent__pb2.ImportRequest.FromString,
+                    response_serializer=oomagent__pb2.ImportResponse.SerializeToString,
             ),
             'ChannelJoin': grpc.stream_stream_rpc_method_handler(
                     servicer.ChannelJoin,
-                    request_deserializer=oomd__pb2.ChannelJoinRequest.FromString,
-                    response_serializer=oomd__pb2.ChannelJoinResponse.SerializeToString,
+                    request_deserializer=oomagent__pb2.ChannelJoinRequest.FromString,
+                    response_serializer=oomagent__pb2.ChannelJoinResponse.SerializeToString,
             ),
             'Join': grpc.unary_unary_rpc_method_handler(
                     servicer.Join,
-                    request_deserializer=oomd__pb2.JoinRequest.FromString,
-                    response_serializer=oomd__pb2.JoinResponse.SerializeToString,
+                    request_deserializer=oomagent__pb2.JoinRequest.FromString,
+                    response_serializer=oomagent__pb2.JoinResponse.SerializeToString,
             ),
             'ChannelExport': grpc.unary_stream_rpc_method_handler(
                     servicer.ChannelExport,
-                    request_deserializer=oomd__pb2.ChannelExportRequest.FromString,
-                    response_serializer=oomd__pb2.ChannelExportResponse.SerializeToString,
+                    request_deserializer=oomagent__pb2.ChannelExportRequest.FromString,
+                    response_serializer=oomagent__pb2.ChannelExportResponse.SerializeToString,
             ),
             'Export': grpc.unary_unary_rpc_method_handler(
                     servicer.Export,
-                    request_deserializer=oomd__pb2.ExportRequest.FromString,
-                    response_serializer=oomd__pb2.ExportResponse.SerializeToString,
+                    request_deserializer=oomagent__pb2.ExportRequest.FromString,
+                    response_serializer=oomagent__pb2.ExportResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'oomd.OomD', rpc_method_handlers)
+            'oomagent.OomAgent', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class OomD(object):
+class OomAgent(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -187,9 +187,9 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/OnlineGet',
-            oomd__pb2.OnlineGetRequest.SerializeToString,
-            oomd__pb2.OnlineGetResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/oomagent.OomAgent/OnlineGet',
+            oomagent__pb2.OnlineGetRequest.SerializeToString,
+            oomagent__pb2.OnlineGetResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -204,9 +204,9 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/OnlineMultiGet',
-            oomd__pb2.OnlineMultiGetRequest.SerializeToString,
-            oomd__pb2.OnlineMultiGetResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/oomagent.OomAgent/OnlineMultiGet',
+            oomagent__pb2.OnlineMultiGetRequest.SerializeToString,
+            oomagent__pb2.OnlineMultiGetResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -221,9 +221,9 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/Sync',
-            oomd__pb2.SyncRequest.SerializeToString,
-            oomd__pb2.SyncResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/oomagent.OomAgent/Sync',
+            oomagent__pb2.SyncRequest.SerializeToString,
+            oomagent__pb2.SyncResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -238,9 +238,9 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(request_iterator, target, '/oomd.OomD/ChannelImport',
-            oomd__pb2.ChannelImportRequest.SerializeToString,
-            oomd__pb2.ImportResponse.FromString,
+        return grpc.experimental.stream_unary(request_iterator, target, '/oomagent.OomAgent/ChannelImport',
+            oomagent__pb2.ChannelImportRequest.SerializeToString,
+            oomagent__pb2.ImportResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -255,9 +255,9 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/Import',
-            oomd__pb2.ImportRequest.SerializeToString,
-            oomd__pb2.ImportResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/oomagent.OomAgent/Import',
+            oomagent__pb2.ImportRequest.SerializeToString,
+            oomagent__pb2.ImportResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -272,9 +272,9 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/oomd.OomD/ChannelJoin',
-            oomd__pb2.ChannelJoinRequest.SerializeToString,
-            oomd__pb2.ChannelJoinResponse.FromString,
+        return grpc.experimental.stream_stream(request_iterator, target, '/oomagent.OomAgent/ChannelJoin',
+            oomagent__pb2.ChannelJoinRequest.SerializeToString,
+            oomagent__pb2.ChannelJoinResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -289,9 +289,9 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/Join',
-            oomd__pb2.JoinRequest.SerializeToString,
-            oomd__pb2.JoinResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/oomagent.OomAgent/Join',
+            oomagent__pb2.JoinRequest.SerializeToString,
+            oomagent__pb2.JoinResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -306,9 +306,9 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/oomd.OomD/ChannelExport',
-            oomd__pb2.ChannelExportRequest.SerializeToString,
-            oomd__pb2.ChannelExportResponse.FromString,
+        return grpc.experimental.unary_stream(request, target, '/oomagent.OomAgent/ChannelExport',
+            oomagent__pb2.ChannelExportRequest.SerializeToString,
+            oomagent__pb2.ChannelExportResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -323,8 +323,8 @@ class OomD(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/oomd.OomD/Export',
-            oomd__pb2.ExportRequest.SerializeToString,
-            oomd__pb2.ExportResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/oomagent.OomAgent/Export',
+            oomagent__pb2.ExportRequest.SerializeToString,
+            oomagent__pb2.ExportResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
