@@ -15,6 +15,14 @@ func (db *DB) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) er
 	return updateEntity(ctx, db, opt)
 }
 
+func (db *DB) GetEntity(ctx context.Context, id int) (*types.Entity, error) {
+	return getEntity(ctx, db, id)
+}
+
+func (db *DB) GetEntityByName(ctx context.Context, name string) (*types.Entity, error) {
+	return getEntityByName(ctx, db, name)
+}
+
 func (db *DB) CreateGroup(ctx context.Context, opt metadata.CreateGroupOpt) (int, error) {
 	return createGroup(ctx, db, opt)
 }
