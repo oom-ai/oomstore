@@ -65,8 +65,10 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 
 // Get point-in-time correct feature values for each entity row.
 // The method is similar to Join, except that both input and output are files on disk.
+// Input File should contain header, the first two columns of Input File should be
+// entity_key, unix_milli, then followed by other real-time feature values.
 func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) error {
-	entityRows, err := GetEntityRowsFromInputFile(opt.InputFilePath)
+	entityRows, header, err := GetEntityRowsFromInputFile(opt.InputFilePath)
 	if err != nil {
 		return err
 	}
@@ -74,6 +76,7 @@ func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) error {
 	joinResult, err := s.ChannelJoin(ctx, types.ChannelJoinOpt{
 		FeatureNames: opt.FeatureNames,
 		EntityRows:   entityRows,
+		ValueNames:   header[2:],
 	})
 	if err != nil {
 		return err
@@ -119,18 +122,22 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int) ([]*met
 	}), nil
 }
 
-func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, error) {
+func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, []string, error) {
 	input, err := os.Open(inputFilePath)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	reader := csv.NewReader(input)
+	header, err := reader.Read()
+	if err != nil {
+		return nil, nil, err
 	}
 	entityRows := make(chan types.EntityRow)
 	var readErr error
+	i := 1
 	go func() {
 		defer close(entityRows)
 		defer input.Close()
-		reader := csv.NewReader(input)
-		var i int64
 		for {
 			line, err := reader.Read()
 			if err == io.EOF {
@@ -140,8 +147,8 @@ func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, e
 				readErr = err
 				return
 			}
-			if len(line) != 2 {
-				readErr = fmt.Errorf("expected 2 values per row, got %d value(s) at row %d", len(line), i)
+			if len(line) < 2 {
+				readErr = fmt.Errorf("at least 2 values per row, got %d value(s) at row %d", len(line), i)
 				return
 			}
 			unixMilli, err := strconv.Atoi(line[1])
@@ -152,14 +159,15 @@ func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, e
 			entityRows <- types.EntityRow{
 				EntityKey: line[0],
 				UnixMilli: int64(unixMilli),
+				Values:    line[2:],
 			}
 			i++
 		}
 	}()
 	if readErr != nil {
-		return nil, readErr
+		return nil, nil, readErr
 	}
-	return entityRows, nil
+	return entityRows, header, nil
 }
 
 func writeJoinResultToFile(outputFilePath string, joinResult *types.JoinResult) error {

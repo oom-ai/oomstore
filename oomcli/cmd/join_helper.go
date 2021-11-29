@@ -18,7 +18,7 @@ type JoinOpt struct {
 }
 
 func join(ctx context.Context, store *oomstore.OomStore, opt JoinOpt, output string) error {
-	entityRows, err := oomstore.GetEntityRowsFromInputFile(opt.InputFilePath)
+	entityRows, header, err := oomstore.GetEntityRowsFromInputFile(opt.InputFilePath)
 	if err != nil {
 		return err
 	}
@@ -26,6 +26,7 @@ func join(ctx context.Context, store *oomstore.OomStore, opt JoinOpt, output str
 	joinResult, err := store.ChannelJoin(ctx, types.ChannelJoinOpt{
 		FeatureNames: opt.FeatureNames,
 		EntityRows:   entityRows,
+		ValueNames:   header[2:],
 	})
 	if err != nil {
 		return err
