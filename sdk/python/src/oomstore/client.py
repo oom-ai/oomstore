@@ -1,8 +1,8 @@
 import sys
 import grpc
 import logging
-from .codegen import oomd_pb2
-from .codegen import oomd_pb2_grpc
+from .codegen import oomagent_pb2
+from .codegen import oomagent_pb2_grpc
 import time
 from pathlib import Path
 from subprocess import Popen
@@ -15,24 +15,24 @@ def map_container_to_dict(map_container):
 class Client(object):
     def __init__(self, port: int, config_path: str):
         try:
-            self.oomd = Popen(["oomd", "--config", config_path])
+            self.oomagent = Popen(["oomagent", "--config", config_path])
         except Exception as e:
             logging.error(e)
             sys.exit(1)
 
         self.addr = "127.0.0.1:%d" % port
 
-        # wait for oomd to start
+        # wait for oomagent to start
         time.sleep(2)
 
     def __del__(self):
-        self.oomd.terminate()
+        self.oomagent.terminate()
 
     def online_get(self, entity_key, feature_names):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomd_pb2_grpc.OomDStub(channel)
+            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
             response = stub.OnlineGet(
-                codegen.oomd_pb2.OnlineGetRequest(
+                codegen.oomagent_pb2.OnlineGetRequest(
                     entity_key=entity_key, feature_names=feature_names
                 )
             )
@@ -40,9 +40,9 @@ class Client(object):
 
     def online_multi_get(self, entity_keys, feature_names):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomd_pb2_grpc.OomDStub(channel)
+            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
             response = stub.OnlineMultiGet(
-                codegen.oomd_pb2.OnlineMultiGetRequest(
+                codegen.oomagent_pb2.OnlineMultiGetRequest(
                     entity_keys=entity_keys, feature_names=feature_names
                 )
             )
@@ -55,17 +55,17 @@ class Client(object):
 
     def sync(self, revision_id):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomd_pb2_grpc.OomDStub(channel)
-            stub.Sync(codegen.oomd_pb2.SyncRequest(revision_id=revision_id))
+            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
+            stub.Sync(codegen.oomagent_pb2.SyncRequest(revision_id=revision_id))
         return
 
     def import_(
         self, group_name, description, input_file_path, delimiter, revision=None
     ):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomd_pb2_grpc.OomDStub(channel)
+            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
             response = stub.Import(
-                codegen.oomd_pb2.ImportRequest(
+                codegen.oomagent_pb2.ImportRequest(
                     group_name=group_name,
                     description=description,
                     input_file_path=input_file_path,
@@ -77,9 +77,9 @@ class Client(object):
 
     def join(self, feature_names, input_file_path, output_file_path):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomd_pb2_grpc.OomDStub(channel)
+            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
             stub.Join(
-                codegen.oomd_pb2.JoinRequest(
+                codegen.oomagent_pb2.JoinRequest(
                     feature_names=feature_names,
                     input_file_path=input_file_path,
                     output_file_path=output_file_path,
@@ -89,9 +89,9 @@ class Client(object):
 
     def export(self, feature_names, revision_id, output_file_path, limit=None):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomd_pb2_grpc.OomDStub(channel)
+            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
             stub.Export(
-                codegen.oomd_pb2.ExportRequest(
+                codegen.oomagent_pb2.ExportRequest(
                     feature_names=feature_names,
                     revision_id=revision_id,
                     output_file_path=output_file_path,
@@ -102,9 +102,9 @@ class Client(object):
 
     def channel_export(self, feature_names, revision_id, limit=None):
         with grpc.insecure_channel(self.addr) as channel:
-            stub = codegen.oomd_pb2_grpc.OomDStub(channel)
+            stub = codegen.oomagent_pb2_grpc.OomAgentStub(channel)
             response_channel = stub.ChannelExport(
-                codegen.oomd_pb2.ExportRequest(
+                codegen.oomagent_pb2.ExportRequest(
                     feature_names=feature_names,
                     revision_id=revision_id,
                     limit=limit
