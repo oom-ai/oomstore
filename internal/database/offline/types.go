@@ -19,6 +19,7 @@ type JoinOpt struct {
 	EntityRows       <-chan types.EntityRow
 	FeatureMap       map[string]types.FeatureList
 	RevisionRangeMap map[string][]*metadata.RevisionRange
+	ValueNames       []string
 }
 
 type JoinOneGroupOpt struct {
@@ -27,6 +28,7 @@ type JoinOneGroupOpt struct {
 	RevisionRanges      []*metadata.RevisionRange
 	Entity              types.Entity
 	EntityRowsTableName string
+	ValueNames          []string
 }
 
 type ImportOpt struct {
