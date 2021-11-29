@@ -72,13 +72,14 @@ assert_json_eq() {
 import_sample() {
     local group=$1
     local file=$2
+    local revision=${3:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
     info "import sample data '$file' into group '$group'..."
     oomcli import \
         --group "$group" \
-        --revision "$(perl -MTime::HiRes=time -E 'say int(time * 1000)')" \
+        --revision "$revision" \
         --input-file \
         "$file" \
-        --description 'sample account data' >/dev/null
+        --description "sample $group data from $(basename "$file")" >/dev/null
 }
 
 prepare_store() {
@@ -88,7 +89,7 @@ prepare_store() {
     # initialize feature store
     oomcli init
     info "create oomstore schema..."
-    oomcli apply -f ./data/schema.yaml
+    oomcli apply -f ./data/fraud_detection.yaml
 
     info "import sample data to offline store..."
     import_sample account ./data/account_100.csv
