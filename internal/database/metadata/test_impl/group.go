@@ -22,7 +22,7 @@ func prepareEntity(t *testing.T, ctx context.Context, store metadata.Store, name
 	return entityID
 }
 
-func TestGetGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCacheGetGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -45,6 +45,42 @@ func TestGetGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	// get existing feature group
 	group, err := store.CacheGetGroup(ctx, id)
+	require.NoError(t, err)
+	require.Equal(t, opt.GroupName, group.Name)
+	require.Equal(t, opt.EntityID, group.EntityID)
+	require.Equal(t, opt.Description, group.Description)
+	require.Equal(t, opt.Category, group.Category)
+}
+
+func TestGetGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	entityID := prepareEntity(t, ctx, store, "device")
+
+	opt := metadata.CreateGroupOpt{
+		GroupName:   "device_info",
+		EntityID:    entityID,
+		Description: "description",
+		Category:    types.BatchFeatureCategory,
+	}
+	id, err := store.CreateGroup(ctx, opt)
+	require.NoError(t, err)
+
+	// get non-exist feature group
+	_, err = store.GetGroup(ctx, 0)
+	require.Error(t, err)
+
+	// get existing feature group by id
+	group, err := store.GetGroup(ctx, id)
+	require.NoError(t, err)
+	require.Equal(t, opt.GroupName, group.Name)
+	require.Equal(t, opt.EntityID, group.EntityID)
+	require.Equal(t, opt.Description, group.Description)
+	require.Equal(t, opt.Category, group.Category)
+
+	// get existing feature group by name
+	group, err = store.GetGroupByName(ctx, "device_info")
 	require.NoError(t, err)
 	require.Equal(t, opt.GroupName, group.Name)
 	require.Equal(t, opt.EntityID, group.EntityID)
