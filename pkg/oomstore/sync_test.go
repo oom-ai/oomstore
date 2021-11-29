@@ -49,7 +49,7 @@ func TestSync(t *testing.T) {
 			},
 			expectedError: fmt.Errorf("the specific revision was synced to the online store, won't do it again this time"),
 			mockFn: func() {
-				metadataStore.EXPECT().GetRevision(ctx, 1).Return(&types.Revision{
+				metadataStore.EXPECT().CacheGetRevision(ctx, 1).Return(&types.Revision{
 					GroupID: 1,
 					Group: &types.Group{
 						ID:               1,
@@ -66,12 +66,12 @@ func TestSync(t *testing.T) {
 			expectedError: nil,
 			mockFn: func() {
 				revision := buildRevision()
-				metadataStore.EXPECT().GetRevision(ctx, 1).Return(revision, nil)
-				metadataStore.EXPECT().GetGroupByName(ctx, "device_info").Return(&types.Group{
+				metadataStore.EXPECT().CacheGetRevision(ctx, 1).Return(revision, nil)
+				metadataStore.EXPECT().CacheGetGroupByName(ctx, "device_info").Return(&types.Group{
 					Name: "device_info",
 					ID:   1,
 				}, nil)
-				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
+				metadataStore.EXPECT().CacheListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
 
 				stream := make(chan types.ExportRecord)
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
@@ -101,12 +101,12 @@ func TestSync(t *testing.T) {
 			mockFn: func() {
 				revision := buildRevision()
 				revision.Group.OnlineRevisionID = intPtr(0)
-				metadataStore.EXPECT().GetRevision(ctx, 1).Return(revision, nil)
-				metadataStore.EXPECT().GetGroupByName(ctx, "device_info").Return(&types.Group{
+				metadataStore.EXPECT().CacheGetRevision(ctx, 1).Return(revision, nil)
+				metadataStore.EXPECT().CacheGetGroupByName(ctx, "device_info").Return(&types.Group{
 					Name: "device_info",
 					ID:   1,
 				}, nil)
-				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
+				metadataStore.EXPECT().CacheListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
 
 				stream := make(chan types.ExportRecord)
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
