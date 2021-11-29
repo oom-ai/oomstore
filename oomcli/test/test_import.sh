@@ -5,8 +5,8 @@ source ./util.sh
 init_store
 register_features
 
-case='oomctl import using absolute path'
-oomctl import \
+case='oomcli import using absolute path'
+oomcli import \
     --group phone \
     --input-file "$(pwd)/device.csv" \
     --description 'test data' > /dev/null

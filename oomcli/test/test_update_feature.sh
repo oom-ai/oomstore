@@ -6,14 +6,18 @@ init_store
 register_features
 import_sample > /dev/null
 
-case='oomctl update group works'
-oomctl update group phone --description "new description"
+case='oomcli update feature works'
+oomcli update feature price --description "new description"
 expected='
-Name:             phone
+Name:             price
+Group:            phone
 Entity:           device
+Category:         batch
+DBValueType:      int
+ValueType:        int64
 Description:      new description
 OnlineRevisionID: <NULL>
 '
-actual=$(oomctl describe group phone)
+actual=$(oomcli describe feature price)
 ignore() { grep -Ev '^(CreateTime|ModifyTime)' <<<"$1"; }
-assert_eq "$case" "$expected" "$(ignore "$actual")"
+assert_eq "$case"  "$expected" "$(ignore "$actual")"
