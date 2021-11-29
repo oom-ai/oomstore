@@ -17,7 +17,7 @@ func (r ExportRecord) ValueAt(i int) interface{} {
 
 type EntityRow struct {
 	EntityKey string `db:"entity_key"`
-	UnixTime  int64  `db:"unix_time"`
+	UnixMilli int64  `db:"unix_milli"`
 }
 
 type JoinResult struct {
