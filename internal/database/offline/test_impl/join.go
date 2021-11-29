@@ -173,19 +173,19 @@ func prepareEntityRows(isEmpty bool) <-chan types.EntityRow {
 		}
 		entityRows <- types.EntityRow{
 			EntityKey: "1234",
-			UnixTime:  10,
+			UnixMilli: 10,
 		}
 		entityRows <- types.EntityRow{
 			EntityKey: "1234",
-			UnixTime:  20,
+			UnixMilli: 20,
 		}
 		entityRows <- types.EntityRow{
 			EntityKey: "1235",
-			UnixTime:  5,
+			UnixMilli: 5,
 		}
 		entityRows <- types.EntityRow{
 			EntityKey: "1235",
-			UnixTime:  14,
+			UnixMilli: 14,
 		}
 	}()
 	return entityRows
