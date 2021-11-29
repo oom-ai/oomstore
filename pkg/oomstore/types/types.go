@@ -16,8 +16,9 @@ func (r ExportRecord) ValueAt(i int) interface{} {
 }
 
 type EntityRow struct {
-	EntityKey string `db:"entity_key"`
-	UnixMilli int64  `db:"unix_milli"`
+	EntityKey string
+	UnixMilli int64
+	Values    []string
 }
 
 type JoinResult struct {

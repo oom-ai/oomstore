@@ -19,7 +19,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	if len(features) == 0 {
 		return nil, nil
 	}
-	entityRowsTableName, err := db.createAndImportTableEntityRows(ctx, opt.Entity, opt.EntityRows)
+	entityRowsTableName, err := db.createAndImportTableEntityRows(ctx, opt.Entity, opt.EntityRows, opt.ValueNames)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	}
 
 	// Step 3: read joined results
-	return db.readJoinedTable(ctx, entityRowsTableName, tableNames, tableToFeatureMap)
+	return db.readJoinedTable(ctx, entityRowsTableName, tableNames, tableToFeatureMap, opt.ValueNames)
 }
 
 func (db *DB) joinOneGroup(ctx context.Context, opt offline.JoinOneGroupOpt) (string, error) {
@@ -57,7 +57,7 @@ func (db *DB) joinOneGroup(ctx context.Context, opt offline.JoinOneGroupOpt) (st
 		return "", nil
 	}
 	// Step 1: create temporary joined table
-	joinedTableName, err := db.createTableJoined(ctx, opt.Features, opt.Entity, opt.GroupName)
+	joinedTableName, err := db.createTableJoined(ctx, opt.Features, opt.Entity, opt.GroupName, opt.ValueNames)
 	if err != nil {
 		return "", err
 	}
@@ -74,9 +74,10 @@ func (db *DB) joinOneGroup(ctx context.Context, opt offline.JoinOneGroupOpt) (st
 		ON l.entity_key = r.%s
 		WHERE l.unix_milli >= $1 AND l.unix_milli < $2;
 	`
-	featureNamesStr := dbutil.Quote(`"`, opt.Features.Names()...)
+	columns := append(opt.ValueNames, opt.Features.Names()...)
+	columnsStr := dbutil.Quote(`"`, columns...)
 	for _, r := range opt.RevisionRanges {
-		query := fmt.Sprintf(joinQuery, joinedTableName, featureNamesStr, featureNamesStr, opt.EntityRowsTableName, r.DataTable, opt.Entity.Name)
+		query := fmt.Sprintf(joinQuery, joinedTableName, columnsStr, columnsStr, opt.EntityRowsTableName, r.DataTable, opt.Entity.Name)
 		if _, tmpErr := db.ExecContext(ctx, query, r.MinRevision, r.MaxRevision); tmpErr != nil {
 			return "", tmpErr
 		}
@@ -85,7 +86,7 @@ func (db *DB) joinOneGroup(ctx context.Context, opt offline.JoinOneGroupOpt) (st
 	return joinedTableName, nil
 }
 
-func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, tableNames []string, featureMap map[string]types.FeatureList) (*types.JoinResult, error) {
+func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, tableNames []string, featureMap map[string]types.FeatureList, valueNames []string) (*types.JoinResult, error) {
 	if len(tableNames) == 0 {
 		return nil, nil
 	}
@@ -105,6 +106,9 @@ func (db *DB) readJoinedTable(ctx context.Context, entityRowsTableName string, t
 		ON entity_rows_table.entity_key = joined_table_2.entity_key AND entity_rows_table.unix_milli = joined_table_2.unix_milli;
 	*/
 	fields := []string{fmt.Sprintf("%s.entity_key, %s.unix_milli", entityRowsTableName, entityRowsTableName)}
+	for _, valueName := range valueNames {
+		fields = append(fields, fmt.Sprintf("%s.%s", entityRowsTableName, valueName))
+	}
 	for _, tableName := range tableNames {
 		for _, f := range featureMap[tableName] {
 			fields = append(fields, fmt.Sprintf("%s.%s", tableName, f.Name))

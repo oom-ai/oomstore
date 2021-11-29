@@ -59,6 +59,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 		EntityRows:       opt.EntityRows,
 		FeatureMap:       featureMap,
 		RevisionRangeMap: revisionRangeMap,
+		ValueNames:       opt.ValueNames,
 	})
 }
 
