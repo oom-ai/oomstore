@@ -1,0 +1,18 @@
+---
+kind: Entity
+name: driver
+length: 2
+batch-features:
+  - group: driver_stats
+    features:
+      - name: conv_rate
+        db-value-type: float8
+        description: ~
+      - name: acc_rate
+        db-value-type: float8
+        description: ~
+      - name: avg_daily_trips
+        db-value-type: int8
+        description: ~
+    description: ~
+description: ~
