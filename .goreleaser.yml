@@ -20,9 +20,9 @@ builds:
         -X github.com/oom-ai/oomstore/version.Version={{.Version}}
         -X github.com/oom-ai/oomstore/version.Commit={{.Commit}}
         -X github.com/oom-ai/oomstore/version.Built={{.CommitDate}}
-  - main: ./oomd
-    id: "oomd"
-    binary: oomd
+  - main: ./oomagent
+    id: "oomagent"
+    binary: oomagent
     env:
       - CGO_ENABLED=0
     goos:

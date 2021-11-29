@@ -12,7 +12,7 @@ info:
 
 .PHONY: build
 build:
-	@go build -o $(OUT)oomd -ldflags "-s -w \
+	@go build -o $(OUT)oomagent -ldflags "-s -w \
 		-X $$(go list -m)/version.Version=$(VERSION) \
 		-X $$(go list -m)/version.Commit=$(COMMIT) \
 		-X $$(go list -m)/version.Built=$$(date -u +%FT%T+00:00)"

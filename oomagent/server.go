@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/oom-ai/oomstore/oomd/codegen"
+	"github.com/oom-ai/oomstore/oomagent/codegen"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	code "google.golang.org/genproto/googleapis/rpc/code"
@@ -15,7 +15,7 @@ import (
 )
 
 type server struct {
-	codegen.UnimplementedOomDServer
+	codegen.UnimplementedOomAgentServer
 
 	oomstore *oomstore.OomStore
 }
@@ -91,7 +91,7 @@ func (s *server) Sync(ctx context.Context, req *codegen.SyncRequest) (*codegen.S
 	}, nil
 }
 
-func (s *server) ChannelImport(stream codegen.OomD_ChannelImportServer) error {
+func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) error {
 	firstReq, err := stream.Recv()
 	if err != nil {
 		return err
@@ -171,7 +171,7 @@ func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codeg
 	}, nil
 }
 
-func (s *server) ChannelJoin(stream codegen.OomD_ChannelJoinServer) error {
+func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 	firstReq, err := stream.Recv()
 	if err != nil {
 		return err
@@ -242,7 +242,7 @@ func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.J
 	}, nil
 }
 
-func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen.OomD_ChannelExportServer) error {
+func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen.OomAgent_ChannelExportServer) error {
 	ctx := context.Background()
 	exportResult, err := s.oomstore.ChannelExport(ctx, types.ChannelExportOpt{
 		FeatureNames: req.FeatureNames,

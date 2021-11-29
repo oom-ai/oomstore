@@ -32,5 +32,5 @@ repos:
         entry: >
           sh -c '
             make codegen &&
-            git add oomd/codegen sdk/python/src/oomstore/codegen
+            git add oomagent/codegen sdk/python/src/oomstore/codegen
           '

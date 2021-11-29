@@ -1,10 +1,10 @@
 syntax = "proto3";
-package oomd;
+package oomagent;
 option go_package = "/codegen";
 
 import "status.proto";
 
-service OomD {
+service OomAgent {
   rpc OnlineGet(OnlineGetRequest) returns (OnlineGetResponse) {}
   rpc OnlineMultiGet(OnlineMultiGetRequest) returns (OnlineMultiGetResponse) {}
   rpc Sync(SyncRequest) returns (SyncResponse) {}
