@@ -17,12 +17,12 @@ func (s *OomStore) ChannelImport(ctx context.Context, opt types.ChannelImport) (
 	if err := s.metadata.Refresh(); err != nil {
 		return 0, fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
-	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
+	group, err := s.metadata.CacheGetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return 0, err
 	}
 
-	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		GroupID: &group.ID,
 	})
 	if features == nil {

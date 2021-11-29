@@ -42,7 +42,7 @@ func TestInformer(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	group, err := informer.GetGroup(ctx, 100)
+	group, err := informer.CacheGetGroup(ctx, 100)
 	require.NoError(t, err)
 
 	require.Equal(t, 100, group.ID)
@@ -60,13 +60,13 @@ func TestInformerDeepCopyGet(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	entity, err := informer.GetEntity(ctx, 1)
+	entity, err := informer.CacheGetEntity(ctx, 1)
 	require.NoError(t, err)
 
 	// changing this entity should not change the internal state of the informer
 	entity.Length = 20
 
-	entity, err = informer.GetEntity(ctx, 1)
+	entity, err = informer.CacheGetEntity(ctx, 1)
 	require.NoError(t, err)
 	require.Equal(t, 1, entity.ID)
 	require.Equal(t, 10, entity.Length)
@@ -77,13 +77,13 @@ func TestInformerDeepCopyList(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	entityList := informer.ListEntity(ctx)
+	entityList := informer.CacheListEntity(ctx)
 	require.Equal(t, 1, len(entityList))
 
 	// changing this entity should not change the internal state of the informer
 	entityList[0].Length = 20
 
-	entity, err := informer.GetEntity(ctx, 1)
+	entity, err := informer.CacheGetEntity(ctx, 1)
 	require.NoError(t, err)
 	require.Equal(t, 1, entity.ID)
 	require.Equal(t, 10, entity.Length)

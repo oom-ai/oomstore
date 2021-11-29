@@ -22,7 +22,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 	if err := s.metadata.Refresh(); err != nil {
 		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
-	features := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureNames: &opt.FeatureNames,
 	})
 
@@ -97,7 +97,7 @@ func buildGroupToFeaturesMap(features types.FeatureList) map[string]types.Featur
 }
 
 func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int) ([]*metadata.RevisionRange, error) {
-	revisions := s.metadata.ListRevision(ctx, &groupID)
+	revisions := s.metadata.CacheListRevision(ctx, &groupID)
 	if len(revisions) == 0 {
 		return nil, nil
 	}

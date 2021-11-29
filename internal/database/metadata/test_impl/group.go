@@ -40,11 +40,11 @@ func TestGetGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.NoError(t, store.Refresh())
 
 	// get non-exist feature group
-	_, err = store.GetGroup(ctx, 0)
+	_, err = store.CacheGetGroup(ctx, 0)
 	require.Error(t, err)
 
 	// get existing feature group
-	group, err := store.GetGroup(ctx, id)
+	group, err := store.CacheGetGroup(ctx, id)
 	require.NoError(t, err)
 	require.Equal(t, opt.GroupName, group.Name)
 	require.Equal(t, opt.EntityID, group.EntityID)
@@ -86,10 +86,10 @@ func TestListGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	require.Equal(t, 1, len(store.ListGroup(ctx, &deviceGroupID)))
-	require.Equal(t, 2, len(store.ListGroup(ctx, &userGroupID)))
-	require.Equal(t, 3, len(store.ListGroup(ctx, nil)))
-	require.Equal(t, 0, len(store.ListGroup(ctx, intPtr(0))))
+	require.Equal(t, 1, len(store.CacheListGroup(ctx, &deviceGroupID)))
+	require.Equal(t, 2, len(store.CacheListGroup(ctx, &userGroupID)))
+	require.Equal(t, 3, len(store.CacheListGroup(ctx, nil)))
+	require.Equal(t, 0, len(store.CacheListGroup(ctx, intPtr(0))))
 }
 
 func TestCreateGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {

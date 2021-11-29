@@ -51,13 +51,13 @@ func TestGetEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	entity, err := store.GetEntity(ctx, id)
+	entity, err := store.CacheGetEntity(ctx, id)
 	require.NoError(t, err)
 	require.Equal(t, opt.EntityName, entity.Name)
 	require.Equal(t, opt.Length, entity.Length)
 	require.Equal(t, opt.Description, entity.Description)
 
-	_, err = store.GetEntity(ctx, 0)
+	_, err = store.CacheGetEntity(ctx, 0)
 	require.EqualError(t, err, "feature entity 0 not found")
 }
 
@@ -81,7 +81,7 @@ func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	entity, err := store.GetEntity(ctx, id)
+	entity, err := store.CacheGetEntity(ctx, id)
 	require.NoError(t, err)
 	require.Equal(t, entity.Description, "new description")
 
@@ -97,7 +97,7 @@ func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	entitys := store.ListEntity(ctx)
+	entitys := store.CacheListEntity(ctx)
 	require.Equal(t, 0, len(entitys))
 
 	_, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
@@ -111,7 +111,7 @@ func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	entitys = store.ListEntity(ctx)
+	entitys = store.CacheListEntity(ctx)
 	require.Equal(t, 1, len(entitys))
 	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
@@ -124,6 +124,6 @@ func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	entitys = store.ListEntity(ctx)
+	entitys = store.CacheListEntity(ctx)
 	require.Equal(t, 2, len(entitys))
 }
