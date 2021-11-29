@@ -54,7 +54,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 			opt: offline.JoinOpt{
 				Entity:     *entity,
 				FeatureMap: oneGroupFeatureMap,
-				EntityRows: prepareEntityRows(true),
+				EntityRows: prepareEntityRows(true, false),
 			},
 			expected: nil,
 		},
@@ -62,21 +62,31 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 			description: "one feature group",
 			opt: offline.JoinOpt{
 				Entity:           *entity,
-				EntityRows:       prepareEntityRows(false),
+				EntityRows:       prepareEntityRows(false, false),
 				FeatureMap:       oneGroupFeatureMap,
 				RevisionRangeMap: prepareRevisionRanges(true),
 			},
-			expected: prepareResult(true),
+			expected: prepareResult(true, false),
 		},
 		{
 			description: "two feature groups",
 			opt: offline.JoinOpt{
 				Entity:           *entity,
-				EntityRows:       prepareEntityRows(false),
+				EntityRows:       prepareEntityRows(false, false),
 				FeatureMap:       twoGroupFeatureMap,
 				RevisionRangeMap: prepareRevisionRanges(false),
 			},
-			expected: prepareResult(false),
+			expected: prepareResult(false, false),
+		}, {
+			description: "two feature groups, with extra values",
+			opt: offline.JoinOpt{
+				Entity:           *entity,
+				EntityRows:       prepareEntityRows(false, true),
+				FeatureMap:       twoGroupFeatureMap,
+				RevisionRangeMap: prepareRevisionRanges(false),
+				ValueNames:       []string{"value_1", "value_2"},
+			},
+			expected: prepareResult(false, true),
 		},
 	}
 
@@ -164,39 +174,56 @@ func prepareRevisionRanges(oneGroup bool) map[string][]*metadata.RevisionRange {
 	}
 }
 
-func prepareEntityRows(isEmpty bool) <-chan types.EntityRow {
+func prepareEntityRows(isEmpty bool, withValue bool) <-chan types.EntityRow {
 	entityRows := make(chan types.EntityRow)
+	rows := []types.EntityRow{
+		{
+			EntityKey: "1234",
+			UnixMilli: 10,
+			Values:    []string{"1", "2"},
+		},
+		{
+			EntityKey: "1234",
+			UnixMilli: 20,
+			Values:    []string{"3", "4"},
+		},
+		{
+			EntityKey: "1235",
+			UnixMilli: 5,
+			Values:    []string{"5", "6"},
+		},
+		{
+			EntityKey: "1235",
+			UnixMilli: 14,
+			Values:    []string{"7", "8"},
+		},
+	}
 	go func() {
 		defer close(entityRows)
 		if isEmpty {
 			return
 		}
-		entityRows <- types.EntityRow{
-			EntityKey: "1234",
-			UnixMilli: 10,
-		}
-		entityRows <- types.EntityRow{
-			EntityKey: "1234",
-			UnixMilli: 20,
-		}
-		entityRows <- types.EntityRow{
-			EntityKey: "1235",
-			UnixMilli: 5,
-		}
-		entityRows <- types.EntityRow{
-			EntityKey: "1235",
-			UnixMilli: 14,
+		for _, row := range rows {
+			if !withValue {
+				row.Values = nil
+			}
+			entityRows <- row
 		}
 	}()
 	return entityRows
 }
 
-func prepareResult(oneGroup bool) *types.JoinResult {
+func prepareResult(oneGroup bool, withValue bool) *types.JoinResult {
 	header := []string{"entity_key", "unix_milli", "model", "price", "is_active"}
+	if withValue {
+		header = []string{"entity_key", "unix_milli", "value_1", "value_2", "model", "price", "is_active"}
+	}
 	values := []map[string]interface{}{
 		{
 			"entity_key": "1234",
 			"unix_milli": int64(10),
+			"value_1":    1,
+			"value_2":    2,
 			"model":      "xiaomi",
 			"price":      int64(100),
 			"is_active":  true,
@@ -204,6 +231,8 @@ func prepareResult(oneGroup bool) *types.JoinResult {
 		{
 			"entity_key": "1234",
 			"unix_milli": int64(20),
+			"value_1":    3,
+			"value_2":    4,
 			"model":      "galaxy",
 			"price":      int64(300),
 			"is_active":  true,
@@ -211,6 +240,8 @@ func prepareResult(oneGroup bool) *types.JoinResult {
 		{
 			"entity_key": "1235",
 			"unix_milli": int64(5),
+			"value_1":    5,
+			"value_2":    6,
 			"model":      "apple",
 			"price":      int64(200),
 			"is_active":  false,
@@ -218,6 +249,8 @@ func prepareResult(oneGroup bool) *types.JoinResult {
 		{
 			"entity_key": "1235",
 			"unix_milli": int64(15),
+			"value_1":    7,
+			"value_2":    8,
 			"model":      "oneplus",
 			"price":      int64(240),
 			"is_active":  false,
@@ -225,6 +258,12 @@ func prepareResult(oneGroup bool) *types.JoinResult {
 	}
 	if oneGroup {
 		header = header[:len(header)-1]
+	}
+	if !withValue {
+		for _, m := range values {
+			delete(m, "value_1")
+			delete(m, "value_2")
+		}
 	}
 
 	data := make(chan []interface{})
