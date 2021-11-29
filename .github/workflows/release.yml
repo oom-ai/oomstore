@@ -22,7 +22,6 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          workdir: oomctl
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
