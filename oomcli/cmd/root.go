@@ -21,7 +21,7 @@ var oomStoreCfg types.OomStoreConfig
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:     "oomctl",
+	Use:     "oomcli",
 	Short:   "a cli tool that lets you control the oom feature store.",
 	Version: version.String(),
 }
@@ -49,7 +49,7 @@ func init() {
 
 // initConfig reads in config file
 func initConfig() {
-	if envCfgFile := os.Getenv("FEATCTL_CONFIG"); envCfgFile != "" {
+	if envCfgFile := os.Getenv("OOMCLI_CONFIG"); envCfgFile != "" {
 		cfgFile = envCfgFile
 	}
 	cfgContent, err := ioutil.ReadFile(cfgFile)

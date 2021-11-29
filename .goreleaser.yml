@@ -5,9 +5,9 @@ before:
     - go mod tidy
     - go generate ./...
 builds:
-  - main: ./oomctl
-    id: "oomctl"
-    binary: oomctl
+  - main: ./oomcli
+    id: "oomcli"
+    binary: oomcli
     env:
       - CGO_ENABLED=0
     goos:
