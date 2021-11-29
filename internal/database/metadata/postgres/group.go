@@ -61,3 +61,23 @@ func updateGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 	}
 	return nil
 }
+
+func getGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*types.Group, error) {
+	var group types.Group
+	query := `SELECT * FROM feature_group WHERE id = $1`
+	if err := sqlxCtx.GetContext(ctx, &group, query, id); err != nil {
+		return nil, err
+	}
+	// TODO: enrich entity
+	return &group, nil
+}
+
+func getGroupByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name string) (*types.Group, error) {
+	var group types.Group
+	query := `SELECT * FROM feature_group WHERE name = $1`
+	if err := sqlxCtx.GetContext(ctx, &group, query, name); err != nil {
+		return nil, err
+	}
+	// TODO: enrich entity
+	return &group, nil
+}
