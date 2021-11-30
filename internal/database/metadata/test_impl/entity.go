@@ -116,7 +116,7 @@ func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	}))
 }
 
-func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCacheListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -150,5 +150,39 @@ func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.NoError(t, store.Refresh())
 
 	entitys = store.CacheListEntity(ctx)
+	require.Equal(t, 2, len(entitys))
+}
+
+func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	entitys, err := store.ListEntity(ctx)
+	require.NoError(t, err)
+	require.Equal(t, 0, len(entitys))
+
+	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  "device",
+			Length:      32,
+			Description: "description",
+		},
+	})
+	require.NoError(t, err)
+
+	entitys, err = store.ListEntity(ctx)
+	require.NoError(t, err)
+	require.Equal(t, 1, len(entitys))
+	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  "user",
+			Length:      16,
+			Description: "description",
+		},
+	})
+	require.NoError(t, err)
+
+	entitys, err = store.ListEntity(ctx)
+	require.NoError(t, err)
 	require.Equal(t, 2, len(entitys))
 }
