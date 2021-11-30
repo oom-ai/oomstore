@@ -60,3 +60,15 @@ func (l RevisionList) Filter(filter func(*Revision) bool) (rs RevisionList) {
 	}
 	return
 }
+
+func (l RevisionList) GroupIDs() []int {
+	groupIDMap := make(map[int]struct{})
+	for _, r := range l {
+		groupIDMap[r.GroupID] = struct{}{}
+	}
+	groupIDs := make([]int, 0, len(groupIDMap))
+	for id := range groupIDMap {
+		groupIDs = append(groupIDs, id)
+	}
+	return groupIDs
+}
