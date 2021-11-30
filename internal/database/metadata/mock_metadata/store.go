@@ -290,6 +290,36 @@ func (mr *MockStoreMockRecorder) GetGroupByName(ctx, name interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupByName", reflect.TypeOf((*MockStore)(nil).GetGroupByName), ctx, name)
 }
 
+// GetRevision mocks base method.
+func (m *MockStore) GetRevision(ctx context.Context, id int) (*types.Revision, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRevision", ctx, id)
+	ret0, _ := ret[0].(*types.Revision)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRevision indicates an expected call of GetRevision.
+func (mr *MockStoreMockRecorder) GetRevision(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevision", reflect.TypeOf((*MockStore)(nil).GetRevision), ctx, id)
+}
+
+// GetRevisionBy mocks base method.
+func (m *MockStore) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRevisionBy", ctx, groupID, revision)
+	ret0, _ := ret[0].(*types.Revision)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRevisionBy indicates an expected call of GetRevisionBy.
+func (mr *MockStoreMockRecorder) GetRevisionBy(ctx, groupID, revision interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevisionBy", reflect.TypeOf((*MockStore)(nil).GetRevisionBy), ctx, groupID, revision)
+}
+
 // ListEntity mocks base method.
 func (m *MockStore) ListEntity(ctx context.Context, entityIDs *[]int) (types.EntityList, error) {
 	m.ctrl.T.Helper()
@@ -306,18 +336,33 @@ func (mr *MockStoreMockRecorder) ListEntity(ctx, entityIDs interface{}) *gomock.
 }
 
 // ListGroup mocks base method.
-func (m *MockStore) ListGroup(ctx context.Context, entityID *int) (types.GroupList, error) {
+func (m *MockStore) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListGroup", ctx, entityID)
+	ret := m.ctrl.Call(m, "ListGroup", ctx, entityID, groupIDs)
 	ret0, _ := ret[0].(types.GroupList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListGroup indicates an expected call of ListGroup.
-func (mr *MockStoreMockRecorder) ListGroup(ctx, entityID interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) ListGroup(ctx, entityID, groupIDs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockStore)(nil).ListGroup), ctx, entityID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockStore)(nil).ListGroup), ctx, entityID, groupIDs)
+}
+
+// ListRevision mocks base method.
+func (m *MockStore) ListRevision(ctx context.Context, groupID *int) (types.RevisionList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListRevision", ctx, groupID)
+	ret0, _ := ret[0].(types.RevisionList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListRevision indicates an expected call of ListRevision.
+func (mr *MockStoreMockRecorder) ListRevision(ctx, groupID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRevision", reflect.TypeOf((*MockStore)(nil).ListRevision), ctx, groupID)
 }
 
 // Refresh mocks base method.
@@ -605,6 +650,36 @@ func (mr *MockReadStoreMockRecorder) GetGroupByName(ctx, name interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupByName", reflect.TypeOf((*MockReadStore)(nil).GetGroupByName), ctx, name)
 }
 
+// GetRevision mocks base method.
+func (m *MockReadStore) GetRevision(ctx context.Context, id int) (*types.Revision, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRevision", ctx, id)
+	ret0, _ := ret[0].(*types.Revision)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRevision indicates an expected call of GetRevision.
+func (mr *MockReadStoreMockRecorder) GetRevision(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevision", reflect.TypeOf((*MockReadStore)(nil).GetRevision), ctx, id)
+}
+
+// GetRevisionBy mocks base method.
+func (m *MockReadStore) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRevisionBy", ctx, groupID, revision)
+	ret0, _ := ret[0].(*types.Revision)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRevisionBy indicates an expected call of GetRevisionBy.
+func (mr *MockReadStoreMockRecorder) GetRevisionBy(ctx, groupID, revision interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevisionBy", reflect.TypeOf((*MockReadStore)(nil).GetRevisionBy), ctx, groupID, revision)
+}
+
 // ListEntity mocks base method.
 func (m *MockReadStore) ListEntity(ctx context.Context, entityIDs *[]int) (types.EntityList, error) {
 	m.ctrl.T.Helper()
@@ -621,18 +696,33 @@ func (mr *MockReadStoreMockRecorder) ListEntity(ctx, entityIDs interface{}) *gom
 }
 
 // ListGroup mocks base method.
-func (m *MockReadStore) ListGroup(ctx context.Context, entityID *int) (types.GroupList, error) {
+func (m *MockReadStore) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListGroup", ctx, entityID)
+	ret := m.ctrl.Call(m, "ListGroup", ctx, entityID, groupIDs)
 	ret0, _ := ret[0].(types.GroupList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListGroup indicates an expected call of ListGroup.
-func (mr *MockReadStoreMockRecorder) ListGroup(ctx, entityID interface{}) *gomock.Call {
+func (mr *MockReadStoreMockRecorder) ListGroup(ctx, entityID, groupIDs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockReadStore)(nil).ListGroup), ctx, entityID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockReadStore)(nil).ListGroup), ctx, entityID, groupIDs)
+}
+
+// ListRevision mocks base method.
+func (m *MockReadStore) ListRevision(ctx context.Context, groupID *int) (types.RevisionList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListRevision", ctx, groupID)
+	ret0, _ := ret[0].(types.RevisionList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListRevision indicates an expected call of ListRevision.
+func (mr *MockReadStoreMockRecorder) ListRevision(ctx, groupID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRevision", reflect.TypeOf((*MockReadStore)(nil).ListRevision), ctx, groupID)
 }
 
 // Refresh mocks base method.
