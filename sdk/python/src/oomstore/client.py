@@ -15,21 +15,33 @@ def map_container_to_dict(map_container):
 
 class Client(object):
     def __init__(self, port: int, config_path: str):
-        try:
-            self.oomagent = Popen(
-                ["oomagent", "--config", config_path, "-p", str(port)]
-            )
-        except Exception as e:
-            logging.error(e)
-            sys.exit(1)
-
-        self.addr = "127.0.0.1:%d" % port
-
-        # wait for oomagent to start
-        time.sleep(2)
+        self.oomagent = Popen(
+            ["oomagent", "--config", config_path, "-p", str(port)]
+        )
+        self.addr = f"127.0.0.1:{port}"
+        self.__wait_for_ready__(0.1, 30)
 
     def __del__(self):
         self.oomagent.terminate()
+
+    def __wait_for_ready__(self, check_interval: float, retries: int):
+        exception = None
+        for _ in range(retries):
+            try:
+                if self.health_check():
+                    return
+            except Exception as e:
+                exception = e
+            time.sleep(check_interval)
+        if exception is not None:
+            raise exception
+        raise Exception(f"oomagent still not ready after retrying {retries} times")
+
+    def health_check(self):
+        with grpc.insecure_channel(self.addr) as channel:
+            stub = oomagent_pb2_grpc.OomAgentStub(channel)
+            response = stub.HealthCheck(oomagent_pb2.HealthCheckRequest())
+            return response.status.code == 0
 
     def online_get(self, entity_key, feature_names):
         with grpc.insecure_channel(self.addr) as channel:
