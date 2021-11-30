@@ -317,6 +317,21 @@ func (mr *MockStoreMockRecorder) GetEntityByName(ctx, name interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEntityByName", reflect.TypeOf((*MockStore)(nil).GetEntityByName), ctx, name)
 }
 
+// GetFeature mocks base method.
+func (m *MockStore) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFeature", ctx, id)
+	ret0, _ := ret[0].(*types.Feature)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFeature indicates an expected call of GetFeature.
+func (mr *MockStoreMockRecorder) GetFeature(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeature", reflect.TypeOf((*MockStore)(nil).GetFeature), ctx, id)
+}
+
 // GetGroup mocks base method.
 func (m *MockStore) GetGroup(ctx context.Context, id int) (*types.Group, error) {
 	m.ctrl.T.Helper()
@@ -688,6 +703,21 @@ func (m *MockReadStore) GetEntityByName(ctx context.Context, name string) (*type
 func (mr *MockReadStoreMockRecorder) GetEntityByName(ctx, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEntityByName", reflect.TypeOf((*MockReadStore)(nil).GetEntityByName), ctx, name)
+}
+
+// GetFeature mocks base method.
+func (m *MockReadStore) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFeature", ctx, id)
+	ret0, _ := ret[0].(*types.Feature)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFeature indicates an expected call of GetFeature.
+func (mr *MockReadStoreMockRecorder) GetFeature(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeature", reflect.TypeOf((*MockReadStore)(nil).GetFeature), ctx, id)
 }
 
 // GetGroup mocks base method.
