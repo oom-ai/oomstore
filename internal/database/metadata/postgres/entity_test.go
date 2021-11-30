@@ -21,3 +21,7 @@ func TestUpdateEntity(t *testing.T) {
 func TestListEntity(t *testing.T) {
 	test_impl.TestListEntity(t, prepareStore)
 }
+
+func TestCacheListEntity(t *testing.T) {
+	test_impl.TestCacheListEntity(t, prepareStore)
+}
