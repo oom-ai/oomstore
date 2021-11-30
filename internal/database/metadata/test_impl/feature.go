@@ -148,6 +148,31 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, "description", feature.Description)
 }
 
+func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+	_, groupID := prepareEntityAndGroup(t, ctx, store)
+
+	_, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
+		FeatureName: "phone",
+		GroupID:     groupID,
+		DBValueType: "varchar(16)",
+		Description: "description",
+		ValueType:   "string",
+	})
+	require.NoError(t, err)
+
+	_, err = store.GetFeatureByName(ctx, "p")
+	require.EqualError(t, err, "feature p not found")
+
+	feature, err := store.GetFeatureByName(ctx, "phone")
+	require.NoError(t, err)
+	require.Equal(t, "phone", feature.Name)
+	require.Equal(t, "device_info", feature.Group.Name)
+	require.Equal(t, "varchar(16)", feature.DBValueType)
+	require.Equal(t, "description", feature.Description)
+}
+
 func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
