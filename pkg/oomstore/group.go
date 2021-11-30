@@ -10,10 +10,7 @@ import (
 
 // Create metadata of a feature group.
 func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (int, error) {
-	if err := s.metadata.Refresh(); err != nil {
-		return 0, fmt.Errorf("failed to refresh informer, err=%+v", err)
-	}
-	entity, err := s.metadata.CacheGetEntityByName(ctx, opt.EntityName)
+	entity, err := s.metadata.GetEntityByName(ctx, opt.EntityName)
 	if err != nil {
 		return 0, err
 	}

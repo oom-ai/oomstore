@@ -22,11 +22,14 @@ var listEntityCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		entities := oomStore.ListEntity(ctx)
+		entities, err := oomStore.ListEntity(ctx)
+		if err != nil {
+			log.Fatalf("failed listing entities, error %v\n", err)
+		}
 
 		// print entities to stdout
 		if err := printEntities(entities, *listOutput); err != nil {
-			log.Fatalf("failing printing entities, error %v\n", err)
+			log.Fatalf("failed printing entities, error %v\n", err)
 		}
 	},
 }
