@@ -12,6 +12,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	code "google.golang.org/genproto/googleapis/rpc/code"
 	status "google.golang.org/genproto/googleapis/rpc/status"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type server struct {
@@ -372,7 +373,7 @@ func convertInterfaceToValue(i interface{}) (*codegen.Value, error) {
 	case nil:
 		return &codegen.Value{
 			Kind: &codegen.Value_NullValue{
-				NullValue: codegen.NullValue_NULL_VALUE,
+				NullValue: structpb.NullValue_NULL_VALUE,
 			},
 		}, nil
 	case int64:
