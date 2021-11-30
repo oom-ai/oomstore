@@ -99,18 +99,32 @@ arg3='
 expected3='
 {
   "status": {},
-  "joinedRow": "FIXME"
+  "joinedRow": [
+    {
+      "stringValue": "7"
+    },
+    {
+      "int64Value": "0"
+    },
+    {
+      "nullValue": "NULL_VALUE"
+    },
+    {
+      "nullValue": "NULL_VALUE"
+    },
+    {
+      "nullValue": "NULL_VALUE"
+    }
+  ]
 }
 '
 
 arg="$arg1"
 arg="$arg$arg2"
-# FIXME: amend $arg3 when #682 fixed
-# arg="$arg$arg3"
+ arg="$arg$arg3"
 
 actual=$(testgrpc ChannelJoin <<<"$arg")
 
 assert_json_eq "$case1" "$expected1" "$(jq -s '.[0]' <<< "$actual")"
 assert_json_eq "$case2" "$expected2" "$(jq -s '.[1]' <<< "$actual")"
-# FIXME: uncomment this when #682 fixed
-# assert_json_eq "$case3" "$expected3" "$(jq -s '.[2]' <<< "$actual")"
+assert_json_eq "$case3" "$expected3" "$(jq -s '.[2]' <<< "$actual")"

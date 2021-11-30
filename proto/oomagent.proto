@@ -20,21 +20,28 @@ service OomAgent {
   rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {}
 }
 
+enum NullValue {
+  // Null value.
+  NULL_VALUE = 0;
+}
+
 message Value {
   // The kind of value.
   oneof kind {
+    // Represents a null value.
+    NullValue null_value = 1;
     // Represents a int64 value.
-    int64 int64_value = 1;
+    int64 int64_value = 2;
     // Represents a double value.
-    double double_value = 2;
+    double double_value = 3;
     // Represents a string value.
-    string string_value = 3;
+    string string_value = 4;
     // Represents a boolean value.
-    bool bool_value = 4;
+    bool bool_value = 5;
     // Represents a unix milliseconds value.
-    int64 unix_milli_value = 5;
+    int64 unix_milli_value = 6;
     // Represents a bytes value.
-    bytes bytes_value = 6;
+    bytes bytes_value = 7;
   }
 }
 
