@@ -59,7 +59,7 @@ batch-features:
     port: 5432
     user: postgres
     password: postgres
-    database: oomstore
+    database: oomstore_test
 online-store: *onestore
 offline-store: *onestore
 metadata-store: *onestore"""
