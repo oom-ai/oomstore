@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
@@ -122,8 +123,8 @@ func TestCacheListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	entitys := store.CacheListEntity(ctx)
-	require.Equal(t, 0, len(entitys))
+	entities := store.CacheListEntity(ctx)
+	require.Equal(t, 0, len(entities))
 
 	_, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
@@ -136,8 +137,8 @@ func TestCacheListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	entitys = store.CacheListEntity(ctx)
-	require.Equal(t, 1, len(entitys))
+	entities = store.CacheListEntity(ctx)
+	require.Equal(t, 1, len(entities))
 	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "user",
@@ -149,17 +150,17 @@ func TestCacheListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	entitys = store.CacheListEntity(ctx)
-	require.Equal(t, 2, len(entitys))
+	entities = store.CacheListEntity(ctx)
+	require.Equal(t, 2, len(entities))
 }
 
 func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	entitys, err := store.ListEntity(ctx)
+	entities, err := store.ListEntity(ctx, nil)
 	require.NoError(t, err)
-	require.Equal(t, 0, len(entitys))
+	require.Equal(t, 0, len(entities))
 
 	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
@@ -170,9 +171,10 @@ func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	})
 	require.NoError(t, err)
 
-	entitys, err = store.ListEntity(ctx)
-	require.NoError(t, err)
-	require.Equal(t, 1, len(entitys))
+	entities, err = store.ListEntity(ctx, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(entities))
+
 	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "user",
@@ -182,7 +184,17 @@ func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	})
 	require.NoError(t, err)
 
-	entitys, err = store.ListEntity(ctx)
-	require.NoError(t, err)
-	require.Equal(t, 2, len(entitys))
+	entities, err = store.ListEntity(ctx, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(entities))
+
+	ids := []int{1, 2}
+	entities, err = store.ListEntity(ctx, &ids)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(entities))
+
+	ids = []int{}
+	entities, err = store.ListEntity(ctx, &ids)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(entities))
 }
