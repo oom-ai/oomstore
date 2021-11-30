@@ -97,7 +97,7 @@ func TestChannelExport(t *testing.T) {
 			}
 
 			metadataStore.EXPECT().CacheGetRevision(ctx, tc.opt.RevisionID).Return(&revision, nil)
-			metadataStore.EXPECT().CacheGetGroupByName(ctx, "device_info").Return(&types.Group{
+			metadataStore.EXPECT().GetGroupByName(ctx, "device_info").Return(&types.Group{
 				Name: "device_info",
 				ID:   1,
 			}, nil)
