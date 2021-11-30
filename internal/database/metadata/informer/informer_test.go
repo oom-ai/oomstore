@@ -50,18 +50,17 @@ func TestInformer(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	group, err := informer.CacheGetGroup(ctx, 100)
+	feature, err := informer.CacheGetFeature(ctx, 1)
 	require.NoError(t, err)
 
-	require.Equal(t, 100, group.ID)
-	require.Equal(t, "group", group.Name)
-	require.Equal(t, "batch", group.Category)
-	require.Equal(t, 1, group.EntityID)
+	require.Equal(t, 1, feature.ID)
+	require.Equal(t, "price", feature.Name)
+	require.Equal(t, 100, feature.GroupID)
 
-	require.NotNil(t, group.Entity)
-	require.Equal(t, 1, group.Entity.ID)
-	require.Equal(t, 10, group.Entity.Length)
-	require.Equal(t, "entity", group.Entity.Name)
+	require.NotNil(t, feature.Group)
+	require.Equal(t, 100, feature.Group.ID)
+	require.Equal(t, 1, feature.Group.Entity.ID)
+	require.Equal(t, "entity", feature.Group.Entity.Name)
 }
 
 func TestInformerDeepCopyGet(t *testing.T) {
