@@ -34,6 +34,10 @@ type ReadStore interface {
 	CacheGetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error)
 	CacheListRevision(ctx context.Context, groupID *int) types.RevisionList
 
+	GetRevision(ctx context.Context, id int) (*types.Revision, error)
+	GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error)
+	ListRevision(ctx context.Context, groupID *int) (types.RevisionList, error)
+
 	// refresh
 	Refresh() error
 }
