@@ -9,7 +9,7 @@ case="api returns ok"
 arg=$(cat <<-EOF
 {
     "group_name": "account",
-    "row": "$(base64 -w0 <./data/account_10.csv)"
+    "row": "$(base64 <./data/account_10.csv | tr -d '\n\r')"
 }
 EOF
 )
