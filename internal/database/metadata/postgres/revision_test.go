@@ -14,18 +14,6 @@ func TestUpdateRevision(t *testing.T) {
 	test_impl.TestUpdateRevision(t, prepareStore)
 }
 
-func TestCacheGetRevision(t *testing.T) {
-	test_impl.TestCacheGetRevision(t, prepareStore)
-}
-
-func TestCacheGetRevisionBy(t *testing.T) {
-	test_impl.TestCacheGetRevisionBy(t, prepareStore)
-}
-
-func TestCacheListRevision(t *testing.T) {
-	test_impl.TestCacheListRevision(t, prepareStore)
-}
-
 func TestGetRevision(t *testing.T) {
 	test_impl.TestGetRevision(t, prepareStore)
 }

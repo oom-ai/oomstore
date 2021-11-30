@@ -114,31 +114,7 @@ func (f *Informer) CacheGetFeatureByName(ctx context.Context, name string) (*typ
 	}
 }
 
-func (f *Informer) CacheGetRevision(ctx context.Context, id int) (*types.Revision, error) {
-	if revision := f.Cache().Revisions.Find(func(r *types.Revision) bool {
-		return r.ID == id
-	}); revision == nil {
-		return nil, errdefs.NotFound(fmt.Errorf("revision %d not found", id))
-	} else {
-		return revision.Copy(), nil
-	}
-}
-
-func (f *Informer) CacheGetRevisionBy(ctx context.Context, groupID int, revisionID int64) (*types.Revision, error) {
-	if revision := f.Cache().Revisions.Find(func(r *types.Revision) bool {
-		return r.GroupID == groupID && r.Revision == revisionID
-	}); revision == nil {
-		return nil, errdefs.NotFound(fmt.Errorf("revision not found by group %d and revision %d", groupID, revisionID))
-	} else {
-		return revision.Copy(), nil
-	}
-}
-
 // List
 func (f *Informer) CacheListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
 	return f.Cache().Features.List(opt).Copy()
-}
-
-func (f *Informer) CacheListRevision(ctx context.Context, groupID *int) types.RevisionList {
-	return f.Cache().Revisions.List(groupID).Copy()
 }
