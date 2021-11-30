@@ -185,6 +185,7 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 	joinResult, err := s.oomstore.ChannelJoin(context.Background(), types.ChannelJoinOpt{
 		FeatureNames: firstReq.FeatureNames,
 		EntityRows:   entityRows,
+		ValueNames:   firstReq.ValueNames,
 	})
 	if err != nil {
 		return err
@@ -221,9 +222,13 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 		if sendErr != nil {
 			return sendErr
 		}
+		if req.GetEntityRow() == nil {
+			return fmt.Errorf("cannot process nil entity row")
+		}
 		entityRows <- types.EntityRow{
 			EntityKey: req.EntityRow.EntityKey,
 			UnixMilli: req.EntityRow.UnixMilli,
+			Values:    req.EntityRow.Values,
 		}
 	}
 }
