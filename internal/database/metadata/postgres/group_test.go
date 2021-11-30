@@ -6,16 +6,8 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata/test_impl"
 )
 
-func TestCacheGetGroup(t *testing.T) {
-	test_impl.TestCacheGetGroup(t, prepareStore)
-}
-
 func TestGetGroup(t *testing.T) {
 	test_impl.TestGetGroup(t, prepareStore)
-}
-
-func TestCacheListGroup(t *testing.T) {
-	test_impl.TestCacheListGroup(t, prepareStore)
 }
 
 func TestListGroup(t *testing.T) {
