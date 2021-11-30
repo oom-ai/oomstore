@@ -175,55 +175,73 @@ func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codeg
 }
 
 func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
+	// We need to read the first request to get the feature names and value names
 	firstReq, err := stream.Recv()
 	if err != nil {
 		return err
 	}
 
+	// A global error
+	var globalErr error
+
+	// This channel indicates when the the ChannelJoin oomstore operation is finished, whether succeeded or failed.
+	done := make(chan struct{})
+	// This channel receives requests from the client.
 	entityRows := make(chan types.EntityRow)
 
-	joinResult, err := s.oomstore.ChannelJoin(context.Background(), types.ChannelJoinOpt{
-		FeatureNames: firstReq.FeatureNames,
-		EntityRows:   entityRows,
-		ValueNames:   firstReq.ValueNames,
-	})
-	if err != nil {
-		return err
-	}
-
-	var sendErr error
+	// This goroutine runs the join operation, and send whatever joined as the response
 	go func() {
-		for row := range joinResult.Data {
-			joinedRow, err := convertJoinedRow(row)
-			if err != nil {
-				sendErr = err
-				break
-			}
-			err = stream.Send(&codegen.ChannelJoinResponse{
-				Status:    buildStatus(code.Code_OK, ""),
-				Header:    joinResult.Header,
-				JoinedRow: joinedRow,
-			})
-			if err != nil {
-				sendErr = err
-				break
+		joinResult, err := s.oomstore.ChannelJoin(context.Background(), types.ChannelJoinOpt{
+			FeatureNames: firstReq.FeatureNames,
+			EntityRows:   entityRows,
+			ValueNames:   firstReq.ValueNames,
+		})
+		if err != nil {
+			globalErr = err
+		} else {
+			for row := range joinResult.Data {
+				joinedRow, err := convertJoinedRow(row)
+				if err != nil {
+					globalErr = err
+					break
+				}
+				err = stream.Send(&codegen.ChannelJoinResponse{
+					Status:    buildStatus(code.Code_OK, ""),
+					Header:    joinResult.Header,
+					JoinedRow: joinedRow,
+				})
+				if err != nil {
+					globalErr = err
+					break
+				}
 			}
 		}
+		done <- struct{}{}
 	}()
+
+	// DO NOT move it before the goroutine starts,
+	// otherwise it blocks since the channel `entityRows` is not being consumed
+	entityRows <- types.EntityRow{
+		EntityKey: firstReq.EntityRow.EntityKey,
+		UnixMilli: firstReq.EntityRow.UnixMilli,
+		Values:    firstReq.EntityRow.Values,
+	}
 
 	for {
 		req, err := stream.Recv()
 		if err == io.EOF {
-			return nil
+			break
 		}
 		if err != nil {
-			return err
+			globalErr = err
+			break
 		}
-		if sendErr != nil {
-			return sendErr
+		if globalErr != nil {
+			break
 		}
 		if req.GetEntityRow() == nil {
-			return fmt.Errorf("cannot process nil entity row")
+			globalErr = fmt.Errorf("cannot process nil entity row")
+			break
 		}
 		entityRows <- types.EntityRow{
 			EntityKey: req.EntityRow.EntityKey,
@@ -231,6 +249,12 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 			Values:    req.EntityRow.Values,
 		}
 	}
+
+	close(entityRows)
+	// wait until oomstore ChannelJoin is done, whether succeeded or failed
+	<-done
+
+	return globalErr
 }
 
 func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.JoinResponse, error) {
