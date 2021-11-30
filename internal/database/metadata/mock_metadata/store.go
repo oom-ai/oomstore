@@ -37,36 +37,6 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 	return m.recorder
 }
 
-// CacheGetEntity mocks base method.
-func (m *MockStore) CacheGetEntity(ctx context.Context, id int) (*types.Entity, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheGetEntity", ctx, id)
-	ret0, _ := ret[0].(*types.Entity)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CacheGetEntity indicates an expected call of CacheGetEntity.
-func (mr *MockStoreMockRecorder) CacheGetEntity(ctx, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetEntity", reflect.TypeOf((*MockStore)(nil).CacheGetEntity), ctx, id)
-}
-
-// CacheGetEntityByName mocks base method.
-func (m *MockStore) CacheGetEntityByName(ctx context.Context, name string) (*types.Entity, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheGetEntityByName", ctx, name)
-	ret0, _ := ret[0].(*types.Entity)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CacheGetEntityByName indicates an expected call of CacheGetEntityByName.
-func (mr *MockStoreMockRecorder) CacheGetEntityByName(ctx, name interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetEntityByName", reflect.TypeOf((*MockStore)(nil).CacheGetEntityByName), ctx, name)
-}
-
 // CacheGetFeature mocks base method.
 func (m *MockStore) CacheGetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	m.ctrl.T.Helper()
@@ -155,20 +125,6 @@ func (m *MockStore) CacheGetRevisionBy(ctx context.Context, groupID int, revisio
 func (mr *MockStoreMockRecorder) CacheGetRevisionBy(ctx, groupID, revision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetRevisionBy", reflect.TypeOf((*MockStore)(nil).CacheGetRevisionBy), ctx, groupID, revision)
-}
-
-// CacheListEntity mocks base method.
-func (m *MockStore) CacheListEntity(ctx context.Context) types.EntityList {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheListEntity", ctx)
-	ret0, _ := ret[0].(types.EntityList)
-	return ret0
-}
-
-// CacheListEntity indicates an expected call of CacheListEntity.
-func (mr *MockStoreMockRecorder) CacheListEntity(ctx interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheListEntity", reflect.TypeOf((*MockStore)(nil).CacheListEntity), ctx)
 }
 
 // CacheListFeature mocks base method.
@@ -500,36 +456,6 @@ func (m *MockReadStore) EXPECT() *MockReadStoreMockRecorder {
 	return m.recorder
 }
 
-// CacheGetEntity mocks base method.
-func (m *MockReadStore) CacheGetEntity(ctx context.Context, id int) (*types.Entity, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheGetEntity", ctx, id)
-	ret0, _ := ret[0].(*types.Entity)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CacheGetEntity indicates an expected call of CacheGetEntity.
-func (mr *MockReadStoreMockRecorder) CacheGetEntity(ctx, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetEntity", reflect.TypeOf((*MockReadStore)(nil).CacheGetEntity), ctx, id)
-}
-
-// CacheGetEntityByName mocks base method.
-func (m *MockReadStore) CacheGetEntityByName(ctx context.Context, name string) (*types.Entity, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheGetEntityByName", ctx, name)
-	ret0, _ := ret[0].(*types.Entity)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CacheGetEntityByName indicates an expected call of CacheGetEntityByName.
-func (mr *MockReadStoreMockRecorder) CacheGetEntityByName(ctx, name interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetEntityByName", reflect.TypeOf((*MockReadStore)(nil).CacheGetEntityByName), ctx, name)
-}
-
 // CacheGetFeature mocks base method.
 func (m *MockReadStore) CacheGetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	m.ctrl.T.Helper()
@@ -618,20 +544,6 @@ func (m *MockReadStore) CacheGetRevisionBy(ctx context.Context, groupID int, rev
 func (mr *MockReadStoreMockRecorder) CacheGetRevisionBy(ctx, groupID, revision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetRevisionBy", reflect.TypeOf((*MockReadStore)(nil).CacheGetRevisionBy), ctx, groupID, revision)
-}
-
-// CacheListEntity mocks base method.
-func (m *MockReadStore) CacheListEntity(ctx context.Context) types.EntityList {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheListEntity", ctx)
-	ret0, _ := ret[0].(types.EntityList)
-	return ret0
-}
-
-// CacheListEntity indicates an expected call of CacheListEntity.
-func (mr *MockReadStoreMockRecorder) CacheListEntity(ctx interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheListEntity", reflect.TypeOf((*MockReadStore)(nil).CacheListEntity), ctx)
 }
 
 // CacheListFeature mocks base method.
