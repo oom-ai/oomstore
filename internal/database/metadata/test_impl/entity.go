@@ -49,6 +49,31 @@ func TestGetEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	id, err := store.CreateEntity(ctx, opt)
 	require.NoError(t, err)
 
+	entity, err := store.GetEntity(ctx, id)
+	require.NoError(t, err)
+	require.Equal(t, opt.EntityName, entity.Name)
+	require.Equal(t, opt.Length, entity.Length)
+	require.Equal(t, opt.Description, entity.Description)
+
+	_, err = store.GetEntity(ctx, 0)
+	require.EqualError(t, err, "feature entity 0 not found")
+}
+
+func TestCacheGetEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	opt := metadata.CreateEntityOpt{
+		CreateEntityOpt: types.CreateEntityOpt{
+			EntityName:  "device",
+			Length:      32,
+			Description: "description",
+		},
+	}
+
+	id, err := store.CreateEntity(ctx, opt)
+	require.NoError(t, err)
+
 	require.NoError(t, store.Refresh())
 
 	entity, err := store.CacheGetEntity(ctx, id)

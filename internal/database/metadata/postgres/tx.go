@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (tx *Tx) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
@@ -12,6 +13,14 @@ func (tx *Tx) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (i
 
 func (tx *Tx) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
 	return updateEntity(ctx, tx, opt)
+}
+
+func (tx *Tx) GetEntity(ctx context.Context, id int) (*types.Entity, error) {
+	return getEntity(ctx, tx, id)
+}
+
+func (tx *Tx) GetEntityByName(ctx context.Context, name string) (*types.Entity, error) {
+	return getEntityByName(ctx, tx, name)
 }
 
 func (tx *Tx) CreateGroup(ctx context.Context, opt metadata.CreateGroupOpt) (int, error) {
