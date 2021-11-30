@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strings"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -68,7 +70,15 @@ func getGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*types
 	if err := sqlxCtx.GetContext(ctx, &group, query, id); err != nil {
 		return nil, err
 	}
-	// TODO: enrich entity
+
+	entity, err := getEntity(ctx, sqlxCtx, group.EntityID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.NotFound(fmt.Errorf("feature group %d not found", id))
+		}
+		return nil, err
+	}
+	group.Entity = entity
 	return &group, nil
 }
 
@@ -78,7 +88,15 @@ func getGroupByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name stri
 	if err := sqlxCtx.GetContext(ctx, &group, query, name); err != nil {
 		return nil, err
 	}
-	// TODO: enrich entity
+
+	entity, err := getEntity(ctx, sqlxCtx, group.EntityID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.NotFound(fmt.Errorf("feature group %s not found", name))
+		}
+		return nil, err
+	}
+	group.Entity = entity
 	return &group, nil
 }
 
@@ -94,16 +112,18 @@ func listGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, entityID *int)
 		return nil, err
 	}
 
-	// TODO: list entities from DB
-	var entities types.EntityList
+	entityIDs := groups.EntityIDs()
+	entities, err := listEntity(ctx, sqlxCtx, &entityIDs)
+	if err != nil {
+		return nil, err
+	}
 	for _, group := range groups {
 		entity := entities.Find(func(e *types.Entity) bool {
 			return group.EntityID == e.ID
 		})
-		// TODO: add nil check back after we can list entities from DB
-		//if entity == nil {
-		//	return nil, fmt.Errorf("cannot find entity %d for group %d", group.EntityID, group.ID)
-		//}
+		if entity == nil {
+			return nil, fmt.Errorf("cannot find entity %d for group %d", group.EntityID, group.ID)
+		}
 		group.Entity = entity
 	}
 	return groups, nil
