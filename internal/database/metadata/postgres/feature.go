@@ -79,3 +79,26 @@ func getFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*typ
 
 	return &feature, nil
 }
+
+func getFeatureByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name string) (*types.Feature, error) {
+	var (
+		feature types.Feature
+		group   *types.Group
+		err     error
+	)
+
+	query := `SELECT * FROM "feature" WHERE name = $1`
+	if err := sqlxCtx.GetContext(ctx, &feature, query, name); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.NotFound(fmt.Errorf("feature %s not found", name))
+		}
+		return nil, err
+	}
+
+	if group, err = getGroup(ctx, sqlxCtx, feature.GroupID); err != nil {
+		return nil, err
+	}
+	feature.Group = group
+
+	return &feature, nil
+}

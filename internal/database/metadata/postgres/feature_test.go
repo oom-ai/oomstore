@@ -30,6 +30,10 @@ func TestGetFeature(t *testing.T) {
 	test_impl.TestGetFeature(t, prepareStore)
 }
 
+func TestGetFeatureByName(t *testing.T) {
+	test_impl.TestGetFeatureByName(t, prepareStore)
+}
+
 func TestListFeature(t *testing.T) {
 	test_impl.TestListFeature(t, prepareStore)
 }
