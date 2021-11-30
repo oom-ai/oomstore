@@ -37,7 +37,7 @@ oomcli:
 	$(MAKE) -C oomcli build
 
 .PHONY: oomagent
-oomagent:
+oomagent: codegen
 	$(MAKE) -C oomagent build
 
 .PHONY: test
