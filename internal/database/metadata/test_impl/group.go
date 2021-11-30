@@ -91,21 +91,30 @@ func TestListGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	_, err = store.CreateGroup(ctx, userBehaviorOpt)
 	require.NoError(t, err)
 
-	groups, err := store.ListGroup(ctx, &deviceGroupID)
+	groups, err := store.ListGroup(ctx, &deviceGroupID, nil)
 	assert.NoError(t, err)
-	require.Equal(t, 1, len(groups))
+	assert.Equal(t, 1, len(groups))
 
-	groups, err = store.ListGroup(ctx, &userGroupID)
+	groups, err = store.ListGroup(ctx, &userGroupID, nil)
 	assert.NoError(t, err)
-	require.Equal(t, 2, len(groups))
+	assert.Equal(t, 2, len(groups))
 
-	groups, err = store.ListGroup(ctx, nil)
+	groups, err = store.ListGroup(ctx, nil, nil)
 	assert.NoError(t, err)
-	require.Equal(t, 3, len(groups))
+	assert.Equal(t, 3, len(groups))
 
-	groups, err = store.ListGroup(ctx, intPtr(0))
+	groups, err = store.ListGroup(ctx, intPtr(0), nil)
 	assert.NoError(t, err)
-	require.Equal(t, 0, len(groups))
+	assert.Equal(t, 0, len(groups))
+
+	ids := []int{deviceGroupID, userGroupID}
+	groups, err = store.ListGroup(ctx, nil, &ids)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(groups))
+
+	groups, err = store.ListGroup(ctx, &userEntityID, &ids)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(groups))
 }
 
 func TestCreateGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {

@@ -9,6 +9,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -141,7 +142,7 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	}
 }
 
-func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCacheGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -203,7 +204,7 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	}
 }
 
-func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCacheGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -275,7 +276,7 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	}
 }
 
-func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCacheListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -311,6 +312,178 @@ func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 				return actual[i].ID < actual[j].ID
 			})
 			require.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
+func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	_, groupID := prepareEntityAndGroup(t, ctx, store)
+	revisionID, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+		Revision:  1000,
+		GroupID:   groupID,
+		DataTable: stringPtr("device_info_1000"),
+		Anchored:  false,
+	})
+	require.NoError(t, err)
+
+	group, err := store.GetGroup(ctx, groupID)
+	require.NoError(t, err)
+
+	revision := types.Revision{
+		ID:        revisionID,
+		Revision:  1000,
+		GroupID:   groupID,
+		DataTable: "device_info_1000",
+		Anchored:  false,
+		Group:     group,
+	}
+
+	testCases := []struct {
+		description   string
+		revisionID    int
+		expectedError error
+		expected      *types.Revision
+	}{
+		{
+			description:   "get revision by revisionID successfully",
+			revisionID:    revisionID,
+			expectedError: nil,
+			expected:      &revision,
+		},
+		{
+			description:   "try to get not existed revision, return error",
+			revisionID:    0,
+			expectedError: fmt.Errorf("revision 0 not found"),
+			expected:      nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			actual, err := store.GetRevision(ctx, tc.revisionID)
+
+			if tc.expectedError != nil {
+				assert.EqualError(t, err, tc.expectedError.Error())
+				assert.Equal(t, tc.expected, actual)
+			} else {
+				assert.NoError(t, tc.expectedError)
+				ignoreCreateAndModifyTime(actual)
+				assert.Equal(t, tc.expected, actual)
+			}
+		})
+	}
+}
+
+func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	_, groupID := prepareEntityAndGroup(t, ctx, store)
+	revisionID, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
+		Revision:  1000,
+		GroupID:   groupID,
+		DataTable: stringPtr("device_info_1000"),
+		Anchored:  false,
+	})
+	require.NoError(t, err)
+
+	group, err := store.GetGroup(ctx, groupID)
+	require.NoError(t, err)
+
+	revision := types.Revision{
+		ID:        revisionID,
+		Revision:  1000,
+		GroupID:   groupID,
+		DataTable: "device_info_1000",
+		Anchored:  false,
+		Group:     group,
+	}
+
+	testCases := []struct {
+		description   string
+		GroupID       int
+		Revision      int64
+		expectedError error
+		expected      *types.Revision
+	}{
+		{
+			description:   "get revision by groupID and revision successfully",
+			GroupID:       groupID,
+			Revision:      revision.Revision,
+			expectedError: nil,
+			expected:      &revision,
+		},
+		{
+			description:   "try to get not existed revision, return error",
+			GroupID:       groupID,
+			Revision:      0,
+			expectedError: fmt.Errorf("revision not found by group %d and revision 0", groupID),
+			expected:      nil,
+		},
+		{
+			description:   "try to get revision for a not existed group, return error",
+			GroupID:       0,
+			Revision:      revision.Revision,
+			expectedError: fmt.Errorf("revision not found by group 0 and revision %d", revision.Revision),
+			expected:      nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			actual, err := store.GetRevisionBy(ctx, tc.GroupID, tc.Revision)
+
+			if tc.expectedError != nil {
+				assert.EqualError(t, err, tc.expectedError.Error())
+				assert.Equal(t, tc.expected, actual)
+			} else {
+				assert.NoError(t, tc.expectedError)
+				ignoreCreateAndModifyTime(actual)
+				assert.Equal(t, tc.expected, actual)
+			}
+		})
+	}
+}
+
+func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	_, groupID, _, revisions := prepareRevisions(t, ctx, store)
+
+	testCases := []struct {
+		description string
+		groupID     *int
+		expected    types.RevisionList
+	}{
+		{
+			description: "list revision, succeed",
+			groupID:     nil,
+			expected:    revisions,
+		},
+		{
+			description: "list revision by groupID, succeed",
+			groupID:     &groupID,
+			expected:    revisions,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			actual, err := store.ListRevision(ctx, tc.groupID)
+			assert.NoError(t, err)
+			for _, item := range actual {
+				ignoreCreateAndModifyTime(item)
+			}
+			sort.Slice(tc.expected, func(i, j int) bool {
+				return tc.expected[i].ID < tc.expected[j].ID
+			})
+			sort.Slice(actual, func(i, j int) bool {
+				return actual[i].ID < actual[j].ID
+			})
+			assert.Equal(t, tc.expected, actual)
 		})
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/jackc/pgerrcode"
+	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
@@ -100,31 +101,60 @@ func getGroupByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name stri
 	return &group, nil
 }
 
-func listGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, entityID *int) (types.GroupList, error) {
-	query := "SELECT * FROM feature_group"
-	args := make([]interface{}, 0)
-	if entityID != nil {
-		query = fmt.Sprintf("%s WHERE entity_id = $1", query)
-		args = append(args, *entityID)
-	}
-	var groups types.GroupList
-	if err := sqlxCtx.SelectContext(ctx, &groups, query, args...); err != nil {
+func listGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, entityID *int, groupIDs *[]int) (types.GroupList, error) {
+	cond, args, err := buildListGroupCond(entityID, groupIDs)
+	if err != nil {
 		return nil, err
 	}
 
+	query := `SELECT * FROM "feature_group"`
+	if len(cond) > 0 {
+		query = fmt.Sprintf("%s WHERE %s", query, cond)
+	}
+	var groups types.GroupList
+	if err := sqlxCtx.SelectContext(ctx, &groups, sqlxCtx.Rebind(query), args...); err != nil {
+		return nil, err
+	}
+
+	if err := enrichGroups(ctx, sqlxCtx, groups); err != nil {
+		return nil, err
+	}
+	return groups, nil
+}
+
+func buildListGroupCond(entityID *int, groupIDs *[]int) (string, []interface{}, error) {
+	args := make([]interface{}, 0)
+	cond := make([]string, 0)
+
+	if entityID != nil {
+		cond = append(cond, "entity_id = ?")
+		args = append(args, *entityID)
+	}
+	if groupIDs != nil {
+		s, inArgs, err := sqlx.In("id IN (?)", *groupIDs)
+		if err != nil {
+			return "", nil, err
+		}
+		cond = append(cond, s)
+		args = append(args, inArgs...)
+	}
+	return strings.Join(cond, " AND "), args, nil
+}
+
+func enrichGroups(ctx context.Context, sqlxCtx metadata.SqlxContext, groups types.GroupList) error {
 	entityIDs := groups.EntityIDs()
 	entities, err := listEntity(ctx, sqlxCtx, &entityIDs)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	for _, group := range groups {
 		entity := entities.Find(func(e *types.Entity) bool {
 			return group.EntityID == e.ID
 		})
 		if entity == nil {
-			return nil, fmt.Errorf("cannot find entity %d for group %d", group.EntityID, group.ID)
+			return fmt.Errorf("cannot find entity %d for group %d", group.EntityID, group.ID)
 		}
 		group.Entity = entity
 	}
-	return groups, nil
+	return nil
 }
