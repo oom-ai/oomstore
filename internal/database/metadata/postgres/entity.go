@@ -72,3 +72,13 @@ func getEntityByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name str
 	return &entity, nil
 
 }
+
+func listEntity(ctx context.Context, sqlxCtx metadata.SqlxContext) (types.EntityList, error) {
+	query := "select * from entity"
+	entities := types.EntityList{}
+
+	if err := sqlxCtx.SelectContext(ctx, &entities, query); err != nil {
+		return nil, err
+	}
+	return entities, nil
+}
