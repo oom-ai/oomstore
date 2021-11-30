@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgerrcode"
+	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -14,7 +15,7 @@ import (
 
 func createEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateEntityOpt) (int, error) {
 	var entityID int
-	query := "insert into entity(name, length, description) values($1, $2, $3) returning id"
+	query := "INSERT INTO entity(name, length, description) VALUES($1, $2, $3) returning id"
 	err := sqlxCtx.GetContext(ctx, &entityID, query, opt.EntityName, opt.Length, opt.Description)
 	if er, ok := err.(*pq.Error); ok {
 		if er.Code == pgerrcode.UniqueViolation {
@@ -48,7 +49,7 @@ func updateEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadat
 
 func getEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*types.Entity, error) {
 	var entity types.Entity
-	query := "select * from entity where id = $1"
+	query := "SELECT * FROM entity WHERE id = $1"
 	if err := sqlxCtx.GetContext(ctx, &entity, query, id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errdefs.NotFound(fmt.Errorf("feature entity %d not found", id))
@@ -61,7 +62,7 @@ func getEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*type
 
 func getEntityByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name string) (*types.Entity, error) {
 	var entity types.Entity
-	query := "select * from entity where name = $1"
+	query := "SELECT * FROM entity WHERE name = $1"
 	if err := sqlxCtx.GetContext(ctx, &entity, query, name); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errdefs.NotFound(fmt.Errorf("feature entity %s not found", name))
@@ -73,11 +74,21 @@ func getEntityByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name str
 
 }
 
-func listEntity(ctx context.Context, sqlxCtx metadata.SqlxContext) (types.EntityList, error) {
-	query := "select * from entity"
+func listEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, entityIDs *[]int) (types.EntityList, error) {
+	query := "SELECT * FROM entity"
+	var args []interface{}
+	var err error
+	if entityIDs != nil {
+		if len(*entityIDs) == 0 {
+			return nil, nil
+		}
+		query, args, err = sqlx.In(fmt.Sprintf("%s WHERE id IN (?)", query), *entityIDs)
+		if err != nil {
+			return nil, err
+		}
+	}
 	entities := types.EntityList{}
-
-	if err := sqlxCtx.SelectContext(ctx, &entities, query); err != nil {
+	if err := sqlxCtx.SelectContext(ctx, &entities, sqlxCtx.Rebind(query), args...); err != nil {
 		return nil, err
 	}
 	return entities, nil
