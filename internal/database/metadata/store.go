@@ -26,10 +26,6 @@ type ReadStore interface {
 	CacheGetFeatureByName(ctx context.Context, name string) (*types.Feature, error)
 	CacheListFeature(ctx context.Context, opt ListFeatureOpt) types.FeatureList
 
-	CacheGetGroup(ctx context.Context, id int) (*types.Group, error)
-	CacheGetGroupByName(ctx context.Context, name string) (*types.Group, error)
-	CacheListGroup(ctx context.Context, entityID *int) types.GroupList
-
 	GetGroup(ctx context.Context, id int) (*types.Group, error)
 	GetGroupByName(ctx context.Context, name string) (*types.Group, error)
 	ListGroup(ctx context.Context, entityID *int) (types.GroupList, error)

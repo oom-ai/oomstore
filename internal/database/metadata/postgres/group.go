@@ -68,14 +68,14 @@ func getGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*types
 	var group types.Group
 	query := `SELECT * FROM feature_group WHERE id = $1`
 	if err := sqlxCtx.GetContext(ctx, &group, query, id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.NotFound(fmt.Errorf("feature group %d not found", id))
+		}
 		return nil, err
 	}
 
 	entity, err := getEntity(ctx, sqlxCtx, group.EntityID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errdefs.NotFound(fmt.Errorf("feature group %d not found", id))
-		}
 		return nil, err
 	}
 	group.Entity = entity
@@ -86,14 +86,14 @@ func getGroupByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name stri
 	var group types.Group
 	query := `SELECT * FROM feature_group WHERE name = $1`
 	if err := sqlxCtx.GetContext(ctx, &group, query, name); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.NotFound(fmt.Errorf("feature group %s not found", name))
+		}
 		return nil, err
 	}
 
 	entity, err := getEntity(ctx, sqlxCtx, group.EntityID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errdefs.NotFound(fmt.Errorf("feature group %s not found", name))
-		}
 		return nil, err
 	}
 	group.Entity = entity

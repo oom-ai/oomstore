@@ -43,7 +43,10 @@ var listGroupCmd = &cobra.Command{
 			entityID = &entity.ID
 		}
 
-		groups := oomStore.ListGroup(ctx, entityID)
+		groups, err := oomStore.ListGroup(ctx, entityID)
+		if err != nil {
+			log.Fatalf("failed listing feature groups, error %v\n", err)
+		}
 		if err := printGroups(groups, *listOutput); err != nil {
 			log.Fatalf("failed printing feature groups, error %v\n", err)
 		}
