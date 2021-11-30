@@ -23,8 +23,8 @@ func (tx *Tx) GetEntityByName(ctx context.Context, name string) (*types.Entity, 
 	return getEntityByName(ctx, tx, name)
 }
 
-func (tx *Tx) ListEntity(ctx context.Context) (types.EntityList, error) {
-	return listEntity(ctx, tx)
+func (tx *Tx) ListEntity(ctx context.Context, entityIDs *[]int) (types.EntityList, error) {
+	return listEntity(ctx, tx, entityIDs)
 }
 
 func (tx *Tx) CreateGroup(ctx context.Context, opt metadata.CreateGroupOpt) (int, error) {
