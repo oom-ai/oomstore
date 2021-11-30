@@ -11,8 +11,8 @@ for i in {1..5}; do
     import_sample driver_stats "./data/driver_stats_revision_$i.csv" "$i"
 done
 
-case="api returns correct result"
-arg=$(cat <<-EOF
+case1="api returns correct result"
+arg1='
 {
   "feature_names": [
     "conv_rate",
@@ -24,16 +24,8 @@ arg=$(cat <<-EOF
     "unix_milli": 3
   }
 }
-{
-  "entity_row": {
-    "entity_key": "7",
-    "unix_milli": 0
-  }
-}
-EOF
-)
-
-expected='
+'
+expected1='
 {
   "status": {},
   "header": [
@@ -61,10 +53,64 @@ expected='
     }
   ]
 }
+'
+
+case2="no header in subsequent request"
+arg2='
 {
-  "status": {},
-  "joinedRow": "TODO"
+  "entity_row": {
+    "entity_key": "7",
+    "unix_milli": 1
+  }
 }
 '
+expected2='
+{
+  "status": {},
+  "joinedRow": [
+    {
+      "stringValue": "7"
+    },
+    {
+      "int64Value": "1"
+    },
+    {
+      "doubleValue": 0.758
+    },
+    {
+      "doubleValue": 0.02
+    },
+    {
+      "int64Value": "389"
+    }
+  ]
+}
+'
+
+case3="handle null value correctly"
+arg3='
+{
+  "entity_row": {
+    "entity_key": "7",
+    "unix_milli": 0
+  }
+}
+'
+expected3='
+{
+  "status": {},
+  "joinedRow": "FIXME"
+}
+'
+
+arg="$arg1"
+arg="$arg$arg2"
+# FIXME: amend $arg3 when #682 fixed
+# arg="$arg$arg3"
+
 actual=$(testgrpc ChannelJoin <<<"$arg")
-assert_json_eq "$case" "$expected" "$actual"
+
+assert_json_eq "$case1" "$expected1" "$(jq -s '.[0]' <<< "$actual")"
+assert_json_eq "$case2" "$expected2" "$(jq -s '.[1]' <<< "$actual")"
+# FIXME: uncomment this when #682 fixed
+# assert_json_eq "$case3" "$expected3" "$(jq -s '.[2]' <<< "$actual")"
