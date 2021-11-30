@@ -40,7 +40,7 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 		metadataOpt.EntityID = &entity.ID
 	}
 	if opt.GroupName != nil {
-		group, err := s.metadata.CacheGetGroupByName(ctx, *opt.GroupName)
+		group, err := s.metadata.GetGroupByName(ctx, *opt.GroupName)
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +69,7 @@ func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatu
 	if err := s.metadata.Refresh(); err != nil {
 		return 0, fmt.Errorf("failed to refresh informer, err=%+v", err)
 	}
-	group, err := s.metadata.CacheGetGroupByName(ctx, opt.GroupName)
+	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return 0, err
 	}

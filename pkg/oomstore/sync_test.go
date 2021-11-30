@@ -67,7 +67,7 @@ func TestSync(t *testing.T) {
 			mockFn: func() {
 				revision := buildRevision()
 				metadataStore.EXPECT().CacheGetRevision(ctx, 1).Return(revision, nil)
-				metadataStore.EXPECT().CacheGetGroupByName(ctx, "device_info").Return(&types.Group{
+				metadataStore.EXPECT().GetGroupByName(ctx, "device_info").Return(&types.Group{
 					Name: "device_info",
 					ID:   1,
 				}, nil)
@@ -102,7 +102,7 @@ func TestSync(t *testing.T) {
 				revision := buildRevision()
 				revision.Group.OnlineRevisionID = intPtr(0)
 				metadataStore.EXPECT().CacheGetRevision(ctx, 1).Return(revision, nil)
-				metadataStore.EXPECT().CacheGetGroupByName(ctx, "device_info").Return(&types.Group{
+				metadataStore.EXPECT().GetGroupByName(ctx, "device_info").Return(&types.Group{
 					Name: "device_info",
 					ID:   1,
 				}, nil)
