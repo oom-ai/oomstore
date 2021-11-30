@@ -369,6 +369,12 @@ func buildStatus(code code.Code, message string) *status.Status {
 
 func convertInterfaceToValue(i interface{}) (*codegen.Value, error) {
 	switch s := i.(type) {
+	case nil:
+		return &codegen.Value{
+			Kind: &codegen.Value_NullValue{
+				NullValue: codegen.NullValue_NULL_VALUE,
+			},
+		}, nil
 	case int64:
 		return &codegen.Value{
 			Kind: &codegen.Value_Int64Value{
