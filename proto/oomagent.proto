@@ -17,6 +17,7 @@ service OomAgent {
 
   rpc ChannelExport(ChannelExportRequest) returns (stream ChannelExportResponse) {}
   rpc Export(ExportRequest) returns (ExportResponse) {}
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {}
 }
 
 message Value {
@@ -137,5 +138,12 @@ message ExportRequest {
 }
 
 message ExportResponse {
+  google.rpc.Status status = 1;
+}
+
+message HealthCheckRequest {
+}
+
+message HealthCheckResponse {
   google.rpc.Status status = 1;
 }

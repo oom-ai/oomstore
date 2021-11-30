@@ -104,11 +104,24 @@ testgrpc() {
     grpcurl --import-path "$PROTO_DIR" --proto "$PROTO_DIR/oomagent.proto" -plaintext -d @ localhost:50051 "oomagent.OomAgent/$1" "${@:1:}"
 }
 
+wait_for_ready() {
+    local interval=$1
+    local retries=$2
+    local message
+    for ((i = 0; i < retries; i++ )); do
+        if message=$(testgrpc HealthCheck <<<"" 2>&1); then
+            return
+        fi
+        sleep "$interval"
+    done
+    erro "oomagent is still not ready: $message"
+}
+
 prepare_oomagent() {
     info "start oomagent server..."
     trap 'kill $(jobs -p)' EXIT INT TERM HUP
     oomagent &
-    sleep 1
+    wait_for_ready 0.1 10
 }
 
 execute_sql() {
