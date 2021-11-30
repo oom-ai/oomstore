@@ -94,26 +94,6 @@ func (f *Informer) Cache() *Cache {
 }
 
 // Get
-func (f *Informer) CacheGetEntity(ctx context.Context, id int) (*types.Entity, error) {
-	if entity := f.Cache().Entities.Find(func(e *types.Entity) bool {
-		return e.ID == id
-	}); entity == nil {
-		return nil, errdefs.NotFound(fmt.Errorf("feature entity %d not found", id))
-	} else {
-		return entity.Copy(), nil
-	}
-}
-
-func (f *Informer) CacheGetEntityByName(ctx context.Context, name string) (*types.Entity, error) {
-	if entity := f.Cache().Entities.Find(func(e *types.Entity) bool {
-		return e.Name == name
-	}); entity == nil {
-		return nil, errdefs.NotFound(fmt.Errorf("feature entity '%s' not found", name))
-	} else {
-		return entity.Copy(), nil
-	}
-}
-
 func (f *Informer) CacheGetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	if feature := f.Cache().Features.Find(func(f *types.Feature) bool {
 		return f.ID == id
@@ -175,10 +155,6 @@ func (f *Informer) CacheGetRevisionBy(ctx context.Context, groupID int, revision
 }
 
 // List
-func (f *Informer) CacheListEntity(ctx context.Context) types.EntityList {
-	return f.Cache().Entities.List().Copy()
-}
-
 func (f *Informer) CacheListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
 	return f.Cache().Features.List(opt).Copy()
 }

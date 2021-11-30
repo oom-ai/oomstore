@@ -18,9 +18,6 @@ type Store interface {
 type ReadStore interface {
 	GetEntity(ctx context.Context, id int) (*types.Entity, error)
 	GetEntityByName(ctx context.Context, name string) (*types.Entity, error)
-	CacheGetEntity(ctx context.Context, id int) (*types.Entity, error)
-	CacheGetEntityByName(ctx context.Context, name string) (*types.Entity, error)
-	CacheListEntity(ctx context.Context) types.EntityList
 	ListEntity(ctx context.Context, entityIDs *[]int) (types.EntityList, error)
 
 	GetFeature(ctx context.Context, id int) (*types.Feature, error)
