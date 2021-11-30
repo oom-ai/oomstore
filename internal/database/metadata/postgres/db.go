@@ -43,8 +43,8 @@ func (db *DB) GetGroupByName(ctx context.Context, name string) (*types.Group, er
 	return getGroupByName(ctx, db, name)
 }
 
-func (db *DB) ListGroup(ctx context.Context, entityID *int) (types.GroupList, error) {
-	return listGroup(ctx, db, entityID)
+func (db *DB) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
+	return listGroup(ctx, db, entityID, groupIDs)
 }
 
 func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
@@ -78,4 +78,14 @@ func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt
 
 func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
 	return updateRevision(ctx, db, opt)
+}
+
+func (db *DB) GetRevision(ctx context.Context, id int) (*types.Revision, error) {
+	return getRevision(ctx, db, id)
+}
+func (db *DB) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
+	return getRevisionBy(ctx, db, groupID, revision)
+}
+func (db *DB) ListRevision(ctx context.Context, groupID *int) (types.RevisionList, error) {
+	return listRevision(ctx, db, groupID)
 }
