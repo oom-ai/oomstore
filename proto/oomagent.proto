@@ -92,11 +92,13 @@ message ImportRequest {
 message EntityRow {
   string entity_key = 1;
   int64 unix_milli = 2;
+  repeated string values = 3;
 }
 
 message ChannelJoinRequest {
   repeated string feature_names = 1;
   EntityRow entity_row = 2;
+  repeated string value_names = 3;
 }
 
 message ChannelJoinResponse {
