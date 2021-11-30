@@ -348,6 +348,21 @@ func (mr *MockStoreMockRecorder) GetGroupByName(ctx, name interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupByName", reflect.TypeOf((*MockStore)(nil).GetGroupByName), ctx, name)
 }
 
+// ListGroup mocks base method.
+func (m *MockStore) ListGroup(ctx context.Context, entityID *int) (types.GroupList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListGroup", ctx, entityID)
+	ret0, _ := ret[0].(types.GroupList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListGroup indicates an expected call of ListGroup.
+func (mr *MockStoreMockRecorder) ListGroup(ctx, entityID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockStore)(nil).ListGroup), ctx, entityID)
+}
+
 // Refresh mocks base method.
 func (m *MockStore) Refresh() error {
 	m.ctrl.T.Helper()
@@ -689,6 +704,21 @@ func (m *MockReadStore) GetGroupByName(ctx context.Context, name string) (*types
 func (mr *MockReadStoreMockRecorder) GetGroupByName(ctx, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupByName", reflect.TypeOf((*MockReadStore)(nil).GetGroupByName), ctx, name)
+}
+
+// ListGroup mocks base method.
+func (m *MockReadStore) ListGroup(ctx context.Context, entityID *int) (types.GroupList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListGroup", ctx, entityID)
+	ret0, _ := ret[0].(types.GroupList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListGroup indicates an expected call of ListGroup.
+func (mr *MockReadStoreMockRecorder) ListGroup(ctx, entityID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockReadStore)(nil).ListGroup), ctx, entityID)
 }
 
 // Refresh mocks base method.
