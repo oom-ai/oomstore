@@ -14,6 +14,10 @@ func TestGetGroup(t *testing.T) {
 	test_impl.TestGetGroup(t, prepareStore)
 }
 
+func TestCacheListGroup(t *testing.T) {
+	test_impl.TestCacheListGroup(t, prepareStore)
+}
+
 func TestListGroup(t *testing.T) {
 	test_impl.TestListGroup(t, prepareStore)
 }
