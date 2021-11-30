@@ -40,7 +40,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		for _, group := range stage.NewGroups {
 			if _, exist := entityMp[group.EntityName]; !exist {
 				var entity *types.Entity
-				if entity, err = s.metadata.CacheGetEntityByName(c, group.EntityName); err != nil {
+				if entity, err = s.metadata.GetEntityByName(c, group.EntityName); err != nil {
 					return err
 				}
 				entityMp[group.EntityName] = entity.ID
@@ -77,7 +77,7 @@ func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore,
 		return 0, err
 	}
 
-	entity, err := s.metadata.CacheGetEntityByName(ctx, newEntity.Name)
+	entity, err := s.metadata.GetEntityByName(ctx, newEntity.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return 0, err

@@ -33,7 +33,7 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 		FeatureNames: opt.FeatureNames,
 	}
 	if opt.EntityName != nil {
-		entity, err := s.metadata.CacheGetEntityByName(ctx, *opt.EntityName)
+		entity, err := s.metadata.GetEntityByName(ctx, *opt.EntityName)
 		if err != nil {
 			return nil, err
 		}
