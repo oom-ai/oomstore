@@ -67,6 +67,18 @@ func (l GroupList) Filter(filter func(*Group) bool) (rs GroupList) {
 	return
 }
 
+func (l GroupList) EntityIDs() []int {
+	entityIDMap := make(map[int]struct{})
+	for _, g := range l {
+		entityIDMap[g.EntityID] = struct{}{}
+	}
+	entityIDs := make([]int, 0, len(entityIDMap))
+	for id := range entityIDMap {
+		entityIDs = append(entityIDs, id)
+	}
+	return entityIDs
+}
+
 func (fg *Group) String() string {
 	onlineRevisionID := "<NULL>"
 
