@@ -2,12 +2,15 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func createFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateFeatureOpt) (int, error) {
@@ -52,4 +55,27 @@ func validateDataType(ctx context.Context, sqlxCtx metadata.SqlxContext, dataTyp
 	stmt := fmt.Sprintf("CREATE TEMPORARY TABLE %s (a %s) ON COMMIT DROP", tmpTable, dataType)
 	_, err := sqlxCtx.ExecContext(ctx, stmt)
 	return err
+}
+
+func getFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*types.Feature, error) {
+	var (
+		feature types.Feature
+		group   *types.Group
+		err     error
+	)
+
+	query := `SELECT * FROM "feature" WHERE id = $1`
+	if err := sqlxCtx.GetContext(ctx, &feature, query, id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.NotFound(fmt.Errorf("feature %d not found", id))
+		}
+		return nil, err
+	}
+
+	if group, err = getGroup(ctx, sqlxCtx, feature.GroupID); err != nil {
+		return nil, err
+	}
+	feature.Group = group
+
+	return &feature, nil
 }
