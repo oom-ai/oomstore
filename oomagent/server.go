@@ -199,18 +199,23 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 		if err != nil {
 			globalErr = err
 		} else {
+			firstResp := true
 			for row := range joinResult.Data {
 				joinedRow, err := convertJoinedRow(row)
 				if err != nil {
 					globalErr = err
 					break
 				}
-				err = stream.Send(&codegen.ChannelJoinResponse{
+				resp := &codegen.ChannelJoinResponse{
 					Status:    buildStatus(code.Code_OK, ""),
-					Header:    joinResult.Header,
 					JoinedRow: joinedRow,
-				})
-				if err != nil {
+				}
+				// Only need to send header upon the first response
+				if firstResp {
+					resp.Header = joinResult.Header
+					firstResp = false
+				}
+				if err = stream.Send(resp); err != nil {
 					globalErr = err
 					break
 				}
