@@ -7,6 +7,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -88,7 +89,7 @@ func TestGetGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, opt.Category, group.Category)
 }
 
-func TestListGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCacheListGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -126,6 +127,55 @@ func TestListGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, 2, len(store.CacheListGroup(ctx, &userGroupID)))
 	require.Equal(t, 3, len(store.CacheListGroup(ctx, nil)))
 	require.Equal(t, 0, len(store.CacheListGroup(ctx, intPtr(0))))
+}
+
+func TestListGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	deviceEntityID := prepareEntity(t, ctx, store, "device")
+	userEntityID := prepareEntity(t, ctx, store, "user")
+
+	deviceOpt := metadata.CreateGroupOpt{
+		GroupName:   "device_info",
+		EntityID:    deviceEntityID,
+		Description: "description",
+		Category:    types.BatchFeatureCategory,
+	}
+	userBaseOpt := metadata.CreateGroupOpt{
+		GroupName:   "user_info",
+		EntityID:    userEntityID,
+		Description: "description",
+		Category:    types.BatchFeatureCategory,
+	}
+	userBehaviorOpt := metadata.CreateGroupOpt{
+		GroupName:   "user_profile",
+		EntityID:    userEntityID,
+		Description: "description",
+		Category:    types.BatchFeatureCategory,
+	}
+	deviceGroupID, err := store.CreateGroup(ctx, deviceOpt)
+	require.NoError(t, err)
+	userGroupID, err := store.CreateGroup(ctx, userBaseOpt)
+	require.NoError(t, err)
+	_, err = store.CreateGroup(ctx, userBehaviorOpt)
+	require.NoError(t, err)
+
+	groups, err := store.ListGroup(ctx, &deviceGroupID)
+	assert.NoError(t, err)
+	require.Equal(t, 1, len(groups))
+
+	groups, err = store.ListGroup(ctx, &userGroupID)
+	assert.NoError(t, err)
+	require.Equal(t, 2, len(groups))
+
+	groups, err = store.ListGroup(ctx, nil)
+	assert.NoError(t, err)
+	require.Equal(t, 3, len(groups))
+
+	groups, err = store.ListGroup(ctx, intPtr(0))
+	assert.NoError(t, err)
+	require.Equal(t, 0, len(groups))
 }
 
 func TestCreateGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
