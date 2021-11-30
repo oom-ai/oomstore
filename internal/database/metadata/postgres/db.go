@@ -39,6 +39,10 @@ func (db *DB) GetGroupByName(ctx context.Context, name string) (*types.Group, er
 	return getGroupByName(ctx, db, name)
 }
 
+func (db *DB) ListGroup(ctx context.Context, entityID *int) (types.GroupList, error) {
+	return listGroup(ctx, db, entityID)
+}
+
 func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
 	return createFeature(ctx, db, opt)
 }

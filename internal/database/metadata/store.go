@@ -32,6 +32,7 @@ type ReadStore interface {
 
 	GetGroup(ctx context.Context, id int) (*types.Group, error)
 	GetGroupByName(ctx context.Context, name string) (*types.Group, error)
+	ListGroup(ctx context.Context, entityID *int) (types.GroupList, error)
 
 	CacheGetRevision(ctx context.Context, id int) (*types.Revision, error)
 	CacheGetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error)
