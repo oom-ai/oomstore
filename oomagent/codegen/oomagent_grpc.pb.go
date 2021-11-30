@@ -27,6 +27,7 @@ type OomAgentClient interface {
 	Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error)
 	ChannelExport(ctx context.Context, in *ChannelExportRequest, opts ...grpc.CallOption) (OomAgent_ChannelExportClient, error)
 	Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (*ExportResponse, error)
+	HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
 }
 
 type oomAgentClient struct {
@@ -188,6 +189,15 @@ func (c *oomAgentClient) Export(ctx context.Context, in *ExportRequest, opts ...
 	return out, nil
 }
 
+func (c *oomAgentClient) HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
+	out := new(HealthCheckResponse)
+	err := c.cc.Invoke(ctx, "/oomagent.OomAgent/HealthCheck", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OomAgentServer is the server API for OomAgent service.
 // All implementations must embed UnimplementedOomAgentServer
 // for forward compatibility
@@ -201,6 +211,7 @@ type OomAgentServer interface {
 	Join(context.Context, *JoinRequest) (*JoinResponse, error)
 	ChannelExport(*ChannelExportRequest, OomAgent_ChannelExportServer) error
 	Export(context.Context, *ExportRequest) (*ExportResponse, error)
+	HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
 	mustEmbedUnimplementedOomAgentServer()
 }
 
@@ -234,6 +245,9 @@ func (UnimplementedOomAgentServer) ChannelExport(*ChannelExportRequest, OomAgent
 }
 func (UnimplementedOomAgentServer) Export(context.Context, *ExportRequest) (*ExportResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Export not implemented")
+}
+func (UnimplementedOomAgentServer) HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HealthCheck not implemented")
 }
 func (UnimplementedOomAgentServer) mustEmbedUnimplementedOomAgentServer() {}
 
@@ -429,6 +443,24 @@ func _OomAgent_Export_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OomAgent_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HealthCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OomAgentServer).HealthCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/oomagent.OomAgent/HealthCheck",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OomAgentServer).HealthCheck(ctx, req.(*HealthCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OomAgent_ServiceDesc is the grpc.ServiceDesc for OomAgent service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -459,6 +491,10 @@ var OomAgent_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Export",
 			Handler:    _OomAgent_Export_Handler,
+		},
+		{
+			MethodName: "HealthCheck",
+			Handler:    _OomAgent_HealthCheck_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
