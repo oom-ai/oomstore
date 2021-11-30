@@ -2,6 +2,7 @@ syntax = "proto3";
 package oomagent;
 option go_package = "/codegen";
 
+import "google/protobuf/struct.proto";
 import "status.proto";
 
 service OomAgent {
@@ -20,16 +21,11 @@ service OomAgent {
   rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {}
 }
 
-enum NullValue {
-  // Null value.
-  NULL_VALUE = 0;
-}
-
 message Value {
   // The kind of value.
   oneof kind {
     // Represents a null value.
-    NullValue null_value = 1;
+    google.protobuf.NullValue null_value = 1;
     // Represents a int64 value.
     int64 int64_value = 2;
     // Represents a double value.
