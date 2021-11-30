@@ -22,6 +22,10 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T) {
 	test_impl.TestCreateFeatureWithInvalidDataType(t, prepareStore)
 }
 
+func TestCacheGetFeature(t *testing.T) {
+	test_impl.TestCacheGetFeature(t, prepareStore)
+}
+
 func TestGetFeature(t *testing.T) {
 	test_impl.TestGetFeature(t, prepareStore)
 }
