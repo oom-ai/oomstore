@@ -20,6 +20,12 @@ type server struct {
 	oomstore *oomstore.OomStore
 }
 
+func (s *server) HealthCheck(ctx context.Context, req *codegen.HealthCheckRequest) (*codegen.HealthCheckResponse, error) {
+	return &codegen.HealthCheckResponse{
+		Status: buildStatus(code.Code_OK, ""),
+	}, nil
+}
+
 func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (*codegen.OnlineGetResponse, error) {
 	result, err := s.oomstore.OnlineGet(ctx, types.OnlineGetOpt{
 		FeatureNames: req.FeatureNames,

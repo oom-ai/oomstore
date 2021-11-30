@@ -59,6 +59,11 @@ class OomAgentStub(object):
                 request_serializer=oomagent__pb2.ExportRequest.SerializeToString,
                 response_deserializer=oomagent__pb2.ExportResponse.FromString,
                 )
+        self.HealthCheck = channel.unary_unary(
+                '/oomagent.OomAgent/HealthCheck',
+                request_serializer=oomagent__pb2.HealthCheckRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.HealthCheckResponse.FromString,
+                )
 
 
 class OomAgentServicer(object):
@@ -118,6 +123,12 @@ class OomAgentServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def HealthCheck(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_OomAgentServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -165,6 +176,11 @@ def add_OomAgentServicer_to_server(servicer, server):
                     servicer.Export,
                     request_deserializer=oomagent__pb2.ExportRequest.FromString,
                     response_serializer=oomagent__pb2.ExportResponse.SerializeToString,
+            ),
+            'HealthCheck': grpc.unary_unary_rpc_method_handler(
+                    servicer.HealthCheck,
+                    request_deserializer=oomagent__pb2.HealthCheckRequest.FromString,
+                    response_serializer=oomagent__pb2.HealthCheckResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -326,5 +342,22 @@ class OomAgent(object):
         return grpc.experimental.unary_unary(request, target, '/oomagent.OomAgent/Export',
             oomagent__pb2.ExportRequest.SerializeToString,
             oomagent__pb2.ExportResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def HealthCheck(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/oomagent.OomAgent/HealthCheck',
+            oomagent__pb2.HealthCheckRequest.SerializeToString,
+            oomagent__pb2.HealthCheckResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
