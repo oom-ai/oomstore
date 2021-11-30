@@ -81,3 +81,30 @@ func getGroupByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name stri
 	// TODO: enrich entity
 	return &group, nil
 }
+
+func listGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, entityID *int) (types.GroupList, error) {
+	query := "SELECT * FROM feature_group"
+	args := make([]interface{}, 0)
+	if entityID != nil {
+		query = fmt.Sprintf("%s WHERE entity_id = $1", query)
+		args = append(args, *entityID)
+	}
+	var groups types.GroupList
+	if err := sqlxCtx.SelectContext(ctx, &groups, query, args...); err != nil {
+		return nil, err
+	}
+
+	// TODO: list entities from DB
+	var entities types.EntityList
+	for _, group := range groups {
+		entity := entities.Find(func(e *types.Entity) bool {
+			return group.EntityID == e.ID
+		})
+		// TODO: add nil check back after we can list entities from DB
+		//if entity == nil {
+		//	return nil, fmt.Errorf("cannot find entity %d for group %d", group.EntityID, group.ID)
+		//}
+		group.Entity = entity
+	}
+	return groups, nil
+}
