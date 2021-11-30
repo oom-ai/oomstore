@@ -59,6 +59,10 @@ func (db *DB) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	return getFeature(ctx, db, id)
 }
 
+func (db *DB) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
+	return getFeatureByName(ctx, db, name)
+}
+
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
 	var (
 		revisionID int
