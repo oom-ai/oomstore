@@ -2,11 +2,14 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func createEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateEntityOpt) (int, error) {
@@ -41,4 +44,31 @@ func updateEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadat
 		return fmt.Errorf("failed to update entity %d: entity not found", opt.EntityID)
 	}
 	return nil
+}
+
+func getEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*types.Entity, error) {
+	var entity types.Entity
+	query := "select * from entity where id = $1"
+	if err := sqlxCtx.GetContext(ctx, &entity, query, id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.NotFound(fmt.Errorf("feature entity %d not found", id))
+		}
+		return nil, err
+	}
+
+	return &entity, nil
+}
+
+func getEntityByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name string) (*types.Entity, error) {
+	var entity types.Entity
+	query := "select * from entity where name = $1"
+	if err := sqlxCtx.GetContext(ctx, &entity, query, name); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.NotFound(fmt.Errorf("feature entity %s not found", name))
+		}
+		return nil, err
+	}
+
+	return &entity, nil
+
 }
