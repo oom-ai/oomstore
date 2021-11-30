@@ -67,36 +67,6 @@ func (mr *MockStoreMockRecorder) CacheGetFeatureByName(ctx, name interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetFeatureByName", reflect.TypeOf((*MockStore)(nil).CacheGetFeatureByName), ctx, name)
 }
 
-// CacheGetGroup mocks base method.
-func (m *MockStore) CacheGetGroup(ctx context.Context, id int) (*types.Group, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheGetGroup", ctx, id)
-	ret0, _ := ret[0].(*types.Group)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CacheGetGroup indicates an expected call of CacheGetGroup.
-func (mr *MockStoreMockRecorder) CacheGetGroup(ctx, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetGroup", reflect.TypeOf((*MockStore)(nil).CacheGetGroup), ctx, id)
-}
-
-// CacheGetGroupByName mocks base method.
-func (m *MockStore) CacheGetGroupByName(ctx context.Context, name string) (*types.Group, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheGetGroupByName", ctx, name)
-	ret0, _ := ret[0].(*types.Group)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CacheGetGroupByName indicates an expected call of CacheGetGroupByName.
-func (mr *MockStoreMockRecorder) CacheGetGroupByName(ctx, name interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetGroupByName", reflect.TypeOf((*MockStore)(nil).CacheGetGroupByName), ctx, name)
-}
-
 // CacheGetRevision mocks base method.
 func (m *MockStore) CacheGetRevision(ctx context.Context, id int) (*types.Revision, error) {
 	m.ctrl.T.Helper()
@@ -139,20 +109,6 @@ func (m *MockStore) CacheListFeature(ctx context.Context, opt metadata.ListFeatu
 func (mr *MockStoreMockRecorder) CacheListFeature(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheListFeature", reflect.TypeOf((*MockStore)(nil).CacheListFeature), ctx, opt)
-}
-
-// CacheListGroup mocks base method.
-func (m *MockStore) CacheListGroup(ctx context.Context, entityID *int) types.GroupList {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheListGroup", ctx, entityID)
-	ret0, _ := ret[0].(types.GroupList)
-	return ret0
-}
-
-// CacheListGroup indicates an expected call of CacheListGroup.
-func (mr *MockStoreMockRecorder) CacheListGroup(ctx, entityID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheListGroup", reflect.TypeOf((*MockStore)(nil).CacheListGroup), ctx, entityID)
 }
 
 // CacheListRevision mocks base method.
@@ -501,36 +457,6 @@ func (mr *MockReadStoreMockRecorder) CacheGetFeatureByName(ctx, name interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetFeatureByName", reflect.TypeOf((*MockReadStore)(nil).CacheGetFeatureByName), ctx, name)
 }
 
-// CacheGetGroup mocks base method.
-func (m *MockReadStore) CacheGetGroup(ctx context.Context, id int) (*types.Group, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheGetGroup", ctx, id)
-	ret0, _ := ret[0].(*types.Group)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CacheGetGroup indicates an expected call of CacheGetGroup.
-func (mr *MockReadStoreMockRecorder) CacheGetGroup(ctx, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetGroup", reflect.TypeOf((*MockReadStore)(nil).CacheGetGroup), ctx, id)
-}
-
-// CacheGetGroupByName mocks base method.
-func (m *MockReadStore) CacheGetGroupByName(ctx context.Context, name string) (*types.Group, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheGetGroupByName", ctx, name)
-	ret0, _ := ret[0].(*types.Group)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CacheGetGroupByName indicates an expected call of CacheGetGroupByName.
-func (mr *MockReadStoreMockRecorder) CacheGetGroupByName(ctx, name interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheGetGroupByName", reflect.TypeOf((*MockReadStore)(nil).CacheGetGroupByName), ctx, name)
-}
-
 // CacheGetRevision mocks base method.
 func (m *MockReadStore) CacheGetRevision(ctx context.Context, id int) (*types.Revision, error) {
 	m.ctrl.T.Helper()
@@ -573,20 +499,6 @@ func (m *MockReadStore) CacheListFeature(ctx context.Context, opt metadata.ListF
 func (mr *MockReadStoreMockRecorder) CacheListFeature(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheListFeature", reflect.TypeOf((*MockReadStore)(nil).CacheListFeature), ctx, opt)
-}
-
-// CacheListGroup mocks base method.
-func (m *MockReadStore) CacheListGroup(ctx context.Context, entityID *int) types.GroupList {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheListGroup", ctx, entityID)
-	ret0, _ := ret[0].(types.GroupList)
-	return ret0
-}
-
-// CacheListGroup indicates an expected call of CacheListGroup.
-func (mr *MockReadStoreMockRecorder) CacheListGroup(ctx, entityID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheListGroup", reflect.TypeOf((*MockReadStore)(nil).CacheListGroup), ctx, entityID)
 }
 
 // CacheListRevision mocks base method.

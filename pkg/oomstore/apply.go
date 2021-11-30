@@ -57,7 +57,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		for _, feature := range stage.NewFeatures {
 			if _, exist := groupMp[feature.GroupName]; !exist {
 				var group *types.Group
-				if group, err = s.metadata.CacheGetGroupByName(ctx, feature.GroupName); err != nil {
+				if group, err = s.metadata.GetGroupByName(ctx, feature.GroupName); err != nil {
 					return err
 				}
 				groupMp[feature.GroupName] = group.ID
@@ -109,7 +109,7 @@ func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, 
 		return 0, err
 	}
 
-	group, err := s.metadata.CacheGetGroupByName(ctx, newGroup.Name)
+	group, err := s.metadata.GetGroupByName(ctx, newGroup.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return 0, err

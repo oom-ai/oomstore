@@ -114,26 +114,6 @@ func (f *Informer) CacheGetFeatureByName(ctx context.Context, name string) (*typ
 	}
 }
 
-func (f *Informer) CacheGetGroup(ctx context.Context, id int) (*types.Group, error) {
-	if group := f.Cache().Groups.Find(func(g *types.Group) bool {
-		return g.ID == id
-	}); group == nil {
-		return nil, errdefs.NotFound(fmt.Errorf("feature group %d not found", id))
-	} else {
-		return group.Copy(), nil
-	}
-}
-
-func (f *Informer) CacheGetGroupByName(ctx context.Context, name string) (*types.Group, error) {
-	if group := f.Cache().Groups.Find(func(g *types.Group) bool {
-		return g.Name == name
-	}); group == nil {
-		return nil, errdefs.NotFound(fmt.Errorf("feature group '%s' not found", name))
-	} else {
-		return group.Copy(), nil
-	}
-}
-
 func (f *Informer) CacheGetRevision(ctx context.Context, id int) (*types.Revision, error) {
 	if revision := f.Cache().Revisions.Find(func(r *types.Revision) bool {
 		return r.ID == id
@@ -157,10 +137,6 @@ func (f *Informer) CacheGetRevisionBy(ctx context.Context, groupID int, revision
 // List
 func (f *Informer) CacheListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
 	return f.Cache().Features.List(opt).Copy()
-}
-
-func (f *Informer) CacheListGroup(ctx context.Context, entityID *int) types.GroupList {
-	return f.Cache().Groups.List(entityID).Copy()
 }
 
 func (f *Informer) CacheListRevision(ctx context.Context, groupID *int) types.RevisionList {

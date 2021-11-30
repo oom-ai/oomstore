@@ -36,7 +36,7 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 				GroupName: "device_info",
 			},
 			mockFunc: func() {
-				metadataStore.EXPECT().CacheGetGroupByName(gomock.Any(), "device_info").Return(nil, fmt.Errorf("error"))
+				metadataStore.EXPECT().GetGroupByName(gomock.Any(), "device_info").Return(nil, fmt.Errorf("error"))
 			},
 			wantRevisionID: 0,
 			wantError:      fmt.Errorf("error"),
@@ -47,7 +47,7 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 				GroupName: "device_info",
 			},
 			mockFunc: func() {
-				metadataStore.EXPECT().CacheGetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1}, nil)
+				metadataStore.EXPECT().GetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1}, nil)
 				metadataStore.EXPECT().CacheListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).Return(nil)
 			},
 			wantRevisionID: 0,
@@ -59,7 +59,7 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 				GroupName: "device_info",
 			},
 			mockFunc: func() {
-				metadataStore.EXPECT().CacheGetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1, EntityID: 1}, nil)
+				metadataStore.EXPECT().GetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1, EntityID: 1}, nil)
 				metadataStore.EXPECT().CacheListFeature(gomock.Any(), gomock.Any()).Return(types.FeatureList{})
 			},
 			wantRevisionID: 0,
@@ -79,7 +79,7 @@ device,model,price
 				GroupName: "device_info",
 			},
 			mockFunc: func() {
-				metadataStore.EXPECT().CacheGetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1, EntityID: 1, Entity: &types.Entity{Name: "device"}}, nil)
+				metadataStore.EXPECT().GetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1, EntityID: 1, Entity: &types.Entity{Name: "device"}}, nil)
 				metadataStore.EXPECT().CacheListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
 					Return(types.FeatureList{
 						{
@@ -211,7 +211,7 @@ device,model,price
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
-			metadataStore.EXPECT().CacheGetGroupByName(ctx, tc.opt.GroupName).Return(&types.Group{
+			metadataStore.EXPECT().GetGroupByName(ctx, tc.opt.GroupName).Return(&types.Group{
 				ID:       1,
 				Name:     tc.opt.GroupName,
 				EntityID: tc.entityID,
