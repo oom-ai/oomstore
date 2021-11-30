@@ -47,6 +47,10 @@ func (tx *Tx) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	return getFeature(ctx, tx, id)
 }
 
+func (tx *Tx) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
+	return getFeatureByName(ctx, tx, name)
+}
+
 func (tx *Tx) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
 	return createRevision(ctx, tx, opt)
 }

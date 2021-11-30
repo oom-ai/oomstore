@@ -24,6 +24,7 @@ type ReadStore interface {
 	ListEntity(ctx context.Context) (types.EntityList, error)
 
 	GetFeature(ctx context.Context, id int) (*types.Feature, error)
+	GetFeatureByName(ctx context.Context, name string) (*types.Feature, error)
 	CacheGetFeature(ctx context.Context, id int) (*types.Feature, error)
 	CacheGetFeatureByName(ctx context.Context, name string) (*types.Feature, error)
 	CacheListFeature(ctx context.Context, opt ListFeatureOpt) types.FeatureList
