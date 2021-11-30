@@ -53,6 +53,26 @@ integration-test: codegen
 lint:
 	@golangci-lint run
 
+.PHONY: start_playground
+start_playground:
+	@if [ "$$(docker ps -q -f name=oomstore_playtround)" ]; then \
+		echo "already running"; \
+	else \
+		docker run --rm -d --name oomstore_playtround \
+			-e POSTGRES_PASSWORD=postgres \
+			-e POSTGRES_USER=postgres \
+			-p 5432:5432 \
+			postgres:14.0-alpine; \
+		docker exec oomstore_playtround sh -c 'while ! pg_isready; do sleep 1; done'; \
+	fi
+
+.PHONY: stop_playground
+stop_playground:
+	@docker stop oomstore_playtround 2>/dev/null || true
+
+.PHONY: restart_playground
+restart_playground: stop_playground start_playground
+
 .PHONY: clean
 clean:
 	$(MAKE) -C oomcli clean
