@@ -60,33 +60,6 @@ func TestGetEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.EqualError(t, err, "feature entity 0 not found")
 }
 
-func TestCacheGetEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
-	defer store.Close()
-
-	opt := metadata.CreateEntityOpt{
-		CreateEntityOpt: types.CreateEntityOpt{
-			EntityName:  "device",
-			Length:      32,
-			Description: "description",
-		},
-	}
-
-	id, err := store.CreateEntity(ctx, opt)
-	require.NoError(t, err)
-
-	require.NoError(t, store.Refresh())
-
-	entity, err := store.CacheGetEntity(ctx, id)
-	require.NoError(t, err)
-	require.Equal(t, opt.EntityName, entity.Name)
-	require.Equal(t, opt.Length, entity.Length)
-	require.Equal(t, opt.Description, entity.Description)
-
-	_, err = store.CacheGetEntity(ctx, 0)
-	require.EqualError(t, err, "feature entity 0 not found")
-}
-
 func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
@@ -107,7 +80,7 @@ func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	entity, err := store.CacheGetEntity(ctx, id)
+	entity, err := store.GetEntity(ctx, id)
 	require.NoError(t, err)
 	require.Equal(t, entity.Description, "new description")
 
@@ -115,43 +88,6 @@ func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		EntityID:       id + 1,
 		NewDescription: stringPtr("new description"),
 	}))
-}
-
-func TestCacheListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
-	defer store.Close()
-
-	require.NoError(t, store.Refresh())
-
-	entities := store.CacheListEntity(ctx)
-	require.Equal(t, 0, len(entities))
-
-	_, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
-		CreateEntityOpt: types.CreateEntityOpt{
-			EntityName:  "device",
-			Length:      32,
-			Description: "description",
-		},
-	})
-	require.NoError(t, err)
-
-	require.NoError(t, store.Refresh())
-
-	entities = store.CacheListEntity(ctx)
-	require.Equal(t, 1, len(entities))
-	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
-		CreateEntityOpt: types.CreateEntityOpt{
-			EntityName:  "user",
-			Length:      16,
-			Description: "description",
-		},
-	})
-	require.NoError(t, err)
-
-	require.NoError(t, store.Refresh())
-
-	entities = store.CacheListEntity(ctx)
-	require.Equal(t, 2, len(entities))
 }
 
 func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {

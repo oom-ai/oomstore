@@ -5,8 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,9 +25,15 @@ func sampleCache() *informer.Cache {
 		EntityID: entity.ID,
 		Entity:   &entity,
 	}
+	feature := types.Feature{
+		ID:      1,
+		Name:    "price",
+		GroupID: group.ID,
+	}
 	entities := types.EntityList{&entity}
 	groups := types.GroupList{&group}
-	return informer.NewCache(entities, nil, groups, nil)
+	features := types.FeatureList{&feature}
+	return informer.NewCache(entities, features, groups, nil)
 }
 
 func prepareInformer(t *testing.T) (context.Context, *informer.Informer) {
@@ -60,32 +68,32 @@ func TestInformerDeepCopyGet(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	entity, err := informer.CacheGetEntity(ctx, 1)
+	feature, err := informer.CacheGetFeature(ctx, 1)
 	require.NoError(t, err)
 
 	// changing this entity should not change the internal state of the informer
-	entity.Length = 20
+	feature.Name = "new_price"
 
-	entity, err = informer.CacheGetEntity(ctx, 1)
-	require.NoError(t, err)
-	require.Equal(t, 1, entity.ID)
-	require.Equal(t, 10, entity.Length)
-	require.Equal(t, "entity", entity.Name)
+	feature, err = informer.CacheGetFeature(ctx, 1)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, feature.ID)
+	assert.Equal(t, 100, feature.GroupID)
+	assert.Equal(t, "price", feature.Name)
 }
 
 func TestInformerDeepCopyList(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	entityList := informer.CacheListEntity(ctx)
-	require.Equal(t, 1, len(entityList))
+	featureList := informer.CacheListFeature(ctx, metadata.ListFeatureOpt{})
+	require.Equal(t, 1, len(featureList))
 
 	// changing this entity should not change the internal state of the informer
-	entityList[0].Length = 20
+	featureList[0].Name = "new_price"
 
-	entity, err := informer.CacheGetEntity(ctx, 1)
-	require.NoError(t, err)
-	require.Equal(t, 1, entity.ID)
-	require.Equal(t, 10, entity.Length)
-	require.Equal(t, "entity", entity.Name)
+	feature, err := informer.CacheGetFeature(ctx, 1)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, feature.ID)
+	assert.Equal(t, 100, feature.GroupID)
+	assert.Equal(t, "price", feature.Name)
 }
