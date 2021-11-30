@@ -96,7 +96,7 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStor
 	require.Error(t, err)
 }
 
-func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCacheGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -116,6 +116,31 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.EqualError(t, err, "feature 0 not found")
 
 	feature, err := store.CacheGetFeature(ctx, id)
+	require.NoError(t, err)
+	require.Equal(t, "phone", feature.Name)
+	require.Equal(t, "device_info", feature.Group.Name)
+	require.Equal(t, "varchar(16)", feature.DBValueType)
+	require.Equal(t, "description", feature.Description)
+}
+
+func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+	_, groupID := prepareEntityAndGroup(t, ctx, store)
+
+	id, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
+		FeatureName: "phone",
+		GroupID:     groupID,
+		DBValueType: "varchar(16)",
+		Description: "description",
+		ValueType:   "string",
+	})
+	require.NoError(t, err)
+
+	_, err = store.GetFeature(ctx, 0)
+	require.EqualError(t, err, "feature 0 not found")
+
+	feature, err := store.GetFeature(ctx, id)
 	require.NoError(t, err)
 	require.Equal(t, "phone", feature.Name)
 	require.Equal(t, "device_info", feature.Group.Name)
