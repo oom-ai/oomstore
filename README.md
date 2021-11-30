@@ -127,8 +127,8 @@ oomcli get online \
 
 ```sh
 oomcli join \
-	--feature state,credit_score,account_age_days,has_2fa_installed,transaction_count_7d,transaction_count_30d \
-	--input-file label.csv
+  --feature state,credit_score,account_age_days,has_2fa_installed,transaction_count_7d,transaction_count_30d \
+  --input-file label.csv
 ```
 
 ```text
