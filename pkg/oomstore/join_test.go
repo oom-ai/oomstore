@@ -114,7 +114,7 @@ func TestChannelJoin(t *testing.T) {
 			metadataStore.EXPECT().CacheListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureNames: &tc.opt.FeatureNames}).Return(tc.features)
 			if tc.entity != nil {
 				for _, featureList := range tc.featureMap {
-					metadataStore.EXPECT().CacheListRevision(gomock.Any(), &featureList[0].GroupID).Return(revisions).AnyTimes()
+					metadataStore.EXPECT().ListRevision(gomock.Any(), &featureList[0].GroupID).Return(revisions, nil).AnyTimes()
 				}
 				offlineStore.EXPECT().Join(gomock.Any(), gomock.Any()).Return(tc.joined, nil)
 			}
