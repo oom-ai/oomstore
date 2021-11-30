@@ -97,7 +97,10 @@ func buildGroupToFeaturesMap(features types.FeatureList) map[string]types.Featur
 }
 
 func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int) ([]*metadata.RevisionRange, error) {
-	revisions := s.metadata.CacheListRevision(ctx, &groupID)
+	revisions, err := s.metadata.ListRevision(ctx, &groupID)
+	if err != nil {
+		return nil, err
+	}
 	if len(revisions) == 0 {
 		return nil, nil
 	}

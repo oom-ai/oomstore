@@ -43,7 +43,10 @@ var listRevisionCmd = &cobra.Command{
 			groupID = &group.ID
 		}
 
-		revisions := oomStore.ListRevision(ctx, groupID)
+		revisions, err := oomStore.ListRevision(ctx, groupID)
+		if err != nil {
+			log.Fatalf("failed listing revisions, error %v\n", err)
+		}
 
 		if err := printRevisions(revisions, *listOutput); err != nil {
 			log.Fatalf("failed printing revisions, error %v\n", err)
