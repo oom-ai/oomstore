@@ -9,7 +9,7 @@ import_sample > /dev/null
 case='oomcli update feature works'
 oomcli update feature price --description "new description"
 expected='
-Name,Group,Entity,Category,DBValueType,ValueType,Description,OnlineRevisionID
+NAME,GROUP,ENTITY,CATEGORY,DB-VALUE-TYPE,VALUE-TYPE,DESCRIPTION,ONLINE-REVISION-ID
 price,phone,device,batch,int,int64,new description,<NULL>
 '
 actual=$(oomcli get meta feature price -o csv)
