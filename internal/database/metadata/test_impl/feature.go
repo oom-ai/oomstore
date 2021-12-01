@@ -96,33 +96,6 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStor
 	require.Error(t, err)
 }
 
-func TestCacheGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
-	defer store.Close()
-	_, groupID := prepareEntityAndGroup(t, ctx, store)
-
-	id, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
-		FeatureName: "phone",
-		GroupID:     groupID,
-		DBValueType: "varchar(16)",
-		Description: "description",
-		ValueType:   "string",
-	})
-	require.NoError(t, err)
-
-	require.NoError(t, store.Refresh())
-
-	_, err = store.CacheGetFeature(ctx, 0)
-	require.EqualError(t, err, "feature 0 not found")
-
-	feature, err := store.CacheGetFeature(ctx, id)
-	require.NoError(t, err)
-	require.Equal(t, "phone", feature.Name)
-	require.Equal(t, "device_info", feature.Group.Name)
-	require.Equal(t, "varchar(16)", feature.DBValueType)
-	require.Equal(t, "description", feature.Description)
-}
-
 func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
@@ -273,6 +246,7 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.NoError(t, err)
 	require.Equal(t, 1, len(features))
 }
+
 func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
@@ -300,7 +274,7 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 
 	require.NoError(t, store.Refresh())
 
-	feature, err := store.CacheGetFeature(ctx, id)
+	feature, err := store.GetFeature(ctx, id)
 	require.NoError(t, err)
 	require.Equal(t, "phone", feature.Name)
 	require.Equal(t, "device_info", feature.Group.Name)

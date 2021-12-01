@@ -71,7 +71,7 @@ func TestSync(t *testing.T) {
 					Name: "device_info",
 					ID:   1,
 				}, nil)
-				metadataStore.EXPECT().CacheListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
+				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features, nil)
 
 				stream := make(chan types.ExportRecord)
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
@@ -106,7 +106,7 @@ func TestSync(t *testing.T) {
 					Name: "device_info",
 					ID:   1,
 				}, nil)
-				metadataStore.EXPECT().CacheListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features)
+				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features, nil)
 
 				stream := make(chan types.ExportRecord)
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{

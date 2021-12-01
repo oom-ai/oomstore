@@ -23,11 +23,11 @@ EOF
 
 case='oomcli join historical-feature'
 expected="
-entity_key,unix_milli,model,price
+entity_key,unix_milli,price,model
 1,$t1,,
 2,$t1,,
-1,$t2,xiaomi-mix3,3999
-2,$t2,huawei-p40,5299
+1,$t2,3999,xiaomi-mix3
+2,$t2,5299,huawei-p40
 "
 actual=$(oomcli join \
     --feature model,price \
@@ -51,11 +51,11 @@ EOF
 
 case='oomcli join historical-feature with real-time feature values'
 expected="
-entity_key,unix_milli,value_1,value_2,model,price
+entity_key,unix_milli,value_1,value_2,price,model
 1,$t1,1,2,,
 2,$t1,3,4,,
-1,$t2,5,6,xiaomi-mix3,3999
-2,$t2,7,8,huawei-p40,5299
+1,$t2,5,6,3999,xiaomi-mix3
+2,$t2,7,8,5299,huawei-p40
 "
 
 actual=$(oomcli join \
