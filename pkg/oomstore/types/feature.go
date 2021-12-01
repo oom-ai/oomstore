@@ -87,6 +87,13 @@ func (l FeatureList) Find(find func(*Feature) bool) *Feature {
 	return nil
 }
 
+func (l FeatureList) GroupIDs() (ids []int) {
+	for _, f := range l {
+		ids = append(ids, f.GroupID)
+	}
+	return ids
+}
+
 func (f *Feature) String() string {
 	onlineRevisionID := "<NULL>"
 

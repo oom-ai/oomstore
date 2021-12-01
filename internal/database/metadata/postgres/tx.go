@@ -47,6 +47,10 @@ func (tx *Tx) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	return getFeature(ctx, tx, id)
 }
 
+func (tx *Tx) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) (types.FeatureList, error) {
+	return listFeature(ctx, tx, opt)
+}
+
 func (tx *Tx) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
 	return getFeatureByName(ctx, tx, name)
 }
