@@ -14,28 +14,37 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listEntityCmd = &cobra.Command{
+var getMetaEntityCmd = &cobra.Command{
 	Use:   "entity",
-	Short: "list all existing entities",
+	Short: "get existing entity given specific confitions",
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) > 1 {
+			log.Fatalf("argument at most one, got %d", len(args))
+		}
+
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
 		entities, err := oomStore.ListEntity(ctx)
 		if err != nil {
-			log.Fatalf("failed listing entities, error %v\n", err)
+			log.Fatalf("failed getting entities, error %v\n", err)
 		}
 
+		if len(args) > 0 {
+			entities = entities.Filter(func(e *types.Entity) bool {
+				return e.Name == args[0]
+			})
+		}
 		// print entities to stdout
-		if err := printEntities(entities, *listOutput); err != nil {
+		if err := printEntities(entities, *getMetaOutput); err != nil {
 			log.Fatalf("failed printing entities, error %v\n", err)
 		}
 	},
 }
 
 func init() {
-	listCmd.AddCommand(listEntityCmd)
+	getMetaCmd.AddCommand(getMetaEntityCmd)
 }
 
 func printEntities(entities types.EntityList, output string) error {
@@ -82,5 +91,5 @@ func entityRecord(entity *types.Entity) []string {
 }
 
 func entityHeader() []string {
-	return []string{"Name", "Length", "Description", "CreateTime", "ModifyTime"}
+	return []string{"NAME", "LENGTH", "DESCRIPTION", "CREATE-TIME", "MODIFY-TIME"}
 }
