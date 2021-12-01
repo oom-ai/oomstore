@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-redis/redis/v8"
@@ -15,6 +16,11 @@ var _ online.Store = &DB{}
 
 type DB struct {
 	*redis.Client
+}
+
+func (db *DB) Ping(ctx context.Context) error {
+	_, err := db.Client.Ping(ctx).Result()
+	return err
 }
 
 func Open(opt *types.RedisOpt) *DB {

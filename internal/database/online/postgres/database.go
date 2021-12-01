@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -14,6 +15,10 @@ var _ online.Store = &DB{}
 
 type DB struct {
 	*sqlx.DB
+}
+
+func (db *DB) Ping(ctx context.Context) error {
+	return db.DB.Ping()
 }
 
 func OpenWith(host, port, user, password, database string) (*DB, error) {

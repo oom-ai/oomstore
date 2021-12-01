@@ -12,5 +12,7 @@ type Store interface {
 	MultiGet(ctx context.Context, opt MultiGetOpt) (map[string]dbutil.RowMap, error)
 	Import(ctx context.Context, opt ImportOpt) error
 	Purge(ctx context.Context, revisionID int) error
+
+	Ping(ctx context.Context) error
 	io.Closer
 }
