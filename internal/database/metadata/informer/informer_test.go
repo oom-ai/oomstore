@@ -50,49 +50,40 @@ func TestInformer(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	feature, err := informer.CacheGetFeature(ctx, 1)
-	require.NoError(t, err)
+	entityID := 1
+	features := informer.CacheListFeature(ctx, metadata.ListFeatureOpt{
+		EntityID: &entityID,
+	})
+	require.Equal(t, 1, len(features))
+	feature := features[0]
 
-	require.Equal(t, 1, feature.ID)
-	require.Equal(t, "price", feature.Name)
-	require.Equal(t, 100, feature.GroupID)
+	assert.Equal(t, 1, feature.ID)
+	assert.Equal(t, "price", feature.Name)
+	assert.Equal(t, 100, feature.GroupID)
 
-	require.NotNil(t, feature.Group)
-	require.Equal(t, 100, feature.Group.ID)
-	require.Equal(t, 1, feature.Group.Entity.ID)
-	require.Equal(t, "entity", feature.Group.Entity.Name)
+	assert.NotNil(t, feature.Group)
+	assert.Equal(t, 100, feature.Group.ID)
+	assert.Equal(t, 1, feature.Group.Entity.ID)
+	assert.Equal(t, "entity", feature.Group.Entity.Name)
 }
 
-func TestInformerDeepCopyGet(t *testing.T) {
+func TestInformerDeepCopy(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	feature, err := informer.CacheGetFeature(ctx, 1)
-	require.NoError(t, err)
-
+	entityID := 1
+	features := informer.CacheListFeature(ctx, metadata.ListFeatureOpt{
+		EntityID: &entityID,
+	})
+	require.Equal(t, 1, len(features))
 	// changing this entity should not change the internal state of the informer
-	feature.Name = "new_price"
+	features[0].Name = "new_price"
 
-	feature, err = informer.CacheGetFeature(ctx, 1)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, feature.ID)
-	assert.Equal(t, 100, feature.GroupID)
-	assert.Equal(t, "price", feature.Name)
-}
-
-func TestInformerDeepCopyList(t *testing.T) {
-	ctx, informer := prepareInformer(t)
-	defer informer.Close()
-
-	featureList := informer.CacheListFeature(ctx, metadata.ListFeatureOpt{})
-	require.Equal(t, 1, len(featureList))
-
-	// changing this entity should not change the internal state of the informer
-	featureList[0].Name = "new_price"
-
-	feature, err := informer.CacheGetFeature(ctx, 1)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, feature.ID)
-	assert.Equal(t, 100, feature.GroupID)
-	assert.Equal(t, "price", feature.Name)
+	features = informer.CacheListFeature(ctx, metadata.ListFeatureOpt{
+		EntityID: &entityID,
+	})
+	require.Equal(t, 1, len(features))
+	assert.Equal(t, 1, features[0].ID)
+	assert.Equal(t, 100, features[0].GroupID)
+	assert.Equal(t, "price", features[0].Name)
 }
