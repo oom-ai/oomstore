@@ -14,17 +14,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listFeatureOpt types.ListFeatureOpt
+var getMetaFeatureOpt types.ListFeatureOpt
 
-var listFeatureCmd = &cobra.Command{
+var getMetaFeatureCmd = &cobra.Command{
 	Use:   "feature",
-	Short: "list all existing features given a specific group",
+	Short: "get existing features given specific conditions",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
-			listFeatureOpt.EntityName = nil
+			getMetaFeatureOpt.EntityName = nil
 		}
 		if !cmd.Flags().Changed("group") {
-			listFeatureOpt.GroupName = nil
+			getMetaFeatureOpt.GroupName = nil
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -32,24 +32,24 @@ var listFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		features, err := oomStore.ListFeature(ctx, listFeatureOpt)
+		features, err := oomStore.ListFeature(ctx, getMetaFeatureOpt)
 		if err != nil {
-			log.Fatalf("failed listing features, error %v\n", err)
+			log.Fatalf("failed getting features, error %v\n", err)
 		}
 
 		// print features to stdout
-		if err := printFeatures(features, *listOutput); err != nil {
+		if err := printFeatures(features, *getOutput); err != nil {
 			log.Fatalf("failed printing features, error %v\n", err)
 		}
 	},
 }
 
 func init() {
-	listCmd.AddCommand(listFeatureCmd)
+	getMetaCmd.AddCommand(getMetaFeatureCmd)
 
-	flags := listFeatureCmd.Flags()
-	listFeatureOpt.EntityName = flags.StringP("entity", "e", "", "entity")
-	listFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
+	flags := getMetaFeatureCmd.Flags()
+	getMetaFeatureOpt.EntityName = flags.StringP("entity", "e", "", "entity")
+	getMetaFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
 }
 
 func printFeatures(features types.FeatureList, output string) error {
