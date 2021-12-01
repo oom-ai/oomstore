@@ -109,7 +109,7 @@ func printFeaturesInASCIITable(features types.FeatureList, border bool) error {
 }
 
 func featureHeader() []string {
-	return []string{"Name", "Group", "Entity", "Category", "DBValueType", "ValueType", "Description", "OnlineRevisionID", "CreateTime", "ModifyTime"}
+	return []string{"NAME", "GROUP", "ENTITY", "CATEGORY", "DB-VALUE-TYPE", "VALUE-TYPE", "DESCRIPTION", "ONLINE-REVISION-ID", "CREATE-TIME", "MODIFY-TIME"}
 }
 
 func featureRecord(f *types.Feature) []string {
