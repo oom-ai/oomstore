@@ -131,6 +131,9 @@ func buildListGroupCond(entityID *int, groupIDs *[]int) (string, []interface{}, 
 		args = append(args, *entityID)
 	}
 	if groupIDs != nil {
+		if len(*groupIDs) == 0 {
+			return "false", args, nil
+		}
 		s, inArgs, err := sqlx.In("id IN (?)", *groupIDs)
 		if err != nil {
 			return "", nil, err

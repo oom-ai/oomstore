@@ -91,7 +91,11 @@ func TestListGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	_, err = store.CreateGroup(ctx, userBehaviorOpt)
 	require.NoError(t, err)
 
-	groups, err := store.ListGroup(ctx, &deviceGroupID, nil)
+	groups, err := store.ListGroup(ctx, nil, &[]int{})
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(groups))
+
+	groups, err = store.ListGroup(ctx, &deviceGroupID, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(groups))
 
