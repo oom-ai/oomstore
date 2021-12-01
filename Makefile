@@ -13,13 +13,22 @@ info:
 	@echo "COMMIT:  $(COMMIT)"
 
 .PHONY: codegen
-codegen:
+codegen: grpc
+
+.PHONY: grpc
+grpc: grpc-go grpc-python
+
+.PHONY: grpc-go
+grpc-go:
 	@docker run --rm -v $$(pwd):/oomstore -w /oomstore rvolosatovs/protoc \
 		--experimental_allow_proto3_optional \
 		-I=proto \
 		--go_out=oomagent \
 		--go-grpc_out=oomagent \
 		proto/oomagent.proto
+
+.PHONY: grpc-python
+grpc-python:
 	@docker run --rm -v $$(pwd):/oomstore -w /oomstore rvolosatovs/protoc \
 		--experimental_allow_proto3_optional \
 		-I=proto \
@@ -41,7 +50,7 @@ oomagent: codegen
 	$(MAKE) -C oomagent build
 
 .PHONY: test
-test:
+test: codegen
 	@go test -race -coverprofile=coverage.out -covermode=atomic ./...
 
 .PHONY: integration-test
