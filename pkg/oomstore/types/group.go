@@ -38,6 +38,15 @@ func (fg *Group) Copy() *Group {
 
 type GroupList []*Group
 
+func (l GroupList) Filter(filter func(*Group) bool) (rs GroupList) {
+	for _, g := range l {
+		if filter(g) {
+			rs = append(rs, g)
+		}
+	}
+	return
+}
+
 func (l GroupList) Find(find func(*Group) bool) *Group {
 	for _, g := range l {
 		if find(g) {

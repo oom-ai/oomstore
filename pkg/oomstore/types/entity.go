@@ -26,13 +26,22 @@ func (e *Entity) Copy() *Entity {
 
 type EntityList []*Entity
 
-func (l *EntityList) Find(find func(*Entity) bool) *Entity {
-	for _, e := range *l {
+func (l EntityList) Find(find func(*Entity) bool) *Entity {
+	for _, e := range l {
 		if find(e) {
 			return e
 		}
 	}
 	return nil
+}
+
+func (l EntityList) Filter(filter func(*Entity) bool) (rs EntityList) {
+	for _, e := range l {
+		if filter(e) {
+			rs = append(rs, e)
+		}
+	}
+	return
 }
 
 func (e *Entity) String() string {
