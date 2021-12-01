@@ -67,7 +67,7 @@ func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreRuntim
 	require.Equal(t, err, fmt.Errorf("feature phone already exists"))
 }
 
-func TestCreateFeatureWithSQLKeywrod(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
