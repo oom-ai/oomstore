@@ -14,17 +14,17 @@ import (
 // ChannelImport a CSV data source into the feature store as a new revision.
 // In the future we want to support more diverse data sources.
 func (s *OomStore) ChannelImport(ctx context.Context, opt types.ChannelImport) (int, error) {
-	if err := s.metadata.Refresh(); err != nil {
-		return 0, fmt.Errorf("failed to refresh informer, err=%+v", err)
-	}
 	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return 0, err
 	}
 
-	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
+	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		GroupID: &group.ID,
 	})
+	if err != nil {
+		return 0, err
+	}
 	if features == nil {
 		return 0, fmt.Errorf("no features under group: %s", opt.GroupName)
 	}

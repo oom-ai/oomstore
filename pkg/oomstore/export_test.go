@@ -101,7 +101,7 @@ func TestChannelExport(t *testing.T) {
 				Name: "device_info",
 				ID:   1,
 			}, nil)
-			metadataStore.EXPECT().CacheListFeature(gomock.Any(), gomock.Any()).Return(features)
+			metadataStore.EXPECT().ListFeature(gomock.Any(), gomock.Any()).Return(features, nil)
 
 			featureNames := tc.opt.FeatureNames
 			if len(featureNames) == 0 {
