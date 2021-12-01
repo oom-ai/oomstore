@@ -15,9 +15,6 @@ import (
 )
 
 func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
-	if err := s.metadata.Refresh(); err != nil {
-		return fmt.Errorf("failed to refresh informer, err=%+v", err)
-	}
 	stage, err := buildApplyStage(ctx, opt)
 	if err != nil {
 		return err
@@ -40,7 +37,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		for _, group := range stage.NewGroups {
 			if _, exist := entityMp[group.EntityName]; !exist {
 				var entity *types.Entity
-				if entity, err = s.metadata.GetEntityByName(c, group.EntityName); err != nil {
+				if entity, err = tx.GetEntityByName(c, group.EntityName); err != nil {
 					return err
 				}
 				entityMp[group.EntityName] = entity.ID
@@ -57,7 +54,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		for _, feature := range stage.NewFeatures {
 			if _, exist := groupMp[feature.GroupName]; !exist {
 				var group *types.Group
-				if group, err = s.metadata.GetGroupByName(ctx, feature.GroupName); err != nil {
+				if group, err = tx.GetGroupByName(ctx, feature.GroupName); err != nil {
 					return err
 				}
 				groupMp[feature.GroupName] = group.ID
@@ -77,7 +74,7 @@ func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.DBStore, ne
 		return 0, err
 	}
 
-	entity, err := s.metadata.GetEntityByName(ctx, newEntity.Name)
+	entity, err := txStore.GetEntityByName(ctx, newEntity.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return 0, err
@@ -109,7 +106,7 @@ func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.DBStore, new
 		return 0, err
 	}
 
-	group, err := s.metadata.GetGroupByName(ctx, newGroup.Name)
+	group, err := txStore.GetGroupByName(ctx, newGroup.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return 0, err
@@ -140,7 +137,7 @@ func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.DBStore, n
 		return err
 	}
 
-	feature, err := s.metadata.CacheGetFeatureByName(ctx, newFeature.Name)
+	feature, err := txStore.GetFeatureByName(ctx, newFeature.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return err
