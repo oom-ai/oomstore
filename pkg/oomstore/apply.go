@@ -21,46 +21,23 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 	}
 
 	return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
-		var (
-			entityMp = make(map[string]int) // entity name -> entity id
-			groupMp  = make(map[string]int) // group name -> group id
-		)
-
 		// apply entity
 		for _, entity := range stage.NewEntities {
-			if entityMp[entity.Name], err = s.applyEntity(ctx, tx, entity); err != nil {
+			if err := s.applyEntity(ctx, tx, entity); err != nil {
 				return err
 			}
 		}
 
 		// apply group
 		for _, group := range stage.NewGroups {
-			if _, exist := entityMp[group.EntityName]; !exist {
-				var entity *types.Entity
-				if entity, err = tx.GetEntityByName(c, group.EntityName); err != nil {
-					return err
-				}
-				entityMp[group.EntityName] = entity.ID
-			}
-
-			group.EntityID = entityMp[group.EntityName]
 			group.Category = types.BatchFeatureCategory
-			if groupMp[group.Name], err = s.applyGroup(ctx, tx, group); err != nil {
+			if err := s.applyGroup(ctx, tx, group); err != nil {
 				return err
 			}
 		}
 
 		// apply feature
 		for _, feature := range stage.NewFeatures {
-			if _, exist := groupMp[feature.GroupName]; !exist {
-				var group *types.Group
-				if group, err = tx.GetGroupByName(ctx, feature.GroupName); err != nil {
-					return err
-				}
-				groupMp[feature.GroupName] = group.ID
-			}
-
-			feature.GroupID = groupMp[feature.GroupName]
 			if err := s.applyFeature(ctx, tx, feature); err != nil {
 				return err
 			}
@@ -69,75 +46,79 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 	})
 }
 
-func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.DBStore, newEntity apply.Entity) (int, error) {
+func (s *OomStore) applyEntity(ctx context.Context, tx metadata.DBStore, newEntity apply.Entity) error {
 	if err := newEntity.Validate(); err != nil {
-		return 0, err
+		return err
 	}
 
-	entity, err := txStore.GetEntityByName(ctx, newEntity.Name)
+	entity, err := tx.GetEntityByName(ctx, newEntity.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
-			return 0, err
+			return err
 		}
-		return txStore.CreateEntity(ctx, metadata.CreateEntityOpt{
+		_, err = tx.CreateEntity(ctx, metadata.CreateEntityOpt{
 			CreateEntityOpt: types.CreateEntityOpt{
 				EntityName:  newEntity.Name,
 				Length:      newEntity.Length,
 				Description: newEntity.Description,
 			},
 		})
+		return err
 	}
 
 	if newEntity.Description != entity.Description {
-		err = txStore.UpdateEntity(ctx, metadata.UpdateEntityOpt{
+		return tx.UpdateEntity(ctx, metadata.UpdateEntityOpt{
 			EntityID:       entity.ID,
 			NewDescription: &newEntity.Description,
 		})
-		if err != nil {
-			return 0, err
-		}
 	}
-
-	return entity.ID, nil
+	return nil
 }
 
-func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.DBStore, newGroup apply.Group) (int, error) {
+func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup apply.Group) error {
 	if err := newGroup.Validate(); err != nil {
-		return 0, err
+		return err
 	}
 
-	group, err := txStore.GetGroupByName(ctx, newGroup.Name)
+	entity, err := tx.GetEntityByName(ctx, newGroup.EntityName)
+	if err != nil {
+		return err
+	}
+
+	group, err := tx.GetGroupByName(ctx, newGroup.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
-			return 0, err
+			return err
 		}
-		return txStore.CreateGroup(ctx, metadata.CreateGroupOpt{
+		_, err = tx.CreateGroup(ctx, metadata.CreateGroupOpt{
 			GroupName:   newGroup.Name,
-			EntityID:    newGroup.EntityID,
+			EntityID:    entity.ID,
 			Category:    newGroup.Category,
 			Description: newGroup.Description,
 		})
+		return err
 	}
 
 	if newGroup.Description != group.Description {
-		err = txStore.UpdateGroup(ctx, metadata.UpdateGroupOpt{
+		return tx.UpdateGroup(ctx, metadata.UpdateGroupOpt{
 			GroupID:        group.ID,
 			NewDescription: &newGroup.Description,
 		})
-		if err != nil {
-			return 0, err
-		}
 
 	}
-	return group.ID, nil
+	return nil
 }
 
-func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.DBStore, newFeature apply.Feature) error {
+func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFeature apply.Feature) error {
 	if err := newFeature.Validate(); err != nil {
 		return err
 	}
 
-	feature, err := txStore.GetFeatureByName(ctx, newFeature.Name)
+	group, err := tx.GetGroupByName(ctx, newFeature.GroupName)
+	if err != nil {
+		return err
+	}
+	feature, err := tx.GetFeatureByName(ctx, newFeature.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return err
@@ -146,9 +127,9 @@ func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.DBStore, n
 		if err != nil {
 			return err
 		}
-		_, err = txStore.CreateFeature(ctx, metadata.CreateFeatureOpt{
+		_, err = tx.CreateFeature(ctx, metadata.CreateFeatureOpt{
 			FeatureName: newFeature.Name,
-			GroupID:     newFeature.GroupID,
+			GroupID:     group.ID,
 			DBValueType: newFeature.DBValueType,
 			Description: newFeature.Description,
 			ValueType:   valueType,
@@ -157,7 +138,7 @@ func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.DBStore, n
 	}
 
 	if newFeature.Description != feature.Description {
-		return txStore.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
+		return tx.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
 			FeatureID:      feature.ID,
 			NewDescription: &newFeature.Description,
 		})
