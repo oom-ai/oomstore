@@ -15,3 +15,12 @@ func (c *GroupCache) Enrich(entityCache *EntityCache) {
 		})
 	}
 }
+
+func (c *GroupCache) List(entityID *int) types.GroupList {
+	if entityID == nil {
+		return c.GroupList
+	}
+	return c.GroupList.Filter(func(g *types.Group) bool {
+		return g.Entity.ID == *entityID
+	})
+}

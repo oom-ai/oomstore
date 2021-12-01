@@ -7,3 +7,7 @@ import (
 type EntityCache struct {
 	types.EntityList
 }
+
+func (c *EntityCache) List() types.EntityList {
+	return c.EntityList
+}
