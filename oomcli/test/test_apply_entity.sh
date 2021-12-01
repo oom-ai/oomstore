@@ -29,14 +29,14 @@ EOF
 
 oomcli apply -f "$TMPFILE"
 
-entity_expected='Name,Length,Description
+entity_expected='NAME,LENGTH,DESCRIPTION
 user,8,description
 device,16,description
 test,32,description
 '
-entity_actual=$(oomcli list entity -o csv)
+entity_actual=$(oomcli get meta entity -o csv)
 ignore_time() { cut -d ',' -f 1-3 <<<"$1"; }
-assert_eq "oomcli list entity" "$(sort <<< "$entity_expected")" "$(ignore_time "$entity_actual" | sort)"
+assert_eq "oomcli get meta entity" "$(sort <<< "$entity_expected")" "$(ignore_time "$entity_actual" | sort)"
 
 group_expected='
 GroupName,GroupID,EntityName,Description
@@ -77,12 +77,12 @@ EOF
 
 oomcli apply -f "$TMPFILE"
 
-entity_expected='Name,Length,Description
+entity_expected='NAME,LENGTH,DESCRIPTION
 user,8,description
 '
-entity_actual=$(oomcli list entity -o csv)
+entity_actual=$(oomcli get meta entity -o csv)
 ignore_time() { cut -d ',' -f 1-3 <<<"$1"; }
-assert_eq "oomcli list entity" "$(sort <<< "$entity_expected")" "$(ignore_time "$entity_actual" | sort)"
+assert_eq "oomcli get meta entity" "$(sort <<< "$entity_expected")" "$(ignore_time "$entity_actual" | sort)"
 
 group_expected='
 GroupName,GroupID,EntityName,Description
