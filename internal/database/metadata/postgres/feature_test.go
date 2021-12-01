@@ -14,8 +14,8 @@ func TestCreateFeatureWithSameName(t *testing.T) {
 	test_impl.TestCreateFeatureWithSameName(t, prepareStore)
 }
 
-func TestCreateFeatureWithSQLKeywrod(t *testing.T) {
-	test_impl.TestCreateFeatureWithSQLKeywrod(t, prepareStore)
+func TestCreateFeatureWithSQLKeyword(t *testing.T) {
+	test_impl.TestCreateFeatureWithSQLKeyword(t, prepareStore)
 }
 
 func TestCreateFeatureWithInvalidDataType(t *testing.T) {
