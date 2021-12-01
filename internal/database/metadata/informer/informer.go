@@ -2,13 +2,11 @@ package informer
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"sync/atomic"
 	"time"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -95,28 +93,6 @@ func (f *Informer) Cache() *Cache {
 	return f.cache.Load().(*Cache)
 }
 
-// Get
-func (f *Informer) CacheGetFeature(ctx context.Context, id int) (*types.Feature, error) {
-	if feature := f.Cache().Features.Find(func(f *types.Feature) bool {
-		return f.ID == id
-	}); feature == nil {
-		return nil, errdefs.NotFound(fmt.Errorf("feature %d not found", id))
-	} else {
-		return feature.Copy(), nil
-	}
-}
-
-func (f *Informer) CacheGetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
-	if feature := f.Cache().Features.Find(func(f *types.Feature) bool {
-		return f.Name == name
-	}); feature == nil {
-		return nil, errdefs.NotFound(fmt.Errorf("feature '%s' not found", name))
-	} else {
-		return feature.Copy(), nil
-	}
-}
-
-// List
 func (f *Informer) CacheListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
 	return f.Cache().Features.List(opt).Copy()
 }
