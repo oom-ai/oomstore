@@ -59,6 +59,10 @@ func (db *DB) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	return getFeature(ctx, db, id)
 }
 
+func (db *DB) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) (types.FeatureList, error) {
+	return listFeature(ctx, db, opt)
+}
+
 func (db *DB) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
 	return getFeatureByName(ctx, db, name)
 }

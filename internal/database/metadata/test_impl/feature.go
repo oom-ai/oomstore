@@ -173,7 +173,7 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, "description", feature.Description)
 }
 
-func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCatheListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -218,6 +218,61 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, 1, len(features))
 }
 
+func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
+
+	features, err := store.ListFeature(ctx, metadata.ListFeatureOpt{})
+	require.NoError(t, err)
+	require.Equal(t, 0, features.Len())
+
+	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
+		FeatureName: "phone",
+		GroupID:     groupID,
+		DBValueType: "varchar(16)",
+		Description: "description",
+		ValueType:   "string",
+	})
+	require.NoError(t, err)
+
+	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{})
+	require.NoError(t, err)
+	require.Equal(t, 1, features.Len())
+
+	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
+		FeatureIDs: &[]int{featureID},
+	})
+	require.NoError(t, err)
+	require.Equal(t, 1, features.Len())
+
+	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
+		EntityID:   intPtr(entityID + 1),
+		FeatureIDs: &[]int{featureID},
+	})
+	require.NoError(t, err)
+	require.Equal(t, 0, features.Len())
+
+	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
+		GroupID:    intPtr(groupID + 1),
+		FeatureIDs: &[]int{featureID},
+	})
+	require.NoError(t, err)
+	require.Equal(t, 0, features.Len())
+
+	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
+		EntityID:   &entityID,
+		FeatureIDs: &[]int{},
+	})
+	require.NoError(t, err)
+	require.Equal(t, 0, len(features))
+
+	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
+		EntityID: &entityID,
+	})
+	require.NoError(t, err)
+	require.Equal(t, 1, len(features))
+}
 func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
