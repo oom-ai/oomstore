@@ -19,12 +19,12 @@ import (
 // Get point-in-time correct feature values for each entity row.
 // Currently, this API only supports batch features.
 func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*types.JoinResult, error) {
-	if err := s.metadata.Refresh(); err != nil {
-		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
-	}
-	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
+	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureNames: &opt.FeatureNames,
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	features = features.Filter(func(f *types.Feature) bool {
 		return f.Group.Category == types.BatchFeatureCategory
