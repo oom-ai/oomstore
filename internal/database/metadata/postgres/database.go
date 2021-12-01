@@ -86,11 +86,7 @@ func list(ctx context.Context, db *sqlx.DB) (*informer.Cache, error) {
 			return err
 		}
 
-		revisions := types.RevisionList{}
-		if err := tx.SelectContext(ctx, &revisions, `SELECT * FROM "feature_group_revision"`); err != nil {
-			return err
-		}
-		cache = informer.NewCache(entities, features, groups, revisions)
+		cache = informer.NewCache(entities, features, groups)
 		return nil
 	})
 	return cache, err

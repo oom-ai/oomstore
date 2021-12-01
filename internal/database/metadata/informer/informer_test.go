@@ -33,7 +33,7 @@ func sampleCache() *informer.Cache {
 	entities := types.EntityList{&entity}
 	groups := types.GroupList{&group}
 	features := types.FeatureList{&feature}
-	return informer.NewCache(entities, features, groups, nil)
+	return informer.NewCache(entities, features, groups)
 }
 
 func prepareInformer(t *testing.T) (context.Context, *informer.Informer) {
