@@ -15,7 +15,7 @@ import (
 )
 
 var _ metadata.Store = &DB{}
-var _ metadata.WriteStore = &Tx{}
+var _ metadata.DBStore = &Tx{}
 
 type DB struct {
 	*sqlx.DB
@@ -40,7 +40,10 @@ func Open(ctx context.Context, option *types.PostgresOpt) (*DB, error) {
 		db.Close()
 		return nil, err
 	}
-	return &DB{DB: db, Informer: informer}, nil
+	return &DB{
+		DB:       db,
+		Informer: informer,
+	}, nil
 }
 
 func OpenDB(ctx context.Context, host, port, user, password, database string) (*sqlx.DB, error) {
@@ -93,7 +96,7 @@ func list(ctx context.Context, db *sqlx.DB) (*informer.Cache, error) {
 	return cache, err
 }
 
-func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, metadata.WriteStore) error) (err error) {
+func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, metadata.DBStore) error) (err error) {
 	tx, err := db.BeginTxx(ctx, nil)
 	if err != nil {
 		return
@@ -118,6 +121,6 @@ func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, meta
 	return fn(ctx, txStore)
 }
 
-func (tx *Tx) WithTransaction(ctx context.Context, fn func(context.Context, metadata.WriteStore) error) (err error) {
+func (tx *Tx) WithTransaction(ctx context.Context, fn func(context.Context, metadata.DBStore) error) (err error) {
 	return fn(ctx, tx)
 }

@@ -35,6 +35,18 @@ func (tx *Tx) UpdateGroup(ctx context.Context, opt metadata.UpdateGroupOpt) erro
 	return updateGroup(ctx, tx, opt)
 }
 
+func (tx *Tx) GetGroup(ctx context.Context, id int) (*types.Group, error) {
+	return getGroup(ctx, tx, id)
+}
+
+func (tx *Tx) GetGroupByName(ctx context.Context, name string) (*types.Group, error) {
+	return getGroupByName(ctx, tx, name)
+}
+
+func (tx *Tx) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
+	return listGroup(ctx, tx, entityID, groupIDs)
+}
+
 func (tx *Tx) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
 	return createFeature(ctx, tx, opt)
 }
@@ -61,4 +73,16 @@ func (tx *Tx) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt
 
 func (tx *Tx) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
 	return updateRevision(ctx, tx, opt)
+}
+
+func (tx *Tx) GetRevision(ctx context.Context, id int) (*types.Revision, error) {
+	return getRevision(ctx, tx, id)
+}
+
+func (tx *Tx) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
+	return getRevisionBy(ctx, tx, groupID, revision)
+}
+
+func (tx *Tx) ListRevision(ctx context.Context, groupID *int) (types.RevisionList, error) {
+	return listRevision(ctx, tx, groupID)
 }
