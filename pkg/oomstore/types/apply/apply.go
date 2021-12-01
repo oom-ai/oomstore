@@ -28,7 +28,6 @@ func NewApplyStage() *ApplyStage {
 type Feature struct {
 	Kind        string `mapstructure:"kind"`
 	Name        string `mapstructure:"name"`
-	GroupID     int
 	GroupName   string `mapstructure:"group-name"`
 	DBValueType string `mapstructure:"db-value-type"`
 	Description string `mapstructure:"description"`
@@ -45,10 +44,9 @@ func (f *Feature) Validate() error {
 }
 
 type Group struct {
-	Kind        string `mapstructure:"kind"`
-	Group       string `mapstructure:"group"`
-	Name        string `mapstructure:"name"`
-	EntityID    int
+	Kind        string    `mapstructure:"kind"`
+	Group       string    `mapstructure:"group"`
+	Name        string    `mapstructure:"name"`
 	EntityName  string    `mapstructure:"entity-name"`
 	Category    string    `mapstructure:"category"`
 	Description string    `mapstructure:"description"`
