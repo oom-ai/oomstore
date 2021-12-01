@@ -38,6 +38,10 @@ func TestListFeature(t *testing.T) {
 	test_impl.TestListFeature(t, prepareStore)
 }
 
+func TestCatchListFeature(t *testing.T) {
+	test_impl.TestCatheListFeature(t, prepareStore)
+}
+
 func TestUpdateFeature(t *testing.T) {
 	test_impl.TestUpdateFeature(t, prepareStore)
 }
