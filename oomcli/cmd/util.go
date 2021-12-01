@@ -11,6 +11,7 @@ import (
 const (
 	CSV        = "csv"
 	ASCIITable = "ascii_table"
+	Column     = "column"
 )
 
 func mustOpenOomStore(ctx context.Context, opt types.OomStoreConfig) *oomstore.OomStore {
