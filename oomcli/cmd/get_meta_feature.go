@@ -19,12 +19,16 @@ var getMetaFeatureOpt types.ListFeatureOpt
 var getMetaFeatureCmd = &cobra.Command{
 	Use:   "feature",
 	Short: "get existing features given specific conditions",
+	Args:  cobra.RangeArgs(0, 1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
 			getMetaFeatureOpt.EntityName = nil
 		}
 		if !cmd.Flags().Changed("group") {
 			getMetaFeatureOpt.GroupName = nil
+		}
+		if len(args) == 1 {
+			getMetaFeatureOpt.FeatureNames = &[]string{args[0]}
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
