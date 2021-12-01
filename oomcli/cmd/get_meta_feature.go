@@ -42,7 +42,7 @@ var getMetaFeatureCmd = &cobra.Command{
 		}
 
 		// print features to stdout
-		if err := printFeatures(features, *getOutput); err != nil {
+		if err := printFeatures(features, *getMetaOutput); err != nil {
 			log.Fatalf("failed printing features, error %v\n", err)
 		}
 	},
@@ -61,7 +61,9 @@ func printFeatures(features types.FeatureList, output string) error {
 	case CSV:
 		return printFeaturesInCSV(features)
 	case ASCIITable:
-		return printFeaturesInASCIITable(features)
+		return printFeaturesInASCIITable(features, true)
+	case Column:
+		return printFeaturesInASCIITable(features, false)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
@@ -82,10 +84,22 @@ func printFeaturesInCSV(features types.FeatureList) error {
 	return nil
 }
 
-func printFeaturesInASCIITable(features types.FeatureList) error {
+func printFeaturesInASCIITable(features types.FeatureList, border bool) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(featureHeader())
 	table.SetAutoFormatHeaders(false)
+	table.SetAlignment(tablewriter.ALIGN_LEFT)
+	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+
+	if !border {
+		table.SetBorder(false)
+		table.SetHeaderLine(false)
+		table.SetNoWhiteSpace(true)
+		table.SetCenterSeparator("")
+		table.SetColumnSeparator("")
+		table.SetRowSeparator("")
+		table.SetTablePadding("  ")
+	}
 
 	for _, feature := range features {
 		table.Append(featureRecord(feature))
