@@ -12,6 +12,8 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
+var _ metadata.CacheStore = &Informer{}
+
 type Cache struct {
 	Entities  *EntityCache
 	Features  *FeatureCache

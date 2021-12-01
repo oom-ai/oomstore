@@ -23,7 +23,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		return err
 	}
 
-	return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.WriteStore) error {
+	return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
 		var (
 			entityMp = make(map[string]int) // entity name -> entity id
 			groupMp  = make(map[string]int) // group name -> group id
@@ -72,7 +72,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 	})
 }
 
-func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore, newEntity apply.Entity) (int, error) {
+func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.DBStore, newEntity apply.Entity) (int, error) {
 	if err := newEntity.Validate(); err != nil {
 		return 0, err
 	}
@@ -104,7 +104,7 @@ func (s *OomStore) applyEntity(ctx context.Context, txStore metadata.WriteStore,
 	return entity.ID, nil
 }
 
-func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, newGroup apply.Group) (int, error) {
+func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.DBStore, newGroup apply.Group) (int, error) {
 	if err := newGroup.Validate(); err != nil {
 		return 0, err
 	}
@@ -135,7 +135,7 @@ func (s *OomStore) applyGroup(ctx context.Context, txStore metadata.WriteStore, 
 	return group.ID, nil
 }
 
-func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.WriteStore, newFeature apply.Feature) error {
+func (s *OomStore) applyFeature(ctx context.Context, txStore metadata.DBStore, newFeature apply.Feature) error {
 	if err := newFeature.Validate(); err != nil {
 		return err
 	}
