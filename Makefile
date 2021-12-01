@@ -92,3 +92,4 @@ restart_playground: stop_playground start_playground
 .PHONY: clean
 clean:
 	$(MAKE) -C oomcli clean
+	$(MAKE) -C oomagent clean
