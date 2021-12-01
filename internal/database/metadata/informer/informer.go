@@ -13,30 +13,25 @@ import (
 var _ metadata.CacheStore = &Informer{}
 
 type Cache struct {
-	Entities  *EntityCache
-	Features  *FeatureCache
-	Groups    *GroupCache
-	Revisions *RevisionCache
+	Entities *EntityCache
+	Features *FeatureCache
+	Groups   *GroupCache
 }
 
 func NewCache(
 	entities types.EntityList,
 	features types.FeatureList,
-	groups types.GroupList,
-	revisions types.RevisionList) *Cache {
+	groups types.GroupList) *Cache {
 	return &Cache{
-		Entities:  &EntityCache{entities},
-		Features:  &FeatureCache{features},
-		Groups:    &GroupCache{groups},
-		Revisions: &RevisionCache{revisions},
+		Entities: &EntityCache{entities},
+		Features: &FeatureCache{features},
+		Groups:   &GroupCache{groups},
 	}
 }
 
 func (c *Cache) enrich() {
 	c.Groups.Enrich(c.Entities)
 	c.Features.Enrich(c.Groups)
-	// TODO: caching revision data is not necessary, but currently we do it for simplicity
-	c.Revisions.Enrich(c.Groups)
 }
 
 type Informer struct {
