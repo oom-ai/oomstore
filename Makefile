@@ -13,7 +13,14 @@ info:
 	@echo "COMMIT:  $(COMMIT)"
 
 .PHONY: codegen
-codegen: grpc
+codegen: grpc mockgen
+
+.PHONY: mockgen
+mockgen:
+	@mockgen --version 2>/dev/null | grep '^v1.6.' >/dev/null || go install github.com/golang/mock/mockgen@v1.6.0
+	@mockgen -source internal/database/metadata/store.go -destination internal/database/metadata/mock_metadata/store.go
+	@mockgen -source internal/database/online/store.go   -destination internal/database/online/mock_online/store.go
+	@mockgen -source internal/database/offline/store.go  -destination internal/database/offline/mock_offline/store.go
 
 .PHONY: grpc
 grpc: grpc-go grpc-python
