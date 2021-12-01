@@ -36,7 +36,7 @@ description: 'description'
 EOF
 
 oomcli apply -f "$TMPFILE"
-feature_expected='Name,Group,Entity,Category,DBValueType,ValueType,Description,OnlineRevisionID
+feature_expected='NAME,GROUP,ENTITY,CATEGORY,DB-VALUE-TYPE,VALUE-TYPE,DESCRIPTION,ONLINE-REVISION-ID
 model,device,user,batch,varchar(16),string,description,<NULL>
 price,device,user,batch,int,int64,description,<NULL>
 '
