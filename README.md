@@ -1,6 +1,7 @@
 # oomstore
 
 [![CI](https://github.com/oom-ai/oomstore/actions/workflows/ci.yml/badge.svg)](https://github.com/oom-ai/oomstore/actions/workflows/ci.yml)
+[![GoDoc](https://godoc.org/github.com/oom-ai/oomstore?status.png)](http://godoc.org/github.com/oom-ai/oomstore)
 [![codecov](https://codecov.io/gh/oom-ai/oomstore/branch/main/graph/badge.svg?token=C59L7LTRM4)](https://codecov.io/gh/oom-ai/oomstore)
 
 The name "OOM" is derived from **O**nline Store, **O**ffline Store, and **M**etadata Store that put together oomstore.
