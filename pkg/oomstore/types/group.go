@@ -38,17 +38,6 @@ func (fg *Group) Copy() *Group {
 
 type GroupList []*Group
 
-func (l GroupList) Copy() GroupList {
-	if len(l) == 0 {
-		return nil
-	}
-	copied := make(GroupList, 0, len(l))
-	for _, x := range l {
-		copied = append(copied, x.Copy())
-	}
-	return copied
-}
-
 func (l GroupList) Find(find func(*Group) bool) *Group {
 	for _, g := range l {
 		if find(g) {
@@ -56,15 +45,6 @@ func (l GroupList) Find(find func(*Group) bool) *Group {
 		}
 	}
 	return nil
-}
-
-func (l GroupList) Filter(filter func(*Group) bool) (rs GroupList) {
-	for _, g := range l {
-		if filter(g) {
-			rs = append(rs, g)
-		}
-	}
-	return
 }
 
 func (l GroupList) EntityIDs() []int {
