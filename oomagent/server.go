@@ -206,7 +206,7 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 		if err != nil {
 			globalErr = err
 		} else {
-			firstResp := true
+			header := joinResult.Header
 			for row := range joinResult.Data {
 				joinedRow, err := convertJoinedRow(row)
 				if err != nil {
@@ -214,18 +214,16 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 					break
 				}
 				resp := &codegen.ChannelJoinResponse{
+					Header:    header,
 					Status:    buildStatus(code.Code_OK, ""),
 					JoinedRow: joinedRow,
-				}
-				// Only need to send header upon the first response
-				if firstResp {
-					resp.Header = joinResult.Header
-					firstResp = false
 				}
 				if err = stream.Send(resp); err != nil {
 					globalErr = err
 					break
 				}
+				// Only need to send header upon the first response
+				header = nil
 			}
 		}
 		done <- struct{}{}
@@ -296,6 +294,8 @@ func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen
 	if err != nil {
 		return err
 	}
+
+	header := exportResult.Header
 	for row := range exportResult.Data {
 		valueRow, err := convertToValueSlice(row)
 		if err != nil {
@@ -303,11 +303,13 @@ func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen
 		}
 		if err := stream.Send(&codegen.ChannelExportResponse{
 			Status: buildStatus(code.Code_OK, ""),
-			Header: exportResult.Header,
+			Header: header,
 			Row:    valueRow,
 		}); err != nil {
 			return err
 		}
+		// Only need to send header upon the first response
+		header = nil
 	}
 	exportErr := exportResult.CheckStreamError()
 	if exportErr != nil {
