@@ -351,7 +351,7 @@ func convertToValueMap(m map[string]interface{}) (map[string]*codegen.Value, err
 
 func convertToValueSlice(s []interface{}) ([]*codegen.Value, error) {
 	valueSlice := make([]*codegen.Value, 0, len(s))
-	for i := range s {
+	for _, i := range s {
 		value, err := convertInterfaceToValue(i)
 		if err != nil {
 			return nil, err
@@ -413,7 +413,7 @@ func convertInterfaceToValue(i interface{}) (*codegen.Value, error) {
 			},
 		}, nil
 	default:
-		return nil, fmt.Errorf("unsupported value type %v", i)
+		return nil, fmt.Errorf("unsupported value type %T", i)
 	}
 }
 
