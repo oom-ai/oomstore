@@ -19,7 +19,7 @@ func TestBuildApplyStage(t *testing.T) {
 		wantErr   error
 	}{
 		{
-			description: "invalid yaml: msissng kind",
+			description: "invalid yaml: missing kind",
 			opt: apply.ApplyOpt{R: strings.NewReader(`
 # kind: Entity
 name: user

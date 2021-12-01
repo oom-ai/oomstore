@@ -48,7 +48,7 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 			},
 			mockFunc: func() {
 				metadataStore.EXPECT().GetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1}, nil)
-				metadataStore.EXPECT().CacheListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).Return(nil)
+				metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).Return(nil, nil)
 			},
 			wantRevisionID: 0,
 			wantError:      fmt.Errorf("no features under group: device_info"),
@@ -60,7 +60,7 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 			},
 			mockFunc: func() {
 				metadataStore.EXPECT().GetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1, EntityID: 1}, nil)
-				metadataStore.EXPECT().CacheListFeature(gomock.Any(), gomock.Any()).Return(types.FeatureList{})
+				metadataStore.EXPECT().ListFeature(gomock.Any(), gomock.Any()).Return(types.FeatureList{}, nil)
 			},
 			wantRevisionID: 0,
 			wantError:      fmt.Errorf("no entity found by group: device_info"),
@@ -80,7 +80,7 @@ device,model,price
 			},
 			mockFunc: func() {
 				metadataStore.EXPECT().GetGroupByName(gomock.Any(), "device_info").Return(&types.Group{ID: 1, EntityID: 1, Entity: &types.Entity{Name: "device"}}, nil)
-				metadataStore.EXPECT().CacheListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
+				metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{GroupID: intPtr(1)}).
 					Return(types.FeatureList{
 						{
 							Name: "model",
@@ -88,7 +88,7 @@ device,model,price
 						{
 							Name: "price",
 						},
-					})
+					}, nil)
 				offlineStore.EXPECT().Import(gomock.Any(), gomock.Any()).AnyTimes().Return(int64(1), nil)
 
 				metadataStore.EXPECT().CreateRevision(gomock.Any(), gomock.Any()).Return(0, "", fmt.Errorf("error"))
@@ -218,7 +218,7 @@ device,model,price
 				Entity:   &tc.Entity,
 			}, nil)
 
-			metadataStore.EXPECT().CacheListFeature(ctx, metadata.ListFeatureOpt{GroupID: intPtr(1)}).Return(tc.features)
+			metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: intPtr(1)}).Return(tc.features, nil)
 
 			metadataStore.EXPECT().CreateRevision(ctx, metadata.CreateRevisionOpt{
 				Revision:    0,
