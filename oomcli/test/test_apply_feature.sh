@@ -40,6 +40,6 @@ feature_expected='Name,Group,Entity,Category,DBValueType,ValueType,Description,O
 model,device,user,batch,varchar(16),string,description,<NULL>
 price,device,user,batch,int,int64,description,<NULL>
 '
-feature_actual=$(oomcli list feature -o csv)
+feature_actual=$(oomcli get meta feature -o csv)
 ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }
-assert_eq "oomcli list feature" "$(sort <<< "$feature_expected")" "$(ignore_time "$feature_actual" | sort)"
+assert_eq "oomcli get meta feature" "$(sort <<< "$feature_expected")" "$(ignore_time "$feature_actual" | sort)"
