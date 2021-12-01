@@ -42,7 +42,7 @@ var getMetaFeatureCmd = &cobra.Command{
 		}
 
 		// print features to stdout
-		if err := printFeatures(features, *getMetaOutput); err != nil {
+		if err := printFeatures(features, *getMetaOutput, *getMetaWide); err != nil {
 			log.Fatalf("failed printing features, error %v\n", err)
 		}
 	},
@@ -56,26 +56,26 @@ func init() {
 	getMetaFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
 }
 
-func printFeatures(features types.FeatureList, output string) error {
+func printFeatures(features types.FeatureList, output string, wide bool) error {
 	switch output {
 	case CSV:
-		return printFeaturesInCSV(features)
+		return printFeaturesInCSV(features, wide)
 	case ASCIITable:
-		return printFeaturesInASCIITable(features, true)
+		return printFeaturesInASCIITable(features, true, wide)
 	case Column:
-		return printFeaturesInASCIITable(features, false)
+		return printFeaturesInASCIITable(features, false, wide)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
 }
 
-func printFeaturesInCSV(features types.FeatureList) error {
+func printFeaturesInCSV(features types.FeatureList, wide bool) error {
 	w := csv.NewWriter(os.Stdout)
-	if err := w.Write(featureHeader()); err != nil {
+	if err := w.Write(featureHeader(wide)); err != nil {
 		return err
 	}
 	for _, feature := range features {
-		if err := w.Write(featureRecord(feature)); err != nil {
+		if err := w.Write(featureRecord(feature, wide)); err != nil {
 			return err
 		}
 	}
@@ -84,9 +84,9 @@ func printFeaturesInCSV(features types.FeatureList) error {
 	return nil
 }
 
-func printFeaturesInASCIITable(features types.FeatureList, border bool) error {
+func printFeaturesInASCIITable(features types.FeatureList, border, wide bool) error {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader(featureHeader())
+	table.SetHeader(featureHeader(wide))
 	table.SetAutoFormatHeaders(false)
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
 	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
@@ -102,22 +102,28 @@ func printFeaturesInASCIITable(features types.FeatureList, border bool) error {
 	}
 
 	for _, feature := range features {
-		table.Append(featureRecord(feature))
+		table.Append(featureRecord(feature, wide))
 	}
 	table.Render()
 	return nil
 }
 
-func featureHeader() []string {
-	return []string{"NAME", "GROUP", "ENTITY", "CATEGORY", "DB-VALUE-TYPE", "VALUE-TYPE", "DESCRIPTION", "ONLINE-REVISION-ID", "CREATE-TIME", "MODIFY-TIME"}
+func featureHeader(wide bool) []string {
+	if wide {
+		return []string{"NAME", "GROUP", "ENTITY", "CATEGORY", "DB-VALUE-TYPE", "VALUE-TYPE", "DESCRIPTION", "ONLINE-REVISION-ID", "CREATE-TIME", "MODIFY-TIME"}
+	}
+	return []string{"NAME", "GROUP", "ENTITY", "CATEGORY", "VALUE-TYPE"}
 }
 
-func featureRecord(f *types.Feature) []string {
+func featureRecord(f *types.Feature, wide bool) []string {
 	onlineRevisionID := "<NULL>"
 
 	if f.OnlineRevisionID() != nil {
 		onlineRevisionID = strconv.FormatInt(int64(*f.OnlineRevisionID()), 10)
 	}
 
-	return []string{f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.DBValueType, f.ValueType, f.Description, onlineRevisionID, f.CreateTime.Format(time.RFC3339), f.ModifyTime.Format(time.RFC3339)}
+	if wide {
+		return []string{f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.DBValueType, f.ValueType, f.Description, onlineRevisionID, f.CreateTime.Format(time.RFC3339), f.ModifyTime.Format(time.RFC3339)}
+	}
+	return []string{f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.ValueType}
 }

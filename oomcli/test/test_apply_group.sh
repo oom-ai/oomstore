@@ -74,11 +74,10 @@ group_actual=$(oomcli list group -o csv)
 ignore_time() { cut -d ',' -f 1-4 <<<"$1"; }
 assert_eq "oomcli list group" "$(sort <<< "$group_expected")" "$(ignore_time "$group_actual" | sort)"
 
-feature_expected='NAME,GROUP,ENTITY,CATEGORY,DB-VALUE-TYPE,VALUE-TYPE,DESCRIPTION,ONLINE-REVISION-ID
-model,device,user,batch,varchar(16),string,description,<NULL>
-price,device,user,batch,int,int64,description,<NULL>
-radio,device,user,batch,int,int64,description,<NULL>
+feature_expected='NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE
+model,device,user,batch,string
+price,device,user,batch,int64
+radio,device,user,batch,int64
 '
 feature_actual=$(oomcli get meta feature -o csv)
-ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }
-assert_eq "oomcli get meta feature" "$(sort <<< "$feature_expected")" "$(ignore_time "$feature_actual" | sort)"
+assert_eq "oomcli get meta feature" "$(sort <<< "$feature_expected")" "$(sort <<< "$feature_actual")"
