@@ -25,9 +25,6 @@ Usage Example:
 	return exportResult.CheckStreamError()
 */
 func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt) (*types.ExportResult, error) {
-	if err := s.metadata.Refresh(); err != nil {
-		return nil, fmt.Errorf("failed to refresh informer, err=%+v", err)
-	}
 	revision, err := s.GetRevision(ctx, opt.RevisionID)
 	if err != nil {
 		return nil, err
