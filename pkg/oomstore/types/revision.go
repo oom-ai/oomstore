@@ -32,6 +32,35 @@ func (r *Revision) Copy() *Revision {
 
 type RevisionList []*Revision
 
+func (l RevisionList) Copy() RevisionList {
+	if len(l) == 0 {
+		return nil
+	}
+	copied := make(RevisionList, 0, len(l))
+	for _, x := range l {
+		copied = append(copied, x.Copy())
+	}
+	return copied
+}
+
+func (l RevisionList) Find(find func(*Revision) bool) *Revision {
+	for _, r := range l {
+		if find(r) {
+			return r
+		}
+	}
+	return nil
+}
+
+func (l RevisionList) Filter(filter func(*Revision) bool) (rs RevisionList) {
+	for _, r := range l {
+		if filter(r) {
+			rs = append(rs, r)
+		}
+	}
+	return
+}
+
 func (l RevisionList) GroupIDs() []int {
 	groupIDMap := make(map[int]struct{})
 	for _, r := range l {

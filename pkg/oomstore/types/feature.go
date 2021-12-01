@@ -62,6 +62,13 @@ func (l *FeatureList) Names() (names []string) {
 	return
 }
 
+func (l *FeatureList) IDs() (ids []int) {
+	for _, f := range *l {
+		ids = append(ids, f.ID)
+	}
+	return
+}
+
 func (l FeatureList) Filter(filter func(*Feature) bool) (rs FeatureList) {
 	for _, f := range l {
 		if filter(f) {
