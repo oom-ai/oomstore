@@ -95,6 +95,20 @@ func (mr *MockStoreMockRecorder) Join(ctx, opt interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Join", reflect.TypeOf((*MockStore)(nil).Join), ctx, opt)
 }
 
+// Ping mocks base method.
+func (m *MockStore) Ping(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Ping", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Ping indicates an expected call of Ping.
+func (mr *MockStoreMockRecorder) Ping(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockStore)(nil).Ping), ctx)
+}
+
 // TypeTag mocks base method.
 func (m *MockStore) TypeTag(dbType string) (string, error) {
 	m.ctrl.T.Helper()

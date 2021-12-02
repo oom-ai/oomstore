@@ -66,3 +66,7 @@ func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
 func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
 	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore)
 }
+
+func TestPing(t *testing.T) {
+	test_impl.TestPing(t, prepareStore)
+}
