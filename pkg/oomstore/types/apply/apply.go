@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 type ApplyOpt struct {
@@ -26,11 +27,11 @@ func NewApplyStage() *ApplyStage {
 }
 
 type Feature struct {
-	Kind        string `mapstructure:"kind"`
-	Name        string `mapstructure:"name"`
-	GroupName   string `mapstructure:"group-name"`
-	DBValueType string `mapstructure:"db-value-type"`
-	Description string `mapstructure:"description"`
+	Kind        string `mapstructure:"kind" yaml:"kind"`
+	Name        string `mapstructure:"name" yaml:"name"`
+	GroupName   string `mapstructure:"group-name" yaml:"group-name"`
+	DBValueType string `mapstructure:"db-value-type" yaml:"db-value-type"`
+	Description string `mapstructure:"description" yaml:"description"`
 }
 
 func (f *Feature) Validate() error {
@@ -41,6 +42,27 @@ func (f *Feature) Validate() error {
 		return errdefs.InvalidAttribute(fmt.Errorf("the db value type of feature should not be empty"))
 	}
 	return nil
+}
+
+type FeatureItems struct {
+	Items []Feature `mapstructure:"items" yaml:"items"`
+}
+
+func FromFeatureList(features types.FeatureList) FeatureItems {
+	items := FeatureItems{
+		Items: make([]Feature, 0, features.Len()),
+	}
+
+	for _, f := range features {
+		items.Items = append(items.Items, Feature{
+			Kind:        "Feature",
+			Name:        f.Name,
+			GroupName:   f.Group.Name,
+			DBValueType: f.DBValueType,
+			Description: f.DBValueType,
+		})
+	}
+	return items
 }
 
 type Group struct {
