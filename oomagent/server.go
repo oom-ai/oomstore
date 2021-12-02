@@ -22,6 +22,11 @@ type server struct {
 }
 
 func (s *server) HealthCheck(ctx context.Context, req *codegen.HealthCheckRequest) (*codegen.HealthCheckResponse, error) {
+	if err := s.oomstore.Ping(ctx); err != nil {
+		return &codegen.HealthCheckResponse{
+			Status: buildStatus(code.Code_UNAVAILABLE, "oomstore is currently unavailable"),
+		}, err
+	}
 	return &codegen.HealthCheckResponse{
 		Status: buildStatus(code.Code_OK, ""),
 	}, nil
