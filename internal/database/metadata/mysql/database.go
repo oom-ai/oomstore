@@ -7,12 +7,14 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
 	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-//var _ metadata.Store = &DB{}
+var _ metadata.Store = &DB{}
+
 //var _ metadata.DBStore = &Tx{}
 
 type DB struct {
@@ -61,7 +63,7 @@ func Open(ctx context.Context, option *types.MySQLOpt) (*DB, error) {
 func OpenDB(host, port, user, password, database string) (*sqlx.DB, error) {
 	return sqlx.Open(
 		"mysql",
-		fmt.Sprintf("%s:%s@(%s:%s)/%s", user, password, host, port, database))
+		fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true", user, password, host, port, database))
 }
 
 func CreateDatabase(ctx context.Context, opt types.MySQLOpt) (err error) {
