@@ -9,11 +9,9 @@ import_sample > /dev/null
 case='oomcli update group works'
 oomcli update group phone --description "new description"
 expected='
-Name:             phone
-Entity:           device
-Description:      new description
-OnlineRevisionID: <NULL>
+ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,phone,device,new description,,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
-actual=$(oomcli describe group phone)
-ignore() { grep -Ev '^(CreateTime|ModifyTime)' <<<"$1"; }
-assert_eq "$case" "$expected" "$(ignore "$actual")"
+filter() { cut -d ',' -f 1-4 <<<"$1"; }
+actual=$(oomcli get meta group phone -o csv)
+assert_eq "$case" "$(filter "$expected")" "$(filter "$actual")"
