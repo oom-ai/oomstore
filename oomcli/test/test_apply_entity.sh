@@ -39,12 +39,12 @@ ignore_time() { cut -d ',' -f 1-3 <<<"$1"; }
 assert_eq "oomcli get meta entity" "$(sort <<< "$entity_expected")" "$(ignore_time "$entity_actual" | sort)"
 
 group_expected='
-GroupName,GroupID,EntityName,Description
-student,1,user,student feature group
+ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,student,user,student feature group,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
-group_actual=$(oomcli list group -o csv)
-ignore_time() { cut -d ',' -f 1-4 <<<"$1"; }
-assert_eq "oomcli list group" "$(sort <<< "$group_expected")" "$(ignore_time "$group_actual" | sort)"
+group_actual=$(oomcli get meta group -o csv)
+filter() { cut -d ',' -f 1-4 <<<"$1"; }
+assert_eq "oomcli get meta group" "$(filter "$group_expected"| sort)" "$(filter "$group_actual" | sort)"
 
 
 init_store
@@ -85,13 +85,14 @@ ignore_time() { cut -d ',' -f 1-3 <<<"$1"; }
 assert_eq "oomcli get meta entity" "$(sort <<< "$entity_expected")" "$(ignore_time "$entity_actual" | sort)"
 
 group_expected='
-GroupName,GroupID,EntityName,Description
-device,1,user,a description
-user,2,user,a description
+ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,device,user,a description,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+2,user,user,a description,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+
 '
-group_actual=$(oomcli list group -o csv)
-ignore_time() { cut -d ',' -f 1-4 <<<"$1"; }
-assert_eq "oomcli list group" "$(sort <<< "$group_expected")" "$(ignore_time "$group_actual" | sort)"
+group_actual=$(oomcli get meta group -o csv)
+filter() { cut -d ',' -f 1-4 <<<"$1"; }
+assert_eq "oomcli get meta group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 
 feature_expected='NAME,GROUP,ENTITY,CATEGORY,DB-VALUE-TYPE,VALUE-TYPE,DESCRIPTION,ONLINE-REVISION-ID
 model,device,user,batch,varchar(16),string,description,<NULL>
