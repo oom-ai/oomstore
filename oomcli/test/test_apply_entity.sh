@@ -29,14 +29,14 @@ EOF
 
 oomcli apply -f "$TMPFILE"
 
-entity_expected='NAME,LENGTH,DESCRIPTION
-user,8,description
-device,16,description
-test,32,description
+entity_expected='ID,NAME,LENGTH,DESCRIPTION
+1,user,8,description
+2,device,16,description
+3,test,32,description
 '
 entity_actual=$(oomcli get meta entity -o csv)
-ignore_time() { cut -d ',' -f 1-3 <<<"$1"; }
-assert_eq "oomcli get meta entity" "$(sort <<< "$entity_expected")" "$(ignore_time "$entity_actual" | sort)"
+#ignore_time() { cut -d ',' -f 1-3 <<<"$1"; }
+assert_eq "oomcli get meta entity" "$(sort <<< "$entity_expected")" "$(sort <<< "$entity_actual")"
 
 group_expected='
 ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
@@ -77,12 +77,11 @@ EOF
 
 oomcli apply -f "$TMPFILE"
 
-entity_expected='NAME,LENGTH,DESCRIPTION
-user,8,description
+entity_expected='ID,NAME,LENGTH,DESCRIPTION
+1,user,8,description
 '
 entity_actual=$(oomcli get meta entity -o csv)
-ignore_time() { cut -d ',' -f 1-3 <<<"$1"; }
-assert_eq "oomcli get meta entity" "$(sort <<< "$entity_expected")" "$(ignore_time "$entity_actual" | sort)"
+assert_eq "oomcli get meta entity" "$(sort <<< "$entity_expected")" "$(sort <<< "$entity_actual")"
 
 group_expected='
 ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
