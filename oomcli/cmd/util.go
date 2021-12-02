@@ -12,6 +12,7 @@ const (
 	CSV        = "csv"
 	ASCIITable = "ascii_table"
 	Column     = "column"
+	YAML       = "yaml"
 )
 
 func mustOpenOomStore(ctx context.Context, opt types.OomStoreConfig) *oomstore.OomStore {
