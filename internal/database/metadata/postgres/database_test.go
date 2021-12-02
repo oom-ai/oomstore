@@ -7,6 +7,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/postgres"
+	"github.com/oom-ai/oomstore/internal/database/metadata/test_impl"
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -68,4 +69,8 @@ func TestCreateDatabase(t *testing.T) {
 		return wantTables[i] < wantTables[j]
 	})
 	assert.Equal(t, wantTables, tables)
+}
+
+func TestPing(t *testing.T) {
+	test_impl.TestPing(t, prepareStore)
 }
