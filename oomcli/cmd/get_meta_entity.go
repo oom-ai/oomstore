@@ -14,9 +14,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	MaxDescriptionLen = 40
+)
+
 var getMetaEntityCmd = &cobra.Command{
 	Use:   "entity",
-	Short: "get existing entity given specific confitions",
+	Short: "get existing entity given specific conditions",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
 			log.Fatalf("argument at most one, got %d", len(args))
@@ -37,7 +41,7 @@ var getMetaEntityCmd = &cobra.Command{
 			})
 		}
 		// print entities to stdout
-		if err := printEntities(entities, *getMetaOutput); err != nil {
+		if err := printEntities(entities, *getMetaOutput, *getMetaWide); err != nil {
 			log.Fatalf("failed printing entities, error %v\n", err)
 		}
 	},
@@ -47,24 +51,24 @@ func init() {
 	getMetaCmd.AddCommand(getMetaEntityCmd)
 }
 
-func printEntities(entities types.EntityList, output string) error {
+func printEntities(entities types.EntityList, output string, wide bool) error {
 	switch output {
 	case CSV:
-		return printEntitiesInCSV(entities)
+		return printEntitiesInCSV(entities, wide)
 	case ASCIITable:
-		return printEntitiesInASCIITable(entities)
+		return printEntitiesInASCIITable(entities, wide)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
 }
 
-func printEntitiesInCSV(entities types.EntityList) error {
+func printEntitiesInCSV(entities types.EntityList, wide bool) error {
 	w := csv.NewWriter(os.Stdout)
-	if err := w.Write(entityHeader()); err != nil {
+	if err := w.Write(entityHeader(wide)); err != nil {
 		return err
 	}
 	for _, entity := range entities {
-		if err := w.Write(entityRecord(entity)); err != nil {
+		if err := w.Write(entityRecord(entity, wide)); err != nil {
 			return err
 		}
 	}
@@ -73,23 +77,33 @@ func printEntitiesInCSV(entities types.EntityList) error {
 	return nil
 }
 
-func printEntitiesInASCIITable(entities types.EntityList) error {
+func printEntitiesInASCIITable(entities types.EntityList, wide bool) error {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader(entityHeader())
+	table.SetHeader(entityHeader(wide))
 	table.SetAutoFormatHeaders(false)
 
 	for _, entity := range entities {
-		table.Append(entityRecord(entity))
+		table.Append(entityRecord(entity, wide))
 	}
 	table.Render()
 	return nil
 }
 
-func entityRecord(entity *types.Entity) []string {
-	return []string{entity.Name, strconv.Itoa(entity.Length), entity.Description, entity.CreateTime.Format(time.RFC3339),
-		entity.ModifyTime.Format(time.RFC3339)}
+func entityRecord(entity *types.Entity, wide bool) []string {
+	if wide {
+		return []string{strconv.Itoa(entity.ID), entity.Name, strconv.Itoa(entity.Length), entity.Description, entity.CreateTime.Format(time.RFC3339),
+			entity.ModifyTime.Format(time.RFC3339)}
+	}
+	desc := entity.Description
+	if len(desc) > MaxDescriptionLen {
+		desc = fmt.Sprintf("%s...", desc[0:MaxDescriptionLen])
+	}
+	return []string{strconv.Itoa(entity.ID), entity.Name, strconv.Itoa(entity.Length), desc}
 }
 
-func entityHeader() []string {
-	return []string{"NAME", "LENGTH", "DESCRIPTION", "CREATE-TIME", "MODIFY-TIME"}
+func entityHeader(wide bool) []string {
+	if wide {
+		return []string{"ID", "NAME", "LENGTH", "DESCRIPTION", "CREATE-TIME", "MODIFY-TIME"}
+	}
+	return []string{"ID", "NAME", "LENGTH", "DESCRIPTION"}
 }
