@@ -14,51 +14,61 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type listGroupOption struct {
+type getMetaGroupOption struct {
 	entityName *string
 }
 
-var listGroupOpt listGroupOption
+var getMetaGroupOpt getMetaGroupOption
 
-var listGroupCmd = &cobra.Command{
+var getMetaGroupCmd = &cobra.Command{
 	Use:   "group",
-	Short: "list feature groups",
+	Short: "get existing group given specific conditions",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
-			listGroupOpt.entityName = nil
+			getMetaGroupOpt.entityName = nil
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) > 1 {
+			log.Fatalf("argument at most one, got %d", len(args))
+		}
+
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
 		var entityID *int
 
-		if listGroupOpt.entityName != nil {
-			entity, err := oomStore.GetEntityByName(ctx, *listGroupOpt.entityName)
+		if getMetaGroupOpt.entityName != nil {
+			entity, err := oomStore.GetEntityByName(ctx, *getMetaGroupOpt.entityName)
 			if err != nil {
-				log.Fatalf("failed to get entity name='%s': %v", *listGroupOpt.entityName, err)
+				log.Fatalf("failed to get entity name='%s': %v", *getMetaGroupOpt.entityName, err)
 			}
 			entityID = &entity.ID
 		}
 
 		groups, err := oomStore.ListGroup(ctx, entityID)
 		if err != nil {
-			log.Fatalf("failed listing feature groups, error %v\n", err)
+			log.Fatalf("failed getting feature groups, error %v\n", err)
 		}
-		if err := printGroups(groups, *listOutput); err != nil {
+
+		if len(args) > 0 {
+			groups = groups.Filter(func(g *types.Group) bool {
+				return g.Name == args[0]
+			})
+		}
+		if err := printGroups(groups, *getMetaOutput); err != nil {
 			log.Fatalf("failed printing feature groups, error %v\n", err)
 		}
 	},
 }
 
 func init() {
-	listCmd.AddCommand(listGroupCmd)
+	getMetaCmd.AddCommand(getMetaGroupCmd)
 
-	flags := listGroupCmd.Flags()
+	flags := getMetaGroupCmd.Flags()
 
-	listGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
+	getMetaGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
 func printGroups(groups []*types.Group, output string) error {
@@ -100,7 +110,7 @@ func printGroupsInASCIITable(groups types.GroupList) error {
 }
 
 func groupHeader() []string {
-	return []string{"GroupName", "GroupID", "EntityName", "Description", "OnlineRevisionID", "CreateTime", "ModifyTime"}
+	return []string{"ID", "NAME", "ENTITY", "DESCRIPTION", "ONLINE-REVISION-ID", "CREATE-TIME", "MODIFY-TIME"}
 }
 
 func groupRecord(g *types.Group) []string {
@@ -108,6 +118,6 @@ func groupRecord(g *types.Group) []string {
 	if g.OnlineRevisionID != nil {
 		onlineRevisionID = fmt.Sprint(*g.OnlineRevisionID)
 	}
-	return []string{g.Name, strconv.Itoa(g.ID), g.Entity.Name, g.Description, onlineRevisionID,
+	return []string{strconv.Itoa(g.ID), g.Name, g.Entity.Name, g.Description, onlineRevisionID,
 		g.CreateTime.Format(time.RFC3339), g.ModifyTime.Format(time.RFC3339)}
 }
