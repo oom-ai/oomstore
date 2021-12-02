@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -12,19 +13,19 @@ func (db *DB) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (i
 }
 
 func (db *DB) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
-	return updateEntity(ctx, db, opt)
+	return sqlutil.UpdateEntity(ctx, db, opt)
 }
 
 func (db *DB) GetEntity(ctx context.Context, id int) (*types.Entity, error) {
-	return getEntity(ctx, db, id)
+	return sqlutil.GetEntity(ctx, db, id)
 }
 
 func (db *DB) GetEntityByName(ctx context.Context, name string) (*types.Entity, error) {
-	return getEntityByName(ctx, db, name)
+	return sqlutil.GetEntityByName(ctx, db, name)
 }
 
 func (db *DB) ListEntity(ctx context.Context, entityIDs *[]int) (types.EntityList, error) {
-	return listEntity(ctx, db, entityIDs)
+	return sqlutil.ListEntity(ctx, db, entityIDs)
 }
 
 func (db *DB) CreateGroup(ctx context.Context, opt metadata.CreateGroupOpt) (int, error) {
