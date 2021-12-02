@@ -57,7 +57,7 @@ var getMetaGroupCmd = &cobra.Command{
 				return g.Name == args[0]
 			})
 		}
-		if err := printGroups(groups, *getMetaOutput); err != nil {
+		if err := printGroups(groups, *getMetaOutput, *getMetaWide); err != nil {
 			log.Fatalf("failed printing feature groups, error %v\n", err)
 		}
 	},
@@ -71,25 +71,25 @@ func init() {
 	getMetaGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func printGroups(groups []*types.Group, output string) error {
+func printGroups(groups []*types.Group, output string, wide bool) error {
 	switch output {
 	case CSV:
-		return printGroupsInCSV(groups)
+		return printGroupsInCSV(groups, wide)
 	case ASCIITable:
-		return printGroupsInASCIITable(groups)
+		return printGroupsInASCIITable(groups, wide)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
 }
 
-func printGroupsInCSV(groups types.GroupList) error {
+func printGroupsInCSV(groups types.GroupList, wide bool) error {
 	w := csv.NewWriter(os.Stdout)
 
-	if err := w.Write(groupHeader()); err != nil {
+	if err := w.Write(groupHeader(wide)); err != nil {
 		return err
 	}
 	for _, g := range groups {
-		if err := w.Write(groupRecord(g)); err != nil {
+		if err := w.Write(groupRecord(g, wide)); err != nil {
 			return err
 		}
 	}
@@ -97,27 +97,37 @@ func printGroupsInCSV(groups types.GroupList) error {
 	return nil
 }
 
-func printGroupsInASCIITable(groups types.GroupList) error {
+func printGroupsInASCIITable(groups types.GroupList, wide bool) error {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader(groupHeader())
+	table.SetHeader(groupHeader(wide))
 	table.SetAutoFormatHeaders(false)
 
 	for _, group := range groups {
-		table.Append(groupRecord(group))
+		table.Append(groupRecord(group, wide))
 	}
 	table.Render()
 	return nil
 }
 
-func groupHeader() []string {
-	return []string{"ID", "NAME", "ENTITY", "DESCRIPTION", "ONLINE-REVISION-ID", "CREATE-TIME", "MODIFY-TIME"}
+func groupHeader(wide bool) []string {
+	if wide {
+		return []string{"ID", "NAME", "ENTITY", "DESCRIPTION", "ONLINE-REVISION-ID", "CREATE-TIME", "MODIFY-TIME"}
+	}
+	return []string{"ID", "NAME", "ENTITY", "DESCRIPTION"}
 }
 
-func groupRecord(g *types.Group) []string {
+func groupRecord(g *types.Group, wide bool) []string {
 	onlineRevisionID := "<NULL>"
 	if g.OnlineRevisionID != nil {
 		onlineRevisionID = fmt.Sprint(*g.OnlineRevisionID)
 	}
-	return []string{strconv.Itoa(g.ID), g.Name, g.Entity.Name, g.Description, onlineRevisionID,
-		g.CreateTime.Format(time.RFC3339), g.ModifyTime.Format(time.RFC3339)}
+	if wide {
+		return []string{strconv.Itoa(g.ID), g.Name, g.Entity.Name, g.Description, onlineRevisionID,
+			g.CreateTime.Format(time.RFC3339), g.ModifyTime.Format(time.RFC3339)}
+	}
+	desc := g.Description
+	if len(desc) > MaxDescriptionLen {
+		desc = fmt.Sprintf("%s...", desc[0:MaxDescriptionLen])
+	}
+	return []string{strconv.Itoa(g.ID), g.Name, g.Entity.Name, desc}
 }
