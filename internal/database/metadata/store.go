@@ -12,6 +12,7 @@ type Store interface {
 	DBStore
 	CacheStore
 
+	Ping(ctx context.Context) error
 	io.Closer
 }
 
