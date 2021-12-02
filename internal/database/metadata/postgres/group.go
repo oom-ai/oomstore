@@ -11,6 +11,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -75,7 +76,7 @@ func getGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*types
 		return nil, err
 	}
 
-	entity, err := getEntity(ctx, sqlxCtx, group.EntityID)
+	entity, err := sqlutil.GetEntity(ctx, sqlxCtx, group.EntityID)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +94,7 @@ func getGroupByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name stri
 		return nil, err
 	}
 
-	entity, err := getEntity(ctx, sqlxCtx, group.EntityID)
+	entity, err := sqlutil.GetEntity(ctx, sqlxCtx, group.EntityID)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +147,7 @@ func buildListGroupCond(entityID *int, groupIDs *[]int) (string, []interface{}, 
 
 func enrichGroups(ctx context.Context, sqlxCtx metadata.SqlxContext, groups types.GroupList) error {
 	entityIDs := groups.EntityIDs()
-	entities, err := listEntity(ctx, sqlxCtx, &entityIDs)
+	entities, err := sqlutil.ListEntity(ctx, sqlxCtx, &entityIDs)
 	if err != nil {
 		return err
 	}
