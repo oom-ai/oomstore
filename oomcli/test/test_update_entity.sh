@@ -9,9 +9,8 @@ import_sample > /dev/null
 case='oomcli update entity works'
 oomcli update entity device --description "new description"
 expected='
-NAME,LENGTH,DESCRIPTION
-device,32,new description
+ID,NAME,LENGTH,DESCRIPTION
+1,device,32,new description
 '
 actual=$(oomcli get meta entity device -o csv)
-ignore() { cut -d ',' -f 1-3 <<<"$1"; }
-assert_eq "$case" "$expected" "$(ignore "$actual")"
+assert_eq "$case" "$expected" "$actual"
