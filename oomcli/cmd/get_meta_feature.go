@@ -7,11 +7,15 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
+
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 )
 
 var getMetaFeatureOpt types.ListFeatureOpt
@@ -64,9 +68,31 @@ func printFeatures(features types.FeatureList, output string, wide bool) error {
 		return printFeaturesInASCIITable(features, true, wide)
 	case Column:
 		return printFeaturesInASCIITable(features, false, wide)
+	case YAML:
+		return printFeatureInYaml(features)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
+}
+
+func printFeatureInYaml(features types.FeatureList) error {
+	var (
+		out   []byte
+		err   error
+		items = apply.FromFeatureList(features)
+	)
+
+	if len(items.Items) > 1 {
+		if out, err = yaml.Marshal(items); err != nil {
+			return err
+		}
+	} else if len(items.Items) == 1 {
+		if out, err = yaml.Marshal(items.Items[0]); err != nil {
+			return err
+		}
+	}
+	fmt.Println(strings.Trim(string(out), "\n"))
+	return nil
 }
 
 func printFeaturesInCSV(features types.FeatureList, wide bool) error {
