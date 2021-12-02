@@ -7,11 +7,15 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 type getMetaGroupOption struct {
@@ -57,7 +61,8 @@ var getMetaGroupCmd = &cobra.Command{
 				return g.Name == args[0]
 			})
 		}
-		if err := printGroups(groups, *getMetaOutput, *getMetaWide); err != nil {
+
+		if err := printGroups(ctx, oomStore, groups, *getMetaOutput, *getMetaWide); err != nil {
 			log.Fatalf("failed printing feature groups, error %v\n", err)
 		}
 	},
@@ -71,7 +76,7 @@ func init() {
 	getMetaGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func printGroups(groups []*types.Group, output string, wide bool) error {
+func printGroups(ctx context.Context, oomStore *oomstore.OomStore, groups []*types.Group, output string, wide bool) error {
 	switch output {
 	case CSV:
 		return printGroupsInCSV(groups, wide)
@@ -79,9 +84,39 @@ func printGroups(groups []*types.Group, output string, wide bool) error {
 		return printGroupsInASCIITable(groups, true, wide)
 	case Column:
 		return printGroupsInASCIITable(groups, false, wide)
+	case YAML:
+		return printGroupInYaml(ctx, oomStore, groups)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
+}
+
+func printGroupInYaml(ctx context.Context, oomStore *oomstore.OomStore, groups types.GroupList) error {
+	var (
+		out      []byte
+		err      error
+		features types.FeatureList
+		items    apply.GroupItems
+	)
+
+	// TODO: Use group ids to filter, rather than taking them all out
+	if features, err = oomStore.ListFeature(ctx, types.ListFeatureOpt{}); err != nil {
+		return err
+	}
+
+	items = apply.FromGroupList(groups, features)
+
+	if len(items.Items) > 1 {
+		if out, err = yaml.Marshal(items); err != nil {
+			return err
+		}
+	} else if len(items.Items) == 1 {
+		if out, err = yaml.Marshal(items.Items[0]); err != nil {
+			return err
+		}
+	}
+	fmt.Println(strings.Trim(string(out), "\n"))
+	return nil
 }
 
 func printGroupsInCSV(groups types.GroupList, wide bool) error {
