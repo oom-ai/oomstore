@@ -140,8 +140,8 @@ func groupRecord(g *types.Group, wide bool) []string {
 			g.CreateTime.Format(time.RFC3339), g.ModifyTime.Format(time.RFC3339)}
 	}
 	desc := g.Description
-	if len(desc) > MaxDescriptionLen {
-		desc = fmt.Sprintf("%s...", desc[0:MaxDescriptionLen])
+	if len(desc) > MetadataFieldTruncateAt {
+		desc = fmt.Sprintf("%s...", desc[0:MetadataFieldTruncateAt])
 	}
 	return []string{strconv.Itoa(g.ID), g.Name, g.Entity.Name, desc}
 }

@@ -152,8 +152,8 @@ func featureRecord(f *types.Feature, wide bool) []string {
 		return []string{strconv.Itoa(f.ID), f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.DBValueType, f.ValueType, f.Description, onlineRevisionID, f.CreateTime.Format(time.RFC3339), f.ModifyTime.Format(time.RFC3339)}
 	}
 	desc := f.Description
-	if len(desc) > MaxDescriptionLen {
-		desc = fmt.Sprintf("%s...", desc[0:MaxDescriptionLen])
+	if len(desc) > MetadataFieldTruncateAt {
+		desc = fmt.Sprintf("%s...", desc[0:MetadataFieldTruncateAt])
 	}
 	return []string{strconv.Itoa(f.ID), f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.ValueType, desc}
 }

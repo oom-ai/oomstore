@@ -6,16 +6,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"time"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
-)
-
-const (
-	MaxDescriptionLen = 40
 )
 
 var getMetaEntityCmd = &cobra.Command{
@@ -65,12 +59,20 @@ func printEntities(entities types.EntityList, output string, wide bool) error {
 }
 
 func printEntitiesInCSV(entities types.EntityList, wide bool) error {
+	header, err := serializeHeader(types.Entity{}, wide)
+	if err != nil {
+		return err
+	}
 	w := csv.NewWriter(os.Stdout)
-	if err := w.Write(entityHeader(wide)); err != nil {
+	if err := w.Write(header); err != nil {
 		return err
 	}
 	for _, entity := range entities {
-		if err := w.Write(entityRecord(entity, wide)); err != nil {
+		record, err := serializeRecord(*entity, wide)
+		if err != nil {
+			return err
+		}
+		if err := w.Write(record); err != nil {
 			return err
 		}
 	}
@@ -80,8 +82,12 @@ func printEntitiesInCSV(entities types.EntityList, wide bool) error {
 }
 
 func printEntitiesInASCIITable(entities types.EntityList, border, wide bool) error {
+	header, err := serializeHeader(types.Entity{}, wide)
+	if err != nil {
+		return err
+	}
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader(entityHeader(wide))
+	table.SetHeader(header)
 	table.SetAutoFormatHeaders(false)
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
 	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
@@ -97,27 +103,12 @@ func printEntitiesInASCIITable(entities types.EntityList, border, wide bool) err
 	}
 
 	for _, entity := range entities {
-		table.Append(entityRecord(entity, wide))
+		record, err := serializeRecord(*entity, wide)
+		if err != nil {
+			return err
+		}
+		table.Append(record)
 	}
 	table.Render()
 	return nil
-}
-
-func entityRecord(entity *types.Entity, wide bool) []string {
-	if wide {
-		return []string{strconv.Itoa(entity.ID), entity.Name, strconv.Itoa(entity.Length), entity.Description, entity.CreateTime.Format(time.RFC3339),
-			entity.ModifyTime.Format(time.RFC3339)}
-	}
-	desc := entity.Description
-	if len(desc) > MaxDescriptionLen {
-		desc = fmt.Sprintf("%s...", desc[0:MaxDescriptionLen])
-	}
-	return []string{strconv.Itoa(entity.ID), entity.Name, strconv.Itoa(entity.Length), desc}
-}
-
-func entityHeader(wide bool) []string {
-	if wide {
-		return []string{"ID", "NAME", "LENGTH", "DESCRIPTION", "CREATE-TIME", "MODIFY-TIME"}
-	}
-	return []string{"ID", "NAME", "LENGTH", "DESCRIPTION"}
 }
