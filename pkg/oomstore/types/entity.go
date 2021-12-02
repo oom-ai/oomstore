@@ -7,13 +7,13 @@ import (
 )
 
 type Entity struct {
-	ID     int    `db:"id"`
-	Name   string `db:"name"`
-	Length int    `db:"length"`
+	ID     int    `db:"id" table:"ID,core"`
+	Name   string `db:"name" table:"NAME,core"`
+	Length int    `db:"length" table:"LENGTH,core"`
 
-	Description string    `db:"description"`
-	CreateTime  time.Time `db:"create_time"`
-	ModifyTime  time.Time `db:"modify_time"`
+	Description string    `db:"description" table:"DESCRIPTION,core,truncate"`
+	CreateTime  time.Time `db:"create_time" table:"CREATE-TIME,detail"`
+	ModifyTime  time.Time `db:"modify_time" table:"MODIFY-TIME,detail"`
 }
 
 func (e *Entity) Copy() *Entity {
