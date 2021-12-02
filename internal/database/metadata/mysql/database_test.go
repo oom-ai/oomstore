@@ -5,15 +5,16 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/mysql"
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_mysql"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-//func prepareStore(t *testing.T) (context.Context, *mysql.DB) {
-//	return prepareDB(t)
-//}
+func prepareStore(t *testing.T) (context.Context, metadata.Store) {
+	return prepareDB(t)
+}
 
 func prepareDB(t *testing.T) (context.Context, *mysql.DB) {
 	ctx := context.Background()

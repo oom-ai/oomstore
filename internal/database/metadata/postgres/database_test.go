@@ -21,7 +21,6 @@ func prepareDB(t *testing.T) (context.Context, *postgres.DB) {
 	ctx := context.Background()
 	opt := runtime_pg.PostgresDbOpt
 	pg, err := postgres.OpenDB(
-		context.Background(),
 		opt.Host,
 		opt.Port,
 		opt.User,
