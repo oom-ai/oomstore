@@ -51,6 +51,20 @@ func Create(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 	return Open(ctx, opt)
 }
 
+// Ping verifies the connections to the backend stores are still alive
+func (s *OomStore) Ping(ctx context.Context) error {
+	if err := s.online.Ping(ctx); err != nil {
+		return err
+	}
+	if err := s.offline.Ping(ctx); err != nil {
+		return err
+	}
+	if err := s.metadata.Ping(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
 // Close the connections to underlying databases.
 func (s *OomStore) Close() error {
 	errs := []error{}
