@@ -93,11 +93,11 @@ group_actual=$(oomcli get meta group -o csv --wide)
 filter() { cut -d ',' -f 1-4 <<<"$1"; }
 assert_eq "oomcli get meta group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 
-feature_expected='NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE
-model,device,user,batch,string
-price,device,user,batch,int64
-age,user,user,batch,int64
-gender,user,user,batch,int64
+feature_expected='ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
+1,model,device,user,batch,string,description
+2,price,device,user,batch,int64,description
+3,age,user,user,batch,int64,description
+4,gender,user,user,batch,int64,description
 '
 feature_actual=$(oomcli get meta feature -o csv)
 assert_eq "oomcli get meta feature" "$(sort <<< "$feature_expected")" "$(sort <<< "$feature_actual")"
