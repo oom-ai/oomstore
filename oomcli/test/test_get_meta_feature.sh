@@ -30,3 +30,34 @@ model,phone,device,batch,varchar(32),string,model,<NULL>
 actual=$(oomcli get meta feature model -o csv --wide)
 ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }
 assert_eq "$case" "$(sort <<< "$expected")" "$(ignore_time "$actual" | sort)"
+
+
+case='oomcli get meta feature: one feature'
+expected='
+kind: Feature
+name: model
+group-name: phone
+db-value-type: varchar(32)
+description: varchar(32)
+'
+
+actual=$(oomcli get meta feature model -o yaml)
+assert_eq "$case" "$expected" "$actual"
+
+case='oomcli get meta feature: multiple features'
+expected='
+items:
+    - kind: Feature
+      name: price
+      group-name: phone
+      db-value-type: int
+      description: int
+    - kind: Feature
+      name: model
+      group-name: phone
+      db-value-type: varchar(32)
+      description: varchar(32)
+'
+
+actual=$(oomcli get meta feature -o yaml)
+assert_eq "$case" "$expected" "$actual"
