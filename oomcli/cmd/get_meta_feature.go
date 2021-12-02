@@ -110,9 +110,9 @@ func printFeaturesInASCIITable(features types.FeatureList, border, wide bool) er
 
 func featureHeader(wide bool) []string {
 	if wide {
-		return []string{"NAME", "GROUP", "ENTITY", "CATEGORY", "DB-VALUE-TYPE", "VALUE-TYPE", "DESCRIPTION", "ONLINE-REVISION-ID", "CREATE-TIME", "MODIFY-TIME"}
+		return []string{"ID", "NAME", "GROUP", "ENTITY", "CATEGORY", "DB-VALUE-TYPE", "VALUE-TYPE", "DESCRIPTION", "ONLINE-REVISION-ID", "CREATE-TIME", "MODIFY-TIME"}
 	}
-	return []string{"NAME", "GROUP", "ENTITY", "CATEGORY", "VALUE-TYPE"}
+	return []string{"ID", "NAME", "GROUP", "ENTITY", "CATEGORY", "VALUE-TYPE", "DESCRIPTION"}
 }
 
 func featureRecord(f *types.Feature, wide bool) []string {
@@ -123,7 +123,11 @@ func featureRecord(f *types.Feature, wide bool) []string {
 	}
 
 	if wide {
-		return []string{f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.DBValueType, f.ValueType, f.Description, onlineRevisionID, f.CreateTime.Format(time.RFC3339), f.ModifyTime.Format(time.RFC3339)}
+		return []string{strconv.Itoa(f.ID), f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.DBValueType, f.ValueType, f.Description, onlineRevisionID, f.CreateTime.Format(time.RFC3339), f.ModifyTime.Format(time.RFC3339)}
 	}
-	return []string{f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.ValueType}
+	desc := f.Description
+	if len(desc) > MaxDescriptionLen {
+		desc = fmt.Sprintf("%s...", desc[0:MaxDescriptionLen])
+	}
+	return []string{strconv.Itoa(f.ID), f.Name, f.Group.Name, f.Entity().Name, f.Group.Category, f.ValueType, desc}
 }

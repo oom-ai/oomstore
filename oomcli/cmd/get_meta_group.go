@@ -76,7 +76,9 @@ func printGroups(groups []*types.Group, output string, wide bool) error {
 	case CSV:
 		return printGroupsInCSV(groups, wide)
 	case ASCIITable:
-		return printGroupsInASCIITable(groups, wide)
+		return printGroupsInASCIITable(groups, true, wide)
+	case Column:
+		return printGroupsInASCIITable(groups, false, wide)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
@@ -97,10 +99,22 @@ func printGroupsInCSV(groups types.GroupList, wide bool) error {
 	return nil
 }
 
-func printGroupsInASCIITable(groups types.GroupList, wide bool) error {
+func printGroupsInASCIITable(groups types.GroupList, border, wide bool) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(groupHeader(wide))
 	table.SetAutoFormatHeaders(false)
+	table.SetAlignment(tablewriter.ALIGN_LEFT)
+	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+
+	if !border {
+		table.SetBorder(false)
+		table.SetHeaderLine(false)
+		table.SetNoWhiteSpace(true)
+		table.SetCenterSeparator("")
+		table.SetColumnSeparator("")
+		table.SetRowSeparator("")
+		table.SetTablePadding("  ")
+	}
 
 	for _, group := range groups {
 		table.Append(groupRecord(group, wide))
