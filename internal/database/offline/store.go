@@ -13,5 +13,7 @@ type Store interface {
 	Import(ctx context.Context, opt ImportOpt) (int64, error)
 
 	TypeTag(dbType string) (string, error)
+
+	Ping(ctx context.Context) error
 	io.Closer
 }
