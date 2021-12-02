@@ -56,7 +56,9 @@ func printEntities(entities types.EntityList, output string, wide bool) error {
 	case CSV:
 		return printEntitiesInCSV(entities, wide)
 	case ASCIITable:
-		return printEntitiesInASCIITable(entities, wide)
+		return printEntitiesInASCIITable(entities, true, wide)
+	case Column:
+		return printEntitiesInASCIITable(entities, false, wide)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
@@ -77,10 +79,22 @@ func printEntitiesInCSV(entities types.EntityList, wide bool) error {
 	return nil
 }
 
-func printEntitiesInASCIITable(entities types.EntityList, wide bool) error {
+func printEntitiesInASCIITable(entities types.EntityList, border, wide bool) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(entityHeader(wide))
 	table.SetAutoFormatHeaders(false)
+	table.SetAlignment(tablewriter.ALIGN_LEFT)
+	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+
+	if !border {
+		table.SetBorder(false)
+		table.SetHeaderLine(false)
+		table.SetNoWhiteSpace(true)
+		table.SetCenterSeparator("")
+		table.SetColumnSeparator("")
+		table.SetRowSeparator("")
+		table.SetTablePadding("  ")
+	}
 
 	for _, entity := range entities {
 		table.Append(entityRecord(entity, wide))
