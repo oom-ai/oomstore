@@ -26,6 +26,10 @@ type Tx struct {
 	*sqlx.Tx
 }
 
+func (db *DB) Ping(ctx context.Context) error {
+	return db.DB.PingContext(ctx)
+}
+
 func Open(ctx context.Context, option *types.PostgresOpt) (*DB, error) {
 	db, err := OpenDB(ctx, option.Host, option.Port, option.User, option.Password, option.Database)
 	if err != nil {
