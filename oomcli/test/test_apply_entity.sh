@@ -40,9 +40,9 @@ assert_eq "oomcli get meta entity" "$(sort <<< "$entity_expected")" "$(sort <<< 
 
 group_expected='
 ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,student,user,student feature group,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+1,student,user,student feature group,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
-group_actual=$(oomcli get meta group -o csv)
+group_actual=$(oomcli get meta group -o csv --wide)
 filter() { cut -d ',' -f 1-4 <<<"$1"; }
 assert_eq "oomcli get meta group" "$(filter "$group_expected"| sort)" "$(filter "$group_actual" | sort)"
 
@@ -85,11 +85,11 @@ assert_eq "oomcli get meta entity" "$(sort <<< "$entity_expected")" "$(sort <<< 
 
 group_expected='
 ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,device,user,a description,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
-2,user,user,a description,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+1,device,user,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+2,user,user,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 
 '
-group_actual=$(oomcli get meta group -o csv)
+group_actual=$(oomcli get meta group -o csv --wide)
 filter() { cut -d ',' -f 1-4 <<<"$1"; }
 assert_eq "oomcli get meta group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 

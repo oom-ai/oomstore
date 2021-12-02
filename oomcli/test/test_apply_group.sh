@@ -31,10 +31,10 @@ oomcli apply -f "$TMPFILE"
 
 group_expected='
 ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,device,user,description,,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
-2,account,user,description,,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+1,device,user,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+2,account,user,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
-group_actual=$(oomcli get meta group -o csv)
+group_actual=$(oomcli get meta group -o csv --wide)
 filter() { cut -d ',' -f 1-4 <<<"$1"; }
 assert_eq "oomcli get meta group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 
@@ -68,9 +68,9 @@ oomcli apply -f "$TMPFILE"
 
 group_expected='
 ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,device,user,description,,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+1,device,user,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
-group_actual=$(oomcli get meta group -o csv)
+group_actual=$(oomcli get meta group -o csv --wide)
 filter() { cut -d ',' -f 1-4 <<<"$1"; }
 assert_eq "oomcli get meta group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 
