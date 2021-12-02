@@ -38,6 +38,10 @@ func (fg *Group) Copy() *Group {
 
 type GroupList []*Group
 
+func (l *GroupList) Len() int {
+	return len(*l)
+}
+
 func (l GroupList) Copy() GroupList {
 	if len(l) == 0 {
 		return nil
