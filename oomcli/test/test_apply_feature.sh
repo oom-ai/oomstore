@@ -36,9 +36,9 @@ description: 'description'
 EOF
 
 oomcli apply -f "$TMPFILE"
-feature_expected='NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE
-model,device,user,batch,string
-price,device,user,batch,int64
+feature_expected='ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
+1,model,device,user,batch,string,description
+2,price,device,user,batch,int64,description
 '
 feature_actual=$(oomcli get meta feature -o csv)
 assert_eq "oomcli get meta feature" "$(sort <<< "$feature_expected")" "$(sort <<< "$feature_actual")"

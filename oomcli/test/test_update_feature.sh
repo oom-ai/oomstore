@@ -9,9 +9,9 @@ import_sample > /dev/null
 case='oomcli update feature works'
 oomcli update feature price --description "new description"
 expected='
-NAME,GROUP,ENTITY,CATEGORY,DB-VALUE-TYPE,VALUE-TYPE,DESCRIPTION,ONLINE-REVISION-ID
-price,phone,device,batch,int,int64,new description,<NULL>
+ID,NAME,GROUP,ENTITY,CATEGORY,DB-VALUE-TYPE,VALUE-TYPE,DESCRIPTION,ONLINE-REVISION-ID
+1,price,phone,device,batch,int,int64,new description,<NULL>
 '
 actual=$(oomcli get meta feature price -o csv --wide)
-ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }
+ignore_time() { cut -d ',' -f 1-9 <<<"$1"; }
 assert_eq "$case"  "$expected" "$(ignore_time "$actual")"
