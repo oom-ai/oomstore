@@ -112,10 +112,7 @@ func (l TokenList) SerializeHeader(truncate bool) []string {
 func (l TokenList) SerializeRecord(truncate bool) ([]string, error) {
 	var rs []string
 	for _, t := range l {
-		s, err := serializeValue(t.Value)
-		if err != nil {
-			return nil, err
-		}
+		s := serializeValue(t.Value)
 		if t.Truncate && len(s) > MetadataFieldTruncateAt {
 			s = s[:MetadataFieldTruncateAt-3] + "..."
 		}

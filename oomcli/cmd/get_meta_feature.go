@@ -46,7 +46,13 @@ var getMetaFeatureCmd = &cobra.Command{
 		}
 
 		// print features to stdout
-		if err := printFeatures(features, *getMetaOutput, *getMetaWide); err != nil {
+		switch *getMetaOutput {
+		case YAML:
+			err = printFeatureInYaml(features)
+		default:
+			err = serializeMetadataList(features, *getMetaOutput, *getMetaWide)
+		}
+		if err != nil {
 			log.Fatalf("failed printing features, error %v\n", err)
 		}
 	},

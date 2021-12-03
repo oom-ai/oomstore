@@ -10,12 +10,12 @@ import (
 	"github.com/spf13/cast"
 )
 
-func serializeValue(i interface{}) (string, error) {
+func serializeValue(i interface{}) string {
 	switch v := i.(type) {
 	case time.Time:
-		return v.Format(time.RFC3339), nil
+		return v.Format(time.RFC3339)
 	default:
-		return cast.ToStringE(v)
+		return cast.ToString(v)
 	}
 }
 
