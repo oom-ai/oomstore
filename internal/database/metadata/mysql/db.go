@@ -53,23 +53,23 @@ func (db *DB) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) (typ
 }
 
 func (db *DB) CreateGroup(ctx context.Context, opt metadata.CreateGroupOpt) (int, error) {
-	panic("implement me")
+	return createGroup(ctx, db, opt)
 }
 
 func (db *DB) UpdateGroup(ctx context.Context, opt metadata.UpdateGroupOpt) error {
-	panic("implement me")
+	return sqlutil.UpdateGroup(ctx, db, opt)
 }
 
 func (db *DB) GetGroup(ctx context.Context, id int) (*types.Group, error) {
-	panic("implement me")
+	return sqlutil.GetGroup(ctx, db, id)
 }
 
 func (db *DB) GetGroupByName(ctx context.Context, name string) (*types.Group, error) {
-	panic("implement me")
+	return sqlutil.GetGroupByName(ctx, db, name)
 }
 
 func (db *DB) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
-	panic("implement me")
+	return sqlutil.ListGroup(ctx, db, entityID, groupIDs)
 }
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
