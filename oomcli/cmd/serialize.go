@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
 	"reflect"
 	"time"
@@ -88,7 +89,7 @@ func serializeValue(i interface{}) string {
 	}
 }
 
-func serializeMetadata(i interface{}, output string, wide bool) error {
+func serializeMetadata(w io.Writer, i interface{}, format string, wide bool) error {
 	truncate := !wide
 	headerTokens, dataTokens, err := parseTokenLists(i)
 	if err != nil {
@@ -99,31 +100,31 @@ func serializeMetadata(i interface{}, output string, wide bool) error {
 	if err != nil {
 		return err
 	}
-	switch output {
+	switch format {
 	case CSV:
-		return serializeInCSV(header, records)
+		return serializeInCSV(w, header, records)
 	case ASCIITable:
-		return serializeInASCIITable(header, records, true)
+		return serializeInASCIITable(w, header, records, true)
 	case Column:
-		return serializeInASCIITable(header, records, false)
+		return serializeInASCIITable(w, header, records, false)
 	default:
-		return fmt.Errorf("unsupported output format %s", output)
+		return fmt.Errorf("unsupported output format %s", format)
 	}
 }
 
-func serializeInCSV(header []string, records [][]string) error {
-	w := csv.NewWriter(os.Stdout)
-	if err := w.Write(header); err != nil {
+func serializeInCSV(w io.Writer, header []string, records [][]string) error {
+	cw := csv.NewWriter(w)
+	if err := cw.Write(header); err != nil {
 		return err
 	}
-	if err := w.WriteAll(records); err != nil {
+	if err := cw.WriteAll(records); err != nil {
 		return err
 	}
-	w.Flush()
+	cw.Flush()
 	return nil
 }
 
-func serializeInASCIITable(header []string, records [][]string, border bool) error {
+func serializeInASCIITable(w io.Writer, header []string, records [][]string, border bool) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(header)
 	table.SetAutoFormatHeaders(false)

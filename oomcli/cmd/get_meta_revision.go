@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -55,8 +56,7 @@ var getMetaRevisionCmd = &cobra.Command{
 			}
 		}
 
-		// print revisions to stdout
-		if err := serializeMetadata(revisions, *getMetaOutput, *getMetaWide); err != nil {
+		if err := serializeMetadata(os.Stdout, revisions, *getMetaOutput, *getMetaWide); err != nil {
 			log.Fatalf("failed printing entities, error %v\n", err)
 		}
 	},

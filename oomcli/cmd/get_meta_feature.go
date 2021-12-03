@@ -3,7 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -44,12 +46,12 @@ var getMetaFeatureCmd = &cobra.Command{
 			log.Fatalf("feature '%s' not found", args[0])
 		}
 
-		// print features to stdout
+		w := os.Stdout
 		switch *getMetaOutput {
 		case YAML:
-			err = printFeatureInYaml(features)
+			err = serializeFeaturesInYaml(w, features)
 		default:
-			err = serializeMetadata(features, *getMetaOutput, *getMetaWide)
+			err = serializeMetadata(w, features, *getMetaOutput, *getMetaWide)
 		}
 		if err != nil {
 			log.Fatalf("failed printing features, error %v\n", err)
@@ -65,7 +67,7 @@ func init() {
 	getMetaFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
 }
 
-func printFeatureInYaml(features types.FeatureList) error {
+func serializeFeaturesInYaml(w io.Writer, features types.FeatureList) error {
 	var (
 		out   []byte
 		err   error
@@ -81,6 +83,6 @@ func printFeatureInYaml(features types.FeatureList) error {
 			return err
 		}
 	}
-	fmt.Println(strings.Trim(string(out), "\n"))
+	fmt.Fprintln(w, strings.Trim(string(out), "\n"))
 	return nil
 }

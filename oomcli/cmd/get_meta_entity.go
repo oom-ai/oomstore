@@ -3,7 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -37,12 +39,13 @@ var getMetaEntityCmd = &cobra.Command{
 				log.Fatalf("entity '%s' not found", args[0])
 			}
 		}
-		// print entities to stdout
+
+		w := os.Stdout
 		switch *getMetaOutput {
 		case YAML:
-			err = printEntitiesInYaml(ctx, oomStore, entities)
+			err = serializeEntitiesInYaml(ctx, w, oomStore, entities)
 		default:
-			err = serializeMetadata(entities, *getMetaOutput, *getMetaWide)
+			err = serializeMetadata(w, entities, *getMetaOutput, *getMetaWide)
 		}
 		if err != nil {
 			log.Fatalf("failed printing entities, error: %v\n", err)
@@ -54,7 +57,7 @@ func init() {
 	getMetaCmd.AddCommand(getMetaEntityCmd)
 }
 
-func printEntitiesInYaml(ctx context.Context, store *oomstore.OomStore, entities types.EntityList) error {
+func serializeEntitiesInYaml(ctx context.Context, w io.Writer, store *oomstore.OomStore, entities types.EntityList) error {
 	var (
 		out   []byte
 		items = apply.EntityItems{
@@ -82,6 +85,6 @@ func printEntitiesInYaml(ctx context.Context, store *oomstore.OomStore, entities
 			return err
 		}
 	}
-	fmt.Println(strings.Trim(string(out), "\n"))
+	fmt.Fprintln(w, strings.Trim(string(out), "\n"))
 	return nil
 }

@@ -3,7 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -59,12 +61,12 @@ var getMetaGroupCmd = &cobra.Command{
 			}
 		}
 
-		// print groups to stdout
+		w := os.Stdout
 		switch *getMetaOutput {
 		case YAML:
-			err = printGroupInYaml(ctx, oomStore, groups)
+			err = printGroupInYaml(ctx, w, oomStore, groups)
 		default:
-			err = serializeMetadata(groups, *getMetaOutput, *getMetaWide)
+			err = serializeMetadata(w, groups, *getMetaOutput, *getMetaWide)
 		}
 		if err != nil {
 			log.Fatalf("failed printing groups, error %v\n", err)
@@ -80,7 +82,7 @@ func init() {
 	getMetaGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func printGroupInYaml(ctx context.Context, oomStore *oomstore.OomStore, groups types.GroupList) error {
+func printGroupInYaml(ctx context.Context, w io.Writer, oomStore *oomstore.OomStore, groups types.GroupList) error {
 	var (
 		out   []byte
 		err   error
@@ -100,7 +102,7 @@ func printGroupInYaml(ctx context.Context, oomStore *oomstore.OomStore, groups t
 			return err
 		}
 	}
-	fmt.Println(strings.Trim(string(out), "\n"))
+	fmt.Fprintln(w, strings.Trim(string(out), "\n"))
 	return nil
 }
 
