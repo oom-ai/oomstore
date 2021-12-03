@@ -3,8 +3,6 @@ package mysql
 import (
 	"context"
 
-	"github.com/jmoiron/sqlx"
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -61,18 +59,12 @@ func (db *DB) ListEntity(ctx context.Context, entityIDs *[]int) (types.EntityLis
 
 func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
 	var featureID int
-	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
-		id, err := createFeature(ctx, tx, opt)
-		if err != nil {
-			return err
-		}
-		featureID = id
-		return nil
+	var err error
+	err = db.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
+		featureID, err = tx.CreateFeature(c, opt)
+		return err
 	})
-	if err != nil {
-		return 0, err
-	}
-	return featureID, nil
+	return featureID, err
 }
 
 func (db *DB) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
@@ -117,8 +109,8 @@ func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt
 		dataTable  string
 		err        error
 	)
-	err = dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
-		revisionID, dataTable, err = createRevision(ctx, db, opt)
+	err = db.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
+		revisionID, dataTable, err = tx.CreateRevision(c, opt)
 		return err
 	})
 	return revisionID, dataTable, err

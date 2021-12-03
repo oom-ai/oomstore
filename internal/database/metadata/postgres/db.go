@@ -74,8 +74,8 @@ func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt
 		dataTable  string
 		err        error
 	)
-	err = db.WithTransaction(ctx, func(c context.Context, s metadata.DBStore) error {
-		revisionID, dataTable, err = createRevision(ctx, db, opt)
+	err = db.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
+		revisionID, dataTable, err = tx.CreateRevision(c, opt)
 		return err
 	})
 	return revisionID, dataTable, err
