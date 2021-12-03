@@ -14,8 +14,7 @@ import (
 )
 
 var _ metadata.Store = &DB{}
-
-//var _ metadata.DBStore = &Tx{}
+var _ metadata.DBStore = &Tx{}
 
 type DB struct {
 	*sqlx.DB

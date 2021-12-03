@@ -14,6 +14,31 @@ const (
 	ER_DUP_ENTRY = 1062
 )
 
+func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, metadata.DBStore) error) error {
+	tx, err := db.BeginTxx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	txStore := &Tx{Tx: tx}
+
+	defer func() {
+		if p := recover(); p != nil {
+			// a panic occurred, rollback and repanic
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			// something went wrong, rollback
+			_ = tx.Rollback()
+		} else {
+			// all good, commit
+			err = tx.Commit()
+		}
+	}()
+
+	return fn(ctx, txStore)
+}
+
 func (db *DB) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
 	return createEntity(ctx, db, opt)
 }
@@ -113,8 +138,4 @@ func (db *DB) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*
 
 func (db *DB) ListRevision(ctx context.Context, groupID *int) (types.RevisionList, error) {
 	return sqlutil.ListRevision(ctx, db, groupID)
-}
-
-func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, metadata.DBStore) error) error {
-	panic("implement me")
 }
