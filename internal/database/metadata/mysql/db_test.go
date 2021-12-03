@@ -73,3 +73,23 @@ func TestCacheListFeature(t *testing.T) {
 func TestUpdateFeature(t *testing.T) {
 	test_impl.TestUpdateFeature(t, prepareStore)
 }
+
+func TestCreateRevision(t *testing.T) {
+	test_impl.TestCreateRevision(t, prepareStore)
+}
+
+func TestUpdateRevision(t *testing.T) {
+	test_impl.TestUpdateRevision(t, prepareStore)
+}
+
+func TestGetRevision(t *testing.T) {
+	test_impl.TestGetRevision(t, prepareStore)
+}
+
+func TestGetRevisionBy(t *testing.T) {
+	test_impl.TestGetRevisionBy(t, prepareStore)
+}
+
+func TestListRevision(t *testing.T) {
+	test_impl.TestListRevision(t, prepareStore)
+}
