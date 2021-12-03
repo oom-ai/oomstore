@@ -14,6 +14,31 @@ const (
 	ER_DUP_ENTRY = 1062
 )
 
+func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, metadata.DBStore) error) error {
+	tx, err := db.BeginTxx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	txStore := &Tx{Tx: tx}
+
+	defer func() {
+		if p := recover(); p != nil {
+			// a panic occurred, rollback and repanic
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			// something went wrong, rollback
+			_ = tx.Rollback()
+		} else {
+			// all good, commit
+			err = tx.Commit()
+		}
+	}()
+
+	return fn(ctx, txStore)
+}
+
 func (db *DB) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
 	return createEntity(ctx, db, opt)
 }
@@ -87,25 +112,30 @@ func (db *DB) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (ty
 }
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
-	panic("implement me")
+	var (
+		revisionID int
+		dataTable  string
+		err        error
+	)
+	err = dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+		revisionID, dataTable, err = createRevision(ctx, db, opt)
+		return err
+	})
+	return revisionID, dataTable, err
 }
 
 func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
-	panic("implement me")
+	return sqlutil.UpdateRevision(ctx, db, opt)
 }
 
 func (db *DB) GetRevision(ctx context.Context, id int) (*types.Revision, error) {
-	panic("implement me")
+	return sqlutil.GetRevision(ctx, db, id)
 }
 
 func (db *DB) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
-	panic("implement me")
+	return sqlutil.GetRevisionBy(ctx, db, groupID, revision)
 }
 
 func (db *DB) ListRevision(ctx context.Context, groupID *int) (types.RevisionList, error) {
-	panic("implement me")
-}
-
-func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, metadata.DBStore) error) error {
-	panic("implement me")
+	return sqlutil.ListRevision(ctx, db, groupID)
 }
