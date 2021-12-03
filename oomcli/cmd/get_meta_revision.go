@@ -18,6 +18,11 @@ var getRevisionOpt getRevisionOption
 var getMetaRevisionCmd = &cobra.Command{
 	Use:   "revision",
 	Short: "get existing revision given specific conditions",
+	PreRun: func(cmd *cobra.Command, args []string) {
+		if !cmd.Flags().Changed("group") {
+			getRevisionOpt.groupName = nil
+		}
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
 			log.Fatalf("argument at most one, got %d", len(args))

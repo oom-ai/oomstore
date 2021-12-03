@@ -90,12 +90,12 @@ func serializeValue(i interface{}) string {
 
 func serializeMetadata(i interface{}, output string, wide bool) error {
 	truncate := !wide
-	lists, err := parseTokenLists(i)
+	headerTokens, dataTokens, err := parseTokenLists(i)
 	if err != nil {
 		return err
 	}
-	header := parseHeader(lists, wide, truncate)
-	records, err := parseRecords(lists, wide, truncate)
+	header := parseHeader(headerTokens, wide, truncate)
+	records, err := parseRecords(dataTokens, wide, truncate)
 	if err != nil {
 		return err
 	}
@@ -145,12 +145,11 @@ func serializeInASCIITable(header []string, records [][]string, border bool) err
 	return nil
 }
 
-func parseHeader(tokens []TokenList, wide, truncate bool) []string {
-	t := tokens[0]
+func parseHeader(tokens TokenList, wide, truncate bool) []string {
 	if !wide {
-		t = t.Brief()
+		return tokens.Brief().SerializeHeader(truncate)
 	}
-	return t.SerializeHeader(truncate)
+	return tokens.SerializeHeader(truncate)
 }
 
 func parseRecords(tokens []TokenList, wide, truncate bool) ([][]string, error) {

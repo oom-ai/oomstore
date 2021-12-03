@@ -55,11 +55,14 @@ type FlattenRevision struct {
 	ModifyTime time.Time `oomcli:"MODIFY-TIME,wide"`
 }
 
-func parseTokenLists(i interface{}) (rs []TokenList, err error) {
+func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenList, err error) {
+	var element interface{}
+	var tokens TokenList
 	switch s := i.(type) {
 	case types.EntityList:
+		element = FlattenEntity{}
 		for _, e := range s {
-			tokens, err := parseTokens(FlattenEntity{
+			tokens, err = parseTokens(FlattenEntity{
 				ID:          e.ID,
 				Name:        e.Name,
 				Length:      e.Length,
@@ -68,14 +71,14 @@ func parseTokenLists(i interface{}) (rs []TokenList, err error) {
 				ModifyTime:  e.ModifyTime,
 			})
 			if err != nil {
-				return nil, err
+				return
 			}
-			rs = append(rs, tokens)
+			dataTokens = append(dataTokens, tokens)
 		}
-		return
 	case types.FeatureList:
+		element = FlattenFeature{}
 		for _, e := range s {
-			tokens, err := parseTokens(FlattenFeature{
+			tokens, err = parseTokens(FlattenFeature{
 				ID:               e.ID,
 				Name:             e.Name,
 				Group:            e.Group.Name,
@@ -89,14 +92,14 @@ func parseTokenLists(i interface{}) (rs []TokenList, err error) {
 				ModifyTime:       e.ModifyTime,
 			})
 			if err != nil {
-				return nil, err
+				return
 			}
-			rs = append(rs, tokens)
+			dataTokens = append(dataTokens, tokens)
 		}
-		return
 	case types.GroupList:
+		element = FlattenGroup{}
 		for _, e := range s {
-			tokens, err := parseTokens(FlattenGroup{
+			tokens, err = parseTokens(FlattenGroup{
 				ID:               e.ID,
 				Name:             e.Name,
 				Entity:           e.Entity.Name,
@@ -106,14 +109,14 @@ func parseTokenLists(i interface{}) (rs []TokenList, err error) {
 				ModifyTime:       e.ModifyTime,
 			})
 			if err != nil {
-				return nil, err
+				return
 			}
-			rs = append(rs, tokens)
+			dataTokens = append(dataTokens, tokens)
 		}
-		return
 	case types.RevisionList:
+		element = FlattenRevision{}
 		for _, e := range s {
-			tokens, err := parseTokens(FlattenRevision{
+			tokens, err = parseTokens(FlattenRevision{
 				ID:          e.ID,
 				Revision:    e.Revision,
 				Group:       e.Group.Name,
@@ -124,12 +127,16 @@ func parseTokenLists(i interface{}) (rs []TokenList, err error) {
 				ModifyTime:  e.ModifyTime,
 			})
 			if err != nil {
-				return nil, err
+				return
 			}
-			rs = append(rs, tokens)
+			dataTokens = append(dataTokens, tokens)
 		}
-		return
 	default:
-		return nil, fmt.Errorf("unsupported type %T", i)
+		return nil, nil, fmt.Errorf("unsupported type %T", i)
 	}
+	headerTokens, err = parseTokens(element)
+	if err != nil {
+		return
+	}
+	return
 }
