@@ -23,3 +23,57 @@ expected='ID,NAME,LENGTH,DESCRIPTION
 '
 actual=$(oomcli get meta entity -o csv)
 assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"
+
+case='oomcli get meta entity -o yaml: one entity'
+expected='
+kind: Entity
+name: device
+length: 32
+description: device
+batch-features:
+    - group: phone
+      description: phone
+      features:
+        - name: price
+          db-value-type: int
+          description: price
+        - name: model
+          db-value-type: varchar(32)
+          description: model
+'
+
+actual=$(oomcli get meta entity device -o yaml)
+assert_eq "$case" "$expected" "$actual"
+
+case='oomcli get meta entity -o yaml: multiple entities'
+expected='
+items:
+    - kind: Entity
+      name: device
+      length: 32
+      description: device
+      batch-features:
+        - group: phone
+          description: phone
+          features:
+            - name: price
+              db-value-type: int
+              description: price
+            - name: model
+              db-value-type: varchar(32)
+              description: model
+    - kind: Entity
+      name: user
+      length: 64
+      description: user
+      batch-features:
+        - group: student
+          description: student
+          features:
+            - name: age
+              db-value-type: int
+              description: age
+'
+
+actual=$(oomcli get meta entity -o yaml)
+assert_eq "$case" "$expected" "$actual"
