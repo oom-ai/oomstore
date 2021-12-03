@@ -33,19 +33,19 @@ func (tx *Tx) CreateGroup(ctx context.Context, opt metadata.CreateGroupOpt) (int
 }
 
 func (tx *Tx) UpdateGroup(ctx context.Context, opt metadata.UpdateGroupOpt) error {
-	return updateGroup(ctx, tx, opt)
+	return sqlutil.UpdateGroup(ctx, tx, opt)
 }
 
 func (tx *Tx) GetGroup(ctx context.Context, id int) (*types.Group, error) {
-	return getGroup(ctx, tx, id)
+	return sqlutil.GetGroup(ctx, tx, id)
 }
 
 func (tx *Tx) GetGroupByName(ctx context.Context, name string) (*types.Group, error) {
-	return getGroupByName(ctx, tx, name)
+	return sqlutil.GetGroupByName(ctx, tx, name)
 }
 
 func (tx *Tx) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
-	return listGroup(ctx, tx, entityID, groupIDs)
+	return sqlutil.ListGroup(ctx, tx, entityID, groupIDs)
 }
 
 func (tx *Tx) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
@@ -53,19 +53,19 @@ func (tx *Tx) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) 
 }
 
 func (tx *Tx) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
-	return updateFeature(ctx, tx, opt)
+	return sqlutil.UpdateFeature(ctx, tx, opt)
 }
 
 func (tx *Tx) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
-	return getFeature(ctx, tx, id)
+	return sqlutil.GetFeature(ctx, tx, id)
 }
 
 func (tx *Tx) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) (types.FeatureList, error) {
-	return listFeature(ctx, tx, opt)
+	return sqlutil.ListFeature(ctx, tx, opt)
 }
 
 func (tx *Tx) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
-	return getFeatureByName(ctx, tx, name)
+	return sqlutil.GetFeatureByName(ctx, tx, name)
 }
 
 func (tx *Tx) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
