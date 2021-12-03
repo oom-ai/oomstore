@@ -33,19 +33,19 @@ func (tx *Tx) CreateGroup(ctx context.Context, opt metadata.CreateGroupOpt) (int
 }
 
 func (tx *Tx) UpdateGroup(ctx context.Context, opt metadata.UpdateGroupOpt) error {
-	return updateGroup(ctx, tx, opt)
+	return sqlutil.UpdateGroup(ctx, tx, opt)
 }
 
 func (tx *Tx) GetGroup(ctx context.Context, id int) (*types.Group, error) {
-	return getGroup(ctx, tx, id)
+	return sqlutil.GetGroup(ctx, tx, id)
 }
 
 func (tx *Tx) GetGroupByName(ctx context.Context, name string) (*types.Group, error) {
-	return getGroupByName(ctx, tx, name)
+	return sqlutil.GetGroupByName(ctx, tx, name)
 }
 
 func (tx *Tx) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
-	return listGroup(ctx, tx, entityID, groupIDs)
+	return sqlutil.ListGroup(ctx, tx, entityID, groupIDs)
 }
 
 func (tx *Tx) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
