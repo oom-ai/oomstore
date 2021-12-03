@@ -10,6 +10,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -93,7 +94,7 @@ func getRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*ty
 		return nil, err
 	}
 
-	group, err := getGroup(ctx, sqlxCtx, revision.GroupID)
+	group, err := sqlutil.GetGroup(ctx, sqlxCtx, revision.GroupID)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +112,7 @@ func getRevisionBy(ctx context.Context, sqlxCtx metadata.SqlxContext, groupID in
 		return nil, err
 	}
 
-	group, err := getGroup(ctx, sqlxCtx, r.GroupID)
+	group, err := sqlutil.GetGroup(ctx, sqlxCtx, r.GroupID)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +139,7 @@ func listRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, groupID *in
 
 func enrichRevisions(ctx context.Context, sqlxCtx metadata.SqlxContext, revisions types.RevisionList) error {
 	groupIDs := revisions.GroupIDs()
-	groups, err := listGroup(ctx, sqlxCtx, nil, &groupIDs)
+	groups, err := sqlutil.ListGroup(ctx, sqlxCtx, nil, &groupIDs)
 	if err != nil {
 		return err
 	}
