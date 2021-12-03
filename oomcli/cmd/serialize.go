@@ -63,7 +63,7 @@ func parseHeaderTag(st interface{}) (HeaderTagList, error) {
 		if err != nil {
 			return rs, err
 		}
-		tableTag, err := tags.Get("table")
+		tableTag, err := tags.Get("oomcli")
 		if err != nil {
 			return rs, err
 		}
