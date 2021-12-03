@@ -146,7 +146,7 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, "description", feature.Description)
 }
 
-func TestCatheListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	ctx, store := prepareStore(t)
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
