@@ -87,7 +87,6 @@ group_expected='
 ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
 1,device,user,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 2,user,user,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
-
 '
 group_actual=$(oomcli get meta group -o csv --wide)
 filter() { cut -d ',' -f 1-4 <<<"$1"; }

@@ -11,6 +11,7 @@ expected='
 ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION,DB-VALUE-TYPE,ONLINE-REVISION-ID
 1,price,phone,device,batch,int64,price,int,<NULL>
 2,model,phone,device,batch,string,model,varchar(32),<NULL>
+3,age,student,user,batch,int64,age,int,<NULL>
 '
 actual=$(oomcli get meta feature -o csv --wide)
 ignore_time() { cut -d ',' -f 1-9 <<<"$1"; }
@@ -20,6 +21,7 @@ case='oomcli get simplified meta features works'
 expected='ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
 1,price,phone,device,batch,int64,price
 2,model,phone,device,batch,string,model
+3,age,student,user,batch,int64,age
 '
 actual=$(oomcli get meta feature -o csv)
 assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"
@@ -40,7 +42,7 @@ kind: Feature
 name: model
 group-name: phone
 db-value-type: varchar(32)
-description: varchar(32)
+description: model
 '
 
 actual=$(oomcli get meta feature model -o yaml)
@@ -53,12 +55,17 @@ items:
       name: price
       group-name: phone
       db-value-type: int
-      description: int
+      description: price
     - kind: Feature
       name: model
       group-name: phone
       db-value-type: varchar(32)
-      description: varchar(32)
+      description: model
+    - kind: Feature
+      name: age
+      group-name: student
+      db-value-type: int
+      description: age
 '
 
 actual=$(oomcli get meta feature -o yaml)

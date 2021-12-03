@@ -1,4 +1,4 @@
-package postgres_test
+package mysql_test
 
 import (
 	"context"
@@ -6,9 +6,8 @@ import (
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/internal/database/metadata/postgres"
-	"github.com/oom-ai/oomstore/internal/database/metadata/test_impl"
-	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
+	"github.com/oom-ai/oomstore/internal/database/metadata/mysql"
+	"github.com/oom-ai/oomstore/internal/database/test/runtime_mysql"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -17,28 +16,28 @@ func prepareStore(t *testing.T) (context.Context, metadata.Store) {
 	return prepareDB(t)
 }
 
-func prepareDB(t *testing.T) (context.Context, *postgres.DB) {
+func prepareDB(t *testing.T) (context.Context, *mysql.DB) {
 	ctx := context.Background()
-	opt := runtime_pg.PostgresDbOpt
-	pg, err := postgres.OpenDB(
+	opt := runtime_mysql.MySQLDbOpt
+	db, err := mysql.OpenDB(
 		opt.Host,
 		opt.Port,
 		opt.User,
 		opt.Password,
-		"test",
+		opt.Database,
 	)
 	require.NoError(t, err)
-	_, err = pg.ExecContext(ctx, "drop database if exists oomstore")
+	_, err = db.ExecContext(ctx, "drop database if exists test")
 	require.NoError(t, err)
-	pg.Close()
+	db.Close()
 
-	err = postgres.CreateDatabase(ctx, runtime_pg.PostgresDbOpt)
-	require.NoError(t, err)
-
-	db, err := postgres.Open(context.Background(), &runtime_pg.PostgresDbOpt)
+	err = mysql.CreateDatabase(ctx, runtime_mysql.MySQLDbOpt)
 	require.NoError(t, err)
 
-	return ctx, db
+	mysqlDB, err := mysql.Open(ctx, &runtime_mysql.MySQLDbOpt)
+	require.NoError(t, err)
+
+	return ctx, mysqlDB
 }
 
 func TestCreateDatabase(t *testing.T) {
@@ -49,15 +48,15 @@ func TestCreateDatabase(t *testing.T) {
 	err := store.SelectContext(ctx, &tables,
 		`SELECT table_name
 			FROM information_schema.tables
-			WHERE table_schema = 'public'
+			WHERE table_schema = 'test'
 			ORDER BY table_name;`)
 	require.NoError(t, err)
 
 	var wantTables []string
-	for table := range postgres.META_TABLE_SCHEMAS {
+	for table := range mysql.META_TABLE_SCHEMAS {
 		wantTables = append(wantTables, table)
 	}
-	for table := range postgres.META_VIEW_SCHEMAS {
+	for table := range mysql.META_VIEW_SCHEMAS {
 		wantTables = append(wantTables, table)
 	}
 
@@ -70,6 +69,6 @@ func TestCreateDatabase(t *testing.T) {
 	assert.Equal(t, wantTables, tables)
 }
 
-func TestPing(t *testing.T) {
-	test_impl.TestPing(t, prepareStore)
-}
+//func TestPing(t *testing.T) {
+//	test_impl.TestPing(t, prepareStore)
+//}

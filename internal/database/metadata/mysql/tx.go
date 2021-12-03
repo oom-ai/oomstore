@@ -1,4 +1,4 @@
-package postgres
+package mysql
 
 import (
 	"context"
@@ -7,6 +7,10 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
+
+func (tx *Tx) WithTransaction(ctx context.Context, fn func(context.Context, metadata.DBStore) error) error {
+	return fn(ctx, tx)
+}
 
 func (tx *Tx) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
 	return createEntity(ctx, tx, opt)

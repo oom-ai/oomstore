@@ -27,9 +27,9 @@ func NewApplyStage() *ApplyStage {
 }
 
 type Feature struct {
-	Kind        string `mapstructure:"kind" yaml:"kind"`
+	Kind        string `mapstructure:"kind" yaml:"kind,omitempty"`
 	Name        string `mapstructure:"name" yaml:"name"`
-	GroupName   string `mapstructure:"group-name" yaml:"group-name"`
+	GroupName   string `mapstructure:"group-name" yaml:"group-name,omitempty"`
 	DBValueType string `mapstructure:"db-value-type" yaml:"db-value-type"`
 	Description string `mapstructure:"description" yaml:"description"`
 }
@@ -48,6 +48,13 @@ type FeatureItems struct {
 	Items []Feature `mapstructure:"items" yaml:"items"`
 }
 
+func (f FeatureItems) Walk(walkFunc func(Feature) Feature) (rs FeatureItems) {
+	for _, i := range f.Items {
+		rs.Items = append(rs.Items, walkFunc(i))
+	}
+	return
+}
+
 func FromFeatureList(features types.FeatureList) FeatureItems {
 	items := FeatureItems{
 		Items: make([]Feature, 0, features.Len()),
@@ -59,20 +66,65 @@ func FromFeatureList(features types.FeatureList) FeatureItems {
 			Name:        f.Name,
 			GroupName:   f.Group.Name,
 			DBValueType: f.DBValueType,
-			Description: f.DBValueType,
+			Description: f.Description,
 		})
 	}
 	return items
 }
 
 type Group struct {
-	Kind        string    `mapstructure:"kind"`
-	Group       string    `mapstructure:"group"`
-	Name        string    `mapstructure:"name"`
-	EntityName  string    `mapstructure:"entity-name"`
-	Category    string    `mapstructure:"category"`
-	Description string    `mapstructure:"description"`
-	Features    []Feature `mapstructure:"features"`
+	Kind        string    `mapstructure:"kind" yaml:"kind,omitempty"`
+	Group       string    `mapstructure:"group" yaml:"group,omitempty"`
+	Name        string    `mapstructure:"name" yaml:"name,omitempty"`
+	EntityName  string    `mapstructure:"entity-name" yaml:"entity-name,omitempty"`
+	Category    string    `mapstructure:"category" yaml:"category,omitempty"`
+	Description string    `mapstructure:"description" yaml:"description"`
+	Features    []Feature `mapstructure:"features" yaml:"features,omitempty"`
+}
+
+type GroupItems struct {
+	Items []Group `mapstructure:"item" yaml:"items"`
+}
+
+func (g *GroupItems) Filter(filter func(Group) bool) (rs GroupItems) {
+	for _, item := range g.Items {
+		if filter(item) {
+			rs.Items = append(rs.Items, item)
+		}
+	}
+	return
+}
+
+func (g GroupItems) Walk(walkFunc func(Group) Group) (rs GroupItems) {
+	for _, i := range g.Items {
+		rs.Items = append(rs.Items, walkFunc(i))
+	}
+	return
+}
+
+func FromGroupList(groups types.GroupList, features types.FeatureList) *GroupItems {
+	items := &GroupItems{
+		Items: make([]Group, 0, groups.Len()),
+	}
+
+	for _, group := range groups {
+		items.Items = append(items.Items, Group{
+			Kind:        "Group",
+			Name:        group.Name,
+			EntityName:  group.Entity.Name,
+			Category:    group.Category,
+			Description: group.Description,
+			Features: FromFeatureList(features.Filter(func(f *types.Feature) bool {
+				return f.Group.Name == group.Name
+			})).Walk(func(f Feature) Feature {
+				f.Kind = ""
+				f.GroupName = ""
+				return f
+			}).Items,
+		})
+	}
+
+	return items
 }
 
 func (g *Group) Validate() error {
@@ -83,13 +135,13 @@ func (g *Group) Validate() error {
 }
 
 type Entity struct {
-	Kind        string `mapstructure:"kind"`
-	Name        string `mapstructure:"name"`
-	Length      int    `mapstructure:"length"`
-	Description string `mapstructure:"description"`
+	Kind        string `mapstructure:"kind" yaml:"kind"`
+	Name        string `mapstructure:"name" yaml:"name"`
+	Length      int    `mapstructure:"length" yaml:"length"`
+	Description string `mapstructure:"description" yaml:"description"`
 
-	BatchFeatures  []Group   `mapstructure:"batch-features"`
-	StreamFeatures []Feature `mapstructure:"stream-features"`
+	BatchFeatures  []Group   `mapstructure:"batch-features" yaml:"batch-features,omitempty"`
+	StreamFeatures []Feature `mapstructure:"stream-features" yaml:"stream-features,omitempty"`
 }
 
 func (e *Entity) Validate() error {
@@ -97,4 +149,30 @@ func (e *Entity) Validate() error {
 		return errdefs.InvalidAttribute(fmt.Errorf("the name of entity should not be empty"))
 	}
 	return nil
+}
+
+type EntityItems struct {
+	Items []Entity `yaml:"items"`
+}
+
+func FromEntityList(entities types.EntityList, groups *GroupItems) (items EntityItems) {
+	for _, entity := range entities {
+		items.Items = append(items.Items, Entity{
+			Kind:        "Entity",
+			Name:        entity.Name,
+			Length:      entity.Length,
+			Description: entity.Description,
+			BatchFeatures: groups.Filter(func(g Group) bool {
+				return g.EntityName == entity.Name
+			}).Walk(func(g Group) Group {
+				g.Kind = ""
+				g.EntityName = ""
+				g.Category = ""
+				g.Group = g.Name
+				g.Name = ""
+				return g
+			}).Items,
+		})
+	}
+	return
 }
