@@ -7,8 +7,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -26,19 +26,15 @@ type Tx struct {
 	*sqlx.Tx
 }
 
-func (db *DB) Ping(ctx context.Context) error {
-	return db.DB.PingContext(ctx)
-}
-
 func Open(ctx context.Context, option *types.PostgresOpt) (*DB, error) {
-	db, err := OpenDB(ctx, option.Host, option.Port, option.User, option.Password, option.Database)
+	db, err := OpenDB(option.Host, option.Port, option.User, option.Password, option.Database)
 	if err != nil {
 		return nil, err
 	}
 
 	// TODO: make the interval configurable
 	informer, err := informer.New(time.Second, func() (*informer.Cache, error) {
-		return list(ctx, db)
+		return sqlutil.ListMetaData(ctx, db)
 	})
 	if err != nil {
 		db.Close()
@@ -50,7 +46,7 @@ func Open(ctx context.Context, option *types.PostgresOpt) (*DB, error) {
 	}, nil
 }
 
-func OpenDB(ctx context.Context, host, port, user, password, database string) (*sqlx.DB, error) {
+func OpenDB(host, port, user, password, database string) (*sqlx.DB, error) {
 	return sqlx.Open(
 		"postgres",
 		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
@@ -62,6 +58,10 @@ func OpenDB(ctx context.Context, host, port, user, password, database string) (*
 	)
 }
 
+func (db *DB) Ping(ctx context.Context) error {
+	return db.DB.PingContext(ctx)
+}
+
 func (db *DB) Close() error {
 	if err := db.Informer.Close(); err != nil {
 		return err
@@ -70,30 +70,6 @@ func (db *DB) Close() error {
 		return err
 	}
 	return nil
-}
-
-func list(ctx context.Context, db *sqlx.DB) (*informer.Cache, error) {
-	var cache *informer.Cache
-	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
-		entities := types.EntityList{}
-		if err := tx.SelectContext(ctx, &entities, `SELECT * FROM "entity"`); err != nil {
-			return err
-		}
-
-		features := types.FeatureList{}
-		if err := tx.SelectContext(ctx, &features, `SELECT * FROM "feature"`); err != nil {
-			return err
-		}
-
-		groups := types.GroupList{}
-		if err := tx.SelectContext(ctx, &groups, `SELECT * FROM "feature_group"`); err != nil {
-			return err
-		}
-
-		cache = informer.NewCache(entities, features, groups)
-		return nil
-	})
-	return cache, err
 }
 
 func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, metadata.DBStore) error) (err error) {
