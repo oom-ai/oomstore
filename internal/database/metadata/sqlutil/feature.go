@@ -12,13 +12,13 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func updateFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateFeatureOpt) error {
+func UpdateFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateFeatureOpt) error {
 	if opt.NewDescription == nil {
 		return fmt.Errorf("invalid option: nothing to update")
 	}
 
-	query := "UPDATE feature SET description = $1 WHERE id = $2"
-	result, err := sqlxCtx.ExecContext(ctx, query, opt.NewDescription, opt.FeatureID)
+	query := "UPDATE feature SET description = ? WHERE id = ?"
+	result, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(query), opt.NewDescription, opt.FeatureID)
 	if err != nil {
 		return err
 	}
@@ -32,22 +32,15 @@ func updateFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metada
 	return nil
 }
 
-func validateDataType(ctx context.Context, sqlxCtx metadata.SqlxContext, dataType string) error {
-	tmpTable := dbutil.TempTable("validate_data_type")
-	stmt := fmt.Sprintf("CREATE TEMPORARY TABLE %s (a %s) ON COMMIT DROP", tmpTable, dataType)
-	_, err := sqlxCtx.ExecContext(ctx, stmt)
-	return err
-}
-
-func getFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*types.Feature, error) {
+func GetFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*types.Feature, error) {
 	var (
 		feature types.Feature
 		group   *types.Group
 		err     error
 	)
 
-	query := `SELECT * FROM "feature" WHERE id = $1`
-	if err := sqlxCtx.GetContext(ctx, &feature, query, id); err != nil {
+	query := `SELECT * FROM feature WHERE id = ?`
+	if err := sqlxCtx.GetContext(ctx, &feature, sqlxCtx.Rebind(query), id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errdefs.NotFound(fmt.Errorf("feature %d not found", id))
 		}
@@ -62,15 +55,15 @@ func getFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*typ
 	return &feature, nil
 }
 
-func getFeatureByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name string) (*types.Feature, error) {
+func GetFeatureByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name string) (*types.Feature, error) {
 	var (
 		feature types.Feature
 		group   *types.Group
 		err     error
 	)
 
-	query := `SELECT * FROM "feature" WHERE name = $1`
-	if err := sqlxCtx.GetContext(ctx, &feature, query, name); err != nil {
+	query := `SELECT * FROM feature WHERE name = ?`
+	if err := sqlxCtx.GetContext(ctx, &feature, sqlxCtx.Rebind(query), name); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errdefs.NotFound(fmt.Errorf("feature %s not found", name))
 		}
@@ -85,13 +78,13 @@ func getFeatureByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name st
 	return &feature, nil
 }
 
-func listFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.ListFeatureOpt) (types.FeatureList, error) {
+func ListFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.ListFeatureOpt) (types.FeatureList, error) {
 	var (
 		features types.FeatureList
 		err      error
 	)
 
-	query := `SELECT * FROM "feature"`
+	query := `SELECT * FROM feature`
 	cond, args, err := buildListFeatureCond(opt)
 	if err != nil {
 		return nil, err
