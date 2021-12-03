@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"reflect"
 	"time"
 
 	"github.com/olekukonko/tablewriter"
@@ -11,6 +12,9 @@ import (
 )
 
 func serializeValue(i interface{}) string {
+	if reflect.TypeOf(i).Kind() == reflect.Ptr && reflect.ValueOf(i).IsNil() {
+		return "<NULL>"
+	}
 	switch v := i.(type) {
 	case time.Time:
 		return v.Format(time.RFC3339)
