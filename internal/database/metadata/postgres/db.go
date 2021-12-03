@@ -53,19 +53,19 @@ func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) 
 }
 
 func (db *DB) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
-	return updateFeature(ctx, db, opt)
+	return sqlutil.UpdateFeature(ctx, db, opt)
 }
 
 func (db *DB) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
-	return getFeature(ctx, db, id)
+	return sqlutil.GetFeature(ctx, db, id)
 }
 
 func (db *DB) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) (types.FeatureList, error) {
-	return listFeature(ctx, db, opt)
+	return sqlutil.ListFeature(ctx, db, opt)
 }
 
 func (db *DB) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
-	return getFeatureByName(ctx, db, name)
+	return sqlutil.GetFeatureByName(ctx, db, name)
 }
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
