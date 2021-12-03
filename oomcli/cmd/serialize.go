@@ -11,6 +11,7 @@ import (
 	"github.com/fatih/structtag"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cast"
+	"gopkg.in/yaml.v3"
 )
 
 type Token struct {
@@ -166,4 +167,21 @@ func parseRecords(tokens []TokenList, wide, truncate bool) ([][]string, error) {
 		rs = append(rs, record)
 	}
 	return rs, nil
+}
+
+func serializeInYaml(w io.Writer, items interface{}) error {
+	encoder := yaml.NewEncoder(w)
+	defer encoder.Close()
+
+	slice := reflect.ValueOf(items).Field(0)
+	if slice.Len() > 1 {
+		if err := encoder.Encode(items); err != nil {
+			return err
+		}
+	} else if slice.Len() == 1 {
+		if err := encoder.Encode(slice.Index(0).Interface()); err != nil {
+			return err
+		}
+	}
+	return nil
 }

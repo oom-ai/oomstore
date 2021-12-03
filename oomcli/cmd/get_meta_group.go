@@ -2,17 +2,13 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 )
 
 type getMetaGroupOption struct {
@@ -64,7 +60,7 @@ var getMetaGroupCmd = &cobra.Command{
 		w := os.Stdout
 		switch *getMetaOutput {
 		case YAML:
-			err = printGroupInYaml(ctx, w, oomStore, groups)
+			err = serializeGroupInYaml(ctx, w, oomStore, groups)
 		default:
 			err = serializeMetadata(w, groups, *getMetaOutput, *getMetaWide)
 		}
@@ -82,36 +78,10 @@ func init() {
 	getMetaGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func printGroupInYaml(ctx context.Context, w io.Writer, oomStore *oomstore.OomStore, groups types.GroupList) error {
-	var (
-		out   []byte
-		err   error
-		items *apply.GroupItems
-	)
-
-	if items, err = groupsToApplyGroupItems(ctx, oomStore, groups); err != nil {
+func serializeGroupInYaml(ctx context.Context, w io.Writer, oomStore *oomstore.OomStore, groups types.GroupList) error {
+	if items, err := groupsToApplyGroupItems(ctx, oomStore, groups); err != nil {
 		return err
+	} else {
+		return serializeInYaml(w, *items)
 	}
-
-	if len(items.Items) > 1 {
-		if out, err = yaml.Marshal(items); err != nil {
-			return err
-		}
-	} else if len(items.Items) == 1 {
-		if out, err = yaml.Marshal(items.Items[0]); err != nil {
-			return err
-		}
-	}
-	fmt.Fprintln(w, strings.Trim(string(out), "\n"))
-	return nil
-}
-
-func groupsToApplyGroupItems(ctx context.Context, store *oomstore.OomStore, groups types.GroupList) (*apply.GroupItems, error) {
-	// TODO: Use group ids to filter, rather than taking them all out
-	features, err := store.ListFeature(ctx, types.ListFeatureOpt{})
-	if err != nil {
-		return nil, err
-	}
-
-	return apply.FromGroupList(groups, features), nil
 }

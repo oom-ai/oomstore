@@ -2,17 +2,14 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 )
 
 var getMetaEntityCmd = &cobra.Command{
@@ -58,33 +55,16 @@ func init() {
 }
 
 func serializeEntitiesInYaml(ctx context.Context, w io.Writer, store *oomstore.OomStore, entities types.EntityList) error {
-	var (
-		out   []byte
-		items = apply.EntityItems{
-			Items: make([]apply.Entity, 0, entities.Len()),
-		}
-	)
-
 	// TODO: Use entitys ids to filter, rather than taking them all out
 	groups, err := store.ListGroup(ctx, nil)
 	if err != nil {
 		return err
 	}
+
 	groupItems, err := groupsToApplyGroupItems(ctx, store, groups)
 	if err != nil {
 		return err
 	}
 
-	items = apply.FromEntityList(entities, groupItems)
-	if len(items.Items) > 1 {
-		if out, err = yaml.Marshal(items); err != nil {
-			return err
-		}
-	} else if len(items.Items) == 1 {
-		if out, err = yaml.Marshal(items.Items[0]); err != nil {
-			return err
-		}
-	}
-	fmt.Fprintln(w, strings.Trim(string(out), "\n"))
-	return nil
+	return serializeInYaml(w, apply.FromEntityList(entities, groupItems))
 }

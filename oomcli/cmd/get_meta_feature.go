@@ -2,14 +2,10 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
@@ -49,7 +45,7 @@ var getMetaFeatureCmd = &cobra.Command{
 		w := os.Stdout
 		switch *getMetaOutput {
 		case YAML:
-			err = serializeFeaturesInYaml(w, features)
+			err = serializeInYaml(w, apply.FromFeatureList(features))
 		default:
 			err = serializeMetadata(w, features, *getMetaOutput, *getMetaWide)
 		}
@@ -65,24 +61,4 @@ func init() {
 	flags := getMetaFeatureCmd.Flags()
 	getMetaFeatureOpt.EntityName = flags.StringP("entity", "e", "", "entity")
 	getMetaFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
-}
-
-func serializeFeaturesInYaml(w io.Writer, features types.FeatureList) error {
-	var (
-		out   []byte
-		err   error
-		items = apply.FromFeatureList(features)
-	)
-
-	if len(items.Items) > 1 {
-		if out, err = yaml.Marshal(items); err != nil {
-			return err
-		}
-	} else if len(items.Items) == 1 {
-		if out, err = yaml.Marshal(items.Items[0]); err != nil {
-			return err
-		}
-	}
-	fmt.Fprintln(w, strings.Trim(string(out), "\n"))
-	return nil
 }
