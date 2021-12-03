@@ -37,6 +37,10 @@ func (l EntityList) Copy() EntityList {
 	return copied
 }
 
+func (l EntityList) Len() int {
+	return len(l)
+}
+
 func (l *EntityList) Find(find func(*Entity) bool) *Entity {
 	for _, e := range *l {
 		if find(e) {
