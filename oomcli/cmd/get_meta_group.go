@@ -93,18 +93,14 @@ func printGroups(ctx context.Context, oomStore *oomstore.OomStore, groups []*typ
 
 func printGroupInYaml(ctx context.Context, oomStore *oomstore.OomStore, groups types.GroupList) error {
 	var (
-		out      []byte
-		err      error
-		features types.FeatureList
-		items    apply.GroupItems
+		out   []byte
+		err   error
+		items *apply.GroupItems
 	)
 
-	// TODO: Use group ids to filter, rather than taking them all out
-	if features, err = oomStore.ListFeature(ctx, types.ListFeatureOpt{}); err != nil {
+	if items, err = groupsToApplyGroupItems(ctx, oomStore, groups); err != nil {
 		return err
 	}
-
-	items = apply.FromGroupList(groups, features)
 
 	if len(items.Items) > 1 {
 		if out, err = yaml.Marshal(items); err != nil {
@@ -117,6 +113,16 @@ func printGroupInYaml(ctx context.Context, oomStore *oomstore.OomStore, groups t
 	}
 	fmt.Println(strings.Trim(string(out), "\n"))
 	return nil
+}
+
+func groupsToApplyGroupItems(ctx context.Context, store *oomstore.OomStore, groups types.GroupList) (*apply.GroupItems, error) {
+	// TODO: Use group ids to filter, rather than taking them all out
+	features, err := store.ListFeature(ctx, types.ListFeatureOpt{})
+	if err != nil {
+		return nil, err
+	}
+
+	return apply.FromGroupList(groups, features), nil
 }
 
 func printGroupsInCSV(groups types.GroupList, wide bool) error {
