@@ -48,9 +48,11 @@ var getMetaRevisionCmd = &cobra.Command{
 		}
 
 		if len(args) > 0 {
-			revisions = revisions.Filter(func(r *types.Revision) bool {
+			if revisions = revisions.Filter(func(r *types.Revision) bool {
 				return strconv.Itoa(r.ID) == args[0]
-			})
+			}); len(revisions) == 0 {
+				log.Fatalf("revision '%s' not found", args[0])
+			}
 		}
 
 		// print revisions to stdout

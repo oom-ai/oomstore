@@ -40,6 +40,10 @@ var getMetaFeatureCmd = &cobra.Command{
 			log.Fatalf("failed getting features, error %v\n", err)
 		}
 
+		if len(args) != 0 && len(features) == 0 {
+			log.Fatalf("feature '%s' not found", args[0])
+		}
+
 		// print features to stdout
 		switch *getMetaOutput {
 		case YAML:

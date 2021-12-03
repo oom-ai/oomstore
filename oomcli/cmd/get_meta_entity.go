@@ -26,9 +26,11 @@ var getMetaEntityCmd = &cobra.Command{
 		}
 
 		if len(args) > 0 {
-			entities = entities.Filter(func(e *types.Entity) bool {
+			if entities = entities.Filter(func(e *types.Entity) bool {
 				return e.Name == args[0]
-			})
+			}); len(entities) == 0 {
+				log.Fatalf("entity '%s' not found", args[0])
+			}
 		}
 		// print entities to stdout
 		if err := serializeMetadata(entities, *getMetaOutput, *getMetaWide); err != nil {

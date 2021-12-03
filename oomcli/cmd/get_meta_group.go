@@ -47,10 +47,13 @@ var getMetaGroupCmd = &cobra.Command{
 		}
 
 		if len(args) > 0 {
-			groups = groups.Filter(func(g *types.Group) bool {
+			if groups = groups.Filter(func(g *types.Group) bool {
 				return g.Name == args[0]
-			})
+			}); len(groups) == 0 {
+				log.Fatalf("group '%s' not found", args[0])
+			}
 		}
+
 		if err := serializeMetadata(groups, *getMetaOutput, *getMetaWide); err != nil {
 			log.Fatalf("failed printing feature groups, error %v\n", err)
 		}
