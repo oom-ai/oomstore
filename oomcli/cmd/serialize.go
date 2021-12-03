@@ -7,9 +7,74 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/fatih/structtag"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cast"
 )
+
+type Token struct {
+	Value    interface{}
+	Name     string
+	Wide     bool
+	Truncate bool
+}
+
+type TokenList []Token
+
+func parseTokens(i interface{}) (TokenList, error) {
+	v := reflect.ValueOf(i)
+	var rs TokenList
+	for i := 0; i < v.NumField(); i++ {
+		tag := v.Type().Field(i).Tag
+		tags, err := structtag.Parse(string(tag))
+		if err != nil {
+			return rs, err
+		}
+		tableTag, err := tags.Get("oomcli")
+		if err != nil {
+			return rs, err
+		}
+		name := tableTag.Name
+		wide := tableTag.HasOption("wide")
+		truncate := tableTag.HasOption("truncate")
+		rs = append(rs, Token{
+			Value: v.Field(i).Interface(), Name: name, Wide: wide, Truncate: truncate})
+	}
+	return rs, nil
+}
+
+func (l TokenList) Brief() TokenList {
+	var rs TokenList
+	for _, t := range l {
+		if !t.Wide {
+			rs = append(rs, t)
+		}
+	}
+	return rs
+}
+
+func (l TokenList) SerializeHeader(truncate bool) []string {
+	var rs []string
+	for _, t := range l {
+		if t.Truncate && len(t.Name) > MetadataFieldTruncateAt {
+			rs = append(rs, t.Name[:MetadataFieldTruncateAt-3]+"...")
+		}
+		rs = append(rs, t.Name)
+	}
+	return rs
+}
+
+func (l TokenList) SerializeRecord(truncate bool) ([]string, error) {
+	var rs []string
+	for _, t := range l {
+		s := serializeValue(t.Value)
+		if t.Truncate && len(s) > MetadataFieldTruncateAt {
+			s = s[:MetadataFieldTruncateAt-3] + "..."
+		}
+		rs = append(rs, s)
+	}
+	return rs, nil
+}
 
 func serializeValue(i interface{}) string {
 	if reflect.TypeOf(i).Kind() == reflect.Ptr && reflect.ValueOf(i).IsNil() {
@@ -23,7 +88,7 @@ func serializeValue(i interface{}) string {
 	}
 }
 
-func serializeMetadataList(i interface{}, output string, wide bool) error {
+func serializeMetadata(i interface{}, output string, wide bool) error {
 	truncate := !wide
 	lists, err := parseTokenLists(i)
 	if err != nil {

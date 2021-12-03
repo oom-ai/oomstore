@@ -31,7 +31,7 @@ var getMetaEntityCmd = &cobra.Command{
 			})
 		}
 		// print entities to stdout
-		if err := serializeMetadataList(entities, *getMetaOutput, *getMetaWide); err != nil {
+		if err := serializeMetadata(entities, *getMetaOutput, *getMetaWide); err != nil {
 			log.Fatalf("failed printing entities, error %v\n", err)
 		}
 	},

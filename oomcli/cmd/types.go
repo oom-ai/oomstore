@@ -2,10 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"reflect"
 	"time"
 
-	"github.com/fatih/structtag"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -55,70 +53,6 @@ type FlattenRevision struct {
 	Anchored   bool      `oomcli:"ANCHORED,wide"`
 	CreateTime time.Time `oomcli:"CREATE-TIME,wide"`
 	ModifyTime time.Time `oomcli:"MODIFY-TIME,wide"`
-}
-
-type Token struct {
-	Value    interface{}
-	Name     string
-	Wide     bool
-	Truncate bool
-}
-
-type TokenList []Token
-
-func (l TokenList) Brief() TokenList {
-	var rs TokenList
-	for _, t := range l {
-		if !t.Wide {
-			rs = append(rs, t)
-		}
-	}
-	return rs
-}
-
-func parseTokens(st interface{}) (TokenList, error) {
-	v := reflect.ValueOf(st)
-	var rs TokenList
-	for i := 0; i < v.NumField(); i++ {
-		tag := v.Type().Field(i).Tag
-		tags, err := structtag.Parse(string(tag))
-		if err != nil {
-			return rs, err
-		}
-		tableTag, err := tags.Get("oomcli")
-		if err != nil {
-			return rs, err
-		}
-		name := tableTag.Name
-		wide := tableTag.HasOption("wide")
-		truncate := tableTag.HasOption("truncate")
-		rs = append(rs, Token{
-			Value: v.Field(i).Interface(), Name: name, Wide: wide, Truncate: truncate})
-	}
-	return rs, nil
-}
-
-func (l TokenList) SerializeHeader(truncate bool) []string {
-	var rs []string
-	for _, t := range l {
-		if t.Truncate && len(t.Name) > MetadataFieldTruncateAt {
-			rs = append(rs, t.Name[:MetadataFieldTruncateAt-3]+"...")
-		}
-		rs = append(rs, t.Name)
-	}
-	return rs
-}
-
-func (l TokenList) SerializeRecord(truncate bool) ([]string, error) {
-	var rs []string
-	for _, t := range l {
-		s := serializeValue(t.Value)
-		if t.Truncate && len(s) > MetadataFieldTruncateAt {
-			s = s[:MetadataFieldTruncateAt-3] + "..."
-		}
-		rs = append(rs, s)
-	}
-	return rs, nil
 }
 
 func parseTokenLists(i interface{}) (rs []TokenList, err error) {

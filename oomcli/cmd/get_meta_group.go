@@ -51,7 +51,7 @@ var getMetaGroupCmd = &cobra.Command{
 				return g.Name == args[0]
 			})
 		}
-		if err := serializeMetadataList(groups, *getMetaOutput, *getMetaWide); err != nil {
+		if err := serializeMetadata(groups, *getMetaOutput, *getMetaWide); err != nil {
 			log.Fatalf("failed printing feature groups, error %v\n", err)
 		}
 	},
