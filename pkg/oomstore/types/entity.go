@@ -7,13 +7,13 @@ import (
 )
 
 type Entity struct {
-	ID     int    `db:"id" oomcli:"ID,core"`
-	Name   string `db:"name" oomcli:"NAME,core"`
-	Length int    `db:"length" oomcli:"LENGTH,core"`
+	ID     int    `db:"id"`
+	Name   string `db:"name"`
+	Length int    `db:"length"`
 
-	Description string    `db:"description" oomcli:"DESCRIPTION,core,truncate"`
-	CreateTime  time.Time `db:"create_time" oomcli:"CREATE-TIME,detail"`
-	ModifyTime  time.Time `db:"modify_time" oomcli:"MODIFY-TIME,detail"`
+	Description string    `db:"description"`
+	CreateTime  time.Time `db:"create_time"`
+	ModifyTime  time.Time `db:"modify_time"`
 }
 
 func (e *Entity) Copy() *Entity {

@@ -31,7 +31,7 @@ var getMetaEntityCmd = &cobra.Command{
 			})
 		}
 		// print entities to stdout
-		if err := serializeList(typeErasure(entities), types.Entity{}, *getMetaOutput, *getMetaWide); err != nil {
+		if err := serializeMetadataList(entities, *getMetaOutput, *getMetaWide); err != nil {
 			log.Fatalf("failed printing entities, error %v\n", err)
 		}
 	},
@@ -39,12 +39,4 @@ var getMetaEntityCmd = &cobra.Command{
 
 func init() {
 	getMetaCmd.AddCommand(getMetaEntityCmd)
-}
-
-func typeErasure(entities types.EntityList) (rs []*interface{}) {
-	for _, e := range entities {
-		x := (interface{})(*e)
-		rs = append(rs, &x)
-	}
-	return
 }
