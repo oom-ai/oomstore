@@ -14,7 +14,7 @@ import (
 
 // UpdateRevision = MustUpdateRevision
 // If fail to update any row or update more than one row, return error
-func updateRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateRevisionOpt) error {
+func UpdateRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateRevisionOpt) error {
 	and := make(map[string]interface{})
 	if opt.NewRevision != nil {
 		and["revision"] = *opt.NewRevision
@@ -46,10 +46,10 @@ func updateRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 	return nil
 }
 
-func getRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*types.Revision, error) {
+func GetRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*types.Revision, error) {
 	var revision types.Revision
-	query := `SELECT * FROM "feature_group_revision" WHERE id = $1`
-	if err := sqlxCtx.GetContext(ctx, &revision, query, id); err != nil {
+	query := `SELECT * FROM feature_group_revision WHERE id = ?`
+	if err := sqlxCtx.GetContext(ctx, &revision, sqlxCtx.Rebind(query), id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errdefs.NotFound(fmt.Errorf("revision %d not found", id))
 		}
@@ -64,10 +64,10 @@ func getRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*ty
 	return &revision, nil
 }
 
-func getRevisionBy(ctx context.Context, sqlxCtx metadata.SqlxContext, groupID int, revision int64) (*types.Revision, error) {
+func GetRevisionBy(ctx context.Context, sqlxCtx metadata.SqlxContext, groupID int, revision int64) (*types.Revision, error) {
 	var r types.Revision
-	query := `SELECT * FROM "feature_group_revision" WHERE "group_id" = $1 AND "revision" = $2`
-	if err := sqlxCtx.GetContext(ctx, &r, query, groupID, revision); err != nil {
+	query := `SELECT * FROM feature_group_revision WHERE group_id = ? AND revision = ?`
+	if err := sqlxCtx.GetContext(ctx, &r, sqlxCtx.Rebind(query), groupID, revision); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errdefs.NotFound(fmt.Errorf("revision not found by group %d and revision %d", groupID, revision))
 		}
@@ -82,15 +82,15 @@ func getRevisionBy(ctx context.Context, sqlxCtx metadata.SqlxContext, groupID in
 	return &r, nil
 }
 
-func listRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, groupID *int) (types.RevisionList, error) {
-	query := `SELECT * FROM "feature_group_revision"`
+func ListRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, groupID *int) (types.RevisionList, error) {
+	query := `SELECT * FROM feature_group_revision`
 	args := make([]interface{}, 0)
 	if groupID != nil {
-		query = fmt.Sprintf(`%s WHERE group_id = $1`, query)
+		query = fmt.Sprintf(`%s WHERE group_id = ?`, query)
 		args = append(args, *groupID)
 	}
 	var revisions types.RevisionList
-	if err := sqlxCtx.SelectContext(ctx, &revisions, query, args...); err != nil {
+	if err := sqlxCtx.SelectContext(ctx, &revisions, sqlxCtx.Rebind(query), args...); err != nil {
 		return nil, err
 	}
 
