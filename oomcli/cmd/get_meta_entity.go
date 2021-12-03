@@ -7,11 +7,15 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -41,7 +45,7 @@ var getMetaEntityCmd = &cobra.Command{
 			})
 		}
 		// print entities to stdout
-		if err := printEntities(entities, *getMetaOutput, *getMetaWide); err != nil {
+		if err := printEntities(ctx, oomStore, entities, *getMetaOutput, *getMetaWide); err != nil {
 			log.Fatalf("failed printing entities, error %v\n", err)
 		}
 	},
@@ -51,7 +55,7 @@ func init() {
 	getMetaCmd.AddCommand(getMetaEntityCmd)
 }
 
-func printEntities(entities types.EntityList, output string, wide bool) error {
+func printEntities(ctx context.Context, store *oomstore.OomStore, entities types.EntityList, output string, wide bool) error {
 	switch output {
 	case CSV:
 		return printEntitiesInCSV(entities, wide)
@@ -59,9 +63,43 @@ func printEntities(entities types.EntityList, output string, wide bool) error {
 		return printEntitiesInASCIITable(entities, true, wide)
 	case Column:
 		return printEntitiesInASCIITable(entities, false, wide)
+	case YAML:
+		return printEntitiesInYaml(ctx, store, entities)
 	default:
 		return fmt.Errorf("unsupported output format %s", output)
 	}
+}
+
+func printEntitiesInYaml(ctx context.Context, store *oomstore.OomStore, entities types.EntityList) error {
+	var (
+		out   []byte
+		items = apply.EntityItems{
+			Items: make([]apply.Entity, 0, entities.Len()),
+		}
+	)
+
+	// TODO: Use entitys ids to filter, rather than taking them all out
+	groups, err := store.ListGroup(ctx, nil)
+	if err != nil {
+		return err
+	}
+	groupItems, err := groupsToApplyGroupItems(ctx, store, groups)
+	if err != nil {
+		return err
+	}
+
+	items = apply.FromEntityList(entities, groupItems)
+	if len(items.Items) > 1 {
+		if out, err = yaml.Marshal(items); err != nil {
+			return err
+		}
+	} else if len(items.Items) == 1 {
+		if out, err = yaml.Marshal(items.Items[0]); err != nil {
+			return err
+		}
+	}
+	fmt.Println(strings.Trim(string(out), "\n"))
+	return nil
 }
 
 func printEntitiesInCSV(entities types.EntityList, wide bool) error {
