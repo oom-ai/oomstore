@@ -4,44 +4,10 @@ set -euo pipefail
 SDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd) && cd "$SDIR" || exit 1
 source ./util.sh
 
-init_store
+apply_single_complex_group() {
+    init_store
 
-trap 'rm -f "$TMPFILE"' EXIT
-TMPFILE=$(mktemp) || exit 1
-cat > "$TMPFILE" <<EOF
-kind: Entity
-name: user
-length: 8
-description: 'description'
----
-kind: Group
-name: device
-entity-name: user
-category: batch
-description: 'description'
----
-kind: Group
-name: account
-entity-name: user
-category: batch
-description: 'description'
-EOF
-
-oomcli apply -f "$TMPFILE"
-
-group_expected='
-ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,device,user,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
-2,account,user,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
-'
-group_actual=$(oomcli get meta group -o csv --wide)
-filter() { cut -d ',' -f 1-4 <<<"$1"; }
-assert_eq "oomcli get meta group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
-
-
-init_store
-
-cat > "$TMPFILE" <<EOF
+    cat <<EOF | oomcli apply -f /dev/stdin
 kind: Entity
 name: user
 length: 8
@@ -64,27 +30,60 @@ features:
   description: 'description'
 EOF
 
-oomcli apply -f "$TMPFILE"
-
-group_expected='
+    group_expected='
 ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
 1,device,user,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
-group_actual=$(oomcli get meta group -o csv --wide)
-filter() { cut -d ',' -f 1-4 <<<"$1"; }
-assert_eq "oomcli get meta group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
+    group_actual=$(oomcli get meta group -o csv --wide)
+    filter() { cut -d ',' -f 1-4 <<<"$1"; }
+    assert_eq "apply_single_complex_group: check group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 
-feature_expected='ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
+    feature_expected='
+ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
 1,model,device,user,batch,string,description
 2,price,device,user,batch,int64,description
 3,radio,device,user,batch,int64,description
 '
-feature_actual=$(oomcli get meta feature -o csv)
-assert_eq "oomcli get meta feature" "$(sort <<< "$feature_expected")" "$(sort <<< "$feature_actual")"
+    feature_actual=$(oomcli get meta feature -o csv)
+    assert_eq "apply_single_complex_group: check feature" "$(sort <<< "$feature_expected")" "$(sort <<< "$feature_actual")"
+}
 
-init_store
+apply_multiple_files_of_group() {
+    init_store
 
-cat > "$TMPFILE" <<EOF
+    cat <<EOF | oomcli apply -f /dev/stdin
+kind: Entity
+name: user
+length: 8
+description: 'description'
+---
+kind: Group
+name: device
+entity-name: user
+category: batch
+description: 'description'
+---
+kind: Group
+name: account
+entity-name: user
+category: batch
+description: 'description'
+EOF
+
+    group_expected='
+ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,device,user,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+2,account,user,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+'
+    group_actual=$(oomcli get meta group -o csv --wide)
+    filter() { cut -d ',' -f 1-4 <<<"$1"; }
+    assert_eq "apply_multiple_files_of_group: check group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
+}
+
+apply_group_items() {
+    init_store
+
+    cat <<EOF | oomcli apply -f /dev/stdin
 kind: Entity
 name: user
 length: 8
@@ -140,19 +139,17 @@ items:
         description: price description
 EOF
 
-oomcli apply -f "$TMPFILE"
-
-group_expected='
+    group_expected='
 ID,NAME,ENTITY,DESCRIPTION
 1,account,user,user account info
 2,transaction_stats,user,user transaction statistics
 3,phone,device,phone info
 '
-group_actual=$(oomcli get meta group -o csv --wide)
-filter() { cut -d ',' -f 1-4 <<<"$1"; }
-assert_eq "oomcli apply multiple group: check features" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
+    group_actual=$(oomcli get meta group -o csv --wide)
+    filter() { cut -d ',' -f 1-4 <<<"$1"; }
+    assert_eq "apply_single_complex_group: check features" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 
-feature_expected='
+    feature_expected='
 ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
 1,state,account,user,batch,string,
 2,credit_score,account,user,batch,int64,credit_score description
@@ -163,5 +160,10 @@ ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
 7,model,phone,device,batch,string,model description
 8,price,phone,device,batch,int64,price description
 '
-feature_actual=$(oomcli get meta feature -o csv)
-assert_eq "oomcli apply multiple group: check group" "$feature_expected" "$feature_actual"
+    feature_actual=$(oomcli get meta feature -o csv)
+    assert_eq "apply_single_complex_group: check group" "$feature_expected" "$feature_actual"
+}
+
+apply_single_complex_group
+apply_multiple_files_of_group
+apply_group_items
