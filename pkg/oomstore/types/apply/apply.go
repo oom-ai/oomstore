@@ -83,7 +83,7 @@ type Group struct {
 }
 
 type GroupItems struct {
-	Items []Group `mapstructure:"item" yaml:"items"`
+	Items []Group `mapstructure:"items" yaml:"items"`
 }
 
 func (g *GroupItems) Filter(filter func(Group) bool) (rs GroupItems) {
@@ -175,4 +175,19 @@ func FromEntityList(entities types.EntityList, groups *GroupItems) (items Entity
 		})
 	}
 	return
+}
+
+type Kind struct {
+	Kind string `mapstructure:"kind"`
+}
+
+type Items struct {
+	Items []Kind `mapstructure:"items"`
+}
+
+func (i *Items) Kind() string {
+	if len(i.Items) == 0 {
+		return ""
+	}
+	return i.Items[0].Kind
 }
