@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
+	"github.com/ethhte88/oomstore/internal/database/metadata"
+	"github.com/ethhte88/oomstore/internal/database/metadata/mock_metadata"
+	"github.com/ethhte88/oomstore/internal/database/online/mock_online"
+	"github.com/ethhte88/oomstore/pkg/oomstore"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/golang/mock/gomock"
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
-	"github.com/oom-ai/oomstore/internal/database/online/mock_online"
-	"github.com/oom-ai/oomstore/pkg/oomstore"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/assert"
 )
 

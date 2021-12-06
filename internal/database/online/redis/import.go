@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/ethhte88/oomstore/internal/database/online"
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {

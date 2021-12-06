@@ -7,8 +7,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
-	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/ethhte88/oomstore/internal/database/offline"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
 var _ offline.Store = &DB{}

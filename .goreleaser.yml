@@ -17,9 +17,9 @@ builds:
     ldflags:
       - >
         -s -w
-        -X github.com/oom-ai/oomstore/version.Version={{.Version}}
-        -X github.com/oom-ai/oomstore/version.Commit={{.Commit}}
-        -X github.com/oom-ai/oomstore/version.Built={{.CommitDate}}
+        -X github.com/ethhte88/oomstore/version.Version={{.Version}}
+        -X github.com/ethhte88/oomstore/version.Commit={{.Commit}}
+        -X github.com/ethhte88/oomstore/version.Built={{.CommitDate}}
   - main: ./oomagent
     id: "oomagent"
     binary: oomagent
@@ -32,9 +32,9 @@ builds:
     ldflags:
       - >
         -s -w
-        -X github.com/oom-ai/oomstore/version.Version={{.Version}}
-        -X github.com/oom-ai/oomstore/version.Commit={{.Commit}}
-        -X github.com/oom-ai/oomstore/version.Built={{.CommitDate}}
+        -X github.com/ethhte88/oomstore/version.Version={{.Version}}
+        -X github.com/ethhte88/oomstore/version.Commit={{.Commit}}
+        -X github.com/ethhte88/oomstore/version.Built={{.CommitDate}}
 
 archives:
   - replacements:

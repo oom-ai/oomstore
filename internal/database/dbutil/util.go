@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/jmoiron/sqlx"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 type RowMap = map[string]interface{}

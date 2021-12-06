@@ -14,8 +14,8 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types/apply"
 )
 
 var getMetaFeatureOpt types.ListFeatureOpt

@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types/apply"
 )
 
 type ApplyOption struct {

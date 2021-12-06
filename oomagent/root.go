@@ -14,10 +14,10 @@ import (
 	"google.golang.org/grpc"
 	"gopkg.in/yaml.v3"
 
-	"github.com/oom-ai/oomstore/oomagent/codegen"
-	"github.com/oom-ai/oomstore/pkg/oomstore"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/version"
+	"github.com/ethhte88/oomstore/oomagent/codegen"
+	"github.com/ethhte88/oomstore/pkg/oomstore"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/ethhte88/oomstore/version"
 )
 
 var cfgFile string

@@ -3,7 +3,7 @@ package test_impl
 import (
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/ethhte88/oomstore/internal/database/online"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
+	"github.com/ethhte88/oomstore/internal/database/metadata"
+	"github.com/ethhte88/oomstore/internal/database/online"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
 // Get online features of a particular entity instance.

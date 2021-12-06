@@ -7,9 +7,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/oom-ai/oomstore/oomagent/codegen"
-	"github.com/oom-ai/oomstore/pkg/oomstore"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/ethhte88/oomstore/oomagent/codegen"
+	"github.com/ethhte88/oomstore/pkg/oomstore"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	code "google.golang.org/genproto/googleapis/rpc/code"
 	status "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/protobuf/types/known/structpb"

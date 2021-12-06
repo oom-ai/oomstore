@@ -3,7 +3,7 @@ package mysql_test
 import (
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata/test_impl"
+	"github.com/ethhte88/oomstore/internal/database/metadata/test_impl"
 )
 
 func TestCreateEntity(t *testing.T) {

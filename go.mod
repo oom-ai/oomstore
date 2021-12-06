@@ -1,4 +1,4 @@
-module github.com/oom-ai/oomstore
+module github.com/ethhte88/oomstore
 
 go 1.17
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
 )
 
 type Store interface {

@@ -5,9 +5,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/internal/database/metadata/mysql"
-	"github.com/oom-ai/oomstore/internal/database/test/runtime_mysql"
+	"github.com/ethhte88/oomstore/internal/database/metadata"
+	"github.com/ethhte88/oomstore/internal/database/metadata/mysql"
+	"github.com/ethhte88/oomstore/internal/database/test/runtime_mysql"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

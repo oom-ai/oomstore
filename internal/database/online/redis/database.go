@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/ethhte88/oomstore/internal/database/online"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/go-redis/redis/v8"
-	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 const PipelineBatchSize = 10

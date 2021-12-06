@@ -9,9 +9,9 @@ import (
 	sql "database/sql"
 	reflect "reflect"
 
+	metadata "github.com/ethhte88/oomstore/internal/database/metadata"
+	types "github.com/ethhte88/oomstore/pkg/oomstore/types"
 	gomock "github.com/golang/mock/gomock"
-	metadata "github.com/oom-ai/oomstore/internal/database/metadata"
-	types "github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 // MockStore is a mock of Store interface.
