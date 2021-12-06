@@ -5,6 +5,7 @@ type BackendType string
 const (
 	POSTGRES BackendType = "postgres"
 	REDIS    BackendType = "redis"
+	MYSQL    BackendType = "mysql"
 )
 
 type OomStoreConfig struct {
@@ -27,6 +28,7 @@ type OfflineStoreConfig struct {
 type MetadataStoreConfig struct {
 	Backend  BackendType  `yaml:"backend"`
 	Postgres *PostgresOpt `yaml:"postgres"`
+	MySQL    *MySQLOpt    `yaml:"mysql"`
 }
 
 type RedisOpt struct {
