@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/cast"
 	"gopkg.in/yaml.v3"
 
 	"github.com/ethhte88/oomstore/internal/database/metadata"
@@ -162,11 +163,9 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 			}
 		}
 
-		var kind string
-		if k, ok := data["kind"]; ok {
-			kind = k.(string)
-		} else {
-			return nil, fmt.Errorf("invalid yaml: missing kind")
+		kind, err := parseKind(data)
+		if err != nil {
+			return nil, err
 		}
 
 		switch kind {
@@ -176,35 +175,14 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 				return nil, err
 			}
 
-			// We don't want entity.BatchFeature to have values.
-			// The whole stage should be a flat structure, not a nested structure.
-			stage.NewEntities = append(stage.NewEntities, apply.Entity{
-				Kind:        entity.Kind,
-				Name:        entity.Name,
-				Length:      entity.Length,
-				Description: entity.Description,
-			})
+			stage.NewEntities = append(stage.NewEntities, buildApplyEntity(entity))
 
 			for _, group := range entity.BatchFeatures {
-				// We don't want group.Features to have values.
-				// The whole stage should be a flat structure, not a nested structure.
-				stage.NewGroups = append(stage.NewGroups, apply.Group{
-					Kind:        "Group",
-					Name:        group.Group,
-					Group:       group.Group,
-					EntityName:  entity.Name,
-					Category:    group.Category,
-					Description: group.Description,
-				})
+				group.Name = group.Group
+				stage.NewGroups = append(stage.NewGroups, buildApplyGroup(group, entity.Name))
 
 				for _, feature := range group.Features {
-					stage.NewFeatures = append(stage.NewFeatures, apply.Feature{
-						Kind:        "Feature",
-						Name:        feature.Name,
-						GroupName:   group.Group,
-						DBValueType: feature.DBValueType,
-						Description: feature.Description,
-					})
+					stage.NewFeatures = append(stage.NewFeatures, buildApplyFeature(feature, group.Name))
 				}
 			}
 		case "Group":
@@ -241,9 +219,107 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 			}
 			stage.NewFeatures = append(stage.NewFeatures, feature)
 
+		case "Items":
+			itemsKind, err := parseItemsKind(data)
+			if err != nil {
+				return nil, err
+			}
+			switch itemsKind {
+			case "Feature":
+				featureItems := apply.FeatureItems{}
+				if err := mapstructure.Decode(data, &featureItems); err != nil {
+					return nil, err
+				}
+				for _, item := range featureItems.Items {
+					stage.NewFeatures = append(stage.NewFeatures, buildApplyFeature(item, item.GroupName))
+				}
+			case "Group":
+				groupItems := apply.GroupItems{}
+				if err := mapstructure.Decode(data, &groupItems); err != nil {
+					return nil, err
+				}
+				for _, group := range groupItems.Items {
+					group.Group = group.Name
+					stage.NewGroups = append(stage.NewGroups, buildApplyGroup(group, group.EntityName))
+
+					for _, feature := range group.Features {
+						stage.NewFeatures = append(stage.NewFeatures, buildApplyFeature(feature, group.Name))
+					}
+				}
+			case "Entity":
+				entityItems := apply.EntityItems{}
+				if err := mapstructure.Decode(data, &entityItems); err != nil {
+					return nil, err
+				}
+				for _, entity := range entityItems.Items {
+					stage.NewEntities = append(stage.NewEntities, buildApplyEntity(entity))
+
+					for _, group := range entity.BatchFeatures {
+						group.Name = group.Group
+						group.Category = types.BatchFeatureCategory
+						stage.NewGroups = append(stage.NewGroups, buildApplyGroup(group, entity.Name))
+
+						for _, feature := range group.Features {
+							stage.NewFeatures = append(stage.NewFeatures, buildApplyFeature(feature, group.Name))
+						}
+					}
+				}
+			}
 		default:
 			return nil, fmt.Errorf("invalid kind '%s'", kind)
 		}
 	}
 	return stage, nil
+}
+
+func parseKind(data map[string]interface{}) (string, error) {
+	if k, ok := data["kind"]; ok {
+		return cast.ToString(k), nil
+	}
+	if _, ok := data["items"]; ok {
+		return "Items", nil
+	}
+	return "", fmt.Errorf("invalid yaml: missing kind or items")
+}
+
+func parseItemsKind(data map[string]interface{}) (string, error) {
+	items := apply.Items{}
+	if err := mapstructure.Decode(data, &items); err != nil {
+		return "", err
+	}
+	return items.Kind(), nil
+}
+
+func buildApplyEntity(entity apply.Entity) apply.Entity {
+	// We don't want entity.BatchFeature to have values.
+	// The whole stage should be a flat structure, not a nested structure.
+	return apply.Entity{
+		Kind:        entity.Kind,
+		Name:        entity.Name,
+		Length:      entity.Length,
+		Description: entity.Description,
+	}
+}
+
+func buildApplyGroup(group apply.Group, entityName string) apply.Group {
+	// We don't want group.Features to have values.
+	// The whole stage should be a flat structure, not a nested structure.
+	return apply.Group{
+		Kind:        "Group",
+		Name:        group.Name,
+		Group:       group.Group,
+		EntityName:  entityName,
+		Category:    group.Category,
+		Description: group.Description,
+	}
+}
+
+func buildApplyFeature(feature apply.Feature, groupName string) apply.Feature {
+	return apply.Feature{
+		Kind:        "Feature",
+		Name:        feature.Name,
+		GroupName:   groupName,
+		DBValueType: feature.DBValueType,
+		Description: feature.Description,
+	}
 }
