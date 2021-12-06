@@ -23,7 +23,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 	return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
 		// apply entity
 		for _, entity := range stage.NewEntities {
-			if err := s.applyEntity(ctx, tx, entity); err != nil {
+			if err := s.applyEntity(c, tx, entity); err != nil {
 				return err
 			}
 		}
@@ -31,14 +31,14 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		// apply group
 		for _, group := range stage.NewGroups {
 			group.Category = types.BatchFeatureCategory
-			if err := s.applyGroup(ctx, tx, group); err != nil {
+			if err := s.applyGroup(c, tx, group); err != nil {
 				return err
 			}
 		}
 
 		// apply feature
 		for _, feature := range stage.NewFeatures {
-			if err := s.applyFeature(ctx, tx, feature); err != nil {
+			if err := s.applyFeature(c, tx, feature); err != nil {
 				return err
 			}
 		}
