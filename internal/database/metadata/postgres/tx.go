@@ -8,6 +8,10 @@ import (
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
+func (tx *Tx) WithTransaction(ctx context.Context, fn func(context.Context, metadata.DBStore) error) (err error) {
+	return fn(ctx, tx)
+}
+
 func (tx *Tx) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
 	return createEntity(ctx, tx, opt)
 }
