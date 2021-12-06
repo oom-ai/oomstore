@@ -101,3 +101,80 @@ feature_expected='ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
 '
 feature_actual=$(oomcli get meta feature -o csv)
 assert_eq "oomcli get meta feature" "$(sort <<< "$feature_expected")" "$(sort <<< "$feature_actual")"
+
+init_store
+cat > "$TMPFILE" <<EOF
+items:
+  - kind: Entity
+    name: user
+    length: 8
+    description: user ID
+    batch-features:
+      - group: account
+        description: user account info
+        features:
+          - name: credit_score
+            db-value-type: int
+            description: credit_score description
+          - name: account_age_days
+            db-value-type: int
+            description: account_age_days description
+          - name: has_2fa_installed
+            db-value-type: bool
+            description: has_2fa_installed description
+      - group: transaction_stats
+        description: user transaction statistics
+        features:
+          - name: transaction_count_7d
+            db-value-type: int
+            description: transaction_count_7d description
+          - name: transaction_count_30d
+            db-value-type: int
+            description: transaction_count_30d description
+  - kind: Entity
+    name: device
+    length: 8
+    description: device info
+    batch-features:
+      - group: phone
+        description: phone info
+        features:
+          - name: model
+            db-value-type: varchar(32)
+            description: model description
+          - name: price
+            db-value-type: int
+            description: price description
+EOF
+
+oomcli apply -f "$TMPFILE"
+
+entity_expected='
+ID,NAME,LENGTH,DESCRIPTION
+1,user,8,user ID
+2,device,8,device info
+'
+entity_actual=$(oomcli get meta entity -o csv)
+assert_eq "oomcli apply mutiple entity: check entity" "$(sort <<< "$entity_expected")" "$(sort <<< "$entity_actual")"
+
+group_expected='
+ID,NAME,ENTITY,DESCRIPTION
+1,account,user,user account info
+2,transaction_stats,user,user transaction statistics
+3,phone,device,phone info
+'
+group_actual=$(oomcli get meta group -o csv)
+assert_eq "oomcli apply multiple entity: check group" "$group_expected" "$group_actual"
+
+feature_expected='
+ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
+1,credit_score,account,user,batch,int64,credit_score description
+2,account_age_days,account,user,batch,int64,account_age_days description
+3,has_2fa_installed,account,user,batch,bool,has_2fa_installed description
+4,transaction_count_7d,transaction_stats,user,batch,int64,transaction_count_7d description
+5,transaction_count_30d,transaction_stats,user,batch,int64,transaction_count_30d description
+6,model,phone,device,batch,string,model description
+7,price,phone,device,batch,int64,price description
+'
+feature_actual=$(oomcli get meta feature -o csv)
+assert_eq "oomcli apply multiple entity: check feature" "$feature_expected" "$feature_actual"
