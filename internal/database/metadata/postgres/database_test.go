@@ -5,10 +5,10 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/internal/database/metadata/postgres"
-	"github.com/oom-ai/oomstore/internal/database/metadata/test_impl"
-	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
+	"github.com/ethhte88/oomstore/internal/database/metadata"
+	"github.com/ethhte88/oomstore/internal/database/metadata/postgres"
+	"github.com/ethhte88/oomstore/internal/database/metadata/test_impl"
+	"github.com/ethhte88/oomstore/internal/database/test/runtime_pg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

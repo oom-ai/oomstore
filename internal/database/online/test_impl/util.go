@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/ethhte88/oomstore/internal/database/online"
 )
 
 type PrepareStoreRuntimeFunc func() (context.Context, online.Store)

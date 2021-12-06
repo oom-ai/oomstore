@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/ethhte88/oomstore/internal/database/metadata"
+	"github.com/ethhte88/oomstore/internal/database/offline"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
 // ChannelImport a CSV data source into the feature store as a new revision.

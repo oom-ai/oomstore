@@ -8,9 +8,9 @@ import (
 	context "context"
 	reflect "reflect"
 
+	offline "github.com/ethhte88/oomstore/internal/database/offline"
+	types "github.com/ethhte88/oomstore/pkg/oomstore/types"
 	gomock "github.com/golang/mock/gomock"
-	offline "github.com/oom-ai/oomstore/internal/database/offline"
-	types "github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 // MockStore is a mock of Store interface.

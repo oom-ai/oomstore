@@ -1,9 +1,9 @@
 # oomstore
 
-[![CI](https://github.com/oom-ai/oomstore/actions/workflows/ci.yml/badge.svg)](https://github.com/oom-ai/oomstore/actions/workflows/ci.yml)
-[![GoReport](https://goreportcard.com/badge/oom-ai/oomstore)](https://goreportcard.com/report/oom-ai/oomstore)
-[![GoDoc](https://godoc.org/github.com/oom-ai/oomstore?status.png)](http://godoc.org/github.com/oom-ai/oomstore)
-[![codecov](https://codecov.io/gh/oom-ai/oomstore/branch/main/graph/badge.svg?token=C59L7LTRM4)](https://codecov.io/gh/oom-ai/oomstore)
+[![CI](https://github.com/ethhte88/oomstore/actions/workflows/ci.yml/badge.svg)](https://github.com/ethhte88/oomstore/actions/workflows/ci.yml)
+[![GoReport](https://goreportcard.com/badge/ethhte88/oomstore)](https://goreportcard.com/report/ethhte88/oomstore)
+[![GoDoc](https://godoc.org/github.com/ethhte88/oomstore?status.png)](http://godoc.org/github.com/ethhte88/oomstore)
+[![codecov](https://codecov.io/gh/ethhte88/oomstore/branch/main/graph/badge.svg?token=C59L7LTRM4)](https://codecov.io/gh/ethhte88/oomstore)
 
 The name "OOM" is derived from **O**nline Store, **O**ffline Store, and **M**etadata Store that put together oomstore.
 

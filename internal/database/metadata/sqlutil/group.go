@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
+	"github.com/ethhte88/oomstore/internal/database/metadata"
+	"github.com/ethhte88/oomstore/pkg/errdefs"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/jmoiron/sqlx"
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func UpdateGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateGroupOpt) error {

@@ -1,6 +1,6 @@
 package main
 
-import "github.com/oom-ai/oomstore/oomcli/cmd"
+import "github.com/ethhte88/oomstore/oomcli/cmd"
 
 func main() {
 	cmd.Execute()

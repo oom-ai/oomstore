@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) TypeTag(dbType string) (string, error) {

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/ethhte88/oomstore/internal/database/offline"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/assert"
 )
 

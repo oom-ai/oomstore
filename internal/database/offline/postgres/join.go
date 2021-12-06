@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
+	"github.com/ethhte88/oomstore/internal/database/offline"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {

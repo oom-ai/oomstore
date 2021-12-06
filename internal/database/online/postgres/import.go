@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
+	"github.com/ethhte88/oomstore/internal/database/online"
 	"github.com/jmoiron/sqlx"
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/online"
 )
 
 const (

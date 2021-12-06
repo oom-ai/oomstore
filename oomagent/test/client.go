@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/oom-ai/oomstore/oomagent/codegen"
+	"github.com/ethhte88/oomstore/oomagent/codegen"
 	"google.golang.org/grpc"
 )
 
