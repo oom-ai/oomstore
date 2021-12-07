@@ -33,8 +33,8 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 1235,oneplus,240
 `)))
 	buildTestDataTable(ctx, t, store, twoGroupFeatures[2:], "offline_2_1", csv.NewReader(strings.NewReader(`
-1234,true
-1235,false
+1234,1
+1235,0
 `)))
 
 	testCases := []struct {
