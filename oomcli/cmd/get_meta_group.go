@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -13,6 +14,7 @@ import (
 
 type getMetaGroupOption struct {
 	entityName *string
+	groupName  *string
 }
 
 var getMetaGroupOpt getMetaGroupOption
@@ -24,48 +26,25 @@ var getMetaGroupCmd = &cobra.Command{
 		if !cmd.Flags().Changed("entity") {
 			getMetaGroupOpt.entityName = nil
 		}
-	},
-	Run: func(cmd *cobra.Command, args []string) {
+
 		if len(args) > 1 {
 			log.Fatalf("argument at most one, got %d", len(args))
+		} else if len(args) == 1 {
+			getMetaGroupOpt.groupName = &args[0]
 		}
-
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		var entityID *int
-
-		if getMetaGroupOpt.entityName != nil {
-			entity, err := oomStore.GetEntityByName(ctx, *getMetaGroupOpt.entityName)
-			if err != nil {
-				log.Fatalf("failed to get entity name='%s': %v", *getMetaGroupOpt.entityName, err)
-			}
-			entityID = &entity.ID
-		}
-
-		groups, err := oomStore.ListGroup(ctx, entityID)
+		groups, err := queryGroups(ctx, oomStore, getMetaGroupOpt.entityName, getMetaGroupOpt.groupName)
 		if err != nil {
-			log.Fatalf("failed getting feature groups, error %v\n", err)
+			log.Fatal(err)
 		}
 
-		if len(args) > 0 {
-			if groups = groups.Filter(func(g *types.Group) bool {
-				return g.Name == args[0]
-			}); len(groups) == 0 {
-				log.Fatalf("group '%s' not found", args[0])
-			}
-		}
-
-		w := os.Stdout
-		switch *getMetaOutput {
-		case YAML:
-			err = serializeGroupInYaml(ctx, w, oomStore, groups)
-		default:
-			err = serializeMetadata(w, groups, *getMetaOutput, *getMetaWide)
-		}
-		if err != nil {
-			log.Fatalf("failed printing groups, error %v\n", err)
+		if err = serializeGroupToWriter(ctx, os.Stdout, oomStore, groups, *getMetaOutput); err != nil {
+			log.Fatal(err)
 		}
 	},
 }
@@ -78,10 +57,43 @@ func init() {
 	getMetaGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func serializeGroupInYaml(ctx context.Context, w io.Writer, oomStore *oomstore.OomStore, groups types.GroupList) error {
-	if items, err := groupsToApplyGroupItems(ctx, oomStore, groups); err != nil {
-		return err
-	} else {
-		return serializeInYaml(w, *items)
+func queryGroups(ctx context.Context, oomStore *oomstore.OomStore, entityName, groupName *string) (types.GroupList, error) {
+	var entityID *int
+
+	if groupName != nil {
+		group, err := oomStore.GetGroupByName(ctx, *groupName)
+		if err != nil {
+			return nil, err
+		}
+
+		if entityName != nil && group.Entity.Name != *entityName {
+			return nil, fmt.Errorf("group '%s' entityName is '%s' not '%s'", *groupName, group.Entity.Name, *entityName)
+		}
+		return types.GroupList{group}, err
+	}
+
+	if entityName != nil {
+		entity, err := oomStore.GetEntityByName(ctx, *entityName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get entity name='%s': %v", *entityName, err)
+		}
+		entityID = &entity.ID
+	}
+
+	return oomStore.ListGroup(ctx, entityID)
+}
+
+func serializeGroupToWriter(ctx context.Context, w io.Writer, oomStore *oomstore.OomStore,
+	groups types.GroupList, outputOpt string) error {
+
+	switch outputOpt {
+	case YAML:
+		if items, err := groupsToApplyGroupItems(ctx, oomStore, groups); err != nil {
+			return err
+		} else {
+			return serializeInYaml(w, *items)
+		}
+	default:
+		return serializeMetadata(w, groups, outputOpt, *getMetaWide)
 	}
 }
