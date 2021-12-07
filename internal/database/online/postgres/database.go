@@ -20,10 +20,10 @@ type DB struct {
 }
 
 func (db *DB) Ping(ctx context.Context) error {
-	return db.DB.Ping()
+	return db.DB.PingContext(ctx)
 }
 
 func Open(opt *types.PostgresOpt) (*DB, error) {
 	db, err := dbutil.OpenPostgresDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
-	return &DB{DB: db}, err
+	return &DB{db}, err
 }
