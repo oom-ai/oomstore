@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -12,46 +13,61 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type getMetaEntityOption struct {
+	entityName *string
+}
+
+var getMetaEntityOpt getMetaEntityOption
+
 var getMetaEntityCmd = &cobra.Command{
 	Use:   "entity",
 	Short: "get existing entity given specific conditions",
-	Run: func(cmd *cobra.Command, args []string) {
+	PreRun: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
 			log.Fatalf("argument at most one, got %d", len(args))
+		} else if len(args) == 1 {
+			getMetaEntityOpt.entityName = &args[0]
 		}
-
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		entities, err := oomStore.ListEntity(ctx)
-		if err != nil {
-			log.Fatalf("failed getting entities, error %v\n", err)
-		}
-
-		if len(args) > 0 {
-			if entities = entities.Filter(func(e *types.Entity) bool {
-				return e.Name == args[0]
-			}); len(entities) == 0 {
-				log.Fatalf("entity '%s' not found", args[0])
-			}
-		}
-
-		w := os.Stdout
-		switch *getMetaOutput {
-		case YAML:
-			err = serializeEntitiesInYaml(ctx, w, oomStore, entities)
-		default:
-			err = serializeMetadata(w, entities, *getMetaOutput, *getMetaWide)
-		}
-		if err != nil {
-			log.Fatalf("failed printing entities, error: %v\n", err)
+		if err := outputEntity(ctx, os.Stdout, *getMetaOutput, oomStore, getMetaEntityOpt.entityName); err != nil {
+			log.Fatal(err)
 		}
 	},
 }
 
 func init() {
 	getMetaCmd.AddCommand(getMetaEntityCmd)
+}
+
+func outputEntity(ctx context.Context, out io.Writer, outputOpt string, oomStore *oomstore.OomStore, entityName *string) error {
+	entities, err := oomStore.ListEntity(ctx)
+	if err != nil {
+		return fmt.Errorf("failed getting entities, error %v\n", err)
+	}
+
+	if entityName != nil {
+		if entities = entities.Filter(func(e *types.Entity) bool {
+			return e.Name == *entityName
+		}); len(entities) == 0 {
+			return fmt.Errorf("entity '%s' not found", *entityName)
+		}
+	}
+
+	switch outputOpt {
+	case YAML:
+		err = serializeEntitiesInYaml(ctx, out, oomStore, entities)
+	default:
+		err = serializeMetadata(out, entities, outputOpt, *getMetaWide)
+	}
+	if err != nil {
+		err = fmt.Errorf("failed printing entities, error: %v\n", err)
+	}
+	return err
 }
 
 func serializeEntitiesInYaml(ctx context.Context, w io.Writer, store *oomstore.OomStore, entities types.EntityList) error {
