@@ -14,6 +14,7 @@ import (
 	offlinePG "github.com/ethhte88/oomstore/internal/database/offline/postgres"
 
 	"github.com/ethhte88/oomstore/internal/database/online"
+	onlineMySQL "github.com/ethhte88/oomstore/internal/database/online/mysql"
 	onlinePG "github.com/ethhte88/oomstore/internal/database/online/postgres"
 	onlineRedis "github.com/ethhte88/oomstore/internal/database/online/redis"
 )
@@ -24,6 +25,8 @@ func OpenOnlineStore(opt types.OnlineStoreConfig) (online.Store, error) {
 		return onlinePG.Open(opt.Postgres)
 	case types.REDIS:
 		return onlineRedis.Open(opt.Redis), nil
+	case types.MYSQL:
+		return onlineMySQL.Open(opt.MySQL)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
