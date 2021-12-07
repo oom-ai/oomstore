@@ -198,3 +198,29 @@ func IsTableNotFoundError(err error, backend types.BackendType) bool {
 	}
 	return false
 }
+
+func GetColumnFormat(backendType types.BackendType) (string, error) {
+	var columnFormat string
+	switch backendType {
+	case types.POSTGRES:
+		columnFormat = `"%s" %s`
+	case types.MYSQL:
+		columnFormat = "`%s` %s"
+	default:
+		return "", fmt.Errorf("unsupported backend type %s", backendType)
+	}
+	return columnFormat, nil
+}
+
+func GetQuote(backendType types.BackendType) (string, error) {
+	var quote string
+	switch backendType {
+	case types.POSTGRES:
+		quote = `"`
+	case types.MYSQL:
+		quote = "`"
+	default:
+		return "", fmt.Errorf("unsupported backend type %s", backendType)
+	}
+	return quote, nil
+}
