@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var EDITOR string
+var editor = "vi"
 
 var editCmd = &cobra.Command{
 	Use:   "edit",
@@ -19,9 +19,9 @@ var editCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(editCmd)
 
-	flags := editCmd.PersistentFlags()
-
-	flags.StringVarP(&EDITOR, "editor", "e", "vi", "the editor")
+	if e := os.Getenv("EDITOR"); e != "" {
+		editor = e
+	}
 }
 
 func getTempFile() (*os.File, error) {
@@ -39,11 +39,11 @@ func checkCommandExist(cmd string) bool {
 }
 
 func openFileByEditor(ctx context.Context, fileName string) error {
-	if !checkCommandExist(EDITOR) {
-		return fmt.Errorf("%s not found", EDITOR)
+	if !checkCommandExist(editor) {
+		return fmt.Errorf("%s not found", editor)
 	}
 
-	cmd := exec.CommandContext(ctx, EDITOR, fileName)
+	cmd := exec.CommandContext(ctx, editor, fileName)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
