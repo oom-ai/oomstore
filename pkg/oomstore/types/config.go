@@ -3,9 +3,10 @@ package types
 type BackendType string
 
 const (
-	POSTGRES BackendType = "postgres"
-	REDIS    BackendType = "redis"
-	MYSQL    BackendType = "mysql"
+	POSTGRES  BackendType = "postgres"
+	REDIS     BackendType = "redis"
+	MYSQL     BackendType = "mysql"
+	SNOWFLAKE BackendType = "snowflake"
 )
 
 type OomStoreConfig struct {

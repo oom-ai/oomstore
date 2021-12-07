@@ -66,7 +66,7 @@ func buildQueryAndArgsForInsertRecords(tableName string, records []interface{}, 
 
 	var columnStr string
 	switch backendType {
-	case types.POSTGRES:
+	case types.POSTGRES, types.SNOWFLAKE:
 		columnStr = Quote(`"`, columns...)
 		tableName = fmt.Sprintf(`"%s"`, tableName)
 	case types.MYSQL:
@@ -89,7 +89,7 @@ func Quote(quote string, fields ...string) string {
 func GetColumnFormat(backendType types.BackendType) (string, error) {
 	var columnFormat string
 	switch backendType {
-	case types.POSTGRES:
+	case types.POSTGRES, types.SNOWFLAKE:
 		columnFormat = `"%s" %s`
 	case types.MYSQL:
 		columnFormat = "`%s` %s"
@@ -102,7 +102,7 @@ func GetColumnFormat(backendType types.BackendType) (string, error) {
 func QuoteFn(backendType types.BackendType) (func(...string) string, error) {
 	var quote string
 	switch backendType {
-	case types.POSTGRES:
+	case types.POSTGRES, types.SNOWFLAKE:
 		quote = `"`
 	case types.MYSQL:
 		quote = "`"
