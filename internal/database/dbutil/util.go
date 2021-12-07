@@ -14,28 +14,46 @@ import (
 
 type RowMap = map[string]interface{}
 
-const CREATE_DATA_TABLE = `CREATE TABLE "{{TABLE_NAME}}" (
+const (
+	CREATE_DATA_TABLE_POSTGRES = `CREATE TABLE "{{TABLE_NAME}}" (
 	"{{ENTITY_NAME}}" VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY,
 	{{COLUMN_DEFS}});
 `
+	CREATE_DATA_TABLE_MYSQL = "CREATE TABLE `{{TABLE_NAME}}` ( " +
+		"`{{ENTITY_NAME}}` VARCHAR({{ENTITY_LENGTH}}) PRIMARY KEY," +
+		"{{COLUMN_DEFS}}); "
+)
 
-func BuildFeatureDataTableSchema(tableName string, entity *types.Entity, features types.FeatureList) string {
+func BuildFeatureDataTableSchema(tableName string, entity *types.Entity, features types.FeatureList, backendType types.BackendType) (string, error) {
+	var columnFormat, tableSchema string
+	switch backendType {
+	case types.POSTGRES:
+		columnFormat = `"%s" %s`
+		tableSchema = CREATE_DATA_TABLE_POSTGRES
+	case types.MYSQL:
+		columnFormat = "`%s` %s"
+		tableSchema = CREATE_DATA_TABLE_MYSQL
+	default:
+		return "", fmt.Errorf("unsupported backend type %s", backendType)
+	}
+
 	// sort to ensure the schema looks consistent
 	sort.Slice(features, func(i, j int) bool {
 		return features[i].Name < features[j].Name
 	})
 	var columnDefs []string
 	for _, column := range features {
-		columnDef := fmt.Sprintf(`"%s" %s`, column.Name, column.DBValueType)
-		columnDefs = append(columnDefs, columnDef)
+		def := fmt.Sprintf(columnFormat, column.Name, column.DBValueType)
+		columnDefs = append(columnDefs, def)
 	}
 
 	// fill schema template
-	schema := strings.ReplaceAll(CREATE_DATA_TABLE, "{{TABLE_NAME}}", tableName)
+	schema := strings.ReplaceAll(tableSchema, "{{TABLE_NAME}}", tableName)
 	schema = strings.ReplaceAll(schema, "{{ENTITY_NAME}}", entity.Name)
 	schema = strings.ReplaceAll(schema, "{{ENTITY_LENGTH}}", strconv.Itoa(entity.Length))
 	schema = strings.ReplaceAll(schema, "{{COLUMN_DEFS}}", strings.Join(columnDefs, ",\n"))
-	return schema
+
+	return schema, nil
 }
 
 func BuildConditions(equal map[string]interface{}, in map[string]interface{}) ([]string, []interface{}, error) {
@@ -68,7 +86,7 @@ func TempTable(prefix string) string {
 	return fmt.Sprintf("tmp_%s_%d", prefix, time.Now().UnixNano())
 }
 
-func buildQueryAndArgsForInsertRecords(tableName string, records []interface{}, columns []string) (string, []interface{}, error) {
+func buildQueryAndArgsForInsertRecords(tableName string, records []interface{}, columns []string, backendType types.BackendType) (string, []interface{}, error) {
 	if len(records) == 0 {
 		return "", nil, nil
 	}
@@ -77,13 +95,22 @@ func buildQueryAndArgsForInsertRecords(tableName string, records []interface{}, 
 		valueFlags = append(valueFlags, "(?)")
 	}
 
+	var columnStr string
+	switch backendType {
+	case types.POSTGRES:
+		columnStr = Quote(`"`, columns...)
+		tableName = fmt.Sprintf(`"%s"`, tableName)
+	case types.MYSQL:
+		columnStr = Quote("`", columns...)
+		tableName = fmt.Sprintf("`%s`", tableName)
+	}
 	return sqlx.In(
-		fmt.Sprintf(`INSERT INTO "%s" (%s) VALUES %s`, tableName, Quote(`"`, columns...), strings.Join(valueFlags, ",")),
+		fmt.Sprintf(`INSERT INTO %s (%s) VALUES %s`, tableName, columnStr, strings.Join(valueFlags, ",")),
 		records...)
 }
 
-func InsertRecordsToTable(db *sqlx.DB, ctx context.Context, tableName string, records []interface{}, columns []string) error {
-	query, args, err := buildQueryAndArgsForInsertRecords(tableName, records, columns)
+func InsertRecordsToTable(db *sqlx.DB, ctx context.Context, tableName string, records []interface{}, columns []string, backendType types.BackendType) error {
+	query, args, err := buildQueryAndArgsForInsertRecords(tableName, records, columns, backendType)
 	if err != nil {
 		return err
 	}
@@ -96,8 +123,8 @@ func InsertRecordsToTable(db *sqlx.DB, ctx context.Context, tableName string, re
 	return nil
 }
 
-func InsertRecordsToTableTx(tx *sqlx.Tx, ctx context.Context, tableName string, records []interface{}, columns []string) error {
-	query, args, err := buildQueryAndArgsForInsertRecords(tableName, records, columns)
+func InsertRecordsToTableTx(tx *sqlx.Tx, ctx context.Context, tableName string, records []interface{}, columns []string, backendType types.BackendType) error {
+	query, args, err := buildQueryAndArgsForInsertRecords(tableName, records, columns, backendType)
 	if err != nil {
 		return err
 	}
