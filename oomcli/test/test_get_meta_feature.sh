@@ -7,10 +7,11 @@ register_features
 import_sample > /dev/null
 
 case='oomcli get meta features works'
-expected='ID,NAME,GROUP,ENTITY,CATEGORY,DB-VALUE-TYPE,VALUE-TYPE,DESCRIPTION,ONLINE-REVISION-ID
-1,price,phone,device,batch,int,int64,price,<NULL>
-2,model,phone,device,batch,varchar(32),string,model,<NULL>
-3,age,student,user,batch,int,int64,age,<NULL>
+expected='
+ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION,DB-VALUE-TYPE,ONLINE-REVISION-ID
+1,price,phone,device,batch,int64,price,int,<NULL>
+2,model,phone,device,batch,string,model,varchar(32),<NULL>
+3,age,student,user,batch,int64,age,int,<NULL>
 '
 actual=$(oomcli get meta feature -o csv --wide)
 ignore_time() { cut -d ',' -f 1-9 <<<"$1"; }
@@ -26,8 +27,9 @@ actual=$(oomcli get meta feature -o csv)
 assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"
 
 case='oomcli get one meta feature works'
-expected='ID,NAME,GROUP,ENTITY,CATEGORY,DB-VALUE-TYPE,VALUE-TYPE,DESCRIPTION,ONLINE-REVISION-ID
-2,model,phone,device,batch,varchar(32),string,model,<NULL>
+expected='
+ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION,DB-VALUE-TYPE,ONLINE-REVISION-ID
+2,model,phone,device,batch,string,model,varchar(32),<NULL>
 '
 actual=$(oomcli get meta feature model -o csv --wide)
 ignore_time() { cut -d ',' -f 1-9 <<<"$1"; }
