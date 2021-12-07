@@ -53,3 +53,10 @@ type MySQLOpt struct {
 	Password string `yaml:"password"`
 	Database string `yaml:"database"`
 }
+
+type SnowflakeOpt struct {
+	Account  string `yaml:"account"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	Database string `yaml:"database"`
+}
