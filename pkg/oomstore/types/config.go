@@ -18,6 +18,7 @@ type OnlineStoreConfig struct {
 	Backend  BackendType  `yaml:"backend"`
 	Postgres *PostgresOpt `yaml:"postgres"`
 	Redis    *RedisOpt    `yaml:"redis"`
+	MySQL    *MySQLOpt    `yaml:"mysql"`
 }
 
 type OfflineStoreConfig struct {
