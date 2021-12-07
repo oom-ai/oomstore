@@ -83,6 +83,17 @@ func Quote(quote string, fields ...string) string {
 	return strings.Join(rs, ",")
 }
 
+func QuoteByBackend(backendType types.BackendType, fields ...string) string {
+	quote := ""
+	switch backendType {
+	case types.POSTGRES:
+		quote = `"`
+	case types.MYSQL:
+		quote = "`"
+	}
+	return Quote(quote, fields...)
+}
+
 func TempTable(prefix string) string {
 	return fmt.Sprintf("tmp_%s_%d", prefix, time.Now().UnixNano())
 }
