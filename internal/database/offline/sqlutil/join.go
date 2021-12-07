@@ -57,7 +57,7 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 	if len(opt.Features) == 0 {
 		return "", nil
 	}
-	quote, err := dbutil.GetQuote(backendType)
+	qt, err := dbutil.QuoteFn(backendType)
 	if err != nil {
 		return "", err
 	}
@@ -82,9 +82,16 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 	`
 
 	columns := append(opt.ValueNames, opt.Features.Names()...)
-	columnsStr := dbutil.Quote(quote, columns...)
+	columnsStr := qt(columns...)
 	for _, r := range opt.RevisionRanges {
-		query := fmt.Sprintf(joinQuery, dbutil.Quote(quote, joinedTableName), columnsStr, columnsStr, dbutil.Quote(quote, opt.EntityRowsTableName), dbutil.Quote(quote, r.DataTable), opt.Entity.Name)
+		query := fmt.Sprintf(joinQuery,
+			qt(joinedTableName),
+			columnsStr,
+			columnsStr,
+			qt(opt.EntityRowsTableName),
+			qt(r.DataTable),
+			opt.Entity.Name,
+		)
 		if _, tmpErr := db.ExecContext(ctx, db.Rebind(query), r.MinRevision, r.MaxRevision); tmpErr != nil {
 			return "", tmpErr
 		}
@@ -93,11 +100,19 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 	return joinedTableName, nil
 }
 
-func readJoinedTable(ctx context.Context, db *sqlx.DB, entityRowsTableName string, tableNames []string, featureMap map[string]types.FeatureList, valueNames []string, backendType types.BackendType) (*types.JoinResult, error) {
+func readJoinedTable(
+	ctx context.Context,
+	db *sqlx.DB,
+	entityRowsTableName string,
+	tableNames []string,
+	featureMap map[string]types.FeatureList,
+	valueNames []string,
+	backendType types.BackendType,
+) (*types.JoinResult, error) {
 	if len(tableNames) == 0 {
 		return nil, nil
 	}
-	quote, err := dbutil.GetQuote(backendType)
+	qt, err := dbutil.QuoteFn(backendType)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +140,7 @@ func readJoinedTable(ctx context.Context, db *sqlx.DB, entityRowsTableName strin
 			fields = append(fields, fmt.Sprintf("%s.%s", tableName, f.Name))
 		}
 	}
-	query := fmt.Sprintf(`SELECT %s FROM %s`, strings.Join(fields, ","), dbutil.Quote(quote, entityRowsTableName))
+	query := fmt.Sprintf(`SELECT %s FROM %s`, strings.Join(fields, ","), qt(entityRowsTableName))
 	tableNames = append([]string{entityRowsTableName}, tableNames...)
 	for i := range tableNames {
 		if i == 0 {
