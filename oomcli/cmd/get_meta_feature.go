@@ -2,11 +2,14 @@ package cmd
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"log"
 	"os"
 
 	"github.com/spf13/cobra"
 
+	"github.com/ethhte88/oomstore/pkg/oomstore"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types/apply"
 )
@@ -33,24 +36,13 @@ var getMetaFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		features, err := oomStore.ListFeature(ctx, getMetaFeatureOpt)
+		features, err := queryFeatures(ctx, oomStore, getMetaFeatureOpt)
 		if err != nil {
-			log.Fatalf("failed getting features, error %v\n", err)
+			log.Fatal(err)
 		}
 
-		if len(args) != 0 && len(features) == 0 {
-			log.Fatalf("feature '%s' not found", args[0])
-		}
-
-		w := os.Stdout
-		switch *getMetaOutput {
-		case YAML:
-			err = serializeInYaml(w, apply.FromFeatureList(features))
-		default:
-			err = serializeMetadata(w, features, *getMetaOutput, *getMetaWide)
-		}
-		if err != nil {
-			log.Fatalf("failed printing features, error %v\n", err)
+		if err := serializeFeatureToWriter(os.Stdout, features, *getMetaOutput); err != nil {
+			log.Fatalf("failed printing features: %v\n", err)
 		}
 	},
 }
@@ -61,4 +53,26 @@ func init() {
 	flags := getMetaFeatureCmd.Flags()
 	getMetaFeatureOpt.EntityName = flags.StringP("entity", "e", "", "entity")
 	getMetaFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
+}
+
+func queryFeatures(ctx context.Context, oomStore *oomstore.OomStore, opt types.ListFeatureOpt) (types.FeatureList, error) {
+	features, err := oomStore.ListFeature(ctx, opt)
+	if err != nil {
+		return nil, fmt.Errorf("failed getting features, error %v\n", err)
+	}
+
+	if opt.FeatureNames != nil && len(features) == 0 {
+		return nil, fmt.Errorf("feature '%s' not found", (*opt.FeatureNames)[0])
+	}
+
+	return features, nil
+}
+
+func serializeFeatureToWriter(w io.Writer, features types.FeatureList, outputOpt string) error {
+	switch outputOpt {
+	case YAML:
+		return serializeInYaml(w, apply.FromFeatureList(features))
+	default:
+		return serializeMetadata(w, features, outputOpt, *getMetaWide)
+	}
 }
