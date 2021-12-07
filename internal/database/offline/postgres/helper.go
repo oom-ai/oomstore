@@ -80,13 +80,13 @@ func (db *DB) insertEntityRows(ctx context.Context, tableName string, entityRows
 		}
 		records = append(records, record)
 		if len(records) == PostgresBatchSize {
-			if err := dbutil.InsertRecordsToTable(db.DB, ctx, tableName, records, columns); err != nil {
+			if err := dbutil.InsertRecordsToTable(db.DB, ctx, tableName, records, columns, types.POSTGRES); err != nil {
 				return err
 			}
 			records = make([]interface{}, 0, PostgresBatchSize)
 		}
 	}
-	if err := dbutil.InsertRecordsToTable(db.DB, ctx, tableName, records, columns); err != nil {
+	if err := dbutil.InsertRecordsToTable(db.DB, ctx, tableName, records, columns, types.POSTGRES); err != nil {
 		return err
 	}
 	return nil

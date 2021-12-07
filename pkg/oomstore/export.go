@@ -30,23 +30,18 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 		return nil, err
 	}
 
-	featureNames := opt.FeatureNames
-	allFeatures, err := s.ListFeature(ctx, types.ListFeatureOpt{
-		GroupName: &revision.Group.Name,
-	})
+	var features types.FeatureList
+	if len(opt.FeatureNames) == 0 {
+		features, err = s.ListFeature(ctx, types.ListFeatureOpt{
+			GroupName: &revision.Group.Name,
+		})
+	} else {
+		features, err = s.ListFeature(ctx, types.ListFeatureOpt{
+			FeatureNames: &opt.FeatureNames,
+		})
+	}
 	if err != nil {
 		return nil, err
-	}
-
-	allFeatureNames := allFeatures.Names()
-	if len(featureNames) == 0 {
-		featureNames = allFeatureNames
-	} else {
-		for _, field := range featureNames {
-			if !contains(allFeatureNames, field) {
-				return nil, fmt.Errorf("feature '%s' does not exist", field)
-			}
-		}
 	}
 
 	entity := revision.Group.Entity
@@ -55,12 +50,12 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 	}
 
 	stream, exportErr := s.offline.Export(ctx, offline.ExportOpt{
-		DataTable:    revision.DataTable,
-		EntityName:   entity.Name,
-		FeatureNames: featureNames,
-		Limit:        opt.Limit,
+		DataTable:  revision.DataTable,
+		EntityName: entity.Name,
+		Features:   features,
+		Limit:      opt.Limit,
 	})
-	header := append([]string{entity.Name}, featureNames...)
+	header := append([]string{entity.Name}, features.Names()...)
 	return types.NewExportResult(header, stream, exportErr), nil
 }
 

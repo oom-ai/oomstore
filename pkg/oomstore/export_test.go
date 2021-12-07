@@ -39,36 +39,40 @@ func TestChannelExport(t *testing.T) {
 	testCases := []struct {
 		description  string
 		opt          types.ChannelExportOpt
+		features     types.FeatureList
 		exportStream <-chan types.ExportRecord
 		exportError  <-chan error
 		expected     [][]interface{}
 	}{
 		{
-			description: "no features",
+			description: "provide no features, should return all feature values",
 			opt: types.ChannelExportOpt{
 				FeatureNames: []string{},
 				RevisionID:   revisionID,
 			},
+			features:     features,
 			exportStream: prepareTwoFeatureStream(),
 			expected:     [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
 		},
 		{
-			description: "provide one feature",
+			description: "provide one feature, should return one feature values",
 			opt: types.ChannelExportOpt{
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
+			features:     features[1:],
 			exportStream: prepareOneFeatureStream(),
 			expected:     [][]interface{}{{"1234", int64(100)}, {"1235", int64(200)}, {"1236", int64(300)}, {"1237", int64(240)}},
 		},
 		{
-			description: "provide revision",
+			description: "provide revision and one feature name, should return one feature values",
 			opt: types.ChannelExportOpt{
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
-			exportStream: prepareTwoFeatureStream(),
-			expected:     [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
+			features:     features,
+			exportStream: prepareOneFeatureStream(),
+			expected:     [][]interface{}{{"1234", int64(100)}, {"1235", int64(200)}, {"1236", int64(300)}, {"1237", int64(240)}},
 		},
 		{
 			description: "empty stream",
@@ -76,6 +80,7 @@ func TestChannelExport(t *testing.T) {
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
+			features:     features,
 			exportStream: prepareEmptyStream(),
 			exportError:  prepareExportError(),
 			expected:     [][]interface{}{},
@@ -97,22 +102,19 @@ func TestChannelExport(t *testing.T) {
 			}
 
 			metadataStore.EXPECT().GetRevision(ctx, tc.opt.RevisionID).Return(&revision, nil)
-			metadataStore.EXPECT().GetGroupByName(ctx, "device_info").Return(&types.Group{
-				Name: "device_info",
-				ID:   1,
-			}, nil)
+			if len(tc.opt.FeatureNames) == 0 {
+				metadataStore.EXPECT().GetGroupByName(ctx, "device_info").Return(&types.Group{
+					Name: "device_info",
+					ID:   1,
+				}, nil)
+			}
 			metadataStore.EXPECT().ListFeature(gomock.Any(), gomock.Any()).Return(features, nil)
 
-			featureNames := tc.opt.FeatureNames
-			if len(featureNames) == 0 {
-				featureNames = features.Names()
-			}
-
 			offlineStore.EXPECT().Export(gomock.Any(), offline.ExportOpt{
-				DataTable:    "device_info_10",
-				EntityName:   "device",
-				FeatureNames: featureNames,
-				Limit:        tc.opt.Limit,
+				DataTable:  "device_info_10",
+				EntityName: "device",
+				Features:   features,
+				Limit:      tc.opt.Limit,
 			}).Return(tc.exportStream, tc.exportError)
 
 			// execute and compare results

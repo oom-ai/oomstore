@@ -8,6 +8,7 @@ import (
 
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/offline"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
@@ -46,8 +47,11 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 	var revision int64
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		schema := dbutil.BuildFeatureDataTableSchema(opt.DataTableName, opt.Entity, opt.Features)
-		_, err := tx.ExecContext(ctx, schema)
+		schema, err := dbutil.BuildFeatureDataTableSchema(opt.DataTableName, opt.Entity, opt.Features, types.POSTGRES)
+		if err != nil {
+			return err
+		}
+		_, err = tx.ExecContext(ctx, schema)
 		if err != nil {
 			return err
 		}

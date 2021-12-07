@@ -75,9 +75,9 @@ func TestSync(t *testing.T) {
 
 				stream := make(chan types.ExportRecord)
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
-					DataTable:    "data-table-name",
-					EntityName:   "device",
-					FeatureNames: features.Names(),
+					DataTable:  "data-table-name",
+					EntityName: "device",
+					Features:   features,
 				}).Return(stream, nil)
 
 				onlineStore.EXPECT().Import(ctx, online.ImportOpt{
@@ -110,9 +110,9 @@ func TestSync(t *testing.T) {
 
 				stream := make(chan types.ExportRecord)
 				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
-					DataTable:    "data-table-name",
-					EntityName:   "device",
-					FeatureNames: features.Names(),
+					DataTable:  "data-table-name",
+					EntityName: "device",
+					Features:   features,
 				}).Return(stream, nil)
 
 				onlineStore.EXPECT().Import(ctx, online.ImportOpt{

@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/online"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -18,8 +19,11 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	err := dbutil.WithTransaction(db.DB, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tableName := getOnlineTableName(opt.Revision.ID)
-		schema := dbutil.BuildFeatureDataTableSchema(tableName, opt.Entity, opt.FeatureList)
-		_, err := tx.ExecContext(ctx, schema)
+		schema, err := dbutil.BuildFeatureDataTableSchema(tableName, opt.Entity, opt.FeatureList, types.POSTGRES)
+		if err != nil {
+			return err
+		}
+		_, err = tx.ExecContext(ctx, schema)
 		if err != nil {
 			return err
 		}
@@ -33,14 +37,14 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			records = append(records, record)
 
 			if len(records) == PostgresBatchSize {
-				if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns); err != nil {
+				if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, types.POSTGRES); err != nil {
 					return err
 				}
 				records = make([]interface{}, 0, PostgresBatchSize)
 			}
 		}
 
-		if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns); err != nil {
+		if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, types.POSTGRES); err != nil {
 			return err
 		}
 		if opt.ExportError != nil {
