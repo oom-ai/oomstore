@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -135,4 +136,15 @@ func InsertRecordsToTableTx(tx *sqlx.Tx, ctx context.Context, tableName string, 
 		return err
 	}
 	return nil
+}
+
+// Build MySQL data source name
+func GetMysqlDSN(host, port, user, password, database string) string {
+	cfg := mysql.NewConfig()
+	cfg.Net = fmt.Sprintf("(%s:%s)", host, port)
+	cfg.User = user
+	cfg.Passwd = password
+	cfg.DBName = database
+	cfg.ParseTime = true
+	return cfg.FormatDSN()
 }

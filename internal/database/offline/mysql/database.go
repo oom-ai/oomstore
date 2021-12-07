@@ -2,8 +2,8 @@ package mysql
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/offline"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/jmoiron/sqlx"
@@ -24,9 +24,7 @@ func Open(option *types.MySQLOpt) (*DB, error) {
 }
 
 func OpenWith(host, port, user, password, database string) (*DB, error) {
-	db, err := sqlx.Open(
-		"mysql",
-		fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true", user, password, host, port, database))
+	db, err := sqlx.Open("mysql", dbutil.GetMysqlDSN(host, port, user, password, database))
 	return &DB{
 		DB: db,
 	}, err
