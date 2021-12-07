@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethhte88/oomstore/internal/database/offline"
 	"github.com/ethhte88/oomstore/internal/database/offline/mysql"
+	"github.com/ethhte88/oomstore/internal/database/offline/test_impl"
 	"github.com/ethhte88/oomstore/internal/database/test/runtime_mysql"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/require"
@@ -38,4 +39,8 @@ func prepareDB(t *testing.T) (context.Context, *mysql.DB) {
 	db, err := mysql.Open(&runtime_mysql.MySQLDbOpt)
 	require.NoError(t, err)
 	return ctx, db
+}
+
+func TestPing(t *testing.T) {
+	test_impl.TestPing(t, prepareStore)
 }
