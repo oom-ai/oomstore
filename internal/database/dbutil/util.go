@@ -149,3 +149,15 @@ func OpenMysqlDB(host, port, user, password, database string) (*sqlx.DB, error) 
 
 	return sqlx.Open("mysql", cfg.FormatDSN())
 }
+
+func OpenPostgresDB(host, port, user, password, database string) (*sqlx.DB, error) {
+	return sqlx.Open(
+		"postgres",
+		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+			user,
+			password,
+			host,
+			port,
+			database),
+	)
+}
