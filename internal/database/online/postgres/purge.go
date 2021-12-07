@@ -2,13 +2,10 @@ package postgres
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/ethhte88/oomstore/internal/database/online/sqlutil"
 )
 
 func (db *DB) Purge(ctx context.Context, revisionID int) error {
-	query := fmt.Sprintf(`DROP TABLE IF EXISTS "%s";`, getOnlineTableName(revisionID))
-	if _, err := db.ExecContext(ctx, query); err != nil {
-		return err
-	}
-	return nil
+	return sqlutil.Purge(ctx, db.DB, revisionID, BackendType)
 }

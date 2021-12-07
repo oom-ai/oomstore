@@ -10,6 +10,8 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+const BackendType = types.MYSQL
+
 var _ online.Store = &DB{}
 
 type DB struct {

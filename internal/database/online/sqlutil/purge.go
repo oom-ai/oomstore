@@ -16,7 +16,3 @@ func Purge(ctx context.Context, db *sqlx.DB, revisionID int, backend types.Backe
 	}
 	return nil
 }
-
-func OnlineTableName(revisionID int) string {
-	return fmt.Sprintf("online_%d", revisionID)
-}
