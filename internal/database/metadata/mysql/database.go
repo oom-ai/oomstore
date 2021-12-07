@@ -60,9 +60,7 @@ func Open(ctx context.Context, option *types.MySQLOpt) (*DB, error) {
 }
 
 func OpenDB(host, port, user, password, database string) (*sqlx.DB, error) {
-	return sqlx.Open(
-		"mysql",
-		fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true", user, password, host, port, database))
+	return sqlx.Open("mysql", dbutil.GetMysqlDSN(host, port, user, password, database))
 }
 
 func CreateDatabase(ctx context.Context, opt types.MySQLOpt) (err error) {
