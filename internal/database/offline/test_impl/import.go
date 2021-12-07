@@ -29,10 +29,12 @@ func TestImport(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 			{
 				Name:        "model",
 				DBValueType: "invalid-db-value-type",
+				ValueType:   types.STRING,
 			},
 			{
 				Name:        "price",
 				DBValueType: "int",
+				ValueType:   types.INT64,
 			},
 		},
 		Header: []string{"device", "model", "price"},
