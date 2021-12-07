@@ -10,7 +10,11 @@ import (
 )
 
 func Purge(ctx context.Context, db *sqlx.DB, revisionID int, backend types.BackendType) error {
-	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, dbutil.QuoteByBackend(backend, OnlineTableName(revisionID)))
+	qt, err := dbutil.QuoteFn(backend)
+	if err != nil {
+		return err
+	}
+	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, qt(OnlineTableName(revisionID)))
 	if _, err := db.ExecContext(ctx, query); err != nil {
 		return err
 	}

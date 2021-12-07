@@ -85,17 +85,6 @@ func Quote(quote string, fields ...string) string {
 	return strings.Join(rs, ",")
 }
 
-func QuoteByBackend(backendType types.BackendType, fields ...string) string {
-	quote := ""
-	switch backendType {
-	case types.POSTGRES:
-		quote = `"`
-	case types.MYSQL:
-		quote = "`"
-	}
-	return Quote(quote, fields...)
-}
-
 func TempTable(prefix string) string {
 	return fmt.Sprintf("tmp_%s_%d", prefix, time.Now().UnixNano())
 }
@@ -212,7 +201,7 @@ func GetColumnFormat(backendType types.BackendType) (string, error) {
 	return columnFormat, nil
 }
 
-func GetQuote(backendType types.BackendType) (string, error) {
+func QuoteFn(backendType types.BackendType) (func(...string) string, error) {
 	var quote string
 	switch backendType {
 	case types.POSTGRES:
@@ -220,7 +209,9 @@ func GetQuote(backendType types.BackendType) (string, error) {
 	case types.MYSQL:
 		quote = "`"
 	default:
-		return "", fmt.Errorf("unsupported backend type %s", backendType)
+		return nil, fmt.Errorf("unsupported backend type %s", backendType)
 	}
-	return quote, nil
+	return func(fields ...string) string {
+		return Quote(quote, fields...)
+	}, nil
 }
