@@ -9,7 +9,7 @@ import (
 )
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	panic("implement me")
+	return sqlutil.Import(ctx, db.DB, opt, loadDataFromCSVReader, types.MYSQL)
 }
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
