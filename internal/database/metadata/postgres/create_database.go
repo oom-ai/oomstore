@@ -11,7 +11,7 @@ import (
 )
 
 func CreateDatabase(ctx context.Context, opt types.PostgresOpt) (err error) {
-	defaultDB, err := OpenDB(opt.Host, opt.Port, opt.User, opt.Password, "")
+	defaultDB, err := dbutil.OpenPostgresDB(opt.Host, opt.Port, opt.User, opt.Password, "")
 	if err != nil {
 		return
 	}
@@ -21,7 +21,7 @@ func CreateDatabase(ctx context.Context, opt types.PostgresOpt) (err error) {
 		return
 	}
 
-	db, err := OpenDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
+	db, err := dbutil.OpenPostgresDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
 	if err != nil {
 		return
 	}

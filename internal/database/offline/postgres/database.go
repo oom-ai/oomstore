@@ -2,11 +2,11 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/offline"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
@@ -22,18 +22,6 @@ func (db *DB) Ping(ctx context.Context) error {
 }
 
 func Open(option *types.PostgresOpt) (*DB, error) {
-	return OpenWith(option.Host, option.Port, option.User, option.Password, option.Database)
-}
-
-func OpenWith(host, port, user, password, database string) (*DB, error) {
-	db, err := sqlx.Open(
-		"postgres",
-		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-			user,
-			password,
-			host,
-			port,
-			database),
-	)
+	db, err := dbutil.OpenPostgresDB(option.Host, option.Port, option.User, option.Password, option.Database)
 	return &DB{db}, err
 }

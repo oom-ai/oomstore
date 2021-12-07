@@ -5,6 +5,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/metadata"
 	"github.com/ethhte88/oomstore/internal/database/metadata/postgres"
 	"github.com/ethhte88/oomstore/internal/database/metadata/test_impl"
@@ -20,7 +21,7 @@ func prepareStore(t *testing.T) (context.Context, metadata.Store) {
 func prepareDB(t *testing.T) (context.Context, *postgres.DB) {
 	ctx := context.Background()
 	opt := runtime_pg.PostgresDbOpt
-	pg, err := postgres.OpenDB(
+	pg, err := dbutil.OpenPostgresDB(
 		opt.Host,
 		opt.Port,
 		opt.User,
