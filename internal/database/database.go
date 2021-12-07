@@ -7,7 +7,7 @@ import (
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 
 	"github.com/ethhte88/oomstore/internal/database/metadata"
-	"github.com/ethhte88/oomstore/internal/database/metadata/mysql"
+	metadataMySQL "github.com/ethhte88/oomstore/internal/database/metadata/mysql"
 	metadataPG "github.com/ethhte88/oomstore/internal/database/metadata/postgres"
 
 	"github.com/ethhte88/oomstore/internal/database/offline"
@@ -34,7 +34,7 @@ func OpenMetadataStore(opt types.MetadataStoreConfig) (metadata.Store, error) {
 	case types.POSTGRES:
 		return metadataPG.Open(context.Background(), opt.Postgres)
 	case types.MYSQL:
-		return mysql.Open(context.Background(), opt.MySQL)
+		return metadataMySQL.Open(context.Background(), opt.MySQL)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
@@ -45,7 +45,7 @@ func CreateMetadataDatabase(ctx context.Context, opt types.MetadataStoreConfig) 
 	case types.POSTGRES:
 		return metadataPG.CreateDatabase(ctx, *opt.Postgres)
 	case types.MYSQL:
-		return mysql.CreateDatabase(ctx, *opt.MySQL)
+		return metadataMySQL.CreateDatabase(ctx, *opt.MySQL)
 	default:
 		return fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
