@@ -87,11 +87,3 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
 	}
 	return exportResult.CheckStreamError()
 }
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
-}
