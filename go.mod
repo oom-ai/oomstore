@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/adrg/xdg v0.4.0
+	github.com/fatih/structtag v1.2.0
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/mock v1.6.0
@@ -34,7 +35,6 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
-	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
