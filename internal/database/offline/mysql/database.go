@@ -20,12 +20,6 @@ func (db *DB) Ping(ctx context.Context) error {
 }
 
 func Open(option *types.MySQLOpt) (*DB, error) {
-	return OpenWith(option.Host, option.Port, option.User, option.Password, option.Database)
-}
-
-func OpenWith(host, port, user, password, database string) (*DB, error) {
-	db, err := sqlx.Open("mysql", dbutil.GetMysqlDSN(host, port, user, password, database))
-	return &DB{
-		DB: db,
-	}, err
+	db, err := dbutil.OpenMysqlDB(option.Host, option.Port, option.User, option.Password, option.Database)
+	return &DB{db}, err
 }
