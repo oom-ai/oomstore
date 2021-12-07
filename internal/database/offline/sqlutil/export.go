@@ -11,9 +11,16 @@ import (
 	"github.com/spf13/cast"
 )
 
-func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
+func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType types.BackendType) (<-chan types.ExportRecord, <-chan error) {
 	fields := append([]string{opt.EntityName}, opt.Features.Names()...)
-	query := fmt.Sprintf("select %s from %s", dbutil.Quote(`"`, fields...), opt.DataTable)
+	var fieldStr string
+	switch backendType {
+	case types.POSTGRES:
+		fieldStr = dbutil.Quote(`"`, fields...)
+	case types.MYSQL:
+		fieldStr = dbutil.Quote("`", fields...)
+	}
+	query := fmt.Sprintf("SELECT %s FROM %s", fieldStr, opt.DataTable)
 	if opt.Limit != nil {
 		query += fmt.Sprintf(" LIMIT %d", *opt.Limit)
 	}
@@ -43,7 +50,7 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt) (<-chan typ
 			}
 			record[0] = cast.ToString(record[0])
 			for i, f := range opt.Features {
-				if f.ValueType != types.STRING {
+				if f.ValueType != types.STRING || record[i+1] == nil {
 					continue
 				}
 				record[i+1] = cast.ToString(record[i+1])
