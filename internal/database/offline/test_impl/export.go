@@ -39,18 +39,18 @@ func TestExport(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		{
 			description: "no features",
 			opt: offline.ExportOpt{
-				DataTable:    dataTable,
-				EntityName:   "device",
-				FeatureNames: []string{},
+				DataTable:  dataTable,
+				EntityName: "device",
+				Features:   types.FeatureList{},
 			},
 			expected: [][]interface{}{{"1234"}, {"1235"}, {"1236"}, {"1237"}},
 		},
 		{
 			description: "valid features and valid entity rows",
 			opt: offline.ExportOpt{
-				DataTable:    dataTable,
-				EntityName:   "device",
-				FeatureNames: []string{"model", "price"},
+				DataTable:  dataTable,
+				EntityName: "device",
+				Features:   features,
 			},
 			expected: [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
 		},
