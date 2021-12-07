@@ -1,17 +1,16 @@
-package postgres
+package mysql
 
 import (
 	"context"
 
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
-
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/online"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
-const BackendType = types.POSTGRES
+const BackendType = types.MYSQL
 
 var _ online.Store = &DB{}
 
@@ -23,7 +22,7 @@ func (db *DB) Ping(ctx context.Context) error {
 	return db.DB.PingContext(ctx)
 }
 
-func Open(opt *types.PostgresOpt) (*DB, error) {
-	db, err := dbutil.OpenPostgresDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
+func Open(opt *types.MySQLOpt) (*DB, error) {
+	db, err := dbutil.OpenMysqlDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
 	return &DB{db}, err
 }
