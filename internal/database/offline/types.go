@@ -8,10 +8,10 @@ import (
 )
 
 type ExportOpt struct {
-	DataTable    string
-	EntityName   string
-	FeatureNames []string
-	Limit        *uint64
+	DataTable  string
+	EntityName string
+	Features   types.FeatureList
+	Limit      *uint64
 }
 
 type JoinOpt struct {
