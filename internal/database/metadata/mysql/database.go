@@ -40,7 +40,7 @@ func (db *DB) Close() error {
 }
 
 func Open(ctx context.Context, option *types.MySQLOpt) (*DB, error) {
-	db, err := OpenDB(option.Host, option.Port, option.User, option.Password, option.Database)
+	db, err := dbutil.OpenMysqlDB(option.Host, option.Port, option.User, option.Password, option.Database)
 	if err != nil {
 		return nil, err
 	}
@@ -59,12 +59,8 @@ func Open(ctx context.Context, option *types.MySQLOpt) (*DB, error) {
 	}, nil
 }
 
-func OpenDB(host, port, user, password, database string) (*sqlx.DB, error) {
-	return sqlx.Open("mysql", dbutil.GetMysqlDSN(host, port, user, password, database))
-}
-
 func CreateDatabase(ctx context.Context, opt types.MySQLOpt) (err error) {
-	defaultDB, err := OpenDB(opt.Host, opt.Port, opt.User, opt.Password, "")
+	defaultDB, err := dbutil.OpenMysqlDB(opt.Host, opt.Port, opt.User, opt.Password, "")
 	if err != nil {
 		return
 	}
@@ -74,7 +70,7 @@ func CreateDatabase(ctx context.Context, opt types.MySQLOpt) (err error) {
 		return
 	}
 
-	db, err := OpenDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
+	db, err := dbutil.OpenMysqlDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
 	if err != nil {
 		return
 	}
