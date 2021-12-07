@@ -2,8 +2,8 @@ package mysql
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/online"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	_ "github.com/go-sql-driver/mysql"
@@ -19,20 +19,10 @@ type DB struct {
 }
 
 func (db *DB) Ping(ctx context.Context) error {
-	return db.DB.Ping()
-}
-
-func OpenWith(host, port, user, password, database string) (*DB, error) {
-	db, err := sqlx.Open("mysql",
-		fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true",
-			user,
-			password,
-			host,
-			port,
-			database))
-	return &DB{db}, err
+	return db.DB.PingContext(ctx)
 }
 
 func Open(opt *types.MySQLOpt) (*DB, error) {
-	return OpenWith(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
+	db, err := dbutil.OpenMysqlDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
+	return &DB{db}, err
 }
