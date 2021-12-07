@@ -11,6 +11,8 @@ import (
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
+const BackendType = types.POSTGRES
+
 var _ online.Store = &DB{}
 
 type DB struct {
