@@ -11,7 +11,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt) (*types.JoinResult, error) {
+func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType types.BackendType) (*types.JoinResult, error) {
 	// Step 1: prepare temporary table entity_rows
 	features := types.FeatureList{}
 	for _, featureList := range opt.FeatureMap {
@@ -20,7 +20,7 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt) (*types.JoinRes
 	if len(features) == 0 {
 		return nil, nil
 	}
-	entityRowsTableName, err := createAndImportTableEntityRows(ctx, db, opt.Entity, opt.EntityRows, opt.ValueNames)
+	entityRowsTableName, err := createAndImportTableEntityRows(ctx, db, opt.Entity, opt.EntityRows, opt.ValueNames, backendType)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt) (*types.JoinRes
 			Features:            featureList,
 			RevisionRanges:      revisionRanges,
 			EntityRowsTableName: entityRowsTableName,
-		})
+		}, backendType)
 		if err != nil {
 			return nil, err
 		}
@@ -50,36 +50,42 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt) (*types.JoinRes
 	}
 
 	// Step 3: read joined results
-	return readJoinedTable(ctx, db, entityRowsTableName, tableNames, tableToFeatureMap, opt.ValueNames)
+	return readJoinedTable(ctx, db, entityRowsTableName, tableNames, tableToFeatureMap, opt.ValueNames, backendType)
 }
 
-func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt) (string, error) {
+func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt, backendType types.BackendType) (string, error) {
 	if len(opt.Features) == 0 {
 		return "", nil
 	}
+	quote, err := dbutil.GetQuote(backendType)
+	if err != nil {
+		return "", err
+	}
+
 	// Step 1: create temporary joined table
-	joinedTableName, err := createTableJoined(ctx, db, opt.Features, opt.Entity, opt.GroupName, opt.ValueNames)
+	joinedTableName, err := createTableJoined(ctx, db, opt.Features, opt.Entity, opt.GroupName, opt.ValueNames, backendType)
 	if err != nil {
 		return "", err
 	}
 
 	// Step 2: iterate each table range, join entity_rows table and each data tables
 	joinQuery := `
-		INSERT INTO "%s"(entity_key, unix_milli, %s)
+		INSERT INTO %s(entity_key, unix_milli, %s)
 		SELECT
 			l.entity_key AS entity_key,
 			l.unix_milli AS unix_milli,
 			%s
-		FROM "%s" AS l
-		LEFT JOIN "%s" AS r
+		FROM %s AS l
+		LEFT JOIN %s AS r
 		ON l.entity_key = r.%s
-		WHERE l.unix_milli >= $1 AND l.unix_milli < $2;
+		WHERE l.unix_milli >= ? AND l.unix_milli < ?;
 	`
+
 	columns := append(opt.ValueNames, opt.Features.Names()...)
-	columnsStr := dbutil.Quote(`"`, columns...)
+	columnsStr := dbutil.Quote(quote, columns...)
 	for _, r := range opt.RevisionRanges {
-		query := fmt.Sprintf(joinQuery, joinedTableName, columnsStr, columnsStr, opt.EntityRowsTableName, r.DataTable, opt.Entity.Name)
-		if _, tmpErr := db.ExecContext(ctx, query, r.MinRevision, r.MaxRevision); tmpErr != nil {
+		query := fmt.Sprintf(joinQuery, dbutil.Quote(quote, joinedTableName), columnsStr, columnsStr, dbutil.Quote(quote, opt.EntityRowsTableName), dbutil.Quote(quote, r.DataTable), opt.Entity.Name)
+		if _, tmpErr := db.ExecContext(ctx, db.Rebind(query), r.MinRevision, r.MaxRevision); tmpErr != nil {
 			return "", tmpErr
 		}
 	}
@@ -87,9 +93,13 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt)
 	return joinedTableName, nil
 }
 
-func readJoinedTable(ctx context.Context, db *sqlx.DB, entityRowsTableName string, tableNames []string, featureMap map[string]types.FeatureList, valueNames []string) (*types.JoinResult, error) {
+func readJoinedTable(ctx context.Context, db *sqlx.DB, entityRowsTableName string, tableNames []string, featureMap map[string]types.FeatureList, valueNames []string, backendType types.BackendType) (*types.JoinResult, error) {
 	if len(tableNames) == 0 {
 		return nil, nil
+	}
+	quote, err := dbutil.GetQuote(backendType)
+	if err != nil {
+		return nil, err
 	}
 
 	// Step 1: join temporary tables
@@ -115,7 +125,7 @@ func readJoinedTable(ctx context.Context, db *sqlx.DB, entityRowsTableName strin
 			fields = append(fields, fmt.Sprintf("%s.%s", tableName, f.Name))
 		}
 	}
-	query := fmt.Sprintf(`SELECT %s FROM %s`, strings.Join(fields, ","), dbutil.Quote(`"`, entityRowsTableName))
+	query := fmt.Sprintf(`SELECT %s FROM %s`, strings.Join(fields, ","), dbutil.Quote(quote, entityRowsTableName))
 	tableNames = append([]string{entityRowsTableName}, tableNames...)
 	for i := range tableNames {
 		if i == 0 {
