@@ -5,6 +5,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/metadata"
 	"github.com/ethhte88/oomstore/internal/database/metadata/mysql"
 	"github.com/ethhte88/oomstore/internal/database/test/runtime_mysql"
@@ -19,7 +20,7 @@ func prepareStore(t *testing.T) (context.Context, metadata.Store) {
 func prepareDB(t *testing.T) (context.Context, *mysql.DB) {
 	ctx := context.Background()
 	opt := runtime_mysql.MySQLDbOpt
-	db, err := mysql.OpenDB(
+	db, err := dbutil.OpenMysqlDB(
 		opt.Host,
 		opt.Port,
 		opt.User,
