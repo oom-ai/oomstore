@@ -2,12 +2,15 @@ package postgres_test
 
 import (
 	"context"
+	"sort"
 	"testing"
 
 	"github.com/ethhte88/oomstore/internal/database/metadata"
 	"github.com/ethhte88/oomstore/internal/database/metadata/postgres"
 	"github.com/ethhte88/oomstore/internal/database/metadata/test_impl"
 	"github.com/ethhte88/oomstore/internal/database/test/runtime_pg"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func prepareStore() (context.Context, metadata.Store) {
@@ -23,6 +26,44 @@ func prepareStore() (context.Context, metadata.Store) {
 	}
 
 	return ctx, store
+}
+
+func TestCreateDatabase(t *testing.T) {
+	ctx, db := runtime_pg.PrepareDB()
+	db.Close()
+
+	if err := postgres.CreateDatabase(ctx, runtime_pg.PostgresDbOpt); err != nil {
+		panic(err)
+	}
+	store, err := postgres.Open(ctx, &runtime_pg.PostgresDbOpt)
+	if err != nil {
+		panic(err)
+	}
+	defer store.Close()
+
+	var tables []string
+	err = store.SelectContext(ctx, &tables,
+		`SELECT table_name
+			FROM information_schema.tables
+			WHERE table_schema = 'public'
+			ORDER BY table_name;`)
+	require.NoError(t, err)
+
+	var wantTables []string
+	for table := range postgres.META_TABLE_SCHEMAS {
+		wantTables = append(wantTables, table)
+	}
+	for table := range postgres.META_VIEW_SCHEMAS {
+		wantTables = append(wantTables, table)
+	}
+
+	sort.Slice(tables, func(i, j int) bool {
+		return tables[i] < tables[j]
+	})
+	sort.Slice(wantTables, func(i, j int) bool {
+		return wantTables[i] < wantTables[j]
+	})
+	assert.Equal(t, wantTables, tables)
 }
 
 func TestCreateEntity(t *testing.T) {
