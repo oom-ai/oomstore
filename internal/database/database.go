@@ -11,6 +11,7 @@ import (
 	metadataPG "github.com/ethhte88/oomstore/internal/database/metadata/postgres"
 
 	"github.com/ethhte88/oomstore/internal/database/offline"
+	offlineMySQL "github.com/ethhte88/oomstore/internal/database/offline/mysql"
 	offlinePG "github.com/ethhte88/oomstore/internal/database/offline/postgres"
 
 	"github.com/ethhte88/oomstore/internal/database/online"
@@ -58,6 +59,8 @@ func OpenOfflineStore(opt types.OfflineStoreConfig) (offline.Store, error) {
 	switch opt.Backend {
 	case types.POSTGRES:
 		return offlinePG.Open(opt.Postgres)
+	case types.MYSQL:
+		return offlineMySQL.Open(opt.MySQL)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
