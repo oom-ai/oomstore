@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPurgeRemovesSpecifiedRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestPurgeRemovesSpecifiedRevision(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 	importSample(t, ctx, store, &SampleMedium)
@@ -27,7 +27,7 @@ func TestPurgeRemovesSpecifiedRevision(t *testing.T, prepareStore PrepareStoreRu
 	}
 }
 
-func TestPurgeNotRemovesOtherRevisions(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestPurgeNotRemovesOtherRevisions(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 	importSample(t, ctx, store, &SampleSmall, &SampleMedium)

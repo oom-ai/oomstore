@@ -6,4 +6,4 @@ import (
 	"github.com/ethhte88/oomstore/internal/database/metadata"
 )
 
-type PrepareStoreRuntimeFunc func() (context.Context, metadata.Store)
+type PrepareStoreFn func() (context.Context, metadata.Store)

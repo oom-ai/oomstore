@@ -12,7 +12,7 @@ import (
 	"github.com/ethhte88/oomstore/internal/database/online"
 )
 
-type PrepareStoreRuntimeFunc func() (context.Context, online.Store)
+type PrepareStoreFn func() (context.Context, online.Store)
 
 type Sample struct {
 	Features types.FeatureList
