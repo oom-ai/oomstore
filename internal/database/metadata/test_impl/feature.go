@@ -112,15 +112,23 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	})
 	require.NoError(t, err)
 
+	// case 1: wrong featureID, return error
 	_, err = store.GetFeature(ctx, 0)
-	require.EqualError(t, err, "feature 0 not found")
+	assert.EqualError(t, err, "feature 0 not found")
 
+	// case 2: correct featureID, return feature `phone`
 	feature, err := store.GetFeature(ctx, id)
-	require.NoError(t, err)
-	require.Equal(t, "phone", feature.Name)
-	require.Equal(t, "device_info", feature.Group.Name)
-	require.Equal(t, "varchar(16)", feature.DBValueType)
-	require.Equal(t, "description", feature.Description)
+	assert.NoError(t, err)
+	expected := &types.Feature{
+		ID:          1,
+		Name:        "phone",
+		ValueType:   types.STRING,
+		DBValueType: "varchar(16)",
+		Description: "description",
+		GroupID:     1,
+	}
+	ignoreFeatureFields(feature)
+	assert.Equal(t, expected, feature)
 }
 
 func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -137,15 +145,23 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	})
 	require.NoError(t, err)
 
+	// case 1: wrong feature name, return error
 	_, err = store.GetFeatureByName(ctx, "p")
-	require.EqualError(t, err, "feature p not found")
+	assert.EqualError(t, err, "feature p not found")
 
+	// case 2: correct feature name, return feature `phone`
 	feature, err := store.GetFeatureByName(ctx, "phone")
-	require.NoError(t, err)
-	require.Equal(t, "phone", feature.Name)
-	require.Equal(t, "device_info", feature.Group.Name)
-	require.Equal(t, "varchar(16)", feature.DBValueType)
-	require.Equal(t, "description", feature.Description)
+	assert.NoError(t, err)
+	expected := &types.Feature{
+		ID:          1,
+		Name:        "phone",
+		ValueType:   types.STRING,
+		DBValueType: "varchar(16)",
+		Description: "description",
+		GroupID:     1,
+	}
+	ignoreFeatureFields(feature)
+	assert.Equal(t, expected, feature)
 }
 
 func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
