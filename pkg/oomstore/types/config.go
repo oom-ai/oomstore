@@ -7,6 +7,7 @@ const (
 	REDIS     BackendType = "redis"
 	MYSQL     BackendType = "mysql"
 	SNOWFLAKE BackendType = "snowflake"
+	DYNAMODB  BackendType = "dynamodb"
 )
 
 type OomStoreConfig struct {
@@ -63,4 +64,13 @@ type SnowflakeOpt struct {
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
 	Database string `yaml:"database"`
+}
+
+type DynamoDBOpt struct {
+	Region          string `yaml:"region"`
+	EndpointURL     string `yaml:"endpoint-url"`
+	AccessKeyID     string `yaml:"access-key-id"`
+	SecretAccessKey string `yaml:"secret-access-key"`
+	SessionToken    string `yaml:"session-token"`
+	Source          string `yaml:"source"`
 }
