@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ethhte88/oomstore/internal/database/metadata"
@@ -46,7 +48,7 @@ func TestCreateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 }
 
 func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -64,7 +66,7 @@ func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreRuntim
 	require.NoError(t, err)
 
 	_, err = store.CreateFeature(ctx, opt)
-	require.Equal(t, err, fmt.Errorf("feature phone already exists"))
+	assert.Equal(t, err, fmt.Errorf("feature phone already exists"))
 }
 
 func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -80,7 +82,7 @@ func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreRunt
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 }
 
 func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -93,7 +95,7 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStor
 		GroupID:     groupID,
 		DBValueType: "invalid_type",
 	})
-	require.Error(t, err)
+	assert.Error(t, err)
 }
 
 func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -110,15 +112,23 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	})
 	require.NoError(t, err)
 
+	// case 1: wrong featureID, return error
 	_, err = store.GetFeature(ctx, 0)
-	require.EqualError(t, err, "feature 0 not found")
+	assert.EqualError(t, err, "feature 0 not found")
 
+	// case 2: correct featureID, return feature `phone`
 	feature, err := store.GetFeature(ctx, id)
-	require.NoError(t, err)
-	require.Equal(t, "phone", feature.Name)
-	require.Equal(t, "device_info", feature.Group.Name)
-	require.Equal(t, "varchar(16)", feature.DBValueType)
-	require.Equal(t, "description", feature.Description)
+	assert.NoError(t, err)
+	expected := &types.Feature{
+		ID:          1,
+		Name:        "phone",
+		ValueType:   types.STRING,
+		DBValueType: "varchar(16)",
+		Description: "description",
+		GroupID:     1,
+	}
+	ignoreFeatureFields(feature)
+	assert.Equal(t, expected, feature)
 }
 
 func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -135,15 +145,23 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	})
 	require.NoError(t, err)
 
+	// case 1: wrong feature name, return error
 	_, err = store.GetFeatureByName(ctx, "p")
-	require.EqualError(t, err, "feature p not found")
+	assert.EqualError(t, err, "feature p not found")
 
+	// case 2: correct feature name, return feature `phone`
 	feature, err := store.GetFeatureByName(ctx, "phone")
-	require.NoError(t, err)
-	require.Equal(t, "phone", feature.Name)
-	require.Equal(t, "device_info", feature.Group.Name)
-	require.Equal(t, "varchar(16)", feature.DBValueType)
-	require.Equal(t, "description", feature.Description)
+	assert.NoError(t, err)
+	expected := &types.Feature{
+		ID:          1,
+		Name:        "phone",
+		ValueType:   types.STRING,
+		DBValueType: "varchar(16)",
+		Description: "description",
+		GroupID:     1,
+	}
+	ignoreFeatureFields(feature)
+	assert.Equal(t, expected, feature)
 }
 
 func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -151,8 +169,9 @@ func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
 
+	// case 1: no feature to list
 	features := store.CacheListFeature(ctx, metadata.ListFeatureOpt{})
-	require.Equal(t, 0, features.Len())
+	assert.Equal(t, 0, features.Len())
 
 	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "phone",
@@ -162,33 +181,44 @@ func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		ValueType:   "string",
 	})
 	require.NoError(t, err)
-
 	require.NoError(t, store.Refresh())
 
+	// case 2: no condition, list all features
 	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{})
-	require.Equal(t, 1, features.Len())
+	assert.Equal(t, 1, features.Len())
 
+	// case 3: list features by FeatureIDs
 	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureIDs: &[]int{featureID},
 	})
-	require.Equal(t, 1, features.Len())
+	assert.Equal(t, 1, features.Len())
 
+	// case 4: list features by EntityID and FeatureIDs
 	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   intPtr(entityID + 1),
 		FeatureIDs: &[]int{featureID},
 	})
-	require.Equal(t, 0, features.Len())
+	assert.Equal(t, 0, features.Len())
 
+	// case 5: list features by GroupID and FeatureIDs
+	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
+		GroupID:    intPtr(groupID + 1),
+		FeatureIDs: &[]int{featureID},
+	})
+	assert.Equal(t, 0, features.Len())
+
+	// case 6: list features by EntityID and empty FeatureIDs, return no feature
 	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   &entityID,
 		FeatureIDs: &[]int{},
 	})
-	require.Equal(t, 0, len(features))
+	assert.Equal(t, 0, len(features))
 
+	// case 7: list features by EntityID
 	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID: &entityID,
 	})
-	require.Equal(t, 1, len(features))
+	assert.Equal(t, 1, len(features))
 }
 
 func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -196,9 +226,10 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
 
+	// case 1: no feature to list
 	features, err := store.ListFeature(ctx, metadata.ListFeatureOpt{})
-	require.NoError(t, err)
-	require.Equal(t, 0, features.Len())
+	assert.NoError(t, err)
+	assert.Equal(t, 0, features.Len())
 
 	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "phone",
@@ -209,42 +240,48 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	})
 	require.NoError(t, err)
 
+	// case 2: no condition, list all features
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{})
-	require.NoError(t, err)
-	require.Equal(t, 1, features.Len())
+	assert.NoError(t, err)
+	assert.Equal(t, 1, features.Len())
 
+	// case 3: list features by FeatureIDs
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureIDs: &[]int{featureID},
 	})
-	require.NoError(t, err)
-	require.Equal(t, 1, features.Len())
+	assert.NoError(t, err)
+	assert.Equal(t, 1, features.Len())
 
+	// case 4: list features by EntityID and FeatureIDs
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   intPtr(entityID + 1),
 		FeatureIDs: &[]int{featureID},
 	})
-	require.NoError(t, err)
-	require.Equal(t, 0, features.Len())
+	assert.NoError(t, err)
+	assert.Equal(t, 0, features.Len())
 
+	// case 5: list features by GroupID and FeatureIDs
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		GroupID:    intPtr(groupID + 1),
 		FeatureIDs: &[]int{featureID},
 	})
-	require.NoError(t, err)
-	require.Equal(t, 0, features.Len())
+	assert.NoError(t, err)
+	assert.Equal(t, 0, features.Len())
 
+	// case 6: list features by EntityID and empty FeatureIDs, return no feature
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   &entityID,
 		FeatureIDs: &[]int{},
 	})
-	require.NoError(t, err)
-	require.Equal(t, 0, len(features))
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(features))
 
+	// case 7: list features by EntityID
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID: &entityID,
 	})
-	require.NoError(t, err)
-	require.Equal(t, 1, len(features))
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(features))
 }
 
 func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -262,22 +299,35 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	id, err := store.CreateFeature(ctx, opt)
 	require.NoError(t, err)
 
-	require.Error(t, store.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
+	// case 1: nothing to update
+	err = store.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
 		FeatureID: id + 1,
-	}))
+	})
+	require.Error(t, err)
 
+	// case 2: update description successfully
 	err = store.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
 		FeatureID:      id,
 		NewDescription: stringPtr("new description"),
 	})
 	require.NoError(t, err)
 
-	require.NoError(t, store.Refresh())
-
 	feature, err := store.GetFeature(ctx, id)
-	require.NoError(t, err)
-	require.Equal(t, "phone", feature.Name)
-	require.Equal(t, "device_info", feature.Group.Name)
-	require.Equal(t, "varchar(16)", feature.DBValueType)
-	require.Equal(t, "new description", feature.Description)
+	assert.NoError(t, err)
+	expected := &types.Feature{
+		ID:          1,
+		Name:        "phone",
+		ValueType:   types.STRING,
+		DBValueType: "varchar(16)",
+		Description: "new description",
+		GroupID:     1,
+	}
+	ignoreFeatureFields(feature)
+	assert.Equal(t, expected, feature)
+}
+
+func ignoreFeatureFields(feature *types.Feature) {
+	feature.CreateTime = time.Time{}
+	feature.ModifyTime = time.Time{}
+	feature.Group = nil
 }
