@@ -49,3 +49,7 @@ func TestExport(t *testing.T) {
 func TestImport(t *testing.T) {
 	test_impl.TestImport(t, prepareStore)
 }
+
+func TestJoin(t *testing.T) {
+	test_impl.TestJoin(t, prepareStore)
+}

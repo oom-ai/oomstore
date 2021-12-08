@@ -20,7 +20,7 @@ func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.E
 }
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
-	panic("implement me")
+	return sqlutil.Join(ctx, db.DB, opt, types.SNOWFLAKE)
 }
 
 func (db *DB) TypeTag(dbType string) (string, error) {
