@@ -1,48 +1,17 @@
-package mysql_test
+package runtime_mysql_test
 
 import (
-	"context"
 	"sort"
 	"testing"
 
-	"github.com/ethhte88/oomstore/internal/database/dbutil"
-	"github.com/ethhte88/oomstore/internal/database/metadata"
 	"github.com/ethhte88/oomstore/internal/database/metadata/mysql"
 	"github.com/ethhte88/oomstore/internal/database/test/runtime_mysql"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func prepareStore(t *testing.T) (context.Context, metadata.Store) {
-	return prepareDB(t)
-}
-
-func prepareDB(t *testing.T) (context.Context, *mysql.DB) {
-	ctx := context.Background()
-	opt := runtime_mysql.MySQLDbOpt
-	db, err := dbutil.OpenMysqlDB(
-		opt.Host,
-		opt.Port,
-		opt.User,
-		opt.Password,
-		opt.Database,
-	)
-	require.NoError(t, err)
-	_, err = db.ExecContext(ctx, "drop database if exists test")
-	require.NoError(t, err)
-	db.Close()
-
-	err = mysql.CreateDatabase(ctx, runtime_mysql.MySQLDbOpt)
-	require.NoError(t, err)
-
-	mysqlDB, err := mysql.Open(ctx, &runtime_mysql.MySQLDbOpt)
-	require.NoError(t, err)
-
-	return ctx, mysqlDB
-}
-
 func TestCreateDatabase(t *testing.T) {
-	ctx, store := prepareDB(t)
+	ctx, store := runtime_mysql.PrepareDB()
 	defer store.Close()
 
 	var tables []string
@@ -69,7 +38,3 @@ func TestCreateDatabase(t *testing.T) {
 	})
 	assert.Equal(t, wantTables, tables)
 }
-
-//func TestPing(t *testing.T) {
-//	test_impl.TestPing(t, prepareStore)
-//}

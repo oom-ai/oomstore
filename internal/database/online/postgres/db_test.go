@@ -1,4 +1,4 @@
-package mysql_test
+package postgres_test
 
 import (
 	"context"
@@ -6,40 +6,25 @@ import (
 	"testing"
 
 	"github.com/ethhte88/oomstore/internal/database/online"
-	"github.com/ethhte88/oomstore/internal/database/online/mysql"
+	"github.com/ethhte88/oomstore/internal/database/online/postgres"
 	"github.com/ethhte88/oomstore/internal/database/online/test_impl"
-	"github.com/ethhte88/oomstore/internal/database/test/runtime_mysql"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/ethhte88/oomstore/internal/database/test/runtime_pg"
 )
 
 func prepareStore() (context.Context, online.Store) {
-	ctx := context.Background()
-	opt := runtime_mysql.MySQLDbOpt
-	store, err := mysql.Open(&types.MySQLOpt{
-		Host:     opt.Host,
-		Port:     opt.Port,
-		User:     opt.User,
-		Password: opt.Password,
-		Database: "test",
-	})
+	ctx, db := runtime_pg.PrepareDB()
+
+	_, err := db.ExecContext(context.Background(), fmt.Sprintf("CREATE DATABASE %s", runtime_pg.PostgresDbOpt.Database))
+	if err != nil {
+		panic(err)
+	}
+	db.Close()
+
+	store, err := postgres.Open(&runtime_pg.PostgresDbOpt)
 	if err != nil {
 		panic(err)
 	}
 
-	sql := fmt.Sprintf("DROP DATABASE IF EXISTS %s; ", opt.Database)
-	if _, err := store.ExecContext(context.Background(), sql); err != nil {
-		panic(err)
-	}
-
-	sql = fmt.Sprintf("CREATE DATABASE %s", opt.Database)
-	if _, err = store.ExecContext(context.Background(), sql); err != nil {
-		panic(err)
-	}
-
-	store, err = mysql.Open(&opt)
-	if err != nil {
-		panic(err)
-	}
 	return ctx, store
 }
 

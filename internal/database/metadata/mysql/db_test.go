@@ -1,10 +1,33 @@
 package mysql_test
 
 import (
+	"context"
 	"testing"
 
+	"github.com/ethhte88/oomstore/internal/database/metadata"
+	"github.com/ethhte88/oomstore/internal/database/metadata/mysql"
 	"github.com/ethhte88/oomstore/internal/database/metadata/test_impl"
+	"github.com/ethhte88/oomstore/internal/database/test/runtime_mysql"
 )
+
+func prepareStore() (context.Context, metadata.Store) {
+	ctx, db := runtime_mysql.PrepareDB()
+	db.Close()
+
+	if err := mysql.CreateDatabase(ctx, runtime_mysql.MySQLDbOpt); err != nil {
+		panic(err)
+	}
+	store, err := mysql.Open(ctx, &runtime_mysql.MySQLDbOpt)
+	if err != nil {
+		panic(err)
+	}
+
+	return ctx, store
+}
+
+func TestPing(t *testing.T) {
+	test_impl.TestPing(t, prepareStore)
+}
 
 func TestCreateEntity(t *testing.T) {
 	test_impl.TestCreateEntity(t, prepareStore)
