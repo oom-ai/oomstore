@@ -13,7 +13,7 @@ import (
 )
 
 func TestImport(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	entity := types.Entity{

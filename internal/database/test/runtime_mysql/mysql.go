@@ -1,24 +1,28 @@
 package runtime_mysql
 
 import (
+	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/jmoiron/sqlx"
 	"github.com/orlangure/gnomock"
-	"github.com/orlangure/gnomock/preset/mysql"
+	mockmysql "github.com/orlangure/gnomock/preset/mysql"
 )
 
 var MySQLDbOpt types.MySQLOpt
 
 func init() {
 	mysqlContainer, err := gnomock.Start(
-		mysql.Preset(
-			mysql.WithUser("test", "test"),
-			mysql.WithDatabase("test"),
-			mysql.WithVersion("8.0"),
+		mockmysql.Preset(
+			mockmysql.WithUser("test", "test"),
+			mockmysql.WithDatabase("test"),
+			mockmysql.WithVersion("8.0"),
 		),
 		gnomock.WithUseLocalImagesFirst(),
 	)
@@ -40,4 +44,24 @@ func init() {
 
 		_ = gnomock.Stop(mysqlContainer)
 	}()
+}
+
+func PrepareDB() (context.Context, *sqlx.DB) {
+	ctx := context.Background()
+	db, err := dbutil.OpenMysqlDB(
+		MySQLDbOpt.Host,
+		MySQLDbOpt.Port,
+		MySQLDbOpt.User,
+		MySQLDbOpt.Password,
+		MySQLDbOpt.Database,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = db.ExecContext(ctx, fmt.Sprintf("drop database if exists %s", MySQLDbOpt.Database))
+	if err != nil {
+		panic(err)
+	}
+	return ctx, db
 }
