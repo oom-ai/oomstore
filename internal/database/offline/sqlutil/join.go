@@ -61,6 +61,8 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 	if err != nil {
 		return "", err
 	}
+	entityKeyStr := qt("entity_key")
+	unixMilliStr := qt("unix_milli")
 
 	// Step 1: create temporary joined table
 	joinedTableName, err := createTableJoined(ctx, db, opt.Features, opt.Entity, opt.GroupName, opt.ValueNames, backendType)
@@ -70,15 +72,15 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 
 	// Step 2: iterate each table range, join entity_rows table and each data tables
 	joinQuery := `
-		INSERT INTO %s(entity_key, unix_milli, %s)
+		INSERT INTO %s(%s, %s, %s)
 		SELECT
-			l.entity_key AS entity_key,
-			l.unix_milli AS unix_milli,
+			l.%s AS entity_key,
+			l.%s AS unix_milli,
 			%s
 		FROM %s AS l
 		LEFT JOIN %s AS r
-		ON l.entity_key = r.%s
-		WHERE l.unix_milli >= ? AND l.unix_milli < ?;
+		ON l.%s = r.%s
+		WHERE l.%s >= ? AND l.%s < ?;
 	`
 
 	columns := append(opt.ValueNames, opt.Features.Names()...)
@@ -86,11 +88,18 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 	for _, r := range opt.RevisionRanges {
 		query := fmt.Sprintf(joinQuery,
 			qt(joinedTableName),
+			entityKeyStr,
+			unixMilliStr,
 			columnsStr,
+			entityKeyStr,
+			unixMilliStr,
 			columnsStr,
 			qt(opt.EntityRowsTableName),
 			qt(r.DataTable),
-			opt.Entity.Name,
+			entityKeyStr,
+			qt(opt.Entity.Name),
+			unixMilliStr,
+			unixMilliStr,
 		)
 		if _, tmpErr := db.ExecContext(ctx, db.Rebind(query), r.MinRevision, r.MaxRevision); tmpErr != nil {
 			return "", tmpErr
@@ -116,6 +125,8 @@ func readJoinedTable(
 	if err != nil {
 		return nil, err
 	}
+	entityKeyStr := qt("entity_key")
+	unixMilliStr := qt("unix_milli")
 
 	// Step 1: join temporary tables
 	/*
@@ -131,13 +142,13 @@ func readJoinedTable(
 		LEFT JOIN joined_table_2
 		ON entity_rows_table.entity_key = joined_table_2.entity_key AND entity_rows_table.unix_milli = joined_table_2.unix_milli;
 	*/
-	fields := []string{fmt.Sprintf("%s.entity_key, %s.unix_milli", entityRowsTableName, entityRowsTableName)}
+	fields := []string{fmt.Sprintf("%s.%s, %s.%s", qt(entityRowsTableName), entityKeyStr, qt(entityRowsTableName), unixMilliStr)}
 	for _, valueName := range valueNames {
-		fields = append(fields, fmt.Sprintf("%s.%s", entityRowsTableName, valueName))
+		fields = append(fields, fmt.Sprintf("%s.%s", qt(entityRowsTableName), qt(valueName)))
 	}
 	for _, tableName := range tableNames {
 		for _, f := range featureMap[tableName] {
-			fields = append(fields, fmt.Sprintf("%s.%s", tableName, f.Name))
+			fields = append(fields, fmt.Sprintf("%s.%s", qt(tableName), qt(f.Name)))
 		}
 	}
 	query := fmt.Sprintf(`SELECT %s FROM %s`, strings.Join(fields, ","), qt(entityRowsTableName))
@@ -146,8 +157,8 @@ func readJoinedTable(
 		if i == 0 {
 			continue
 		}
-		query = fmt.Sprintf("%s LEFT JOIN %s ON %s.unix_milli = %s.unix_milli AND %s.entity_key = %s.entity_key",
-			query, tableNames[i], tableNames[i-1], tableNames[i], tableNames[i-1], tableNames[i])
+		query = fmt.Sprintf("%s LEFT JOIN %s ON %s.%s = %s.%s AND %s.%s = %s.%s",
+			query, qt(tableNames[i]), qt(tableNames[i-1]), unixMilliStr, qt(tableNames[i]), unixMilliStr, qt(tableNames[i-1]), entityKeyStr, qt(tableNames[i]), entityKeyStr)
 	}
 
 	// Step 2: read joined results
