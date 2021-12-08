@@ -153,8 +153,9 @@ func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
 
+	// case 1: no feature to list
 	features := store.CacheListFeature(ctx, metadata.ListFeatureOpt{})
-	require.Equal(t, 0, features.Len())
+	assert.Equal(t, 0, features.Len())
 
 	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "phone",
@@ -164,33 +165,44 @@ func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 		ValueType:   "string",
 	})
 	require.NoError(t, err)
-
 	require.NoError(t, store.Refresh())
 
+	// case 2: no condition, list all features
 	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{})
-	require.Equal(t, 1, features.Len())
+	assert.Equal(t, 1, features.Len())
 
+	// case 3: list features by FeatureIDs
 	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureIDs: &[]int{featureID},
 	})
-	require.Equal(t, 1, features.Len())
+	assert.Equal(t, 1, features.Len())
 
+	// case 4: list features by EntityID and FeatureIDs
 	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   intPtr(entityID + 1),
 		FeatureIDs: &[]int{featureID},
 	})
-	require.Equal(t, 0, features.Len())
+	assert.Equal(t, 0, features.Len())
 
+	// case 5: list features by GroupID and FeatureIDs
+	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
+		GroupID:    intPtr(groupID + 1),
+		FeatureIDs: &[]int{featureID},
+	})
+	assert.Equal(t, 0, features.Len())
+
+	// case 6: list features by EntityID and empty FeatureIDs, return no feature
 	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   &entityID,
 		FeatureIDs: &[]int{},
 	})
-	require.Equal(t, 0, len(features))
+	assert.Equal(t, 0, len(features))
 
+	// case 7: list features by EntityID
 	features = store.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID: &entityID,
 	})
-	require.Equal(t, 1, len(features))
+	assert.Equal(t, 1, len(features))
 }
 
 func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -198,9 +210,10 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
 
+	// case 1: no feature to list
 	features, err := store.ListFeature(ctx, metadata.ListFeatureOpt{})
-	require.NoError(t, err)
-	require.Equal(t, 0, features.Len())
+	assert.NoError(t, err)
+	assert.Equal(t, 0, features.Len())
 
 	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "phone",
@@ -211,42 +224,48 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	})
 	require.NoError(t, err)
 
+	// case 2: no condition, list all features
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{})
-	require.NoError(t, err)
-	require.Equal(t, 1, features.Len())
+	assert.NoError(t, err)
+	assert.Equal(t, 1, features.Len())
 
+	// case 3: list features by FeatureIDs
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureIDs: &[]int{featureID},
 	})
-	require.NoError(t, err)
-	require.Equal(t, 1, features.Len())
+	assert.NoError(t, err)
+	assert.Equal(t, 1, features.Len())
 
+	// case 4: list features by EntityID and FeatureIDs
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   intPtr(entityID + 1),
 		FeatureIDs: &[]int{featureID},
 	})
-	require.NoError(t, err)
-	require.Equal(t, 0, features.Len())
+	assert.NoError(t, err)
+	assert.Equal(t, 0, features.Len())
 
+	// case 5: list features by GroupID and FeatureIDs
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		GroupID:    intPtr(groupID + 1),
 		FeatureIDs: &[]int{featureID},
 	})
-	require.NoError(t, err)
-	require.Equal(t, 0, features.Len())
+	assert.NoError(t, err)
+	assert.Equal(t, 0, features.Len())
 
+	// case 6: list features by EntityID and empty FeatureIDs, return no feature
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID:   &entityID,
 		FeatureIDs: &[]int{},
 	})
-	require.NoError(t, err)
-	require.Equal(t, 0, len(features))
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(features))
 
+	// case 7: list features by EntityID
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID: &entityID,
 	})
-	require.NoError(t, err)
-	require.Equal(t, 1, len(features))
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(features))
 }
 
 func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
