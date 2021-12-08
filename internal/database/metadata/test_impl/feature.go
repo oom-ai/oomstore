@@ -48,7 +48,7 @@ func TestCreateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 }
 
 func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -66,7 +66,7 @@ func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreRuntim
 	require.NoError(t, err)
 
 	_, err = store.CreateFeature(ctx, opt)
-	require.Equal(t, err, fmt.Errorf("feature phone already exists"))
+	assert.Equal(t, err, fmt.Errorf("feature phone already exists"))
 }
 
 func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -82,7 +82,7 @@ func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreRunt
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 }
 
 func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
@@ -95,7 +95,7 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStor
 		GroupID:     groupID,
 		DBValueType: "invalid_type",
 	})
-	require.Error(t, err)
+	assert.Error(t, err)
 }
 
 func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
