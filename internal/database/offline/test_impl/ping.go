@@ -7,7 +7,7 @@ import (
 )
 
 func TestPing(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	require.NoError(t, store.Ping(ctx))

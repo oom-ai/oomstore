@@ -24,7 +24,7 @@ func prepareEntity(t *testing.T, ctx context.Context, store metadata.Store, name
 }
 
 func TestGetGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	entityID := prepareEntity(t, ctx, store, "device")
@@ -60,7 +60,7 @@ func TestGetGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 }
 
 func TestListGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	deviceEntityID := prepareEntity(t, ctx, store, "device")
@@ -122,7 +122,7 @@ func TestListGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 }
 
 func TestCreateGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	entityID := prepareEntity(t, ctx, store, "device")
@@ -150,7 +150,7 @@ func TestCreateGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 }
 
 func TestUpdateGroup(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	entityID := prepareEntity(t, ctx, store, "device")

@@ -1,24 +1,27 @@
 package runtime_pg
 
 import (
+	"context"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/jmoiron/sqlx"
 	"github.com/orlangure/gnomock"
-	"github.com/orlangure/gnomock/preset/postgres"
+	mockpg "github.com/orlangure/gnomock/preset/postgres"
 )
 
 var PostgresDbOpt types.PostgresOpt
 
 func init() {
 	postgresContainer, err := gnomock.Start(
-		postgres.Preset(
-			postgres.WithUser("test", "test"),
-			postgres.WithDatabase("test"),
-			postgres.WithVersion("14.0"),
+		mockpg.Preset(
+			mockpg.WithUser("test", "test"),
+			mockpg.WithDatabase("test"),
+			mockpg.WithVersion("14.0"),
 		),
 		gnomock.WithUseLocalImagesFirst(),
 	)
@@ -41,4 +44,25 @@ func init() {
 
 		_ = gnomock.Stop(postgresContainer)
 	}()
+}
+
+func PrepareDB() (context.Context, *sqlx.DB) {
+	ctx := context.Background()
+	db, err := dbutil.OpenPostgresDB(
+		PostgresDbOpt.Host,
+		PostgresDbOpt.Port,
+		PostgresDbOpt.User,
+		PostgresDbOpt.Password,
+		"test",
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = db.ExecContext(ctx, "drop database if exists oomstore")
+	if err != nil {
+		panic(err)
+	}
+
+	return ctx, db
 }

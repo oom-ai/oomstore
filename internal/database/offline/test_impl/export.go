@@ -11,7 +11,7 @@ import (
 )
 
 func TestExport(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	dataTable := "offline_1_1"

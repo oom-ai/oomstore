@@ -14,7 +14,7 @@ import (
 )
 
 func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -95,7 +95,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 }
 
 func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -143,7 +143,7 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 }
 
 func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -204,7 +204,7 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 }
 
 func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -275,7 +275,7 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 }
 
 func TestListRevision(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
-	ctx, store := prepareStore(t)
+	ctx, store := prepareStore()
 	defer store.Close()
 
 	_, groupID, _, revisions := prepareRevisions(t, ctx, store)
