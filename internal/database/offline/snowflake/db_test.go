@@ -11,7 +11,11 @@ import (
 )
 
 func prepareStore() (context.Context, offline.Store) {
-	return prepareDB()
+	ctx, db := prepareDB()
+	if _, err := db.ExecContext(ctx, "CREATE DATABASE test"); err != nil {
+		panic(err)
+	}
+	return ctx, db
 }
 
 func prepareDB() (context.Context, *snowflake.DB) {
@@ -26,9 +30,22 @@ func prepareDB() (context.Context, *snowflake.DB) {
 	if err != nil {
 		panic(err)
 	}
-	return context.Background(), db
+
+	ctx := context.Background()
+	if _, err = db.ExecContext(ctx, "DROP DATABASE IF EXISTS test"); err != nil {
+		panic(err)
+	}
+	return ctx, db
 }
 
 func TestPing(t *testing.T) {
 	test_impl.TestPing(t, prepareStore)
+}
+
+func TestExport(t *testing.T) {
+	test_impl.TestExport(t, prepareStore)
+}
+
+func TestImport(t *testing.T) {
+	test_impl.TestImport(t, prepareStore)
 }
