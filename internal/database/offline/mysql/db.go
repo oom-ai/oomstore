@@ -21,5 +21,5 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 }
 
 func (db *DB) TypeTag(dbType string) (string, error) {
-	panic("implement me")
+	return TypeTag(dbType)
 }
