@@ -3,10 +3,11 @@ package cmd
 import (
 	"context"
 	"log"
-	"os"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types/apply"
 	"github.com/spf13/cobra"
+
+	"github.com/ethhte88/oomstore/pkg/oomstore"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
 type editEntityOption struct {
@@ -30,27 +31,17 @@ var editEntityCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		tempFile, err := getTempFile()
+		entities, err := queryEntities(ctx, oomStore, editEntityOpt.entityName)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if err := outputEntity(ctx, tempFile, YAML, oomStore, editEntityOpt.entityName); err != nil {
-			log.Fatal(err)
-		}
-		tempFileName := tempFile.Name()
-		tempFile.Close()
 
-		if err = openFileByEditor(ctx, tempFileName); err != nil {
-			log.Fatal(err)
-		}
-
-		tempFile, err = os.OpenFile(tempFileName, os.O_RDONLY, 0666)
+		fileName, err := writeEntitiesToTempFile(ctx, oomStore, entities)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer tempFile.Close()
 
-		if err := oomStore.Apply(ctx, apply.ApplyOpt{R: tempFile}); err != nil {
+		if err = edit(ctx, oomStore, fileName); err != nil {
 			log.Fatalf("apply failed: %v", err)
 		}
 		log.Println("applied")
@@ -59,4 +50,18 @@ var editEntityCmd = &cobra.Command{
 
 func init() {
 	editCmd.AddCommand(editEntityCmd)
+}
+
+func writeEntitiesToTempFile(ctx context.Context, oomStore *oomstore.OomStore, entities types.EntityList) (string, error) {
+	tempFile, err := getTempFile()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer tempFile.Close()
+
+	if err := serializeEntitiesToWriter(ctx, tempFile, oomStore, entities, YAML); err != nil {
+		return "", err
+	}
+
+	return tempFile.Name(), nil
 }

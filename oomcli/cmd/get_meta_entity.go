@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -34,8 +33,13 @@ var getMetaEntityCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if err := outputEntity(ctx, os.Stdout, *getMetaOutput, oomStore, getMetaEntityOpt.entityName); err != nil {
+		entities, err := queryEntities(ctx, oomStore, getMetaEntityOpt.entityName)
+		if err != nil {
 			log.Fatal(err)
+		}
+
+		if err = serializeEntitiesToWriter(ctx, os.Stdout, oomStore, entities, *getMetaOutput); err != nil {
+			log.Fatalf("failed printing entities, error: %v\n", err)
 		}
 	},
 }
@@ -44,43 +48,32 @@ func init() {
 	getMetaCmd.AddCommand(getMetaEntityCmd)
 }
 
-func outputEntity(ctx context.Context, out io.Writer, outputOpt string, oomStore *oomstore.OomStore, entityName *string) error {
-	entities, err := oomStore.ListEntity(ctx)
-	if err != nil {
-		return fmt.Errorf("failed getting entities, error %v\n", err)
-	}
-
+func queryEntities(ctx context.Context, oomStore *oomstore.OomStore, entityName *string) (types.EntityList, error) {
 	if entityName != nil {
-		if entities = entities.Filter(func(e *types.Entity) bool {
-			return e.Name == *entityName
-		}); len(entities) == 0 {
-			return fmt.Errorf("entity '%s' not found", *entityName)
-		}
+		entity, err := oomStore.GetEntityByName(ctx, *entityName)
+		return types.EntityList{entity}, err
 	}
+	return oomStore.ListEntity(ctx)
+}
+
+func serializeEntitiesToWriter(ctx context.Context, w io.Writer, oomStore *oomstore.OomStore,
+	entities types.EntityList, outputOpt string) error {
 
 	switch outputOpt {
 	case YAML:
-		err = serializeEntitiesInYaml(ctx, out, oomStore, entities)
+		// TODO: Use entity ids to filter, rather than taking them all out
+		groups, err := oomStore.ListGroup(ctx, nil)
+		if err != nil {
+			return err
+		}
+
+		groupItems, err := groupsToApplyGroupItems(ctx, oomStore, groups)
+		if err != nil {
+			return err
+		}
+
+		return serializeInYaml(w, apply.FromEntityList(entities, groupItems))
 	default:
-		err = serializeMetadata(out, entities, outputOpt, *getMetaWide)
+		return serializeMetadata(w, entities, outputOpt, *getMetaWide)
 	}
-	if err != nil {
-		err = fmt.Errorf("failed printing entities, error: %v\n", err)
-	}
-	return err
-}
-
-func serializeEntitiesInYaml(ctx context.Context, w io.Writer, store *oomstore.OomStore, entities types.EntityList) error {
-	// TODO: Use entitys ids to filter, rather than taking them all out
-	groups, err := store.ListGroup(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	groupItems, err := groupsToApplyGroupItems(ctx, store, groups)
-	if err != nil {
-		return err
-	}
-
-	return serializeInYaml(w, apply.FromEntityList(entities, groupItems))
 }

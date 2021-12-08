@@ -7,6 +7,9 @@ import (
 	"os/exec"
 
 	"github.com/spf13/cobra"
+
+	"github.com/ethhte88/oomstore/pkg/oomstore"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types/apply"
 )
 
 var editor = "vi"
@@ -38,7 +41,7 @@ func checkCommandExist(cmd string) bool {
 	return err == nil
 }
 
-func openFileByEditor(ctx context.Context, fileName string) error {
+func editFileByExternalEditor(ctx context.Context, fileName string) error {
 	if !checkCommandExist(editor) {
 		return fmt.Errorf("%s not found", editor)
 	}
@@ -48,4 +51,24 @@ func openFileByEditor(ctx context.Context, fileName string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+func edit(ctx context.Context, oomStore *oomstore.OomStore, fileName string) error {
+	if err := editFileByExternalEditor(ctx, fileName); err != nil {
+		return err
+	}
+
+	file, err := os.OpenFile(fileName, os.O_RDONLY, 0666)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		file.Close()
+		os.Remove(file.Name())
+	}()
+
+	if err := oomStore.Apply(ctx, apply.ApplyOpt{R: file}); err != nil {
+		return fmt.Errorf("apply failed: %v", err)
+	}
+	return nil
 }
