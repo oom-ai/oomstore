@@ -6,7 +6,6 @@ import (
 
 	"github.com/ethhte88/oomstore/internal/database/offline"
 	"github.com/ethhte88/oomstore/internal/database/offline/snowflake"
-	"github.com/ethhte88/oomstore/internal/database/offline/test_impl"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -44,6 +43,6 @@ func prepareDB(t *testing.T) (context.Context, *snowflake.DB) {
 	return ctx, db
 }
 
-func TestPing(t *testing.T) {
-	test_impl.TestPing(t, prepareStore)
-}
+// func TestPing(t *testing.T) {
+// 	test_impl.TestPing(t, prepareStore)
+// }
