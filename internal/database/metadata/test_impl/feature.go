@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ethhte88/oomstore/internal/database/metadata"
@@ -262,22 +264,35 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	id, err := store.CreateFeature(ctx, opt)
 	require.NoError(t, err)
 
-	require.Error(t, store.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
+	// case 1: nothing to update
+	err = store.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
 		FeatureID: id + 1,
-	}))
+	})
+	require.Error(t, err)
 
+	// case 2: update description successfully
 	err = store.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
 		FeatureID:      id,
 		NewDescription: stringPtr("new description"),
 	})
 	require.NoError(t, err)
 
-	require.NoError(t, store.Refresh())
-
 	feature, err := store.GetFeature(ctx, id)
-	require.NoError(t, err)
-	require.Equal(t, "phone", feature.Name)
-	require.Equal(t, "device_info", feature.Group.Name)
-	require.Equal(t, "varchar(16)", feature.DBValueType)
-	require.Equal(t, "new description", feature.Description)
+	assert.NoError(t, err)
+	expected := &types.Feature{
+		ID:          1,
+		Name:        "phone",
+		ValueType:   types.STRING,
+		DBValueType: "varchar(16)",
+		Description: "new description",
+		GroupID:     1,
+	}
+	ignoreFeatureFields(feature)
+	assert.Equal(t, expected, feature)
+}
+
+func ignoreFeatureFields(feature *types.Feature) {
+	feature.CreateTime = time.Time{}
+	feature.ModifyTime = time.Time{}
+	feature.Group = nil
 }
