@@ -34,7 +34,7 @@ func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Sto
 	return entityID, groupID
 }
 
-func TestCreateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCreateFeature(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -51,7 +51,7 @@ func TestCreateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	assert.NoError(t, err)
 }
 
-func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -69,7 +69,7 @@ func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreRuntim
 	assert.Equal(t, err, fmt.Errorf("feature phone already exists"))
 }
 
-func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -85,7 +85,7 @@ func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreRunt
 	assert.NoError(t, err)
 }
 
-func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -98,7 +98,7 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStor
 	assert.Error(t, err)
 }
 
-func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestGetFeature(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -131,7 +131,7 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	assert.Equal(t, expected, feature)
 }
 
-func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -164,7 +164,7 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	assert.Equal(t, expected, feature)
 }
 
-func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -221,7 +221,7 @@ func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	assert.Equal(t, 1, len(features))
 }
 
-func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestListFeature(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
@@ -284,7 +284,7 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	assert.Equal(t, 1, len(features))
 }
 
-func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)

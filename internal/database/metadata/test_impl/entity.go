@@ -11,7 +11,7 @@ import (
 	"github.com/ethhte88/oomstore/internal/database/metadata"
 )
 
-func TestCreateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestCreateEntity(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 
@@ -35,7 +35,7 @@ func TestCreateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.Equal(t, err, fmt.Errorf("entity device already exists"))
 }
 
-func TestGetEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestGetEntity(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 
@@ -60,7 +60,7 @@ func TestGetEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	require.EqualError(t, err, "feature entity 0 not found")
 }
 
-func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 
@@ -90,7 +90,7 @@ func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
 	}))
 }
 
-func TestListEntity(t *testing.T, prepareStore PrepareStoreRuntimeFunc) {
+func TestListEntity(t *testing.T, prepareStore PrepareStoreFn) {
 	ctx, store := prepareStore()
 	defer store.Close()
 
