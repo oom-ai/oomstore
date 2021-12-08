@@ -19,16 +19,12 @@ func (db *DB) Ping(ctx context.Context) error {
 	return db.DB.PingContext(ctx)
 }
 
-func Open(option *types.SnowflakeOpt) (*DB, error) {
-	return OpenWith(option.Account, option.User, option.Password, option.Database)
-}
-
-func OpenWith(account, user, password, database string) (*DB, error) {
+func Open(opt *types.SnowflakeOpt) (*DB, error) {
 	dsn, err := gosnowflake.DSN(&gosnowflake.Config{
-		Account:  account,
-		User:     user,
-		Password: password,
-		Database: database,
+		Account:  opt.Account,
+		User:     opt.User,
+		Password: opt.Password,
+		Database: opt.Database,
 	})
 	if err != nil {
 		return nil, err
