@@ -24,6 +24,7 @@ type OnlineStoreConfig struct {
 type OfflineStoreConfig struct {
 	Backend  BackendType  `yaml:"backend"`
 	Postgres *PostgresOpt `yaml:"postgres"`
+	MySQL    *MySQLOpt    `yaml:"mysql"`
 }
 
 type MetadataStoreConfig struct {
