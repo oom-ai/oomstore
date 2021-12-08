@@ -7,10 +7,6 @@ import (
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) TypeTag(dbType string) (string, error) {
-	return TypeTag(dbType)
-}
-
 func TypeTag(dbType string) (string, error) {
 	var s = dbType
 	if pos := strings.Index(dbType, "("); pos != -1 {
