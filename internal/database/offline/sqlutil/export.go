@@ -3,6 +3,8 @@ package sqlutil
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/offline"
@@ -53,14 +55,71 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType
 			}
 			record[0] = cast.ToString(record[0])
 			for i, f := range opt.Features {
-				if f.ValueType != types.STRING || record[i+1] == nil {
+				if record[i+1] == nil {
 					continue
 				}
-				record[i+1] = cast.ToString(record[i+1])
+				if backendType == types.SNOWFLAKE {
+
+					v, err := deserializeByTag(record[i+1], f.ValueType)
+					if err != nil {
+						errs <- fmt.Errorf("failed at deserializeByTag, err=%v", err)
+						return
+					}
+					record[i+1] = v
+				} else {
+					if f.ValueType == types.STRING {
+						record[i+1] = cast.ToString(record[i+1])
+					}
+				}
 			}
 			stream <- record
 		}
 	}()
 
 	return stream, errs
+}
+
+// gosnowflake Scan always produce string when the destination is interface{}
+// As a work around, we cast the string to interface{} based on ValueType
+// This method is mostly copied from redis.DeserializeByTag, except we use 10 rather than 36 as the base
+// In the long run, we should fix the gosnowflake converter with a pr
+func deserializeByTag(i interface{}, typeTag string) (interface{}, error) {
+	if i == nil {
+		return nil, nil
+	}
+
+	s, ok := i.(string)
+	if !ok {
+		return nil, fmt.Errorf("not a string or nil: %v", i)
+	}
+
+	switch typeTag {
+	case types.STRING:
+		return s, nil
+
+	case types.INT64:
+		x, err := strconv.ParseInt(s, 10, 64)
+		return x, err
+
+	case types.FLOAT64:
+		x, err := strconv.ParseFloat(s, 64)
+		return x, err
+
+	case types.BOOL:
+		if s == "1" {
+			return true, nil
+		} else if s == "0" {
+			return false, nil
+		} else {
+			return nil, fmt.Errorf("invalid bool value: %s", s)
+		}
+	case types.TIME:
+		x, err := strconv.ParseInt(s, 10, 64)
+		return time.UnixMilli(x), err
+
+	case types.BYTES:
+		return []byte(s), nil
+	default:
+		return "", fmt.Errorf("unsupported type tag: %s", typeTag)
+	}
 }
