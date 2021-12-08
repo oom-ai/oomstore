@@ -1,10 +1,29 @@
 package postgres_test
 
 import (
+	"context"
 	"testing"
 
+	"github.com/ethhte88/oomstore/internal/database/metadata"
+	"github.com/ethhte88/oomstore/internal/database/metadata/postgres"
 	"github.com/ethhte88/oomstore/internal/database/metadata/test_impl"
+	"github.com/ethhte88/oomstore/internal/database/test/runtime_pg"
 )
+
+func prepareStore() (context.Context, metadata.Store) {
+	ctx, db := runtime_pg.PrepareDB()
+	db.Close()
+
+	if err := postgres.CreateDatabase(ctx, runtime_pg.PostgresDbOpt); err != nil {
+		panic(err)
+	}
+	store, err := postgres.Open(ctx, &runtime_pg.PostgresDbOpt)
+	if err != nil {
+		panic(err)
+	}
+
+	return ctx, store
+}
 
 func TestCreateEntity(t *testing.T) {
 	test_impl.TestCreateEntity(t, prepareStore)
