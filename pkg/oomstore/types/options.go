@@ -57,7 +57,7 @@ type ChannelImport struct {
 type ImportOpt struct {
 	GroupName   string
 	Description string
-	DataSource  CsvDataSourceWithFile
+	DataSource  interface{}
 	Revision    *int64
 }
 
