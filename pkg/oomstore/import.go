@@ -96,20 +96,25 @@ func (s *OomStore) ChannelImport(ctx context.Context, opt types.ChannelImport) (
 // Import is similar to ChannelImport, the only difference is that it takes in InputFilePath
 // as an argument.
 func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
-	file, err := os.Open(opt.DataSource.InputFilePath)
-	if err != nil {
-		return 0, err
+	switch dataSource := opt.DataSource.(type) {
+	case types.CsvDataSourceWithFile:
+		file, err := os.Open(dataSource.InputFilePath)
+		if err != nil {
+			return 0, err
+		}
+		defer file.Close()
+		return s.ChannelImport(ctx, types.ChannelImport{
+			GroupName:   opt.GroupName,
+			Description: opt.Description,
+			DataSource: types.CsvDataSource{
+				Reader:    file,
+				Delimiter: dataSource.Delimiter,
+			},
+			Revision: opt.Revision,
+		})
+	default:
+		return 0, fmt.Errorf("unsupported data source: %T", opt.DataSource)
 	}
-	defer file.Close()
-	return s.ChannelImport(ctx, types.ChannelImport{
-		GroupName:   opt.GroupName,
-		Description: opt.Description,
-		DataSource: types.CsvDataSource{
-			Reader:    file,
-			Delimiter: opt.DataSource.Delimiter,
-		},
-		Revision: opt.Revision,
-	})
 }
 
 func hasDup(a []string) bool {

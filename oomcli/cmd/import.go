@@ -10,6 +10,8 @@ import (
 )
 
 var importOpt types.ImportOpt
+var importDataSource types.CsvDataSourceWithFile
+
 var importCmd = &cobra.Command{
 	Use:   "import",
 	Short: "import feature data from a csv file",
@@ -17,6 +19,7 @@ var importCmd = &cobra.Command{
 		if !cmd.Flags().Changed("revision") {
 			importOpt.Revision = nil
 		}
+		importOpt.DataSource = importDataSource
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
@@ -43,9 +46,9 @@ func init() {
 
 	flags.StringVar(&importOpt.Description, "description", "", "revision description")
 
-	flags.StringVar(&importOpt.DataSource.InputFilePath, "input-file", "", "input csv file")
+	flags.StringVar(&importDataSource.InputFilePath, "input-file", "", "input csv file")
 	_ = importCmd.MarkFlagRequired("input-file")
 
-	flags.StringVar(&importOpt.DataSource.Delimiter, "delimiter", ",", "specify field delimiter")
+	flags.StringVar(&importDataSource.Delimiter, "delimiter", ",", "specify field delimiter")
 	importOpt.Revision = flags.Int64P("revision", "r", 0, "user-defined revision")
 }
