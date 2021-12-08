@@ -9,3 +9,11 @@ import (
 func TestImport(t *testing.T) {
 	test_impl.TestImport(t, prepareStore)
 }
+
+func TestExport(t *testing.T) {
+	test_impl.TestExport(t, prepareStore)
+}
+
+func TestJoin(t *testing.T) {
+	test_impl.TestJoin(t, prepareStore)
+}
