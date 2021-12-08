@@ -19,9 +19,16 @@ func createTableJoined(ctx context.Context, db *sqlx.DB, features types.FeatureL
 	if err != nil {
 		return "", err
 	}
+	qt, err := dbutil.QuoteFn(backendType)
+	if err != nil {
+		return "", err
+	}
 	// create table joined
 	tableName := dbutil.TempTable(fmt.Sprintf("joined_%s", groupName))
-	columnDefs := []string{fmt.Sprintf("entity_key  VARCHAR(%d) NOT NULL", entity.Length), "unix_milli  BIGINT NOT NULL"}
+	columnDefs := []string{
+		fmt.Sprintf(`%s  VARCHAR(%d) NOT NULL`, qt("entity_key"), entity.Length),
+		fmt.Sprintf(`%s  BIGINT NOT NULL`, qt("unix_milli")),
+	}
 	for _, name := range valueNames {
 		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, "TEXT"))
 	}
@@ -33,15 +40,20 @@ func createTableJoined(ctx context.Context, db *sqlx.DB, features types.FeatureL
 			%s
 		);
 	`
-	index := fmt.Sprintf(`CREATE INDEX idx_%s ON %s (unix_milli, entity_key)`, tableName, tableName)
 
-	schema = fmt.Sprintf(schema, tableName, strings.Join(columnDefs, ",\n"))
+	schema = fmt.Sprintf(schema, qt(tableName), strings.Join(columnDefs, ",\n"))
 	if _, err := db.ExecContext(ctx, schema); err != nil {
 		return "", err
 	}
-	_, err = db.ExecContext(ctx, index)
 
-	return tableName, err
+	// snowflake doesn't support index
+	if backendType != types.SNOWFLAKE {
+		index := fmt.Sprintf(`CREATE INDEX idx_%s ON %s (unix_milli, entity_key)`, tableName, tableName)
+		if _, err = db.ExecContext(ctx, index); err != nil {
+			return "", err
+		}
+	}
+	return tableName, nil
 }
 
 func createAndImportTableEntityRows(ctx context.Context, db *sqlx.DB, entity types.Entity, entityRows <-chan types.EntityRow, valueNames []string, backendType types.BackendType) (string, error) {
@@ -49,10 +61,17 @@ func createAndImportTableEntityRows(ctx context.Context, db *sqlx.DB, entity typ
 	if err != nil {
 		return "", err
 	}
+	qt, err := dbutil.QuoteFn(backendType)
+	if err != nil {
+		return "", err
+	}
 
 	// create table entity_rows
 	tableName := dbutil.TempTable("entity_rows")
-	columnDefs := []string{fmt.Sprintf("entity_key  VARCHAR(%d) NOT NULL", entity.Length), "unix_milli  BIGINT NOT NULL"}
+	columnDefs := []string{
+		fmt.Sprintf(`%s  VARCHAR(%d) NOT NULL`, qt("entity_key"), entity.Length),
+		fmt.Sprintf(`%s  BIGINT NOT NULL`, qt("unix_milli")),
+	}
 	for _, name := range valueNames {
 		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, "TEXT"))
 	}
@@ -60,7 +79,7 @@ func createAndImportTableEntityRows(ctx context.Context, db *sqlx.DB, entity typ
 		CREATE TABLE %s (
 			%s
 		);
-	`, tableName, strings.Join(columnDefs, ",\n"))
+	`, qt(tableName), strings.Join(columnDefs, ",\n"))
 
 	if _, err := db.ExecContext(ctx, schema); err != nil {
 		return "", err
@@ -71,10 +90,12 @@ func createAndImportTableEntityRows(ctx context.Context, db *sqlx.DB, entity typ
 		return "", err
 	}
 
-	// create index
-	index := fmt.Sprintf(`CREATE INDEX idx_%s ON %s (unix_milli, entity_key)`, tableName, tableName)
-	if _, err := db.ExecContext(ctx, index); err != nil {
-		return "", err
+	// create index: snowflake doesn't support index
+	if backendType != types.SNOWFLAKE {
+		index := fmt.Sprintf(`CREATE INDEX idx_%s ON %s (unix_milli, entity_key)`, tableName, tableName)
+		if _, err := db.ExecContext(ctx, index); err != nil {
+			return "", err
+		}
 	}
 	return tableName, nil
 }
