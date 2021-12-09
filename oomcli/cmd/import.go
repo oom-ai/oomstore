@@ -10,16 +10,26 @@ import (
 )
 
 var importOpt types.ImportOpt
-var importDataSource types.CsvFileDataSource
+var importCSVDataSource types.CsvFileDataSource
+var importExternalTableDataSource types.ExternalTableDataSource
 
 var importCmd = &cobra.Command{
 	Use:   "import",
-	Short: "import feature data from a csv file",
-	PreRun: func(cmd *cobra.Command, args []string) {
+	Short: "import feature data from a data source",
+	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if !cmd.Flags().Changed("revision") {
 			importOpt.Revision = nil
 		}
-		importOpt.DataSource = importDataSource
+		if importCSVDataSource.InputFilePath == "" && importExternalTableDataSource.TableName == "" {
+			return fmt.Errorf(`required flag(s) "input-file" or "table-link" not set`)
+		} else if importCSVDataSource.InputFilePath != "" && importExternalTableDataSource.TableName != "" {
+			return fmt.Errorf(`"input-file" and "table-link" can not be set both`)
+		} else if importCSVDataSource.InputFilePath != "" {
+			importOpt.DataSource = importCSVDataSource
+		} else if importExternalTableDataSource.TableName != "" {
+			importOpt.DataSource = importExternalTableDataSource
+		}
+		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
@@ -46,9 +56,9 @@ func init() {
 
 	flags.StringVar(&importOpt.Description, "description", "", "revision description")
 
-	flags.StringVar(&importDataSource.InputFilePath, "input-file", "", "input csv file")
-	_ = importCmd.MarkFlagRequired("input-file")
+	flags.StringVar(&importCSVDataSource.InputFilePath, "input-file", "", "input csv file")
+	flags.StringVar(&importExternalTableDataSource.TableName, "table-link", "", "link to a existing data table")
 
-	flags.StringVar(&importDataSource.Delimiter, "delimiter", ",", "specify field delimiter")
+	flags.StringVar(&importCSVDataSource.Delimiter, "delimiter", ",", "specify field delimiter")
 	importOpt.Revision = flags.Int64P("revision", "r", 0, "user-defined revision")
 }
