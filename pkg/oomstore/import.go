@@ -19,29 +19,28 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 	if err != nil {
 		return 0, err
 	}
-	switch dataSource := opt.DataSource.(type) {
-	case types.CsvFileDataSource:
-		file, err := os.Open(dataSource.InputFilePath)
+	switch opt.DataSourceType {
+	case types.CSV_FILE:
+		src := importOpt.CsvFileDataSource
+		file, err := os.Open(src.InputFilePath)
 		if err != nil {
 			return 0, err
 		}
 		defer file.Close()
-		importOpt.dataSource = types.CsvReaderDataSource{
+		return s.csvReaderImport(ctx, importOpt, &types.CsvReaderDataSource{
 			Reader:    file,
-			Delimiter: dataSource.Delimiter,
-		}
-		return s.csvReaderImport(ctx, importOpt)
-	case types.CsvReaderDataSource:
-		return s.csvReaderImport(ctx, importOpt)
-	case types.TableLinkDataSource:
-		return s.tableLinkImport(ctx, importOpt)
+			Delimiter: src.Delimiter,
+		})
+	case types.CSV_READER:
+		return s.csvReaderImport(ctx, importOpt, opt.CsvReaderDataSource)
+	case types.TABLE_LINK:
+		return s.tableLinkImport(ctx, importOpt, opt.TableLinkDataSource)
 	default:
-		return 0, fmt.Errorf("unsupported data source: %T", opt.DataSource)
+		return 0, fmt.Errorf("unsupported data source: %v", opt.DataSourceType)
 	}
 }
 
-func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt) (int, error) {
-	dataSource := opt.dataSource.(types.CsvReaderDataSource)
+func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) (int, error) {
 	// make sure csv data source has all defined columns
 	csvReader := csv.NewReader(dataSource.Reader)
 	csvReader.Comma = []rune(dataSource.Delimiter)[0]
@@ -62,8 +61,8 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt) (int, er
 		Revision:    0,
 		GroupID:     opt.group.ID,
 		DataTable:   nil,
-		Description: opt.description,
-		Anchored:    opt.revision != nil,
+		Description: opt.Description,
+		Anchored:    opt.Revision != nil,
 	})
 	if err != nil {
 		return 0, err
@@ -73,7 +72,7 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt) (int, er
 		Entity:        opt.entity,
 		Features:      opt.features,
 		Header:        header,
-		Revision:      opt.revision,
+		Revision:      opt.Revision,
 		CsvReader:     csvReader,
 		DataTableName: dataTableName,
 	})
@@ -81,8 +80,8 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt) (int, er
 		return 0, err
 	}
 
-	if opt.revision != nil {
-		revision = *opt.revision
+	if opt.Revision != nil {
+		revision = *opt.Revision
 	}
 	if err := s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
 		RevisionID:  newRevisionID,
@@ -96,9 +95,7 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt) (int, er
 	return newRevisionID, nil
 }
 
-func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt) (int, error) {
-	dataSource := opt.dataSource.(types.TableLinkDataSource)
-
+func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt, dataSource *types.TableLinkDataSource) (int, error) {
 	// Make sure all features existing with correct value type
 	tableSchema, err := s.offline.TableSchema(ctx, dataSource.TableName)
 	if err != nil {
@@ -122,17 +119,17 @@ func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt) (int, er
 	}
 
 	var revision int64
-	if opt.revision == nil {
+	if opt.Revision == nil {
 		revision = time.Now().UnixMilli()
 	} else {
-		revision = *opt.revision
+		revision = *opt.Revision
 	}
 	newRevisionID, _, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:    revision,
 		GroupID:     opt.group.ID,
 		DataTable:   &dataSource.TableName,
-		Description: opt.description,
-		Anchored:    opt.revision != nil,
+		Description: opt.Description,
+		Anchored:    opt.Revision != nil,
 	})
 	if err != nil {
 		return 0, err
@@ -195,20 +192,16 @@ func (s *OomStore) parseImportOpt(ctx context.Context, opt types.ImportOpt) (*im
 	}
 
 	return &importOpt{
-		dataSource:  opt.DataSource,
-		entity:      entity,
-		group:       group,
-		features:    features,
-		revision:    opt.Revision,
-		description: opt.Description,
+		ImportOpt: &opt,
+		entity:    entity,
+		group:     group,
+		features:  features,
 	}, nil
 }
 
 type importOpt struct {
-	dataSource  interface{}
-	entity      *types.Entity
-	group       *types.Group
-	features    types.FeatureList
-	revision    *int64
-	description string
+	*types.ImportOpt
+	entity   *types.Entity
+	group    *types.Group
+	features types.FeatureList
 }
