@@ -10,7 +10,7 @@ import (
 )
 
 var importOpt types.ImportOpt
-var importDataSource types.CsvDataSourceWithFile
+var importDataSource types.CsvFileDataSource
 
 var importCmd = &cobra.Command{
 	Use:   "import",
