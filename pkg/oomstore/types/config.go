@@ -8,6 +8,7 @@ const (
 	MYSQL     BackendType = "mysql"
 	SNOWFLAKE BackendType = "snowflake"
 	DYNAMODB  BackendType = "dynamodb"
+	CASSANDRA BackendType = "cassandra"
 )
 
 type OomStoreConfig struct {
@@ -73,4 +74,11 @@ type DynamoDBOpt struct {
 	SecretAccessKey string `yaml:"secret-access-key"`
 	SessionToken    string `yaml:"session-token"`
 	Source          string `yaml:"source"`
+}
+
+type CassandraOpt struct {
+	Hosts    []string `yaml:"hosts"`
+	User     string   `yaml:"user"`
+	Password string   `yaml:"password"`
+	KeySpace string   `yaml:"keyspace"`
 }
