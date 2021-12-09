@@ -22,7 +22,7 @@ const (
 func BuildFeatureDataTableSchema(tableName string, entity *types.Entity, features types.FeatureList, backendType types.BackendType) (string, error) {
 	var columnFormat, tableSchema string
 	switch backendType {
-	case types.POSTGRES, types.SNOWFLAKE:
+	case types.POSTGRES, types.SNOWFLAKE, types.CASSANDRA:
 		columnFormat = `"%s" %s`
 		tableSchema = CREATE_DATA_TABLE_POSTGRES
 	case types.MYSQL:
