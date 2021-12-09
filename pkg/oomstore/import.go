@@ -5,38 +5,44 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/ethhte88/oomstore/internal/database/metadata"
 	"github.com/ethhte88/oomstore/internal/database/offline"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
-// ChannelImport a CSV data source into the feature store as a new revision.
-// In the future we want to support more diverse data sources.
-func (s *OomStore) ChannelImport(ctx context.Context, opt types.ChannelImport) (int, error) {
-	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
+func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
+	importOpt, err := s.parseImportOpt(ctx, opt)
 	if err != nil {
 		return 0, err
 	}
-
-	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
-		GroupID: &group.ID,
-	})
-	if err != nil {
-		return 0, err
+	switch dataSource := opt.DataSource.(type) {
+	case types.CsvFileDataSource:
+		file, err := os.Open(dataSource.InputFilePath)
+		if err != nil {
+			return 0, err
+		}
+		defer file.Close()
+		importOpt.dataSource = types.CsvReaderDataSource{
+			Reader:    file,
+			Delimiter: dataSource.Delimiter,
+		}
+		return s.csvReaderImport(ctx, importOpt)
+	case types.CsvReaderDataSource:
+		return s.csvReaderImport(ctx, importOpt)
+	case types.ExternalTableDataSource:
+		return s.externalTableImport(ctx, importOpt)
+	default:
+		return 0, fmt.Errorf("unsupported data source: %T", opt.DataSource)
 	}
-	if features == nil {
-		return 0, fmt.Errorf("no features under group: %s", opt.GroupName)
-	}
+}
 
-	entity := group.Entity
-	if entity == nil {
-		return 0, fmt.Errorf("no entity found by group: %s", opt.GroupName)
-	}
-
+func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt) (int, error) {
+	dataSource := opt.dataSource.(types.CsvReaderDataSource)
 	// make sure csv data source has all defined columns
-	csvReader := csv.NewReader(opt.DataSource.Reader)
-	csvReader.Comma = []rune(opt.DataSource.Delimiter)[0]
+	csvReader := csv.NewReader(dataSource.Reader)
+	csvReader.Comma = []rune(dataSource.Delimiter)[0]
 
 	header, err := csvReader.Read()
 	if err != nil {
@@ -45,33 +51,27 @@ func (s *OomStore) ChannelImport(ctx context.Context, opt types.ChannelImport) (
 	if hasDup(header) {
 		return 0, fmt.Errorf("csv data source has duplicated columns: %v", header)
 	}
-	columnNames := append([]string{entity.Name}, features.Names()...)
+	columnNames := append([]string{opt.entity.Name}, opt.features.Names()...)
 	if !stringSliceEqual(header, columnNames) {
 		return 0, fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
-	var revision int64
-	if opt.Revision != nil {
-		revision = *opt.Revision
-	}
-
 	newRevisionID, dataTableName, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
-		Revision: revision,
-		GroupID:  group.ID,
-		// TODO: support user-defined DataTable
+		Revision:    0,
+		GroupID:     opt.group.ID,
 		DataTable:   nil,
-		Description: opt.Description,
-		Anchored:    opt.Revision != nil,
+		Description: opt.description,
+		Anchored:    opt.revision != nil,
 	})
 	if err != nil {
 		return 0, err
 	}
 
-	revision, err = s.offline.Import(ctx, offline.ImportOpt{
-		Entity:        entity,
-		Features:      features,
+	revision, err := s.offline.Import(ctx, offline.ImportOpt{
+		Entity:        opt.entity,
+		Features:      opt.features,
 		Header:        header,
-		Revision:      opt.Revision,
+		Revision:      opt.revision,
 		CsvReader:     csvReader,
 		DataTableName: dataTableName,
 	})
@@ -79,13 +79,14 @@ func (s *OomStore) ChannelImport(ctx context.Context, opt types.ChannelImport) (
 		return 0, err
 	}
 
-	if opt.Revision == nil {
-		if err := s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
-			RevisionID:  newRevisionID,
-			NewRevision: &revision,
-		}); err != nil {
-			return 0, err
-		}
+	if opt.revision != nil {
+		revision = *opt.revision
+	}
+	if err := s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
+		RevisionID:  newRevisionID,
+		NewRevision: &revision,
+	}); err != nil {
+		return 0, err
 	}
 
 	// TODO: clean up revision and data_table if import failed
@@ -93,28 +94,27 @@ func (s *OomStore) ChannelImport(ctx context.Context, opt types.ChannelImport) (
 	return newRevisionID, nil
 }
 
-// Import is similar to ChannelImport, the only difference is that it takes in InputFilePath
-// as an argument.
-func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
-	switch dataSource := opt.DataSource.(type) {
-	case types.CsvDataSourceWithFile:
-		file, err := os.Open(dataSource.InputFilePath)
-		if err != nil {
-			return 0, err
-		}
-		defer file.Close()
-		return s.ChannelImport(ctx, types.ChannelImport{
-			GroupName:   opt.GroupName,
-			Description: opt.Description,
-			DataSource: types.CsvDataSource{
-				Reader:    file,
-				Delimiter: dataSource.Delimiter,
-			},
-			Revision: opt.Revision,
-		})
-	default:
-		return 0, fmt.Errorf("unsupported data source: %T", opt.DataSource)
+func (s *OomStore) externalTableImport(ctx context.Context, opt *importOpt) (int, error) {
+	dataSource := opt.dataSource.(types.ExternalTableDataSource)
+	// TOOD: validate data source
+	var revision int64
+	if opt.revision == nil {
+		revision = time.Now().UnixMilli()
+	} else {
+		revision = *opt.revision
 	}
+	newRevisionID, _, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
+		Revision:    revision,
+		GroupID:     opt.group.ID,
+		DataTable:   &dataSource.TableName,
+		Description: opt.description,
+		Anchored:    opt.revision != nil,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	return newRevisionID, nil
 }
 
 func hasDup(a []string) bool {
@@ -146,4 +146,45 @@ func stringSliceEqual(a, b []string) bool {
 		}
 	}
 	return true
+}
+
+func (s *OomStore) parseImportOpt(ctx context.Context, opt types.ImportOpt) (*importOpt, error) {
+	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
+	if err != nil {
+		return nil, err
+	}
+
+	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+		GroupID: &group.ID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if features == nil {
+		err = fmt.Errorf("no features under group: %s", opt.GroupName)
+		return nil, err
+	}
+
+	entity := group.Entity
+	if entity == nil {
+		return nil, fmt.Errorf("no entity found by group: %s", opt.GroupName)
+	}
+
+	return &importOpt{
+		dataSource:  opt.DataSource,
+		entity:      entity,
+		group:       group,
+		features:    features,
+		revision:    opt.Revision,
+		description: opt.Description,
+	}, nil
+}
+
+type importOpt struct {
+	dataSource  interface{}
+	entity      *types.Entity
+	group       *types.Group
+	features    types.FeatureList
+	revision    *int64
+	description string
 }

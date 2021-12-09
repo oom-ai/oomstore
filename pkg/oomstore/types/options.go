@@ -47,13 +47,6 @@ type ExportOpt struct {
 	OutputFilePath string
 }
 
-type ChannelImport struct {
-	GroupName   string
-	Description string
-	DataSource  CsvDataSource
-	Revision    *int64
-}
-
 type ImportOpt struct {
 	GroupName   string
 	Description string
@@ -61,14 +54,18 @@ type ImportOpt struct {
 	Revision    *int64
 }
 
-type CsvDataSource struct {
+type CsvReaderDataSource struct {
 	Reader    io.Reader
 	Delimiter string
 }
 
-type CsvDataSourceWithFile struct {
+type CsvFileDataSource struct {
 	InputFilePath string
 	Delimiter     string
+}
+
+type ExternalTableDataSource struct {
+	TableName string
 }
 
 type OnlineGetOpt struct {
