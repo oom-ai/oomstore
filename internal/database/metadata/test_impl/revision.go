@@ -3,7 +3,6 @@ package test_impl
 import (
 	"context"
 	"fmt"
-	"sort"
 	"testing"
 	"time"
 
@@ -303,13 +302,7 @@ func TestListRevision(t *testing.T, prepareStore PrepareStoreFn) {
 			for _, item := range actual {
 				ignoreCreateAndModifyTime(item)
 			}
-			sort.Slice(tc.expected, func(i, j int) bool {
-				return tc.expected[i].ID < tc.expected[j].ID
-			})
-			sort.Slice(actual, func(i, j int) bool {
-				return actual[i].ID < actual[j].ID
-			})
-			assert.Equal(t, tc.expected, actual)
+			assert.ElementsMatch(t, tc.expected, actual)
 		})
 	}
 }
