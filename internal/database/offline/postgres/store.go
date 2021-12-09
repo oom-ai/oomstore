@@ -17,7 +17,7 @@ type DB struct {
 }
 
 func (db *DB) Ping(ctx context.Context) error {
-	return db.DB.PingContext(ctx)
+	return db.PingContext(ctx)
 }
 
 func Open(option *types.PostgresOpt) (*DB, error) {
