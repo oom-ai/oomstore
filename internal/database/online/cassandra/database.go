@@ -8,7 +8,10 @@ import (
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
-const BackendType = types.CASSANDRA
+const (
+	BatchSize   = 1000
+	BackendType = types.CASSANDRA
+)
 
 type DB struct {
 	*gocql.Session
