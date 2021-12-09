@@ -20,3 +20,15 @@ func TestOpen(t *testing.T) {
 func TestPing(t *testing.T) {
 	test_impl.TestPing(t, prepareStore)
 }
+
+func TestGetExisted(t *testing.T) {
+	test_impl.TestGetExisted(t, prepareStore)
+}
+
+func TestGetNotExistedEntityKey(t *testing.T) {
+	test_impl.TestGetNotExistedEntityKey(t, prepareStore)
+}
+
+func TestMultiGet(t *testing.T) {
+	test_impl.TestMultiGet(t, prepareStore)
+}
