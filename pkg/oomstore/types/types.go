@@ -51,3 +51,12 @@ func (e *ExportResult) CheckStreamError() error {
 	}
 	return nil
 }
+
+type DataTableSchema struct {
+	Fields []DataTableFieldSchema
+}
+
+type DataTableFieldSchema struct {
+	Name      string
+	ValueType string
+}
