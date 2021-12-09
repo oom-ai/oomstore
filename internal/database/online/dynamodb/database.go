@@ -26,7 +26,6 @@ func Open(opt *types.DynamoDBOpt) (*DB, error) {
 			func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 				return aws.Endpoint{URL: opt.EndpointURL}, nil
 			})),
-		// TODO: let's worry about credentials later when we test on AWS
 		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
 			Value: aws.Credentials{
 				AccessKeyID:     opt.AccessKeyID,
