@@ -20,13 +20,13 @@ type DB struct {
 	*sqlx.DB
 }
 
-func (db *DB) Ping(ctx context.Context) error {
-	return db.DB.PingContext(ctx)
-}
-
 func Open(opt *types.PostgresOpt) (*DB, error) {
 	db, err := dbutil.OpenPostgresDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
 	return &DB{db}, err
+}
+
+func (db *DB) Ping(ctx context.Context) error {
+	return db.DB.PingContext(ctx)
 }
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
