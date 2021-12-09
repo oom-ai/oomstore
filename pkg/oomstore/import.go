@@ -12,6 +12,8 @@ import (
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
+// Import data into the offline feature store as a new revision.
+// In the future we want to support more diverse data sources.
 func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
 	importOpt, err := s.parseImportOpt(ctx, opt)
 	if err != nil {
