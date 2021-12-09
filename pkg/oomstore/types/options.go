@@ -64,7 +64,7 @@ type CsvFileDataSource struct {
 	Delimiter     string
 }
 
-type ExternalTableDataSource struct {
+type TableLinkDataSource struct {
 	TableName string
 }
 
