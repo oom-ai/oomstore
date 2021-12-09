@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/offline"
 	"github.com/ethhte88/oomstore/internal/database/offline/postgres"
 	"github.com/ethhte88/oomstore/internal/database/offline/test_impl"
@@ -42,4 +43,18 @@ func TestExport(t *testing.T) {
 
 func TestJoin(t *testing.T) {
 	test_impl.TestJoin(t, prepareStore)
+}
+
+func TestTableSchema(t *testing.T) {
+	test_impl.TestTableSchema(t, prepareStore, func(ctx context.Context) {
+		opt := runtime_pg.PostgresDbOpt
+		db, err := dbutil.OpenPostgresDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+		if _, err := db.ExecContext(ctx, `create table "user"("user" varchar(16), "age" smallint)`); err != nil {
+			panic(err)
+		}
+	})
 }
