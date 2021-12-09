@@ -22,9 +22,8 @@ type DB struct {
 func Open(opt *types.DynamoDBOpt) (*DB, error) {
 	cfg, err := config.LoadDefaultConfig(context.Background(),
 		config.WithRegion(opt.Region),
-		// TODO: replace the deprecated method WithEndpointResolver
-		config.WithEndpointResolver(aws.EndpointResolverFunc(
-			func(service, region string) (aws.Endpoint, error) {
+		config.WithEndpointResolverWithOptions(aws.EndpointResolverWithOptionsFunc(
+			func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 				return aws.Endpoint{URL: opt.EndpointURL}, nil
 			})),
 		// TODO: let's worry about credentials later when we test on AWS
