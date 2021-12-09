@@ -2,7 +2,6 @@ package mysql_test
 
 import (
 	"context"
-	"sort"
 	"testing"
 
 	"github.com/ethhte88/oomstore/internal/database/metadata"
@@ -61,13 +60,7 @@ func TestCreateDatabase(t *testing.T) {
 		wantTables = append(wantTables, table)
 	}
 
-	sort.Slice(tables, func(i, j int) bool {
-		return tables[i] < tables[j]
-	})
-	sort.Slice(wantTables, func(i, j int) bool {
-		return wantTables[i] < wantTables[j]
-	})
-	assert.Equal(t, wantTables, tables)
+	assert.ElementsMatch(t, wantTables, tables)
 }
 
 func TestCreateEntity(t *testing.T) {
