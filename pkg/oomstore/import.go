@@ -31,8 +31,8 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 		return s.csvReaderImport(ctx, importOpt)
 	case types.CsvReaderDataSource:
 		return s.csvReaderImport(ctx, importOpt)
-	case types.ExternalTableDataSource:
-		return s.externalTableImport(ctx, importOpt)
+	case types.TableLinkDataSource:
+		return s.tableLinkImport(ctx, importOpt)
 	default:
 		return 0, fmt.Errorf("unsupported data source: %T", opt.DataSource)
 	}
@@ -94,8 +94,8 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt) (int, er
 	return newRevisionID, nil
 }
 
-func (s *OomStore) externalTableImport(ctx context.Context, opt *importOpt) (int, error) {
-	dataSource := opt.dataSource.(types.ExternalTableDataSource)
+func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt) (int, error) {
+	dataSource := opt.dataSource.(types.TableLinkDataSource)
 
 	// Make sure all features existing with correct value type
 	tableSchema, err := s.offline.TableSchema(ctx, dataSource.TableName)
@@ -111,7 +111,7 @@ func (s *OomStore) externalTableImport(ctx context.Context, opt *importOpt) (int
 				return nil
 			}
 		}
-		return fmt.Errorf("field '%s' found in external table", f.Name)
+		return fmt.Errorf("field '%s' found in target table", f.Name)
 	}
 	for _, feature := range opt.features {
 		if err := validate(feature); err != nil {

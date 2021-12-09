@@ -10,8 +10,8 @@ import (
 )
 
 var importOpt types.ImportOpt
-var importCSVDataSource types.CsvFileDataSource
-var importExternalTableDataSource types.ExternalTableDataSource
+var importCSVFileDataSource types.CsvFileDataSource
+var importTableLinkDataSource types.TableLinkDataSource
 
 var importCmd = &cobra.Command{
 	Use:   "import",
@@ -20,14 +20,14 @@ var importCmd = &cobra.Command{
 		if !cmd.Flags().Changed("revision") {
 			importOpt.Revision = nil
 		}
-		if importCSVDataSource.InputFilePath == "" && importExternalTableDataSource.TableName == "" {
+		if importCSVFileDataSource.InputFilePath == "" && importTableLinkDataSource.TableName == "" {
 			return fmt.Errorf(`required flag(s) "input-file" or "table-link" not set`)
-		} else if importCSVDataSource.InputFilePath != "" && importExternalTableDataSource.TableName != "" {
+		} else if importCSVFileDataSource.InputFilePath != "" && importTableLinkDataSource.TableName != "" {
 			return fmt.Errorf(`"input-file" and "table-link" can not be set both`)
-		} else if importCSVDataSource.InputFilePath != "" {
-			importOpt.DataSource = importCSVDataSource
-		} else if importExternalTableDataSource.TableName != "" {
-			importOpt.DataSource = importExternalTableDataSource
+		} else if importCSVFileDataSource.InputFilePath != "" {
+			importOpt.DataSource = importCSVFileDataSource
+		} else if importTableLinkDataSource.TableName != "" {
+			importOpt.DataSource = importTableLinkDataSource
 		}
 		return nil
 	},
@@ -56,9 +56,9 @@ func init() {
 
 	flags.StringVar(&importOpt.Description, "description", "", "revision description")
 
-	flags.StringVar(&importCSVDataSource.InputFilePath, "input-file", "", "input csv file")
-	flags.StringVar(&importExternalTableDataSource.TableName, "table-link", "", "link to a existing data table")
+	flags.StringVar(&importCSVFileDataSource.InputFilePath, "input-file", "", "input csv file")
+	flags.StringVar(&importTableLinkDataSource.TableName, "table-link", "", "link to a existing data table")
 
-	flags.StringVar(&importCSVDataSource.Delimiter, "delimiter", ",", "specify field delimiter")
+	flags.StringVar(&importCSVFileDataSource.Delimiter, "delimiter", ",", "specify field delimiter")
 	importOpt.Revision = flags.Int64P("revision", "r", 0, "user-defined revision")
 }
