@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/offline"
@@ -62,6 +63,9 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 			Name:      fieldName,
 			ValueType: valueType,
 		})
+	}
+	if len(schema.Fields) == 0 {
+		return nil, fmt.Errorf("table not found")
 	}
 	return &schema, nil
 }
