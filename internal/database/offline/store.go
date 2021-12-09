@@ -12,6 +12,7 @@ type Store interface {
 	Export(ctx context.Context, opt ExportOpt) (<-chan types.ExportRecord, <-chan error)
 	Import(ctx context.Context, opt ImportOpt) (int64, error)
 
+	TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error)
 	TypeTag(dbType string) (string, error)
 
 	Ping(ctx context.Context) error

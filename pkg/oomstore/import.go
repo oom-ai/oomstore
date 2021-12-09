@@ -96,7 +96,29 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt) (int, er
 
 func (s *OomStore) externalTableImport(ctx context.Context, opt *importOpt) (int, error) {
 	dataSource := opt.dataSource.(types.ExternalTableDataSource)
-	// TOOD: validate data source
+
+	// Make sure all features existing with correct value type
+	tableSchema, err := s.offline.TableSchema(ctx, dataSource.TableName)
+	if err != nil {
+		return 0, err
+	}
+	validate := func(f *types.Feature) error {
+		for _, field := range tableSchema.Fields {
+			if field.Name == f.Name {
+				if field.ValueType != f.ValueType {
+					return fmt.Errorf("expect value type '%s', got '%s'", f.ValueType, field.ValueType)
+				}
+				return nil
+			}
+		}
+		return fmt.Errorf("field '%s' found in external table", f.Name)
+	}
+	for _, feature := range opt.features {
+		if err := validate(feature); err != nil {
+			return 0, err
+		}
+	}
+
 	var revision int64
 	if opt.revision == nil {
 		revision = time.Now().UnixMilli()
