@@ -13,6 +13,7 @@ import (
 	"github.com/ethhte88/oomstore/internal/database/offline"
 	offlineMySQL "github.com/ethhte88/oomstore/internal/database/offline/mysql"
 	offlinePG "github.com/ethhte88/oomstore/internal/database/offline/postgres"
+	offlineSnowflake "github.com/ethhte88/oomstore/internal/database/offline/snowflake"
 
 	"github.com/ethhte88/oomstore/internal/database/online"
 	onlineMySQL "github.com/ethhte88/oomstore/internal/database/online/mysql"
@@ -61,6 +62,8 @@ func OpenOfflineStore(opt types.OfflineStoreConfig) (offline.Store, error) {
 		return offlinePG.Open(opt.Postgres)
 	case types.MYSQL:
 		return offlineMySQL.Open(opt.MySQL)
+	case types.SNOWFLAKE:
+		return offlineSnowflake.Open(opt.Snowflake)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
