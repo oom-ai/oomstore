@@ -23,9 +23,10 @@ type OnlineStoreConfig struct {
 }
 
 type OfflineStoreConfig struct {
-	Backend  BackendType  `yaml:"backend"`
-	Postgres *PostgresOpt `yaml:"postgres"`
-	MySQL    *MySQLOpt    `yaml:"mysql"`
+	Backend   BackendType   `yaml:"backend"`
+	Postgres  *PostgresOpt  `yaml:"postgres"`
+	MySQL     *MySQLOpt     `yaml:"mysql"`
+	Snowflake *SnowflakeOpt `yaml:"snowflake"`
 }
 
 type MetadataStoreConfig struct {
