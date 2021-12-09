@@ -68,7 +68,8 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 		{
 			description: "Create Revision failed",
 			opt: types.ImportOpt{
-				DataSource: types.CsvReaderDataSource{
+				DataSourceType: types.CSV_READER,
+				CsvReaderDataSource: &types.CsvReaderDataSource{
 					Reader: strings.NewReader(`
 device,model,price
 1234,xiaomi,200
@@ -132,8 +133,10 @@ func TestChannelImport(t *testing.T) {
 		{
 			description: "import batch feature, succeed",
 			opt: types.ImportOpt{
-				DataSource: types.CsvReaderDataSource{
-					Reader: strings.NewReader(`device,model,price
+				DataSourceType: types.CSV_READER,
+				CsvReaderDataSource: &types.CsvReaderDataSource{
+					Reader: strings.NewReader(`
+device,model,price
 1234,xiaomi,200
 1235,apple,299
 `),
@@ -157,8 +160,9 @@ func TestChannelImport(t *testing.T) {
 		{
 			description: "import batch feature, csv data source has duplicated columns",
 			opt: types.ImportOpt{
-				GroupName: "device",
-				DataSource: types.CsvReaderDataSource{
+				GroupName:      "device",
+				DataSourceType: types.CSV_READER,
+				CsvReaderDataSource: &types.CsvReaderDataSource{
 					Reader: strings.NewReader(`
 device,model,model
 1234,xiaomi,xiaomi
@@ -183,7 +187,8 @@ device,model,model
 		{
 			description: "import batch feature, csv header of the data source doesn't match the feature group schema",
 			opt: types.ImportOpt{
-				DataSource: types.CsvReaderDataSource{
+				DataSourceType: types.CSV_READER,
+				CsvReaderDataSource: &types.CsvReaderDataSource{
 					Reader: strings.NewReader(`
 device,model,price
 1234,xiaomi,200

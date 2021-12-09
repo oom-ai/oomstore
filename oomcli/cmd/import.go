@@ -25,9 +25,11 @@ var importCmd = &cobra.Command{
 		} else if importCSVFileDataSource.InputFilePath != "" && importTableLinkDataSource.TableName != "" {
 			return fmt.Errorf(`"input-file" and "table-link" can not be set both`)
 		} else if importCSVFileDataSource.InputFilePath != "" {
-			importOpt.DataSource = importCSVFileDataSource
+			importOpt.DataSourceType = types.CSV_FILE
+			importOpt.CsvFileDataSource = &importCSVFileDataSource
 		} else if importTableLinkDataSource.TableName != "" {
-			importOpt.DataSource = importTableLinkDataSource
+			importOpt.DataSourceType = types.TABLE_LINK
+			importOpt.TableLinkDataSource = &importTableLinkDataSource
 		}
 		return nil
 	},
