@@ -2,7 +2,6 @@ package dbutil
 
 import (
 	"fmt"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -32,10 +31,6 @@ func BuildFeatureDataTableSchema(tableName string, entity *types.Entity, feature
 		return "", fmt.Errorf("unsupported backend type %s", backendType)
 	}
 
-	// sort to ensure the schema looks consistent
-	sort.Slice(features, func(i, j int) bool {
-		return features[i].Name < features[j].Name
-	})
 	var columnDefs []string
 	for _, column := range features {
 		def := fmt.Sprintf(columnFormat, column.Name, column.DBValueType)
