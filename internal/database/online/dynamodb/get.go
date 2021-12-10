@@ -2,6 +2,7 @@ package dynamodb
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -26,6 +27,9 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		},
 	})
 	if err != nil {
+		if apiErr := new(types.ResourceNotFoundException); errors.As(err, &apiErr) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
