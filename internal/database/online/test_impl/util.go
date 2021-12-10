@@ -49,7 +49,7 @@ func init() {
 					Name:        "account",
 					GroupID:     1,
 					ValueType:   types.FLOAT64,
-					DBValueType: "double",
+					DBValueType: "real",
 				},
 				&types.Feature{
 					ID:          3,
@@ -58,13 +58,20 @@ func init() {
 					ValueType:   types.BOOL,
 					DBValueType: "bool",
 				},
+				&types.Feature{
+					ID:          4,
+					Name:        "register_time",
+					GroupID:     1,
+					ValueType:   types.TIME,
+					DBValueType: "datetime",
+				},
 			},
 			Revision: &types.Revision{ID: 3, GroupID: 1},
 			Entity:   &types.Entity{ID: 5, Name: "user", Length: 4},
 			Data: []types.ExportRecord{
-				[]interface{}{"3215", int64(18), "F", 1.1, true},
-				[]interface{}{"3216", int64(29), nil, 2.0, false},
-				[]interface{}{"3217", int64(44), "M", 3.1, true},
+				[]interface{}{"3215", int64(18), "F", 1.1, true, time.Now()},
+				[]interface{}{"3216", int64(29), nil, 2.0, false, time.Now()},
+				[]interface{}{"3217", int64(44), "M", 3.1, true, time.Now()},
 			},
 		}
 

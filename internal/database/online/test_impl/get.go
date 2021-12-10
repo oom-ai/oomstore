@@ -2,8 +2,10 @@ package test_impl
 
 import (
 	"testing"
+	"time"
 
 	"github.com/ethhte88/oomstore/internal/database/online"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -25,7 +27,15 @@ func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn) {
 		require.NoError(t, err)
 
 		for i, f := range s.Features {
-			assert.Equal(t, target.ValueAt(i), rs[f.Name], "result: %+v", rs)
+			if f.ValueType == types.TIME {
+				expected, ok := target.ValueAt(i).(time.Time)
+				require.Equal(t, true, ok)
+				actual, ok := rs[f.Name].(time.Time)
+				require.Equal(t, true, ok)
+				assert.Equal(t, expected.UnixMilli(), actual.UnixMilli())
+			} else {
+				assert.Equal(t, target.ValueAt(i), rs[f.Name], "result: %+v", rs)
+			}
 		}
 	}
 }
@@ -66,7 +76,15 @@ func TestMultiGet(t *testing.T, prepareStore PrepareStoreFn) {
 
 	for _, record := range s.Data {
 		for i, feature := range s.Features {
-			assert.Equal(t, record.ValueAt(i), rs[record.EntityKey()][feature.Name])
+			if feature.ValueType == types.TIME {
+				expected, ok := record.ValueAt(i).(time.Time)
+				require.Equal(t, true, ok)
+				actual, ok := rs[record.EntityKey()][feature.Name].(time.Time)
+				require.Equal(t, true, ok)
+				assert.Equal(t, expected.UnixMilli(), actual.UnixMilli())
+			} else {
+				assert.Equal(t, record.ValueAt(i), rs[record.EntityKey()][feature.Name], "result: %+v", rs)
+			}
 		}
 	}
 

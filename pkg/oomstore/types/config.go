@@ -22,6 +22,7 @@ type OnlineStoreConfig struct {
 	Postgres *PostgresOpt `yaml:"postgres"`
 	Redis    *RedisOpt    `yaml:"redis"`
 	MySQL    *MySQLOpt    `yaml:"mysql"`
+	DynamoDB *DynamoDBOpt `yaml:"dynamodb"`
 }
 
 type OfflineStoreConfig struct {
