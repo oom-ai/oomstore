@@ -79,10 +79,11 @@ func deserializeIntoRowMap(values []interface{}, features types.FeatureList, bac
 	rs := map[string]interface{}{}
 	for i := range values {
 		value := values[i]
-		if value != nil && features[i].ValueType == types.STRING {
-			value = dbutil.DeserializeString(value, backend)
+		typedValue, err := deserializeByTag(value, features[i].ValueType, backend)
+		if err != nil {
+			return nil, err
 		}
-		rs[features[i].Name] = value
+		rs[features[i].Name] = typedValue
 	}
 	return rs, nil
 }
