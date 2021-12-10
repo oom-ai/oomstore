@@ -1,5 +1,7 @@
 package types
 
+import "time"
+
 type BackendType string
 
 const (
@@ -78,8 +80,9 @@ type DynamoDBOpt struct {
 }
 
 type CassandraOpt struct {
-	Hosts    []string `yaml:"hosts"`
-	User     string   `yaml:"user"`
-	Password string   `yaml:"password"`
-	KeySpace string   `yaml:"keyspace"`
+	Hosts    []string      `yaml:"hosts"`
+	User     string        `yaml:"user"`
+	Password string        `yaml:"password"`
+	KeySpace string        `yaml:"keyspace"`
+	Timeout  time.Duration `yaml:"timeout"`
 }
