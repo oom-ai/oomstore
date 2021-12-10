@@ -138,11 +138,12 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 		}
 	}()
 
-	revisionID, err := s.oomstore.ChannelImport(context.Background(), types.ChannelImport{
-		GroupName:   firstReq.GroupName,
-		Revision:    firstReq.Revision,
-		Description: firstReq.Description,
-		DataSource: types.CsvDataSource{
+	revisionID, err := s.oomstore.Import(context.Background(), types.ImportOpt{
+		GroupName:      firstReq.GroupName,
+		Revision:       firstReq.Revision,
+		Description:    firstReq.Description,
+		DataSourceType: types.CSV_READER,
+		CsvReaderDataSource: &types.CsvReaderDataSource{
 			Reader:    reader,
 			Delimiter: ",",
 		},
@@ -165,10 +166,11 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 
 func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codegen.ImportResponse, error) {
 	revisionID, err := s.oomstore.Import(ctx, types.ImportOpt{
-		GroupName:   req.GroupName,
-		Description: req.Description,
-		Revision:    req.Revision,
-		DataSource: types.CsvDataSourceWithFile{
+		GroupName:      req.GroupName,
+		Description:    req.Description,
+		Revision:       req.Revision,
+		DataSourceType: types.CSV_FILE,
+		CsvFileDataSource: &types.CsvFileDataSource{
 			InputFilePath: req.InputFilePath,
 			Delimiter:     ",",
 		},

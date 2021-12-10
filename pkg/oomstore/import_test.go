@@ -25,14 +25,14 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 
 	testCases := []struct {
 		description    string
-		opt            types.ChannelImport
+		opt            types.ImportOpt
 		mockFunc       func()
 		wantRevisionID int
 		wantError      error
 	}{
 		{
 			description: "GetGroup failed",
-			opt: types.ChannelImport{
+			opt: types.ImportOpt{
 				GroupName: "device_info",
 			},
 			mockFunc: func() {
@@ -43,7 +43,7 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 		},
 		{
 			description: "ListFeature failed",
-			opt: types.ChannelImport{
+			opt: types.ImportOpt{
 				GroupName: "device_info",
 			},
 			mockFunc: func() {
@@ -55,7 +55,7 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 		},
 		{
 			description: "GetEntity failed",
-			opt: types.ChannelImport{
+			opt: types.ImportOpt{
 				GroupName: "device_info",
 			},
 			mockFunc: func() {
@@ -67,8 +67,9 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 		},
 		{
 			description: "Create Revision failed",
-			opt: types.ChannelImport{
-				DataSource: types.CsvDataSource{
+			opt: types.ImportOpt{
+				DataSourceType: types.CSV_READER,
+				CsvReaderDataSource: &types.CsvReaderDataSource{
 					Reader: strings.NewReader(`
 device,model,price
 1234,xiaomi,200
@@ -102,7 +103,7 @@ device,model,price
 		t.Run(tc.description, func(t *testing.T) {
 			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 			tc.mockFunc()
-			revisionID, err := store.ChannelImport(context.Background(), tc.opt)
+			revisionID, err := store.Import(context.Background(), tc.opt)
 			assert.EqualError(t, err, tc.wantError.Error())
 			assert.Equal(t, tc.wantRevisionID, revisionID)
 		})
@@ -121,7 +122,7 @@ func TestChannelImport(t *testing.T) {
 	testCases := []struct {
 		description string
 
-		opt        types.ChannelImport
+		opt        types.ImportOpt
 		features   types.FeatureList
 		entityID   int
 		Entity     types.Entity
@@ -131,9 +132,11 @@ func TestChannelImport(t *testing.T) {
 	}{
 		{
 			description: "import batch feature, succeed",
-			opt: types.ChannelImport{
-				DataSource: types.CsvDataSource{
-					Reader: strings.NewReader(`device,model,price
+			opt: types.ImportOpt{
+				DataSourceType: types.CSV_READER,
+				CsvReaderDataSource: &types.CsvReaderDataSource{
+					Reader: strings.NewReader(`
+device,model,price
 1234,xiaomi,200
 1235,apple,299
 `),
@@ -156,9 +159,10 @@ func TestChannelImport(t *testing.T) {
 		},
 		{
 			description: "import batch feature, csv data source has duplicated columns",
-			opt: types.ChannelImport{
-				GroupName: "device",
-				DataSource: types.CsvDataSource{
+			opt: types.ImportOpt{
+				GroupName:      "device",
+				DataSourceType: types.CSV_READER,
+				CsvReaderDataSource: &types.CsvReaderDataSource{
 					Reader: strings.NewReader(`
 device,model,model
 1234,xiaomi,xiaomi
@@ -182,8 +186,9 @@ device,model,model
 		},
 		{
 			description: "import batch feature, csv header of the data source doesn't match the feature group schema",
-			opt: types.ChannelImport{
-				DataSource: types.CsvDataSource{
+			opt: types.ImportOpt{
+				DataSourceType: types.CSV_READER,
+				CsvReaderDataSource: &types.CsvReaderDataSource{
 					Reader: strings.NewReader(`
 device,model,price
 1234,xiaomi,200
@@ -235,7 +240,7 @@ device,model,price
 				}).Return(nil).AnyTimes()
 			}
 
-			revisionID, err := store.ChannelImport(ctx, tc.opt)
+			revisionID, err := store.Import(ctx, tc.opt)
 			if tc.wantError != nil {
 				assert.EqualError(t, err, tc.wantError.Error())
 			} else {

@@ -2,6 +2,7 @@ package snowflake
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/offline"
@@ -56,4 +57,8 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 
 func (db *DB) TypeTag(dbType string) (string, error) {
 	return TypeTag(dbType)
+}
+
+func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
+	return nil, fmt.Errorf("not implemented")
 }

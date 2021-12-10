@@ -1,9 +1,5 @@
 package types
 
-import (
-	"io"
-)
-
 type CreateFeatureOpt struct {
 	FeatureName string
 	GroupName   string
@@ -45,30 +41,6 @@ type ExportOpt struct {
 	FeatureNames   []string
 	Limit          *uint64
 	OutputFilePath string
-}
-
-type ChannelImport struct {
-	GroupName   string
-	Description string
-	DataSource  CsvDataSource
-	Revision    *int64
-}
-
-type ImportOpt struct {
-	GroupName   string
-	Description string
-	DataSource  CsvDataSourceWithFile
-	Revision    *int64
-}
-
-type CsvDataSource struct {
-	Reader    io.Reader
-	Delimiter string
-}
-
-type CsvDataSourceWithFile struct {
-	InputFilePath string
-	Delimiter     string
 }
 
 type OnlineGetOpt struct {
