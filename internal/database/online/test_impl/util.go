@@ -53,18 +53,18 @@ func init() {
 					DBValueType: "real",
 				},
 				&types.Feature{
-					ID:          3,
+					ID:          4,
 					Name:        "is_active",
 					GroupID:     1,
 					ValueType:   types.BOOL,
 					DBValueType: "bool",
 				},
 				&types.Feature{
-					ID:          4,
+					ID:          5,
 					Name:        "register_time",
 					GroupID:     1,
 					ValueType:   types.TIME,
-					DBValueType: "datetime",
+					DBValueType: "timestamp",
 				},
 			},
 			Revision: &types.Revision{ID: 3, GroupID: 1},
@@ -139,7 +139,9 @@ func compareFeatureValue(t *testing.T, expected, actual interface{}, valueType s
 		actual, ok := actual.(time.Time)
 		require.Equal(t, true, ok)
 
-		assert.Equal(t, expected.UnixMilli(), actual.UnixMilli())
+		if expected.Location() == actual.Location() {
+			assert.Equal(t, expected.Local().Unix(), actual.Local().Unix())
+		}
 	} else {
 		assert.Equal(t, expected, actual)
 	}
