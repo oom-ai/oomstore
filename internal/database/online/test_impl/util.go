@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ethhte88/oomstore/internal/database/online"
@@ -128,4 +129,18 @@ func RandString(n int) string {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
 	return string(b)
+}
+
+func compareFeatureValue(t *testing.T, expected, actual interface{}, valueType string) {
+	if valueType == types.TIME {
+		expected, ok := expected.(time.Time)
+		require.Equal(t, true, ok)
+
+		actual, ok := actual.(time.Time)
+		require.Equal(t, true, ok)
+
+		assert.Equal(t, expected.UnixMilli(), actual.UnixMilli())
+	} else {
+		assert.Equal(t, expected, actual)
+	}
 }
