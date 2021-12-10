@@ -16,6 +16,7 @@ import (
 	offlineSnowflake "github.com/ethhte88/oomstore/internal/database/offline/snowflake"
 
 	"github.com/ethhte88/oomstore/internal/database/online"
+	onlineDynamoDB "github.com/ethhte88/oomstore/internal/database/online/dynamodb"
 	onlineMySQL "github.com/ethhte88/oomstore/internal/database/online/mysql"
 	onlinePG "github.com/ethhte88/oomstore/internal/database/online/postgres"
 	onlineRedis "github.com/ethhte88/oomstore/internal/database/online/redis"
@@ -29,6 +30,8 @@ func OpenOnlineStore(opt types.OnlineStoreConfig) (online.Store, error) {
 		return onlineRedis.Open(opt.Redis), nil
 	case types.MYSQL:
 		return onlineMySQL.Open(opt.MySQL)
+	case types.DYNAMODB:
+		return onlineDynamoDB.Open(opt.DynamoDB)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
