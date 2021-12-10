@@ -25,7 +25,7 @@ func Open(opt *types.MySQLOpt) (*DB, error) {
 }
 
 func (db *DB) Ping(ctx context.Context) error {
-	return db.DB.PingContext(ctx)
+	return db.PingContext(ctx)
 }
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
