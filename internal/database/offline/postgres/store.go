@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/offline"
@@ -39,4 +40,32 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 
 func (db *DB) TypeTag(dbType string) (string, error) {
 	return TypeTag(dbType)
+}
+
+func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
+	rows, err := db.QueryxContext(ctx, "select column_name, data_type from information_schema.columns where table_name = $1", tableName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var schema types.DataTableSchema
+	for rows.Next() {
+		var fieldName, dbValueType string
+		if err := rows.Scan(&fieldName, &dbValueType); err != nil {
+			return nil, err
+		}
+		valueType, err := db.TypeTag(dbValueType)
+		if err != nil {
+			return nil, err
+		}
+		schema.Fields = append(schema.Fields, types.DataTableFieldSchema{
+			Name:      fieldName,
+			ValueType: valueType,
+		})
+	}
+	if len(schema.Fields) == 0 {
+		return nil, fmt.Errorf("table not found")
+	}
+	return &schema, nil
 }
