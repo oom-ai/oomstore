@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	awsDynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/ethhte88/oomstore/internal/database/online/dynamodb"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/orlangure/gnomock"
