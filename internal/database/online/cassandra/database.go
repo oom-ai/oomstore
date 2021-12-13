@@ -2,6 +2,7 @@ package cassandra
 
 import (
 	"context"
+	"time"
 
 	"github.com/gocql/gocql"
 
@@ -33,6 +34,11 @@ func Open(option *types.CassandraOpt) (*DB, error) {
 		Password: option.Password,
 	}
 	cluster.Keyspace = option.KeySpace
+	if option.Timeout != 0 {
+		cluster.Timeout = option.Timeout
+	} else {
+		cluster.Timeout = time.Second * 5
+	}
 
 	session, err := cluster.CreateSession()
 	if err != nil {
