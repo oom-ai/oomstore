@@ -20,6 +20,7 @@ repos:
       - id: go-fmt
       - id: go-imports
       - id: golangci-lint
+        args: [--timeout=5m]
     # - id: go-cyclo
     # args: [-over=20]
   - repo: local
