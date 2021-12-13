@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/gocql/gocql"
 	"github.com/orlangure/gnomock"
@@ -49,13 +50,13 @@ func PrepareDB() (context.Context, *gocql.Session) {
 		Username: CassandraDbOpt.User,
 		Password: CassandraDbOpt.Password,
 	}
-	cluster.Keyspace = CassandraDbOpt.KeySpace
+	cluster.Timeout = time.Second * 5
 
 	session, err := cluster.CreateSession()
 	if err != nil {
 		panic(err)
 	}
-	if err := session.Query("DROP KEYSPACE IF EXISTS test").Exec(); err != nil {
+	if err := session.Query("DROP KEYSPACE IF EXISTS test").WithContext(ctx).Exec(); err != nil {
 		panic(err)
 	}
 	return ctx, session

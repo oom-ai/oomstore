@@ -3,6 +3,7 @@ package cassandra
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/gocql/gocql"
@@ -10,24 +11,26 @@ import (
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/online"
 	"github.com/ethhte88/oomstore/internal/database/online/sqlutil"
+	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
-	panic("implement me!")
-}
-
-func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
-	panic("implement me!")
-}
+const (
+	CASSANDRA_SCHEMA = `CREATE TABLE {{TABLE_NAME}} (
+	{{ENTITY_NAME}} TEXT PRIMARY KEY,
+	{{COLUMN_DEFS}});
+`
+	columnFormat = "%s %s"
+)
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	columns := append([]string{opt.Entity.Name}, opt.FeatureList.Names()...)
 	tableName := sqlutil.OnlineTableName(opt.Revision.ID)
 
-	table, err := dbutil.BuildFeatureDataTableSchema(tableName, opt.Entity, opt.FeatureList, BackendType)
+	table, err := buildDataTableSchema(tableName, opt.Entity, opt.FeatureList)
 	if err != nil {
 		return err
 	}
+
 	// create table
 	if err := db.Query(table).Exec(); err != nil {
 		return err
@@ -54,8 +57,43 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	return db.ExecuteBatch(batch)
 }
 
-func (db *DB) Purge(ctx context.Context, revisionID int) error {
-	panic("implement me!")
+func buildDataTableSchema(tableName string, entity *types.Entity, features types.FeatureList) (string, error) {
+	var columnDefs []string
+	for _, column := range features {
+		dbValueType, err := getDbTypeFrom(column.ValueType)
+		if err != nil {
+			return "", err
+		}
+		def := fmt.Sprintf(columnFormat, column.Name, dbValueType)
+		columnDefs = append(columnDefs, def)
+	}
+
+	// fill schema template
+	schema := strings.ReplaceAll(CASSANDRA_SCHEMA, "{{TABLE_NAME}}", tableName)
+	schema = strings.ReplaceAll(schema, "{{ENTITY_NAME}}", entity.Name)
+	schema = strings.ReplaceAll(schema, "{{ENTITY_LENGTH}}", strconv.Itoa(entity.Length))
+	schema = strings.ReplaceAll(schema, "{{COLUMN_DEFS}}", strings.Join(columnDefs, ",\n"))
+
+	return schema, nil
+}
+
+var (
+	typeMap = map[string]string{
+		types.STRING:  "text",
+		types.INT64:   "bigint",
+		types.FLOAT64: "double",
+		types.BOOL:    "boolean",
+		types.TIME:    "timestamp",
+		types.BYTES:   "text",
+	}
+)
+
+func getDbTypeFrom(valueType string) (string, error) {
+	if t, ok := typeMap[valueType]; !ok {
+		return "", fmt.Errorf("unsupported value type: %s", valueType)
+	} else {
+		return t, nil
+	}
 }
 
 func buildInsertStatement(tableName string, columns []string) string {
