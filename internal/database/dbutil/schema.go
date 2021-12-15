@@ -41,7 +41,7 @@ func BuildSchema(schema Schema, schemaType SchemaType) (string, error) {
 	case Cassandra:
 		text = cassandraSchema
 	default:
-		return "", errdefs.InvalidAttribute(fmt.Errorf("%s not support", schemaType))
+		return "", errdefs.InvalidAttribute(fmt.Errorf("schema type %s is not supported", schemaType))
 	}
 
 	buf := bytes.NewBuffer(nil)
