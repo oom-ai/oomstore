@@ -3,7 +3,6 @@ package cassandra
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/gocql/gocql"
@@ -12,14 +11,6 @@ import (
 	"github.com/ethhte88/oomstore/internal/database/online"
 	"github.com/ethhte88/oomstore/internal/database/online/sqlutil"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
-)
-
-const (
-	CASSANDRA_SCHEMA = `CREATE TABLE {{TABLE_NAME}} (
-	{{ENTITY_NAME}} TEXT PRIMARY KEY,
-	{{COLUMN_DEFS}});
-`
-	columnFormat = "%s %s"
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
@@ -57,24 +48,33 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	return db.ExecuteBatch(batch)
 }
 
+func getDbTypeFrom(valueType string) (string, error) {
+	if t, ok := typeMap[valueType]; !ok {
+		return "", fmt.Errorf("unsupported value type: %s", valueType)
+	} else {
+		return t, nil
+	}
+}
+
 func buildDataTableSchema(tableName string, entity *types.Entity, features types.FeatureList) (string, error) {
-	var columnDefs []string
-	for _, column := range features {
-		dbValueType, err := getDbTypeFrom(column.ValueType)
+	columns := make([]dbutil.Column, 0, len(features))
+	for _, feature := range features {
+		dbType, err := getDbTypeFrom(feature.ValueType)
 		if err != nil {
 			return "", err
 		}
-		def := fmt.Sprintf(columnFormat, column.Name, dbValueType)
-		columnDefs = append(columnDefs, def)
+
+		columns = append(columns, dbutil.Column{
+			Name:   feature.Name,
+			DbType: dbType,
+		})
 	}
 
-	// fill schema template
-	schema := strings.ReplaceAll(CASSANDRA_SCHEMA, "{{TABLE_NAME}}", tableName)
-	schema = strings.ReplaceAll(schema, "{{ENTITY_NAME}}", entity.Name)
-	schema = strings.ReplaceAll(schema, "{{ENTITY_LENGTH}}", strconv.Itoa(entity.Length))
-	schema = strings.ReplaceAll(schema, "{{COLUMN_DEFS}}", strings.Join(columnDefs, ",\n"))
-
-	return schema, nil
+	return dbutil.BuildSchema(dbutil.Schema{
+		TableName:  tableName,
+		EntityName: entity.Name,
+		Columns:    columns,
+	}, dbutil.Cassandra)
 }
 
 var (
@@ -87,14 +87,6 @@ var (
 		types.BYTES:   "text",
 	}
 )
-
-func getDbTypeFrom(valueType string) (string, error) {
-	if t, ok := typeMap[valueType]; !ok {
-		return "", fmt.Errorf("unsupported value type: %s", valueType)
-	} else {
-		return t, nil
-	}
-}
 
 func buildInsertStatement(tableName string, columns []string) string {
 	valueFlags := make([]string, 0, len(columns))
