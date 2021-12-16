@@ -70,6 +70,10 @@ type SnowflakeOpt struct {
 	Database string `yaml:"database"`
 }
 
+type BigQueryOpt struct {
+	ProjectID string `yaml:"project_id"`
+}
+
 type DynamoDBOpt struct {
 	Region          string `yaml:"region"`
 	EndpointURL     string `yaml:"endpoint-url"`
