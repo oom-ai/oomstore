@@ -1,7 +1,7 @@
 package offline
 
 import (
-	"encoding/csv"
+	"bufio"
 
 	"github.com/ethhte88/oomstore/internal/database/metadata"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
@@ -37,7 +37,10 @@ type ImportOpt struct {
 	Header        []string
 	Revision      *int64
 	DataTableName string
+	Source        *CSVSource
+}
 
-	// CsvReader must not contain header
-	CsvReader *csv.Reader
+type CSVSource struct {
+	Reader    *bufio.Reader
+	Delimiter string
 }
