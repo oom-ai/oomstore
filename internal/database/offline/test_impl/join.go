@@ -7,10 +7,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ethhte88/oomstore/internal/database/metadata"
 	"github.com/ethhte88/oomstore/internal/database/offline"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestJoin(t *testing.T, prepareStore PrepareStoreFn) {
@@ -93,7 +95,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			actual, err := store.Join(context.Background(), tc.opt)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			if tc.expected == nil {
 				assert.Equal(t, tc.expected, actual)
 			} else {
