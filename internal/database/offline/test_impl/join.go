@@ -110,16 +110,19 @@ func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.Feature
 	price := &types.Feature{
 		Name:        "price",
 		DBValueType: "INT",
+		ValueType:   types.INT64,
 		GroupID:     1,
 	}
 	model := &types.Feature{
 		Name:        "model",
 		DBValueType: "VARCHAR(32)",
+		ValueType:   types.STRING,
 		GroupID:     1,
 	}
 	isActive := &types.Feature{
 		Name:        "is_active",
 		DBValueType: "boolean",
+		ValueType:   types.BOOL,
 		GroupID:     2,
 	}
 
