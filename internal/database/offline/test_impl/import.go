@@ -29,7 +29,6 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 			{
 				Name:        "model",
 				DBValueType: "invalid-db-value-type",
-				ValueType:   types.STRING,
 			},
 			{
 				Name:        "price",
@@ -54,6 +53,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 	t.Run("normal import call", func(t *testing.T) {
 		revision := int64(1234)
 		opt.Features[0].DBValueType = "varchar(32)"
+		opt.Features[0].ValueType = types.STRING
 		opt.Revision = &revision
 		_, err := store.Import(ctx, opt)
 		assert.NoError(t, err)
