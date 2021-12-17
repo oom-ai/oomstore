@@ -70,8 +70,7 @@ func TestChannelImportWithDependencyError(t *testing.T) {
 			opt: types.ImportOpt{
 				DataSourceType: types.CSV_READER,
 				CsvReaderDataSource: &types.CsvReaderDataSource{
-					Reader: strings.NewReader(`
-device,model,price
+					Reader: strings.NewReader(`device,model,price
 1234,xiaomi,200
 1235,apple,299
 `),
@@ -135,8 +134,7 @@ func TestChannelImport(t *testing.T) {
 			opt: types.ImportOpt{
 				DataSourceType: types.CSV_READER,
 				CsvReaderDataSource: &types.CsvReaderDataSource{
-					Reader: strings.NewReader(`
-device,model,price
+					Reader: strings.NewReader(`device,model,price
 1234,xiaomi,200
 1235,apple,299
 `),
@@ -163,8 +161,7 @@ device,model,price
 				GroupName:      "device",
 				DataSourceType: types.CSV_READER,
 				CsvReaderDataSource: &types.CsvReaderDataSource{
-					Reader: strings.NewReader(`
-device,model,model
+					Reader: strings.NewReader(`device,model,model
 1234,xiaomi,xiaomi
 1235,apple,xiaomi
 `),
@@ -189,8 +186,7 @@ device,model,model
 			opt: types.ImportOpt{
 				DataSourceType: types.CSV_READER,
 				CsvReaderDataSource: &types.CsvReaderDataSource{
-					Reader: strings.NewReader(`
-device,model,price
+					Reader: strings.NewReader(`device,model,price
 1234,xiaomi,200
 1235,apple,299
 `),
