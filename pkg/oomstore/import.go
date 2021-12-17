@@ -1,12 +1,13 @@
 package oomstore
 
 import (
+	"bufio"
 	"context"
-	"encoding/csv"
 	"fmt"
 	"os"
 	"time"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/metadata"
 	"github.com/ethhte88/oomstore/internal/database/offline"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
@@ -41,11 +42,9 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 }
 
 func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) (int, error) {
-	// make sure csv data source has all defined columns
-	csvReader := csv.NewReader(dataSource.Reader)
-	csvReader.Comma = []rune(dataSource.Delimiter)[0]
-
-	header, err := csvReader.Read()
+	//make sure csv data source has all defined columns
+	reader := bufio.NewReader(dataSource.Reader)
+	header, err := dbutil.ReadLine(reader, dataSource.Delimiter)
 	if err != nil {
 		return 0, err
 	}
@@ -73,8 +72,11 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 		Features:      opt.features,
 		Header:        header,
 		Revision:      opt.Revision,
-		CsvReader:     csvReader,
 		DataTableName: dataTableName,
+		Source: &offline.CSVSource{
+			Reader:    reader,
+			Delimiter: dataSource.Delimiter,
+		},
 	})
 	if err != nil {
 		return 0, err
