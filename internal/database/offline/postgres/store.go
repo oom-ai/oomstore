@@ -27,7 +27,7 @@ func Open(option *types.PostgresOpt) (*DB, error) {
 }
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	return sqlutil.Import(ctx, db.DB, opt, loadDataFromCSVReader, types.POSTGRES)
+	return sqlutil.Import(ctx, db.DB, opt, loadDataFromSource, types.POSTGRES)
 }
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
