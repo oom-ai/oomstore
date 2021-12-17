@@ -15,7 +15,7 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tableName := OnlineTableName(opt.Revision.ID)
-		schema, err := dbutil.BuildFeatureDataTableSchema(tableName, opt.Entity, opt.FeatureList, backend)
+		schema, err := dbutil.BuildCreateSchema(tableName, opt.Entity, opt.FeatureList, backend)
 		if err != nil {
 			return err
 		}
