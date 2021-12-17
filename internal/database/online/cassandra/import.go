@@ -70,7 +70,7 @@ func buildDataTableSchema(tableName string, entity *types.Entity, features types
 		})
 	}
 
-	return dbutil.BuildSchema(dbutil.Schema{
+	return dbutil.BuildSchema(dbutil.CreateSchema{
 		TableName:  tableName,
 		EntityName: entity.Name,
 		Columns:    columns,
