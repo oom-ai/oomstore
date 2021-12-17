@@ -2,14 +2,15 @@ package postgres
 
 import (
 	"context"
-	"encoding/csv"
 	"io"
 
+	"github.com/ethhte88/oomstore/internal/database/dbutil"
+	"github.com/ethhte88/oomstore/internal/database/offline"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
 
-func loadDataFromCSVReader(tx *sqlx.Tx, ctx context.Context, csvReader *csv.Reader, tableName string, header []string) error {
+func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string) error {
 	stmt, err := tx.PreparexContext(ctx, pq.CopyIn(tableName, header...))
 	if err != nil {
 		return err
@@ -17,16 +18,18 @@ func loadDataFromCSVReader(tx *sqlx.Tx, ctx context.Context, csvReader *csv.Read
 	defer stmt.Close()
 
 	for {
-		row, err := csvReader.Read()
+		record, err := dbutil.ReadLine(source.Reader, source.Delimiter)
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
 			return err
 		}
-
-		args := []interface{}{}
-		for _, v := range row {
+		if len(record) != len(header) {
+			continue
+		}
+		args := make([]interface{}, 0, len(record))
+		for _, v := range record {
 			args = append(args, v)
 		}
 		if _, err := stmt.ExecContext(ctx, args...); err != nil {
