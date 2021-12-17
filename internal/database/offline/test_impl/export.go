@@ -1,7 +1,7 @@
 package test_impl
 
 import (
-	"encoding/csv"
+	"bufio"
 	"strings"
 	"testing"
 
@@ -27,12 +27,15 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn) {
 			ValueType:   types.INT64,
 		},
 	}
-	buildTestDataTable(ctx, t, store, features, dataTable, csv.NewReader(strings.NewReader(`
+	buildTestDataTable(ctx, t, store, features, dataTable, &offline.CSVSource{
+		Reader: bufio.NewReader(strings.NewReader(`
 1234,xiaomi,100
 1235,apple,200
 1236,huawei,300
 1237,oneplus,240
-`)))
+`)),
+		Delimiter: ",",
+	})
 
 	testCases := []struct {
 		description string

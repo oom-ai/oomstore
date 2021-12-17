@@ -2,7 +2,6 @@ package test_impl
 
 import (
 	"context"
-	"encoding/csv"
 	"testing"
 
 	"github.com/ethhte88/oomstore/internal/database/offline"
@@ -12,7 +11,7 @@ import (
 
 type PrepareStoreFn func() (context.Context, offline.Store)
 
-func buildTestDataTable(ctx context.Context, t *testing.T, store offline.Store, features []*types.Feature, dataTable string, reader *csv.Reader) {
+func buildTestDataTable(ctx context.Context, t *testing.T, store offline.Store, features []*types.Feature, dataTable string, source *offline.CSVSource) {
 	entity := &types.Entity{
 		Name:   "device",
 		Length: 10,
@@ -26,7 +25,7 @@ func buildTestDataTable(ctx context.Context, t *testing.T, store offline.Store, 
 		DataTableName: dataTable,
 		Features:      features,
 		Header:        header,
-		CsvReader:     reader,
+		Source:        source,
 	}
 	_, err := store.Import(ctx, opt)
 	require.NoError(t, err)
