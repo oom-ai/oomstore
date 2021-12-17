@@ -1,8 +1,8 @@
 package test_impl
 
 import (
+	"bufio"
 	"context"
-	"encoding/csv"
 	"math"
 	"strings"
 	"testing"
@@ -24,18 +24,27 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn) {
 	oneGroupFeatures, oneGroupFeatureMap := prepareFeatures(true)
 	twoGroupFeatures, twoGroupFeatureMap := prepareFeatures(false)
 
-	buildTestDataTable(ctx, t, store, oneGroupFeatures, "offline_1_1", csv.NewReader(strings.NewReader(`
+	buildTestDataTable(ctx, t, store, oneGroupFeatures, "offline_1_1", &offline.CSVSource{
+		Reader: bufio.NewReader(strings.NewReader(`
 1234,xiaomi,100
 1235,apple,200
-`)))
-	buildTestDataTable(ctx, t, store, oneGroupFeatures, "offline_1_2", csv.NewReader(strings.NewReader(`
+`)),
+		Delimiter: ",",
+	})
+	buildTestDataTable(ctx, t, store, oneGroupFeatures, "offline_1_2", &offline.CSVSource{
+		Reader: bufio.NewReader(strings.NewReader(`
 1234,galaxy,300
 1235,oneplus,240
-`)))
-	buildTestDataTable(ctx, t, store, twoGroupFeatures[2:], "offline_2_1", csv.NewReader(strings.NewReader(`
+`)),
+		Delimiter: ",",
+	})
+	buildTestDataTable(ctx, t, store, twoGroupFeatures[2:], "offline_2_1", &offline.CSVSource{
+		Reader: bufio.NewReader(strings.NewReader(`
 1234,1
 1235,0
-`)))
+`)),
+		Delimiter: ",",
+	})
 
 	testCases := []struct {
 		description string

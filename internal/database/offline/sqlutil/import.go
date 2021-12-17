@@ -2,7 +2,6 @@ package sqlutil
 
 import (
 	"context"
-	"encoding/csv"
 	"time"
 
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
@@ -11,7 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type LoadData func(tx *sqlx.Tx, ctx context.Context, csvReader *csv.Reader, tableName string, header []string) error
+type LoadData func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string) error
 
 func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData LoadData, backendType types.BackendType) (int64, error) {
 	var revision int64
@@ -27,7 +26,7 @@ func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData Lo
 		}
 
 		// populate the data table
-		err = loadData(tx, ctx, opt.CsvReader, opt.DataTableName, opt.Header)
+		err = loadData(tx, ctx, opt.Source, opt.DataTableName, opt.Header)
 		if err != nil {
 			return err
 		}

@@ -44,7 +44,7 @@ func Open(opt *types.SnowflakeOpt) (*DB, error) {
 }
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromCSVReader(types.SNOWFLAKE, SnowflakeBatchSize), types.SNOWFLAKE)
+	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(types.SNOWFLAKE, SnowflakeBatchSize), types.SNOWFLAKE)
 }
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {

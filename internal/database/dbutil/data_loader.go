@@ -1,38 +1,37 @@
 package dbutil
 
 import (
+	"bufio"
 	"context"
-	"encoding/csv"
 	"io"
+	"strings"
 
+	"github.com/ethhte88/oomstore/internal/database/offline"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/jmoiron/sqlx"
 )
 
 // Currying
-func LoadDataFromCSVReader(backendType types.BackendType, batchSize int) func(tx *sqlx.Tx, ctx context.Context, csvReader *csv.Reader, tableName string, header []string) error {
-	return func(tx *sqlx.Tx, ctx context.Context, csvReader *csv.Reader, tableName string, header []string) error {
-		return loadDataFromCSVReader(tx, ctx, csvReader, tableName, header, backendType, batchSize)
+func LoadDataFromSource(backendType types.BackendType, batchSize int) func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string) error {
+	return func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string) error {
+		return loadDataFromSource(tx, ctx, source, tableName, header, backendType, batchSize)
 	}
 }
 
-func loadDataFromCSVReader(tx *sqlx.Tx, ctx context.Context, csvReader *csv.Reader, tableName string, header []string, backendType types.BackendType, batchSize int) error {
+func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, backendType types.BackendType, batchSize int) error {
 	records := make([]interface{}, 0, batchSize)
 	for {
-		row, err := csvReader.Read()
+		record, err := ReadLine(source.Reader, source.Delimiter)
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
 			return err
 		}
-		record := make([]interface{}, 0, len(row))
-		for _, v := range row {
-			record = append(record, v)
+		if len(record) != len(header) {
+			continue
 		}
-
 		records = append(records, record)
-
 		if len(records) == batchSize {
 			if err := InsertRecordsToTableTx(tx, ctx, tableName, records, header, backendType); err != nil {
 				return err
@@ -44,4 +43,12 @@ func loadDataFromCSVReader(tx *sqlx.Tx, ctx context.Context, csvReader *csv.Read
 		return err
 	}
 	return nil
+}
+
+func ReadLine(reader *bufio.Reader, delimiter string) ([]string, error) {
+	row, err := reader.ReadString('\n')
+	if err != nil {
+		return nil, err
+	}
+	return strings.Split(strings.Trim(row, "\n"), delimiter), nil
 }

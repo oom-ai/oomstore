@@ -1,7 +1,7 @@
 package test_impl
 
 import (
-	"encoding/csv"
+	"bufio"
 	"sort"
 	"strings"
 	"testing"
@@ -37,12 +37,15 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 			},
 		},
 		Header: []string{"device", "model", "price"},
-		CsvReader: csv.NewReader(strings.NewReader(`
+		Source: &offline.CSVSource{
+			Reader: bufio.NewReader(strings.NewReader(`
 1234,xiaomi,1899
 1235,apple,4999
 1236,huawei,5999
 1237,oneplus,3999
 `)),
+			Delimiter: ",",
+		},
 	}
 
 	t.Run("invalid db value type", func(t *testing.T) {
