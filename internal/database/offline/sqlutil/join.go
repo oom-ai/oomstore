@@ -1,9 +1,11 @@
 package sqlutil
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"strings"
+	"text/template"
 
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/internal/database/offline"
@@ -71,36 +73,22 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 	}
 
 	// Step 2: iterate each table range, join entity_rows table and each data tables
-	joinQuery := `
-		INSERT INTO %s(%s, %s, %s)
-		SELECT
-			l.%s AS entity_key,
-			l.%s AS unix_milli,
-			%s
-		FROM %s AS l
-		LEFT JOIN %s AS r
-		ON l.%s = r.%s
-		WHERE l.%s >= ? AND l.%s < ?;
-	`
-
 	columns := append(opt.ValueNames, opt.Features.Names()...)
 	columnsStr := qt(columns...)
 	for _, r := range opt.RevisionRanges {
-		query := fmt.Sprintf(joinQuery,
-			qt(joinedTableName),
-			entityKeyStr,
-			unixMilliStr,
-			columnsStr,
-			entityKeyStr,
-			unixMilliStr,
-			columnsStr,
-			qt(opt.EntityRowsTableName),
-			qt(r.DataTable),
-			entityKeyStr,
-			qt(opt.Entity.Name),
-			unixMilliStr,
-			unixMilliStr,
-		)
+		query, err := buildJoinQuery(joinSchema{
+			TableName:           joinedTableName,
+			EntityKeyStr:        entityKeyStr,
+			EntityName:          opt.Entity.Name,
+			UnixMilliStr:        unixMilliStr,
+			ColumnsStr:          columnsStr,
+			EntityRowsTableName: opt.EntityRowsTableName,
+			DataTable:           r.DataTable,
+			Backend:             backendType,
+		})
+		if err != nil {
+			return "", err
+		}
 		if _, tmpErr := db.ExecContext(ctx, db.Rebind(query), r.MinRevision, r.MaxRevision); tmpErr != nil {
 			return "", tmpErr
 		}
@@ -208,4 +196,45 @@ func dropTemporaryTables(ctx context.Context, db *sqlx.DB, tableNames []string) 
 		}
 	}
 	return err
+}
+
+const JOIN_SCHEMA = `
+INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{.ColumnsStr }})
+SELECT
+	l.{{ .EntityKeyStr }} AS entity_key,
+	l.{{ .UnixMilliStr }} AS unix_milli,
+	{{ .ColumnsStr }}
+FROM
+	{{ qt .EntityRowsTableName }} AS l
+LEFT JOIN {{ qt .DataTable }} AS r
+ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
+WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
+`
+
+type joinSchema struct {
+	TableName           string
+	EntityKeyStr        string
+	EntityName          string
+	UnixMilliStr        string
+	ColumnsStr          string
+	EntityRowsTableName string
+	DataTable           string
+	Backend             types.BackendType
+}
+
+func buildJoinQuery(schema joinSchema) (string, error) {
+	qt, err := dbutil.QuoteFn(schema.Backend)
+	if err != nil {
+		return "", err
+	}
+
+	t := template.Must(template.New("join").Funcs(template.FuncMap{
+		"qt": qt,
+	}).Parse(JOIN_SCHEMA))
+
+	buf := bytes.NewBuffer(nil)
+	if err := t.Execute(buf, schema); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
