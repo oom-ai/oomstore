@@ -1,9 +1,11 @@
 package sqlutil
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"strings"
+	"text/template"
 
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
 	"github.com/ethhte88/oomstore/pkg/oomstore/types"
@@ -127,4 +129,49 @@ func dropTable(ctx context.Context, db *sqlx.DB, tableName string) error {
 	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
 	_, err := db.ExecContext(ctx, query)
 	return err
+}
+
+const JOIN_TEMP_TABLES_SCHEMA = `
+SELECT
+	{{ qt .EntityRowsTableName }}.{{ .EntityKeyStr }},
+	{{ qt .EntityRowsTableName }}.{{ .UnixMilliStr }},
+	{{ fieldJoin .Fields }}
+FROM {{ qt .EntityRowsTableName }}
+{{ range $pair := .JoinTables }}
+	{{- $t1 := qt $pair.LeftTable -}}
+	{{- $t2 := qt $pair.RightTable -}}
+lEFT JOIN {{ $t2 }}
+ON {{ $t1 }}.{{ $.UnixMilliStr }} = {{ $t2 }}.{{ $.UnixMilliStr }} AND {{ $t1 }}.{{ $.EntityKeyStr }} = {{ $t2 }}.{{ $.EntityKeyStr }}
+{{end}}`
+
+type joinTablePair struct {
+	LeftTable  string
+	RightTable string
+}
+type joinTempTablesSchema struct {
+	EntityRowsTableName string
+	EntityKeyStr        string
+	UnixMilliStr        string
+	Fields              []string
+	JoinTables          []joinTablePair
+	Backend             types.BackendType
+}
+
+func buildJoinTempTablesSchema(schema joinTempTablesSchema) (string, error) {
+	qt, err := dbutil.QuoteFn(schema.Backend)
+	if err != nil {
+		return "", err
+	}
+	t := template.Must(template.New("temp_join").Funcs(template.FuncMap{
+		"qt": qt,
+		"fieldJoin": func(fields []string) string {
+			return strings.Join(fields, ",\n\t")
+		},
+	}).Parse(JOIN_TEMP_TABLES_SCHEMA))
+
+	buf := bytes.NewBuffer(nil)
+	if err := t.Execute(buf, schema); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
