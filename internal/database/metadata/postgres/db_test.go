@@ -12,16 +12,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func prepareStore() (context.Context, metadata.Store) {
+func prepareStore(t *testing.T) (context.Context, metadata.Store) {
 	ctx, db := runtime_pg.PrepareDB()
 	db.Close()
 
 	if err := postgres.CreateDatabase(ctx, runtime_pg.PostgresDbOpt); err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	store, err := postgres.Open(ctx, &runtime_pg.PostgresDbOpt)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	return ctx, store
