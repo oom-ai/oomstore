@@ -8,6 +8,7 @@ import (
 	"text/template"
 
 	"github.com/jmoiron/sqlx"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -168,6 +169,50 @@ func buildJoinTempTablesSchema(schema joinTempTablesSchema) (string, error) {
 			return strings.Join(fields, ",\n\t")
 		},
 	}).Parse(JOIN_TEMP_TABLES_SCHEMA))
+
+	buf := bytes.NewBuffer(nil)
+	if err := t.Execute(buf, schema); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
+const INSERT_BASE_JOIN_SCHEMA = `
+INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{ columnJoin .Columns }})
+SELECT
+	l.{{ .EntityKeyStr }} AS entity_key,
+	l.{{ .UnixMilliStr }} AS unix_milli,
+	{{ columnJoin .Columns }}
+FROM
+	{{ qt .EntityRowsTableName }} AS l
+LEFT JOIN {{ qt .DataTable }} AS r
+ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
+WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
+`
+
+type insertBaseJoinSchema struct {
+	TableName           string
+	EntityKeyStr        string
+	EntityName          string
+	UnixMilliStr        string
+	Columns             []string
+	EntityRowsTableName string
+	DataTable           string
+	Backend             types.BackendType
+}
+
+func buildInsertBaseJoinSchema(schema insertBaseJoinSchema) (string, error) {
+	qt, err := dbutil.QuoteFn(schema.Backend)
+	if err != nil {
+		return "", err
+	}
+
+	t := template.Must(template.New("join").Funcs(template.FuncMap{
+		"qt": qt,
+		"columnJoin": func(columns []string) string {
+			return qt(columns...)
+		},
+	}).Parse(INSERT_BASE_JOIN_SCHEMA))
 
 	buf := bytes.NewBuffer(nil)
 	if err := t.Execute(buf, schema); err != nil {
