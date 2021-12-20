@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"strings"
 	"text/template"
 
 	"github.com/ethhte88/oomstore/internal/database/dbutil"
@@ -130,23 +129,37 @@ func readJoinedTable(
 		LEFT JOIN joined_table_2
 		ON entity_rows_table.entity_key = joined_table_2.entity_key AND entity_rows_table.unix_milli = joined_table_2.unix_milli;
 	*/
-	fields := []string{fmt.Sprintf("%s.%s, %s.%s", qt(entityRowsTableName), entityKeyStr, qt(entityRowsTableName), unixMilliStr)}
-	for _, valueName := range valueNames {
-		fields = append(fields, fmt.Sprintf("%s.%s", qt(entityRowsTableName), qt(valueName)))
+	var (
+		fields         []string
+		joinTablePairs []joinTablePair
+	)
+
+	for _, name := range valueNames {
+		fields = append(fields, qt(name))
 	}
-	for _, tableName := range tableNames {
-		for _, f := range featureMap[tableName] {
-			fields = append(fields, fmt.Sprintf("%s.%s", qt(tableName), qt(f.Name)))
+	for _, name := range tableNames {
+		for _, f := range featureMap[name] {
+			fields = append(fields, fmt.Sprintf("%s.%s", qt(name), qt(f.Name)))
 		}
 	}
-	query := fmt.Sprintf(`SELECT %s FROM %s`, strings.Join(fields, ","), qt(entityRowsTableName))
+
 	tableNames = append([]string{entityRowsTableName}, tableNames...)
-	for i := range tableNames {
-		if i == 0 {
-			continue
-		}
-		query = fmt.Sprintf("%s LEFT JOIN %s ON %s.%s = %s.%s AND %s.%s = %s.%s",
-			query, qt(tableNames[i]), qt(tableNames[i-1]), unixMilliStr, qt(tableNames[i]), unixMilliStr, qt(tableNames[i-1]), entityKeyStr, qt(tableNames[i]), entityKeyStr)
+	for i := 0; i < len(tableNames)-1; i++ {
+		joinTablePairs = append(joinTablePairs, joinTablePair{
+			LeftTable:  tableNames[i],
+			RightTable: tableNames[i+1],
+		})
+	}
+	query, err := buildJoinTempTablesSchema(joinTempTablesSchema{
+		EntityRowsTableName: entityRowsTableName,
+		EntityKeyStr:        entityKeyStr,
+		UnixMilliStr:        unixMilliStr,
+		Fields:              fields,
+		JoinTables:          joinTablePairs,
+		Backend:             backendType,
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	// Step 2: read joined results
