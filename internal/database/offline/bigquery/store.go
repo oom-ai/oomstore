@@ -12,6 +12,7 @@ var _ offline.Store = &DB{}
 
 type DB struct {
 	*bigquery.Client
+	datasetID string
 }
 
 func Open(ctx context.Context, opt *types.BigQueryOpt) (*DB, error) {
@@ -19,7 +20,10 @@ func Open(ctx context.Context, opt *types.BigQueryOpt) (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &DB{client}, nil
+	return &DB{
+		Client:    client,
+		datasetID: opt.DatasetID,
+	}, nil
 }
 
 func (db *DB) Ping(ctx context.Context) error {
@@ -29,14 +33,6 @@ func (db *DB) Ping(ctx context.Context) error {
 }
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
-	panic("implement me")
-}
-
-func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
-	panic("implement me")
-}
-
-func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
 	panic("implement me")
 }
 
