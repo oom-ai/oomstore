@@ -73,7 +73,7 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 	// Step 2: iterate each table range, join entity_rows table and each data tables
 	columns := append(opt.ValueNames, opt.Features.Names()...)
 	for _, r := range opt.RevisionRanges {
-		query, err := buildInsertBaseJoinSchema(insertBaseJoinSchema{
+		query, err := buildJoinQuery(joinQuery{
 			TableName:           joinedTableName,
 			EntityKeyStr:        entityKeyStr,
 			EntityName:          opt.Entity.Name,
@@ -148,7 +148,7 @@ func readJoinedTable(
 			RightTable: tableNames[i+1],
 		})
 	}
-	query, err := buildJoinTempTablesSchema(joinTempTablesSchema{
+	query, err := buildReadJoinResultQuery(readJoinResultQuery{
 		EntityRowsTableName: entityRowsTableName,
 		EntityKeyStr:        entityKeyStr,
 		UnixMilliStr:        unixMilliStr,

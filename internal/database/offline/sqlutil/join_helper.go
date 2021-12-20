@@ -132,7 +132,7 @@ func dropTable(ctx context.Context, db *sqlx.DB, tableName string) error {
 	return err
 }
 
-const JOIN_TEMP_TABLES_SCHEMA = `
+const READ_JOIN_RESULT_QUERY = `
 SELECT
 	{{ qt .EntityRowsTableName }}.{{ .EntityKeyStr }},
 	{{ qt .EntityRowsTableName }}.{{ .UnixMilliStr }},
@@ -149,7 +149,8 @@ type joinTablePair struct {
 	LeftTable  string
 	RightTable string
 }
-type joinTempTablesSchema struct {
+
+type readJoinResultQuery struct {
 	EntityRowsTableName string
 	EntityKeyStr        string
 	UnixMilliStr        string
@@ -158,7 +159,7 @@ type joinTempTablesSchema struct {
 	Backend             types.BackendType
 }
 
-func buildJoinTempTablesSchema(schema joinTempTablesSchema) (string, error) {
+func buildReadJoinResultQuery(schema readJoinResultQuery) (string, error) {
 	qt, err := dbutil.QuoteFn(schema.Backend)
 	if err != nil {
 		return "", err
@@ -168,7 +169,7 @@ func buildJoinTempTablesSchema(schema joinTempTablesSchema) (string, error) {
 		"fieldJoin": func(fields []string) string {
 			return strings.Join(fields, ",\n\t")
 		},
-	}).Parse(JOIN_TEMP_TABLES_SCHEMA))
+	}).Parse(READ_JOIN_RESULT_QUERY))
 
 	buf := bytes.NewBuffer(nil)
 	if err := t.Execute(buf, schema); err != nil {
@@ -177,7 +178,7 @@ func buildJoinTempTablesSchema(schema joinTempTablesSchema) (string, error) {
 	return buf.String(), nil
 }
 
-const INSERT_BASE_JOIN_SCHEMA = `
+const JOIN_QUERY = `
 INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{ columnJoin .Columns }})
 SELECT
 	l.{{ .EntityKeyStr }} AS entity_key,
@@ -190,7 +191,7 @@ ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
 WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
 `
 
-type insertBaseJoinSchema struct {
+type joinQuery struct {
 	TableName           string
 	EntityKeyStr        string
 	EntityName          string
@@ -201,7 +202,7 @@ type insertBaseJoinSchema struct {
 	Backend             types.BackendType
 }
 
-func buildInsertBaseJoinSchema(schema insertBaseJoinSchema) (string, error) {
+func buildJoinQuery(schema joinQuery) (string, error) {
 	qt, err := dbutil.QuoteFn(schema.Backend)
 	if err != nil {
 		return "", err
@@ -212,7 +213,7 @@ func buildInsertBaseJoinSchema(schema insertBaseJoinSchema) (string, error) {
 		"columnJoin": func(columns []string) string {
 			return qt(columns...)
 		},
-	}).Parse(INSERT_BASE_JOIN_SCHEMA))
+	}).Parse(JOIN_QUERY))
 
 	buf := bytes.NewBuffer(nil)
 	if err := t.Execute(buf, schema); err != nil {
