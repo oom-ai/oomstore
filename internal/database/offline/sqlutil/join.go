@@ -1,12 +1,11 @@
 package sqlutil
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"text/template"
 
 	"github.com/jmoiron/sqlx"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -73,14 +72,13 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 
 	// Step 2: iterate each table range, join entity_rows table and each data tables
 	columns := append(opt.ValueNames, opt.Features.Names()...)
-	columnsStr := qt(columns...)
 	for _, r := range opt.RevisionRanges {
-		query, err := buildJoinQuery(joinSchema{
+		query, err := buildJoinQuery(joinQuery{
 			TableName:           joinedTableName,
 			EntityKeyStr:        entityKeyStr,
 			EntityName:          opt.Entity.Name,
 			UnixMilliStr:        unixMilliStr,
-			ColumnsStr:          columnsStr,
+			Columns:             columns,
 			EntityRowsTableName: opt.EntityRowsTableName,
 			DataTable:           r.DataTable,
 			Backend:             backendType,
@@ -150,7 +148,7 @@ func readJoinedTable(
 			RightTable: tableNames[i+1],
 		})
 	}
-	query, err := buildJoinTempTablesSchema(joinTempTablesSchema{
+	query, err := buildReadJoinResultQuery(readJoinResultQuery{
 		EntityRowsTableName: entityRowsTableName,
 		EntityKeyStr:        entityKeyStr,
 		UnixMilliStr:        unixMilliStr,
@@ -209,45 +207,4 @@ func dropTemporaryTables(ctx context.Context, db *sqlx.DB, tableNames []string) 
 		}
 	}
 	return err
-}
-
-const JOIN_SCHEMA = `
-INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{.ColumnsStr }})
-SELECT
-	l.{{ .EntityKeyStr }} AS entity_key,
-	l.{{ .UnixMilliStr }} AS unix_milli,
-	{{ .ColumnsStr }}
-FROM
-	{{ qt .EntityRowsTableName }} AS l
-LEFT JOIN {{ qt .DataTable }} AS r
-ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
-WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
-`
-
-type joinSchema struct {
-	TableName           string
-	EntityKeyStr        string
-	EntityName          string
-	UnixMilliStr        string
-	ColumnsStr          string
-	EntityRowsTableName string
-	DataTable           string
-	Backend             types.BackendType
-}
-
-func buildJoinQuery(schema joinSchema) (string, error) {
-	qt, err := dbutil.QuoteFn(schema.Backend)
-	if err != nil {
-		return "", err
-	}
-
-	t := template.Must(template.New("join").Funcs(template.FuncMap{
-		"qt": qt,
-	}).Parse(JOIN_SCHEMA))
-
-	buf := bytes.NewBuffer(nil)
-	if err := t.Execute(buf, schema); err != nil {
-		return "", err
-	}
-	return buf.String(), nil
 }
