@@ -75,6 +75,7 @@ type SnowflakeOpt struct {
 
 type BigQueryOpt struct {
 	ProjectID string `yaml:"project_id"`
+	DatasetID string `yaml:"dataset_id"`
 }
 
 type DynamoDBOpt struct {
