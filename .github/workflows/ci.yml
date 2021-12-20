@@ -47,28 +47,16 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:14.0-alpine
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd="pg_isready"
-          --health-interval=5s
-          --health-timeout=2s
-          --health-retries=3
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2
       with:
         go-version: '1.17'
-    - name: Install test dependencies
+    - name: Install grpcurl
       run: go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
     - name: Install oomplay
       run: |
-        wget https://github.com/oom-ai/oomplay/releases/download/v0.1.0/oomplay-musl_0.1.0_amd64.deb
+        wget https://github.com/oom-ai/oomplay/releases/download/v0.1.0/oomplay-musl_0.1.0_amd64.deb &&
         sudo dpkg -i oomplay-musl_0.1.0_amd64.deb
     - name: Run unit tests
       run: make test
