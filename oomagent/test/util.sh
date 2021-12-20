@@ -84,7 +84,7 @@ import_sample() {
 
 prepare_store() {
     info "initialize feature store"
-    execute_sql 'drop database if exists oomstore_test'
+    oomplay init -c "$OOMCLI_CONFIG"
 
     # initialize feature store
     oomcli init
@@ -122,8 +122,4 @@ prepare_oomagent() {
     trap 'kill $(jobs -p)' EXIT INT TERM HUP
     oomagent &
     wait_for_ready 0.1 10
-}
-
-execute_sql() {
-    PGPASSWORD=postgres psql -h localhost -U postgres -c "$1" >/dev/null
 }
