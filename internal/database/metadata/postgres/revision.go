@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ethhte88/oomstore/internal/database/metadata"
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
 func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateRevisionOpt) (int, string, error) {

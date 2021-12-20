@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ethhte88/oomstore/internal/database/offline"
-	"github.com/ethhte88/oomstore/internal/database/offline/mysql"
-	"github.com/ethhte88/oomstore/internal/database/offline/test_impl"
-	"github.com/ethhte88/oomstore/internal/database/test/runtime_mysql"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/internal/database/offline/mysql"
+	"github.com/oom-ai/oomstore/internal/database/offline/test_impl"
+	"github.com/oom-ai/oomstore/internal/database/test/runtime_mysql"
 )
 
 func prepareStore() (context.Context, offline.Store) {

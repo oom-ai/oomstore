@@ -4,10 +4,10 @@ import (
 	"context"
 	"io"
 
-	"github.com/ethhte88/oomstore/internal/database/dbutil"
-	"github.com/ethhte88/oomstore/internal/database/offline"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/offline"
 )
 
 func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string) error {

@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ethhte88/oomstore/internal/database/online"
-	"github.com/ethhte88/oomstore/internal/database/online/test_impl"
-	"github.com/ethhte88/oomstore/internal/database/test/runtime_dynamodb"
+	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/internal/database/online/test_impl"
+	"github.com/oom-ai/oomstore/internal/database/test/runtime_dynamodb"
 )
 
 func prepareStore() (context.Context, online.Store) {

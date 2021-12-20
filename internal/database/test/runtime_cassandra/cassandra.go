@@ -11,7 +11,7 @@ import (
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/preset/cassandra"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 var CassandraDbOpt types.CassandraOpt

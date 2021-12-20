@@ -3,8 +3,8 @@ package dbutil
 import (
 	"fmt"
 
-	"github.com/ethhte88/oomstore/pkg/errdefs"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func GetDbTypeFrom(backend types.BackendType, valueType string) (string, error) {

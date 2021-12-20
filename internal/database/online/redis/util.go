@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func SerializeByTag(i interface{}, typeTag string) (s string, err error) {

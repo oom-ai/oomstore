@@ -8,11 +8,11 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ethhte88/oomstore/internal/database/metadata/mock_metadata"
-	"github.com/ethhte88/oomstore/internal/database/offline"
-	"github.com/ethhte88/oomstore/internal/database/offline/mock_offline"
-	"github.com/ethhte88/oomstore/pkg/oomstore"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
+	"github.com/oom-ai/oomstore/pkg/oomstore"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func TestChannelExport(t *testing.T) {

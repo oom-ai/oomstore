@@ -7,10 +7,10 @@ import (
 
 	"github.com/gocql/gocql"
 
-	"github.com/ethhte88/oomstore/internal/database/dbutil"
-	"github.com/ethhte88/oomstore/internal/database/online"
-	"github.com/ethhte88/oomstore/internal/database/online/sqlutil"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {

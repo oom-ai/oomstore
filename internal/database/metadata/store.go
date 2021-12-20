@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"io"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 type Store interface {

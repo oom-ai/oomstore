@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ethhte88/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 )
 
 var errTest = errors.New("this is a test")

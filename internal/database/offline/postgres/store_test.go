@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ethhte88/oomstore/internal/database/dbutil"
-	"github.com/ethhte88/oomstore/internal/database/offline"
-	"github.com/ethhte88/oomstore/internal/database/offline/postgres"
-	"github.com/ethhte88/oomstore/internal/database/offline/test_impl"
-	"github.com/ethhte88/oomstore/internal/database/test/runtime_pg"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/internal/database/offline/postgres"
+	"github.com/oom-ai/oomstore/internal/database/offline/test_impl"
+	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
 )
 
 func prepareStore() (context.Context, offline.Store) {

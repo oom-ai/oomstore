@@ -9,10 +9,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/ethhte88/oomstore/internal/database/dbutil"
-	"github.com/ethhte88/oomstore/internal/database/online"
-	"github.com/ethhte88/oomstore/internal/database/online/sqlutil"
-	oomTypes "github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+	oomTypes "github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 const (

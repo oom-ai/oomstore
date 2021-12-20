@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ethhte88/oomstore/internal/database/metadata"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/go-sql-driver/mysql"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func createGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateGroupOpt) (int, error) {

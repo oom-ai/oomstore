@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ethhte88/oomstore/internal/database/dbutil"
-	"github.com/ethhte88/oomstore/internal/database/offline"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/jmoiron/sqlx"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cast"
 )
 

@@ -3,8 +3,8 @@ package snowflake_test
 import (
 	"testing"
 
-	"github.com/ethhte88/oomstore/internal/database/offline/snowflake"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/offline/snowflake"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func TestValueTypeTag(t *testing.T) {

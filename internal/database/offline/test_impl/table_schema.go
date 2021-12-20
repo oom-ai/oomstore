@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/require"
 )
 

@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cast"
 	"gopkg.in/yaml.v3"
 
-	"github.com/ethhte88/oomstore/internal/database/metadata"
-	"github.com/ethhte88/oomstore/pkg/errdefs"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types/apply"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 )
 
 func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {

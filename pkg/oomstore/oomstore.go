@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ethhte88/oomstore/internal/database"
-	"github.com/ethhte88/oomstore/internal/database/metadata"
-	"github.com/ethhte88/oomstore/internal/database/offline"
-	"github.com/ethhte88/oomstore/internal/database/online"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 // Combine online store, offline store, and metadata store instances in one place.

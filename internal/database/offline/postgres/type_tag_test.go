@@ -3,8 +3,8 @@ package postgres_test
 import (
 	"testing"
 
-	"github.com/ethhte88/oomstore/internal/database/offline/postgres"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/offline/postgres"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func TestValueTypeTag(t *testing.T) {

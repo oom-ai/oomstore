@@ -9,8 +9,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsDynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/ethhte88/oomstore/internal/database/online/dynamodb"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/online/dynamodb"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/preset/localstack"
 )

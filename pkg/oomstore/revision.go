@@ -3,7 +3,7 @@ package oomstore
 import (
 	"context"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 // List metadata of revisions of a same group.

@@ -3,7 +3,7 @@ package sqlutil
 import (
 	"fmt"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 const BatchSize = 10

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ethhte88/oomstore/internal/database/dbutil"
-	"github.com/ethhte88/oomstore/internal/database/metadata"
-	"github.com/ethhte88/oomstore/internal/database/metadata/informer"
-	"github.com/ethhte88/oomstore/internal/database/metadata/sqlutil"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/jmoiron/sqlx"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
+	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 var _ metadata.Store = &DB{}

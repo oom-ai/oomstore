@@ -3,11 +3,11 @@ package dbutil
 import (
 	"fmt"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func OpenMysqlDB(host, port, user, password, database string) (*sqlx.DB, error) {

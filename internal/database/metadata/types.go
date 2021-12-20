@@ -1,6 +1,6 @@
 package metadata
 
-import "github.com/ethhte88/oomstore/pkg/oomstore/types"
+import "github.com/oom-ai/oomstore/pkg/oomstore/types"
 
 type RevisionRange struct {
 	MinRevision int64  `db:"min_revision"`

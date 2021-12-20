@@ -8,9 +8,9 @@ import (
 	context "context"
 	reflect "reflect"
 
-	dbutil "github.com/ethhte88/oomstore/internal/database/dbutil"
-	online "github.com/ethhte88/oomstore/internal/database/online"
 	gomock "github.com/golang/mock/gomock"
+	dbutil "github.com/oom-ai/oomstore/internal/database/dbutil"
+	online "github.com/oom-ai/oomstore/internal/database/online"
 )
 
 // MockStore is a mock of Store interface.

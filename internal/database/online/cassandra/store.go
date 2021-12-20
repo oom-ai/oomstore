@@ -6,7 +6,7 @@ import (
 
 	"github.com/gocql/gocql"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 const (

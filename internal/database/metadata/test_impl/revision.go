@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethhte88/oomstore/internal/database/metadata"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

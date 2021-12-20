@@ -1,7 +1,7 @@
 package informer
 
 import (
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 type EntityCache struct {

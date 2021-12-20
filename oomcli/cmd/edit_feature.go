@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
 

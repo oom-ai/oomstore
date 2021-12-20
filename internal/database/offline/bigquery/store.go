@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/ethhte88/oomstore/internal/database/offline"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 var _ offline.Store = &DB{}

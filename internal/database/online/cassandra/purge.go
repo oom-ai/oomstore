@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ethhte88/oomstore/internal/database/online/sqlutil"
+	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
 )
 
 func (db *DB) Purge(ctx context.Context, revisionID int) error {

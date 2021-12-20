@@ -9,9 +9,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types/apply"
+	"github.com/oom-ai/oomstore/pkg/oomstore"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 )
 
 var getMetaFeatureOpt types.ListFeatureOpt

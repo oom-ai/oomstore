@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types/apply"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 	"github.com/stretchr/testify/require"
 )
 

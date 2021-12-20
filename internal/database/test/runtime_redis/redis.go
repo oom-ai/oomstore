@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/preset/redis"
 )

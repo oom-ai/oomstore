@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ethhte88/oomstore/internal/database/offline"
-	"github.com/ethhte88/oomstore/internal/database/offline/snowflake"
-	"github.com/ethhte88/oomstore/internal/database/offline/test_impl"
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/internal/database/offline/snowflake"
+	"github.com/oom-ai/oomstore/internal/database/offline/test_impl"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func prepareStore() (context.Context, offline.Store) {

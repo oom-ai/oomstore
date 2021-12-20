@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ethhte88/oomstore/pkg/oomstore/types"
 	"github.com/jmoiron/sqlx"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func BuildConditions(equal map[string]interface{}, in map[string]interface{}) ([]string, []interface{}, error) {
