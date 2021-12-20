@@ -6,6 +6,7 @@ import (
 	"cloud.google.com/go/bigquery"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"google.golang.org/api/option"
 )
 
 var _ offline.Store = &DB{}
@@ -16,7 +17,7 @@ type DB struct {
 }
 
 func Open(ctx context.Context, opt *types.BigQueryOpt) (*DB, error) {
-	client, err := bigquery.NewClient(ctx, opt.ProjectID)
+	client, err := bigquery.NewClient(ctx, opt.ProjectID, option.WithCredentialsJSON([]byte(opt.Credentials)))
 	if err != nil {
 		return nil, err
 	}
