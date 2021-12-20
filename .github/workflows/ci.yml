@@ -68,6 +68,10 @@ jobs:
       run: go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
     - name: Run unit tests
       run: make test
+      env:
+        SNOWFLAKE_TEST_ACCOUNT: ${{ secrets.SNOWFLAKE_TEST_ACCOUNT }}
+        SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER }}
+        SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD }}
     - name: Run integration tests
       run: make integration-test
     - uses: codecov/codecov-action@v2

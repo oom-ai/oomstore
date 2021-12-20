@@ -2,6 +2,7 @@ package snowflake_test
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -19,12 +20,10 @@ func prepareStore() (context.Context, offline.Store) {
 }
 
 func prepareDB() (context.Context, *snowflake.DB) {
-	// Have to hardcode because we have no tool to mock snowflake
-	// The info are subject to change because each trial only lasts 30 days
 	opt := types.SnowflakeOpt{
-		Account:  "fka25816",
-		User:     "yiksanchan",
-		Password: "snowflakeYYDS1",
+		Account:  os.Getenv("SNOWFLAKE_TEST_ACCOUNT"),
+		User:     os.Getenv("SNOWFLAKE_TEST_USER"),
+		Password: os.Getenv("SNOWFLAKE_TEST_PASSWORD"),
 	}
 	db, err := snowflake.Open(&opt)
 	if err != nil {
