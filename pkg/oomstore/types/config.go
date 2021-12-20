@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type BackendType string
 
@@ -20,7 +23,7 @@ type OomStoreConfig struct {
 }
 
 type OnlineStoreConfig struct {
-	Backend  BackendType  `yaml:"backend"`
+	Backend  BackendType  `yaml:"-"`
 	Postgres *PostgresOpt `yaml:"postgres"`
 	Redis    *RedisOpt    `yaml:"redis"`
 	MySQL    *MySQLOpt    `yaml:"mysql"`
@@ -28,14 +31,14 @@ type OnlineStoreConfig struct {
 }
 
 type OfflineStoreConfig struct {
-	Backend   BackendType   `yaml:"backend"`
+	Backend   BackendType   `yaml:"-"`
 	Postgres  *PostgresOpt  `yaml:"postgres"`
 	MySQL     *MySQLOpt     `yaml:"mysql"`
 	Snowflake *SnowflakeOpt `yaml:"snowflake"`
 }
 
 type MetadataStoreConfig struct {
-	Backend  BackendType  `yaml:"backend"`
+	Backend  BackendType  `yaml:"-"`
 	Postgres *PostgresOpt `yaml:"postgres"`
 	MySQL    *MySQLOpt    `yaml:"mysql"`
 }
@@ -89,4 +92,77 @@ type CassandraOpt struct {
 	Password string        `yaml:"password"`
 	KeySpace string        `yaml:"keyspace"`
 	Timeout  time.Duration `yaml:"timeout"`
+}
+
+func (cfg *OomStoreConfig) Validate() error {
+	if err := cfg.MetadataStore.Validate(); err != nil {
+		return err
+	}
+	if err := cfg.OnlineStore.Validate(); err != nil {
+		return err
+	}
+	if err := cfg.OfflineStore.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (cfg *MetadataStoreConfig) Validate() error {
+	n := 0
+	if cfg.Postgres != nil {
+		cfg.Backend = POSTGRES
+		n++
+	}
+	if cfg.MySQL != nil {
+		cfg.Backend = MYSQL
+		n++
+	}
+	if n != 1 {
+		return fmt.Errorf("require exactly one metadata store backend")
+	}
+	return nil
+}
+
+func (cfg *OnlineStoreConfig) Validate() error {
+	n := 0
+	if cfg.Postgres != nil {
+		cfg.Backend = POSTGRES
+		n++
+	}
+	if cfg.MySQL != nil {
+		cfg.Backend = MYSQL
+		n++
+	}
+	if cfg.Redis != nil {
+		cfg.Backend = REDIS
+		n++
+	}
+	if cfg.DynamoDB != nil {
+		cfg.Backend = DYNAMODB
+		n++
+	}
+	if n != 1 {
+		return fmt.Errorf("require exactly one online store backend")
+	}
+	return nil
+}
+
+func (cfg *OfflineStoreConfig) Validate() error {
+	n := 0
+	if cfg.Postgres != nil {
+		cfg.Backend = POSTGRES
+		n++
+	}
+	if cfg.MySQL != nil {
+		cfg.Backend = MYSQL
+		n++
+	}
+	if cfg.Snowflake != nil {
+		cfg.Backend = SNOWFLAKE
+		n++
+	}
+	if n != 1 {
+		return fmt.Errorf("require exactly one offline store backend")
+	}
+	return nil
 }
