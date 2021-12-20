@@ -73,14 +73,13 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 
 	// Step 2: iterate each table range, join entity_rows table and each data tables
 	columns := append(opt.ValueNames, opt.Features.Names()...)
-	columnsStr := qt(columns...)
 	for _, r := range opt.RevisionRanges {
-		query, err := buildJoinQuery(joinSchema{
+		query, err := buildInsertBaseJoinSchema(insertBaseJoinSchema{
 			TableName:           joinedTableName,
 			EntityKeyStr:        entityKeyStr,
 			EntityName:          opt.Entity.Name,
 			UnixMilliStr:        unixMilliStr,
-			ColumnsStr:          columnsStr,
+			Columns:             columns,
 			EntityRowsTableName: opt.EntityRowsTableName,
 			DataTable:           r.DataTable,
 			Backend:             backendType,
@@ -211,12 +210,12 @@ func dropTemporaryTables(ctx context.Context, db *sqlx.DB, tableNames []string) 
 	return err
 }
 
-const JOIN_SCHEMA = `
-INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{.ColumnsStr }})
+const INSERT_BASE_JOIN_SCHEMA = `
+INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{ columnJoin .Columns }})
 SELECT
 	l.{{ .EntityKeyStr }} AS entity_key,
 	l.{{ .UnixMilliStr }} AS unix_milli,
-	{{ .ColumnsStr }}
+	{{ columnJoin .Columns }}
 FROM
 	{{ qt .EntityRowsTableName }} AS l
 LEFT JOIN {{ qt .DataTable }} AS r
@@ -224,18 +223,18 @@ ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
 WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
 `
 
-type joinSchema struct {
+type insertBaseJoinSchema struct {
 	TableName           string
 	EntityKeyStr        string
 	EntityName          string
 	UnixMilliStr        string
-	ColumnsStr          string
+	Columns             []string
 	EntityRowsTableName string
 	DataTable           string
 	Backend             types.BackendType
 }
 
-func buildJoinQuery(schema joinSchema) (string, error) {
+func buildInsertBaseJoinSchema(schema insertBaseJoinSchema) (string, error) {
 	qt, err := dbutil.QuoteFn(schema.Backend)
 	if err != nil {
 		return "", err
@@ -243,7 +242,10 @@ func buildJoinQuery(schema joinSchema) (string, error) {
 
 	t := template.Must(template.New("join").Funcs(template.FuncMap{
 		"qt": qt,
-	}).Parse(JOIN_SCHEMA))
+		"columnJoin": func(columns []string) string {
+			return qt(columns...)
+		},
+	}).Parse(INSERT_BASE_JOIN_SCHEMA))
 
 	buf := bytes.NewBuffer(nil)
 	if err := t.Execute(buf, schema); err != nil {
