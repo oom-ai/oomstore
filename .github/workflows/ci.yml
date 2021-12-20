@@ -70,7 +70,6 @@ jobs:
       run: |
         wget https://github.com/oom-ai/oomplay/releases/download/v0.1.0/oomplay-musl_0.1.0_amd64.deb
         sudo dpkg -i oomplay-musl_0.1.0_amd64.deb
-        oomplay --help
     - name: Run unit tests
       run: make test
       env:
