@@ -9,7 +9,7 @@ import (
 )
 
 func TestTableSchema(t *testing.T, prepareStore PrepareStoreFn, prepareSampleTable func(ctx context.Context)) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 
 	prepareSampleTable(ctx)
