@@ -13,7 +13,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/online"
 )
 
-type PrepareStoreFn func() (context.Context, online.Store)
+type PrepareStoreFn func(*testing.T) (context.Context, online.Store)
 
 type Sample struct {
 	Features types.FeatureList

@@ -9,7 +9,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_dynamodb"
 )
 
-func prepareStore() (context.Context, online.Store) {
+func prepareStore(t *testing.T) (context.Context, online.Store) {
 	return runtime_dynamodb.PrepareDB()
 }
 

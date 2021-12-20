@@ -12,7 +12,7 @@ import (
 )
 
 func TestCreateEntity(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 
 	opt := metadata.CreateEntityOpt{
@@ -36,7 +36,7 @@ func TestCreateEntity(t *testing.T, prepareStore PrepareStoreFn) {
 }
 
 func TestGetEntity(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 
 	opt := metadata.CreateEntityOpt{
@@ -61,7 +61,7 @@ func TestGetEntity(t *testing.T, prepareStore PrepareStoreFn) {
 }
 
 func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 
 	id, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
@@ -91,7 +91,7 @@ func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreFn) {
 }
 
 func TestListEntity(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 
 	entities, err := store.ListEntity(ctx, nil)

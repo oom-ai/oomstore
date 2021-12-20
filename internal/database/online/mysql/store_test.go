@@ -11,17 +11,17 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_mysql"
 )
 
-func prepareStore() (context.Context, online.Store) {
+func prepareStore(t *testing.T) (context.Context, online.Store) {
 	ctx, db := runtime_mysql.PrepareDB()
 
 	if _, err := db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", runtime_mysql.MySQLDbOpt.Database)); err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	db.Close()
 
 	store, err := mysql.Open(&runtime_mysql.MySQLDbOpt)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	return ctx, store

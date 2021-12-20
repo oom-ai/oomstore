@@ -11,18 +11,18 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_pg"
 )
 
-func prepareStore() (context.Context, online.Store) {
+func prepareStore(t *testing.T) (context.Context, online.Store) {
 	ctx, db := runtime_pg.PrepareDB()
 
 	_, err := db.ExecContext(context.Background(), fmt.Sprintf("CREATE DATABASE %s", runtime_pg.PostgresDbOpt.Database))
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	db.Close()
 
 	store, err := postgres.Open(&runtime_pg.PostgresDbOpt)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	return ctx, store

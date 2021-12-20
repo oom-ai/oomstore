@@ -16,7 +16,7 @@ import (
 )
 
 func TestJoin(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 
 	entity := &types.Entity{

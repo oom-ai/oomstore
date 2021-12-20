@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type PrepareStoreFn func() (context.Context, offline.Store)
+type PrepareStoreFn func(t *testing.T) (context.Context, offline.Store)
 
 func buildTestDataTable(ctx context.Context, t *testing.T, store offline.Store, features []*types.Feature, dataTable string, source *offline.CSVSource) {
 	entity := &types.Entity{

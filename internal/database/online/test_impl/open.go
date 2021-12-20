@@ -7,7 +7,7 @@ import (
 )
 
 func TestOpen(t *testing.T, prepareStore PrepareStoreFn) {
-	_, store := prepareStore()
+	_, store := prepareStore(t)
 	assert.NotNil(t, store)
 	store.Close()
 }

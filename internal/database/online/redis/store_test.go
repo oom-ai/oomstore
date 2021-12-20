@@ -10,11 +10,11 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_redis"
 )
 
-func prepareStore() (context.Context, online.Store) {
+func prepareStore(t *testing.T) (context.Context, online.Store) {
 	ctx := context.Background()
 	store := redis.Open(&runtime_redis.RedisDbOpt)
 	if _, err := store.FlushDB(ctx).Result(); err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	return ctx, store

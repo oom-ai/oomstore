@@ -11,10 +11,10 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func prepareStore() (context.Context, offline.Store) {
+func prepareStore(t *testing.T) (context.Context, offline.Store) {
 	ctx, db := prepareDB()
 	if _, err := db.ExecContext(ctx, "CREATE DATABASE test"); err != nil {
-		panic(err)
+		t.Fatal(t)
 	}
 	return ctx, db
 }

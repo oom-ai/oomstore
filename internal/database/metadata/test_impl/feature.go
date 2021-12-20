@@ -35,7 +35,7 @@ func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Sto
 }
 
 func TestCreateFeature(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
@@ -52,7 +52,7 @@ func TestCreateFeature(t *testing.T, prepareStore PrepareStoreFn) {
 }
 
 func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
@@ -70,7 +70,7 @@ func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreFn) {
 }
 
 func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
@@ -86,7 +86,7 @@ func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreFn) 
 }
 
 func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
@@ -99,7 +99,7 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStor
 }
 
 func TestGetFeature(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
@@ -132,7 +132,7 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreFn) {
 }
 
 func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
@@ -165,7 +165,7 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreFn) {
 }
 
 func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
 
@@ -222,7 +222,7 @@ func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreFn) {
 }
 
 func TestListFeature(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	entityID, groupID := prepareEntityAndGroup(t, ctx, store)
 
@@ -285,7 +285,7 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreFn) {
 }
 
 func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
