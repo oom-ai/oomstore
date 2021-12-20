@@ -40,10 +40,6 @@ func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.E
 	panic("implement me")
 }
 
-func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	panic("implement me")
-}
-
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
 	panic("implement me")
 }
