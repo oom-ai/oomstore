@@ -23,6 +23,9 @@ type OomStore struct {
 // Under the hood, it setups connections to the underlying databases.
 // You should always use this method to create a new OomStore instance in code.
 func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
 	onlineStore, err := database.OpenOnlineStore(opt.OnlineStore)
 	if err != nil {
 		return nil, err
@@ -45,6 +48,9 @@ func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 
 // Create a new OomStore instance.
 func Create(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
 	if err := database.CreateMetadataDatabase(ctx, opt.MetadataStore); err != nil {
 		return nil, err
 	}
