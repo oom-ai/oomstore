@@ -28,8 +28,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn) {
 		},
 	}
 	buildTestDataTable(ctx, t, store, features, dataTable, &offline.CSVSource{
-		Reader: bufio.NewReader(strings.NewReader(`
-1234,xiaomi,100
+		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100
 1235,apple,200
 1236,huawei,300
 1237,oneplus,240

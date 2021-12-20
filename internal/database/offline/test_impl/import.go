@@ -29,6 +29,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 			{
 				Name:        "model",
 				DBValueType: "invalid-db-value-type",
+				ValueType:   "invalid-db-value-type",
 			},
 			{
 				Name:        "price",
@@ -38,8 +39,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 		},
 		Header: []string{"device", "model", "price"},
 		Source: &offline.CSVSource{
-			Reader: bufio.NewReader(strings.NewReader(`
-1234,xiaomi,1899
+			Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,1899
 1235,apple,4999
 1236,huawei,5999
 1237,oneplus,3999
