@@ -2,53 +2,52 @@ package bigquery_test
 
 import (
 	"context"
+	"os"
+	"testing"
+
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/bigquery"
 	"github.com/oom-ai/oomstore/internal/database/offline/test_impl"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
-func prepareStore() (context.Context, offline.Store) {
-	ctx, db := prepareDB()
+func prepareStore(t *testing.T) (context.Context, offline.Store) {
+	ctx, db := prepareDB(t)
 	return ctx, db
 }
 
-func prepareDB() (context.Context, *bigquery.DB) {
+func prepareDB(t *testing.T) (context.Context, *bigquery.DB) {
 	ctx := context.Background()
 	opt := types.BigQueryOpt{
-		ProjectID: "oom-feature-store",
-		DatasetID: "test",
+		ProjectID:   "oom-feature-store",
+		DatasetID:   "test",
+		Credentials: os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"),
 	}
 	db, err := bigquery.Open(ctx, &opt)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	return ctx, db
 }
 
 func TestPing(t *testing.T) {
-	// skip this unit test until we can put credentials to env
-	t.Skip()
 	test_impl.TestPing(t, prepareStore)
 }
 
 func TestImport(t *testing.T) {
-	t.Skip()
 	test_impl.TestImport(t, prepareStore)
 
-	ctx, db := prepareDB()
+	ctx, db := prepareDB(t)
 	table := db.Dataset("test").Table("offline_1_1")
 	err := table.Delete(ctx)
 	require.NoError(t, err)
 }
 
 func TestExport(t *testing.T) {
-	t.Skip()
 	test_impl.TestExport(t, prepareStore)
 
-	ctx, db := prepareDB()
+	ctx, db := prepareDB(t)
 	table := db.Dataset("test").Table("offline_1_1")
 	err := table.Delete(ctx)
 	require.NoError(t, err)
