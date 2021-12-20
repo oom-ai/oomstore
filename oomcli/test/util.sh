@@ -75,15 +75,11 @@ sync() {
     oomcli sync -r "$1"
 }
 
-execute_sql() {
-    PGPASSWORD=postgres psql -h localhost -U postgres -c "$1" >/dev/null
-}
-
 init_store() {
     info "initialize feature store"
 
-    # destroy database
-    execute_sql 'drop database if exists oomstore_test'
+    # initialize backend database
+    oomplay init -c "$OOMCLI_CONFIG"
 
     # initialize feature store
     oomcli init
