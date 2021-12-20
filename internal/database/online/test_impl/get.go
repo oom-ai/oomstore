@@ -9,7 +9,7 @@ import (
 
 func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn) {
 	s := &SampleSmall
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	importSample(t, ctx, store, s)
 
@@ -31,7 +31,7 @@ func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn) {
 
 func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreFn) {
 	s := &SampleSmall
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	importSample(t, ctx, store, s)
 
@@ -47,7 +47,7 @@ func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreFn) {
 
 func TestMultiGet(t *testing.T, prepareStore PrepareStoreFn) {
 	s := &SampleSmall
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	importSample(t, ctx, store, s)
 

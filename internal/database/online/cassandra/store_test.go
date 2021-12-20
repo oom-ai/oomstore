@@ -11,7 +11,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_cassandra"
 )
 
-func prepareStore() (context.Context, online.Store) {
+func prepareStore(t *testing.T) (context.Context, online.Store) {
 	ctx, session := runtime_cassandra.PrepareDB()
 
 	createKeySpace := fmt.Sprintf(`CREATE KEYSPACE %s
@@ -21,13 +21,13 @@ func prepareStore() (context.Context, online.Store) {
 	}`, runtime_cassandra.CassandraDbOpt.KeySpace)
 
 	if err := session.Query(createKeySpace).WithContext(ctx).Exec(); err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	session.Close()
 
 	store, err := cassandra.Open(&runtime_cassandra.CassandraDbOpt)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	return ctx, store
 }

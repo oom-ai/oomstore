@@ -8,7 +8,7 @@ import (
 )
 
 func TestPurgeRemovesSpecifiedRevision(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	importSample(t, ctx, store, &SampleMedium)
 
@@ -28,7 +28,7 @@ func TestPurgeRemovesSpecifiedRevision(t *testing.T, prepareStore PrepareStoreFn
 }
 
 func TestPurgeNotRemovesOtherRevisions(t *testing.T, prepareStore PrepareStoreFn) {
-	ctx, store := prepareStore()
+	ctx, store := prepareStore(t)
 	defer store.Close()
 	importSample(t, ctx, store, &SampleSmall, &SampleMedium)
 
