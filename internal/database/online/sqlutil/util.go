@@ -24,7 +24,7 @@ func deserializeByTag(i interface{}, typeTag string, backend types.BackendType) 
 		}
 		return i, nil
 	case types.BOOL:
-		if backend == types.MYSQL {
+		if backend == types.MYSQL || backend == types.SQLite {
 			if i == int64(1) {
 				return true, nil
 			} else if i == int64(0) {
