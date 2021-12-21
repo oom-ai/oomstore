@@ -1,23 +1,12 @@
 package sqlite
 
 import (
-	"fmt"
-	"strings"
-
+	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func TypeTag(dbType string) (string, error) {
-	var s = dbType
-	if pos := strings.Index(dbType, "("); pos != -1 {
-		s = s[:pos]
-	}
-	s = strings.TrimSpace(strings.ToLower(s))
-	if t, ok := typeMap[s]; !ok {
-		return "", fmt.Errorf("unsupported sql type: %s", dbType)
-	} else {
-		return t, nil
-	}
+	return sqlutil.TypeTag(typeMap, dbType)
 }
 
 var (
