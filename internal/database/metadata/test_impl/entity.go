@@ -32,7 +32,7 @@ func TestCreateEntity(t *testing.T, prepareStore PrepareStoreFn) {
 			Description: "description",
 		},
 	})
-	require.Equal(t, err, fmt.Errorf("entity device already exists"))
+	require.Equal(t, fmt.Errorf("entity device already exists"), err)
 }
 
 func TestGetEntity(t *testing.T, prepareStore PrepareStoreFn) {

@@ -5,6 +5,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/test_impl"
+
 	"github.com/oom-ai/oomstore/internal/database/metadata/postgres"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,9 +17,9 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata/sqlite"
 )
 
-//func prepareStore(t *testing.T) (context.Context, metadata.Store) {
-//	return prepareDB(t)
-//}
+func prepareStore(t *testing.T) (context.Context, metadata.Store) {
+	return prepareDB(t)
+}
 
 func prepareDB(t *testing.T) (context.Context, *sqlite.DB) {
 	ctx := context.Background()
@@ -64,4 +67,20 @@ func TestCreateDatabase(t *testing.T) {
 	wantTables = append(wantTables, "sqlite_sequence")
 
 	assert.ElementsMatch(t, wantTables, tables)
+}
+
+func TestCreateEntity(t *testing.T) {
+	test_impl.TestCreateEntity(t, prepareStore)
+}
+
+func TestGetEntity(t *testing.T) {
+	test_impl.TestGetEntity(t, prepareStore)
+}
+
+func TestUpdateEntity(t *testing.T) {
+	test_impl.TestUpdateEntity(t, prepareStore)
+}
+
+func TestListEntity(t *testing.T) {
+	test_impl.TestListEntity(t, prepareStore)
 }
