@@ -11,6 +11,7 @@ const (
 	POSTGRES  BackendType = "postgres"
 	REDIS     BackendType = "redis"
 	MYSQL     BackendType = "mysql"
+	SQLite    BackendType = "sqlite"
 	SNOWFLAKE BackendType = "snowflake"
 	DYNAMODB  BackendType = "dynamodb"
 	CASSANDRA BackendType = "cassandra"
@@ -56,6 +57,10 @@ type PostgresOpt struct {
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
 	Database string `yaml:"database"`
+}
+
+type SQLiteOpt struct {
+	DBFile string `yaml:"db-file"`
 }
 
 type MySQLOpt struct {
