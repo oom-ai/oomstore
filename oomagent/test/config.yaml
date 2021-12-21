@@ -1,5 +1,11 @@
-store: &pg
-  backend: postgres
+online-store:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: redis
+    database: 0
+
+offline-store:
   postgres:
     host: 127.0.0.1
     port: 5432
@@ -7,6 +13,10 @@ store: &pg
     password: postgres
     database: oomstore_test
 
-online-store: *pg
-offline-store: *pg
-metadata-store: *pg
+metadata-store:
+  postgres:
+    host: 127.0.0.1
+    port: 5432
+    user: postgres
+    password: postgres
+    database: oomstore_test
