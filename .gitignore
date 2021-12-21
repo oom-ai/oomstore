@@ -4,5 +4,7 @@ coverage.out
 __pycache__/
 *.protoset
 venv
+.env
+.vscode
 
 dist/
