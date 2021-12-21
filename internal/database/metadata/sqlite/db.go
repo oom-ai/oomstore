@@ -3,6 +3,8 @@ package sqlite
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
+
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -13,28 +15,23 @@ func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, meta
 }
 
 func (db *DB) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
-	//TODO implement me
-	panic("implement me")
+	return createEntity(ctx, db, opt)
 }
 
 func (db *DB) UpdateEntity(ctx context.Context, opt metadata.UpdateEntityOpt) error {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.UpdateEntity(ctx, db, opt)
 }
 
 func (db *DB) GetEntity(ctx context.Context, id int) (*types.Entity, error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.GetEntity(ctx, db, id)
 }
 
 func (db *DB) GetEntityByName(ctx context.Context, name string) (*types.Entity, error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.GetEntityByName(ctx, db, name)
 }
 
 func (db *DB) ListEntity(ctx context.Context, entityIDs *[]int) (types.EntityList, error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.ListEntity(ctx, db, entityIDs)
 }
 
 func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
@@ -113,11 +110,6 @@ func (db *DB) ListRevision(ctx context.Context, groupID *int) (types.RevisionLis
 }
 
 func (db *DB) CacheListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (db *DB) Refresh() error {
 	//TODO implement me
 	panic("implement me")
 }
