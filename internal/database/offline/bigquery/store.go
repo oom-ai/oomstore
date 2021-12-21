@@ -40,7 +40,9 @@ func (db *DB) Ping(ctx context.Context) error {
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
 	q := fmt.Sprintf(`SELECT column_name, data_type FROM %s.INFORMATION_SCHEMA.COLUMNS WHERE table_name = "%s"`, db.datasetID, tableName)
 	rows, err := db.Query(q).Read(ctx)
-
+	if err != nil {
+		return nil, err
+	}
 	var schema types.DataTableSchema
 	for {
 		recordMap := make(map[string]bigquery.Value)
@@ -51,9 +53,13 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 		if err != nil {
 			return nil, err
 		}
+		valueType, err := db.TypeTag(cast.ToString(recordMap["data_type"]))
+		if err != nil {
+			return nil, err
+		}
 		schema.Fields = append(schema.Fields, types.DataTableFieldSchema{
 			Name:      cast.ToString(recordMap["column_name"]),
-			ValueType: cast.ToString(recordMap["data_type"]),
+			ValueType: valueType,
 		})
 	}
 
