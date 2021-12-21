@@ -55,3 +55,20 @@ func TestExport(t *testing.T) {
 func TestJoin(t *testing.T) {
 	test_impl.TestJoin(t, prepareStore)
 }
+
+func TestTableSchema(t *testing.T) {
+	test_impl.TestTableSchema(t, prepareStore, func(ctx context.Context) {
+		opt := types.BigQueryOpt{
+			ProjectID:   "oom-feature-store",
+			DatasetID:   "test",
+			Credentials: os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"),
+		}
+		db, err := bigquery.Open(ctx, &opt)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := db.Query("CREATE TABLE test.user(`user` STRING, `age` BIGINT)").Read(ctx); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
