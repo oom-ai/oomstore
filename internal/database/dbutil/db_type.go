@@ -12,6 +12,8 @@ func GetDbTypeFrom(backend types.BackendType, valueType string) (string, error) 
 	switch backend {
 	case types.POSTGRES:
 		mp = postgresType
+	case types.SQLite:
+		mp = sqliteType
 	case types.MYSQL:
 		mp = mysqlType
 	case types.CASSANDRA:
@@ -32,6 +34,14 @@ func GetDbTypeFrom(backend types.BackendType, valueType string) (string, error) 
 }
 
 var (
+	sqliteType = map[string]string{
+		types.STRING:  "TEXT",
+		types.INT64:   "INTEGER",
+		types.FLOAT64: "FLOAT",
+		types.BOOL:    "INTEGER",
+		types.BYTES:   "BLOB",
+		types.TIME:    "TIMESTAMP",
+	}
 	mysqlType = map[string]string{
 		types.STRING:  "text",
 		types.INT64:   "bigint",

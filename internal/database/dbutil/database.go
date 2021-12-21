@@ -7,8 +7,13 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
+
+func OpenSQLite(dbFile string) (*sqlx.DB, error) {
+	return sqlx.Open("sqlite3", dbFile)
+}
 
 func OpenMysqlDB(host, port, user, password, database string) (*sqlx.DB, error) {
 	cfg := mysql.NewConfig()

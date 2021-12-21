@@ -14,23 +14,20 @@ import (
 )
 
 func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType types.BackendType) (<-chan types.ExportRecord, <-chan error) {
-	fields := append([]string{opt.EntityName}, opt.Features.Names()...)
-	var fieldStr string
-	var tableName string
-	switch backendType {
-	case types.POSTGRES, types.SNOWFLAKE:
-		fieldStr = dbutil.Quote(`"`, fields...)
-		tableName = dbutil.Quote(`"`, opt.DataTable)
-	case types.MYSQL:
-		fieldStr = dbutil.Quote("`", fields...)
-		tableName = dbutil.Quote("`", opt.DataTable)
+	var (
+		fields = append([]string{opt.EntityName}, opt.Features.Names()...)
+		stream = make(chan types.ExportRecord)
+		errs   = make(chan error, 1) // at most 1 error
+	)
+	qt, err := dbutil.QuoteFn(backendType)
+	if err != nil {
+		errs <- err
+		return stream, errs
 	}
-	query := fmt.Sprintf("SELECT %s FROM %s", fieldStr, tableName)
+	query := fmt.Sprintf("SELECT %s FROM %s", qt(fields...), qt(opt.DataTable))
 	if opt.Limit != nil {
 		query += fmt.Sprintf(" LIMIT %d", *opt.Limit)
 	}
-	stream := make(chan types.ExportRecord)
-	errs := make(chan error, 1) // at most 1 error
 
 	go func() {
 		defer close(stream)

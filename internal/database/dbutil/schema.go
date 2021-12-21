@@ -25,7 +25,7 @@ var (
 	createSchemaFuncs = template.FuncMap{
 		"entity": func(entity types.Entity, backend types.BackendType) string {
 			switch backend {
-			case types.CASSANDRA:
+			case types.CASSANDRA, types.SQLite:
 				return fmt.Sprintf(`"%s" TEXT PRIMARY KEY`, entity.Name)
 			case types.POSTGRES, types.SNOWFLAKE:
 				return fmt.Sprintf(`"%s" VARCHAR(%d) PRIMARY KEY`, entity.Name, entity.Length)

@@ -69,7 +69,7 @@ func buildQueryAndArgsForInsertRecords(tableName string, records []interface{}, 
 	case types.POSTGRES, types.SNOWFLAKE:
 		columnStr = Quote(`"`, columns...)
 		tableName = fmt.Sprintf(`"%s"`, tableName)
-	case types.MYSQL:
+	case types.MYSQL, types.SQLite:
 		columnStr = Quote("`", columns...)
 		tableName = fmt.Sprintf("`%s`", tableName)
 	}
@@ -91,7 +91,7 @@ func GetColumnFormat(backendType types.BackendType) (string, error) {
 	switch backendType {
 	case types.POSTGRES, types.SNOWFLAKE:
 		columnFormat = `"%s" %s`
-	case types.MYSQL:
+	case types.MYSQL, types.SQLite:
 		columnFormat = "`%s` %s"
 	default:
 		return "", fmt.Errorf("unsupported backend type %s", backendType)
@@ -104,7 +104,7 @@ func QuoteFn(backendType types.BackendType) (func(...string) string, error) {
 	switch backendType {
 	case types.POSTGRES, types.SNOWFLAKE:
 		quote = `"`
-	case types.MYSQL:
+	case types.MYSQL, types.SQLite:
 		quote = "`"
 	default:
 		return nil, fmt.Errorf("unsupported backend type %s", backendType)
