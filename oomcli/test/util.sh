@@ -79,7 +79,7 @@ init_store() {
     info "initialize feature store"
 
     # initialize backend database
-    oomplay init -c "$OOMCLI_CONFIG"
+    oomplay init -f "$OOMCLI_CONFIG"
 
     # initialize feature store
     oomcli init

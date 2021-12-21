@@ -84,7 +84,7 @@ import_sample() {
 
 prepare_store() {
     info "initialize feature store"
-    oomplay init -c "$OOMCLI_CONFIG"
+    oomplay init -f "$OOMCLI_CONFIG"
 
     # initialize feature store
     oomcli init

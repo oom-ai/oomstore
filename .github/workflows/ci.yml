@@ -47,6 +47,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    env:
+      oomplay-version: '0.2.0'
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2
@@ -56,8 +58,10 @@ jobs:
       run: go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
     - name: Install oomplay
       run: |
-        wget https://github.com/oom-ai/oomplay/releases/download/v0.1.0/oomplay-musl_0.1.0_amd64.deb &&
-        sudo dpkg -i oomplay-musl_0.1.0_amd64.deb
+        v=${{env.oomplay-version}}
+        pkg=oomplay-musl_${v}_amd64.deb
+        wget https://github.com/oom-ai/oomplay/releases/download/v${v}/${pkg} &&
+        sudo dpkg -i ${pkg}
     - name: Run unit tests
       run: make test
       env:
