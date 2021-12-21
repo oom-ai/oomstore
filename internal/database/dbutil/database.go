@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/mattn/go-sqlite3"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -49,6 +49,12 @@ func DeserializeString(i interface{}, backend types.BackendType) string {
 
 func IsTableNotFoundError(err error, backend types.BackendType) bool {
 	switch backend {
+	case types.SQLite:
+		// https://github.com/mattn/go-sqlite3/issues/244
+		if sqliteErr, ok := err.(sqlite3.Error); ok {
+			return sqliteErr.Code == sqlite3.ErrError
+		}
+
 	// https://dev.mysql.com/doc/mysql-errors/5.7/en/server-error-reference.html#error_er_no_such_table
 	case types.MYSQL:
 		if e2, ok := err.(*mysql.MySQLError); ok {
