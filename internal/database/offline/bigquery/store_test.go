@@ -67,7 +67,7 @@ func TestTableSchema(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if _, err := db.Query("CREATE TABLE test.user(`user` STRING, `age` BIGINT)").Read(ctx); err != nil {
+		if _, err = db.Query("CREATE TABLE test.user(`user` STRING, `age` BIGINT)").Read(ctx); err != nil {
 			t.Fatal(err)
 		}
 	})
