@@ -21,7 +21,7 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType
 	case types.POSTGRES, types.SNOWFLAKE:
 		fieldStr = dbutil.Quote(`"`, fields...)
 		tableName = dbutil.Quote(`"`, opt.DataTable)
-	case types.MYSQL:
+	case types.MYSQL, types.SQLite:
 		fieldStr = dbutil.Quote("`", fields...)
 		tableName = dbutil.Quote("`", opt.DataTable)
 	}
