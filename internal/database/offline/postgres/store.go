@@ -11,6 +11,8 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
+const PostgresBatchSize = 20
+
 var _ offline.Store = &DB{}
 
 type DB struct {
@@ -27,7 +29,7 @@ func Open(option *types.PostgresOpt) (*DB, error) {
 }
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	return sqlutil.Import(ctx, db.DB, opt, loadDataFromSource, types.POSTGRES)
+	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(types.POSTGRES, PostgresBatchSize), types.POSTGRES)
 }
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
