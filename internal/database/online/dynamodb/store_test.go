@@ -10,7 +10,7 @@ import (
 )
 
 func prepareStore(t *testing.T) (context.Context, online.Store) {
-	return runtime_dynamodb.PrepareDB()
+	return runtime_dynamodb.PrepareDB(t)
 }
 
 func TestOpen(t *testing.T) {

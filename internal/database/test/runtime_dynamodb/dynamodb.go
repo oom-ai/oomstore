@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsDynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -46,10 +47,10 @@ func init() {
 	}()
 }
 
-func PrepareDB() (context.Context, *dynamodb.DB) {
+func PrepareDB(t *testing.T) (context.Context, *dynamodb.DB) {
 	db, err := dynamodb.Open(&DynamoDBDbOpt)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	ctx := context.Background()
@@ -57,13 +58,13 @@ func PrepareDB() (context.Context, *dynamodb.DB) {
 	// Drop all existing tables so that it doesn't interfere with tests that come after
 	output, err := db.Client.ListTables(ctx, &awsDynamodb.ListTablesInput{})
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	for _, tableName := range output.TableNames {
 		if _, err := db.Client.DeleteTable(ctx, &awsDynamodb.DeleteTableInput{
 			TableName: aws.String(tableName),
 		}); err != nil {
-			panic(err)
+			t.Fatal(err)
 		}
 	}
 

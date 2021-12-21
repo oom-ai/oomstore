@@ -36,11 +36,11 @@ func TestCreateDatabase(t *testing.T) {
 	db.Close()
 
 	if err := mysql.CreateDatabase(ctx, runtime_mysql.MySQLDbOpt); err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	store, err := mysql.Open(ctx, &runtime_mysql.MySQLDbOpt)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	defer store.Close()
 

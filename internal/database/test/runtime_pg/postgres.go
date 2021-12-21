@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"testing"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
@@ -46,7 +47,7 @@ func init() {
 	}()
 }
 
-func PrepareDB() (context.Context, *sqlx.DB) {
+func PrepareDB(t *testing.T) (context.Context, *sqlx.DB) {
 	ctx := context.Background()
 	db, err := dbutil.OpenPostgresDB(
 		PostgresDbOpt.Host,
@@ -56,12 +57,12 @@ func PrepareDB() (context.Context, *sqlx.DB) {
 		"test",
 	)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	_, err = db.ExecContext(ctx, "drop database if exists oomstore")
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	return ctx, db

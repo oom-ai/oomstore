@@ -1,9 +1,10 @@
 package bigquery
 
 import (
-	"cloud.google.com/go/bigquery"
 	"context"
 	"fmt"
+
+	"cloud.google.com/go/bigquery"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"

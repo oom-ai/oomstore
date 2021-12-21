@@ -13,7 +13,7 @@ import (
 )
 
 func prepareStore(t *testing.T) (context.Context, offline.Store) {
-	ctx, db := runtime_pg.PrepareDB()
+	ctx, db := runtime_pg.PrepareDB(t)
 
 	_, err := db.ExecContext(context.Background(), fmt.Sprintf("CREATE DATABASE %s", runtime_pg.PostgresDbOpt.Database))
 	if err != nil {
