@@ -38,5 +38,5 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 }
 
 func (db *DB) TypeTag(dbType string) (string, error) {
-	panic("implement me")
+	return TypeTag(dbType)
 }
