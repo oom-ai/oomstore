@@ -3,8 +3,9 @@ package bigquery
 import (
 	"context"
 	"fmt"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"time"
+
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 
 	"cloud.google.com/go/bigquery"
 	"github.com/oom-ai/oomstore/internal/database/offline"

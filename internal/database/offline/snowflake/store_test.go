@@ -12,14 +12,14 @@ import (
 )
 
 func prepareStore(t *testing.T) (context.Context, offline.Store) {
-	ctx, db := prepareDB()
+	ctx, db := prepareDB(t)
 	if _, err := db.ExecContext(ctx, "CREATE DATABASE test"); err != nil {
 		t.Fatal(t)
 	}
 	return ctx, db
 }
 
-func prepareDB() (context.Context, *snowflake.DB) {
+func prepareDB(t *testing.T) (context.Context, *snowflake.DB) {
 	opt := types.SnowflakeOpt{
 		Account:  os.Getenv("SNOWFLAKE_TEST_ACCOUNT"),
 		User:     os.Getenv("SNOWFLAKE_TEST_USER"),
@@ -27,12 +27,12 @@ func prepareDB() (context.Context, *snowflake.DB) {
 	}
 	db, err := snowflake.Open(&opt)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	ctx := context.Background()
 	if _, err = db.ExecContext(ctx, "DROP DATABASE IF EXISTS test"); err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	return ctx, db
 }

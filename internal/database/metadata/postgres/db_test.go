@@ -13,7 +13,7 @@ import (
 )
 
 func prepareStore(t *testing.T) (context.Context, metadata.Store) {
-	ctx, db := runtime_pg.PrepareDB()
+	ctx, db := runtime_pg.PrepareDB(t)
 	db.Close()
 
 	if err := postgres.CreateDatabase(ctx, runtime_pg.PostgresDbOpt); err != nil {
@@ -28,15 +28,15 @@ func prepareStore(t *testing.T) (context.Context, metadata.Store) {
 }
 
 func TestCreateDatabase(t *testing.T) {
-	ctx, db := runtime_pg.PrepareDB()
+	ctx, db := runtime_pg.PrepareDB(t)
 	db.Close()
 
 	if err := postgres.CreateDatabase(ctx, runtime_pg.PostgresDbOpt); err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	store, err := postgres.Open(ctx, &runtime_pg.PostgresDbOpt)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	defer store.Close()
 

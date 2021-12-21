@@ -12,7 +12,7 @@ import (
 )
 
 func prepareStore(t *testing.T) (context.Context, online.Store) {
-	ctx, session := runtime_cassandra.PrepareDB()
+	ctx, session := runtime_cassandra.PrepareDB(t)
 
 	createKeySpace := fmt.Sprintf(`CREATE KEYSPACE %s
 	WITH replication = {
