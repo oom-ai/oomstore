@@ -2,13 +2,14 @@ package bigquery
 
 import (
 	"bytes"
-	"cloud.google.com/go/bigquery"
 	"context"
 	"fmt"
-	"google.golang.org/api/iterator"
 	"strconv"
 	"strings"
 	"text/template"
+
+	"cloud.google.com/go/bigquery"
+	"google.golang.org/api/iterator"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"

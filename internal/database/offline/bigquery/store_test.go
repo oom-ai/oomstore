@@ -30,7 +30,7 @@ func prepareDB(t *testing.T) (context.Context, *bigquery.DB) {
 		t.Fatal(err)
 	}
 
-	db.Dataset("test").DeleteWithContents(ctx)
+	_ = db.Dataset("test").DeleteWithContents(ctx)
 	err = db.Dataset("test").Create(ctx, &bq.DatasetMetadata{
 		Location: "US",
 	})
