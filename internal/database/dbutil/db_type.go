@@ -22,6 +22,8 @@ func GetDbTypeFrom(backend types.BackendType, valueType types.ValueType) (string
 		mp = snowFlake
 	case types.DYNAMODB:
 		mp = dynamoDB
+	case types.REDSHIFT:
+		mp = redshiftType
 	default:
 		return "", errdefs.InvalidAttribute(fmt.Errorf("unsupported backend: %s", backend))
 	}
@@ -82,4 +84,5 @@ var (
 		types.TIME:    "timestamp",
 		types.BYTES:   "text",
 	}
+	redshiftType = postgresType
 )

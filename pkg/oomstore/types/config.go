@@ -16,6 +16,7 @@ const (
 	DYNAMODB  BackendType = "dynamodb"
 	CASSANDRA BackendType = "cassandra"
 	BIGQUERY  BackendType = "bigquery"
+	REDSHIFT  BackendType = "redshift"
 )
 
 type OomStoreConfig struct {
@@ -39,6 +40,7 @@ type OfflineStoreConfig struct {
 	MySQL     *MySQLOpt     `yaml:"mysql"`
 	Snowflake *SnowflakeOpt `yaml:"snowflake"`
 	BigQuery  *BigQueryOpt  `yaml:"bigquery"`
+	Redshift  *RedshiftOpt  `yaml:"redshift"`
 }
 
 type MetadataStoreConfig struct {
@@ -62,6 +64,8 @@ type PostgresOpt struct {
 	Password string `yaml:"password"`
 	Database string `yaml:"database"`
 }
+
+type RedshiftOpt = PostgresOpt
 
 type SQLiteOpt struct {
 	DBFile string `yaml:"db-file"`
