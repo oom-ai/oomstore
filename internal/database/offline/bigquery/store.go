@@ -33,10 +33,6 @@ func (db *DB) Ping(ctx context.Context) error {
 	return err
 }
 
-func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
-	panic("implement me")
-}
-
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
 	panic("implement me")
 }
