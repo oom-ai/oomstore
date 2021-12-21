@@ -5,11 +5,12 @@ import (
 	"os"
 	"testing"
 
+	bq "cloud.google.com/go/bigquery"
+
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/bigquery"
 	"github.com/oom-ai/oomstore/internal/database/offline/test_impl"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/stretchr/testify/require"
 )
 
 func prepareStore(t *testing.T) (context.Context, offline.Store) {
@@ -28,6 +29,14 @@ func prepareDB(t *testing.T) (context.Context, *bigquery.DB) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	_ = db.Dataset("test").DeleteWithContents(ctx)
+	err = db.Dataset("test").Create(ctx, &bq.DatasetMetadata{
+		Location: "US",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 	return ctx, db
 }
 
@@ -37,18 +46,12 @@ func TestPing(t *testing.T) {
 
 func TestImport(t *testing.T) {
 	test_impl.TestImport(t, prepareStore)
-
-	ctx, db := prepareDB(t)
-	table := db.Dataset("test").Table("offline_1_1")
-	err := table.Delete(ctx)
-	require.NoError(t, err)
 }
 
 func TestExport(t *testing.T) {
 	test_impl.TestExport(t, prepareStore)
+}
 
-	ctx, db := prepareDB(t)
-	table := db.Dataset("test").Table("offline_1_1")
-	err := table.Delete(ctx)
-	require.NoError(t, err)
+func TestJoin(t *testing.T) {
+	test_impl.TestJoin(t, prepareStore)
 }

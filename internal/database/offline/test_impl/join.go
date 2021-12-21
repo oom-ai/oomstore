@@ -27,22 +27,19 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn) {
 	twoGroupFeatures, twoGroupFeatureMap := prepareFeatures(false)
 
 	buildTestDataTable(ctx, t, store, oneGroupFeatures, "offline_1_1", &offline.CSVSource{
-		Reader: bufio.NewReader(strings.NewReader(`
-1234,xiaomi,100
+		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100
 1235,apple,200
 `)),
 		Delimiter: ",",
 	})
 	buildTestDataTable(ctx, t, store, oneGroupFeatures, "offline_1_2", &offline.CSVSource{
-		Reader: bufio.NewReader(strings.NewReader(`
-1234,galaxy,300
+		Reader: bufio.NewReader(strings.NewReader(`1234,galaxy,300
 1235,oneplus,240
 `)),
 		Delimiter: ",",
 	})
 	buildTestDataTable(ctx, t, store, twoGroupFeatures[2:], "offline_2_1", &offline.CSVSource{
-		Reader: bufio.NewReader(strings.NewReader(`
-1234,1
+		Reader: bufio.NewReader(strings.NewReader(`1234,1
 1235,0
 `)),
 		Delimiter: ",",
@@ -88,7 +85,8 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn) {
 				RevisionRangeMap: prepareRevisionRanges(false),
 			},
 			expected: prepareResult(false, false),
-		}, {
+		},
+		{
 			description: "two feature groups, with extra values",
 			opt: offline.JoinOpt{
 				Entity:           *entity,
