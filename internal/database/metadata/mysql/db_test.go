@@ -48,8 +48,9 @@ func TestCreateDatabase(t *testing.T) {
 	err = store.SelectContext(ctx, &tables,
 		`SELECT table_name
 			FROM information_schema.tables
-			WHERE table_schema = 'test'
-			ORDER BY table_name;`)
+			WHERE table_schema = ?
+			ORDER BY table_name;`,
+		runtime_mysql.MySQLDbOpt.Database)
 	require.NoError(t, err)
 
 	var wantTables []string
