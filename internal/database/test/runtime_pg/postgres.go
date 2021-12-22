@@ -10,38 +10,41 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-var PostgresDbOpt = types.PostgresOpt{
-	Host:     "127.0.0.1",
-	Port:     "5432",
-	User:     "test",
-	Password: "test",
-	Database: "oomstore_test",
-}
-
-func PrepareDB(t *testing.T) (context.Context, *sqlx.DB) {
+func PrepareDB(t *testing.T, database string) (context.Context, *sqlx.DB) {
 	ctx := context.Background()
+	opt := GetOpt(database)
 	db, err := dbutil.OpenPostgresDB(
-		PostgresDbOpt.Host,
-		PostgresDbOpt.Port,
-		PostgresDbOpt.User,
-		PostgresDbOpt.Password,
+		opt.Host,
+		opt.Port,
+		opt.User,
+		opt.Password,
 		// Postgres creates a database with the same name of the user.
 		// We need to connect using this database to drop other databases.
-		PostgresDbOpt.User,
+		opt.User,
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if err := exec.Command(
-		"oomplay", "init", "postgres",
-		"--port", PostgresDbOpt.Port,
-		"--user", PostgresDbOpt.User,
-		"--password", PostgresDbOpt.Password,
-		"--database", PostgresDbOpt.Database,
-	).Run(); err != nil {
-		t.Fatal(err)
-	}
-
 	return ctx, db
+}
+
+func Reset(database string) error {
+	opt := GetOpt(database)
+	return exec.Command(
+		"oomplay", "init", "postgres",
+		"--port", opt.Port,
+		"--user", opt.User,
+		"--password", opt.Password,
+		"--database", opt.Database,
+	).Run()
+}
+
+func GetOpt(database string) *types.PostgresOpt {
+	return &types.PostgresOpt{
+		Host:     "127.0.0.1",
+		Port:     "5432",
+		User:     "test",
+		Password: "test",
+		Database: database,
+	}
 }
