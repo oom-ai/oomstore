@@ -35,81 +35,61 @@ func (db *DB) ListEntity(ctx context.Context, entityIDs *[]int) (types.EntityLis
 }
 
 func (db *DB) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {
-	//TODO implement me
-	panic("implement me")
+	return createFeature(ctx, db, opt)
 }
 
 func (db *DB) UpdateFeature(ctx context.Context, opt metadata.UpdateFeatureOpt) error {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.UpdateFeature(ctx, db, opt)
 }
 
 func (db *DB) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.GetFeature(ctx, db, id)
 }
 
 func (db *DB) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.GetFeatureByName(ctx, db, name)
 }
 
 func (db *DB) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) (types.FeatureList, error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.ListFeature(ctx, db, opt)
 }
 
 func (db *DB) CreateGroup(ctx context.Context, opt metadata.CreateGroupOpt) (int, error) {
-	//TODO implement me
-	panic("implement me")
+	return createGroup(ctx, db, opt)
 }
 
 func (db *DB) UpdateGroup(ctx context.Context, opt metadata.UpdateGroupOpt) error {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.UpdateGroup(ctx, db, opt)
 }
 
 func (db *DB) GetGroup(ctx context.Context, id int) (*types.Group, error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.GetGroup(ctx, db, id)
 }
 
 func (db *DB) GetGroupByName(ctx context.Context, name string) (*types.Group, error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.GetGroupByName(ctx, db, name)
 }
 
 func (db *DB) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.ListGroup(ctx, db, entityID, groupIDs)
 }
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
-	//TODO implement me
-	panic("implement me")
+	return createRevision(ctx, db, opt)
 }
 
 func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.UpdateRevision(ctx, db, opt)
 }
 
 func (db *DB) GetRevision(ctx context.Context, id int) (*types.Revision, error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.GetRevision(ctx, db, id)
 }
 
 func (db *DB) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.GetRevisionBy(ctx, db, groupID, revision)
 }
 
 func (db *DB) ListRevision(ctx context.Context, groupID *int) (types.RevisionList, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (db *DB) CacheListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.ListRevision(ctx, db, groupID)
 }
