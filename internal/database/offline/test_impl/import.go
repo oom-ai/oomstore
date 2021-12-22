@@ -6,9 +6,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/spf13/cast"
+
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/spf13/cast"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,14 +28,12 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 		DataTableName: dataTable,
 		Features: []*types.Feature{
 			{
-				Name:        "model",
-				DBValueType: "invalid-db-value-type",
-				ValueType:   "invalid-db-value-type",
+				Name:      "price",
+				ValueType: types.INT64,
 			},
 			{
-				Name:        "price",
-				DBValueType: "int",
-				ValueType:   types.INT64,
+				Name:      "model",
+				ValueType: "invalid-db-value-type",
 			},
 		},
 		Header: []string{"device", "model", "price"},
@@ -55,8 +54,16 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 
 	t.Run("normal import call", func(t *testing.T) {
 		revision := int64(1234)
-		opt.Features[0].DBValueType = "varchar(32)"
-		opt.Features[0].ValueType = types.STRING
+		opt.Features = []*types.Feature{
+			{
+				Name:      "price",
+				ValueType: types.INT64,
+			},
+			{
+				Name:      "model",
+				ValueType: types.STRING,
+			},
+		}
 		opt.Revision = &revision
 		_, err := store.Import(ctx, opt)
 		assert.NoError(t, err)
@@ -64,7 +71,10 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 		stream, errch := store.Export(ctx, offline.ExportOpt{
 			DataTable:  dataTable,
 			EntityName: entity.Name,
-			Features:   opt.Features,
+			Features: []*types.Feature{
+				{Name: "model", ValueType: types.STRING},
+				{Name: "price", ValueType: types.INT64},
+			},
 		})
 		records := make([][]interface{}, 0)
 		for row := range stream {

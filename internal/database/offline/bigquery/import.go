@@ -16,24 +16,33 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 
 	// Step 1: define table schema
 	schema := make(bigquery.Schema, 0, len(opt.Features)+1)
-	schema = append(schema, &bigquery.FieldSchema{
-		Name:        opt.Entity.Name,
-		Type:        bigquery.StringFieldType,
-		Description: "entity key",
-	})
-	for _, f := range opt.Features {
-		fieldType, err := convertValueTypeToBigQueryType(f.ValueType)
-		if err != nil {
-			return 0, err
+	for _, h := range opt.Header {
+		if h == opt.Entity.Name {
+			schema = append(schema, &bigquery.FieldSchema{
+				Name:        opt.Entity.Name,
+				Type:        bigquery.StringFieldType,
+				Description: "entity key",
+			})
+		} else {
+			feature := opt.Features.Find(func(f *types.Feature) bool {
+				return f.Name == h
+			})
+			if feature == nil {
+				return 0, fmt.Errorf("missing feature %s", h)
+			}
+			fieldType, err := convertValueTypeToBigQueryType(feature.ValueType)
+			if err != nil {
+				return 0, err
+			}
+			schema = append(schema, &bigquery.FieldSchema{
+				Name:        feature.Name,
+				Type:        fieldType,
+				Description: feature.Description,
+			})
 		}
-		schema = append(schema, &bigquery.FieldSchema{
-			Name:        f.Name,
-			Type:        fieldType,
-			Description: f.Description,
-		})
 	}
 
-	// Step 2: create offline etable
+	// Step 2: create offline table
 	metaData := &bigquery.TableMetadata{
 		Name:   opt.DataTableName,
 		Schema: schema,
