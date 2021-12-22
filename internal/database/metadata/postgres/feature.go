@@ -11,6 +11,9 @@ import (
 )
 
 func createFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateFeatureOpt) (int, error) {
+	if err := opt.ValueType.Validate(); err != nil {
+		return 0, err
+	}
 	var featureID int
 	query := "INSERT INTO feature(name, group_id, value_type, description) VALUES ($1, $2, $3, $4) RETURNING id"
 	err := sqlxCtx.GetContext(ctx, &featureID, query, opt.FeatureName, opt.GroupID, opt.ValueType, opt.Description)

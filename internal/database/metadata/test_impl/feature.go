@@ -58,6 +58,7 @@ func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreFn) {
 	opt := metadata.CreateFeatureOpt{
 		FeatureName: "phone",
 		GroupID:     groupID,
+		ValueType:   types.STRING,
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
@@ -75,6 +76,7 @@ func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreFn) 
 	opt := metadata.CreateFeatureOpt{
 		FeatureName: "user",
 		GroupID:     groupID,
+		ValueType:   types.INT64,
 		Description: "order",
 	}
 

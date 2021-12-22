@@ -8,12 +8,16 @@ import (
 type ValueType int
 
 const (
-	STRING ValueType = iota + 1
+	valueTypeStart ValueType = iota
+
+	STRING
 	INT64
 	FLOAT64
 	BOOL
 	TIME
 	BYTES
+
+	valueTypeEnd
 )
 
 func (t ValueType) String() string {
@@ -50,4 +54,11 @@ func ParseValueType(s string) (ValueType, error) {
 		return BYTES, nil
 	}
 	return 0, fmt.Errorf("Unknown value type: %s", s)
+}
+
+func (v ValueType) Validate() error {
+	if v <= valueTypeStart || v >= valueTypeEnd {
+		return fmt.Errorf("Invalid value type: %d", v)
+	}
+	return nil
 }
