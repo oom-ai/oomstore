@@ -5,21 +5,21 @@ import (
 	"os"
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/internal/database/metadata/test_impl"
-
-	"github.com/oom-ai/oomstore/internal/database/metadata/postgres"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/postgres"
 	"github.com/oom-ai/oomstore/internal/database/metadata/sqlite"
+	"github.com/oom-ai/oomstore/internal/database/metadata/test_impl"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func prepareStore(t *testing.T) (context.Context, metadata.Store) {
 	return prepareDB(t)
 }
+
+func destroyStore() {}
 
 func prepareDB(t *testing.T) (context.Context, *sqlite.DB) {
 	ctx := context.Background()
@@ -70,47 +70,47 @@ func TestCreateDatabase(t *testing.T) {
 }
 
 func TestCreateEntity(t *testing.T) {
-	test_impl.TestCreateEntity(t, prepareStore)
+	test_impl.TestCreateEntity(t, prepareStore, destroyStore)
 }
 
 func TestGetEntity(t *testing.T) {
-	test_impl.TestGetEntity(t, prepareStore)
+	test_impl.TestGetEntity(t, prepareStore, destroyStore)
 }
 
 func TestUpdateEntity(t *testing.T) {
-	test_impl.TestUpdateEntity(t, prepareStore)
+	test_impl.TestUpdateEntity(t, prepareStore, destroyStore)
 }
 
 func TestListEntity(t *testing.T) {
-	test_impl.TestListEntity(t, prepareStore)
+	test_impl.TestListEntity(t, prepareStore, destroyStore)
 }
 
 func TestCreateGroup(t *testing.T) {
-	test_impl.TestCreateGroup(t, prepareStore)
+	test_impl.TestCreateGroup(t, prepareStore, destroyStore)
 }
 
 func TestUpdateGroup(t *testing.T) {
-	test_impl.TestUpdateGroup(t, prepareStore)
+	test_impl.TestUpdateGroup(t, prepareStore, destroyStore)
 }
 
 func TestGetGroup(t *testing.T) {
-	test_impl.TestGetGroup(t, prepareStore)
+	test_impl.TestGetGroup(t, prepareStore, destroyStore)
 }
 
 func TestListGroup(t *testing.T) {
-	test_impl.TestListGroup(t, prepareStore)
+	test_impl.TestListGroup(t, prepareStore, destroyStore)
 }
 
 func TestCreateFeature(t *testing.T) {
-	test_impl.TestCreateFeature(t, prepareStore)
+	test_impl.TestCreateFeature(t, prepareStore, destroyStore)
 }
 
 func TestCreateFeatureWithSameName(t *testing.T) {
-	test_impl.TestCreateFeatureWithSameName(t, prepareStore)
+	test_impl.TestCreateFeatureWithSameName(t, prepareStore, destroyStore)
 }
 
 func TestCreateFeatureWithSQLKeyword(t *testing.T) {
-	test_impl.TestCreateFeatureWithSQLKeyword(t, prepareStore)
+	test_impl.TestCreateFeatureWithSQLKeyword(t, prepareStore, destroyStore)
 }
 
 func TestCreateFeatureWithInvalidDataType(t *testing.T) {
@@ -118,45 +118,45 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T) {
 	// so we cannot use `Create Table` to check whether data type is valid or not.
 	// This issue will be auto-resolved when we infer DB value type from go value type.
 	t.Skip()
-	test_impl.TestCreateFeatureWithInvalidDataType(t, prepareStore)
+	test_impl.TestCreateFeatureWithInvalidDataType(t, prepareStore, destroyStore)
 }
 
 func TestUpdateFeature(t *testing.T) {
-	test_impl.TestUpdateFeature(t, prepareStore)
+	test_impl.TestUpdateFeature(t, prepareStore, destroyStore)
 }
 
 func TestGetFeature(t *testing.T) {
-	test_impl.TestGetFeature(t, prepareStore)
+	test_impl.TestGetFeature(t, prepareStore, destroyStore)
 }
 
 func TestGetFeatureByName(t *testing.T) {
-	test_impl.TestGetFeatureByName(t, prepareStore)
+	test_impl.TestGetFeatureByName(t, prepareStore, destroyStore)
 }
 
 func TestListFeature(t *testing.T) {
-	test_impl.TestListFeature(t, prepareStore)
+	test_impl.TestListFeature(t, prepareStore, destroyStore)
 }
 
 func TestCacheListFeature(t *testing.T) {
-	test_impl.TestCacheListFeature(t, prepareStore)
+	test_impl.TestCacheListFeature(t, prepareStore, destroyStore)
 }
 
 func TestCreateRevision(t *testing.T) {
-	test_impl.TestCreateRevision(t, prepareStore)
+	test_impl.TestCreateRevision(t, prepareStore, destroyStore)
 }
 
 func TestUpdateRevision(t *testing.T) {
-	test_impl.TestUpdateRevision(t, prepareStore)
+	test_impl.TestUpdateRevision(t, prepareStore, destroyStore)
 }
 
 func TestGetRevision(t *testing.T) {
-	test_impl.TestGetRevision(t, prepareStore)
+	test_impl.TestGetRevision(t, prepareStore, destroyStore)
 }
 
 func TestGetRevisionBy(t *testing.T) {
-	test_impl.TestGetRevisionBy(t, prepareStore)
+	test_impl.TestGetRevisionBy(t, prepareStore, destroyStore)
 }
 
 func TestListRevision(t *testing.T) {
-	test_impl.TestListRevision(t, prepareStore)
+	test_impl.TestListRevision(t, prepareStore, destroyStore)
 }
