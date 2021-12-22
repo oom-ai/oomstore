@@ -18,7 +18,7 @@ const (
 )
 
 func supportIndex(backendType types.BackendType) bool {
-	for _, b := range []types.BackendType{types.SNOWFLAKE, types.REDSHIFT} {
+	for _, b := range []types.BackendType{types.SNOWFLAKE, types.REDSHIFT, types.BIGQUERY} {
 		if b == backendType {
 			return false
 		}
@@ -67,67 +67,88 @@ func createTableJoined(ctx context.Context, db *sqlx.DB, features types.FeatureL
 	return tableName, nil
 }
 
-func createAndImportTableEntityRows(ctx context.Context, db *sqlx.DB, entity types.Entity, entityRows <-chan types.EntityRow, valueNames []string, backendType types.BackendType) (string, error) {
-	columnFormat, err := dbutil.GetColumnFormat(backendType)
+func PrepareEntityRowsTable(ctx context.Context, dbOpt dbutil.DBOpt, entity types.Entity, entityRows <-chan types.EntityRow, valueNames []string) (string, error) {
+	// Step 1: create entity_rows table
+	columnFormat, err := dbutil.GetColumnFormat(dbOpt.Backend)
 	if err != nil {
 		return "", err
 	}
-	qt, err := dbutil.QuoteFn(backendType)
+	qt, err := dbutil.QuoteFn(dbOpt.Backend)
 	if err != nil {
 		return "", err
+	}
+	tableName := dbutil.TempTable("entity_rows")
+
+	// TODO: infer db_type from value_type
+	var entityType, valueType, qtTableName string
+	switch dbOpt.Backend {
+	case types.BIGQUERY:
+		entityType = "STRING"
+		valueType = "STRING"
+		qtTableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, qt(tableName))
+	default:
+		entityType = fmt.Sprintf("VARCHAR(%d)", entity.Length)
+		valueType = "TEXT"
+		qtTableName = qt(tableName)
 	}
 
-	// create table entity_rows
-	tableName := dbutil.TempTable("entity_rows")
 	columnDefs := []string{
-		fmt.Sprintf(`%s  VARCHAR(%d) NOT NULL`, qt("entity_key"), entity.Length),
-		fmt.Sprintf(`%s  BIGINT NOT NULL`, qt("unix_milli")),
+		fmt.Sprintf(`%s %s NOT NULL`, qt("entity_key"), entityType),
+		fmt.Sprintf(`%s BIGINT NOT NULL`, qt("unix_milli")),
 	}
 	for _, name := range valueNames {
-		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, "TEXT"))
+		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, valueType))
 	}
 	schema := fmt.Sprintf(`
 		CREATE TABLE %s (
 			%s
 		);
-	`, qt(tableName), strings.Join(columnDefs, ",\n"))
+	`, qtTableName, strings.Join(columnDefs, ",\n"))
 
-	if _, err := db.ExecContext(ctx, schema); err != nil {
+	if err = dbOpt.ExecContext(ctx, schema, nil); err != nil {
 		return "", err
 	}
 
-	// populate dataset to the table
-	if err := insertEntityRows(ctx, db, tableName, entityRows, valueNames, backendType); err != nil {
+	// Step 2: populate dataset to the table
+	if err = insertEntityRows(ctx, dbOpt, tableName, entityRows, valueNames); err != nil {
 		return "", err
 	}
 
-	if supportIndex(backendType) {
+	// Step 3: create index on table entity_rows
+	if supportIndex(dbOpt.Backend) {
 		index := fmt.Sprintf(`CREATE INDEX idx_%s ON %s (unix_milli, entity_key)`, tableName, tableName)
-		if _, err := db.ExecContext(ctx, index); err != nil {
+		if err = dbOpt.ExecContext(ctx, index, nil); err != nil {
 			return "", err
 		}
 	}
+
 	return tableName, nil
 }
 
-func insertEntityRows(ctx context.Context, db *sqlx.DB, tableName string, entityRows <-chan types.EntityRow, valueNames []string, backendType types.BackendType) error {
+func insertEntityRows(ctx context.Context, dbOpt dbutil.DBOpt, tableName string, entityRows <-chan types.EntityRow, valueNames []string) error {
 	records := make([]interface{}, 0, InsertBatchSize)
 	columns := []string{"entity_key", "unix_milli"}
 	columns = append(columns, valueNames...)
+
+	format := `%s`
+	if dbOpt.Backend == types.BIGQUERY {
+		format = `"%s"`
+	}
 	for entityRow := range entityRows {
-		record := []interface{}{entityRow.EntityKey, entityRow.UnixMilli}
+		record := []interface{}{fmt.Sprintf(format, entityRow.EntityKey), entityRow.UnixMilli}
 		for _, v := range entityRow.Values {
-			record = append(record, v)
+			record = append(record, fmt.Sprintf(format, v))
 		}
 		records = append(records, record)
 		if len(records) == InsertBatchSize {
-			if err := dbutil.InsertRecordsToTable(db, ctx, tableName, records, columns, backendType); err != nil {
+
+			if err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, records, columns); err != nil {
 				return err
 			}
 			records = make([]interface{}, 0, InsertBatchSize)
 		}
 	}
-	if err := dbutil.InsertRecordsToTable(db, ctx, tableName, records, columns, backendType); err != nil {
+	if err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, records, columns); err != nil {
 		return err
 	}
 	return nil

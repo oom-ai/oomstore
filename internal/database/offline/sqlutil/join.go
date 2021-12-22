@@ -20,7 +20,11 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType typ
 	if len(features) == 0 {
 		return nil, nil
 	}
-	entityRowsTableName, err := createAndImportTableEntityRows(ctx, db, opt.Entity, opt.EntityRows, opt.ValueNames, backendType)
+	dbOpt := dbutil.DBOpt{
+		Backend: backendType,
+		SqlxDB:  db,
+	}
+	entityRowsTableName, err := PrepareEntityRowsTable(ctx, dbOpt, opt.Entity, opt.EntityRows, opt.ValueNames)
 	if err != nil {
 		return nil, err
 	}
