@@ -81,7 +81,7 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType
 // As a work around, we cast the string to interface{} based on ValueType
 // This method is mostly copied from redis.DeserializeByTag, except we use 10 rather than 36 as the base
 // TODO: we should let the snowflake team fix the gosnowflake converter
-func deserializeByTag(i interface{}, typeTag string) (interface{}, error) {
+func deserializeByTag(i interface{}, valueType types.ValueType) (interface{}, error) {
 	if i == nil {
 		return nil, nil
 	}
@@ -91,7 +91,7 @@ func deserializeByTag(i interface{}, typeTag string) (interface{}, error) {
 		return nil, fmt.Errorf("not a string or nil: %v", i)
 	}
 
-	switch typeTag {
+	switch valueType {
 	case types.STRING:
 		return s, nil
 
@@ -118,6 +118,6 @@ func deserializeByTag(i interface{}, typeTag string) (interface{}, error) {
 	case types.BYTES:
 		return []byte(s), nil
 	default:
-		return "", fmt.Errorf("unsupported type tag: %s", typeTag)
+		return "", fmt.Errorf("unsupported value type: %s", valueType)
 	}
 }

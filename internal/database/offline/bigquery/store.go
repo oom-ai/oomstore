@@ -14,7 +14,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-var BigQueryTypeMap = map[string]string{
+var BigQueryTypeMap = map[string]types.ValueType{
 	"bool":     types.BOOL,
 	"bytes":    types.BYTES,
 	"datetime": types.TIME,
@@ -84,6 +84,6 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 	return &schema, nil
 }
 
-func (db *DB) TypeTag(dbType string) (string, error) {
-	return sqlutil.TypeTag(BigQueryTypeMap, dbType)
+func (db *DB) TypeTag(dbType string) (types.ValueType, error) {
+	return sqlutil.GetValueType(BigQueryTypeMap, dbType)
 }

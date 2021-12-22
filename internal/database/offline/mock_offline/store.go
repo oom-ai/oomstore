@@ -125,10 +125,10 @@ func (mr *MockStoreMockRecorder) TableSchema(ctx, tableName interface{}) *gomock
 }
 
 // TypeTag mocks base method.
-func (m *MockStore) TypeTag(dbType string) (string, error) {
+func (m *MockStore) TypeTag(dbType string) (types.ValueType, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TypeTag", dbType)
-	ret0, _ := ret[0].(string)
+	ret0, _ := ret[0].(types.ValueType)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -33,7 +33,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 			},
 			{
 				Name:      "model",
-				ValueType: "invalid-db-value-type",
+				ValueType: -1,
 			},
 		},
 		Header: []string{"device", "model", "price"},

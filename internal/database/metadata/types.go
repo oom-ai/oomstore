@@ -18,7 +18,7 @@ type CreateFeatureOpt struct {
 	GroupID     int
 	DBValueType string
 	Description string
-	ValueType   string
+	ValueType   types.ValueType
 }
 
 type CreateGroupOpt struct {

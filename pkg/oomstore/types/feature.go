@@ -7,10 +7,10 @@ import (
 )
 
 type Feature struct {
-	ID          int    `db:"id"`
-	Name        string `db:"name"`
-	ValueType   string `db:"value_type"`
-	DBValueType string `db:"db_value_type"`
+	ID          int       `db:"id"`
+	Name        string    `db:"name"`
+	ValueType   ValueType `db:"value_type"`
+	DBValueType string    `db:"db_value_type"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`

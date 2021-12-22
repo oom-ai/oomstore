@@ -70,7 +70,7 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 	return time.Now().UnixMilli(), nil
 }
 
-func convertValueTypeToBigQueryType(t string) (bigquery.FieldType, error) {
+func convertValueTypeToBigQueryType(t types.ValueType) (bigquery.FieldType, error) {
 	switch t {
 	case types.STRING:
 		return bigquery.StringFieldType, nil

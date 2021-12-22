@@ -12,12 +12,12 @@ func OnlineTableName(revisionID int) string {
 	return fmt.Sprintf("online_%d", revisionID)
 }
 
-func deserializeByTag(i interface{}, typeTag string, backend types.BackendType) (interface{}, error) {
+func deserializeByTag(i interface{}, valueType types.ValueType, backend types.BackendType) (interface{}, error) {
 	if i == nil {
 		return nil, nil
 	}
 
-	switch typeTag {
+	switch valueType {
 	case types.STRING:
 		if backend == types.MYSQL {
 			return string(i.([]byte)), nil

@@ -147,7 +147,7 @@ func buildQueryForInsertRecords(datasetID, tableName string, records [][]interfa
 	return fmt.Sprintf(`INSERT INTO %s.%s (%s) VALUES %s`, datasetID, tableName, columnStr, strings.Join(values, ",")), nil
 }
 
-func convertValueTypeToBigQuerySQLType(t string) (string, error) {
+func convertValueTypeToBigQuerySQLType(t types.ValueType) (string, error) {
 	switch t {
 	case types.STRING:
 		return "STRING", nil

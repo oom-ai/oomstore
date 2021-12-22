@@ -10,7 +10,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-var PostgresTypeMap = map[string]string{
+var PostgresTypeMap = map[string]types.ValueType{
 	"bigint":    types.INT64,
 	"int8":      types.INT64,
 	"bigserial": types.INT64,
@@ -89,8 +89,8 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	return sqlutil.Join(ctx, db.DB, opt, types.POSTGRES)
 }
 
-func (db *DB) TypeTag(dbType string) (string, error) {
-	return sqlutil.TypeTag(PostgresTypeMap, dbType)
+func (db *DB) TypeTag(dbType string) (types.ValueType, error) {
+	return sqlutil.GetValueType(PostgresTypeMap, dbType)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
