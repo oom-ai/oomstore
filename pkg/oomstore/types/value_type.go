@@ -3,6 +3,8 @@ package types
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 )
 
 type ValueType int
@@ -38,7 +40,7 @@ func (v ValueType) Validate() error {
 	if _, ok := allValueTypes[v]; ok {
 		return nil
 	} else {
-		return fmt.Errorf("Invalid value type: %d", v)
+		return errdefs.InvalidAttribute(fmt.Errorf("Invalid value type: %d", v))
 	}
 }
 
@@ -57,5 +59,5 @@ func ParseValueType(s string) (ValueType, error) {
 	case "bytes":
 		return BYTES, nil
 	}
-	return INVALID, fmt.Errorf("Unknown value type: %s", s)
+	return INVALID, errdefs.InvalidAttribute(fmt.Errorf("Unknown value type: %s", s))
 }

@@ -36,6 +36,7 @@ func DBValueType(backend types.BackendType, valueType types.ValueType) (string, 
 	return t, nil
 }
 
+// Used for inferring feature value type from a supported offline db value type
 func ValueType(backend types.BackendType, dbValueType string) (types.ValueType, error) {
 	var mp map[string]types.ValueType
 	switch backend {
