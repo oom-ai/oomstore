@@ -9,14 +9,14 @@ offline-store:
   postgres:
     host: 127.0.0.1
     port: 5432
-    user: postgres
-    password: postgres
+    user: test
+    password: test
     database: oomstore_test
 
 metadata-store:
   postgres:
     host: 127.0.0.1
     port: 5432
-    user: postgres
-    password: postgres
+    user: test
+    password: test
     database: oomstore_test
