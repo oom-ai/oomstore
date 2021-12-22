@@ -12,9 +12,16 @@ import (
 )
 
 func PrepareDB(t *testing.T, database string) (context.Context, *sqlx.DB) {
-	ctx := context.Background()
+	db, err := prepareDB(database)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return context.Background(), db
+}
+
+func prepareDB(database string) (*sqlx.DB, error) {
 	opt := GetOpt(database)
-	db, err := dbutil.OpenPostgresDB(
+	return dbutil.OpenPostgresDB(
 		opt.Host,
 		opt.Port,
 		opt.User,
@@ -23,10 +30,21 @@ func PrepareDB(t *testing.T, database string) (context.Context, *sqlx.DB) {
 		// We need to connect using this database to drop other databases.
 		opt.User,
 	)
-	if err != nil {
-		t.Fatal(err)
+}
+
+func DestroyStore(database string) func() {
+	return func() {
+		db, err := prepareDB(database)
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+
+		if _, err := db.ExecContext(context.Background(),
+			fmt.Sprintf("DROP DATABASE IF EXISTS %s", database)); err != nil {
+			panic(err)
+		}
 	}
-	return ctx, db
 }
 
 func Reset(database string) {
