@@ -15,7 +15,7 @@ import (
 const SnowflakeBatchSize = 100
 
 // TODO: add type NUMBER, DECIMAL, NUMERIC
-var SnowflakeTypeMap = map[string]string{
+var SnowflakeTypeMap = map[string]types.ValueType{
 	"boolean": types.BOOL,
 
 	"binary":    types.BYTES,
@@ -88,8 +88,8 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	return sqlutil.Join(ctx, db.DB, opt, types.SNOWFLAKE)
 }
 
-func (db *DB) TypeTag(dbType string) (string, error) {
-	return sqlutil.TypeTag(SnowflakeTypeMap, dbType)
+func (db *DB) TypeTag(dbType string) (types.ValueType, error) {
+	return sqlutil.GetValueType(SnowflakeTypeMap, dbType)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {

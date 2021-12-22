@@ -122,7 +122,7 @@ func importSample(t *testing.T, ctx context.Context, store online.Store, samples
 	}
 }
 
-func compareFeatureValue(t *testing.T, expected, actual interface{}, valueType string) {
+func compareFeatureValue(t *testing.T, expected, actual interface{}, valueType types.ValueType) {
 	if valueType == types.TIME {
 		expected, ok := expected.(time.Time)
 		require.Equal(t, true, ok)

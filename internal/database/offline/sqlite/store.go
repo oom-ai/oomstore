@@ -14,7 +14,7 @@ import (
 
 const SQLiteBatchSize = 20
 
-var SQLiteTypeMap = map[string]string{
+var SQLiteTypeMap = map[string]types.ValueType{
 	"integer":   types.INT64,
 	"float":     types.FLOAT64,
 	"blob":      types.BYTES,
@@ -50,8 +50,8 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	return sqlutil.Join(ctx, db.DB, opt, types.SQLite)
 }
 
-func (db *DB) TypeTag(dbType string) (string, error) {
-	return sqlutil.TypeTag(SQLiteTypeMap, dbType)
+func (db *DB) TypeTag(dbType string) (types.ValueType, error) {
+	return sqlutil.GetValueType(SQLiteTypeMap, dbType)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {

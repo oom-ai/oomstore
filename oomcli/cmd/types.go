@@ -29,13 +29,13 @@ type FlattenGroup struct {
 }
 
 type FlattenFeature struct {
-	ID          int    `oomcli:"ID"`
-	Name        string `oomcli:"NAME"`
-	Group       string `oomcli:"GROUP"`
-	Entity      string `oomcli:"ENTITY"`
-	Category    string `oomcli:"CATEGORY"`
-	ValueType   string `oomcli:"VALUE-TYPE"`
-	Description string `oomcli:"DESCRIPTION,truncate"`
+	ID          int             `oomcli:"ID"`
+	Name        string          `oomcli:"NAME"`
+	Group       string          `oomcli:"GROUP"`
+	Entity      string          `oomcli:"ENTITY"`
+	Category    string          `oomcli:"CATEGORY"`
+	ValueType   types.ValueType `oomcli:"VALUE-TYPE"`
+	Description string          `oomcli:"DESCRIPTION,truncate"`
 
 	DBValueType      string    `oomcli:"DB-VALUE-TYPE,wide"`
 	OnlineRevisionID *int      `oomcli:"ONLINE-REVISION-ID,wide"`

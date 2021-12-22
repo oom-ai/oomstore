@@ -58,5 +58,5 @@ type DataTableSchema struct {
 
 type DataTableFieldSchema struct {
 	Name      string
-	ValueType string
+	ValueType ValueType
 }

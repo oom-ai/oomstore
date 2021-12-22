@@ -27,7 +27,7 @@ func TestCreateBatchFeature(t *testing.T) {
 	testCases := []struct {
 		description string
 		opt         types.CreateFeatureOpt
-		valueType   string
+		valueType   types.ValueType
 		group       types.Group
 		expectError bool
 	}{

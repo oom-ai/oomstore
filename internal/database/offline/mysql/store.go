@@ -13,7 +13,7 @@ import (
 
 const MySQLBatchSize = 20
 
-var MySQLTypeMap = map[string]string{
+var MySQLTypeMap = map[string]types.ValueType{
 	"boolean": types.BOOL,
 	"bool":    types.BOOL,
 
@@ -68,8 +68,8 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	return sqlutil.Join(ctx, db.DB, opt, types.MYSQL)
 }
 
-func (db *DB) TypeTag(dbType string) (string, error) {
-	return sqlutil.TypeTag(MySQLTypeMap, dbType)
+func (db *DB) TypeTag(dbType string) (types.ValueType, error) {
+	return sqlutil.GetValueType(MySQLTypeMap, dbType)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {

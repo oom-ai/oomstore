@@ -7,8 +7,8 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func GetDbTypeFrom(backend types.BackendType, valueType string) (string, error) {
-	var mp map[string]string
+func GetDbTypeFrom(backend types.BackendType, valueType types.ValueType) (string, error) {
+	var mp map[types.ValueType]string
 	switch backend {
 	case types.POSTGRES:
 		mp = postgresType
@@ -34,7 +34,7 @@ func GetDbTypeFrom(backend types.BackendType, valueType string) (string, error) 
 }
 
 var (
-	sqliteType = map[string]string{
+	sqliteType = map[types.ValueType]string{
 		types.STRING:  "TEXT",
 		types.INT64:   "INTEGER",
 		types.FLOAT64: "FLOAT",
@@ -42,7 +42,7 @@ var (
 		types.BYTES:   "BLOB",
 		types.TIME:    "TIMESTAMP",
 	}
-	mysqlType = map[string]string{
+	mysqlType = map[types.ValueType]string{
 		types.STRING:  "text",
 		types.INT64:   "bigint",
 		types.FLOAT64: "double",
@@ -50,7 +50,7 @@ var (
 		types.TIME:    "datetime",
 		types.BYTES:   "binary",
 	}
-	postgresType = map[string]string{
+	postgresType = map[types.ValueType]string{
 		types.STRING:  "text",
 		types.INT64:   "bigint",
 		types.FLOAT64: "double precision",
@@ -58,7 +58,7 @@ var (
 		types.TIME:    "timestamptz",
 		types.BYTES:   "bytea",
 	}
-	snowFlake = map[string]string{
+	snowFlake = map[types.ValueType]string{
 		types.STRING:  "VARCHAR",
 		types.INT64:   "INTEGER",
 		types.FLOAT64: "DOUBLE",
@@ -66,7 +66,7 @@ var (
 		types.TIME:    "TIME",
 		types.BYTES:   "BINARY",
 	}
-	dynamoDB = map[string]string{
+	dynamoDB = map[types.ValueType]string{
 		types.STRING:  "String",
 		types.INT64:   "BigInteger",
 		types.FLOAT64: "Float",
@@ -74,7 +74,7 @@ var (
 		types.TIME:    "Date",
 		types.BYTES:   "Byte",
 	}
-	cassandraType = map[string]string{
+	cassandraType = map[types.ValueType]string{
 		types.STRING:  "text",
 		types.INT64:   "bigint",
 		types.FLOAT64: "double",

@@ -7,7 +7,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-var typeMap = map[string]string{
+var typeMap = map[string]types.ValueType{
 	"boolean":  types.BOOL,
 	"binary":   types.BYTES,
 	"bigint":   types.INT64,
@@ -19,7 +19,7 @@ var typeMap = map[string]string{
 func TestTypeTag(t *testing.T) {
 	for _, tt := range []struct {
 		input    string
-		expected string
+		expected types.ValueType
 	}{
 		{"boolean", types.BOOL},
 		{"binary", types.BYTES},
@@ -29,7 +29,7 @@ func TestTypeTag(t *testing.T) {
 		{"VARCHAR(64)", types.STRING},
 		{"datetime", types.TIME},
 	} {
-		actual, err := sqlutil.TypeTag(typeMap, tt.input)
+		actual, err := sqlutil.GetValueType(typeMap, tt.input)
 		if err != nil {
 			t.Fatal(err)
 		}

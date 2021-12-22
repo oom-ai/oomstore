@@ -8,14 +8,14 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func SerializeByTag(i interface{}, typeTag string) (s string, err error) {
+func SerializeByTag(i interface{}, valueType types.ValueType) (s string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("failed to serailize by tag: %v", r)
 		}
 	}()
 
-	switch typeTag {
+	switch valueType {
 	case types.STRING:
 		return i.(string), nil
 	case types.INT64:
@@ -86,7 +86,7 @@ func SerializeByValue(i interface{}) (string, error) {
 	}
 }
 
-func DeserializeByTag(i interface{}, typeTag string) (interface{}, error) {
+func DeserializeByTag(i interface{}, valueType types.ValueType) (interface{}, error) {
 	if i == nil {
 		return nil, nil
 	}
@@ -96,7 +96,7 @@ func DeserializeByTag(i interface{}, typeTag string) (interface{}, error) {
 		return nil, fmt.Errorf("not a string or nil: %v", i)
 	}
 
-	switch typeTag {
+	switch valueType {
 	case types.STRING:
 		return s, nil
 
@@ -123,7 +123,7 @@ func DeserializeByTag(i interface{}, typeTag string) (interface{}, error) {
 	case types.BYTES:
 		return []byte(s), nil
 	default:
-		return "", fmt.Errorf("unsupported type tag: %s", typeTag)
+		return "", fmt.Errorf("unsupported type tag: %s", valueType)
 	}
 }
 

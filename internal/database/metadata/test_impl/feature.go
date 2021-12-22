@@ -44,7 +44,7 @@ func TestCreateFeature(t *testing.T, prepareStore PrepareStoreFn) {
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
 		Description: "description",
-		ValueType:   "string",
+		ValueType:   types.STRING,
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
@@ -108,7 +108,7 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreFn) {
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
 		Description: "description",
-		ValueType:   "string",
+		ValueType:   types.STRING,
 	})
 	require.NoError(t, err)
 
@@ -141,7 +141,7 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreFn) {
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
 		Description: "description",
-		ValueType:   "string",
+		ValueType:   types.STRING,
 	})
 	require.NoError(t, err)
 
@@ -178,7 +178,7 @@ func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreFn) {
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
 		Description: "description",
-		ValueType:   "string",
+		ValueType:   types.STRING,
 	})
 	require.NoError(t, err)
 	require.NoError(t, store.Refresh())
@@ -236,7 +236,7 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreFn) {
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
 		Description: "description",
-		ValueType:   "string",
+		ValueType:   types.STRING,
 	})
 	require.NoError(t, err)
 
@@ -294,7 +294,7 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreFn) {
 		GroupID:     groupID,
 		DBValueType: "varchar(16)",
 		Description: "description",
-		ValueType:   "string",
+		ValueType:   types.STRING,
 	}
 	id, err := store.CreateFeature(ctx, opt)
 	require.NoError(t, err)
