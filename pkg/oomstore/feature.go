@@ -62,15 +62,10 @@ func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatu
 		return 0, fmt.Errorf("expected batch feature group, got %s feature group", group.Category)
 	}
 
-	valueType, err := s.offline.ValueType(opt.DBValueType)
-	if err != nil {
-		return 0, err
-	}
 	return s.metadata.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: opt.FeatureName,
 		GroupID:     group.ID,
-		DBValueType: opt.DBValueType,
-		ValueType:   valueType,
+		ValueType:   opt.ValueType,
 		Description: opt.Description,
 	})
 }

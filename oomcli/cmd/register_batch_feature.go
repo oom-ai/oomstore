@@ -9,6 +9,8 @@ import (
 )
 
 var registerBatchFeatureOpt types.CreateFeatureOpt
+var registerBatchFeatureValueType string
+
 var registerBatchFeatureCmd = &cobra.Command{
 	Use:   "batch-feature <feature_name>",
 	Short: "register a new batch feature",
@@ -35,8 +37,8 @@ func init() {
 	flags.StringVarP(&registerBatchFeatureOpt.GroupName, "group", "g", "", "feature group")
 	_ = registerBatchFeatureCmd.MarkFlagRequired("group")
 
-	flags.StringVarP(&registerBatchFeatureOpt.DBValueType, "db-value-type", "", "", "feature value type in database")
-	_ = registerBatchFeatureCmd.MarkFlagRequired("db-value-type")
+	flags.StringVarP(&registerBatchFeatureValueType, "value-type", "", "", "feature value type")
+	_ = registerBatchFeatureCmd.MarkFlagRequired("value-type")
 
 	flags.StringVar(&registerBatchFeatureOpt.Description, "description", "", "feature description")
 }

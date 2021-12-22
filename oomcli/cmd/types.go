@@ -37,7 +37,6 @@ type FlattenFeature struct {
 	ValueType   types.ValueType `oomcli:"VALUE-TYPE"`
 	Description string          `oomcli:"DESCRIPTION,truncate"`
 
-	DBValueType      string    `oomcli:"DB-VALUE-TYPE,wide"`
 	OnlineRevisionID *int      `oomcli:"ONLINE-REVISION-ID,wide"`
 	CreateTime       time.Time `oomcli:"CREATE-TIME,wide"`
 	ModifyTime       time.Time `oomcli:"MODIFY-TIME,wide"`
@@ -86,7 +85,6 @@ func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenL
 				Category:         e.Group.Category,
 				ValueType:        e.ValueType,
 				Description:      e.Description,
-				DBValueType:      e.DBValueType,
 				OnlineRevisionID: e.OnlineRevisionID(),
 				CreateTime:       e.CreateTime,
 				ModifyTime:       e.ModifyTime,

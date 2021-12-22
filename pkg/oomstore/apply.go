@@ -124,14 +124,13 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 		if !errdefs.IsNotFound(err) {
 			return err
 		}
-		valueType, err := s.offline.ValueType(newFeature.DBValueType)
+		valueType, err := types.ParseValueType(newFeature.ValueType)
 		if err != nil {
 			return err
 		}
 		_, err = tx.CreateFeature(ctx, metadata.CreateFeatureOpt{
 			FeatureName: newFeature.Name,
 			GroupID:     group.ID,
-			DBValueType: newFeature.DBValueType,
 			Description: newFeature.Description,
 			ValueType:   valueType,
 		})
@@ -207,7 +206,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 					Kind:        "Feature",
 					Name:        feature.Name,
 					GroupName:   group.Name,
-					DBValueType: feature.DBValueType,
+					ValueType:   feature.ValueType,
 					Description: feature.Description,
 				})
 			}
@@ -319,7 +318,7 @@ func buildApplyFeature(feature apply.Feature, groupName string) apply.Feature {
 		Kind:        "Feature",
 		Name:        feature.Name,
 		GroupName:   groupName,
-		DBValueType: feature.DBValueType,
+		ValueType:   feature.ValueType,
 		Description: feature.Description,
 	}
 }

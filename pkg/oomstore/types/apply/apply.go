@@ -30,7 +30,7 @@ type Feature struct {
 	Kind        string `mapstructure:"kind" yaml:"kind,omitempty"`
 	Name        string `mapstructure:"name" yaml:"name"`
 	GroupName   string `mapstructure:"group-name" yaml:"group-name,omitempty"`
-	DBValueType string `mapstructure:"db-value-type" yaml:"db-value-type"`
+	ValueType   string `mapstructure:"value-type" yaml:"value-type"`
 	Description string `mapstructure:"description" yaml:"description"`
 }
 
@@ -38,7 +38,7 @@ func (f *Feature) Validate() error {
 	if f.Name == "" {
 		return errdefs.InvalidAttribute(fmt.Errorf("the name of feature should not be empty"))
 	}
-	if f.DBValueType == "" {
+	if f.ValueType == "" {
 		return errdefs.InvalidAttribute(fmt.Errorf("the db value type of feature should not be empty"))
 	}
 	return nil
@@ -65,7 +65,7 @@ func FromFeatureList(features types.FeatureList) FeatureItems {
 			Kind:        "Feature",
 			Name:        f.Name,
 			GroupName:   f.Group.Name,
-			DBValueType: f.DBValueType,
+			ValueType:   f.ValueType.String(),
 			Description: f.Description,
 		})
 	}

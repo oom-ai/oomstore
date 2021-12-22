@@ -10,11 +10,8 @@ import (
 )
 
 func createFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateFeatureOpt) (int, error) {
-	if err := validateDataType(ctx, sqlxCtx, opt.DBValueType); err != nil {
-		return 0, fmt.Errorf("error validating value_type input, details: %s", err.Error())
-	}
-	query := "INSERT INTO feature(name, group_id, db_value_type, value_type, description) VALUES (?, ?, ?, ?, ?)"
-	res, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(query), opt.FeatureName, opt.GroupID, opt.DBValueType, opt.ValueType, opt.Description)
+	query := "INSERT INTO feature(name, group_id, value_type, description) VALUES (?, ?, ?, ?)"
+	res, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(query), opt.FeatureName, opt.GroupID, opt.ValueType, opt.Description)
 	if err != nil {
 		if er, ok := err.(*mysql.MySQLError); ok {
 			if er.Number == ER_DUP_ENTRY {

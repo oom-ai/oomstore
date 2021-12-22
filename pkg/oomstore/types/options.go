@@ -3,7 +3,7 @@ package types
 type CreateFeatureOpt struct {
 	FeatureName string
 	GroupName   string
-	DBValueType string
+	ValueType   ValueType
 	Description string
 }
 

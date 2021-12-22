@@ -11,12 +11,9 @@ import (
 )
 
 func createFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateFeatureOpt) (int, error) {
-	if err := validateDataType(ctx, sqlxCtx, opt.DBValueType); err != nil {
-		return 0, fmt.Errorf("err when validating value_type input, details: %s", err.Error())
-	}
 	var featureID int
-	query := "INSERT INTO feature(name, group_id, db_value_type, value_type, description) VALUES ($1, $2, $3, $4, $5) RETURNING id"
-	err := sqlxCtx.GetContext(ctx, &featureID, query, opt.FeatureName, opt.GroupID, opt.DBValueType, opt.ValueType, opt.Description)
+	query := "INSERT INTO feature(name, group_id, value_type, description) VALUES ($1, $2, $3, $4) RETURNING id"
+	err := sqlxCtx.GetContext(ctx, &featureID, query, opt.FeatureName, opt.GroupID, opt.ValueType, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {

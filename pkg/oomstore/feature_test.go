@@ -36,7 +36,7 @@ func TestCreateBatchFeature(t *testing.T) {
 			opt: types.CreateFeatureOpt{
 				FeatureName: "model",
 				GroupName:   "device_info",
-				DBValueType: "VARCHAR(32)",
+				ValueType:   types.STRING,
 			},
 			valueType: types.STRING,
 			group: types.Group{
@@ -51,7 +51,7 @@ func TestCreateBatchFeature(t *testing.T) {
 			opt: types.CreateFeatureOpt{
 				FeatureName: "model",
 				GroupName:   "device_info",
-				DBValueType: "BIGINT",
+				ValueType:   types.INT64,
 			},
 			valueType: types.INT64,
 			group: types.Group{
@@ -72,11 +72,10 @@ func TestCreateBatchFeature(t *testing.T) {
 				metadataOpt := metadata.CreateFeatureOpt{
 					FeatureName: tc.opt.FeatureName,
 					GroupID:     tc.group.ID,
-					DBValueType: tc.opt.DBValueType,
 					ValueType:   tc.valueType,
 					Description: tc.opt.Description,
 				}
-				offlineStore.EXPECT().ValueType(tc.opt.DBValueType).Return(tc.valueType, nil)
+				offlineStore.EXPECT().ValueType(tc.opt.ValueType).Return(tc.valueType, nil)
 				metadataStore.EXPECT().CreateFeature(ctx, metadataOpt).Return(0, nil)
 			}
 			_, err := store.CreateBatchFeature(ctx, tc.opt)
