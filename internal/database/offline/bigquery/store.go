@@ -9,9 +9,27 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"google.golang.org/api/option"
 )
+
+var BigQueryTypeMap = map[string]string{
+	"bool":     types.BOOL,
+	"bytes":    types.BYTES,
+	"datetime": types.TIME,
+	"string":   types.STRING,
+
+	"bigint":   types.INT64,
+	"smallint": types.INT64,
+	"int64":    types.INT64,
+	"integer":  types.INT64,
+	"int":      types.INT64,
+
+	"float64": types.FLOAT64,
+	"numeric": types.FLOAT64,
+	"decimal": types.FLOAT64,
+}
 
 var _ offline.Store = &DB{}
 
@@ -67,5 +85,5 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 }
 
 func (db *DB) TypeTag(dbType string) (string, error) {
-	return TypeTag(dbType)
+	return sqlutil.TypeTag(BigQueryTypeMap, dbType)
 }

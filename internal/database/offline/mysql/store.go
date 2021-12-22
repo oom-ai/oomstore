@@ -13,6 +13,34 @@ import (
 
 const MySQLBatchSize = 20
 
+var MySQLTypeMap = map[string]string{
+	"boolean": types.BOOL,
+	"bool":    types.BOOL,
+
+	"binary":    types.BYTES,
+	"varbinary": types.BYTES,
+
+	"integer":   types.INT64,
+	"int":       types.INT64,
+	"smallint":  types.INT64,
+	"bigint":    types.INT64,
+	"tinyint":   types.INT64,
+	"mediumint": types.INT64,
+
+	"double": types.FLOAT64,
+	"float":  types.FLOAT64,
+
+	"text":    types.STRING,
+	"varchar": types.STRING,
+	"char":    types.STRING,
+
+	"date":      types.TIME,
+	"time":      types.TIME,
+	"datetime":  types.TIME,
+	"timestamp": types.TIME,
+	"year":      types.TIME,
+}
+
 var _ offline.Store = &DB{}
 
 type DB struct {
@@ -41,7 +69,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 }
 
 func (db *DB) TypeTag(dbType string) (string, error) {
-	return TypeTag(dbType)
+	return sqlutil.TypeTag(MySQLTypeMap, dbType)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
