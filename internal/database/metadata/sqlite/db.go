@@ -95,7 +95,16 @@ func (db *DB) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (ty
 }
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
-	return createRevision(ctx, db, opt)
+	var (
+		revisionID int
+		dataTable  string
+		err        error
+	)
+	err = db.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
+		revisionID, dataTable, err = tx.CreateRevision(c, opt)
+		return err
+	})
+	return revisionID, dataTable, err
 }
 
 func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
