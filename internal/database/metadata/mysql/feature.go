@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
@@ -29,14 +28,4 @@ func createFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metada
 		return 0, err
 	}
 	return int(featureID), err
-}
-
-func validateDataType(ctx context.Context, sqlxCtx metadata.SqlxContext, dataType string) error {
-	tmpTable := dbutil.TempTable("validate_data_type")
-	query := fmt.Sprintf("CREATE TEMPORARY TABLE %s (a %s)", tmpTable, dataType)
-	if _, err := sqlxCtx.ExecContext(ctx, query); err != nil {
-		return err
-	}
-	_, err := sqlxCtx.ExecContext(ctx, fmt.Sprintf("DROP TEMPORARY TABLE %s", tmpTable))
-	return err
 }
