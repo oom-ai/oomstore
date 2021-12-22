@@ -8,6 +8,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
+
 	"cloud.google.com/go/bigquery"
 	"google.golang.org/api/iterator"
 
@@ -16,7 +18,8 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) { // Step 1: prepare temporary table entity_rows
+func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
+	// Step 1: prepare temporary table entity_rows
 	features := types.FeatureList{}
 	for _, featureList := range opt.FeatureMap {
 		features = append(features, featureList...)
@@ -24,7 +27,12 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	if len(features) == 0 {
 		return nil, nil
 	}
-	entityRowsTableName, err := createAndImportTableEntityRows(ctx, db, opt.EntityRows, opt.ValueNames, types.MYSQL)
+	dbOpt := dbutil.DBOpt{
+		Backend:    types.BIGQUERY,
+		BigQueryDB: db.Client,
+		DatasetID:  &db.datasetID,
+	}
+	entityRowsTableName, err := sqlutil.PrepareEntityRowsTable(ctx, dbOpt, opt.Entity, opt.EntityRows, opt.ValueNames)
 	if err != nil {
 		return nil, err
 	}

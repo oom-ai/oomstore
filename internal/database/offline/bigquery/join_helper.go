@@ -9,7 +9,6 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/spf13/cast"
 )
 
 const (
@@ -53,98 +52,10 @@ func createTableJoined(ctx context.Context, db *DB, features types.FeatureList, 
 	return tableName, nil
 }
 
-func createAndImportTableEntityRows(ctx context.Context, db *DB, entityRows <-chan types.EntityRow, valueNames []string, backendType types.BackendType) (string, error) {
-	columnFormat, err := dbutil.GetColumnFormat(backendType)
-	if err != nil {
-		return "", err
-	}
-	qt, err := dbutil.QuoteFn(backendType)
-	if err != nil {
-		return "", err
-	}
-
-	// create table entity_rows
-	tableName := dbutil.TempTable("entity_rows")
-	columnDefs := []string{
-		fmt.Sprintf(`%s STRING NOT NULL`, qt("entity_key")),
-		fmt.Sprintf(`%s BIGINT NOT NULL`, qt("unix_milli")),
-	}
-	for _, name := range valueNames {
-		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, "STRING"))
-	}
-	schema := fmt.Sprintf(`
-		CREATE TABLE %s.%s (
-			%s
-		);
-	`, db.datasetID, qt(tableName), strings.Join(columnDefs, ",\n"))
-
-	if _, err = db.Query(schema).Read(ctx); err != nil {
-		return "", err
-	}
-
-	// populate dataset to the table
-	if err := insertEntityRows(ctx, db, tableName, entityRows, valueNames, backendType); err != nil {
-		return "", err
-	}
-
-	return tableName, nil
-}
-
-func insertEntityRows(ctx context.Context, db *DB, tableName string, entityRows <-chan types.EntityRow, valueNames []string, backendType types.BackendType) error {
-	records := make([][]interface{}, 0, InsertBatchSize)
-	columns := []string{"entity_key", "unix_milli"}
-	columns = append(columns, valueNames...)
-	for entityRow := range entityRows {
-		record := []interface{}{fmt.Sprintf(`"%s"`, entityRow.EntityKey), entityRow.UnixMilli}
-		for _, v := range entityRow.Values {
-			record = append(record, fmt.Sprintf(`"%s"`, v))
-		}
-		records = append(records, record)
-		if len(records) == InsertBatchSize {
-			if err := insertRecordsToTable(db, ctx, tableName, records, columns, backendType); err != nil {
-				return err
-			}
-			records = make([][]interface{}, 0, InsertBatchSize)
-		}
-	}
-	if err := insertRecordsToTable(db, ctx, tableName, records, columns, backendType); err != nil {
-		return err
-	}
-	return nil
-}
-
 func dropTable(ctx context.Context, db *DB, tableName string) error {
 	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
 	_, err := db.Query(query).Read(ctx)
 	return err
-}
-
-func insertRecordsToTable(db *DB, ctx context.Context, tableName string, records [][]interface{}, columns []string, backendType types.BackendType) error {
-	query, err := buildQueryForInsertRecords(db.datasetID, tableName, records, columns, backendType)
-	if err != nil {
-		return err
-	}
-	if query == "" {
-		return nil
-	}
-	if _, err := db.Query(query).Read(ctx); err != nil {
-		return err
-	}
-	return nil
-}
-
-func buildQueryForInsertRecords(datasetID, tableName string, records [][]interface{}, columns []string, backendType types.BackendType) (string, error) {
-	if len(records) == 0 {
-		return "", nil
-	}
-	values := make([]string, 0, len(records))
-	for _, row := range records {
-		values = append(values, fmt.Sprintf("(%s)", strings.Join(cast.ToStringSlice(row), ",")))
-	}
-	columnStr := dbutil.Quote("`", columns...)
-	tableName = fmt.Sprintf("`%s`", tableName)
-
-	return fmt.Sprintf(`INSERT INTO %s.%s (%s) VALUES %s`, datasetID, tableName, columnStr, strings.Join(values, ",")), nil
 }
 
 func convertValueTypeToBigQuerySQLType(t types.ValueType) (string, error) {

@@ -27,22 +27,23 @@ func BuildConditions(equal map[string]interface{}, in map[string]interface{}) ([
 	return cond, args, nil
 }
 
-func InsertRecordsToTable(db *sqlx.DB, ctx context.Context, tableName string, records []interface{}, columns []string, backendType types.BackendType) error {
-	query, args, err := buildQueryAndArgsForInsertRecords(tableName, records, columns, backendType)
+func InsertRecordsToTable(ctx context.Context, dbOpt DBOpt, tableName string, records []interface{}, columns []string) error {
+	query, args, err := dbOpt.BuildInsertQuery(tableName, records, columns)
 	if err != nil {
 		return err
 	}
 	if query == "" {
 		return nil
 	}
-	if _, err := db.ExecContext(ctx, db.Rebind(query), args...); err != nil {
-		return err
-	}
-	return nil
+
+	return dbOpt.ExecContext(ctx, query, args)
 }
 
 func InsertRecordsToTableTx(tx *sqlx.Tx, ctx context.Context, tableName string, records []interface{}, columns []string, backendType types.BackendType) error {
-	query, args, err := buildQueryAndArgsForInsertRecords(tableName, records, columns, backendType)
+	dbOpt := DBOpt{
+		Backend: backendType,
+	}
+	query, args, err := dbOpt.BuildInsertQuery(tableName, records, columns)
 	if err != nil {
 		return err
 	}
@@ -53,29 +54,6 @@ func InsertRecordsToTableTx(tx *sqlx.Tx, ctx context.Context, tableName string, 
 		return err
 	}
 	return nil
-}
-
-func buildQueryAndArgsForInsertRecords(tableName string, records []interface{}, columns []string, backendType types.BackendType) (string, []interface{}, error) {
-	if len(records) == 0 {
-		return "", nil, nil
-	}
-	valueFlags := make([]string, 0, len(records))
-	for i := 0; i < len(records); i++ {
-		valueFlags = append(valueFlags, "(?)")
-	}
-
-	var columnStr string
-	switch backendType {
-	case types.POSTGRES, types.SNOWFLAKE, types.REDSHIFT:
-		columnStr = Quote(`"`, columns...)
-		tableName = fmt.Sprintf(`"%s"`, tableName)
-	case types.MYSQL, types.SQLite:
-		columnStr = Quote("`", columns...)
-		tableName = fmt.Sprintf("`%s`", tableName)
-	}
-	return sqlx.In(
-		fmt.Sprintf(`INSERT INTO %s (%s) VALUES %s`, tableName, columnStr, strings.Join(valueFlags, ",")),
-		records...)
 }
 
 func Quote(quote string, fields ...string) string {
@@ -91,7 +69,7 @@ func GetColumnFormat(backendType types.BackendType) (string, error) {
 	switch backendType {
 	case types.POSTGRES, types.SNOWFLAKE, types.REDSHIFT:
 		columnFormat = `"%s" %s`
-	case types.MYSQL, types.SQLite:
+	case types.MYSQL, types.SQLite, types.BIGQUERY:
 		columnFormat = "`%s` %s"
 	default:
 		return "", fmt.Errorf("unsupported backend type %s", backendType)
@@ -104,7 +82,7 @@ func QuoteFn(backendType types.BackendType) (func(...string) string, error) {
 	switch backendType {
 	case types.POSTGRES, types.SNOWFLAKE, types.REDSHIFT:
 		quote = `"`
-	case types.MYSQL, types.SQLite:
+	case types.MYSQL, types.SQLite, types.BIGQUERY:
 		quote = "`"
 	default:
 		return nil, fmt.Errorf("unsupported backend type %s", backendType)
