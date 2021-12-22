@@ -15,8 +15,6 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const SQLiteBatchSize = 20
-
 var _ metadata.Store = &DB{}
 var _ metadata.DBStore = &Tx{}
 
