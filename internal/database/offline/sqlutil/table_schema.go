@@ -5,12 +5,13 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 // SqlxTableSchema returns the schema of the given table.
-func SqlxTableSchema(ctx context.Context, store offline.Store, rows *sqlx.Rows) (*types.DataTableSchema, error) {
+func SqlxTableSchema(ctx context.Context, store offline.Store, backend types.BackendType, rows *sqlx.Rows) (*types.DataTableSchema, error) {
 	defer rows.Close()
 
 	var schema types.DataTableSchema
@@ -19,7 +20,7 @@ func SqlxTableSchema(ctx context.Context, store offline.Store, rows *sqlx.Rows) 
 		if err := rows.Scan(&fieldName, &dbValueType); err != nil {
 			return nil, err
 		}
-		valueType, err := store.ValueType(dbValueType)
+		valueType, err := dbutil.ValueType(backend, dbValueType)
 		if err != nil {
 			return nil, err
 		}

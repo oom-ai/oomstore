@@ -14,15 +14,6 @@ import (
 
 const SQLiteBatchSize = 20
 
-var SQLiteTypeMap = map[string]types.ValueType{
-	"integer":   types.INT64,
-	"float":     types.FLOAT64,
-	"blob":      types.BYTES,
-	"text":      types.STRING,
-	"timestamp": types.TIME,
-	"datetime":  types.TIME,
-}
-
 var _ offline.Store = &DB{}
 
 type DB struct {
@@ -48,10 +39,6 @@ func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.E
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
 	return sqlutil.Join(ctx, db.DB, opt, types.SQLite)
-}
-
-func (db *DB) ValueType(dbType string) (types.ValueType, error) {
-	return sqlutil.GetValueType(SQLiteTypeMap, dbType)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {

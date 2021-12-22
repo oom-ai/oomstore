@@ -8,28 +8,13 @@ import (
 	"google.golang.org/api/iterator"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"google.golang.org/api/option"
 )
 
-var BigQueryTypeMap = map[string]types.ValueType{
-	"bool":     types.BOOL,
-	"bytes":    types.BYTES,
-	"datetime": types.TIME,
-	"string":   types.STRING,
-
-	"bigint":   types.INT64,
-	"smallint": types.INT64,
-	"int64":    types.INT64,
-	"integer":  types.INT64,
-	"int":      types.INT64,
-
-	"float64": types.FLOAT64,
-	"numeric": types.FLOAT64,
-	"decimal": types.FLOAT64,
-}
+const BackendType = types.BIGQUERY
 
 var _ offline.Store = &DB{}
 
@@ -71,7 +56,7 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 		if err != nil {
 			return nil, err
 		}
-		valueType, err := db.ValueType(cast.ToString(recordMap["data_type"]))
+		valueType, err := dbutil.ValueType(BackendType, cast.ToString(recordMap["data_type"]))
 		if err != nil {
 			return nil, err
 		}
@@ -82,8 +67,4 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 	}
 
 	return &schema, nil
-}
-
-func (db *DB) ValueType(dbType string) (types.ValueType, error) {
-	return sqlutil.GetValueType(BigQueryTypeMap, dbType)
 }
