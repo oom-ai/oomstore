@@ -77,9 +77,10 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType
 }
 
 // gosnowflake Scan always produce string when the destination is interface{}
+// See https://github.com/snowflakedb/gosnowflake/issues/517
 // As a work around, we cast the string to interface{} based on ValueType
 // This method is mostly copied from redis.DeserializeByTag, except we use 10 rather than 36 as the base
-// In the long run, we should fix the gosnowflake converter with a pr
+// TODO: we should let the snowflake team fix the gosnowflake converter
 func deserializeByTag(i interface{}, typeTag string) (interface{}, error) {
 	if i == nil {
 		return nil, nil
