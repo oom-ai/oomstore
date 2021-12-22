@@ -71,7 +71,7 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 		if err != nil {
 			return nil, err
 		}
-		valueType, err := db.TypeTag(cast.ToString(recordMap["data_type"]))
+		valueType, err := db.ValueType(cast.ToString(recordMap["data_type"]))
 		if err != nil {
 			return nil, err
 		}
@@ -84,6 +84,6 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 	return &schema, nil
 }
 
-func (db *DB) TypeTag(dbType string) (types.ValueType, error) {
+func (db *DB) ValueType(dbType string) (types.ValueType, error) {
 	return sqlutil.GetValueType(BigQueryTypeMap, dbType)
 }

@@ -124,7 +124,7 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 		if !errdefs.IsNotFound(err) {
 			return err
 		}
-		valueType, err := s.offline.TypeTag(newFeature.DBValueType)
+		valueType, err := s.offline.ValueType(newFeature.DBValueType)
 		if err != nil {
 			return err
 		}

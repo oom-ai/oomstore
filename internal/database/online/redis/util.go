@@ -123,7 +123,7 @@ func DeserializeByTag(i interface{}, valueType types.ValueType) (interface{}, er
 	case types.BYTES:
 		return []byte(s), nil
 	default:
-		return "", fmt.Errorf("unsupported type tag: %s", valueType)
+		return "", fmt.Errorf("unsupported value type: %s", valueType)
 	}
 }
 

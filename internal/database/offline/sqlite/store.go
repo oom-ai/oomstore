@@ -50,7 +50,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	return sqlutil.Join(ctx, db.DB, opt, types.SQLite)
 }
 
-func (db *DB) TypeTag(dbType string) (types.ValueType, error) {
+func (db *DB) ValueType(dbType string) (types.ValueType, error) {
 	return sqlutil.GetValueType(SQLiteTypeMap, dbType)
 }
 

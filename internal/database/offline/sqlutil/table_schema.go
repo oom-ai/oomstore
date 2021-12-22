@@ -19,7 +19,7 @@ func SqlxTableSchema(ctx context.Context, store offline.Store, rows *sqlx.Rows) 
 		if err := rows.Scan(&fieldName, &dbValueType); err != nil {
 			return nil, err
 		}
-		valueType, err := store.TypeTag(dbValueType)
+		valueType, err := store.ValueType(dbValueType)
 		if err != nil {
 			return nil, err
 		}

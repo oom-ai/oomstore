@@ -16,7 +16,7 @@ var typeMap = map[string]types.ValueType{
 	"datetime": types.TIME,
 }
 
-func TestTypeTag(t *testing.T) {
+func TestValueType(t *testing.T) {
 	for _, tt := range []struct {
 		input    string
 		expected types.ValueType

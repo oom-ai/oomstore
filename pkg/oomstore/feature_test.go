@@ -76,7 +76,7 @@ func TestCreateBatchFeature(t *testing.T) {
 					ValueType:   tc.valueType,
 					Description: tc.opt.Description,
 				}
-				offlineStore.EXPECT().TypeTag(tc.opt.DBValueType).Return(tc.valueType, nil)
+				offlineStore.EXPECT().ValueType(tc.opt.DBValueType).Return(tc.valueType, nil)
 				metadataStore.EXPECT().CreateFeature(ctx, metadataOpt).Return(0, nil)
 			}
 			_, err := store.CreateBatchFeature(ctx, tc.opt)
