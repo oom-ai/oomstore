@@ -24,15 +24,13 @@ var META_TABLE_SCHEMAS = map[string]string{
 			id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 			name          VARCHAR(32)  NOT     NULL,
 			group_id      INT          NOT     NULL,
-			db_value_type VARCHAR(32)  NOT     NULL,
-			value_type    VARCHAR(16)  NOT     NULL,
+			value_type    INT  		   NOT     NULL,
 			description   VARCHAR(128) DEFAULT '',
 			create_time   TIMESTAMP    NOT     NULL DEFAULT CURRENT_TIMESTAMP,
 			modify_time   TIMESTAMP    NOT     NULL DEFAULT CURRENT_TIMESTAMP,
 			UNIQUE (name)
 		);
 		COMMENT ON COLUMN feature.value_type    IS 'data type of feature value';
-		COMMENT ON COLUMN feature.db_value_type IS 'database data type of feature value';
 		`,
 	"feature_group": `
 		CREATE TABLE feature_group (

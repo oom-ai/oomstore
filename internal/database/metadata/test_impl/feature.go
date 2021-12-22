@@ -42,7 +42,6 @@ func TestCreateFeature(t *testing.T, prepareStore PrepareStoreFn) {
 	opt := metadata.CreateFeatureOpt{
 		FeatureName: "phone",
 		GroupID:     groupID,
-		DBValueType: "varchar(16)",
 		Description: "description",
 		ValueType:   types.STRING,
 	}
@@ -59,7 +58,7 @@ func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreFn) {
 	opt := metadata.CreateFeatureOpt{
 		FeatureName: "phone",
 		GroupID:     groupID,
-		DBValueType: "varchar(16)",
+		ValueType:   types.STRING,
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
@@ -77,7 +76,7 @@ func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreFn) 
 	opt := metadata.CreateFeatureOpt{
 		FeatureName: "user",
 		GroupID:     groupID,
-		DBValueType: "int",
+		ValueType:   types.INT64,
 		Description: "order",
 	}
 
@@ -93,7 +92,6 @@ func TestCreateFeatureWithInvalidDataType(t *testing.T, prepareStore PrepareStor
 	_, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "model",
 		GroupID:     groupID,
-		DBValueType: "invalid_type",
 	})
 	assert.Error(t, err)
 }
@@ -106,7 +104,6 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreFn) {
 	id, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "phone",
 		GroupID:     groupID,
-		DBValueType: "varchar(16)",
 		Description: "description",
 		ValueType:   types.STRING,
 	})
@@ -123,7 +120,6 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreFn) {
 		ID:          1,
 		Name:        "phone",
 		ValueType:   types.STRING,
-		DBValueType: "varchar(16)",
 		Description: "description",
 		GroupID:     1,
 	}
@@ -139,7 +135,6 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreFn) {
 	_, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "phone",
 		GroupID:     groupID,
-		DBValueType: "varchar(16)",
 		Description: "description",
 		ValueType:   types.STRING,
 	})
@@ -156,7 +151,6 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreFn) {
 		ID:          1,
 		Name:        "phone",
 		ValueType:   types.STRING,
-		DBValueType: "varchar(16)",
 		Description: "description",
 		GroupID:     1,
 	}
@@ -176,7 +170,6 @@ func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreFn) {
 	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "phone",
 		GroupID:     groupID,
-		DBValueType: "varchar(16)",
 		Description: "description",
 		ValueType:   types.STRING,
 	})
@@ -234,7 +227,6 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreFn) {
 	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "phone",
 		GroupID:     groupID,
-		DBValueType: "varchar(16)",
 		Description: "description",
 		ValueType:   types.STRING,
 	})
@@ -292,7 +284,6 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreFn) {
 	opt := metadata.CreateFeatureOpt{
 		FeatureName: "phone",
 		GroupID:     groupID,
-		DBValueType: "varchar(16)",
 		Description: "description",
 		ValueType:   types.STRING,
 	}
@@ -318,7 +309,6 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreFn) {
 		ID:          1,
 		Name:        "phone",
 		ValueType:   types.STRING,
-		DBValueType: "varchar(16)",
 		Description: "new description",
 		GroupID:     1,
 	}

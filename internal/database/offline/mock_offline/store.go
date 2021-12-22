@@ -123,18 +123,3 @@ func (mr *MockStoreMockRecorder) TableSchema(ctx, tableName interface{}) *gomock
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TableSchema", reflect.TypeOf((*MockStore)(nil).TableSchema), ctx, tableName)
 }
-
-// TypeTag mocks base method.
-func (m *MockStore) TypeTag(dbType string) (types.ValueType, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TypeTag", dbType)
-	ret0, _ := ret[0].(types.ValueType)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// TypeTag indicates an expected call of TypeTag.
-func (mr *MockStoreMockRecorder) TypeTag(dbType interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TypeTag", reflect.TypeOf((*MockStore)(nil).TypeTag), dbType)
-}

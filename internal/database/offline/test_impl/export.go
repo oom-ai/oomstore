@@ -17,14 +17,12 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn) {
 	dataTable := "offline_1_1"
 	features := []*types.Feature{
 		{
-			Name:        "model",
-			DBValueType: "VARCHAR(32)",
-			ValueType:   types.STRING,
+			Name:      "model",
+			ValueType: types.STRING,
 		},
 		{
-			Name:        "price",
-			DBValueType: "INT",
-			ValueType:   types.INT64,
+			Name:      "price",
+			ValueType: types.INT64,
 		},
 	}
 	buildTestDataTable(ctx, t, store, features, dataTable, &offline.CSVSource{

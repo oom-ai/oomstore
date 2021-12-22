@@ -216,9 +216,9 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 	}
 	features := types.FeatureList{
 		{
-			Name:        "model",
-			DBValueType: "VARCHAR(32)",
-			GroupID:     1,
+			Name:      "model",
+			ValueType: types.STRING,
+			GroupID:   1,
 			Group: &types.Group{
 				EntityID:         1,
 				OnlineRevisionID: &revision1,
@@ -227,9 +227,9 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 			},
 		},
 		{
-			Name:        "price",
-			DBValueType: "INT",
-			GroupID:     2,
+			Name:      "price",
+			ValueType: types.INT64,
+			GroupID:   2,
 			Group: &types.Group{
 				EntityID:         1,
 				OnlineRevisionID: &revision2,
@@ -238,9 +238,9 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 			},
 		},
 		{
-			Name:        "age",
-			DBValueType: "INT",
-			GroupID:     3,
+			Name:      "age",
+			ValueType: types.INT64,
+			GroupID:   3,
 			Group: &types.Group{
 				EntityID:         2,
 				OnlineRevisionID: &revision2,

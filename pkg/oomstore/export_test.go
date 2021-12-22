@@ -27,12 +27,12 @@ func TestChannelExport(t *testing.T) {
 	revisionID := 5
 	features := types.FeatureList{
 		{
-			Name:        "model",
-			DBValueType: "VARCHAR(32)",
+			Name:      "model",
+			ValueType: types.STRING,
 		},
 		{
-			Name:        "price",
-			DBValueType: "INT",
+			Name:      "price",
+			ValueType: types.INT64,
 		},
 	}
 

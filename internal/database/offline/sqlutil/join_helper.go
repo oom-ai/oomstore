@@ -26,7 +26,15 @@ func supportIndex(backendType types.BackendType) bool {
 	return true
 }
 
-func createTableJoined(ctx context.Context, db *sqlx.DB, features types.FeatureList, entity types.Entity, groupName string, valueNames []string, backendType types.BackendType) (string, error) {
+func createTableJoined(
+	ctx context.Context,
+	db *sqlx.DB,
+	features types.FeatureList,
+	entity types.Entity,
+	groupName string,
+	valueNames []string,
+	backendType types.BackendType,
+) (string, error) {
 	columnFormat, err := dbutil.GetColumnFormat(backendType)
 	if err != nil {
 		return "", err
@@ -45,7 +53,11 @@ func createTableJoined(ctx context.Context, db *sqlx.DB, features types.FeatureL
 		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, "TEXT"))
 	}
 	for _, f := range features {
-		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, f.Name, f.DBValueType))
+		dbValueType, err := dbutil.DBValueType(backendType, f.ValueType)
+		if err != nil {
+			return "", err
+		}
+		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, f.Name, dbValueType))
 	}
 	schema := `
 		CREATE TABLE %s (
@@ -67,7 +79,12 @@ func createTableJoined(ctx context.Context, db *sqlx.DB, features types.FeatureL
 	return tableName, nil
 }
 
-func PrepareEntityRowsTable(ctx context.Context, dbOpt dbutil.DBOpt, entity types.Entity, entityRows <-chan types.EntityRow, valueNames []string) (string, error) {
+func PrepareEntityRowsTable(ctx context.Context,
+	dbOpt dbutil.DBOpt,
+	entity types.Entity,
+	entityRows <-chan types.EntityRow,
+	valueNames []string,
+) (string, error) {
 	// Step 1: create entity_rows table
 	columnFormat, err := dbutil.GetColumnFormat(dbOpt.Backend)
 	if err != nil {
@@ -125,7 +142,12 @@ func PrepareEntityRowsTable(ctx context.Context, dbOpt dbutil.DBOpt, entity type
 	return tableName, nil
 }
 
-func insertEntityRows(ctx context.Context, dbOpt dbutil.DBOpt, tableName string, entityRows <-chan types.EntityRow, valueNames []string) error {
+func insertEntityRows(ctx context.Context,
+	dbOpt dbutil.DBOpt,
+	tableName string,
+	entityRows <-chan types.EntityRow,
+	valueNames []string,
+) error {
 	records := make([]interface{}, 0, InsertBatchSize)
 	columns := []string{"entity_key", "unix_milli"}
 	columns = append(columns, valueNames...)

@@ -91,7 +91,7 @@ func BuildCreateSchema(tableName string, entity *types.Entity, features types.Fe
 func newSchema(tableName string, entity types.Entity, features types.FeatureList, backend types.BackendType) (CreateSchema, error) {
 	columns := make([]Column, 0, len(features))
 	for _, feature := range features {
-		dbType, err := GetDbTypeFrom(backend, feature.ValueType)
+		dbType, err := DBValueType(backend, feature.ValueType)
 		if err != nil {
 			return CreateSchema{}, err
 		}
