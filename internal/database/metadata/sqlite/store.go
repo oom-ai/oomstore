@@ -18,10 +18,15 @@ import (
 const SQLiteBatchSize = 20
 
 var _ metadata.Store = &DB{}
+var _ metadata.DBStore = &Tx{}
 
 type DB struct {
 	*sqlx.DB
 	*informer.Informer
+}
+
+type Tx struct {
+	*sqlx.Tx
 }
 
 func Open(ctx context.Context, opt *types.SQLiteOpt) (*DB, error) {
