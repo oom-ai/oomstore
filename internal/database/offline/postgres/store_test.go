@@ -17,9 +17,7 @@ var DATABASE string
 
 func init() {
 	DATABASE = strings.ToLower(dbutil.RandString(20))
-	if err := runtime_pg.Reset(DATABASE); err != nil {
-		panic(err)
-	}
+	runtime_pg.Reset(DATABASE)
 }
 
 func prepareStore(t *testing.T) (context.Context, offline.Store) {
@@ -41,27 +39,27 @@ func prepareStore(t *testing.T) (context.Context, offline.Store) {
 }
 
 func TestPing(t *testing.T) {
-	t.Cleanup(func() { _ = runtime_pg.Reset(DATABASE) })
+	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
 	test_impl.TestPing(t, prepareStore)
 }
 
 func TestImport(t *testing.T) {
-	t.Cleanup(func() { _ = runtime_pg.Reset(DATABASE) })
+	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
 	test_impl.TestImport(t, prepareStore)
 }
 
 func TestExport(t *testing.T) {
-	t.Cleanup(func() { _ = runtime_pg.Reset(DATABASE) })
+	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
 	test_impl.TestExport(t, prepareStore)
 }
 
 func TestJoin(t *testing.T) {
-	t.Cleanup(func() { _ = runtime_pg.Reset(DATABASE) })
+	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
 	test_impl.TestJoin(t, prepareStore)
 }
 
 func TestTableSchema(t *testing.T) {
-	t.Cleanup(func() { _ = runtime_pg.Reset(DATABASE) })
+	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
 	test_impl.TestTableSchema(t, prepareStore, func(ctx context.Context) {
 		opt := runtime_pg.GetOpt(DATABASE)
 		db, err := dbutil.OpenPostgresDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)

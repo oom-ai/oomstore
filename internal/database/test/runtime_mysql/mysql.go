@@ -2,6 +2,7 @@ package runtime_mysql
 
 import (
 	"context"
+	"fmt"
 	"os/exec"
 
 	"github.com/jmoiron/sqlx"
@@ -30,14 +31,14 @@ func PrepareDB() (context.Context, *sqlx.DB) {
 		panic(err)
 	}
 
-	if err := exec.Command(
+	if out, err := exec.Command(
 		"oomplay", "init", "mysql",
 		"--port", MySQLDbOpt.Port,
 		"--user", MySQLDbOpt.User,
 		"--password", MySQLDbOpt.Password,
 		"--database", MySQLDbOpt.Database,
-	).Run(); err != nil {
-		panic(err)
+	).CombinedOutput(); err != nil {
+		panic(fmt.Sprintf("oomplay failed with error: %v, output: %s", err, out))
 	}
 	return ctx, db
 }

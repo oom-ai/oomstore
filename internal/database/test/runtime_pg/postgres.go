@@ -2,6 +2,7 @@ package runtime_pg
 
 import (
 	"context"
+	"fmt"
 	"os/exec"
 	"testing"
 
@@ -28,15 +29,17 @@ func PrepareDB(t *testing.T, database string) (context.Context, *sqlx.DB) {
 	return ctx, db
 }
 
-func Reset(database string) error {
+func Reset(database string) {
 	opt := GetOpt(database)
-	return exec.Command(
+	if out, err := exec.Command(
 		"oomplay", "init", "postgres",
 		"--port", opt.Port,
 		"--user", opt.User,
 		"--password", opt.Password,
 		"--database", opt.Database,
-	).Run()
+	).CombinedOutput(); err != nil {
+		panic(fmt.Sprintf("oomplay failed with error: %v, output: %s", err, out))
+	}
 }
 
 func GetOpt(database string) *types.PostgresOpt {
