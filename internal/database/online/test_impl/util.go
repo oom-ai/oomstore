@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 )
 
@@ -94,7 +95,7 @@ func init() {
 		var data []types.ExportRecord
 
 		for i := 0; i < 1000; i++ {
-			record := []interface{}{RandString(entity.Length), rand.Float64()}
+			record := []interface{}{dbutil.RandString(entity.Length), rand.Float64()}
 			data = append(data, record)
 		}
 		SampleMedium = Sample{features, revision, entity, data}
@@ -119,16 +120,6 @@ func importSample(t *testing.T, ctx context.Context, store online.Store, samples
 		})
 		require.NoError(t, err)
 	}
-}
-
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-func RandString(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
-	}
-	return string(b)
 }
 
 func compareFeatureValue(t *testing.T, expected, actual interface{}, valueType string) {
