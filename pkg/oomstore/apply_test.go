@@ -86,14 +86,14 @@ kind: Feature
 name: model
 group-name: device
 category: batch
-db-value-type: varchar(16)
+value-type: string
 description: 'description'
 ---
 kind: Feature
 name: price
 group-name: device
 category: batch
-db-value-type: int
+value-type: int64
 description: 'description'
 `)},
 			wantStage: &apply.ApplyStage{
@@ -127,14 +127,14 @@ description: 'description'
 						Kind:        "Feature",
 						Name:        "model",
 						GroupName:   "device",
-						ValueType:   "varchar(16)",
+						ValueType:   "string",
 						Description: "description",
 					},
 					{
 						Kind:        "Feature",
 						Name:        "price",
 						GroupName:   "device",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "description",
 					},
 				},
@@ -151,10 +151,10 @@ category: batch
 description: 'description'
 features:
 - name: model
-  db-value-type: varchar(16)
+  value-type: string
   description: 'description'
 - name: price
-  db-value-type: int
+  value-type: int64
   description: 'description'
 `)},
 			wantStage: &apply.ApplyStage{
@@ -174,7 +174,7 @@ features:
 						Kind:        "Feature",
 						Name:        "model",
 						GroupName:   "device",
-						ValueType:   "varchar(16)",
+						ValueType:   "string",
 						Description: "description",
 					},
 					{
@@ -182,7 +182,7 @@ features:
 						Kind:        "Feature",
 						Name:        "price",
 						GroupName:   "device",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "description",
 					},
 				},
@@ -201,19 +201,19 @@ batch-features:
   description: description
   features:
   - name: model
-    db-value-type: varchar(16)
+    value-type: string
     description: 'description'
   - name: price
-    db-value-type: int
+    value-type: int64
     description: 'description'
 - group: user
   description: description
   features:
   - name: age
-    db-value-type: int
+    value-type: int64
     description: 'description'
   - name: gender
-    db-value-type: int
+    value-type: int64
     description: 'description'
 `)},
 			wantStage: &apply.ApplyStage{
@@ -246,7 +246,7 @@ batch-features:
 						Kind:        "Feature",
 						Name:        "model",
 						GroupName:   "device",
-						ValueType:   "varchar(16)",
+						ValueType:   "string",
 						Description: "description",
 					},
 					{
@@ -254,21 +254,21 @@ batch-features:
 						Kind:        "Feature",
 						Name:        "price",
 						GroupName:   "device",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "description",
 					},
 					{
 						Kind:        "Feature",
 						Name:        "age",
 						GroupName:   "user",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "description",
 					},
 					{
 						Kind:        "Feature",
 						Name:        "gender",
 						GroupName:   "user",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "description",
 					},
 				},
@@ -282,27 +282,27 @@ items:
     - kind: Feature
       name: credit_score
       group-name: account
-      db-value-type: int
+      value-type: int64
       description: "credit_score description"
     - kind: Feature
       name: account_age_days
       group-name: account
-      db-value-type: int
+      value-type: int64
       description: "account_age_days description"
     - kind: Feature
       name: has_2fa_installed
       group-name: account
-      db-value-type: bool
+      value-type: bool
       description: "has_2fa_installed description"
     - kind: Feature
       name: transaction_count_7d
       group-name: transaction_stats
-      db-value-type: int
+      value-type: int64
       description: "transaction_count_7d description"
     - kind: Feature
       name: transaction_count_30d
       group-name: transaction_stats
-      db-value-type: int
+      value-type: int64
       description: "transaction_count_30d description"
 `),
 			},
@@ -314,14 +314,14 @@ items:
 						Kind:        "Feature",
 						Name:        "credit_score",
 						GroupName:   "account",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "credit_score description",
 					},
 					{
 						Kind:        "Feature",
 						Name:        "account_age_days",
 						GroupName:   "account",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "account_age_days description",
 					},
 					{
@@ -335,14 +335,14 @@ items:
 						Kind:        "Feature",
 						Name:        "transaction_count_7d",
 						GroupName:   "transaction_stats",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "transaction_count_7d description",
 					},
 					{
 						Kind:        "Feature",
 						Name:        "transaction_count_30d",
 						GroupName:   "transaction_stats",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "transaction_count_30d description",
 					},
 				},
@@ -360,13 +360,13 @@ items:
       description: user account info
       features:
         - name: credit_score
-          db-value-type: int
+          value-type: int64
           description: credit_score description
         - name: account_age_days
-          db-value-type: int
+          value-type: int64
           description: account_age_days description
         - name: has_2fa_installed
-          db-value-type: bool
+          value-type: bool
           description: has_2fa_installed description
     - kind: Group
       name: transaction_stats
@@ -375,10 +375,10 @@ items:
       description: user transaction statistics
       features:
         - name: transaction_count_7d
-          db-value-type: int
+          value-type: int64
           description: transaction_count_7d description
         - name: transaction_count_30d
-          db-value-type: int
+          value-type: int64
           description: transaction_count_30d description
 `),
 			},
@@ -407,14 +407,14 @@ items:
 						Kind:        "Feature",
 						Name:        "credit_score",
 						GroupName:   "account",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "credit_score description",
 					},
 					{
 						Kind:        "Feature",
 						Name:        "account_age_days",
 						GroupName:   "account",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "account_age_days description",
 					},
 					{
@@ -428,14 +428,14 @@ items:
 						Kind:        "Feature",
 						Name:        "transaction_count_7d",
 						GroupName:   "transaction_stats",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "transaction_count_7d description",
 					},
 					{
 						Kind:        "Feature",
 						Name:        "transaction_count_30d",
 						GroupName:   "transaction_stats",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "transaction_count_30d description",
 					},
 				},
@@ -456,22 +456,22 @@ items:
           description: user account info
           features:
             - name: credit_score
-              db-value-type: int
+              value-type: int64
               description: credit_score description
             - name: account_age_days
-              db-value-type: int
+              value-type: int64
               description: account_age_days description
             - name: has_2fa_installed
-              db-value-type: bool
+              value-type: bool
               description: has_2fa_installed description
         - group: transaction_stats
           description: user transaction statistics
           features:
             - name: transaction_count_7d
-              db-value-type: int
+              value-type: int64
               description: transaction_count_7d description
             - name: transaction_count_30d
-              db-value-type: int
+              value-type: int64
               description: transaction_count_30d description
     - kind: Entity
       name: device
@@ -482,10 +482,10 @@ items:
           description: phone info
           features:
             - name: model
-              db-value-type: varchar(32)
+              value-type: string
               description: model description
             - name: price
-              db-value-type: int
+              value-type: int64
               description: price description
 `),
 			},
@@ -535,14 +535,14 @@ items:
 						Kind:        "Feature",
 						Name:        "credit_score",
 						GroupName:   "account",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "credit_score description",
 					},
 					{
 						Kind:        "Feature",
 						Name:        "account_age_days",
 						GroupName:   "account",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "account_age_days description",
 					},
 					{
@@ -556,28 +556,28 @@ items:
 						Kind:        "Feature",
 						Name:        "transaction_count_7d",
 						GroupName:   "transaction_stats",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "transaction_count_7d description",
 					},
 					{
 						Kind:        "Feature",
 						Name:        "transaction_count_30d",
 						GroupName:   "transaction_stats",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "transaction_count_30d description",
 					},
 					{
 						Kind:        "Feature",
 						Name:        "model",
 						GroupName:   "phone",
-						ValueType:   "varchar(32)",
+						ValueType:   "string",
 						Description: "model description",
 					},
 					{
 						Kind:        "Feature",
 						Name:        "price",
 						GroupName:   "phone",
-						ValueType:   "int",
+						ValueType:   "int64",
 						Description: "price description",
 					},
 				},
