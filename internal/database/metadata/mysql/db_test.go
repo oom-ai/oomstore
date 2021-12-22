@@ -23,9 +23,7 @@ func init() {
 }
 
 func prepareStore(t *testing.T) (context.Context, metadata.Store) {
-	ctx, db := runtime_mysql.PrepareDB(t, DATABASE)
-	db.Close()
-
+	ctx := context.Background()
 	opt := runtime_mysql.GetOpt(DATABASE)
 	if err := mysql.CreateDatabase(ctx, *opt); err != nil {
 		t.Fatal(err)
@@ -38,15 +36,13 @@ func prepareStore(t *testing.T) (context.Context, metadata.Store) {
 }
 
 func TestPing(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestPing(t, prepareStore)
+	test_impl.TestPing(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestCreateDatabase(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	ctx, db := runtime_mysql.PrepareDB(t, DATABASE)
-	db.Close()
+	t.Cleanup(runtime_mysql.DestroyStore(DATABASE))
 
+	ctx := context.Background()
 	opt := runtime_mysql.GetOpt(DATABASE)
 	if err := mysql.CreateDatabase(ctx, *opt); err != nil {
 		t.Fatal(err)
@@ -78,111 +74,89 @@ func TestCreateDatabase(t *testing.T) {
 }
 
 func TestCreateEntity(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestCreateEntity(t, prepareStore)
+	test_impl.TestCreateEntity(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestGetEntity(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestGetEntity(t, prepareStore)
+	test_impl.TestGetEntity(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestUpdateEntity(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestUpdateEntity(t, prepareStore)
+	test_impl.TestUpdateEntity(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestListEntity(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestListEntity(t, prepareStore)
+	test_impl.TestListEntity(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestGetGroup(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestGetGroup(t, prepareStore)
+	test_impl.TestGetGroup(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestListGroup(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestListGroup(t, prepareStore)
+	test_impl.TestListGroup(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestCreateGroup(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestCreateGroup(t, prepareStore)
+	test_impl.TestCreateGroup(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestUpdateGroup(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestUpdateGroup(t, prepareStore)
+	test_impl.TestUpdateGroup(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestCreateFeature(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestCreateFeature(t, prepareStore)
+	test_impl.TestCreateFeature(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestCreateFeatureWithSameName(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestCreateFeatureWithSameName(t, prepareStore)
+	test_impl.TestCreateFeatureWithSameName(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestCreateFeatureWithSQLKeyword(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestCreateFeatureWithSQLKeyword(t, prepareStore)
+	test_impl.TestCreateFeatureWithSQLKeyword(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestCreateFeatureWithInvalidDataType(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestCreateFeatureWithInvalidDataType(t, prepareStore)
+	test_impl.TestCreateFeatureWithInvalidDataType(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestGetFeature(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestGetFeature(t, prepareStore)
+	test_impl.TestGetFeature(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestGetFeatureByName(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestGetFeatureByName(t, prepareStore)
+	test_impl.TestGetFeatureByName(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestListFeature(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestListFeature(t, prepareStore)
+	test_impl.TestListFeature(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestCacheListFeature(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestCacheListFeature(t, prepareStore)
+	test_impl.TestCacheListFeature(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestUpdateFeature(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestUpdateFeature(t, prepareStore)
+	test_impl.TestUpdateFeature(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestCreateRevision(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestCreateRevision(t, prepareStore)
+	test_impl.TestCreateRevision(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestUpdateRevision(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestUpdateRevision(t, prepareStore)
+	test_impl.TestUpdateRevision(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestGetRevision(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestGetRevision(t, prepareStore)
+	test_impl.TestGetRevision(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestGetRevisionBy(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestGetRevisionBy(t, prepareStore)
+	test_impl.TestGetRevisionBy(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestListRevision(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestListRevision(t, prepareStore)
+	test_impl.TestListRevision(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }

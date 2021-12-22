@@ -8,3 +8,5 @@ import (
 )
 
 type PrepareStoreFn func(t *testing.T) (context.Context, metadata.Store)
+
+type DestroyStoreFn func()

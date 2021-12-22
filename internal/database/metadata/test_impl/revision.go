@@ -12,7 +12,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateRevision(t *testing.T, prepareStore PrepareStoreFn) {
+func TestCreateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -93,7 +95,9 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreFn) {
 	}
 }
 
-func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreFn) {
+func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -141,7 +145,9 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreFn) {
 	}
 }
 
-func TestGetRevision(t *testing.T, prepareStore PrepareStoreFn) {
+func TestGetRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -202,7 +208,9 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreFn) {
 	}
 }
 
-func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreFn) {
+func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -273,7 +281,9 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreFn) {
 	}
 }
 
-func TestListRevision(t *testing.T, prepareStore PrepareStoreFn) {
+func TestListRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
