@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
@@ -99,25 +98,5 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	var schema types.DataTableSchema
-	for rows.Next() {
-		var fieldName, dbValueType string
-		if err := rows.Scan(&fieldName, &dbValueType); err != nil {
-			return nil, err
-		}
-		valueType, err := db.TypeTag(dbValueType)
-		if err != nil {
-			return nil, err
-		}
-		schema.Fields = append(schema.Fields, types.DataTableFieldSchema{
-			Name:      fieldName,
-			ValueType: valueType,
-		})
-	}
-	if len(schema.Fields) == 0 {
-		return nil, fmt.Errorf("table not found")
-	}
-	return &schema, nil
+	return sqlutil.SqlxTableSchema(ctx, db, rows)
 }
