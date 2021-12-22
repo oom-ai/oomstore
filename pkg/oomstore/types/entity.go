@@ -1,8 +1,6 @@
 package types
 
 import (
-	"fmt"
-	"strings"
 	"time"
 )
 
@@ -57,14 +55,4 @@ func (l *EntityList) Filter(filter func(*Entity) bool) (rs EntityList) {
 		}
 	}
 	return
-}
-
-func (e *Entity) String() string {
-	return strings.Join([]string{
-		fmt.Sprintf("Name:        %s", e.Name),
-		fmt.Sprintf("Length:      %d", e.Length),
-		fmt.Sprintf("Description: %s", e.Description),
-		fmt.Sprintf("CreateTime:  %s", e.CreateTime.Format(time.RFC3339)),
-		fmt.Sprintf("ModifyTime:  %s", e.ModifyTime.Format(time.RFC3339)),
-	}, "\n")
 }

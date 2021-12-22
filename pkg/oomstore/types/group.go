@@ -1,8 +1,6 @@
 package types
 
 import (
-	"fmt"
-	"strings"
 	"time"
 )
 
@@ -81,20 +79,4 @@ func (l GroupList) EntityIDs() []int {
 		entityIDs = append(entityIDs, id)
 	}
 	return entityIDs
-}
-
-func (fg *Group) String() string {
-	onlineRevisionID := "<NULL>"
-
-	if fg.OnlineRevisionID != nil {
-		onlineRevisionID = fmt.Sprint(*fg.OnlineRevisionID)
-	}
-	return strings.Join([]string{
-		fmt.Sprintf("Name:             %s", fg.Name),
-		fmt.Sprintf("Entity:           %s", fg.Entity.Name),
-		fmt.Sprintf("Description:      %s", fg.Description),
-		fmt.Sprintf("OnlineRevisionID: %s", onlineRevisionID),
-		fmt.Sprintf("CreateTime:       %s", fg.CreateTime.Format(time.RFC3339)),
-		fmt.Sprintf("ModifyTime:       %s", fg.ModifyTime.Format(time.RFC3339)),
-	}, "\n")
 }
