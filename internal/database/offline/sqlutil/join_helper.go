@@ -70,8 +70,7 @@ func createTableJoined(
 		return "", err
 	}
 
-	// snowflake doesn't support index
-	if backendType != types.SNOWFLAKE {
+	if supportIndex(backendType) {
 		index := fmt.Sprintf(`CREATE INDEX idx_%s ON %s (unix_milli, entity_key)`, tableName, tableName)
 		if _, err = db.ExecContext(ctx, index); err != nil {
 			return "", err

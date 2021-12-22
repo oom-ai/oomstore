@@ -10,7 +10,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const BackendType = types.POSTGRES
+const BackendType = types.REDSHIFT
 
 const RedshiftBatchSize = 20
 
@@ -30,15 +30,15 @@ func Open(option *types.RedshiftOpt) (*DB, error) {
 }
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(types.REDSHIFT, RedshiftBatchSize), types.REDSHIFT)
+	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(BackendType, RedshiftBatchSize), BackendType)
 }
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
-	return sqlutil.Export(ctx, db.DB, opt, types.REDSHIFT)
+	return sqlutil.Export(ctx, db.DB, opt, BackendType)
 }
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
-	return sqlutil.Join(ctx, db.DB, opt, types.REDSHIFT)
+	return sqlutil.Join(ctx, db.DB, opt, BackendType)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
