@@ -91,7 +91,7 @@ func GetColumnFormat(backendType types.BackendType) (string, error) {
 	switch backendType {
 	case types.POSTGRES, types.SNOWFLAKE, types.REDSHIFT:
 		columnFormat = `"%s" %s`
-	case types.MYSQL, types.SQLite:
+	case types.MYSQL, types.SQLite, types.BIGQUERY:
 		columnFormat = "`%s` %s"
 	default:
 		return "", fmt.Errorf("unsupported backend type %s", backendType)
@@ -104,7 +104,7 @@ func QuoteFn(backendType types.BackendType) (func(...string) string, error) {
 	switch backendType {
 	case types.POSTGRES, types.SNOWFLAKE, types.REDSHIFT:
 		quote = `"`
-	case types.MYSQL, types.SQLite:
+	case types.MYSQL, types.SQLite, types.BIGQUERY:
 		quote = "`"
 	default:
 		return nil, fmt.Errorf("unsupported backend type %s", backendType)
