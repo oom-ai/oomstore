@@ -37,12 +37,12 @@ func GetDbTypeFrom(backend types.BackendType, valueType types.ValueType) (string
 
 var (
 	sqliteType = map[types.ValueType]string{
-		types.STRING:  "TEXT",
-		types.INT64:   "INTEGER",
-		types.FLOAT64: "FLOAT",
-		types.BOOL:    "INTEGER",
-		types.BYTES:   "BLOB",
-		types.TIME:    "TIMESTAMP",
+		types.STRING:  "text",
+		types.INT64:   "integer",
+		types.FLOAT64: "float",
+		types.BOOL:    "integer",
+		types.BYTES:   "blob",
+		types.TIME:    "timestamp",
 	}
 	mysqlType = map[types.ValueType]string{
 		types.STRING:  "text",
@@ -50,31 +50,31 @@ var (
 		types.FLOAT64: "double",
 		types.BOOL:    "bool",
 		types.TIME:    "datetime",
-		types.BYTES:   "binary",
+		types.BYTES:   "varbinary",
 	}
 	postgresType = map[types.ValueType]string{
 		types.STRING:  "text",
 		types.INT64:   "bigint",
 		types.FLOAT64: "double precision",
 		types.BOOL:    "boolean",
-		types.TIME:    "timestamptz",
+		types.TIME:    "timestamp",
 		types.BYTES:   "bytea",
 	}
 	snowFlake = map[types.ValueType]string{
-		types.STRING:  "VARCHAR",
-		types.INT64:   "INTEGER",
-		types.FLOAT64: "DOUBLE",
-		types.BOOL:    "BOOLEAN",
-		types.TIME:    "TIME",
-		types.BYTES:   "BINARY",
+		types.STRING:  "varchar",
+		types.INT64:   "bigint",
+		types.FLOAT64: "double",
+		types.BOOL:    "boolean",
+		types.TIME:    "timestamp",
+		types.BYTES:   "varbinary",
 	}
 	dynamoDB = map[types.ValueType]string{
 		types.STRING:  "String",
 		types.INT64:   "BigInteger",
-		types.FLOAT64: "Float",
+		types.FLOAT64: "Double",
 		types.BOOL:    "Boolean",
 		types.TIME:    "Date",
-		types.BYTES:   "Byte",
+		types.BYTES:   "ByteBuffer",
 	}
 	cassandraType = map[types.ValueType]string{
 		types.STRING:  "text",
@@ -82,7 +82,7 @@ var (
 		types.FLOAT64: "double",
 		types.BOOL:    "boolean",
 		types.TIME:    "timestamp",
-		types.BYTES:   "text",
+		types.BYTES:   "blob",
 	}
 	redshiftType = postgresType
 )
