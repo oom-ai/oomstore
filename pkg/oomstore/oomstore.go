@@ -30,7 +30,7 @@ func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	offlineStore, err := database.OpenOfflineStore(opt.OfflineStore)
+	offlineStore, err := database.OpenOfflineStore(ctx, opt.OfflineStore)
 	if err != nil {
 		return nil, err
 	}

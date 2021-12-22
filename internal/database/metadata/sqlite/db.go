@@ -10,8 +10,28 @@ import (
 )
 
 func (db *DB) WithTransaction(ctx context.Context, fn func(context.Context, metadata.DBStore) error) error {
-	//TODO implement me
-	panic("implement me")
+	tx, err := db.BeginTxx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	txStore := &Tx{Tx: tx}
+
+	defer func() {
+		if p := recover(); p != nil {
+			// a panic occurred, rollback and repanic
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			// something went wrong, rollback
+			_ = tx.Rollback()
+		} else {
+			// all good, commit
+			err = tx.Commit()
+		}
+	}()
+
+	return fn(ctx, txStore)
 }
 
 func (db *DB) CreateEntity(ctx context.Context, opt metadata.CreateEntityOpt) (int, error) {
@@ -75,7 +95,16 @@ func (db *DB) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (ty
 }
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
-	return createRevision(ctx, db, opt)
+	var (
+		revisionID int
+		dataTable  string
+		err        error
+	)
+	err = db.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
+		revisionID, dataTable, err = tx.CreateRevision(c, opt)
+		return err
+	})
+	return revisionID, dataTable, err
 }
 
 func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {

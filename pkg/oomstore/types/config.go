@@ -15,6 +15,7 @@ const (
 	SNOWFLAKE BackendType = "snowflake"
 	DYNAMODB  BackendType = "dynamodb"
 	CASSANDRA BackendType = "cassandra"
+	BIGQUERY  BackendType = "bigquery"
 )
 
 type OomStoreConfig struct {
@@ -24,11 +25,12 @@ type OomStoreConfig struct {
 }
 
 type OnlineStoreConfig struct {
-	Backend  BackendType  `yaml:"-"`
-	Postgres *PostgresOpt `yaml:"postgres"`
-	Redis    *RedisOpt    `yaml:"redis"`
-	MySQL    *MySQLOpt    `yaml:"mysql"`
-	DynamoDB *DynamoDBOpt `yaml:"dynamodb"`
+	Backend   BackendType   `yaml:"-"`
+	Postgres  *PostgresOpt  `yaml:"postgres"`
+	Redis     *RedisOpt     `yaml:"redis"`
+	MySQL     *MySQLOpt     `yaml:"mysql"`
+	DynamoDB  *DynamoDBOpt  `yaml:"dynamodb"`
+	Cassandra *CassandraOpt `yaml:"cassandra"`
 }
 
 type OfflineStoreConfig struct {
@@ -36,12 +38,14 @@ type OfflineStoreConfig struct {
 	Postgres  *PostgresOpt  `yaml:"postgres"`
 	MySQL     *MySQLOpt     `yaml:"mysql"`
 	Snowflake *SnowflakeOpt `yaml:"snowflake"`
+	BigQuery  *BigQueryOpt  `yaml:"bigquery"`
 }
 
 type MetadataStoreConfig struct {
 	Backend  BackendType  `yaml:"-"`
 	Postgres *PostgresOpt `yaml:"postgres"`
 	MySQL    *MySQLOpt    `yaml:"mysql"`
+	SQLite   *SQLiteOpt   `yaml:"sqlite"`
 }
 
 type RedisOpt struct {
