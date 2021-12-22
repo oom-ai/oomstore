@@ -7,7 +7,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func GetDbTypeFrom(backend types.BackendType, valueType types.ValueType) (string, error) {
+func DBValueType(backend types.BackendType, valueType types.ValueType) (string, error) {
 	var mp map[types.ValueType]string
 	switch backend {
 	case types.POSTGRES:
