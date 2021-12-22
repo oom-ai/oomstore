@@ -38,6 +38,8 @@ func OpenPostgresDB(host, port, user, password, database string) (*sqlx.DB, erro
 	)
 }
 
+var OpenRedshiftDB = OpenPostgresDB
+
 func DeserializeString(i interface{}, backend types.BackendType) string {
 	switch backend {
 	case types.MYSQL:

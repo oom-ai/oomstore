@@ -15,6 +15,7 @@ import (
 	offlineBigQuery "github.com/oom-ai/oomstore/internal/database/offline/bigquery"
 	offlineMySQL "github.com/oom-ai/oomstore/internal/database/offline/mysql"
 	offlinePG "github.com/oom-ai/oomstore/internal/database/offline/postgres"
+	offlineRedshift "github.com/oom-ai/oomstore/internal/database/offline/redshift"
 	offlineSnowflake "github.com/oom-ai/oomstore/internal/database/offline/snowflake"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -78,6 +79,8 @@ func OpenOfflineStore(ctx context.Context, opt types.OfflineStoreConfig) (offlin
 		return offlineSnowflake.Open(opt.Snowflake)
 	case types.BIGQUERY:
 		return offlineBigQuery.Open(ctx, opt.BigQuery)
+	case types.REDSHIFT:
+		return offlineRedshift.Open(opt.Redshift)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}

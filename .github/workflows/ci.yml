@@ -69,6 +69,9 @@ jobs:
         SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER }}
         SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD }}
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        REDSHIFT_TEST_HOST: ${{ secrets.REDSHIFT_TEST_HOST }}
+        REDSHIFT_TEST_USER: ${{ secrets.REDSHIFT_TEST_USER }}
+        REDSHIFT_TEST_PASSWORD: ${{ secrets.REDSHIFT_TEST_PASSWORD }}
     - name: Run integration tests
       run: make integration-test
     - uses: codecov/codecov-action@v2

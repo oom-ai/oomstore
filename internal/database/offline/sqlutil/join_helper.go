@@ -17,6 +17,15 @@ const (
 	InsertBatchSize = 20
 )
 
+func supportIndex(backendType types.BackendType) bool {
+	for _, b := range []types.BackendType{types.SNOWFLAKE, types.REDSHIFT} {
+		if b == backendType {
+			return false
+		}
+	}
+	return true
+}
+
 func createTableJoined(ctx context.Context, db *sqlx.DB, features types.FeatureList, entity types.Entity, groupName string, valueNames []string, backendType types.BackendType) (string, error) {
 	columnFormat, err := dbutil.GetColumnFormat(backendType)
 	if err != nil {
@@ -49,8 +58,7 @@ func createTableJoined(ctx context.Context, db *sqlx.DB, features types.FeatureL
 		return "", err
 	}
 
-	// snowflake doesn't support index
-	if backendType != types.SNOWFLAKE {
+	if supportIndex(backendType) {
 		index := fmt.Sprintf(`CREATE INDEX idx_%s ON %s (unix_milli, entity_key)`, tableName, tableName)
 		if _, err = db.ExecContext(ctx, index); err != nil {
 			return "", err
@@ -93,8 +101,7 @@ func createAndImportTableEntityRows(ctx context.Context, db *sqlx.DB, entity typ
 		return "", err
 	}
 
-	// create index: snowflake doesn't support index
-	if backendType != types.SNOWFLAKE {
+	if supportIndex(backendType) {
 		index := fmt.Sprintf(`CREATE INDEX idx_%s ON %s (unix_milli, entity_key)`, tableName, tableName)
 		if _, err := db.ExecContext(ctx, index); err != nil {
 			return "", err

@@ -39,5 +39,4 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSou
 
 	_, err = stmt.ExecContext(ctx)
 	return err
-
 }
