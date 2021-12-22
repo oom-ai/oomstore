@@ -23,7 +23,9 @@ func prepareEntity(t *testing.T, ctx context.Context, store metadata.Store, name
 	return entityID
 }
 
-func TestGetGroup(t *testing.T, prepareStore PrepareStoreFn) {
+func TestGetGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -59,7 +61,9 @@ func TestGetGroup(t *testing.T, prepareStore PrepareStoreFn) {
 	require.Equal(t, opt.Category, group.Category)
 }
 
-func TestListGroup(t *testing.T, prepareStore PrepareStoreFn) {
+func TestListGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -121,7 +125,9 @@ func TestListGroup(t *testing.T, prepareStore PrepareStoreFn) {
 	assert.Equal(t, 1, len(groups))
 }
 
-func TestCreateGroup(t *testing.T, prepareStore PrepareStoreFn) {
+func TestCreateGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -149,7 +155,9 @@ func TestCreateGroup(t *testing.T, prepareStore PrepareStoreFn) {
 	require.NotNil(t, err)
 }
 
-func TestUpdateGroup(t *testing.T, prepareStore PrepareStoreFn) {
+func TestUpdateGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 

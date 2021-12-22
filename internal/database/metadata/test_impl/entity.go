@@ -11,7 +11,9 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
-func TestCreateEntity(t *testing.T, prepareStore PrepareStoreFn) {
+func TestCreateEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -35,7 +37,9 @@ func TestCreateEntity(t *testing.T, prepareStore PrepareStoreFn) {
 	require.Equal(t, fmt.Errorf("entity device already exists"), err)
 }
 
-func TestGetEntity(t *testing.T, prepareStore PrepareStoreFn) {
+func TestGetEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -60,7 +64,9 @@ func TestGetEntity(t *testing.T, prepareStore PrepareStoreFn) {
 	require.EqualError(t, err, "feature entity 0 not found")
 }
 
-func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreFn) {
+func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
@@ -90,7 +96,9 @@ func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreFn) {
 	}))
 }
 
-func TestListEntity(t *testing.T, prepareStore PrepareStoreFn) {
+func TestListEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
