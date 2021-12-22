@@ -20,9 +20,9 @@ func DBValueType(backend types.BackendType, valueType types.ValueType) (string, 
 	case types.CASSANDRA:
 		mp = valueTypeToCassandraType
 	case types.SNOWFLAKE:
-		mp = valueTypeToSnowFlake
+		mp = valueTypeToSnowFlakeType
 	case types.DYNAMODB:
-		mp = valueTypeToDynamoDB
+		mp = valueTypeToDynamoDBType
 	case types.REDSHIFT:
 		mp = valueTypeToRedshiftType
 	default:
@@ -42,7 +42,7 @@ func ValueType(backend types.BackendType, dbValueType string) (types.ValueType, 
 	case types.POSTGRES:
 		mp = postgresTypeToValueType
 	case types.MYSQL:
-		mp = mySQLTypeToValueType
+		mp = mysqlTypeToValueType
 	case types.SNOWFLAKE:
 		mp = snowflakeTypeToValueType
 	case types.BIGQUERY:
@@ -88,7 +88,7 @@ var (
 		types.TIME:    "timestamp",
 		types.BYTES:   "bytea",
 	}
-	valueTypeToSnowFlake = map[types.ValueType]string{
+	valueTypeToSnowFlakeType = map[types.ValueType]string{
 		types.STRING:  "varchar",
 		types.INT64:   "bigint",
 		types.FLOAT64: "double",
@@ -96,7 +96,7 @@ var (
 		types.TIME:    "timestamp",
 		types.BYTES:   "varbinary",
 	}
-	valueTypeToDynamoDB = map[types.ValueType]string{
+	valueTypeToDynamoDBType = map[types.ValueType]string{
 		types.STRING:  "String",
 		types.INT64:   "BigInteger",
 		types.FLOAT64: "Double",
@@ -184,7 +184,7 @@ var (
 		"numeric": types.FLOAT64,
 		"decimal": types.FLOAT64,
 	}
-	mySQLTypeToValueType = map[string]types.ValueType{
+	mysqlTypeToValueType = map[string]types.ValueType{
 		"boolean": types.BOOL,
 		"bool":    types.BOOL,
 
