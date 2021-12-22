@@ -2,43 +2,56 @@ package mysql_test
 
 import (
 	"context"
+	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/mysql"
 	"github.com/oom-ai/oomstore/internal/database/metadata/test_impl"
 	"github.com/oom-ai/oomstore/internal/database/test/runtime_mysql"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
+var DATABASE string
+
+func init() {
+	DATABASE = strings.ToLower(dbutil.RandString(20))
+	runtime_mysql.Reset(DATABASE)
+}
+
 func prepareStore(t *testing.T) (context.Context, metadata.Store) {
-	ctx, db := runtime_mysql.PrepareDB()
+	ctx, db := runtime_mysql.PrepareDB(t, DATABASE)
 	db.Close()
 
-	if err := mysql.CreateDatabase(ctx, runtime_mysql.MySQLDbOpt); err != nil {
+	opt := runtime_mysql.GetOpt(DATABASE)
+	if err := mysql.CreateDatabase(ctx, *opt); err != nil {
 		t.Fatal(err)
 	}
-	store, err := mysql.Open(ctx, &runtime_mysql.MySQLDbOpt)
+	store, err := mysql.Open(ctx, opt)
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	return ctx, store
 }
 
 func TestPing(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestPing(t, prepareStore)
 }
 
 func TestCreateDatabase(t *testing.T) {
-	ctx, db := runtime_mysql.PrepareDB()
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
+	ctx, db := runtime_mysql.PrepareDB(t, DATABASE)
 	db.Close()
 
-	if err := mysql.CreateDatabase(ctx, runtime_mysql.MySQLDbOpt); err != nil {
+	opt := runtime_mysql.GetOpt(DATABASE)
+	if err := mysql.CreateDatabase(ctx, *opt); err != nil {
 		t.Fatal(err)
 	}
-	store, err := mysql.Open(ctx, &runtime_mysql.MySQLDbOpt)
+	store, err := mysql.Open(ctx, opt)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +63,7 @@ func TestCreateDatabase(t *testing.T) {
 			FROM information_schema.tables
 			WHERE table_schema = ?
 			ORDER BY table_name;`,
-		runtime_mysql.MySQLDbOpt.Database)
+		opt.Database)
 	require.NoError(t, err)
 
 	var wantTables []string
@@ -65,89 +78,111 @@ func TestCreateDatabase(t *testing.T) {
 }
 
 func TestCreateEntity(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestCreateEntity(t, prepareStore)
 }
 
 func TestGetEntity(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestGetEntity(t, prepareStore)
 }
 
 func TestUpdateEntity(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestUpdateEntity(t, prepareStore)
 }
 
 func TestListEntity(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestListEntity(t, prepareStore)
 }
 
 func TestGetGroup(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestGetGroup(t, prepareStore)
 }
 
 func TestListGroup(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestListGroup(t, prepareStore)
 }
 
 func TestCreateGroup(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestCreateGroup(t, prepareStore)
 }
 
 func TestUpdateGroup(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestUpdateGroup(t, prepareStore)
 }
 
 func TestCreateFeature(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestCreateFeature(t, prepareStore)
 }
 
 func TestCreateFeatureWithSameName(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestCreateFeatureWithSameName(t, prepareStore)
 }
 
 func TestCreateFeatureWithSQLKeyword(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestCreateFeatureWithSQLKeyword(t, prepareStore)
 }
 
 func TestCreateFeatureWithInvalidDataType(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestCreateFeatureWithInvalidDataType(t, prepareStore)
 }
 
 func TestGetFeature(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestGetFeature(t, prepareStore)
 }
 
 func TestGetFeatureByName(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestGetFeatureByName(t, prepareStore)
 }
 
 func TestListFeature(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestListFeature(t, prepareStore)
 }
 
 func TestCacheListFeature(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestCacheListFeature(t, prepareStore)
 }
 
 func TestUpdateFeature(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestUpdateFeature(t, prepareStore)
 }
 
 func TestCreateRevision(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestCreateRevision(t, prepareStore)
 }
 
 func TestUpdateRevision(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestUpdateRevision(t, prepareStore)
 }
 
 func TestGetRevision(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestGetRevision(t, prepareStore)
 }
 
 func TestGetRevisionBy(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestGetRevisionBy(t, prepareStore)
 }
 
 func TestListRevision(t *testing.T) {
+	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
 	test_impl.TestListRevision(t, prepareStore)
 }
