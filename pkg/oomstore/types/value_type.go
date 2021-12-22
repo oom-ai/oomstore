@@ -8,34 +8,38 @@ import (
 type ValueType int
 
 const (
-	valueTypeStart ValueType = iota
-
+	INVALID ValueType = iota
 	STRING
 	INT64
 	FLOAT64
 	BOOL
 	TIME
 	BYTES
-
-	valueTypeEnd
 )
 
+var allValueTypes = map[ValueType]string{
+	STRING:  "string",
+	INT64:   "int64",
+	FLOAT64: "float64",
+	BOOL:    "bool",
+	TIME:    "time",
+	BYTES:   "bytes",
+}
+
 func (t ValueType) String() string {
-	switch t {
-	case STRING:
-		return "string"
-	case INT64:
-		return "int64"
-	case FLOAT64:
-		return "float64"
-	case BOOL:
-		return "bool"
-	case TIME:
-		return "time"
-	case BYTES:
-		return "bytes"
+	if s, ok := allValueTypes[t]; ok {
+		return s
+	} else {
+		return "Unknown(" + strconv.Itoa(int(t)) + ")"
 	}
-	return "Unknown(" + strconv.Itoa(int(t)) + ")"
+}
+
+func (v ValueType) Validate() error {
+	if _, ok := allValueTypes[v]; ok {
+		return nil
+	} else {
+		return fmt.Errorf("Invalid value type: %d", v)
+	}
 }
 
 func ParseValueType(s string) (ValueType, error) {
@@ -53,12 +57,5 @@ func ParseValueType(s string) (ValueType, error) {
 	case "bytes":
 		return BYTES, nil
 	}
-	return 0, fmt.Errorf("Unknown value type: %s", s)
-}
-
-func (v ValueType) Validate() error {
-	if v <= valueTypeStart || v >= valueTypeEnd {
-		return fmt.Errorf("Invalid value type: %d", v)
-	}
-	return nil
+	return INVALID, fmt.Errorf("Unknown value type: %s", s)
 }
