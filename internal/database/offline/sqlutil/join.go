@@ -11,6 +11,17 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
+type QueryResults func(ctx context.Context, dbOpt dbutil.DBOpt, query string, header, tableNames []string) (*types.JoinResult, error)
+
+type ReadJoinedTableOpt struct {
+	EntityRowsTableName string
+	TableNames          []string
+	FeatureMap          map[string]types.FeatureList
+	ValueNames          []string
+	QueryResults        QueryResults
+	ReadJoinResultQuery string
+}
+
 func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType types.BackendType) (*types.JoinResult, error) {
 	// Step 1: prepare temporary table entity_rows
 	features := types.FeatureList{}
@@ -54,7 +65,14 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType typ
 	}
 
 	// Step 3: read joined results
-	return readJoinedTable(ctx, db, entityRowsTableName, tableNames, tableToFeatureMap, opt.ValueNames, backendType)
+	return ReadJoinedTable(ctx, dbOpt, ReadJoinedTableOpt{
+		EntityRowsTableName: entityRowsTableName,
+		TableNames:          tableNames,
+		FeatureMap:          tableToFeatureMap,
+		ValueNames:          opt.ValueNames,
+		QueryResults:        sqlxQueryResults,
+		ReadJoinResultQuery: READ_JOIN_RESULT_QUERY,
+	})
 }
 
 func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGroupOpt) (string, error) {
@@ -99,19 +117,12 @@ func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGr
 	return joinedTableName, nil
 }
 
-func readJoinedTable(
-	ctx context.Context,
-	db *sqlx.DB,
-	entityRowsTableName string,
-	tableNames []string,
-	featureMap map[string]types.FeatureList,
-	valueNames []string,
-	backendType types.BackendType,
-) (*types.JoinResult, error) {
+func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTableOpt) (*types.JoinResult, error) {
+	tableNames := opt.TableNames
 	if len(tableNames) == 0 {
 		return nil, nil
 	}
-	qt, err := dbutil.QuoteFn(backendType)
+	qt, err := dbutil.QuoteFn(dbOpt.Backend)
 	if err != nil {
 		return nil, err
 	}
@@ -133,44 +144,51 @@ func readJoinedTable(
 		ON entity_rows_table.entity_key = joined_table_2.entity_key AND entity_rows_table.unix_milli = joined_table_2.unix_milli;
 	*/
 	var (
-		fields         []string
+		fields, header []string
 		joinTablePairs []joinTablePair
 	)
-
-	for _, name := range valueNames {
+	header = append(header, "entity_key", "unix_milli")
+	for _, name := range opt.ValueNames {
 		fields = append(fields, qt(name))
+		header = append(header, name)
 	}
 	for _, name := range tableNames {
-		for _, f := range featureMap[name] {
+		for _, f := range opt.FeatureMap[name] {
 			fields = append(fields, fmt.Sprintf("%s.%s", qt(name), qt(f.Name)))
+			header = append(header, f.Name)
 		}
 	}
 
-	tableNames = append([]string{entityRowsTableName}, tableNames...)
+	tableNames = append([]string{opt.EntityRowsTableName}, tableNames...)
 	for i := 0; i < len(tableNames)-1; i++ {
 		joinTablePairs = append(joinTablePairs, joinTablePair{
 			LeftTable:  tableNames[i],
 			RightTable: tableNames[i+1],
 		})
 	}
-	query, err := buildReadJoinResultQuery(readJoinResultQuery{
-		EntityRowsTableName: entityRowsTableName,
+	datasetID := ""
+	if dbOpt.Backend == types.BackendBigQuery {
+		datasetID = *dbOpt.DatasetID
+	}
+	query, err := buildReadJoinResultQuery(opt.ReadJoinResultQuery, readJoinResultQueryParams{
+		EntityRowsTableName: opt.EntityRowsTableName,
 		EntityKeyStr:        entityKeyStr,
 		UnixMilliStr:        unixMilliStr,
 		Fields:              fields,
 		JoinTables:          joinTablePairs,
-		Backend:             backendType,
+		Backend:             dbOpt.Backend,
+		DatasetID:           datasetID,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	// Step 2: read joined results
-	rows, err := db.QueryxContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	header, err := rows.Columns()
+	return opt.QueryResults(ctx, dbOpt, query, header, tableNames)
+}
+
+func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, header, tableNames []string) (*types.JoinResult, error) {
+	rows, err := dbOpt.SqlxDB.QueryxContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +197,7 @@ func readJoinedTable(
 	var scanErr, dropErr error
 	go func() {
 		defer func() {
-			if err := dropTemporaryTables(ctx, db, tableNames); err != nil {
+			if err := dropTemporaryTables(ctx, dbOpt.SqlxDB, tableNames); err != nil {
 				dropErr = err
 			}
 			defer rows.Close()
