@@ -10,7 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExport(t *testing.T, prepareStore PrepareStoreFn) {
+func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 

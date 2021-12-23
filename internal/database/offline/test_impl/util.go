@@ -11,6 +11,8 @@ import (
 
 type PrepareStoreFn func(t *testing.T) (context.Context, offline.Store)
 
+type DestroyStoreFn func()
+
 func buildTestDataTable(ctx context.Context, t *testing.T, store offline.Store, features []*types.Feature, dataTable string, source *offline.CSVSource) {
 	entity := &types.Entity{
 		Name:   "device",
