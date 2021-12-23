@@ -25,11 +25,11 @@ var (
 	createSchemaFuncs = template.FuncMap{
 		"entity": func(entity types.Entity, backend types.BackendType) string {
 			switch backend {
-			case types.CASSANDRA, types.SQLite:
+			case types.BackendCassandra, types.BackendSQLite:
 				return fmt.Sprintf(`"%s" TEXT PRIMARY KEY`, entity.Name)
-			case types.POSTGRES, types.SNOWFLAKE:
+			case types.BackendPostgres, types.BackendSnowflake:
 				return fmt.Sprintf(`"%s" VARCHAR(%d) PRIMARY KEY`, entity.Name, entity.Length)
-			case types.MYSQL:
+			case types.BackendMySQL:
 				return fmt.Sprintf("`%s` VARCHAR(%d) PRIMARY KEY", entity.Name, entity.Length)
 			default:
 				return fmt.Sprintf("%s VARCHAR(%d) PRIMARY KEY", entity.Name, entity.Length)
@@ -38,9 +38,9 @@ var (
 		"columnJoin": func(columns []Column, backend types.BackendType) string {
 			var format string
 			switch backend {
-			case types.POSTGRES, types.SNOWFLAKE, types.CASSANDRA:
+			case types.BackendPostgres, types.BackendSnowflake, types.BackendCassandra:
 				format = `"%s" %s`
-			case types.MYSQL:
+			case types.BackendMySQL:
 				format = "`%s` %s"
 			default:
 				format = "%s %s"
@@ -70,7 +70,7 @@ type CreateSchema struct {
 func BuildCreateSchema(tableName string, entity *types.Entity, features types.FeatureList, backend types.BackendType) (string, error) {
 	var text string
 	switch backend {
-	case types.SNOWFLAKE:
+	case types.BackendSnowflake:
 		text = snowflakeCreateSchema
 	default:
 		text = createSchema

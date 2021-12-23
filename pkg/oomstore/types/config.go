@@ -8,15 +8,15 @@ import (
 type BackendType string
 
 const (
-	POSTGRES  BackendType = "postgres"
-	REDIS     BackendType = "redis"
-	MYSQL     BackendType = "mysql"
-	SQLite    BackendType = "sqlite"
-	SNOWFLAKE BackendType = "snowflake"
-	DYNAMODB  BackendType = "dynamodb"
-	CASSANDRA BackendType = "cassandra"
-	BIGQUERY  BackendType = "bigquery"
-	REDSHIFT  BackendType = "redshift"
+	BackendPostgres  BackendType = "postgres"
+	BackendRedis     BackendType = "redis"
+	BackendMySQL     BackendType = "mysql"
+	BackendSQLite    BackendType = "sqlite"
+	BackendSnowflake BackendType = "snowflake"
+	BackendDynamoDB  BackendType = "dynamodb"
+	BackendCassandra BackendType = "cassandra"
+	BackendBigQuery  BackendType = "bigquery"
+	BackendRedshift  BackendType = "redshift"
 )
 
 type OomStoreConfig struct {
@@ -125,11 +125,11 @@ func (cfg *OomStoreConfig) Validate() error {
 func (cfg *MetadataStoreConfig) Validate() error {
 	n := 0
 	if cfg.Postgres != nil {
-		cfg.Backend = POSTGRES
+		cfg.Backend = BackendPostgres
 		n++
 	}
 	if cfg.MySQL != nil {
-		cfg.Backend = MYSQL
+		cfg.Backend = BackendMySQL
 		n++
 	}
 	if n != 1 {
@@ -141,19 +141,19 @@ func (cfg *MetadataStoreConfig) Validate() error {
 func (cfg *OnlineStoreConfig) Validate() error {
 	n := 0
 	if cfg.Postgres != nil {
-		cfg.Backend = POSTGRES
+		cfg.Backend = BackendPostgres
 		n++
 	}
 	if cfg.MySQL != nil {
-		cfg.Backend = MYSQL
+		cfg.Backend = BackendMySQL
 		n++
 	}
 	if cfg.Redis != nil {
-		cfg.Backend = REDIS
+		cfg.Backend = BackendRedis
 		n++
 	}
 	if cfg.DynamoDB != nil {
-		cfg.Backend = DYNAMODB
+		cfg.Backend = BackendDynamoDB
 		n++
 	}
 	if n != 1 {
@@ -165,15 +165,15 @@ func (cfg *OnlineStoreConfig) Validate() error {
 func (cfg *OfflineStoreConfig) Validate() error {
 	n := 0
 	if cfg.Postgres != nil {
-		cfg.Backend = POSTGRES
+		cfg.Backend = BackendPostgres
 		n++
 	}
 	if cfg.MySQL != nil {
-		cfg.Backend = MYSQL
+		cfg.Backend = BackendMySQL
 		n++
 	}
 	if cfg.Snowflake != nil {
-		cfg.Backend = SNOWFLAKE
+		cfg.Backend = BackendSnowflake
 		n++
 	}
 	if n != 1 {

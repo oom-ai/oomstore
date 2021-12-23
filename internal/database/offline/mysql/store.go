@@ -29,15 +29,15 @@ func Open(option *types.MySQLOpt) (*DB, error) {
 }
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(types.MYSQL, MySQLBatchSize), types.MYSQL)
+	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(types.BackendMySQL, MySQLBatchSize), types.BackendMySQL)
 }
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
-	return sqlutil.Export(ctx, db.DB, opt, types.MYSQL)
+	return sqlutil.Export(ctx, db.DB, opt, types.BackendMySQL)
 }
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
-	return sqlutil.Join(ctx, db.DB, opt, types.MYSQL)
+	return sqlutil.Join(ctx, db.DB, opt, types.BackendMySQL)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {

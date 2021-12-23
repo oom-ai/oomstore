@@ -11,7 +11,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const BackendType = types.SQLite
+const BackendType = types.BackendSQLite
 
 var _ online.Store = &DB{}
 

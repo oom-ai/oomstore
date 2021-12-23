@@ -10,7 +10,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const BackendType = types.REDSHIFT
+const BackendType = types.BackendRedshift
 
 const RedshiftBatchSize = 20
 

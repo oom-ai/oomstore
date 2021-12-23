@@ -67,9 +67,9 @@ func Quote(quote string, fields ...string) string {
 func GetColumnFormat(backendType types.BackendType) (string, error) {
 	var columnFormat string
 	switch backendType {
-	case types.POSTGRES, types.SNOWFLAKE, types.REDSHIFT:
+	case types.BackendPostgres, types.BackendSnowflake, types.BackendRedshift:
 		columnFormat = `"%s" %s`
-	case types.MYSQL, types.SQLite, types.BIGQUERY:
+	case types.BackendMySQL, types.BackendSQLite, types.BackendBigQuery:
 		columnFormat = "`%s` %s"
 	default:
 		return "", fmt.Errorf("unsupported backend type %s", backendType)
@@ -80,9 +80,9 @@ func GetColumnFormat(backendType types.BackendType) (string, error) {
 func QuoteFn(backendType types.BackendType) (func(...string) string, error) {
 	var quote string
 	switch backendType {
-	case types.POSTGRES, types.SNOWFLAKE, types.REDSHIFT:
+	case types.BackendPostgres, types.BackendSnowflake, types.BackendRedshift:
 		quote = `"`
-	case types.MYSQL, types.SQLite, types.BIGQUERY:
+	case types.BackendMySQL, types.BackendSQLite, types.BackendBigQuery:
 		quote = "`"
 	default:
 		return nil, fmt.Errorf("unsupported backend type %s", backendType)

@@ -18,7 +18,7 @@ const (
 )
 
 func supportIndex(backendType types.BackendType) bool {
-	for _, b := range []types.BackendType{types.SNOWFLAKE, types.REDSHIFT, types.BIGQUERY} {
+	for _, b := range []types.BackendType{types.BackendSnowflake, types.BackendRedshift, types.BackendBigQuery} {
 		if b == backendType {
 			return false
 		}
@@ -99,7 +99,7 @@ func PrepareEntityRowsTable(ctx context.Context,
 	// TODO: infer db_type from value_type
 	var entityType, valueType, qtTableName string
 	switch dbOpt.Backend {
-	case types.BIGQUERY:
+	case types.BackendBigQuery:
 		entityType = "STRING"
 		valueType = "STRING"
 		qtTableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, qt(tableName))
@@ -153,7 +153,7 @@ func insertEntityRows(ctx context.Context,
 	columns = append(columns, valueNames...)
 
 	format := `%s`
-	if dbOpt.Backend == types.BIGQUERY {
+	if dbOpt.Backend == types.BackendBigQuery {
 		format = `"%s"`
 	}
 	for entityRow := range entityRows {

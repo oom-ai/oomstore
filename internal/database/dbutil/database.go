@@ -42,7 +42,7 @@ var OpenRedshiftDB = OpenPostgresDB
 
 func DeserializeString(i interface{}, backend types.BackendType) string {
 	switch backend {
-	case types.MYSQL:
+	case types.BackendMySQL:
 		return string(i.([]byte))
 	default:
 		return i.(string)
@@ -51,18 +51,18 @@ func DeserializeString(i interface{}, backend types.BackendType) string {
 
 func IsTableNotFoundError(err error, backend types.BackendType) bool {
 	switch backend {
-	case types.SQLite:
+	case types.BackendSQLite:
 		// https://github.com/mattn/go-sqlite3/issues/244
 		if sqliteErr, ok := err.(sqlite3.Error); ok {
 			return sqliteErr.Code == sqlite3.ErrError
 		}
 
 	// https://dev.mysql.com/doc/mysql-errors/5.7/en/server-error-reference.html#error_er_no_such_table
-	case types.MYSQL:
+	case types.BackendMySQL:
 		if e2, ok := err.(*mysql.MySQLError); ok {
 			return e2.Number == 1146
 		}
-	case types.POSTGRES:
+	case types.BackendPostgres:
 		if e2, ok := err.(*pq.Error); ok {
 			return e2.Code == pgerrcode.UndefinedTable
 		}

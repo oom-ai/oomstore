@@ -25,7 +25,7 @@ type DBOpt struct {
 
 func (d *DBOpt) ExecContext(ctx context.Context, query string, args []interface{}) error {
 	switch d.Backend {
-	case types.BIGQUERY:
+	case types.BackendBigQuery:
 		_, err := d.BigQueryDB.Query(query).Read(ctx)
 		return err
 	default:
@@ -41,16 +41,16 @@ func (d *DBOpt) BuildInsertQuery(tableName string, records []interface{}, column
 
 	var columnStr string
 	switch d.Backend {
-	case types.POSTGRES, types.SNOWFLAKE, types.REDSHIFT:
+	case types.BackendPostgres, types.BackendSnowflake, types.BackendRedshift:
 		columnStr = Quote(`"`, columns...)
 		tableName = fmt.Sprintf(`"%s"`, tableName)
-	case types.MYSQL, types.SQLite, types.BIGQUERY:
+	case types.BackendMySQL, types.BackendSQLite, types.BackendBigQuery:
 		columnStr = Quote("`", columns...)
 		tableName = fmt.Sprintf("`%s`", tableName)
 	}
 
 	switch d.Backend {
-	case types.BIGQUERY:
+	case types.BackendBigQuery:
 		values := make([]string, 0, len(records))
 		for _, row := range records {
 			values = append(values, fmt.Sprintf("(%s)", strings.Join(cast.ToStringSlice(row), ",")))

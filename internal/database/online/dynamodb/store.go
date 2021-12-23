@@ -11,7 +11,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const BackendType = types.DYNAMODB
+const BackendType = types.BackendDynamoDB
 
 var _ online.Store = &DB{}
 

@@ -11,19 +11,19 @@ import (
 func DBValueType(backend types.BackendType, valueType types.ValueType) (string, error) {
 	var mp map[types.ValueType]string
 	switch backend {
-	case types.POSTGRES:
+	case types.BackendPostgres:
 		mp = valueTypeToPostgresType
-	case types.SQLite:
+	case types.BackendSQLite:
 		mp = valueTypeToSQLiteType
-	case types.MYSQL:
+	case types.BackendMySQL:
 		mp = valueTypeToMySQLType
-	case types.CASSANDRA:
+	case types.BackendCassandra:
 		mp = valueTypeToCassandraType
-	case types.SNOWFLAKE:
+	case types.BackendSnowflake:
 		mp = valueTypeToSnowFlakeType
-	case types.DYNAMODB:
+	case types.BackendDynamoDB:
 		mp = valueTypeToDynamoDBType
-	case types.REDSHIFT:
+	case types.BackendRedshift:
 		mp = valueTypeToRedshiftType
 	default:
 		return "", errdefs.InvalidAttribute(fmt.Errorf("unsupported backend: %s", backend))
@@ -40,17 +40,17 @@ func DBValueType(backend types.BackendType, valueType types.ValueType) (string, 
 func ValueType(backend types.BackendType, dbValueType string) (types.ValueType, error) {
 	var mp map[string]types.ValueType
 	switch backend {
-	case types.POSTGRES:
+	case types.BackendPostgres:
 		mp = postgresTypeToValueType
-	case types.MYSQL:
+	case types.BackendMySQL:
 		mp = mysqlTypeToValueType
-	case types.SNOWFLAKE:
+	case types.BackendSnowflake:
 		mp = snowflakeTypeToValueType
-	case types.BIGQUERY:
+	case types.BackendBigQuery:
 		mp = bigQueryTypeToValueType
-	case types.SQLite:
+	case types.BackendSQLite:
 		mp = sqliteTypeToValueType
-	case types.REDSHIFT:
+	case types.BackendRedshift:
 		mp = redshiftTypeToValueType
 	default:
 		return 0, errdefs.InvalidAttribute(fmt.Errorf("unsupported backend: %s", backend))

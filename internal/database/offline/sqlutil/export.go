@@ -55,7 +55,7 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType
 				if record[i+1] == nil {
 					continue
 				}
-				if backendType == types.SNOWFLAKE {
+				if backendType == types.BackendSnowflake {
 
 					v, err := deserializeByTag(record[i+1], f.ValueType)
 					if err != nil {
