@@ -37,13 +37,13 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType typ
 		if !ok {
 			continue
 		}
-		joinedTableName, err := joinOneGroup(ctx, db, offline.JoinOneGroupOpt{
+		joinedTableName, err := JoinOneGroup(ctx, dbOpt, offline.JoinOneGroupOpt{
 			GroupName:           groupName,
 			Entity:              opt.Entity,
 			Features:            featureList,
 			RevisionRanges:      revisionRanges,
 			EntityRowsTableName: entityRowsTableName,
-		}, backendType)
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -57,11 +57,11 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType typ
 	return readJoinedTable(ctx, db, entityRowsTableName, tableNames, tableToFeatureMap, opt.ValueNames, backendType)
 }
 
-func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt, backendType types.BackendType) (string, error) {
+func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGroupOpt) (string, error) {
 	if len(opt.Features) == 0 {
 		return "", nil
 	}
-	qt, err := dbutil.QuoteFn(backendType)
+	qt, err := dbutil.QuoteFn(dbOpt.Backend)
 	if err != nil {
 		return "", err
 	}
@@ -69,7 +69,7 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 	unixMilliStr := qt("unix_milli")
 
 	// Step 1: create temporary joined table
-	joinedTableName, err := createTableJoined(ctx, db, opt.Features, opt.Entity, opt.GroupName, opt.ValueNames, backendType)
+	joinedTableName, err := PrepareJoinedTable(ctx, dbOpt, opt.Features, opt.Entity, opt.GroupName, opt.ValueNames)
 	if err != nil {
 		return "", err
 	}
@@ -77,7 +77,7 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 	// Step 2: iterate each table range, join entity_rows table and each data tables
 	columns := append(opt.ValueNames, opt.Features.Names()...)
 	for _, r := range opt.RevisionRanges {
-		query, err := buildJoinQuery(joinQuery{
+		query, err := buildJoinQuery(joinQueryParams{
 			TableName:           joinedTableName,
 			EntityKeyStr:        entityKeyStr,
 			EntityName:          opt.Entity.Name,
@@ -85,13 +85,14 @@ func joinOneGroup(ctx context.Context, db *sqlx.DB, opt offline.JoinOneGroupOpt,
 			Columns:             columns,
 			EntityRowsTableName: opt.EntityRowsTableName,
 			DataTable:           r.DataTable,
-			Backend:             backendType,
+			Backend:             dbOpt.Backend,
+			DatasetID:           dbOpt.DatasetID,
 		})
 		if err != nil {
 			return "", err
 		}
-		if _, tmpErr := db.ExecContext(ctx, db.Rebind(query), r.MinRevision, r.MaxRevision); tmpErr != nil {
-			return "", tmpErr
+		if err = dbOpt.ExecContext(ctx, query, []interface{}{r.MinRevision, r.MaxRevision}); err != nil {
+			return "", err
 		}
 	}
 

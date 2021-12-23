@@ -50,6 +50,7 @@ func PrepareJoinedTable(
 			return "", err
 		}
 		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, f.Name, dbValueType))
+
 	}
 	schema := `
 		CREATE TABLE %s (
@@ -242,7 +243,7 @@ ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
 WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
 `
 
-type joinQuery struct {
+type joinQueryParams struct {
 	TableName           string
 	EntityKeyStr        string
 	EntityName          string
@@ -251,10 +252,17 @@ type joinQuery struct {
 	EntityRowsTableName string
 	DataTable           string
 	Backend             types.BackendType
+	DatasetID           *string
 }
 
-func buildJoinQuery(schema joinQuery) (string, error) {
-	qt, err := dbutil.QuoteFn(schema.Backend)
+func buildJoinQuery(params joinQueryParams) (string, error) {
+	if params.Backend == types.BackendBigQuery {
+		params.TableName = fmt.Sprintf("%s.%s", *params.DatasetID, params.TableName)
+		params.EntityRowsTableName = fmt.Sprintf("%s.%s", *params.DatasetID, params.EntityRowsTableName)
+		params.DataTable = fmt.Sprintf("%s.%s", *params.DatasetID, params.DataTable)
+	}
+
+	qt, err := dbutil.QuoteFn(params.Backend)
 	if err != nil {
 		return "", err
 	}
@@ -267,7 +275,7 @@ func buildJoinQuery(schema joinQuery) (string, error) {
 	}).Parse(JOIN_QUERY))
 
 	buf := bytes.NewBuffer(nil)
-	if err := t.Execute(buf, schema); err != nil {
+	if err := t.Execute(buf, params); err != nil {
 		return "", err
 	}
 	return buf.String(), nil
