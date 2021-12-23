@@ -25,6 +25,8 @@ func DBValueType(backend types.BackendType, valueType types.ValueType) (string, 
 		mp = valueTypeToDynamoDBType
 	case types.BackendRedshift:
 		mp = valueTypeToRedshiftType
+	case types.BackendBigQuery:
+		mp = valueTypeToBigQueryType
 	default:
 		return "", errdefs.InvalidAttribute(fmt.Errorf("unsupported backend: %s", backend))
 	}
@@ -121,6 +123,15 @@ var (
 		types.TIME:    "timestamp",
 		types.BYTES:   "varbyte",
 	}
+	valueTypeToBigQueryType = map[types.ValueType]string{
+		types.String:  "string",
+		types.Int64:   "bigint",
+		types.Float64: "float64",
+		types.Bool:    "bool",
+		types.Time:    "datetime",
+		types.Bytes:   "bytes",
+	}
+	valueTypeToRedshiftType = valueTypeToPostgresType
 )
 
 // Mapping database data type to feature value type
