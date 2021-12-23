@@ -20,30 +20,33 @@ func prepareStore(t *testing.T) (context.Context, online.Store) {
 	return ctx, store
 }
 
+// the unit test for redis only run locally, and only the online store uses redis, no data race.
+func destroyStore() {}
+
 func TestOpen(t *testing.T) {
-	test_impl.TestOpen(t, prepareStore)
+	test_impl.TestOpen(t, prepareStore, destroyStore)
 }
 
 func TestGetExisted(t *testing.T) {
-	test_impl.TestGetExisted(t, prepareStore)
+	test_impl.TestGetExisted(t, prepareStore, destroyStore)
 }
 
 func TestGetNotExistedEntityKey(t *testing.T) {
-	test_impl.TestGetNotExistedEntityKey(t, prepareStore)
+	test_impl.TestGetNotExistedEntityKey(t, prepareStore, destroyStore)
 }
 
 func TestMultiGet(t *testing.T) {
-	test_impl.TestMultiGet(t, prepareStore)
+	test_impl.TestMultiGet(t, prepareStore, destroyStore)
 }
 
 func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
-	test_impl.TestPurgeRemovesSpecifiedRevision(t, prepareStore)
+	test_impl.TestPurgeRemovesSpecifiedRevision(t, prepareStore, destroyStore)
 }
 
 func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
-	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore)
+	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore, destroyStore)
 }
 
 func TestPing(t *testing.T) {
-	test_impl.TestPing(t, prepareStore)
+	test_impl.TestPing(t, prepareStore, destroyStore)
 }

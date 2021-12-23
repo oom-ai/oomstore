@@ -8,8 +8,6 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	awsDynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/oom-ai/oomstore/internal/database/online/dynamodb"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/orlangure/gnomock"
@@ -52,21 +50,6 @@ func PrepareDB(t *testing.T) (context.Context, *dynamodb.DB) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	return context.Background(), db
 
-	ctx := context.Background()
-
-	// Drop all existing tables so that it doesn't interfere with tests that come after
-	output, err := db.Client.ListTables(ctx, &awsDynamodb.ListTablesInput{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, tableName := range output.TableNames {
-		if _, err := db.Client.DeleteTable(ctx, &awsDynamodb.DeleteTableInput{
-			TableName: aws.String(tableName),
-		}); err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	return ctx, db
 }

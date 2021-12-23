@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"testing"
 	"time"
 
 	"github.com/gocql/gocql"
@@ -43,7 +42,7 @@ func init() {
 	}()
 }
 
-func PrepareDB(t *testing.T) (context.Context, *gocql.Session) {
+func PrepareDB() (context.Context, *gocql.Session) {
 	ctx := context.Background()
 
 	cluster := gocql.NewCluster(CassandraDbOpt.Hosts...)
@@ -55,10 +54,13 @@ func PrepareDB(t *testing.T) (context.Context, *gocql.Session) {
 
 	session, err := cluster.CreateSession()
 	if err != nil {
-		t.Fatal(err)
-	}
-	if err := session.Query("DROP KEYSPACE IF EXISTS test").WithContext(ctx).Exec(); err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	return ctx, session
+}
+
+func GetOpt(keySpace string) *types.CassandraOpt {
+	opt := CassandraDbOpt
+	opt.KeySpace = keySpace
+	return &opt
 }

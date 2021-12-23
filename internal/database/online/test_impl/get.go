@@ -7,7 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn) {
+func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	s := &SampleSmall
 	ctx, store := prepareStore(t)
 	defer store.Close()
@@ -29,7 +31,9 @@ func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn) {
 	}
 }
 
-func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreFn) {
+func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreFn, destroystore DestroyStoreFn) {
+	t.Cleanup(destroystore)
+
 	s := &SampleSmall
 	ctx, store := prepareStore(t)
 	defer store.Close()
@@ -45,7 +49,9 @@ func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreFn) {
 	require.Equal(t, 0, len(rs), "actual: %+v", rs)
 }
 
-func TestMultiGet(t *testing.T, prepareStore PrepareStoreFn) {
+func TestMultiGet(t *testing.T, prepareStore PrepareStoreFn, destroystore DestroyStoreFn) {
+	t.Cleanup(destroystore)
+
 	s := &SampleSmall
 	ctx, store := prepareStore(t)
 	defer store.Close()

@@ -6,7 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOpen(t *testing.T, prepareStore PrepareStoreFn) {
+func TestOpen(t *testing.T, prepareStore PrepareStoreFn, destroystore DestroyStoreFn) {
+	t.Cleanup(destroystore)
+
 	_, store := prepareStore(t)
 	assert.NotNil(t, store)
 	store.Close()
