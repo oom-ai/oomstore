@@ -6,7 +6,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPing(t *testing.T, prepareStore PrepareStoreFn) {
+func TestPing(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 

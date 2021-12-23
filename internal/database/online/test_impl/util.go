@@ -16,6 +16,8 @@ import (
 
 type PrepareStoreFn func(*testing.T) (context.Context, online.Store)
 
+type DestroyStoreFn func()
+
 type Sample struct {
 	Features types.FeatureList
 	Revision *types.Revision
