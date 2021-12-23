@@ -6,7 +6,7 @@ import (
 
 var registerCmd = &cobra.Command{
 	Use:   "register",
-	Short: "register a resource",
+	Short: "Register a resource",
 }
 
 func init() {

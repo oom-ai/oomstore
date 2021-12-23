@@ -18,7 +18,7 @@ var editEntityOpt editEntityOption
 
 var editEntityCmd = &cobra.Command{
 	Use:   "entity",
-	Short: "edit entity resources",
+	Short: "Edit entity resources",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
 			log.Fatalf("argument at most one, got %d", len(args))

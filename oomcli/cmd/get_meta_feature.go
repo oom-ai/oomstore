@@ -18,7 +18,7 @@ var getMetaFeatureOpt types.ListFeatureOpt
 
 var getMetaFeatureCmd = &cobra.Command{
 	Use:   "feature",
-	Short: "get existing features given specific conditions",
+	Short: "Get existing features given specific conditions",
 	Args:  cobra.RangeArgs(0, 1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {

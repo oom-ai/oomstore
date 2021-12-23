@@ -18,7 +18,7 @@ var onlineGetOpt types.OnlineGetOpt
 
 var getOnlineCmd = &cobra.Command{
 	Use:   "online",
-	Short: "get online feature values",
+	Short: "Get online feature values",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)

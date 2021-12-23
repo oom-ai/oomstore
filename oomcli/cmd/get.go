@@ -8,7 +8,7 @@ var getOutput *string
 
 var getCmd = &cobra.Command{
 	Use:   "get",
-	Short: "get resources",
+	Short: "Get resources",
 }
 
 func init() {

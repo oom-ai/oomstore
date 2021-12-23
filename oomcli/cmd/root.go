@@ -22,7 +22,7 @@ var oomStoreCfg types.OomStoreConfig
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "oomcli",
-	Short:   "a cli tool that lets you control the oom feature store.",
+	Short:   "A cli tool that lets you control the oom feature store.",
 	Version: version.String(),
 }
 

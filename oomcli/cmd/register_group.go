@@ -11,7 +11,7 @@ import (
 var registerGroupOpt types.CreateGroupOpt
 var registerGroupCmd = &cobra.Command{
 	Use:   "group <group_name>",
-	Short: "register a new feature group",
+	Short: "Register a new feature group",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		registerGroupOpt.GroupName = args[0]

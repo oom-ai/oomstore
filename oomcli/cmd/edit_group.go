@@ -19,7 +19,7 @@ var editGroupOpt editGroupOption
 
 var editGroupCmd = &cobra.Command{
 	Use:   "group",
-	Short: "edit group resources",
+	Short: "Edit group resources",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
 			editGroupOpt.entityName = nil

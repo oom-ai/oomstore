@@ -20,7 +20,7 @@ var getMetaEntityOpt getMetaEntityOption
 
 var getMetaEntityCmd = &cobra.Command{
 	Use:   "entity",
-	Short: "get existing entity given specific conditions",
+	Short: "Get existing entity given specific conditions",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
 			log.Fatalf("argument at most one, got %d", len(args))

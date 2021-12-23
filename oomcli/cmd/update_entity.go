@@ -12,7 +12,7 @@ var updateEntityOpt types.UpdateEntityOpt
 
 var updateEntityCmd = &cobra.Command{
 	Use:   "entity <entity_name>",
-	Short: "update a particular entity",
+	Short: "Update a particular entity",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		updateEntityOpt.EntityName = args[0]

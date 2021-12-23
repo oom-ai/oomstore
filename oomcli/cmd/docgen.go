@@ -12,7 +12,7 @@ import (
 
 var docgenCmd = &cobra.Command{
 	Use:   "docgen",
-	Short: "generate oomcli docs",
+	Short: "Generate oomcli docs",
 	Run: func(cmd *cobra.Command, args []string) {
 		genDoc()
 	},

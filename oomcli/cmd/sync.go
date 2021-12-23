@@ -12,7 +12,7 @@ var syncOpt types.SyncOpt
 
 var syncCmd = &cobra.Command{
 	Use:   "sync",
-	Short: "sync feature values from offline store to online store",
+	Short: "Sync feature values from offline store to online store",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
