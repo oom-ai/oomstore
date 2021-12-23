@@ -14,7 +14,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-const BackendType = types.BIGQUERY
+const BackendType = types.BackendBigQuery
 
 var _ offline.Store = &DB{}
 

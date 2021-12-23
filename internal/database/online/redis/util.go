@@ -16,22 +16,22 @@ func SerializeByTag(i interface{}, valueType types.ValueType) (s string, err err
 	}()
 
 	switch valueType {
-	case types.STRING:
+	case types.String:
 		return i.(string), nil
-	case types.INT64:
+	case types.Int64:
 		return strconv.FormatInt(int64(i.(int64)), SerializeIntBase), nil
-	case types.FLOAT64:
+	case types.Float64:
 		return strconv.FormatFloat(i.(float64), 'f', -1, 64), nil
-	case types.BOOL:
+	case types.Bool:
 		if i.(bool) {
 			return "1", nil
 		} else {
 			return "0", nil
 		}
-	case types.TIME:
+	case types.Time:
 		return strconv.FormatInt(i.(time.Time).UnixMilli(), SerializeIntBase), nil
 
-	case types.BYTES:
+	case types.Bytes:
 		return string(i.([]byte)), nil
 	default:
 		return "", fmt.Errorf("unable to serialize %#v of type %T to string", i, i)
@@ -97,18 +97,18 @@ func DeserializeByTag(i interface{}, valueType types.ValueType) (interface{}, er
 	}
 
 	switch valueType {
-	case types.STRING:
+	case types.String:
 		return s, nil
 
-	case types.INT64:
+	case types.Int64:
 		x, err := strconv.ParseInt(s, SerializeIntBase, 64)
 		return x, err
 
-	case types.FLOAT64:
+	case types.Float64:
 		x, err := strconv.ParseFloat(s, 64)
 		return x, err
 
-	case types.BOOL:
+	case types.Bool:
 		if s == "1" {
 			return true, nil
 		} else if s == "0" {
@@ -116,11 +116,11 @@ func DeserializeByTag(i interface{}, valueType types.ValueType) (interface{}, er
 		} else {
 			return nil, fmt.Errorf("invalid bool value: %s", s)
 		}
-	case types.TIME:
+	case types.Time:
 		x, err := strconv.ParseInt(s, SerializeIntBase, 64)
 		return time.UnixMilli(x), err
 
-	case types.BYTES:
+	case types.Bytes:
 		return []byte(s), nil
 	default:
 		return "", fmt.Errorf("unsupported value type: %s", valueType)

@@ -17,7 +17,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	columns := append([]string{opt.Entity.Name}, opt.FeatureList.Names()...)
 	tableName := sqlutil.OnlineTableName(opt.Revision.ID)
 
-	table, err := dbutil.BuildCreateSchema(tableName, opt.Entity, opt.FeatureList, types.CASSANDRA)
+	table, err := dbutil.BuildCreateSchema(tableName, opt.Entity, opt.FeatureList, types.BackendCassandra)
 	if err != nil {
 		return err
 	}

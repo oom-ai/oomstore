@@ -44,15 +44,15 @@ func Open(opt *types.SnowflakeOpt) (*DB, error) {
 }
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(types.SNOWFLAKE, SnowflakeBatchSize), types.SNOWFLAKE)
+	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(types.BackendSnowflake, SnowflakeBatchSize), types.BackendSnowflake)
 }
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
-	return sqlutil.Export(ctx, db.DB, opt, types.SNOWFLAKE)
+	return sqlutil.Export(ctx, db.DB, opt, types.BackendSnowflake)
 }
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
-	return sqlutil.Join(ctx, db.DB, opt, types.SNOWFLAKE)
+	return sqlutil.Join(ctx, db.DB, opt, types.BackendSnowflake)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {

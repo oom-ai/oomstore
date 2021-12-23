@@ -28,15 +28,15 @@ import (
 
 func OpenOnlineStore(opt types.OnlineStoreConfig) (online.Store, error) {
 	switch opt.Backend {
-	case types.POSTGRES:
+	case types.BackendPostgres:
 		return onlinePG.Open(opt.Postgres)
-	case types.REDIS:
+	case types.BackendRedis:
 		return onlineRedis.Open(opt.Redis), nil
-	case types.MYSQL:
+	case types.BackendMySQL:
 		return onlineMySQL.Open(opt.MySQL)
-	case types.DYNAMODB:
+	case types.BackendDynamoDB:
 		return onlineDynamoDB.Open(opt.DynamoDB)
-	case types.CASSANDRA:
+	case types.BackendCassandra:
 		return onlineCassandra.Open(opt.Cassandra)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
@@ -45,11 +45,11 @@ func OpenOnlineStore(opt types.OnlineStoreConfig) (online.Store, error) {
 
 func OpenMetadataStore(opt types.MetadataStoreConfig) (metadata.Store, error) {
 	switch opt.Backend {
-	case types.POSTGRES:
+	case types.BackendPostgres:
 		return metadataPG.Open(context.Background(), opt.Postgres)
-	case types.MYSQL:
+	case types.BackendMySQL:
 		return metadataMySQL.Open(context.Background(), opt.MySQL)
-	case types.SQLite:
+	case types.BackendSQLite:
 		return metadataSQLite.Open(context.Background(), opt.SQLite)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
@@ -58,11 +58,11 @@ func OpenMetadataStore(opt types.MetadataStoreConfig) (metadata.Store, error) {
 
 func CreateMetadataDatabase(ctx context.Context, opt types.MetadataStoreConfig) error {
 	switch opt.Backend {
-	case types.POSTGRES:
+	case types.BackendPostgres:
 		return metadataPG.CreateDatabase(ctx, *opt.Postgres)
-	case types.MYSQL:
+	case types.BackendMySQL:
 		return metadataMySQL.CreateDatabase(ctx, *opt.MySQL)
-	case types.SQLite:
+	case types.BackendSQLite:
 		return metadataSQLite.CreateDatabase(ctx, *opt.SQLite)
 	default:
 		return fmt.Errorf("unsupported backend: %s", opt.Backend)
@@ -71,15 +71,15 @@ func CreateMetadataDatabase(ctx context.Context, opt types.MetadataStoreConfig) 
 
 func OpenOfflineStore(ctx context.Context, opt types.OfflineStoreConfig) (offline.Store, error) {
 	switch opt.Backend {
-	case types.POSTGRES:
+	case types.BackendPostgres:
 		return offlinePG.Open(opt.Postgres)
-	case types.MYSQL:
+	case types.BackendMySQL:
 		return offlineMySQL.Open(opt.MySQL)
-	case types.SNOWFLAKE:
+	case types.BackendSnowflake:
 		return offlineSnowflake.Open(opt.Snowflake)
-	case types.BIGQUERY:
+	case types.BackendBigQuery:
 		return offlineBigQuery.Open(ctx, opt.BigQuery)
-	case types.REDSHIFT:
+	case types.BackendRedshift:
 		return offlineRedshift.Open(opt.Redshift)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)

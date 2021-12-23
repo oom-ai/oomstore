@@ -72,17 +72,17 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 
 func convertValueTypeToBigQueryType(t types.ValueType) (bigquery.FieldType, error) {
 	switch t {
-	case types.STRING:
+	case types.String:
 		return bigquery.StringFieldType, nil
-	case types.INT64:
+	case types.Int64:
 		return bigquery.IntegerFieldType, nil
-	case types.BOOL:
+	case types.Bool:
 		return bigquery.BooleanFieldType, nil
-	case types.FLOAT64:
+	case types.Float64:
 		return bigquery.FloatFieldType, nil
-	case types.BYTES:
+	case types.Bytes:
 		return bigquery.BytesFieldType, nil
-	case types.TIME:
+	case types.Time:
 		return bigquery.TimeFieldType, nil
 	default:
 		return "", fmt.Errorf("unsupported value type %s", t)

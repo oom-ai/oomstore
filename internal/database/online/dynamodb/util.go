@@ -15,7 +15,7 @@ func serializeByTag(i interface{}, valueType types.ValueType) (out interface{}, 
 	}()
 
 	switch valueType {
-	case types.TIME:
+	case types.Time:
 		return i.(time.Time).UnixMilli(), nil
 	default:
 		return i, nil
@@ -28,13 +28,13 @@ func deserializeByTag(i interface{}, valueType types.ValueType) (interface{}, er
 	}
 
 	switch valueType {
-	case types.INT64:
+	case types.Int64:
 		v, ok := i.(float64)
 		if !ok {
 			return "", fmt.Errorf("not float64 %v", i)
 		}
 		return int64(v), nil
-	case types.TIME:
+	case types.Time:
 		v, ok := i.(float64)
 		if !ok {
 			return "", fmt.Errorf("not float64 %v", i)

@@ -12,7 +12,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const BackendType = types.POSTGRES
+const BackendType = types.BackendPostgres
 
 var _ online.Store = &DB{}
 

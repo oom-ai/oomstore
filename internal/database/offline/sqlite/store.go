@@ -30,15 +30,15 @@ func Open(option *types.SQLiteOpt) (*DB, error) {
 }
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(types.SQLite, SQLiteBatchSize), types.SQLite)
+	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(types.BackendSQLite, SQLiteBatchSize), types.BackendSQLite)
 }
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
-	return sqlutil.Export(ctx, db.DB, opt, types.SQLite)
+	return sqlutil.Export(ctx, db.DB, opt, types.BackendSQLite)
 }
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
-	return sqlutil.Join(ctx, db.DB, opt, types.SQLite)
+	return sqlutil.Join(ctx, db.DB, opt, types.BackendSQLite)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {

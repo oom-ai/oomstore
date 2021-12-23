@@ -18,13 +18,13 @@ func deserializeByTag(i interface{}, valueType types.ValueType, backend types.Ba
 	}
 
 	switch valueType {
-	case types.STRING:
-		if backend == types.MYSQL {
+	case types.String:
+		if backend == types.BackendMySQL {
 			return string(i.([]byte)), nil
 		}
 		return i, nil
-	case types.BOOL:
-		if backend == types.MYSQL || backend == types.SQLite {
+	case types.Bool:
+		if backend == types.BackendMySQL || backend == types.BackendSQLite {
 			if i == int64(1) {
 				return true, nil
 			} else if i == int64(0) {

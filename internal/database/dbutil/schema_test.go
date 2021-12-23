@@ -12,11 +12,11 @@ func TestBuildSchema(t *testing.T) {
 	features := types.FeatureList{
 		&types.Feature{
 			Name:      "age",
-			ValueType: types.INT64,
+			ValueType: types.Int64,
 		},
 		&types.Feature{
 			Name:      "gender",
-			ValueType: types.STRING,
+			ValueType: types.String,
 		},
 	}
 	cases := []struct {
@@ -32,7 +32,7 @@ func TestBuildSchema(t *testing.T) {
 	}{
 		{
 			description: "postgres schema",
-			backend:     types.POSTGRES,
+			backend:     types.BackendPostgres,
 			tableName:   "user",
 			entity: &types.Entity{
 				Name:   "user_id",
@@ -50,7 +50,7 @@ CREATE TABLE user (
 		},
 		{
 			description: "mysql schema",
-			backend:     types.MYSQL,
+			backend:     types.BackendMySQL,
 			tableName:   "user",
 			entity: &types.Entity{
 				Name:   "user_id",
@@ -67,7 +67,7 @@ CREATE TABLE user (
 		},
 		{
 			description: "cassandra schema",
-			backend:     types.CASSANDRA,
+			backend:     types.BackendCassandra,
 			tableName:   "user",
 			entity: &types.Entity{
 				Name: "user_id",

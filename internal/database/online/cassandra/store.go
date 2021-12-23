@@ -11,7 +11,7 @@ import (
 
 const (
 	BatchSize   = 1000
-	BackendType = types.CASSANDRA
+	BackendType = types.BackendCassandra
 )
 
 type DB struct {

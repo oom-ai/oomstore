@@ -10,7 +10,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const BackendType = types.POSTGRES
+const BackendType = types.BackendPostgres
 
 var _ offline.Store = &DB{}
 
@@ -28,15 +28,15 @@ func Open(option *types.PostgresOpt) (*DB, error) {
 }
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	return sqlutil.Import(ctx, db.DB, opt, loadDataFromSource, types.POSTGRES)
+	return sqlutil.Import(ctx, db.DB, opt, loadDataFromSource, types.BackendPostgres)
 }
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
-	return sqlutil.Export(ctx, db.DB, opt, types.POSTGRES)
+	return sqlutil.Export(ctx, db.DB, opt, types.BackendPostgres)
 }
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
-	return sqlutil.Join(ctx, db.DB, opt, types.POSTGRES)
+	return sqlutil.Join(ctx, db.DB, opt, types.BackendPostgres)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {

@@ -28,7 +28,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 		return nil, nil
 	}
 	dbOpt := dbutil.DBOpt{
-		Backend:    types.BIGQUERY,
+		Backend:    types.BackendBigQuery,
 		BigQueryDB: db.Client,
 		DatasetID:  &db.datasetID,
 	}
@@ -51,7 +51,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 			Features:            featureList,
 			RevisionRanges:      revisionRanges,
 			EntityRowsTableName: entityRowsTableName,
-		}, types.MYSQL)
+		}, types.BackendMySQL)
 		if err != nil {
 			return nil, err
 		}
@@ -62,7 +62,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	}
 
 	//// Step 3: read joined results
-	return readJoinedTable(ctx, db, entityRowsTableName, tableNames, tableToFeatureMap, opt.ValueNames, types.MYSQL)
+	return readJoinedTable(ctx, db, entityRowsTableName, tableNames, tableToFeatureMap, opt.ValueNames, types.BackendMySQL)
 }
 
 func joinOneGroup(ctx context.Context, db *DB, opt offline.JoinOneGroupOpt, backendType types.BackendType) (string, error) {
