@@ -236,13 +236,3 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 		Data:   data,
 	}, dropErr
 }
-
-func dropTemporaryTables(ctx context.Context, db *sqlx.DB, tableNames []string) error {
-	var err error
-	for _, tableName := range tableNames {
-		if tmpErr := dropTable(ctx, db, tableName); tmpErr != nil {
-			err = tmpErr
-		}
-	}
-	return err
-}
