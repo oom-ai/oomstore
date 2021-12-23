@@ -26,6 +26,9 @@ type DBOpt struct {
 func (d *DBOpt) ExecContext(ctx context.Context, query string, args []interface{}) error {
 	switch d.Backend {
 	case types.BackendBigQuery:
+		for _, arg := range args {
+			query = strings.Replace(query, "?", cast.ToString(arg), 1)
+		}
 		_, err := d.BigQueryDB.Query(query).Read(ctx)
 		return err
 	default:

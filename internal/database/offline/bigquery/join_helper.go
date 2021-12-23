@@ -11,70 +11,10 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const (
-	InsertBatchSize = 20
-)
-
-func createTableJoined(ctx context.Context, db *DB, features types.FeatureList, groupName string, valueNames []string, backendType types.BackendType) (string, error) {
-	columnFormat, err := dbutil.GetColumnFormat(backendType)
-	if err != nil {
-		return "", err
-	}
-	qt, err := dbutil.QuoteFn(backendType)
-	if err != nil {
-		return "", err
-	}
-	// create table joined
-	tableName := dbutil.TempTable(fmt.Sprintf("joined_%s", groupName))
-	columnDefs := []string{
-		fmt.Sprintf(`%s STRING NOT NULL`, qt("entity_key")),
-		fmt.Sprintf(`%s BIGINT NOT NULL`, qt("unix_milli")),
-	}
-	for _, name := range valueNames {
-		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, "STRING"))
-	}
-	for _, f := range features {
-		sqlType, err := convertValueTypeToBigQuerySQLType(f.ValueType)
-		if err != nil {
-			return "", err
-		}
-		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, f.Name, sqlType))
-	}
-	schema := fmt.Sprintf(`
-		CREATE TABLE %s.%s (
-			%s
-		);
-	`, db.datasetID, qt(tableName), strings.Join(columnDefs, ",\n"))
-	if _, err := db.Query(schema).Read(ctx); err != nil {
-		return "", err
-	}
-
-	return tableName, nil
-}
-
 func dropTable(ctx context.Context, db *DB, tableName string) error {
 	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
 	_, err := db.Query(query).Read(ctx)
 	return err
-}
-
-func convertValueTypeToBigQuerySQLType(t types.ValueType) (string, error) {
-	switch t {
-	case types.String:
-		return "STRING", nil
-	case types.Int64:
-		return "BIGINT", nil
-	case types.Bool:
-		return "BOOL", nil
-	case types.Float64:
-		return "FLOAT64", nil
-	case types.Bytes:
-		return "BYTES", nil
-	case types.Time:
-		return "DATETIME", nil
-	default:
-		return "", fmt.Errorf("unsupported value type %s", t)
-	}
 }
 
 const READ_JOIN_RESULT_QUERY = `

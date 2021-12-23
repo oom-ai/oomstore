@@ -26,53 +26,46 @@ func supportIndex(backendType types.BackendType) bool {
 	return true
 }
 
-func createTableJoined(
+func PrepareJoinedTable(
 	ctx context.Context,
-	db *sqlx.DB,
+	dbOpt dbutil.DBOpt,
 	features types.FeatureList,
 	entity types.Entity,
 	groupName string,
 	valueNames []string,
-	backendType types.BackendType,
 ) (string, error) {
-	columnFormat, err := dbutil.GetColumnFormat(backendType)
-	if err != nil {
-		return "", err
-	}
-	qt, err := dbutil.QuoteFn(backendType)
-	if err != nil {
-		return "", err
-	}
-	// create table joined
+	// Step 1: create table joined_
 	tableName := dbutil.TempTable(fmt.Sprintf("joined_%s", groupName))
-	columnDefs := []string{
-		fmt.Sprintf(`%s  VARCHAR(%d) NOT NULL`, qt("entity_key"), entity.Length),
-		fmt.Sprintf(`%s  BIGINT NOT NULL`, qt("unix_milli")),
+	qtTableName, columnDefs, err := prepareTableSchema(dbOpt, entity, tableName, valueNames)
+	if err != nil {
+		return "", err
 	}
-	for _, name := range valueNames {
-		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, "TEXT"))
+	columnFormat, err := dbutil.GetColumnFormat(dbOpt.Backend)
+	if err != nil {
+		return "", err
 	}
 	for _, f := range features {
-		dbValueType, err := dbutil.DBValueType(backendType, f.ValueType)
+		dbValueType, err := dbutil.DBValueType(dbOpt.Backend, f.ValueType)
 		if err != nil {
 			return "", err
 		}
 		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, f.Name, dbValueType))
+
 	}
 	schema := `
 		CREATE TABLE %s (
 			%s
 		);
 	`
-
-	schema = fmt.Sprintf(schema, qt(tableName), strings.Join(columnDefs, ",\n"))
-	if _, err := db.ExecContext(ctx, schema); err != nil {
+	schema = fmt.Sprintf(schema, qtTableName, strings.Join(columnDefs, ",\n"))
+	if err = dbOpt.ExecContext(ctx, schema, nil); err != nil {
 		return "", err
 	}
 
-	if supportIndex(backendType) {
+	// Step 2: create index on table joined_
+	if supportIndex(dbOpt.Backend) {
 		index := fmt.Sprintf(`CREATE INDEX idx_%s ON %s (unix_milli, entity_key)`, tableName, tableName)
-		if _, err = db.ExecContext(ctx, index); err != nil {
+		if err = dbOpt.ExecContext(ctx, index, nil); err != nil {
 			return "", err
 		}
 	}
@@ -85,36 +78,11 @@ func PrepareEntityRowsTable(ctx context.Context,
 	entityRows <-chan types.EntityRow,
 	valueNames []string,
 ) (string, error) {
-	// Step 1: create entity_rows table
-	columnFormat, err := dbutil.GetColumnFormat(dbOpt.Backend)
-	if err != nil {
-		return "", err
-	}
-	qt, err := dbutil.QuoteFn(dbOpt.Backend)
-	if err != nil {
-		return "", err
-	}
+	// Step 1: create table entity_rows
 	tableName := dbutil.TempTable("entity_rows")
-
-	// TODO: infer db_type from value_type
-	var entityType, valueType, qtTableName string
-	switch dbOpt.Backend {
-	case types.BackendBigQuery:
-		entityType = "STRING"
-		valueType = "STRING"
-		qtTableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, qt(tableName))
-	default:
-		entityType = fmt.Sprintf("VARCHAR(%d)", entity.Length)
-		valueType = "TEXT"
-		qtTableName = qt(tableName)
-	}
-
-	columnDefs := []string{
-		fmt.Sprintf(`%s %s NOT NULL`, qt("entity_key"), entityType),
-		fmt.Sprintf(`%s BIGINT NOT NULL`, qt("unix_milli")),
-	}
-	for _, name := range valueNames {
-		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, valueType))
+	qtTableName, columnDefs, err := prepareTableSchema(dbOpt, entity, tableName, valueNames)
+	if err != nil {
+		return "", err
 	}
 	schema := fmt.Sprintf(`
 		CREATE TABLE %s (
@@ -140,6 +108,40 @@ func PrepareEntityRowsTable(ctx context.Context,
 	}
 
 	return tableName, nil
+}
+
+func prepareTableSchema(dbOpt dbutil.DBOpt, entity types.Entity, tableName string, valueNames []string) (string, []string, error) {
+	columnFormat, err := dbutil.GetColumnFormat(dbOpt.Backend)
+	if err != nil {
+		return "", nil, err
+	}
+	qt, err := dbutil.QuoteFn(dbOpt.Backend)
+	if err != nil {
+		return "", nil, err
+	}
+
+	// TODO: infer db_type from value_type
+	var entityType, valueType, qtTableName string
+	switch dbOpt.Backend {
+	case types.BackendBigQuery:
+		entityType = "STRING"
+		valueType = "STRING"
+		qtTableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, qt(tableName))
+	default:
+		entityType = fmt.Sprintf("VARCHAR(%d)", entity.Length)
+		valueType = "TEXT"
+		qtTableName = qt(tableName)
+	}
+
+	columnDefs := []string{
+		fmt.Sprintf(`%s %s NOT NULL`, qt("entity_key"), entityType),
+		fmt.Sprintf(`%s BIGINT NOT NULL`, qt("unix_milli")),
+	}
+	for _, name := range valueNames {
+		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, valueType))
+	}
+
+	return qtTableName, columnDefs, nil
 }
 
 func insertEntityRows(ctx context.Context,
@@ -241,7 +243,7 @@ ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
 WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
 `
 
-type joinQuery struct {
+type joinQueryParams struct {
 	TableName           string
 	EntityKeyStr        string
 	EntityName          string
@@ -250,10 +252,17 @@ type joinQuery struct {
 	EntityRowsTableName string
 	DataTable           string
 	Backend             types.BackendType
+	DatasetID           *string
 }
 
-func buildJoinQuery(schema joinQuery) (string, error) {
-	qt, err := dbutil.QuoteFn(schema.Backend)
+func buildJoinQuery(params joinQueryParams) (string, error) {
+	if params.Backend == types.BackendBigQuery {
+		params.TableName = fmt.Sprintf("%s.%s", *params.DatasetID, params.TableName)
+		params.EntityRowsTableName = fmt.Sprintf("%s.%s", *params.DatasetID, params.EntityRowsTableName)
+		params.DataTable = fmt.Sprintf("%s.%s", *params.DatasetID, params.DataTable)
+	}
+
+	qt, err := dbutil.QuoteFn(params.Backend)
 	if err != nil {
 		return "", err
 	}
@@ -266,7 +275,7 @@ func buildJoinQuery(schema joinQuery) (string, error) {
 	}).Parse(JOIN_QUERY))
 
 	buf := bytes.NewBuffer(nil)
-	if err := t.Execute(buf, schema); err != nil {
+	if err := t.Execute(buf, params); err != nil {
 		return "", err
 	}
 	return buf.String(), nil
