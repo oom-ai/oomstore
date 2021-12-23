@@ -21,10 +21,20 @@ func init() {
 }
 
 func prepareStore(t *testing.T) (context.Context, offline.Store) {
-	ctx, db := runtime_mysql.PrepareDB(t, DATABASE)
+	ctx := context.Background()
 	opt := runtime_mysql.GetOpt(DATABASE)
+	db, err := dbutil.OpenMysqlDB(
+		opt.Host,
+		opt.Port,
+		opt.User,
+		opt.Password,
+		"",
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	if _, err := db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", opt.Database)); err != nil {
+	if _, err := db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", DATABASE)); err != nil {
 		t.Fatal(err)
 	}
 	db.Close()
@@ -38,21 +48,17 @@ func prepareStore(t *testing.T) (context.Context, offline.Store) {
 }
 
 func TestPing(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestPing(t, prepareStore)
+	test_impl.TestPing(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestExport(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestExport(t, prepareStore)
+	test_impl.TestExport(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestImport(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestImport(t, prepareStore)
+	test_impl.TestImport(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestJoin(t *testing.T) {
-	t.Cleanup(func() { runtime_mysql.Reset(DATABASE) })
-	test_impl.TestJoin(t, prepareStore)
+	test_impl.TestJoin(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
