@@ -1,12 +1,8 @@
 package bigquery
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"strconv"
-	"strings"
-	"text/template"
 
 	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
 
@@ -45,13 +41,13 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 		if !ok {
 			continue
 		}
-		joinedTableName, err := joinOneGroup(ctx, db, offline.JoinOneGroupOpt{
+		joinedTableName, err := sqlutil.JoinOneGroup(ctx, dbOpt, offline.JoinOneGroupOpt{
 			GroupName:           groupName,
 			Entity:              opt.Entity,
 			Features:            featureList,
 			RevisionRanges:      revisionRanges,
 			EntityRowsTableName: entityRowsTableName,
-		}, types.BackendMySQL)
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -63,50 +59,6 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 
 	//// Step 3: read joined results
 	return readJoinedTable(ctx, db, entityRowsTableName, tableNames, tableToFeatureMap, opt.ValueNames, types.BackendMySQL)
-}
-
-func joinOneGroup(ctx context.Context, db *DB, opt offline.JoinOneGroupOpt, backendType types.BackendType) (string, error) {
-	if len(opt.Features) == 0 {
-		return "", nil
-	}
-	qt, err := dbutil.QuoteFn(backendType)
-	if err != nil {
-		return "", err
-	}
-	entityKeyStr := qt("entity_key")
-	unixMilliStr := qt("unix_milli")
-
-	// Step 1: create temporary joined table
-	joinedTableName, err := createTableJoined(ctx, db, opt.Features, opt.GroupName, opt.ValueNames, backendType)
-	if err != nil {
-		return "", err
-	}
-
-	// Step 2: iterate each table range, join entity_rows table and each data tables
-	columns := append(opt.ValueNames, opt.Features.Names()...)
-	columnsStr := qt(columns...)
-	for _, r := range opt.RevisionRanges {
-		q, err := buildJoinQuery(joinSchema{
-			TableName:           fmt.Sprintf("%s.%s", db.datasetID, joinedTableName),
-			EntityKeyStr:        entityKeyStr,
-			EntityName:          opt.Entity.Name,
-			UnixMilliStr:        unixMilliStr,
-			ColumnsStr:          columnsStr,
-			EntityRowsTableName: fmt.Sprintf("%s.%s", db.datasetID, opt.EntityRowsTableName),
-			DataTable:           fmt.Sprintf("%s.%s", db.datasetID, r.DataTable),
-			Backend:             backendType,
-		})
-		if err != nil {
-			return "", err
-		}
-		q = strings.Replace(q, "?", strconv.Itoa(int(r.MinRevision)), 1)
-		q = strings.Replace(q, "?", strconv.Itoa(int(r.MaxRevision)), 1)
-		if _, err = db.Query(q).Read(ctx); err != nil {
-			return "", err
-		}
-	}
-
-	return joinedTableName, nil
 }
 
 func readJoinedTable(
@@ -179,7 +131,6 @@ func readJoinedTable(
 	if err != nil {
 		return nil, err
 	}
-
 	// Step 2: read joined results
 	rows, err := db.Query(query).Read(ctx)
 	if err != nil {
@@ -189,23 +140,6 @@ func readJoinedTable(
 	data := make(chan []interface{})
 	var scanErr, dropErr error
 
-	//recordMap := make(map[string]bigquery.Value)
-	//err = rows.Next(&recordMap)
-	//if err == iterator.Done {
-	//	return &types.JoinResult{}, nil
-	//}
-	//if err != nil {
-	//	scanErr = err
-	//}
-	//schema := rows.Schema
-	////header := make([]string, 0, len(schema))
-	////for _, field := range schema {
-	////	header = append(header, field.Name)
-	////}
-	//record := make([]interface{}, 0, len(recordMap))
-	//for _, h := range header {
-	//	record = append(record, recordMap[h])
-	//}
 	go func() {
 		defer func() {
 			if err := dropTemporaryTables(ctx, db, tableNames); err != nil {
@@ -248,45 +182,4 @@ func dropTemporaryTables(ctx context.Context, db *DB, tableNames []string) error
 		}
 	}
 	return err
-}
-
-const JOIN_SCHEMA = `
-INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{.ColumnsStr }})
-SELECT
-	l.{{ .EntityKeyStr }} AS entity_key,
-	l.{{ .UnixMilliStr }} AS unix_milli,
-	{{ .ColumnsStr }}
-FROM
-	{{ qt .EntityRowsTableName }} AS l
-LEFT JOIN {{ qt .DataTable }} AS r
-ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
-WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
-`
-
-type joinSchema struct {
-	TableName           string
-	EntityKeyStr        string
-	EntityName          string
-	UnixMilliStr        string
-	ColumnsStr          string
-	EntityRowsTableName string
-	DataTable           string
-	Backend             types.BackendType
-}
-
-func buildJoinQuery(schema joinSchema) (string, error) {
-	qt, err := dbutil.QuoteFn(schema.Backend)
-	if err != nil {
-		return "", err
-	}
-
-	t := template.Must(template.New("join").Funcs(template.FuncMap{
-		"qt": qt,
-	}).Parse(JOIN_SCHEMA))
-
-	buf := bytes.NewBuffer(nil)
-	if err := t.Execute(buf, schema); err != nil {
-		return "", err
-	}
-	return buf.String(), nil
 }
