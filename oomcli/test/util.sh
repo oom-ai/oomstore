@@ -52,9 +52,9 @@ register_features() {
     oomcli register group phone    --entity device  --description "phone"
     oomcli register group student  --entity user    --description "student"
 
-    oomcli register batch-feature price --group phone    --db-value-type "int"          --description "price"
-    oomcli register batch-feature model --group phone    --db-value-type "varchar(32)"  --description "model"
-    oomcli register batch-feature age   --group student  --db-value-type "int"          --description "age"
+    oomcli register batch-feature price --group phone   --value-type "int64"  --description "price"
+    oomcli register batch-feature model --group phone   --value-type "string" --description "model"
+    oomcli register batch-feature age   --group student --value-type "int64"  --description "age"
 }
 
 # import sample data

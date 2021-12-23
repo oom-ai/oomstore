@@ -28,6 +28,15 @@ var allValueTypes = map[ValueType]string{
 	Bytes:   "bytes",
 }
 
+var allValueTypeStrings = map[string]ValueType{
+	"string":  String,
+	"int64":   Int64,
+	"float64": Float64,
+	"bool":    Bool,
+	"time":    Time,
+	"bytes":   Bytes,
+}
+
 func (t ValueType) String() string {
 	if s, ok := allValueTypes[t]; ok {
 		return s
@@ -45,19 +54,9 @@ func (v ValueType) Validate() error {
 }
 
 func ParseValueType(s string) (ValueType, error) {
-	switch s {
-	case "string":
-		return Bytes, nil
-	case "int64":
-		return Int64, nil
-	case "float64":
-		return Float64, nil
-	case "bool":
-		return Bool, nil
-	case "time":
-		return Time, nil
-	case "bytes":
-		return Bytes, nil
+	if v, ok := allValueTypeStrings[s]; ok {
+		return v, nil
+	} else {
+		return Invalid, errdefs.InvalidAttribute(fmt.Errorf("Unknown value type: %s", s))
 	}
-	return Invalid, errdefs.InvalidAttribute(fmt.Errorf("Unknown value type: %s", s))
 }

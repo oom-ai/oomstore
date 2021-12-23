@@ -16,6 +16,11 @@ var registerBatchFeatureCmd = &cobra.Command{
 	Short: "register a new batch feature",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
+		valueType, err := types.ParseValueType(registerBatchFeatureValueType)
+		if err != nil {
+			log.Fatalf("failed registering new feature: %v\n", err)
+		}
+		registerBatchFeatureOpt.ValueType = valueType
 		registerBatchFeatureOpt.FeatureName = args[0]
 	},
 	Run: func(cmd *cobra.Command, args []string) {

@@ -39,10 +39,10 @@ category: batch
 description: phone
 features:
     - name: price
-      db-value-type: int
+      value-type: int64
       description: price
     - name: model
-      db-value-type: varchar(32)
+      value-type: string
       description: model
 '
 
@@ -59,10 +59,10 @@ items:
       description: phone
       features:
         - name: price
-          db-value-type: int
+          value-type: int64
           description: price
         - name: model
-          db-value-type: varchar(32)
+          value-type: string
           description: model
     - kind: Group
       name: student
@@ -71,7 +71,7 @@ items:
       description: student
       features:
         - name: age
-          db-value-type: int
+          value-type: int64
           description: age
 '
 actual=$(oomcli get meta group -o yaml)
