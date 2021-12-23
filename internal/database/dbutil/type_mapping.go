@@ -115,14 +115,6 @@ var (
 		types.Time:    "timestamp",
 		types.Bytes:   "blob",
 	}
-	valueTypeToRedshiftType = map[types.ValueType]string{
-		types.STRING:  "text",
-		types.INT64:   "bigint",
-		types.FLOAT64: "double precision",
-		types.BOOL:    "boolean",
-		types.TIME:    "timestamp",
-		types.BYTES:   "varbyte",
-	}
 	valueTypeToBigQueryType = map[types.ValueType]string{
 		types.String:  "string",
 		types.Int64:   "bigint",
