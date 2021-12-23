@@ -52,20 +52,14 @@ func (d *DBOpt) BuildInsertQuery(tableName string, records []interface{}, column
 		tableName = fmt.Sprintf("`%s`", tableName)
 	}
 
-	switch d.Backend {
-	case types.BackendBigQuery:
-		values := make([]string, 0, len(records))
-		for _, row := range records {
-			values = append(values, fmt.Sprintf("(%s)", strings.Join(cast.ToStringSlice(row), ",")))
-		}
-		return fmt.Sprintf(`INSERT INTO %s.%s (%s) VALUES %s`, *d.DatasetID, tableName, columnStr, strings.Join(values, ",")), nil, nil
-	default:
-		valueFlags := make([]string, 0, len(records))
-		for i := 0; i < len(records); i++ {
-			valueFlags = append(valueFlags, "(?)")
-		}
-		return sqlx.In(
-			fmt.Sprintf(`INSERT INTO %s (%s) VALUES %s`, tableName, columnStr, strings.Join(valueFlags, ",")),
-			records...)
+	valueFlags := make([]string, 0, len(records))
+	for i := 0; i < len(records); i++ {
+		valueFlags = append(valueFlags, "(?)")
 	}
+	if d.Backend == types.BackendBigQuery {
+		tableName = fmt.Sprintf("%s.%s", *d.DatasetID, tableName)
+	}
+	return sqlx.In(
+		fmt.Sprintf(`INSERT INTO %s (%s) VALUES %s`, tableName, columnStr, strings.Join(valueFlags, ",")),
+		records...)
 }
