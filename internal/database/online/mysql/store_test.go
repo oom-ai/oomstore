@@ -17,7 +17,6 @@ var DATABASE string
 
 func init() {
 	DATABASE = strings.ToLower(dbutil.RandString(20))
-	runtime_mysql.Reset(DATABASE)
 }
 
 func prepareStore(t *testing.T) (context.Context, online.Store) {

@@ -47,8 +47,9 @@ func DestroyStore(database string) func() {
 	}
 }
 
-func Reset(database string) {
-	opt := GetOpt(database)
+func init() {
+	// "dummy" db will not actually be used during testing
+	opt := GetOpt("dummy")
 	if out, err := exec.Command(
 		"oomplay", "init", "mysql",
 		"--port", opt.Port,
