@@ -47,7 +47,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 		},
 	}
 
-	t.Run("invalid db value type", func(t *testing.T) {
+	t.Run("invalid value type", func(t *testing.T) {
 		_, err := store.Import(ctx, opt)
 		assert.Error(t, err)
 	})

@@ -39,7 +39,7 @@ func (f *Feature) Validate() error {
 		return errdefs.InvalidAttribute(fmt.Errorf("the name of feature should not be empty"))
 	}
 	if f.ValueType == "" {
-		return errdefs.InvalidAttribute(fmt.Errorf("the db value type of feature should not be empty"))
+		return errdefs.InvalidAttribute(fmt.Errorf("the value type of feature should not be empty"))
 	}
 	return nil
 }
