@@ -26,18 +26,20 @@ func prepareStore(t *testing.T) (context.Context, offline.Store) {
 	return context.Background(), &sqlite.DB{conn}
 }
 
+func destroyStore() {}
+
 func TestPing(t *testing.T) {
-	test_impl.TestPing(t, prepareStore)
+	test_impl.TestPing(t, prepareStore, destroyStore)
 }
 
 func TestExport(t *testing.T) {
-	test_impl.TestExport(t, prepareStore)
+	test_impl.TestExport(t, prepareStore, destroyStore)
 }
 
 func TestImport(t *testing.T) {
-	test_impl.TestImport(t, prepareStore)
+	test_impl.TestImport(t, prepareStore, destroyStore)
 }
 
 func TestJoin(t *testing.T) {
-	test_impl.TestJoin(t, prepareStore)
+	test_impl.TestJoin(t, prepareStore, destroyStore)
 }

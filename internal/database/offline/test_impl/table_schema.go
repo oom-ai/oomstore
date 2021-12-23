@@ -8,7 +8,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestTableSchema(t *testing.T, prepareStore PrepareStoreFn, prepareSampleTable func(ctx context.Context)) {
+func TestTableSchema(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn, prepareSampleTable func(ctx context.Context)) {
+	t.Cleanup(destroyStore)
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 

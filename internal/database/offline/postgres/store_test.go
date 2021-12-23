@@ -39,28 +39,23 @@ func prepareStore(t *testing.T) (context.Context, offline.Store) {
 }
 
 func TestPing(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestPing(t, prepareStore)
+	test_impl.TestPing(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
 func TestImport(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestImport(t, prepareStore)
+	test_impl.TestImport(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
 func TestExport(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestExport(t, prepareStore)
+	test_impl.TestExport(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
 func TestJoin(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestJoin(t, prepareStore)
+	test_impl.TestJoin(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
 func TestTableSchema(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestTableSchema(t, prepareStore, func(ctx context.Context) {
+	test_impl.TestTableSchema(t, prepareStore, runtime_pg.DestroyStore(DATABASE), func(ctx context.Context) {
 		opt := runtime_pg.GetOpt(DATABASE)
 		db, err := dbutil.OpenPostgresDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
 		if err != nil {

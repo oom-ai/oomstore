@@ -2,38 +2,38 @@ package redshift_test
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"strings"
 	"testing"
 
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/redshift"
 	"github.com/oom-ai/oomstore/internal/database/offline/test_impl"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
+
+var DATABASE string
+
+func init() {
+	DATABASE = strings.ToLower(dbutil.RandString(20))
+}
 
 func prepareStore(t *testing.T) (context.Context, offline.Store) {
 	ctx, db := prepareDB(t)
-	if _, err := db.ExecContext(ctx, "CREATE DATABASE test"); err != nil {
+	if _, err := db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", DATABASE)); err != nil {
 		t.Fatal(err)
 	}
+	db.Close()
 
-	store, err := redshift.Open(getOpt("test"))
+	store, err := redshift.Open(getOpt(DATABASE))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	return ctx, store
-}
-
-// Check if DB 'test' exists in the redshift cluster
-// Redshift does not support CREATE DATABASE IF NOT EXISTS or DROP DATABASE IF EXISTS
-func existsTestDB(ctx context.Context, db *redshift.DB) (bool, error) {
-	row := db.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = 'test')")
-	var exists bool
-	if err := row.Scan(&exists); err != nil {
-		return false, err
-	}
-	return exists, nil
 }
 
 func prepareDB(t *testing.T) (context.Context, *redshift.DB) {
@@ -44,19 +44,24 @@ func prepareDB(t *testing.T) (context.Context, *redshift.DB) {
 	}
 
 	ctx := context.Background()
+	return ctx, db
+}
 
-	exists, err := existsTestDB(ctx, db)
-	if err != nil {
-		t.Fatal(err)
-	}
+func destroyStore(database string) func() {
+	return func() {
+		// open the default db
+		db, err := redshift.Open(getOpt("dev"))
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
 
-	if exists {
-		if _, err = db.ExecContext(ctx, "DROP DATABASE test"); err != nil {
-			t.Fatal(err)
+		ctx := context.Background()
+
+		if _, err = db.ExecContext(ctx, fmt.Sprintf("DROP DATABASE %s", database)); err != nil {
+			panic(err)
 		}
 	}
-
-	return ctx, db
 }
 
 func getOpt(dbname string) *types.PostgresOpt {
@@ -70,17 +75,17 @@ func getOpt(dbname string) *types.PostgresOpt {
 }
 
 func TestPing(t *testing.T) {
-	test_impl.TestPing(t, prepareStore)
+	test_impl.TestPing(t, prepareStore, destroyStore(DATABASE))
 }
 
 func TestExport(t *testing.T) {
-	test_impl.TestExport(t, prepareStore)
+	test_impl.TestExport(t, prepareStore, destroyStore(DATABASE))
 }
 
 func TestImport(t *testing.T) {
-	test_impl.TestImport(t, prepareStore)
+	test_impl.TestImport(t, prepareStore, destroyStore(DATABASE))
 }
 
 func TestJoin(t *testing.T) {
-	test_impl.TestJoin(t, prepareStore)
+	test_impl.TestJoin(t, prepareStore, destroyStore(DATABASE))
 }

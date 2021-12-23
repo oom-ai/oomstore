@@ -2,16 +2,25 @@ package bigquery_test
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	bq "cloud.google.com/go/bigquery"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/bigquery"
 	"github.com/oom-ai/oomstore/internal/database/offline/test_impl"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
+
+var DATASET_ID string
+
+func init() {
+	DATASET_ID = strings.ToLower(dbutil.RandString(20))
+}
 
 func prepareStore(t *testing.T) (context.Context, offline.Store) {
 	ctx, db := prepareDB(t)
@@ -22,7 +31,7 @@ func prepareDB(t *testing.T) (context.Context, *bigquery.DB) {
 	ctx := context.Background()
 	opt := types.BigQueryOpt{
 		ProjectID:   "oom-feature-store",
-		DatasetID:   "test",
+		DatasetID:   DATASET_ID,
 		Credentials: os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"),
 	}
 	db, err := bigquery.Open(ctx, &opt)
@@ -30,8 +39,7 @@ func prepareDB(t *testing.T) (context.Context, *bigquery.DB) {
 		t.Fatal(err)
 	}
 
-	_ = db.Dataset("test").DeleteWithContents(ctx)
-	err = db.Dataset("test").Create(ctx, &bq.DatasetMetadata{
+	err = db.Dataset(DATASET_ID).Create(ctx, &bq.DatasetMetadata{
 		Location: "US",
 	})
 	if err != nil {
@@ -40,34 +48,56 @@ func prepareDB(t *testing.T) (context.Context, *bigquery.DB) {
 	return ctx, db
 }
 
+func destroyStore(datasetID string) func() {
+	return func() {
+		opt := types.BigQueryOpt{
+			ProjectID:   "oom-feature-store",
+			DatasetID:   datasetID,
+			Credentials: os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"),
+		}
+		db, err := bigquery.Open(context.Background(), &opt)
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+
+		if err := db.Dataset(DATASET_ID).DeleteWithContents(context.Background()); err != nil {
+			panic(err)
+		}
+
+	}
+}
+
 func TestPing(t *testing.T) {
-	test_impl.TestPing(t, prepareStore)
+	test_impl.TestPing(t, prepareStore, destroyStore(DATASET_ID))
 }
 
 func TestImport(t *testing.T) {
-	test_impl.TestImport(t, prepareStore)
+	test_impl.TestImport(t, prepareStore, destroyStore(DATASET_ID))
 }
 
 func TestExport(t *testing.T) {
-	test_impl.TestExport(t, prepareStore)
+	test_impl.TestExport(t, prepareStore, destroyStore(DATASET_ID))
 }
 
 func TestJoin(t *testing.T) {
-	test_impl.TestJoin(t, prepareStore)
+	test_impl.TestJoin(t, prepareStore, destroyStore(DATASET_ID))
 }
 
 func TestTableSchema(t *testing.T) {
-	test_impl.TestTableSchema(t, prepareStore, func(ctx context.Context) {
+	test_impl.TestTableSchema(t, prepareStore, destroyStore(DATASET_ID), func(ctx context.Context) {
 		opt := types.BigQueryOpt{
 			ProjectID:   "oom-feature-store",
-			DatasetID:   "test",
+			DatasetID:   DATASET_ID,
 			Credentials: os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"),
 		}
 		db, err := bigquery.Open(ctx, &opt)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if _, err = db.Query("CREATE TABLE test.user(`user` STRING, `age` BIGINT)").Read(ctx); err != nil {
+
+		query := fmt.Sprintf("CREATE TABLE %s.user(`user` STRING, `age` BIGINT)", DATASET_ID)
+		if _, err = db.Query(query).Read(ctx); err != nil {
 			t.Fatal(err)
 		}
 	})
