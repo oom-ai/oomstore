@@ -17,14 +17,31 @@ const (
 	InsertBatchSize = 20
 )
 
-func supportIndex(backendType types.BackendType) bool {
-	for _, b := range []types.BackendType{types.BackendSnowflake, types.BackendRedshift, types.BackendBigQuery} {
-		if b == backendType {
-			return false
-		}
-	}
-	return true
-}
+const JOIN_QUERY = `
+INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{ columnJoin .Columns }})
+SELECT
+	l.{{ .EntityKeyStr }} AS entity_key,
+	l.{{ .UnixMilliStr }} AS unix_milli,
+	{{ columnJoin .Columns }}
+FROM
+	{{ qt .EntityRowsTableName }} AS l
+LEFT JOIN {{ qt .DataTable }} AS r
+ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
+WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
+`
+
+const READ_JOIN_RESULT_QUERY = `
+SELECT
+	{{ qt .EntityRowsTableName }}.{{ .EntityKeyStr }},
+	{{ qt .EntityRowsTableName }}.{{ .UnixMilliStr }},
+	{{ fieldJoin .Fields }}
+FROM {{ qt .EntityRowsTableName }}
+{{ range $pair := .JoinTables }}
+	{{- $t1 := qt $pair.LeftTable -}}
+	{{- $t2 := qt $pair.RightTable -}}
+lEFT JOIN {{ $t2 }}
+ON {{ $t1 }}.{{ $.UnixMilliStr }} = {{ $t2 }}.{{ $.UnixMilliStr }} AND {{ $t1 }}.{{ $.EntityKeyStr }} = {{ $t2 }}.{{ $.EntityKeyStr }}
+{{end}}`
 
 func PrepareJoinedTable(
 	ctx context.Context,
@@ -178,24 +195,30 @@ func insertEntityRows(ctx context.Context,
 	return nil
 }
 
+func dropTemporaryTables(ctx context.Context, db *sqlx.DB, tableNames []string) error {
+	var err error
+	for _, tableName := range tableNames {
+		if tmpErr := dropTable(ctx, db, tableName); tmpErr != nil {
+			err = tmpErr
+		}
+	}
+	return err
+}
+
 func dropTable(ctx context.Context, db *sqlx.DB, tableName string) error {
 	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
 	_, err := db.ExecContext(ctx, query)
 	return err
 }
 
-const READ_JOIN_RESULT_QUERY = `
-SELECT
-	{{ qt .EntityRowsTableName }}.{{ .EntityKeyStr }},
-	{{ qt .EntityRowsTableName }}.{{ .UnixMilliStr }},
-	{{ fieldJoin .Fields }}
-FROM {{ qt .EntityRowsTableName }}
-{{ range $pair := .JoinTables }}
-	{{- $t1 := qt $pair.LeftTable -}}
-	{{- $t2 := qt $pair.RightTable -}}
-lEFT JOIN {{ $t2 }}
-ON {{ $t1 }}.{{ $.UnixMilliStr }} = {{ $t2 }}.{{ $.UnixMilliStr }} AND {{ $t1 }}.{{ $.EntityKeyStr }} = {{ $t2 }}.{{ $.EntityKeyStr }}
-{{end}}`
+func supportIndex(backendType types.BackendType) bool {
+	for _, b := range []types.BackendType{types.BackendSnowflake, types.BackendRedshift, types.BackendBigQuery} {
+		if b == backendType {
+			return false
+		}
+	}
+	return true
+}
 
 type joinTablePair struct {
 	LeftTable  string
@@ -230,19 +253,6 @@ func buildReadJoinResultQuery(query string, params readJoinResultQueryParams) (s
 	}
 	return buf.String(), nil
 }
-
-const JOIN_QUERY = `
-INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{ columnJoin .Columns }})
-SELECT
-	l.{{ .EntityKeyStr }} AS entity_key,
-	l.{{ .UnixMilliStr }} AS unix_milli,
-	{{ columnJoin .Columns }}
-FROM
-	{{ qt .EntityRowsTableName }} AS l
-LEFT JOIN {{ qt .DataTable }} AS r
-ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
-WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
-`
 
 type joinQueryParams struct {
 	TableName           string
