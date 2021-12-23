@@ -10,7 +10,7 @@ import (
 
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "initialize a feature store",
+	Short: "Initialize a feature store",
 	Run: func(cmd *cobra.Command, args []string) {
 		if _, err := oomstore.Create(context.Background(), oomStoreCfg); err != nil {
 			log.Fatal(err)

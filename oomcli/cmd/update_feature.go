@@ -12,7 +12,7 @@ var updateFeatureOpt types.UpdateFeatureOpt
 
 var updateFeatureCmd = &cobra.Command{
 	Use:   "feature <feature_name>",
-	Short: "update a particular feature",
+	Short: "Update a particular feature",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		updateFeatureOpt.FeatureName = args[0]

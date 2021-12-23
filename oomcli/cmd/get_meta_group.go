@@ -21,7 +21,7 @@ var getMetaGroupOpt getMetaGroupOption
 
 var getMetaGroupCmd = &cobra.Command{
 	Use:   "group",
-	Short: "get existing group given specific conditions",
+	Short: "Get existing group given specific conditions",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
 			getMetaGroupOpt.entityName = nil

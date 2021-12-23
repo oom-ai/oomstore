@@ -12,7 +12,7 @@ var joinOutput *string
 
 var joinCmd = &cobra.Command{
 	Use:   "join",
-	Short: "join training label data set with historical feature values",
+	Short: "Join training label data set with historical feature values",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("output") {
 			joinOutput = stringPtr(ASCIITable)

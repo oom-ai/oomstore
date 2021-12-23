@@ -12,7 +12,7 @@ import (
 
 var docgenCmd = &cobra.Command{
 	Use:   "docgen",
-	Short: "generate oomcli docs",
+	Short: "Generate oomcli docs",
 	Run: func(cmd *cobra.Command, args []string) {
 		genDoc()
 	},
@@ -60,7 +60,7 @@ func genMarkdown(cmd *cobra.Command, w io.Writer) error {
 	buf.WriteString("## " + name + "\n\n")
 	buf.WriteString(cmd.Short + "\n\n")
 	if len(cmd.Long) > 0 {
-		buf.WriteString("### Synopsis\n\n")
+		buf.WriteString("Synopsis\n\n")
 		buf.WriteString(cmd.Long + "\n\n")
 	}
 
@@ -69,7 +69,7 @@ func genMarkdown(cmd *cobra.Command, w io.Writer) error {
 	}
 
 	if len(cmd.Example) > 0 {
-		buf.WriteString("### Examples\n\n")
+		buf.WriteString("Examples\n\n")
 		buf.WriteString(fmt.Sprintf("```\n%s\n```\n\n", cmd.Example))
 	}
 
@@ -83,7 +83,7 @@ func printOptions(buf *bytes.Buffer, cmd *cobra.Command, name string) {
 	flags := cmd.NonInheritedFlags()
 	flags.SetOutput(buf)
 	if flags.HasAvailableFlags() {
-		buf.WriteString("### Options\n\n```text\n")
+		buf.WriteString("Options\n\n```text\n")
 		flags.PrintDefaults()
 		buf.WriteString("```\n\n")
 	}
@@ -91,7 +91,7 @@ func printOptions(buf *bytes.Buffer, cmd *cobra.Command, name string) {
 	parentFlags := cmd.InheritedFlags()
 	parentFlags.SetOutput(buf)
 	if parentFlags.HasAvailableFlags() {
-		buf.WriteString("### Options inherited from parent commands\n\n```text\n")
+		buf.WriteString("Options inherited from parent commands\n\n```text\n")
 		parentFlags.PrintDefaults()
 		buf.WriteString("```\n\n")
 	}

@@ -17,7 +17,7 @@ var editFeatureOpt editFeatureOption
 
 var editFeatureCmd = &cobra.Command{
 	Use:   "feature",
-	Short: "edit feature resources",
+	Short: "Edit feature resources",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
 			editFeatureOpt.EntityName = nil

@@ -8,7 +8,7 @@ var getMetaOutput *string
 var getMetaWide *bool
 var getMetaCmd = &cobra.Command{
 	Use:   "meta",
-	Short: "get metadata",
+	Short: "Get metadata",
 }
 
 func init() {

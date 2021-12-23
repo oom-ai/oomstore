@@ -6,7 +6,7 @@ import (
 
 var updateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "update a resource",
+	Short: "Update a resource",
 }
 
 func init() {

@@ -12,7 +12,7 @@ var updateGroupOpt types.UpdateGroupOpt
 
 var updateGroupCmd = &cobra.Command{
 	Use:   "group <group_name>",
-	Short: "update a particular group",
+	Short: "Update a particular group",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		updateGroupOpt.GroupName = args[0]

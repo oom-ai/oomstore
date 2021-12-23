@@ -15,7 +15,7 @@ var importTableLinkDataSource types.TableLinkDataSource
 
 var importCmd = &cobra.Command{
 	Use:   "import",
-	Short: "import feature data from a data source",
+	Short: "Import feature data from a data source",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if !cmd.Flags().Changed("revision") {
 			importOpt.Revision = nil
