@@ -66,7 +66,7 @@ func CreateDatabase(ctx context.Context, opt types.MySQLOpt) (err error) {
 	}
 	defer defaultDB.Close()
 
-	if _, err = defaultDB.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", opt.Database)); err != nil {
+	if _, err = defaultDB.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", opt.Database)); err != nil {
 		return
 	}
 

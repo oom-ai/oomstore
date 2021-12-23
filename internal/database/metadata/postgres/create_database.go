@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -18,7 +20,9 @@ func CreateDatabase(ctx context.Context, opt types.PostgresOpt) (err error) {
 	defer defaultDB.Close()
 
 	if _, err = defaultDB.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", opt.Database)); err != nil {
-		return
+		if e2, ok := err.(*pq.Error); ok && e2.Code != pgerrcode.DuplicateDatabase {
+			return err
+		}
 	}
 
 	db, err := dbutil.OpenPostgresDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
