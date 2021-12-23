@@ -39,36 +39,29 @@ func prepareStore(t *testing.T) (context.Context, online.Store) {
 }
 
 func TestOpen(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestOpen(t, prepareStore)
+	test_impl.TestOpen(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
 func TestGetExisted(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestGetExisted(t, prepareStore)
+	test_impl.TestGetExisted(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
 func TestGetNotExistedEntityKey(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestGetNotExistedEntityKey(t, prepareStore)
+	test_impl.TestGetNotExistedEntityKey(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
 func TestMultiGet(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestMultiGet(t, prepareStore)
+	test_impl.TestMultiGet(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
 func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestPurgeRemovesSpecifiedRevision(t, prepareStore)
+	test_impl.TestPurgeRemovesSpecifiedRevision(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
 func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore)
+	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
 func TestPing(t *testing.T) {
-	t.Cleanup(func() { runtime_pg.Reset(DATABASE) })
-	test_impl.TestPing(t, prepareStore)
+	test_impl.TestPing(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
