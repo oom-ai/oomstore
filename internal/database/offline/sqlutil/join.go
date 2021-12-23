@@ -22,7 +22,26 @@ type ReadJoinedTableOpt struct {
 	ReadJoinResultQuery string
 }
 
+type DoJoinOpt struct {
+	offline.JoinOpt
+	QueryResults        QueryResults
+	ReadJoinResultQuery string
+}
+
 func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType types.BackendType) (*types.JoinResult, error) {
+	dbOpt := dbutil.DBOpt{
+		Backend: backendType,
+		SqlxDB:  db,
+	}
+	doJoinOpt := DoJoinOpt{
+		JoinOpt:             opt,
+		QueryResults:        sqlxQueryResults,
+		ReadJoinResultQuery: READ_JOIN_RESULT_QUERY,
+	}
+	return DoJoin(ctx, dbOpt, doJoinOpt)
+}
+
+func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.JoinResult, error) {
 	// Step 1: prepare temporary table entity_rows
 	features := types.FeatureList{}
 	for _, featureList := range opt.FeatureMap {
@@ -30,10 +49,6 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType typ
 	}
 	if len(features) == 0 {
 		return nil, nil
-	}
-	dbOpt := dbutil.DBOpt{
-		Backend: backendType,
-		SqlxDB:  db,
 	}
 	entityRowsTableName, err := PrepareEntityRowsTable(ctx, dbOpt, opt.Entity, opt.EntityRows, opt.ValueNames)
 	if err != nil {
@@ -70,8 +85,8 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType typ
 		TableNames:          tableNames,
 		FeatureMap:          tableToFeatureMap,
 		ValueNames:          opt.ValueNames,
-		QueryResults:        sqlxQueryResults,
-		ReadJoinResultQuery: READ_JOIN_RESULT_QUERY,
+		QueryResults:        opt.QueryResults,
+		ReadJoinResultQuery: opt.ReadJoinResultQuery,
 	})
 }
 
