@@ -23,14 +23,14 @@ kind: Feature
 name: model
 group-name: device
 category: batch
-db-value-type: varchar(16)
+value-type: string
 description: 'description'
 ---
 kind: Feature
 name: price
 group-name: device
 category: batch
-db-value-type: int
+value-type: int64
 description: 'description'
 EOF
 
@@ -68,27 +68,27 @@ items:
   - kind: Feature
     name: credit_score
     group-name: account
-    db-value-type: int
+    value-type: int64
     description: "credit_score description"
   - kind: Feature
     name: account_age_days
     group-name: account
-    db-value-type: int
+    value-type: int64
     description: "account_age_days description"
   - kind: Feature
     name: has_2fa_installed
     group-name: account
-    db-value-type: bool
+    value-type: bool
     description: "has_2fa_installed description"
   - kind: Feature
     name: transaction_count_7d
     group-name: transaction_stats
-    db-value-type: int
+    value-type: int64
     description: "transaction_count_7d description"
   - kind: Feature
     name: transaction_count_30d
     group-name: transaction_stats
-    db-value-type: int
+    value-type: int64
     description: "transaction_count_30d description"
 EOF
 

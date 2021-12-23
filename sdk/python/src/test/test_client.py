@@ -32,20 +32,20 @@ batch-features:
     description: "user account info"
     features:
       - name: state
-        db-value-type: varchar(32)
+        value-type: string
       - name: credit_score
-        db-value-type: int
+        value-type: int64
       - name: account_age_days
-        db-value-type: int
+        value-type: int64
       - name: has_2fa_installed
-        db-value-type: bool
+        value-type: bool
   - group: transaction_stats
     description: "user transaction statistics"
     features:
       - name: transaction_count_7d
-        db-value-type: int
+        value-type: int64
       - name: transaction_count_30d
-        db-value-type: int"""
+        value-type: int64"""
             )
             return f.name
 

@@ -6,13 +6,13 @@ batch-features:
   - group: driver_stats
     features:
       - name: conv_rate
-        db-value-type: float8
+        value-type: float64
         description: ~
       - name: acc_rate
-        db-value-type: float8
+        value-type: float64
         description: ~
       - name: avg_daily_trips
-        db-value-type: int8
+        value-type: int64
         description: ~
     description: ~
 description: ~
