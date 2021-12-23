@@ -202,17 +202,18 @@ type joinTablePair struct {
 	RightTable string
 }
 
-type readJoinResultQuery struct {
+type readJoinResultQueryParams struct {
 	EntityRowsTableName string
 	EntityKeyStr        string
 	UnixMilliStr        string
 	Fields              []string
 	JoinTables          []joinTablePair
 	Backend             types.BackendType
+	DatasetID           string
 }
 
-func buildReadJoinResultQuery(schema readJoinResultQuery) (string, error) {
-	qt, err := dbutil.QuoteFn(schema.Backend)
+func buildReadJoinResultQuery(query string, params readJoinResultQueryParams) (string, error) {
+	qt, err := dbutil.QuoteFn(params.Backend)
 	if err != nil {
 		return "", err
 	}
@@ -221,10 +222,10 @@ func buildReadJoinResultQuery(schema readJoinResultQuery) (string, error) {
 		"fieldJoin": func(fields []string) string {
 			return strings.Join(fields, ",\n\t")
 		},
-	}).Parse(READ_JOIN_RESULT_QUERY))
+	}).Parse(query))
 
 	buf := bytes.NewBuffer(nil)
-	if err := t.Execute(buf, schema); err != nil {
+	if err := t.Execute(buf, params); err != nil {
 		return "", err
 	}
 	return buf.String(), nil
