@@ -14,57 +14,17 @@ import (
 )
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
-	// Step 1: prepare temporary table entity_rows
-	features := types.FeatureList{}
-	for _, featureList := range opt.FeatureMap {
-		features = append(features, featureList...)
-	}
-	if len(features) == 0 {
-		return nil, nil
-	}
 	dbOpt := dbutil.DBOpt{
 		Backend:    types.BackendBigQuery,
 		BigQueryDB: db.Client,
 		DatasetID:  &db.datasetID,
 	}
-	entityRowsTableName, err := sqlutil.PrepareEntityRowsTable(ctx, dbOpt, opt.Entity, opt.EntityRows, opt.ValueNames)
-	if err != nil {
-		return nil, err
-	}
-
-	// Step 2: process features by group, insert result to table joined
-	tableNames := make([]string, 0)
-	tableToFeatureMap := make(map[string]types.FeatureList)
-	for groupName, featureList := range opt.FeatureMap {
-		revisionRanges, ok := opt.RevisionRangeMap[groupName]
-		if !ok {
-			continue
-		}
-		joinedTableName, err := sqlutil.JoinOneGroup(ctx, dbOpt, offline.JoinOneGroupOpt{
-			GroupName:           groupName,
-			Entity:              opt.Entity,
-			Features:            featureList,
-			RevisionRanges:      revisionRanges,
-			EntityRowsTableName: entityRowsTableName,
-		})
-		if err != nil {
-			return nil, err
-		}
-		if joinedTableName != "" {
-			tableNames = append(tableNames, joinedTableName)
-			tableToFeatureMap[joinedTableName] = featureList
-		}
-	}
-
-	//// Step 3: read joined results
-	return sqlutil.ReadJoinedTable(ctx, dbOpt, sqlutil.ReadJoinedTableOpt{
-		EntityRowsTableName: entityRowsTableName,
-		TableNames:          tableNames,
-		FeatureMap:          tableToFeatureMap,
-		ValueNames:          opt.ValueNames,
+	doJoinOpt := sqlutil.DoJoinOpt{
+		JoinOpt:             opt,
 		QueryResults:        bigqueryQueryResults,
 		ReadJoinResultQuery: READ_JOIN_RESULT_QUERY,
-	})
+	}
+	return sqlutil.DoJoin(ctx, dbOpt, doJoinOpt)
 }
 
 func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, header, tableNames []string) (*types.JoinResult, error) {
