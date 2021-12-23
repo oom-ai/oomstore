@@ -36,31 +36,31 @@ func init() {
 					ID:        1,
 					Name:      "age",
 					GroupID:   1,
-					ValueType: types.INT64,
+					ValueType: types.Int64,
 				},
 				&types.Feature{
 					ID:        2,
 					Name:      "gender",
 					GroupID:   1,
-					ValueType: types.STRING,
+					ValueType: types.String,
 				},
 				&types.Feature{
 					ID:        3,
 					Name:      "account",
 					GroupID:   1,
-					ValueType: types.FLOAT64,
+					ValueType: types.Float64,
 				},
 				&types.Feature{
 					ID:        4,
 					Name:      "is_active",
 					GroupID:   1,
-					ValueType: types.BOOL,
+					ValueType: types.Bool,
 				},
 				&types.Feature{
 					ID:        5,
 					Name:      "register_time",
 					GroupID:   1,
-					ValueType: types.TIME,
+					ValueType: types.Time,
 				},
 			},
 			Revision: &types.Revision{ID: 3, GroupID: 1},
@@ -80,7 +80,7 @@ func init() {
 				ID:        2,
 				Name:      "charge",
 				GroupID:   2,
-				ValueType: types.FLOAT64,
+				ValueType: types.Float64,
 			},
 		}
 
@@ -117,7 +117,7 @@ func importSample(t *testing.T, ctx context.Context, store online.Store, samples
 }
 
 func compareFeatureValue(t *testing.T, expected, actual interface{}, valueType types.ValueType) {
-	if valueType == types.TIME {
+	if valueType == types.Time {
 		expected, ok := expected.(time.Time)
 		require.Equal(t, true, ok)
 

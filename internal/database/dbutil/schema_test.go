@@ -12,11 +12,11 @@ func TestBuildSchema(t *testing.T) {
 	features := types.FeatureList{
 		&types.Feature{
 			Name:      "age",
-			ValueType: types.INT64,
+			ValueType: types.Int64,
 		},
 		&types.Feature{
 			Name:      "gender",
-			ValueType: types.STRING,
+			ValueType: types.String,
 		},
 	}
 	cases := []struct {

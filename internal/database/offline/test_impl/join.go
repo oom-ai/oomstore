@@ -118,17 +118,17 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn) {
 func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.FeatureList) {
 	price := &types.Feature{
 		Name:      "price",
-		ValueType: types.INT64,
+		ValueType: types.Int64,
 		GroupID:   1,
 	}
 	model := &types.Feature{
 		Name:      "model",
-		ValueType: types.STRING,
+		ValueType: types.String,
 		GroupID:   1,
 	}
 	isActive := &types.Feature{
 		Name:      "is_active",
-		ValueType: types.BOOL,
+		ValueType: types.Bool,
 		GroupID:   2,
 	}
 

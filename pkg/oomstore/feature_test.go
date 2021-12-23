@@ -36,9 +36,9 @@ func TestCreateBatchFeature(t *testing.T) {
 			opt: types.CreateFeatureOpt{
 				FeatureName: "model",
 				GroupName:   "device_info",
-				ValueType:   types.STRING,
+				ValueType:   types.String,
 			},
-			valueType: types.STRING,
+			valueType: types.String,
 			group: types.Group{
 				ID:       1,
 				Name:     "device_info",
@@ -51,9 +51,9 @@ func TestCreateBatchFeature(t *testing.T) {
 			opt: types.CreateFeatureOpt{
 				FeatureName: "model",
 				GroupName:   "device_info",
-				ValueType:   types.INT64,
+				ValueType:   types.Int64,
 			},
-			valueType: types.INT64,
+			valueType: types.Int64,
 			group: types.Group{
 				ID:       1,
 				Name:     "device_info",

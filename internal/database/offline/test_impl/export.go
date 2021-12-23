@@ -18,11 +18,11 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn) {
 	features := []*types.Feature{
 		{
 			Name:      "model",
-			ValueType: types.STRING,
+			ValueType: types.String,
 		},
 		{
 			Name:      "price",
-			ValueType: types.INT64,
+			ValueType: types.Int64,
 		},
 	}
 	buildTestDataTable(ctx, t, store, features, dataTable, &offline.CSVSource{

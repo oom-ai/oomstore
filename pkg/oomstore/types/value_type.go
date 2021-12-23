@@ -10,22 +10,22 @@ import (
 type ValueType int
 
 const (
-	INVALID ValueType = iota
-	STRING
-	INT64
-	FLOAT64
-	BOOL
-	TIME
-	BYTES
+	Invalid ValueType = iota
+	String
+	Int64
+	Float64
+	Bool
+	Time
+	Bytes
 )
 
 var allValueTypes = map[ValueType]string{
-	STRING:  "string",
-	INT64:   "int64",
-	FLOAT64: "float64",
-	BOOL:    "bool",
-	TIME:    "time",
-	BYTES:   "bytes",
+	String:  "string",
+	Int64:   "int64",
+	Float64: "float64",
+	Bool:    "bool",
+	Time:    "time",
+	Bytes:   "bytes",
 }
 
 func (t ValueType) String() string {
@@ -47,17 +47,17 @@ func (v ValueType) Validate() error {
 func ParseValueType(s string) (ValueType, error) {
 	switch s {
 	case "string":
-		return BYTES, nil
+		return Bytes, nil
 	case "int64":
-		return INT64, nil
+		return Int64, nil
 	case "float64":
-		return FLOAT64, nil
+		return Float64, nil
 	case "bool":
-		return BOOL, nil
+		return Bool, nil
 	case "time":
-		return TIME, nil
+		return Time, nil
 	case "bytes":
-		return BYTES, nil
+		return Bytes, nil
 	}
-	return INVALID, errdefs.InvalidAttribute(fmt.Errorf("Unknown value type: %s", s))
+	return Invalid, errdefs.InvalidAttribute(fmt.Errorf("Unknown value type: %s", s))
 }

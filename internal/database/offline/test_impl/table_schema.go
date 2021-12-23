@@ -22,11 +22,11 @@ func TestTableSchema(t *testing.T, prepareStore PrepareStoreFn, prepareSampleTab
 		Fields: []types.DataTableFieldSchema{
 			{
 				Name:      "user",
-				ValueType: types.STRING,
+				ValueType: types.String,
 			},
 			{
 				Name:      "age",
-				ValueType: types.INT64,
+				ValueType: types.Int64,
 			},
 		},
 	}

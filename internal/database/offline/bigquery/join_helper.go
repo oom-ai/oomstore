@@ -60,17 +60,17 @@ func dropTable(ctx context.Context, db *DB, tableName string) error {
 
 func convertValueTypeToBigQuerySQLType(t types.ValueType) (string, error) {
 	switch t {
-	case types.STRING:
+	case types.String:
 		return "STRING", nil
-	case types.INT64:
+	case types.Int64:
 		return "BIGINT", nil
-	case types.BOOL:
+	case types.Bool:
 		return "BOOL", nil
-	case types.FLOAT64:
+	case types.Float64:
 		return "FLOAT64", nil
-	case types.BYTES:
+	case types.Bytes:
 		return "BYTES", nil
-	case types.TIME:
+	case types.Time:
 		return "DATETIME", nil
 	default:
 		return "", fmt.Errorf("unsupported value type %s", t)

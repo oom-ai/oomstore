@@ -8,12 +8,12 @@ import (
 )
 
 var typeMap = map[string]types.ValueType{
-	"boolean":  types.BOOL,
-	"binary":   types.BYTES,
-	"bigint":   types.INT64,
-	"double":   types.FLOAT64,
-	"varchar":  types.STRING,
-	"datetime": types.TIME,
+	"boolean":  types.Bool,
+	"binary":   types.Bytes,
+	"bigint":   types.Int64,
+	"double":   types.Float64,
+	"varchar":  types.String,
+	"datetime": types.Time,
 }
 
 func TestValueType(t *testing.T) {
@@ -21,13 +21,13 @@ func TestValueType(t *testing.T) {
 		input    string
 		expected types.ValueType
 	}{
-		{"boolean", types.BOOL},
-		{"binary", types.BYTES},
-		{"bigint", types.INT64},
-		{"double", types.FLOAT64},
-		{"varchar(32)", types.STRING},
-		{"VARCHAR(64)", types.STRING},
-		{"datetime", types.TIME},
+		{"boolean", types.Bool},
+		{"binary", types.Bytes},
+		{"bigint", types.Int64},
+		{"double", types.Float64},
+		{"varchar(32)", types.String},
+		{"VARCHAR(64)", types.String},
+		{"datetime", types.Time},
 	} {
 		actual, err := sqlutil.GetValueType(typeMap, tt.input)
 		if err != nil {

@@ -45,7 +45,7 @@ func TestCreateFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore D
 		FeatureName: "phone",
 		GroupID:     groupID,
 		Description: "description",
-		ValueType:   types.STRING,
+		ValueType:   types.String,
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
@@ -62,7 +62,7 @@ func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreFn, de
 	opt := metadata.CreateFeatureOpt{
 		FeatureName: "phone",
 		GroupID:     groupID,
-		ValueType:   types.STRING,
+		ValueType:   types.String,
 	}
 
 	_, err := store.CreateFeature(ctx, opt)
@@ -82,7 +82,7 @@ func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreFn, 
 	opt := metadata.CreateFeatureOpt{
 		FeatureName: "user",
 		GroupID:     groupID,
-		ValueType:   types.INT64,
+		ValueType:   types.Int64,
 		Description: "order",
 	}
 
@@ -115,7 +115,7 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore Dest
 		FeatureName: "phone",
 		GroupID:     groupID,
 		Description: "description",
-		ValueType:   types.STRING,
+		ValueType:   types.String,
 	})
 	require.NoError(t, err)
 
@@ -129,7 +129,7 @@ func TestGetFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore Dest
 	expected := &types.Feature{
 		ID:          1,
 		Name:        "phone",
-		ValueType:   types.STRING,
+		ValueType:   types.String,
 		Description: "description",
 		GroupID:     1,
 	}
@@ -148,7 +148,7 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreFn, destroyStor
 		FeatureName: "phone",
 		GroupID:     groupID,
 		Description: "description",
-		ValueType:   types.STRING,
+		ValueType:   types.String,
 	})
 	require.NoError(t, err)
 
@@ -162,7 +162,7 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreFn, destroyStor
 	expected := &types.Feature{
 		ID:          1,
 		Name:        "phone",
-		ValueType:   types.STRING,
+		ValueType:   types.String,
 		Description: "description",
 		GroupID:     1,
 	}
@@ -185,7 +185,7 @@ func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStor
 		FeatureName: "phone",
 		GroupID:     groupID,
 		Description: "description",
-		ValueType:   types.STRING,
+		ValueType:   types.String,
 	})
 	require.NoError(t, err)
 	require.NoError(t, store.Refresh())
@@ -244,7 +244,7 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 		FeatureName: "phone",
 		GroupID:     groupID,
 		Description: "description",
-		ValueType:   types.STRING,
+		ValueType:   types.String,
 	})
 	require.NoError(t, err)
 
@@ -303,7 +303,7 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore D
 		FeatureName: "phone",
 		GroupID:     groupID,
 		Description: "description",
-		ValueType:   types.STRING,
+		ValueType:   types.String,
 	}
 	id, err := store.CreateFeature(ctx, opt)
 	require.NoError(t, err)
@@ -326,7 +326,7 @@ func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore D
 	expected := &types.Feature{
 		ID:          1,
 		Name:        "phone",
-		ValueType:   types.STRING,
+		ValueType:   types.String,
 		Description: "new description",
 		GroupID:     1,
 	}

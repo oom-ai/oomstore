@@ -217,7 +217,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 	features := types.FeatureList{
 		{
 			Name:      "model",
-			ValueType: types.STRING,
+			ValueType: types.String,
 			GroupID:   1,
 			Group: &types.Group{
 				EntityID:         1,
@@ -228,7 +228,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 		},
 		{
 			Name:      "price",
-			ValueType: types.INT64,
+			ValueType: types.Int64,
 			GroupID:   2,
 			Group: &types.Group{
 				EntityID:         1,
@@ -239,7 +239,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 		},
 		{
 			Name:      "age",
-			ValueType: types.INT64,
+			ValueType: types.Int64,
 			GroupID:   3,
 			Group: &types.Group{
 				EntityID:         2,

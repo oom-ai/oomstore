@@ -29,7 +29,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 		Features: []*types.Feature{
 			{
 				Name:      "price",
-				ValueType: types.INT64,
+				ValueType: types.Int64,
 			},
 			{
 				Name:      "model",
@@ -57,11 +57,11 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 		opt.Features = []*types.Feature{
 			{
 				Name:      "price",
-				ValueType: types.INT64,
+				ValueType: types.Int64,
 			},
 			{
 				Name:      "model",
-				ValueType: types.STRING,
+				ValueType: types.String,
 			},
 		}
 		opt.Revision = &revision
@@ -72,8 +72,8 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn) {
 			DataTable:  dataTable,
 			EntityName: entity.Name,
 			Features: []*types.Feature{
-				{Name: "model", ValueType: types.STRING},
-				{Name: "price", ValueType: types.INT64},
+				{Name: "model", ValueType: types.String},
+				{Name: "price", ValueType: types.Int64},
 			},
 		})
 		records := make([][]interface{}, 0)

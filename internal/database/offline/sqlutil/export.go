@@ -64,7 +64,7 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType
 					}
 					record[i+1] = v
 				} else {
-					if f.ValueType == types.STRING {
+					if f.ValueType == types.String {
 						record[i+1] = cast.ToString(record[i+1])
 					}
 				}
@@ -92,18 +92,18 @@ func deserializeByTag(i interface{}, valueType types.ValueType) (interface{}, er
 	}
 
 	switch valueType {
-	case types.STRING:
+	case types.String:
 		return s, nil
 
-	case types.INT64:
+	case types.Int64:
 		x, err := strconv.ParseInt(s, 10, 64)
 		return x, err
 
-	case types.FLOAT64:
+	case types.Float64:
 		x, err := strconv.ParseFloat(s, 64)
 		return x, err
 
-	case types.BOOL:
+	case types.Bool:
 		if s == "1" {
 			return true, nil
 		} else if s == "0" {
@@ -111,11 +111,11 @@ func deserializeByTag(i interface{}, valueType types.ValueType) (interface{}, er
 		} else {
 			return nil, fmt.Errorf("invalid bool value: %s", s)
 		}
-	case types.TIME:
+	case types.Time:
 		x, err := strconv.ParseInt(s, 10, 64)
 		return time.UnixMilli(x), err
 
-	case types.BYTES:
+	case types.Bytes:
 		return []byte(s), nil
 	default:
 		return "", fmt.Errorf("unsupported value type: %s", valueType)

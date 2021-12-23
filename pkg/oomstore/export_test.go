@@ -28,11 +28,11 @@ func TestChannelExport(t *testing.T) {
 	features := types.FeatureList{
 		{
 			Name:      "model",
-			ValueType: types.STRING,
+			ValueType: types.String,
 		},
 		{
 			Name:      "price",
-			ValueType: types.INT64,
+			ValueType: types.Int64,
 		},
 	}
 
