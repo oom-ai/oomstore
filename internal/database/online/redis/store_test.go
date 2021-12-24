@@ -12,7 +12,7 @@ import (
 
 func prepareStore(t *testing.T) (context.Context, online.Store) {
 	ctx := context.Background()
-	store := redis.Open(&runtime_redis.RedisDbOpt)
+	store := redis.Open(runtime_redis.GetOpt())
 	if _, err := store.FlushDB(ctx).Result(); err != nil {
 		t.Fatal(err)
 	}
@@ -20,8 +20,12 @@ func prepareStore(t *testing.T) (context.Context, online.Store) {
 	return ctx, store
 }
 
-// the unit test for redis only run locally, and only the online store uses redis, no data race.
-func destroyStore() {}
+func destroyStore() {
+	store := redis.Open(runtime_redis.GetOpt())
+	if _, err := store.Client.FlushDB(context.Background()).Result(); err != nil {
+		panic(err)
+	}
+}
 
 func TestOpen(t *testing.T) {
 	test_impl.TestOpen(t, prepareStore, destroyStore)

@@ -1,40 +1,30 @@
 package runtime_redis
 
 import (
-	"os"
-	"os/signal"
+	"fmt"
+	"os/exec"
 	"strconv"
-	"syscall"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/orlangure/gnomock"
-	"github.com/orlangure/gnomock/preset/redis"
 )
 
-var RedisDbOpt types.RedisOpt
-
 func init() {
-	container, err := gnomock.Start(
-		redis.Preset(
-			redis.WithVersion("6.2.6"),
-		),
-		gnomock.WithUseLocalImagesFirst(),
-	)
-	if err != nil {
-		panic(err)
+	opt := GetOpt()
+	if out, err := exec.Command(
+		"oomplay", "init", "redis",
+		"--port", opt.Port,
+		"--password", opt.Password,
+		"--database", strconv.Itoa(opt.Database),
+	).CombinedOutput(); err != nil {
+		panic(fmt.Sprintf("oomplay failed with error: %v, output: %s", err, out))
 	}
+}
 
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)
-		<-c
-		_ = gnomock.Stop(container)
-	}()
-
-	RedisDbOpt = types.RedisOpt{
-		Host:     container.Host,
-		Port:     strconv.Itoa(container.DefaultPort()),
-		Password: "",
+func GetOpt() *types.RedisOpt {
+	return &types.RedisOpt{
+		Host:     "localhost",
+		Port:     "6379",
+		Password: "test",
 		Database: 0,
 	}
 }
