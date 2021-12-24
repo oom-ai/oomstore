@@ -2,6 +2,7 @@ package dynamodb_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -30,7 +31,7 @@ func destroyStore(t *testing.T) func() {
 			if _, err := db.Client.DeleteTable(ctx, &awsDynamodb.DeleteTableInput{
 				TableName: aws.String(tableName),
 			}); err != nil {
-				panic(err)
+				panic(fmt.Sprintf("failed deleting table '%s': %v", tableName, err))
 			}
 		}
 	}

@@ -90,7 +90,7 @@ func init() {
 		entity := &types.Entity{ID: 5, Name: "user", Length: 5}
 		var data []types.ExportRecord
 
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < 100; i++ {
 			record := []interface{}{dbutil.RandString(entity.Length), rand.Float64()}
 			data = append(data, record)
 		}
