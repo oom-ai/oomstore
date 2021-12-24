@@ -15,6 +15,7 @@ type CreateEntityOpt struct {
 
 type CreateFeatureOpt struct {
 	FeatureName string
+	FullName    string
 	GroupID     int
 	Description string
 	ValueType   types.ValueType

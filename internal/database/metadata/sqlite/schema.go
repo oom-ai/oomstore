@@ -13,6 +13,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 		CREATE TABLE feature (
 			id				INTEGER 		NOT NULL PRIMARY KEY AUTOINCREMENT,
 			name          	VARCHAR(32) 	NOT	NULL,
+			full_name   	VARCHAR(65)		NOT NULL,
 			group_id      	INT         	NOT	NULL,
 			value_type    	INT          	NOT	NULL,
 			description   	VARCHAR(128)	DEFAULT '',
