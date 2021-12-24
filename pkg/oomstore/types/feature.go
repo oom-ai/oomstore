@@ -7,6 +7,7 @@ import (
 type Feature struct {
 	ID        int       `db:"id"`
 	Name      string    `db:"name"`
+	FullName  string    `db:"full_name"`
 	ValueType ValueType `db:"value_type"`
 
 	Description string    `db:"description"`
