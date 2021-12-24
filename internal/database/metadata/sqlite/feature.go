@@ -13,8 +13,8 @@ func createFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metada
 	if err := opt.ValueType.Validate(); err != nil {
 		return 0, err
 	}
-	query := "INSERT INTO feature(name, group_id, value_type, description) VALUES (?, ?, ?, ?)"
-	res, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(query), opt.FeatureName, opt.GroupID, opt.ValueType, opt.Description)
+	query := "INSERT INTO feature(name, full_name, group_id, value_type, description) VALUES (?, ?, ?, ?, ?)"
+	res, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(query), opt.FeatureName, opt.FullName, opt.GroupID, opt.ValueType, opt.Description)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok {
 			if sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
