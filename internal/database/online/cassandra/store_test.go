@@ -19,7 +19,6 @@ func init() {
 	KEYSPACE = strings.ToLower(dbutil.RandString(20))
 }
 
-// TODO: repalce gnomock with oomplay
 func prepareStore(t *testing.T) (context.Context, online.Store) {
 	ctx, session := runtime_cassandra.PrepareDB()
 
