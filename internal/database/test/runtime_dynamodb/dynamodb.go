@@ -3,53 +3,37 @@ package runtime_dynamodb
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
+	"os/exec"
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/online/dynamodb"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/orlangure/gnomock"
-	"github.com/orlangure/gnomock/preset/localstack"
 )
 
-var DynamoDBDbOpt types.DynamoDBOpt
-
 func init() {
-	dynamodbContainer, err := gnomock.Start(
-		localstack.Preset(
-			localstack.WithServices(localstack.DynamoDB),
-		),
-		gnomock.WithUseLocalImagesFirst(),
-	)
-	if err != nil {
-		panic(err)
+	if out, err := exec.Command(
+		"oomplay", "init", "dynamodb",
+		"--port", "4566",
+	).CombinedOutput(); err != nil {
+		panic(fmt.Sprintf("oomplay failed with error: %v, output: %s", err, out))
 	}
-
-	DynamoDBDbOpt = types.DynamoDBOpt{
-		Region:          "us-east-1",
-		EndpointURL:     fmt.Sprintf("http://%s/", dynamodbContainer.Address(localstack.APIPort)),
-		AccessKeyID:     "test",
-		SecretAccessKey: "test",
-		SessionToken:    "test",
-		Source:          "test",
-	}
-
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)
-		<-c
-
-		_ = gnomock.Stop(dynamodbContainer)
-	}()
 }
 
 func PrepareDB(t *testing.T) (context.Context, *dynamodb.DB) {
-	db, err := dynamodb.Open(&DynamoDBDbOpt)
+	db, err := dynamodb.Open(GetOpt())
 	if err != nil {
 		t.Fatal(err)
 	}
 	return context.Background(), db
+}
 
+func GetOpt() *types.DynamoDBOpt {
+	return &types.DynamoDBOpt{
+		Region:          ".",
+		EndpointURL:     "http://localhost:4566",
+		AccessKeyID:     ".",
+		SecretAccessKey: ".",
+		SessionToken:    ".",
+		Source:          ".",
+	}
 }
