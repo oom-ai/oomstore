@@ -19,7 +19,8 @@ var META_TABLE_SCHEMAS = map[string]string{
 			description   	VARCHAR(128)	DEFAULT '',
 			create_time   	TIMESTAMP    	NOT	NULL DEFAULT CURRENT_TIMESTAMP,
 			modify_time   	TIMESTAMP    	NOT	NULL DEFAULT CURRENT_TIMESTAMP,
-			UNIQUE (name),
+			UNIQUE (group_id, name),
+			UNIQUE (full_name),
 			FOREIGN KEY (group_id) REFERENCES feature_group(id)
 		);
 		`,
