@@ -71,6 +71,7 @@ func TestCreateBatchFeature(t *testing.T) {
 			if tc.group.Category == types.BatchFeatureCategory {
 				metadataOpt := metadata.CreateFeatureOpt{
 					FeatureName: tc.opt.FeatureName,
+					FullName:    fmt.Sprintf("%s:%s", tc.opt.GroupName, tc.opt.FeatureName),
 					GroupID:     tc.group.ID,
 					ValueType:   tc.valueType,
 					Description: tc.opt.Description,
