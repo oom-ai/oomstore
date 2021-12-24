@@ -65,8 +65,8 @@ func GetOpt(database string) *types.MySQLOpt {
 	return &types.MySQLOpt{
 		Host:     "127.0.0.1",
 		Port:     "3306",
-		User:     "root",
-		Password: "mysql",
+		User:     "test",
+		Password: "test",
 		Database: database,
 	}
 }
