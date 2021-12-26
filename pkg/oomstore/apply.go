@@ -190,25 +190,11 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 				return nil, err
 			}
 
-			// We don't want group.Features to have values.
-			// The whole stage should be a flat structure, not a nested structure.
-			stage.NewGroups = append(stage.NewGroups, apply.Group{
-				Kind:        "Group",
-				Name:        group.Name,
-				Group:       group.Name,
-				EntityName:  group.EntityName,
-				Category:    group.Category,
-				Description: group.Description,
-			})
+			group.Group = group.Name
+			stage.NewGroups = append(stage.NewGroups, buildApplyGroup(group, group.EntityName))
 
 			for _, feature := range group.Features {
-				stage.NewFeatures = append(stage.NewFeatures, apply.Feature{
-					Kind:        "Feature",
-					Name:        feature.Name,
-					GroupName:   group.Name,
-					ValueType:   feature.ValueType,
-					Description: feature.Description,
-				})
+				stage.NewFeatures = append(stage.NewFeatures, buildApplyFeature(feature, group.Name))
 			}
 
 		case "Feature":
