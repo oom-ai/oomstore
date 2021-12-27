@@ -21,9 +21,9 @@ case="api returns ok"
 arg=$(cat <<-EOF
 {
   "feature_names": [
-    "conv_rate",
-    "acc_rate",
-    "avg_daily_trips"
+    "driver_stats.conv_rate",
+    "driver_stats.acc_rate",
+    "driver_stats.avg_daily_trips"
   ],
   "input_file_path": "./data/driver_stats_label.csv",
   "output_file_path": "$output"
@@ -40,7 +40,7 @@ assert_json_eq "$case" "$expected" "$actual"
 
 case="result is correct"
 expected='
-entity_key,unix_milli,conv_rate,acc_rate,avg_daily_trips
+entity_key,unix_milli,driver_stats.conv_rate,driver_stats.acc_rate,driver_stats.avg_daily_trips
 1,0,,,
 1,3,0.556,0.465,464
 1,4,0.377,0.991,329

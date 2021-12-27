@@ -9,7 +9,7 @@ case="query single feature"
 arg='
 {
     "entity_keys": ["19", "50", "78"],
-    "feature_names": ["state"]
+    "feature_names": ["account.state"]
 }
 '
 expected='
@@ -18,21 +18,21 @@ expected='
   "result": {
     "19": {
       "map": {
-        "state": {
+        "account.state": {
           "stringValue": "Illinois"
         }
       }
     },
     "50": {
       "map": {
-        "state": {
+        "account.state": {
           "stringValue": "Hawaii"
         }
       }
     },
     "78": {
       "map": {
-        "state": {
+        "account.state": {
           "stringValue": "Tennessee"
         }
       }
@@ -47,7 +47,7 @@ case="query multiple features"
 arg='
 {
     "entity_keys": ["48", "74"],
-    "feature_names": ["state", "credit_score", "transaction_count_7d", "transaction_count_30d"]
+    "feature_names": ["account.state", "account.credit_score", "transaction_stats.transaction_count_7d", "transaction_stats.transaction_count_30d"]
 }
 '
 expected='
@@ -56,32 +56,32 @@ expected='
   "result": {
     "48": {
       "map": {
-        "credit_score": {
+        "account.credit_score": {
           "int64Value": "708"
         },
-        "state": {
+        "account.state": {
           "stringValue": "Indiana"
         },
-        "transaction_count_30d": {
+        "transaction_stats.transaction_count_30d": {
           "int64Value": "45"
         },
-        "transaction_count_7d": {
+        "transaction_stats.transaction_count_7d": {
           "int64Value": "5"
         }
       }
     },
     "74": {
       "map": {
-        "credit_score": {
+        "account.credit_score": {
           "int64Value": "703"
         },
-        "state": {
+        "account.state": {
           "stringValue": "Ohio"
         },
-        "transaction_count_30d": {
+        "transaction_stats.transaction_count_30d": {
           "int64Value": "25"
         },
-        "transaction_count_7d": {
+        "transaction_stats.transaction_count_7d": {
           "int64Value": "8"
         }
       }
