@@ -37,30 +37,35 @@ func init() {
 				&types.Feature{
 					ID:        1,
 					Name:      "age",
+					FullName:  "user.age",
 					GroupID:   1,
 					ValueType: types.Int64,
 				},
 				&types.Feature{
 					ID:        2,
 					Name:      "gender",
+					FullName:  "user.gender",
 					GroupID:   1,
 					ValueType: types.String,
 				},
 				&types.Feature{
 					ID:        3,
 					Name:      "account",
+					FullName:  "user.account",
 					GroupID:   1,
 					ValueType: types.Float64,
 				},
 				&types.Feature{
 					ID:        4,
 					Name:      "is_active",
+					FullName:  "user.is_active",
 					GroupID:   1,
 					ValueType: types.Bool,
 				},
 				&types.Feature{
 					ID:        5,
 					Name:      "register_time",
+					FullName:  "user.register_time",
 					GroupID:   1,
 					ValueType: types.Time,
 				},
@@ -81,6 +86,7 @@ func init() {
 			&types.Feature{
 				ID:        2,
 				Name:      "charge",
+				FullName:  "user.charge",
 				GroupID:   2,
 				ValueType: types.Float64,
 			},
