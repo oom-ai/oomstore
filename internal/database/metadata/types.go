@@ -60,8 +60,8 @@ type UpdateRevisionOpt struct {
 }
 
 type ListFeatureOpt struct {
-	EntityID     *int
-	GroupID      *int
-	FeatureIDs   *[]int
-	FeatureNames *[]string
+	EntityID         *int
+	GroupID          *int
+	FeatureIDs       *[]int
+	FeatureFullNames *[]string
 }
