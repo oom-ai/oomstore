@@ -34,8 +34,8 @@ func (s *server) HealthCheck(ctx context.Context, req *codegen.HealthCheckReques
 
 func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (*codegen.OnlineGetResponse, error) {
 	result, err := s.oomstore.OnlineGet(ctx, types.OnlineGetOpt{
-		FeatureNames: req.FeatureNames,
-		EntityKey:    req.EntityKey,
+		FeatureFullNames: req.FeatureNames,
+		EntityKey:        req.EntityKey,
 	})
 	if err != nil {
 		return &codegen.OnlineGetResponse{
@@ -59,8 +59,8 @@ func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (
 
 func (s *server) OnlineMultiGet(ctx context.Context, req *codegen.OnlineMultiGetRequest) (*codegen.OnlineMultiGetResponse, error) {
 	result, err := s.oomstore.OnlineMultiGet(ctx, types.OnlineMultiGetOpt{
-		FeatureNames: req.FeatureNames,
-		EntityKeys:   req.EntityKeys,
+		FeatureFullNames: req.FeatureNames,
+		EntityKeys:       req.EntityKeys,
 	})
 	if err != nil {
 		return &codegen.OnlineMultiGetResponse{

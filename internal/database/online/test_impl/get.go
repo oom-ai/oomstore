@@ -26,7 +26,7 @@ func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn, destroyStore Dest
 		require.NoError(t, err)
 
 		for i, f := range s.Features {
-			compareFeatureValue(t, target.ValueAt(i), rs[f.Name], f.ValueType)
+			compareFeatureValue(t, target.ValueAt(i), rs[f.FullName], f.ValueType)
 		}
 	}
 }
@@ -68,10 +68,9 @@ func TestMultiGet(t *testing.T, prepareStore PrepareStoreFn, destroystore Destro
 		EntityKeys:  keys,
 	})
 	require.NoError(t, err)
-
 	for _, record := range s.Data {
 		for i, feature := range s.Features {
-			compareFeatureValue(t, record.ValueAt(i), rs[record.EntityKey()][feature.Name], feature.ValueType)
+			compareFeatureValue(t, record.ValueAt(i), rs[record.EntityKey()][feature.FullName], feature.ValueType)
 		}
 	}
 

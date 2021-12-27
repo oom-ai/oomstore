@@ -30,8 +30,8 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		return nil, err
 	}
 
-	for k, v := range rs {
-		rs[k] = deserializeString(v)
+	for _, feature := range opt.FeatureList {
+		rs[feature.FullName] = deserializeString(rs[feature.Name])
 	}
 	return rs, nil
 }
@@ -84,8 +84,8 @@ func deserializeIntoRowMap(values map[string]interface{}, entityName string, fea
 	entityKey := values[entityName].(string)
 	delete(values, entityName)
 
-	for k, v := range values {
-		values[k] = deserializeString(v)
+	for _, feature := range features {
+		values[feature.FullName] = deserializeString(values[feature.Name])
 	}
 	return entityKey, values
 }

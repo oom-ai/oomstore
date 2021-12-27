@@ -13,7 +13,7 @@ import (
 // Get online features of a particular entity instance.
 func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*types.FeatureValues, error) {
 	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
-		FeatureFullNames: &opt.FeatureNames,
+		FeatureFullNames: &opt.FeatureFullNames,
 	}).Filter(func(f *types.Feature) bool {
 		return f.Group.OnlineRevisionID != nil
 	})
@@ -27,10 +27,10 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 	}
 
 	rs := types.FeatureValues{
-		EntityName:      entity.Name,
-		EntityKey:       opt.EntityKey,
-		FeatureNames:    opt.FeatureNames,
-		FeatureValueMap: make(map[string]interface{}),
+		EntityName:       entity.Name,
+		EntityKey:        opt.EntityKey,
+		FeatureFullNames: opt.FeatureFullNames,
+		FeatureValueMap:  make(map[string]interface{}),
 	}
 
 	featureMap := groupFeaturesByRevisionID(features)
@@ -58,7 +58,7 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 // Get online features of multiple entity instances.
 func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetOpt) (map[string]*types.FeatureValues, error) {
 	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
-		FeatureFullNames: &opt.FeatureNames,
+		FeatureFullNames: &opt.FeatureFullNames,
 	})
 
 	features = features.Filter(func(f *types.Feature) bool {
@@ -86,10 +86,10 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 	result := make(map[string]*types.FeatureValues)
 	for _, entityKey := range opt.EntityKeys {
 		result[entityKey] = &types.FeatureValues{
-			EntityName:      entity.Name,
-			EntityKey:       entityKey,
-			FeatureNames:    opt.FeatureNames,
-			FeatureValueMap: make(map[string]interface{}),
+			EntityName:       entity.Name,
+			EntityKey:        entityKey,
+			FeatureFullNames: opt.FeatureFullNames,
+			FeatureValueMap:  make(map[string]interface{}),
 		}
 		for featureName, featureValue := range featureValueMap[entityKey] {
 			result[entityKey].FeatureValueMap[featureName] = featureValue

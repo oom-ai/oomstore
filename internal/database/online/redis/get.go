@@ -36,7 +36,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		if err != nil {
 			return nil, err
 		}
-		rowMap[opt.FeatureList[i].Name] = typedValue
+		rowMap[opt.FeatureList[i].FullName] = typedValue
 	}
 	return rowMap, nil
 }

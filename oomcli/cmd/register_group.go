@@ -9,12 +9,14 @@ import (
 )
 
 var registerGroupOpt types.CreateGroupOpt
+var category string
 var registerGroupCmd = &cobra.Command{
 	Use:   "group <group_name>",
 	Short: "Register a new feature group",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		registerGroupOpt.GroupName = args[0]
+		registerGroupOpt.Category = types.Category(category)
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
@@ -34,6 +36,9 @@ func init() {
 
 	flags.StringVarP(&registerGroupOpt.EntityName, "entity", "e", "", "entity name")
 	_ = registerGroupCmd.MarkFlagRequired("entity")
+
+	flags.StringVarP(&category, "category", "c", "", "group category")
+	_ = registerGroupCmd.MarkFlagRequired("category")
 
 	flags.StringVarP(&registerGroupOpt.Description, "description", "d", "", "group description")
 }

@@ -38,8 +38,8 @@ func TestOnlineGet(t *testing.T) {
 		{
 			description: "no available features",
 			opt: types.OnlineGetOpt{
-				FeatureNames: unavailableFeatures.Names(),
-				EntityKey:    "1234",
+				FeatureFullNames: unavailableFeatures.FullNames(),
+				EntityKey:        "1234",
 			},
 			features:      unavailableFeatures,
 			expectedError: nil,
@@ -48,8 +48,8 @@ func TestOnlineGet(t *testing.T) {
 		{
 			description: "inconsistent entity type, fail",
 			opt: types.OnlineGetOpt{
-				FeatureNames: inconsistentFeatures.Names(),
-				EntityKey:    "1234",
+				FeatureFullNames: inconsistentFeatures.FullNames(),
+				EntityKey:        "1234",
 			},
 			features:      inconsistentFeatures,
 			expectedError: fmt.Errorf("expected 1 entity, got 2 entities"),
@@ -58,16 +58,16 @@ func TestOnlineGet(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.OnlineGetOpt{
-				FeatureNames: consistentFeatures.Names(),
-				EntityKey:    "1234",
+				FeatureFullNames: consistentFeatures.FullNames(),
+				EntityKey:        "1234",
 			},
 			features:      consistentFeatures,
 			entityName:    &entityName,
 			expectedError: nil,
 			expected: &types.FeatureValues{
-				EntityName:   entityName,
-				EntityKey:    "1234",
-				FeatureNames: consistentFeatures.Names(),
+				EntityName:       entityName,
+				EntityKey:        "1234",
+				FeatureFullNames: consistentFeatures.FullNames(),
 				FeatureValueMap: map[string]interface{}{
 					"price": int64(100),
 					"model": "xiaomi",
@@ -78,7 +78,7 @@ func TestOnlineGet(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().CacheListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureFullNames: &tc.opt.FeatureNames}).Return(tc.features)
+			metadataStore.EXPECT().CacheListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureFullNames: &tc.opt.FeatureFullNames}).Return(tc.features)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().Get(gomock.Any(), gomock.Any()).Return(dbutil.RowMap{
 					"price": int64(100),
@@ -122,8 +122,8 @@ func TestOnlineMultiGet(t *testing.T) {
 		{
 			description: "no available features, return nil",
 			opt: types.OnlineMultiGetOpt{
-				FeatureNames: unavailableFeatures.Names(),
-				EntityKeys:   []string{"1234", "1235"},
+				FeatureFullNames: unavailableFeatures.FullNames(),
+				EntityKeys:       []string{"1234", "1235"},
 			},
 			features:      unavailableFeatures,
 			expectedError: nil,
@@ -132,8 +132,8 @@ func TestOnlineMultiGet(t *testing.T) {
 		{
 			description: "inconsistent entity type, fail",
 			opt: types.OnlineMultiGetOpt{
-				FeatureNames: inconsistentFeatures.Names(),
-				EntityKeys:   []string{"1234", "1235"},
+				FeatureFullNames: inconsistentFeatures.FullNames(),
+				EntityKeys:       []string{"1234", "1235"},
 			},
 			features:      inconsistentFeatures,
 			expectedError: fmt.Errorf("expected 1 entity, got 2 entities"),
@@ -142,26 +142,26 @@ func TestOnlineMultiGet(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.OnlineMultiGetOpt{
-				FeatureNames: consistentFeatures.Names(),
-				EntityKeys:   []string{"1234", "1235"},
+				FeatureFullNames: consistentFeatures.FullNames(),
+				EntityKeys:       []string{"1234", "1235"},
 			},
 			features:      consistentFeatures,
 			entityName:    &entityName,
 			expectedError: nil,
 			expected: map[string]*types.FeatureValues{
 				"1234": {
-					EntityName:   "device",
-					EntityKey:    "1234",
-					FeatureNames: consistentFeatures.Names(),
+					EntityName:       "device",
+					EntityKey:        "1234",
+					FeatureFullNames: consistentFeatures.FullNames(),
 					FeatureValueMap: map[string]interface{}{
 						"model": "xiaomi",
 						"price": int64(100),
 					},
 				},
 				"1235": {
-					EntityName:   "device",
-					EntityKey:    "1235",
-					FeatureNames: consistentFeatures.Names(),
+					EntityName:       "device",
+					EntityKey:        "1235",
+					FeatureFullNames: consistentFeatures.FullNames(),
 					FeatureValueMap: map[string]interface{}{
 						"model": "apple",
 						"price": int64(200),
@@ -173,7 +173,7 @@ func TestOnlineMultiGet(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().CacheListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureFullNames: &tc.opt.FeatureNames}).Return(tc.features)
+			metadataStore.EXPECT().CacheListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureFullNames: &tc.opt.FeatureFullNames}).Return(tc.features)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().MultiGet(gomock.Any(), gomock.Any()).Return(map[string]dbutil.RowMap{
 					"1234": {

@@ -45,13 +45,13 @@ type ExportOpt struct {
 }
 
 type OnlineGetOpt struct {
-	FeatureNames []string
-	EntityKey    string
+	FeatureFullNames []string
+	EntityKey        string
 }
 
 type OnlineMultiGetOpt struct {
-	FeatureNames []string
-	EntityKeys   []string
+	FeatureFullNames []string
+	EntityKeys       []string
 }
 
 type ChannelJoinOpt struct {
