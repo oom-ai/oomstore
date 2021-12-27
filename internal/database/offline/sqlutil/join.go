@@ -170,7 +170,7 @@ func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTabl
 	for _, name := range tableNames {
 		for _, f := range opt.FeatureMap[name] {
 			fields = append(fields, fmt.Sprintf("%s.%s", qt(name), qt(f.Name)))
-			header = append(header, f.Name)
+			header = append(header, f.FullName)
 		}
 	}
 

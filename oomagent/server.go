@@ -206,9 +206,9 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 	// This goroutine runs the join operation, and send whatever joined as the response
 	go func() {
 		joinResult, err := s.oomstore.ChannelJoin(context.Background(), types.ChannelJoinOpt{
-			FeatureNames: firstReq.FeatureNames,
-			EntityRows:   entityRows,
-			ValueNames:   firstReq.ValueNames,
+			FeatureFullNames: firstReq.FeatureNames,
+			EntityRows:       entityRows,
+			ValueNames:       firstReq.ValueNames,
 		})
 		if err != nil {
 			globalErr = err
@@ -276,9 +276,9 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 
 func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.JoinResponse, error) {
 	err := s.oomstore.Join(ctx, types.JoinOpt{
-		FeatureNames:   req.FeatureNames,
-		InputFilePath:  req.InputFilePath,
-		OutputFilePath: req.OutputFilePath,
+		FeatureFullNames: req.FeatureNames,
+		InputFilePath:    req.InputFilePath,
+		OutputFilePath:   req.OutputFilePath,
 	})
 	if err != nil {
 		return &codegen.JoinResponse{

@@ -110,7 +110,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 			} else {
 				expectedValues := extractValues(tc.expected.Data)
 				actualValues := extractValues(actual.Data)
-				assert.ObjectsAreEqual(tc.expected.Header, actual.Header)
+				assert.ElementsMatch(t, tc.expected.Header, actual.Header)
 				assert.ObjectsAreEqual(expectedValues, actualValues)
 			}
 		})
@@ -120,16 +120,19 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.FeatureList) {
 	price := &types.Feature{
 		Name:      "price",
+		FullName:  "device_basic.price",
 		ValueType: types.Int64,
 		GroupID:   1,
 	}
 	model := &types.Feature{
 		Name:      "model",
+		FullName:  "device_basic.model",
 		ValueType: types.String,
 		GroupID:   1,
 	}
 	isActive := &types.Feature{
 		Name:      "is_active",
+		FullName:  "device_advanced.is_active",
 		ValueType: types.Bool,
 		GroupID:   2,
 	}
@@ -225,46 +228,46 @@ func prepareEntityRows(isEmpty bool, withValue bool) <-chan types.EntityRow {
 }
 
 func prepareResult(oneGroup bool, withValue bool) *types.JoinResult {
-	header := []string{"entity_key", "unix_milli", "model", "price", "is_active"}
+	header := []string{"entity_key", "unix_milli", "device_basic.model", "device_basic.price", "device_advanced.is_active"}
 	if withValue {
-		header = []string{"entity_key", "unix_milli", "value_1", "value_2", "model", "price", "is_active"}
+		header = []string{"entity_key", "unix_milli", "value_1", "value_2", "device_basic.model", "device_basic.price", "device_advanced.is_active"}
 	}
 	values := []map[string]interface{}{
 		{
-			"entity_key": "1234",
-			"unix_milli": int64(10),
-			"value_1":    1,
-			"value_2":    2,
-			"model":      "xiaomi",
-			"price":      int64(100),
-			"is_active":  true,
+			"entity_key":                "1234",
+			"unix_milli":                int64(10),
+			"value_1":                   "1",
+			"value_2":                   "2",
+			"device_basic.model":        "xiaomi",
+			"device_basic.price":        int64(100),
+			"device_advanced.is_active": true,
 		},
 		{
-			"entity_key": "1234",
-			"unix_milli": int64(20),
-			"value_1":    3,
-			"value_2":    4,
-			"model":      "galaxy",
-			"price":      int64(300),
-			"is_active":  true,
+			"entity_key":                "1234",
+			"unix_milli":                int64(20),
+			"value_1":                   "3",
+			"value_2":                   "4",
+			"device_basic.model":        "galaxy",
+			"device_basic.price":        int64(300),
+			"device_advanced.is_active": true,
 		},
 		{
-			"entity_key": "1235",
-			"unix_milli": int64(5),
-			"value_1":    5,
-			"value_2":    6,
-			"model":      "apple",
-			"price":      int64(200),
-			"is_active":  false,
+			"entity_key":                "1235",
+			"unix_milli":                int64(5),
+			"value_1":                   "5",
+			"value_2":                   "6",
+			"device_basic.model":        "apple",
+			"device_basic.price":        int64(200),
+			"device_advanced.is_active": false,
 		},
 		{
-			"entity_key": "1235",
-			"unix_milli": int64(15),
-			"value_1":    7,
-			"value_2":    8,
-			"model":      "oneplus",
-			"price":      int64(240),
-			"is_active":  false,
+			"entity_key":                "1235",
+			"unix_milli":                int64(14),
+			"value_1":                   "7",
+			"value_2":                   "8",
+			"device_basic.model":        "apple",
+			"device_basic.price":        int64(200),
+			"device_advanced.is_active": false,
 		},
 	}
 	if oneGroup {

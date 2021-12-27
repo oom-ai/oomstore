@@ -23,14 +23,14 @@ EOF
 
 case='oomcli join historical-feature'
 expected="
-entity_key,unix_milli,price,model
+entity_key,unix_milli,phone.price,phone.model
 1,$t1,,
 2,$t1,,
 1,$t2,3999,xiaomi-mix3
 2,$t2,5299,huawei-p40
 "
 actual=$(oomcli join \
-    --feature model,price \
+    --feature phone.model,phone.price \
     --input-file entity_rows.csv \
     --output csv
 )
@@ -51,7 +51,7 @@ EOF
 
 case='oomcli join historical-feature with real-time feature values'
 expected="
-entity_key,unix_milli,value_1,value_2,price,model
+entity_key,unix_milli,value_1,value_2,phone.price,phone.model
 1,$t1,1,2,,
 2,$t1,3,4,,
 1,$t2,5,6,3999,xiaomi-mix3
@@ -59,7 +59,7 @@ entity_key,unix_milli,value_1,value_2,price,model
 "
 
 actual=$(oomcli join \
-    --feature model,price \
+    --feature phone.model,phone.price \
     --input-file entity_rows_with_values.csv \
     --output csv
 )

@@ -3,6 +3,7 @@ package bigquery
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
 
@@ -55,7 +56,8 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 			}
 			record := make([]interface{}, 0, len(recordMap))
 			for _, h := range header {
-				record = append(record, recordMap[h])
+				column := strings.Split(h, ".")
+				record = append(record, recordMap[column[len(column)-1]])
 			}
 			data <- record
 		}
