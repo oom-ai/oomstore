@@ -20,7 +20,7 @@ import (
 // Currently, this API only supports batch features.
 func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*types.JoinResult, error) {
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
-		FeatureNames: &opt.FeatureNames,
+		FeatureFullNames: &opt.FeatureNames,
 	})
 	if err != nil {
 		return nil, err

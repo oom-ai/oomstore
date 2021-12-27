@@ -60,6 +60,13 @@ func (l *FeatureList) Names() (names []string) {
 	return
 }
 
+func (l *FeatureList) FullNames() (fullNames []string) {
+	for _, f := range *l {
+		fullNames = append(fullNames, f.FullName)
+	}
+	return
+}
+
 func (l *FeatureList) IDs() (ids []int) {
 	for _, f := range *l {
 		ids = append(ids, f.ID)

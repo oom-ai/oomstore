@@ -8,14 +8,14 @@ type CreateFeatureOpt struct {
 }
 
 type ListFeatureOpt struct {
-	EntityName   *string
-	GroupName    *string
-	FeatureNames *[]string
+	EntityName       *string
+	GroupName        *string
+	FeatureFullNames *[]string
 }
 
 type UpdateFeatureOpt struct {
-	FeatureName    string
-	NewDescription *string
+	FeatureFullName string
+	NewDescription  *string
 }
 
 type CreateEntityOpt struct {
