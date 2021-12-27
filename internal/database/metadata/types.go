@@ -25,7 +25,7 @@ type CreateGroupOpt struct {
 	GroupName   string
 	EntityID    int
 	Description string
-	Category    string
+	Category    types.Category
 }
 
 type CreateRevisionOpt struct {

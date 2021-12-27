@@ -58,7 +58,7 @@ func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatu
 	if err != nil {
 		return 0, err
 	}
-	if group.Category != types.BatchFeatureCategory {
+	if group.Category != types.CategoryBatch {
 		return 0, fmt.Errorf("expected batch feature group, got %s feature group", group.Category)
 	}
 

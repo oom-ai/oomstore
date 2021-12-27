@@ -222,7 +222,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 			Group: &types.Group{
 				EntityID:         1,
 				OnlineRevisionID: &revision1,
-				Category:         types.BatchFeatureCategory,
+				Category:         types.CategoryBatch,
 				Entity:           entityDevice,
 			},
 		},
@@ -233,7 +233,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 			Group: &types.Group{
 				EntityID:         1,
 				OnlineRevisionID: &revision2,
-				Category:         types.BatchFeatureCategory,
+				Category:         types.CategoryBatch,
 				Entity:           entityDevice,
 			},
 		},
@@ -244,7 +244,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 			Group: &types.Group{
 				EntityID:         2,
 				OnlineRevisionID: &revision2,
-				Category:         types.BatchFeatureCategory,
+				Category:         types.CategoryBatch,
 				Entity:           entityUser,
 			},
 		},
@@ -252,7 +252,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 	if !isAvailable {
 		for i := range features {
 			features[i].Group.OnlineRevisionID = nil
-			features[i].Group.Category = types.StreamFeatureCategory
+			features[i].Group.Category = types.CategoryStream
 		}
 	}
 

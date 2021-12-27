@@ -31,7 +31,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 
 		// apply group
 		for _, group := range stage.NewGroups {
-			group.Category = types.BatchFeatureCategory
+			group.Category = types.CategoryBatch
 			if err := s.applyGroup(c, tx, group); err != nil {
 				return err
 			}
@@ -242,7 +242,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 
 					for _, group := range entity.BatchFeatures {
 						group.Name = group.Group
-						group.Category = types.BatchFeatureCategory
+						group.Category = types.CategoryBatch
 						stage.NewGroups = append(stage.NewGroups, buildApplyGroup(group, entity.Name))
 
 						for _, feature := range group.Features {

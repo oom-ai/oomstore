@@ -42,7 +42,7 @@ func TestCreateBatchFeature(t *testing.T) {
 			group: types.Group{
 				ID:       1,
 				Name:     "device_info",
-				Category: types.BatchFeatureCategory,
+				Category: types.CategoryBatch,
 			},
 			expectError: false,
 		},
@@ -57,7 +57,7 @@ func TestCreateBatchFeature(t *testing.T) {
 			group: types.Group{
 				ID:       1,
 				Name:     "device_info",
-				Category: types.StreamFeatureCategory,
+				Category: types.CategoryStream,
 			},
 			expectError: true,
 		},
@@ -68,7 +68,7 @@ func TestCreateBatchFeature(t *testing.T) {
 			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 			metadataStore.EXPECT().GetGroupByName(ctx, tc.opt.GroupName).Return(&tc.group, nil)
 
-			if tc.group.Category == types.BatchFeatureCategory {
+			if tc.group.Category == types.CategoryBatch {
 				metadataOpt := metadata.CreateFeatureOpt{
 					FeatureName: tc.opt.FeatureName,
 					FullName:    fmt.Sprintf("%s.%s", tc.opt.GroupName, tc.opt.FeatureName),

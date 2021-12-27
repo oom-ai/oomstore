@@ -35,7 +35,7 @@ func TestGetGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 		GroupName:   "device_info",
 		EntityID:    entityID,
 		Description: "description",
-		Category:    types.BatchFeatureCategory,
+		Category:    types.CategoryBatch,
 	}
 	id, err := store.CreateGroup(ctx, opt)
 	require.NoError(t, err)
@@ -74,19 +74,19 @@ func TestListGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destr
 		GroupName:   "device_info",
 		EntityID:    deviceEntityID,
 		Description: "description",
-		Category:    types.BatchFeatureCategory,
+		Category:    types.CategoryBatch,
 	}
 	userBaseOpt := metadata.CreateGroupOpt{
 		GroupName:   "user_info",
 		EntityID:    userEntityID,
 		Description: "description",
-		Category:    types.BatchFeatureCategory,
+		Category:    types.CategoryBatch,
 	}
 	userBehaviorOpt := metadata.CreateGroupOpt{
 		GroupName:   "user_profile",
 		EntityID:    userEntityID,
 		Description: "description",
-		Category:    types.BatchFeatureCategory,
+		Category:    types.CategoryBatch,
 	}
 	deviceGroupID, err := store.CreateGroup(ctx, deviceOpt)
 	require.NoError(t, err)
@@ -137,7 +137,7 @@ func TestCreateGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 		GroupName:   "device_info",
 		EntityID:    entityID,
 		Description: "description",
-		Category:    types.BatchFeatureCategory,
+		Category:    types.CategoryBatch,
 	}
 
 	// create successfully
@@ -167,7 +167,7 @@ func TestUpdateGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 		GroupName:   "device_info",
 		EntityID:    entityID,
 		Description: "description",
-		Category:    types.BatchFeatureCategory,
+		Category:    types.CategoryBatch,
 	}
 	groupID, err := store.CreateGroup(ctx, opt)
 	require.NoError(t, err)

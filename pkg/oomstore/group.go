@@ -19,7 +19,7 @@ func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (i
 		Description: opt.Description,
 		// Via the oomstore API, we can only create a batch feature group
 		// So we hardcode the category to be batch
-		Category: types.BatchFeatureCategory,
+		Category: types.CategoryBatch,
 	})
 }
 

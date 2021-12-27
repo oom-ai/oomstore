@@ -11,7 +11,7 @@ import (
 )
 
 func createGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateGroupOpt) (int, error) {
-	if opt.Category != types.BatchFeatureCategory && opt.Category != types.StreamFeatureCategory {
+	if opt.Category != types.CategoryBatch && opt.Category != types.CategoryStream {
 		return 0, fmt.Errorf("illegal category '%s', should be either 'stream' or 'batch'", opt.Category)
 	}
 	var groupID int
