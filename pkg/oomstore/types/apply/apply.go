@@ -74,7 +74,6 @@ func FromFeatureList(features types.FeatureList) FeatureItems {
 
 type Group struct {
 	Kind        string         `mapstructure:"kind" yaml:"kind,omitempty"`
-	Group       string         `mapstructure:"group" yaml:"group,omitempty"`
 	Name        string         `mapstructure:"name" yaml:"name,omitempty"`
 	EntityName  string         `mapstructure:"entity-name" yaml:"entity-name,omitempty"`
 	Category    types.Category `mapstructure:"category" yaml:"category,omitempty"`
@@ -140,8 +139,7 @@ type Entity struct {
 	Length      int    `mapstructure:"length" yaml:"length"`
 	Description string `mapstructure:"description" yaml:"description"`
 
-	BatchFeatures  []Group   `mapstructure:"batch-features" yaml:"batch-features,omitempty"`
-	StreamFeatures []Feature `mapstructure:"stream-features" yaml:"stream-features,omitempty"`
+	Groups []Group `mapstructure:"groups" yaml:"groups,omitempty"`
 }
 
 func (e *Entity) Validate() error {
@@ -162,14 +160,11 @@ func FromEntityList(entities types.EntityList, groups *GroupItems) (items Entity
 			Name:        entity.Name,
 			Length:      entity.Length,
 			Description: entity.Description,
-			BatchFeatures: groups.Filter(func(g Group) bool {
+			Groups: groups.Filter(func(g Group) bool {
 				return g.EntityName == entity.Name
 			}).Walk(func(g Group) Group {
 				g.Kind = ""
 				g.EntityName = ""
-				g.Category = ""
-				g.Group = g.Name
-				g.Name = ""
 				return g
 			}).Items,
 		})

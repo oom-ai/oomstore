@@ -18,10 +18,11 @@ type FlattenEntity struct {
 }
 
 type FlattenGroup struct {
-	ID          int    `oomcli:"ID"`
-	Name        string `oomcli:"NAME"`
-	Entity      string `oomcli:"ENTITY"`
-	Description string `oomcli:"DESCRIPTION,truncate"`
+	ID          int            `oomcli:"ID"`
+	Name        string         `oomcli:"NAME"`
+	Entity      string         `oomcli:"ENTITY"`
+	Category    types.Category `oomcli:"CATEGORY"`
+	Description string         `oomcli:"DESCRIPTION,truncate"`
 
 	OnlineRevisionID *int      `oomcli:"ONLINE-REVISION-ID,wide"`
 	CreateTime       time.Time `oomcli:"CREATE-TIME,wide"`
@@ -101,6 +102,7 @@ func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenL
 				ID:               e.ID,
 				Name:             e.Name,
 				Entity:           e.Entity.Name,
+				Category:         e.Category,
 				Description:      e.Description,
 				OnlineRevisionID: e.OnlineRevisionID,
 				CreateTime:       e.CreateTime,
