@@ -6,12 +6,13 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func createGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateGroupOpt) (int, error) {
 	if opt.Category != types.CategoryBatch && opt.Category != types.CategoryStream {
-		return 0, fmt.Errorf("illegal category '%s', should be either 'stream' or 'batch'", opt.Category)
+		return 0, errdefs.InvalidAttribute(fmt.Errorf("illegal category '%s', should be either 'stream' or 'batch'", opt.Category))
 	}
 
 	query := "INSERT INTO feature_group(name, entity_id, category, description) VALUES(?, ?, ?, ?)"

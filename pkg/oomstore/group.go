@@ -13,13 +13,12 @@ func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (i
 	if err != nil {
 		return 0, err
 	}
+
 	return s.metadata.CreateGroup(ctx, metadata.CreateGroupOpt{
 		GroupName:   opt.GroupName,
 		EntityID:    entity.ID,
 		Description: opt.Description,
-		// Via the oomstore API, we can only create a batch feature group
-		// So we hardcode the category to be batch
-		Category: types.CategoryBatch,
+		Category:    opt.Category,
 	})
 }
 

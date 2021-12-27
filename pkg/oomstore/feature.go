@@ -52,14 +52,11 @@ func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt
 	})
 }
 
-// Create metadata of a batch feature.
-func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatureOpt) (int, error) {
+// Create metadata of a feature.
+func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt) (int, error) {
 	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return 0, err
-	}
-	if group.Category != types.CategoryBatch {
-		return 0, fmt.Errorf("expected batch feature group, got %s feature group", group.Category)
 	}
 
 	return s.metadata.CreateFeature(ctx, metadata.CreateFeatureOpt{
