@@ -24,10 +24,11 @@ func init() {
 func prepareStore(t *testing.T) (context.Context, metadata.Store) {
 	ctx := context.Background()
 
-	opt := runtime_pg.GetOpt(DATABASE)
+	opt := runtime_pg.RootOpt(DATABASE)
 	if err := postgres.CreateDatabase(ctx, *opt); err != nil {
 		t.Fatal(err)
 	}
+
 	store, err := postgres.Open(ctx, opt)
 	if err != nil {
 		t.Fatal(err)
@@ -40,7 +41,7 @@ func TestCreateDatabase(t *testing.T) {
 	t.Cleanup(runtime_pg.DestroyStore(DATABASE))
 
 	ctx := context.Background()
-	opt := runtime_pg.GetOpt(DATABASE)
+	opt := runtime_pg.RootOpt(DATABASE)
 	if err := postgres.CreateDatabase(ctx, *opt); err != nil {
 		t.Fatal(err)
 	}

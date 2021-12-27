@@ -30,24 +30,16 @@ func PrepareDB() (context.Context, *gocql.Session) {
 }
 
 func init() {
-	// "dummy" db will not actually be used during testing
-	opt := GetOpt("dummy")
-	if out, err := exec.Command(
-		"oomplay", "init", "cassandra",
-		"--port",
-		"9042",
-		"--keyspace",
-		opt.KeySpace,
-	).CombinedOutput(); err != nil {
+	if out, err := exec.Command("oomplay", "init", "cassandra").CombinedOutput(); err != nil {
 		panic(fmt.Sprintf("oomplay failed with error: %v, output: %v", err, out))
 	}
 }
 
 func GetOpt(keySpace string) *types.CassandraOpt {
 	return &types.CassandraOpt{
-		Hosts:    []string{"127.0.0.1:9042"},
-		User:     "test",
-		Password: "test",
+		Hosts:    []string{"127.0.0.1:29042"},
+		User:     "oomplay",
+		Password: "oomplay",
 		KeySpace: keySpace,
 	}
 }

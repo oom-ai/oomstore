@@ -2,7 +2,6 @@ package mysql_test
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"testing"
 
@@ -20,30 +19,14 @@ func init() {
 }
 
 func prepareStore(t *testing.T) (context.Context, offline.Store) {
-	ctx := context.Background()
-	opt := runtime_mysql.GetOpt(DATABASE)
-	db, err := dbutil.OpenMysqlDB(
-		opt.Host,
-		opt.Port,
-		opt.User,
-		opt.Password,
-		"",
-	)
+	runtime_mysql.CreateDatabase(DATABASE)
+
+	store, err := mysql.Open(runtime_mysql.GetOpt(DATABASE))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if _, err := db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", DATABASE)); err != nil {
-		t.Fatal(err)
-	}
-	db.Close()
-
-	store, err := mysql.Open(opt)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return ctx, store
+	return context.Background(), store
 }
 
 func TestPing(t *testing.T) {
