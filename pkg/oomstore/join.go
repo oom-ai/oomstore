@@ -16,11 +16,11 @@ import (
 	"github.com/spf13/cast"
 )
 
-// Get point-in-time correct feature values for each entity row.
+// ChannelJoin gets point-in-time correct feature values for each entity row.
 // Currently, this API only supports batch features.
 func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*types.JoinResult, error) {
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
-		FeatureFullNames: &opt.FeatureNames,
+		FeatureFullNames: &opt.FeatureFullNames,
 	})
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 	})
 }
 
-// Get point-in-time correct feature values for each entity row.
+// Join gets point-in-time correct feature values for each entity row.
 // The method is similar to Join, except that both input and output are files on disk.
 // Input File should contain header, the first two columns of Input File should be
 // entity_key, unix_milli, then followed by other real-time feature values.
@@ -74,9 +74,9 @@ func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) error {
 	}
 
 	joinResult, err := s.ChannelJoin(ctx, types.ChannelJoinOpt{
-		FeatureNames: opt.FeatureNames,
-		EntityRows:   entityRows,
-		ValueNames:   header[2:],
+		FeatureFullNames: opt.FeatureFullNames,
+		EntityRows:       entityRows,
+		ValueNames:       header[2:],
 	})
 	if err != nil {
 		return err

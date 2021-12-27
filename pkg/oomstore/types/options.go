@@ -55,15 +55,15 @@ type OnlineMultiGetOpt struct {
 }
 
 type ChannelJoinOpt struct {
-	FeatureNames []string
-	EntityRows   <-chan EntityRow
-	ValueNames   []string
+	FeatureFullNames []string
+	EntityRows       <-chan EntityRow
+	ValueNames       []string
 }
 
 type JoinOpt struct {
-	FeatureNames   []string
-	InputFilePath  string
-	OutputFilePath string
+	FeatureFullNames []string
+	InputFilePath    string
+	OutputFilePath   string
 }
 
 type UpdateEntityOpt struct {

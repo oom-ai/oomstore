@@ -57,8 +57,8 @@ func TestChannelJoin(t *testing.T) {
 		{
 			description: "no valid features, return nil",
 			opt: types.ChannelJoinOpt{
-				FeatureNames: streamFeatures.Names(),
-				EntityRows:   entityRows,
+				FeatureFullNames: streamFeatures.FullNames(),
+				EntityRows:       entityRows,
 			},
 			features:      streamFeatures,
 			expectedError: nil,
@@ -67,8 +67,8 @@ func TestChannelJoin(t *testing.T) {
 		{
 			description: "inconsistent features, return nil",
 			opt: types.ChannelJoinOpt{
-				FeatureNames: inconsistentFeatures.Names(),
-				EntityRows:   entityRows,
+				FeatureFullNames: inconsistentFeatures.FullNames(),
+				EntityRows:       entityRows,
 			},
 			features:      inconsistentFeatures,
 			expectedError: fmt.Errorf("inconsistent entity type: %v", map[string]string{"device": "price", "user": "age"}),
@@ -77,8 +77,8 @@ func TestChannelJoin(t *testing.T) {
 		{
 			description: "nil joined, return nil",
 			opt: types.ChannelJoinOpt{
-				FeatureNames: consistentFeatures.Names(),
-				EntityRows:   entityRows,
+				FeatureFullNames: consistentFeatures.FullNames(),
+				EntityRows:       entityRows,
 			},
 			entity:   &entity,
 			features: consistentFeatures,
@@ -93,8 +93,8 @@ func TestChannelJoin(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.ChannelJoinOpt{
-				FeatureNames: consistentFeatures.Names(),
-				EntityRows:   entityRows,
+				FeatureFullNames: consistentFeatures.FullNames(),
+				EntityRows:       entityRows,
 			},
 			entity:   &entity,
 			features: consistentFeatures,
@@ -111,7 +111,7 @@ func TestChannelJoin(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
-			metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureFullNames: &tc.opt.FeatureNames}).Return(tc.features, nil)
+			metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureFullNames: &tc.opt.FeatureFullNames}).Return(tc.features, nil)
 			if tc.entity != nil {
 				for _, featureList := range tc.featureMap {
 					metadataStore.EXPECT().ListRevision(gomock.Any(), &featureList[0].GroupID).Return(revisions, nil).AnyTimes()
