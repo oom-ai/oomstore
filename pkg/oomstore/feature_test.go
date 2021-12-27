@@ -15,7 +15,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func TestCreateBatchFeature(t *testing.T) {
+func TestCreateFeature(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	ctx := context.Background()
@@ -29,7 +29,6 @@ func TestCreateBatchFeature(t *testing.T) {
 		opt         types.CreateFeatureOpt
 		valueType   types.ValueType
 		group       types.Group
-		expectError bool
 	}{
 		{
 			description: "create batch feature, succeed",
@@ -44,10 +43,9 @@ func TestCreateBatchFeature(t *testing.T) {
 				Name:     "device_info",
 				Category: types.CategoryBatch,
 			},
-			expectError: false,
 		},
 		{
-			description: "create stream feature, fail",
+			description: "create stream feature, succeed",
 			opt: types.CreateFeatureOpt{
 				FeatureName: "model",
 				GroupName:   "device_info",
@@ -59,7 +57,6 @@ func TestCreateBatchFeature(t *testing.T) {
 				Name:     "device_info",
 				Category: types.CategoryStream,
 			},
-			expectError: true,
 		},
 	}
 
@@ -68,22 +65,17 @@ func TestCreateBatchFeature(t *testing.T) {
 			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 			metadataStore.EXPECT().GetGroupByName(ctx, tc.opt.GroupName).Return(&tc.group, nil)
 
-			if tc.group.Category == types.CategoryBatch {
-				metadataOpt := metadata.CreateFeatureOpt{
-					FeatureName: tc.opt.FeatureName,
-					FullName:    fmt.Sprintf("%s.%s", tc.opt.GroupName, tc.opt.FeatureName),
-					GroupID:     tc.group.ID,
-					ValueType:   tc.valueType,
-					Description: tc.opt.Description,
-				}
-				metadataStore.EXPECT().CreateFeature(ctx, metadataOpt).Return(0, nil)
+			metadataOpt := metadata.CreateFeatureOpt{
+				FeatureName: tc.opt.FeatureName,
+				FullName:    fmt.Sprintf("%s.%s", tc.opt.GroupName, tc.opt.FeatureName),
+				GroupID:     tc.group.ID,
+				ValueType:   tc.valueType,
+				Description: tc.opt.Description,
 			}
-			_, err := store.CreateBatchFeature(ctx, tc.opt)
-			if tc.expectError {
-				assert.Error(t, err, fmt.Errorf("expected batch feature group, got %s feature group", tc.group.Category))
-			} else {
-				assert.NoError(t, err)
-			}
+			metadataStore.EXPECT().CreateFeature(ctx, metadataOpt).Return(0, nil)
+
+			_, err := store.CreateFeature(ctx, tc.opt)
+			assert.NoError(t, err)
 		})
 	}
 }
