@@ -36,8 +36,12 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 			GroupName: &revision.Group.Name,
 		})
 	} else {
+		fullNames := make([]string, 0, len(opt.FeatureNames))
+		for _, name := range opt.FeatureNames {
+			fullNames = append(fullNames, fmt.Sprintf("%s.%s", revision.Group.Name, name))
+		}
 		features, err = s.ListFeature(ctx, types.ListFeatureOpt{
-			FeatureNames: &opt.FeatureNames,
+			FeatureFullNames: &fullNames,
 		})
 	}
 	if err != nil {

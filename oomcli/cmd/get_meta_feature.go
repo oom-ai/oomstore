@@ -28,7 +28,7 @@ var getMetaFeatureCmd = &cobra.Command{
 			getMetaFeatureOpt.GroupName = nil
 		}
 		if len(args) == 1 {
-			getMetaFeatureOpt.FeatureNames = &[]string{args[0]}
+			getMetaFeatureOpt.FeatureFullNames = &[]string{args[0]}
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -61,8 +61,8 @@ func queryFeatures(ctx context.Context, oomStore *oomstore.OomStore, opt types.L
 		return nil, fmt.Errorf("failed getting features, error %v\n", err)
 	}
 
-	if opt.FeatureNames != nil && len(features) == 0 {
-		return nil, fmt.Errorf("feature '%s' not found", (*opt.FeatureNames)[0])
+	if opt.FeatureFullNames != nil && len(features) == 0 {
+		return nil, fmt.Errorf("feature '%s' not found", (*opt.FeatureFullNames)[0])
 	}
 
 	return features, nil

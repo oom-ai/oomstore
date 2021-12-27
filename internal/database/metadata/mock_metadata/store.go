@@ -172,18 +172,18 @@ func (mr *MockStoreMockRecorder) GetFeature(ctx, id interface{}) *gomock.Call {
 }
 
 // GetFeatureByName mocks base method.
-func (m *MockStore) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
+func (m *MockStore) GetFeatureByName(ctx context.Context, fullName string) (*types.Feature, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFeatureByName", ctx, name)
+	ret := m.ctrl.Call(m, "GetFeatureByName", ctx, fullName)
 	ret0, _ := ret[0].(*types.Feature)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFeatureByName indicates an expected call of GetFeatureByName.
-func (mr *MockStoreMockRecorder) GetFeatureByName(ctx, name interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) GetFeatureByName(ctx, fullName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockStore)(nil).GetFeatureByName), ctx, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockStore)(nil).GetFeatureByName), ctx, fullName)
 }
 
 // GetGroup mocks base method.
@@ -534,18 +534,18 @@ func (mr *MockDBStoreMockRecorder) GetFeature(ctx, id interface{}) *gomock.Call 
 }
 
 // GetFeatureByName mocks base method.
-func (m *MockDBStore) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
+func (m *MockDBStore) GetFeatureByName(ctx context.Context, fullName string) (*types.Feature, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFeatureByName", ctx, name)
+	ret := m.ctrl.Call(m, "GetFeatureByName", ctx, fullName)
 	ret0, _ := ret[0].(*types.Feature)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFeatureByName indicates an expected call of GetFeatureByName.
-func (mr *MockDBStoreMockRecorder) GetFeatureByName(ctx, name interface{}) *gomock.Call {
+func (mr *MockDBStoreMockRecorder) GetFeatureByName(ctx, fullName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockDBStore)(nil).GetFeatureByName), ctx, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockDBStore)(nil).GetFeatureByName), ctx, fullName)
 }
 
 // GetGroup mocks base method.

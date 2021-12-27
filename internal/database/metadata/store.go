@@ -29,7 +29,7 @@ type DBStore interface {
 	CreateFeature(ctx context.Context, opt CreateFeatureOpt) (int, error)
 	UpdateFeature(ctx context.Context, opt UpdateFeatureOpt) error
 	GetFeature(ctx context.Context, id int) (*types.Feature, error)
-	GetFeatureByName(ctx context.Context, name string) (*types.Feature, error)
+	GetFeatureByName(ctx context.Context, fullName string) (*types.Feature, error)
 	ListFeature(ctx context.Context, opt ListFeatureOpt) (types.FeatureList, error)
 
 	// feature group

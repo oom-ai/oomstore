@@ -34,11 +34,11 @@ func (c *FeatureCache) List(opt metadata.ListFeatureOpt) types.FeatureList {
 	}
 
 	// filter names
-	if opt.FeatureNames != nil {
+	if opt.FeatureFullNames != nil {
 		var tmp types.FeatureList
-		for _, name := range *opt.FeatureNames {
+		for _, fullName := range *opt.FeatureFullNames {
 			if f := features.Find(func(f *types.Feature) bool {
-				return f.Name == name
+				return f.FullName == fullName
 			}); f != nil {
 				tmp = append(tmp, f)
 			}
