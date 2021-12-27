@@ -130,6 +130,7 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 		}
 		_, err = tx.CreateFeature(ctx, metadata.CreateFeatureOpt{
 			FeatureName: newFeature.Name,
+			FullName:    fmt.Sprintf("%s.%s", group.Name, newFeature.Name),
 			GroupID:     group.ID,
 			Description: newFeature.Description,
 			ValueType:   valueType,

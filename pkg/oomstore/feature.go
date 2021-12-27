@@ -64,7 +64,7 @@ func (s *OomStore) CreateBatchFeature(ctx context.Context, opt types.CreateFeatu
 
 	return s.metadata.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: opt.FeatureName,
-		FullName:    fmt.Sprintf("%s:%s", group.Name, opt.FeatureName),
+		FullName:    fmt.Sprintf("%s.%s", group.Name, opt.FeatureName),
 		GroupID:     group.ID,
 		ValueType:   opt.ValueType,
 		Description: opt.Description,
