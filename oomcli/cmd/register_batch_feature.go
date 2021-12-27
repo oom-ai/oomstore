@@ -28,7 +28,7 @@ var registerBatchFeatureCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if _, err := oomStore.CreateBatchFeature(ctx, registerBatchFeatureOpt); err != nil {
+		if _, err := oomStore.CreateFeature(ctx, registerBatchFeatureOpt); err != nil {
 			log.Fatalf("failed registering new feature: %v\n", err)
 		}
 	},

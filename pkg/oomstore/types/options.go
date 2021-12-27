@@ -27,6 +27,7 @@ type CreateEntityOpt struct {
 type CreateGroupOpt struct {
 	GroupName   string
 	EntityName  string
+	Category    Category
 	Description string
 }
 
