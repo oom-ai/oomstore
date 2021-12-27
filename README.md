@@ -68,8 +68,9 @@ kind: Entity
 name: user
 length: 8
 description: 'user ID'
-batch-features:
-- group: account
+groups:
+- name: account
+  category: batch
   description: 'user account info'
   features:
   - name: state
@@ -80,7 +81,8 @@ batch-features:
     value-type: int64
   - name: has_2fa_installed
     value-type: bool
-- group: transaction_stats
+- name: transaction_stats
+  category: batch
   description: 'user transaction statistics'
   features:
   - name: transaction_count_7d

@@ -2,8 +2,9 @@
 kind: Entity
 name: driver
 length: 2
-batch-features:
-  - group: driver_stats
+groups:
+  - name: driver_stats
+    category: batch
     features:
       - name: conv_rate
         value-type: float64
