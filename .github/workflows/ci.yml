@@ -48,7 +48,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      oomplay-version: '0.3.2'
+      oomplay-version: '0.4.1'
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2

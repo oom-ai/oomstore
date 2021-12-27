@@ -2,7 +2,6 @@ package postgres_test
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"testing"
 
@@ -20,21 +19,14 @@ func init() {
 }
 
 func prepareStore(t *testing.T) (context.Context, offline.Store) {
-	ctx, db := runtime_pg.PrepareDB(t, DATABASE)
-	opt := runtime_pg.GetOpt(DATABASE)
+	runtime_pg.CreateDatabase(DATABASE)
 
-	_, err := db.ExecContext(context.Background(), fmt.Sprintf("CREATE DATABASE %s", opt.Database))
-	if err != nil {
-		t.Fatal(err)
-	}
-	db.Close()
-
-	store, err := postgres.Open(opt)
+	store, err := postgres.Open(runtime_pg.GetOpt(DATABASE))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	return ctx, store
+	return context.Background(), store
 }
 
 func TestPing(t *testing.T) {

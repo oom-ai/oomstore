@@ -24,6 +24,7 @@ func init() {
 func prepareStore(t *testing.T) (context.Context, metadata.Store) {
 	ctx := context.Background()
 	opt := runtime_mysql.GetOpt(DATABASE)
+
 	if err := mysql.CreateDatabase(ctx, *opt); err != nil {
 		t.Fatal(err)
 	}

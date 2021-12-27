@@ -11,10 +11,7 @@ import (
 )
 
 func init() {
-	if out, err := exec.Command(
-		"oomplay", "init", "dynamodb",
-		"--port", "4566",
-	).CombinedOutput(); err != nil {
+	if out, err := exec.Command("oomplay", "init", "dynamodb").CombinedOutput(); err != nil {
 		panic(fmt.Sprintf("oomplay failed with error: %v, output: %s", err, out))
 	}
 }
@@ -30,7 +27,7 @@ func PrepareDB(t *testing.T) (context.Context, *dynamodb.DB) {
 func GetOpt() *types.DynamoDBOpt {
 	return &types.DynamoDBOpt{
 		Region:          ".",
-		EndpointURL:     "http://localhost:4566",
+		EndpointURL:     "http://localhost:24566",
 		AccessKeyID:     ".",
 		SecretAccessKey: ".",
 		SessionToken:    ".",
