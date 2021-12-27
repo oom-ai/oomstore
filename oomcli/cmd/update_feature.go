@@ -15,7 +15,7 @@ var updateFeatureCmd = &cobra.Command{
 	Short: "Update a particular feature",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
-		updateFeatureOpt.FeatureName = args[0]
+		updateFeatureOpt.FeatureFullName = args[0]
 		if !cmd.Flags().Changed("description") {
 			updateFeatureOpt.NewDescription = nil
 		}
@@ -26,7 +26,7 @@ var updateFeatureCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if err := oomStore.UpdateFeature(ctx, updateFeatureOpt); err != nil {
-			log.Fatalf("failed to update feature %s, err %v\n", updateFeatureOpt.FeatureName, err)
+			log.Fatalf("failed to update feature %s, err %v\n", updateFeatureOpt.FeatureFullName, err)
 		}
 	},
 }

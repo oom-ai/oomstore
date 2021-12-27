@@ -29,7 +29,7 @@ var editFeatureCmd = &cobra.Command{
 		if len(args) > 1 {
 			log.Fatalf("argument at most one, got %d", len(args))
 		} else if len(args) == 1 {
-			editFeatureOpt.FeatureNames = &[]string{args[0]}
+			editFeatureOpt.FeatureFullNames = &[]string{args[0]}
 		}
 
 	},

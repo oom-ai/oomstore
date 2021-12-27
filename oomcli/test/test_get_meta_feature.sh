@@ -31,12 +31,12 @@ expected='
 ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION,ONLINE-REVISION-ID
 2,model,phone,device,batch,string,model,<NULL>
 '
-actual=$(oomcli get meta feature model -o csv --wide)
+actual=$(oomcli get meta feature phone.model -o csv --wide)
 ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }
 assert_eq "$case" "$(sort <<< "$expected")" "$(ignore_time "$actual" | sort)"
 
 
-case='oomcli get meta feature: one feature'
+case='oomcli get meta feature in yaml: one feature'
 expected='
 kind: Feature
 name: model
@@ -45,7 +45,7 @@ value-type: string
 description: model
 '
 
-actual=$(oomcli get meta feature model -o yaml)
+actual=$(oomcli get meta feature phone.model -o yaml)
 assert_eq "$case" "$expected" "$actual"
 
 case='oomcli get meta feature: multiple features'
