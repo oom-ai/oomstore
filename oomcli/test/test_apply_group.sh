@@ -31,11 +31,11 @@ features:
 EOF
 
     group_expected='
-ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,device,user,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+ID,NAME,ENTITY,CATEGORY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,device,user,batch,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
     group_actual=$(oomcli get meta group -o csv --wide)
-    filter() { cut -d ',' -f 1-4 <<<"$1"; }
+    filter() { cut -d ',' -f 1-5 <<<"$1"; }
     assert_eq "apply_single_complex_group: check group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 
     feature_expected='
@@ -71,12 +71,12 @@ description: 'description'
 EOF
 
     group_expected='
-ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,device,user,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
-2,account,user,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+ID,NAME,ENTITY,CATEGORY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,device,user,batch,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+2,account,user,batch,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
     group_actual=$(oomcli get meta group -o csv --wide)
-    filter() { cut -d ',' -f 1-4 <<<"$1"; }
+    filter() { cut -d ',' -f 1-5 <<<"$1"; }
     assert_eq "apply_multiple_files_of_group: check group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 }
 
@@ -140,14 +140,14 @@ items:
 EOF
 
     group_expected='
-ID,NAME,ENTITY,DESCRIPTION
-1,account,user,user account info
-2,transaction_stats,user,user transaction statistics
-3,phone,device,phone info
+ID,NAME,ENTITY,CATEGORY,DESCRIPTION
+1,account,user,batch,user account info
+2,transaction_stats,user,batch,user transaction statistics
+3,phone,device,batch,phone info
 '
     group_actual=$(oomcli get meta group -o csv --wide)
-    filter() { cut -d ',' -f 1-4 <<<"$1"; }
-    assert_eq "apply_single_complex_group: check features" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
+    filter() { cut -d ',' -f 1-5 <<<"$1"; }
+    assert_eq "apply_single_complex_group: check group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 
     feature_expected='
 ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION

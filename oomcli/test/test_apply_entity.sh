@@ -10,8 +10,9 @@ kind: Entity
 name: user
 length: 8
 description: 'description'
-batch-features:
-- group: device
+groups:
+- name: device
+  category: batch
   description: a description
   features:
   - name: model
@@ -20,7 +21,8 @@ batch-features:
   - name: price
     value-type: int64
     description: 'description'
-- group: user
+- name: user
+  category: batch
   description: a description
   features:
   - name: age
@@ -39,12 +41,12 @@ ID,NAME,LENGTH,DESCRIPTION
     assert_eq "apply_single_complex_entity: check entity" "$(sort <<< "$entity_expected")" "$(sort <<< "$entity_actual")"
 
     group_expected='
-ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,device,user,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
-2,user,user,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+ID,NAME,ENTITY,CATEGORY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,device,user,batch,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+2,user,user,batch,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
     group_actual=$(oomcli get meta group -o csv --wide)
-    filter() { cut -d ',' -f 1-4 <<<"$1"; }
+    filter() { cut -d ',' -f 1-5 <<<"$1"; }
     assert_eq "apply_single_complex_entity: check group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 
     feature_expected='
@@ -66,8 +68,9 @@ kind: Entity
 name: user
 length: 8
 description: 'description'
-batch-features:
-- group: student
+groups:
+- name: student
+  category: batch
   description: student feature group
 ---
 kind: Entity
@@ -92,11 +95,11 @@ ID,NAME,LENGTH,DESCRIPTION
     assert_eq "apply_multiple_files_of_entity: oomcli get meta entity" "$entity_expected" "$entity_actual"
 
     group_expected='
-ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,student,user,student feature group,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+ID,NAME,ENTITY,CATEGORY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,student,user,batch,student feature group,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
     group_actual=$(oomcli get meta group -o csv --wide)
-    filter() { cut -d ',' -f 1-4 <<<"$1"; }
+    filter() { cut -d ',' -f 1-5 <<<"$1"; }
     assert_eq "oapply_multiple_files_of_entity: check group" "$(filter "$group_expected"| sort)" "$(filter "$group_actual" | sort)"
 }
 
@@ -109,8 +112,9 @@ items:
     name: user
     length: 8
     description: user ID
-    batch-features:
-      - group: account
+    groups:
+      - name: account
+        category: batch
         description: user account info
         features:
           - name: credit_score
@@ -122,7 +126,8 @@ items:
           - name: has_2fa_installed
             value-type: bool
             description: has_2fa_installed description
-      - group: transaction_stats
+      - name: transaction_stats
+        category: batch
         description: user transaction statistics
         features:
           - name: transaction_count_7d
@@ -135,8 +140,9 @@ items:
     name: device
     length: 8
     description: device info
-    batch-features:
-      - group: phone
+    groups:
+      - name: phone
+        category: batch
         description: phone info
         features:
           - name: model
@@ -156,10 +162,10 @@ ID,NAME,LENGTH,DESCRIPTION
       assert_eq "apply_entity_items: oomcli apply mutiple entity: check entity" "$(sort <<< "$entity_expected")" "$(sort <<< "$entity_actual")"
 
     group_expected='
-ID,NAME,ENTITY,DESCRIPTION
-1,account,user,user account info
-2,transaction_stats,user,user transaction statistics
-3,phone,device,phone info
+ID,NAME,ENTITY,CATEGORY,DESCRIPTION
+1,account,user,batch,user account info
+2,transaction_stats,user,batch,user transaction statistics
+3,phone,device,batch,phone info
 '
       group_actual=$(oomcli get meta group -o csv)
       assert_eq "apply_entity_items: oomcli apply multiple entity: check group" "$group_expected" "$group_actual"

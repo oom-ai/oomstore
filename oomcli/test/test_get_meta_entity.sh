@@ -30,8 +30,9 @@ kind: Entity
 name: device
 length: 32
 description: device
-batch-features:
-    - group: phone
+groups:
+    - name: phone
+      category: batch
       description: phone
       features:
         - name: price
@@ -52,8 +53,9 @@ items:
       name: device
       length: 32
       description: device
-      batch-features:
-        - group: phone
+      groups:
+        - name: phone
+          category: batch
           description: phone
           features:
             - name: price
@@ -66,13 +68,17 @@ items:
       name: user
       length: 64
       description: user
-      batch-features:
-        - group: student
+      groups:
+        - name: student
+          category: batch
           description: student
           features:
             - name: age
               value-type: int64
               description: age
+        - name: user-click
+          category: stream
+          description: user click post feature
 '
 
 actual=$(oomcli get meta entity -o yaml)
