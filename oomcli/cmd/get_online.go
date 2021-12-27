@@ -43,7 +43,7 @@ func init() {
 	flags.StringVarP(&onlineGetOpt.EntityKey, "entity-key", "k", "", "entity keys")
 	_ = getOnlineCmd.MarkFlagRequired("entity-key")
 
-	flags.StringSliceVar(&onlineGetOpt.FeatureNames, "feature", nil, "feature names")
+	flags.StringSliceVar(&onlineGetOpt.FeatureFullNames, "feature", nil, "feature full names")
 	_ = getOnlineCmd.MarkFlagRequired("feature")
 }
 
@@ -59,7 +59,7 @@ func printOnlineFeatures(featureValues *types.FeatureValues, output string) erro
 }
 
 func printOnlineFeaturesInCSV(featureValues *types.FeatureValues) error {
-	header := append([]string{featureValues.EntityName}, featureValues.FeatureNames...)
+	header := append([]string{featureValues.EntityName}, featureValues.FeatureFullNames...)
 	record := append([]string{featureValues.EntityKey}, cast.ToStringSlice(featureValues.FeatureValueSlice())...)
 
 	w := csv.NewWriter(os.Stdout)
@@ -74,7 +74,7 @@ func printOnlineFeaturesInCSV(featureValues *types.FeatureValues) error {
 }
 
 func printOnlineFeaturesInASCIITable(featureValues *types.FeatureValues) error {
-	header := append([]string{featureValues.EntityName}, featureValues.FeatureNames...)
+	header := append([]string{featureValues.EntityName}, featureValues.FeatureFullNames...)
 	record := append([]string{featureValues.EntityKey}, cast.ToStringSlice(featureValues.FeatureValueSlice())...)
 
 	table := tablewriter.NewWriter(os.Stdout)
