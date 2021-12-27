@@ -83,7 +83,7 @@ func deserializeIntoRowMap(values []interface{}, features types.FeatureList, bac
 		if err != nil {
 			return nil, err
 		}
-		rs[features[i].Name] = typedValue
+		rs[features[i].FullName] = typedValue
 	}
 	return rs, nil
 }
