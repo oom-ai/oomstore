@@ -146,6 +146,7 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreFn, destroyStor
 
 	_, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "phone",
+		FullName:    "device_info.phone",
 		GroupID:     groupID,
 		Description: "description",
 		ValueType:   types.String,
@@ -157,11 +158,12 @@ func TestGetFeatureByName(t *testing.T, prepareStore PrepareStoreFn, destroyStor
 	assert.EqualError(t, err, "feature p not found")
 
 	// case 2: correct feature name, return feature `phone`
-	feature, err := store.GetFeatureByName(ctx, "phone")
+	feature, err := store.GetFeatureByName(ctx, "device_info.phone")
 	assert.NoError(t, err)
 	expected := &types.Feature{
 		ID:          1,
 		Name:        "phone",
+		FullName:    "device_info.phone",
 		ValueType:   types.String,
 		Description: "description",
 		GroupID:     1,
@@ -183,6 +185,7 @@ func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStor
 
 	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "phone",
+		FullName:    "device_info.phone",
 		GroupID:     groupID,
 		Description: "description",
 		ValueType:   types.String,
@@ -226,6 +229,13 @@ func TestCacheListFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStor
 		EntityID: &entityID,
 	})
 	assert.Equal(t, 1, len(features))
+
+	// case 8: list features by FeatureFullNames
+	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
+		FeatureFullNames: &[]string{"device_info.phone"},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(features))
 }
 
 func TestListFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
@@ -242,6 +252,7 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 
 	featureID, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: "phone",
+		FullName:    "device_info.phone",
 		GroupID:     groupID,
 		Description: "description",
 		ValueType:   types.String,
@@ -287,6 +298,13 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 	// case 7: list features by EntityID
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
 		EntityID: &entityID,
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(features))
+
+	// case 8: list features by FeatureFullNames
+	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
+		FeatureFullNames: &[]string{"device_info.phone"},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(features))
