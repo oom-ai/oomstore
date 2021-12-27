@@ -27,7 +27,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 	}
 
 	features = features.Filter(func(f *types.Feature) bool {
-		return f.Group.Category == types.BatchFeatureCategory
+		return f.Group.Category == types.CategoryBatch
 	})
 	if len(features) == 0 {
 		return nil, nil

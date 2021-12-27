@@ -73,13 +73,13 @@ func FromFeatureList(features types.FeatureList) FeatureItems {
 }
 
 type Group struct {
-	Kind        string    `mapstructure:"kind" yaml:"kind,omitempty"`
-	Group       string    `mapstructure:"group" yaml:"group,omitempty"`
-	Name        string    `mapstructure:"name" yaml:"name,omitempty"`
-	EntityName  string    `mapstructure:"entity-name" yaml:"entity-name,omitempty"`
-	Category    string    `mapstructure:"category" yaml:"category,omitempty"`
-	Description string    `mapstructure:"description" yaml:"description"`
-	Features    []Feature `mapstructure:"features" yaml:"features,omitempty"`
+	Kind        string         `mapstructure:"kind" yaml:"kind,omitempty"`
+	Group       string         `mapstructure:"group" yaml:"group,omitempty"`
+	Name        string         `mapstructure:"name" yaml:"name,omitempty"`
+	EntityName  string         `mapstructure:"entity-name" yaml:"entity-name,omitempty"`
+	Category    types.Category `mapstructure:"category" yaml:"category,omitempty"`
+	Description string         `mapstructure:"description" yaml:"description"`
+	Features    []Feature      `mapstructure:"features" yaml:"features,omitempty"`
 }
 
 type GroupItems struct {

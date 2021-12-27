@@ -5,9 +5,9 @@ import (
 )
 
 type Group struct {
-	ID       int    `db:"id"`
-	Name     string `db:"name"`
-	Category string `db:"category"`
+	ID       int      `db:"id"`
+	Name     string   `db:"name"`
+	Category Category `db:"category"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`

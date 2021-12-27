@@ -33,7 +33,7 @@ type FlattenFeature struct {
 	Name        string          `oomcli:"NAME"`
 	Group       string          `oomcli:"GROUP"`
 	Entity      string          `oomcli:"ENTITY"`
-	Category    string          `oomcli:"CATEGORY"`
+	Category    types.Category  `oomcli:"CATEGORY"`
 	ValueType   types.ValueType `oomcli:"VALUE-TYPE"`
 	Description string          `oomcli:"DESCRIPTION,truncate"`
 

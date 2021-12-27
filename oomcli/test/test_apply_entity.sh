@@ -55,7 +55,7 @@ ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
 4,gender,user,user,batch,int64,description
 '
     feature_actual=$(oomcli get meta feature -o csv)
-    assert_eq "apply_single_complex_entity(: check feature" "$(sort <<< "$feature_expected")" "$(sort <<< "$feature_actual")"
+    assert_eq "apply_single_complex_entity: check feature" "$(sort <<< "$feature_expected")" "$(sort <<< "$feature_actual")"
 }
 
 apply_multiple_files_of_entity() {

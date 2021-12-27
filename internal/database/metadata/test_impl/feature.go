@@ -27,7 +27,7 @@ func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Sto
 		GroupName:   "device_info",
 		EntityID:    entityID,
 		Description: "description",
-		Category:    types.BatchFeatureCategory,
+		Category:    types.CategoryBatch,
 	})
 	require.NoError(t, err)
 	require.NoError(t, store.Refresh())
