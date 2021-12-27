@@ -70,18 +70,6 @@ integration-test: codegen
 lint:
 	@golangci-lint run
 
-.PHONY: start_playground
-start_playground:
-	@playground/start.sh '$(db)'
-
-.PHONY: stop_playground
-stop_playground:
-	@playground/stop.sh '$(db)'
-
-.PHONY: restart_playground
-restart_playground:
-	@playground/restart.sh '$(db)'
-
 .PHONY: clean
 clean:
 	$(MAKE) -C oomcli clean
