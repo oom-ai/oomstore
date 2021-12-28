@@ -32,6 +32,7 @@ type OnlineStoreConfig struct {
 	MySQL     *MySQLOpt     `yaml:"mysql"`
 	DynamoDB  *DynamoDBOpt  `yaml:"dynamodb"`
 	Cassandra *CassandraOpt `yaml:"cassandra"`
+	TiDB      *MySQLOpt     `yaml:"tidb"`
 }
 
 type OfflineStoreConfig struct {
@@ -41,6 +42,7 @@ type OfflineStoreConfig struct {
 	Snowflake *SnowflakeOpt `yaml:"snowflake"`
 	BigQuery  *BigQueryOpt  `yaml:"bigquery"`
 	Redshift  *RedshiftOpt  `yaml:"redshift"`
+	TiDB      *MySQLOpt     `yaml:"tidb"`
 }
 
 type MetadataStoreConfig struct {
@@ -48,6 +50,7 @@ type MetadataStoreConfig struct {
 	Postgres *PostgresOpt `yaml:"postgres"`
 	MySQL    *MySQLOpt    `yaml:"mysql"`
 	SQLite   *SQLiteOpt   `yaml:"sqlite"`
+	TiDB     *MySQLOpt    `yaml:"tidb"`
 }
 
 type RedisOpt struct {
