@@ -90,9 +90,9 @@ func TestChannelExport(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 			revision := types.Revision{
-				ID:        1,
-				GroupID:   1,
-				DataTable: "device_info_10",
+				ID:            1,
+				GroupID:       1,
+				SnapshotTable: "device_info_10",
 				Group: &types.Group{
 					Name:     "device_info",
 					ID:       1,
@@ -111,10 +111,10 @@ func TestChannelExport(t *testing.T) {
 			metadataStore.EXPECT().ListFeature(gomock.Any(), gomock.Any()).Return(features, nil)
 
 			offlineStore.EXPECT().Export(gomock.Any(), offline.ExportOpt{
-				DataTable:  "device_info_10",
-				EntityName: "device",
-				Features:   features,
-				Limit:      tc.opt.Limit,
+				SnapshotTable: "device_info_10",
+				EntityName:    "device",
+				Features:      features,
+				Limit:         tc.opt.Limit,
 			}).Return(tc.exportStream, tc.exportError)
 
 			// execute and compare results

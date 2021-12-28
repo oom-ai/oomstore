@@ -112,16 +112,16 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int) ([]*met
 	var ranges []*metadata.RevisionRange
 	for i := 1; i < len(revisions); i++ {
 		ranges = append(ranges, &metadata.RevisionRange{
-			MinRevision: revisions[i-1].Revision,
-			MaxRevision: revisions[i].Revision,
-			DataTable:   revisions[i-1].DataTable,
+			MinRevision:   revisions[i-1].Revision,
+			MaxRevision:   revisions[i].Revision,
+			SnapshotTable: revisions[i-1].SnapshotTable,
 		})
 	}
 
 	return append(ranges, &metadata.RevisionRange{
-		MinRevision: revisions[len(revisions)-1].Revision,
-		MaxRevision: math.MaxInt64,
-		DataTable:   revisions[len(revisions)-1].DataTable,
+		MinRevision:   revisions[len(revisions)-1].Revision,
+		MaxRevision:   math.MaxInt64,
+		SnapshotTable: revisions[len(revisions)-1].SnapshotTable,
 	}), nil
 }
 

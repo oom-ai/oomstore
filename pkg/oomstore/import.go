@@ -56,23 +56,23 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 		return 0, fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
-	newRevisionID, dataTableName, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:    0,
-		GroupID:     opt.group.ID,
-		DataTable:   nil,
-		Description: opt.Description,
-		Anchored:    opt.Revision != nil,
+	newRevisionID, snapshotTableName, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
+		Revision:      0,
+		GroupID:       opt.group.ID,
+		SnapshotTable: nil,
+		Description:   opt.Description,
+		Anchored:      opt.Revision != nil,
 	})
 	if err != nil {
 		return 0, err
 	}
 
 	revision, err := s.offline.Import(ctx, offline.ImportOpt{
-		Entity:        opt.entity,
-		Features:      opt.features,
-		Header:        header,
-		Revision:      opt.Revision,
-		DataTableName: dataTableName,
+		Entity:            opt.entity,
+		Features:          opt.features,
+		Header:            header,
+		Revision:          opt.Revision,
+		SnapshotTableName: snapshotTableName,
 		Source: &offline.CSVSource{
 			Reader:    reader,
 			Delimiter: dataSource.Delimiter,
@@ -127,11 +127,11 @@ func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt, dataSour
 		revision = *opt.Revision
 	}
 	newRevisionID, _, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:    revision,
-		GroupID:     opt.group.ID,
-		DataTable:   &dataSource.TableName,
-		Description: opt.Description,
-		Anchored:    opt.Revision != nil,
+		Revision:      revision,
+		GroupID:       opt.group.ID,
+		SnapshotTable: &dataSource.TableName,
+		Description:   opt.Description,
+		Anchored:      opt.Revision != nil,
 	})
 	if err != nil {
 		return 0, err
