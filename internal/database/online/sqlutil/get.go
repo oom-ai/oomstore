@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -13,7 +14,7 @@ import (
 
 func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.BackendType) (dbutil.RowMap, error) {
 	featureNames := opt.FeatureList.Names()
-	tableName := OnlineTableName(opt.RevisionID)
+	tableName := OnlineBatchTableName(opt.RevisionID)
 	qt, err := dbutil.QuoteFn(backend)
 	if err != nil {
 		return nil, err
@@ -38,7 +39,7 @@ func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.Back
 // response: map[entity_key]map[feature_name]feature_value
 func MultiGet(ctx context.Context, db *sqlx.DB, opt online.MultiGetOpt, backend types.BackendType) (map[string]dbutil.RowMap, error) {
 	featureNames := opt.FeatureList.Names()
-	tableName := OnlineTableName(opt.RevisionID)
+	tableName := OnlineBatchTableName(opt.RevisionID)
 	qt, err := dbutil.QuoteFn(backend)
 	if err != nil {
 		return nil, err

@@ -18,7 +18,7 @@ const (
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	// Step 1: create table
-	tableName := sqlutil.OnlineTableName(opt.Revision.ID)
+	tableName := sqlutil.OnlineBatchTableName(opt.Revision.ID)
 	_, err := db.CreateTable(ctx, &dynamodb.CreateTableInput{
 		TableName: aws.String(tableName),
 		KeySchema: []types.KeySchemaElement{

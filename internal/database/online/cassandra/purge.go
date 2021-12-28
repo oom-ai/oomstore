@@ -8,6 +8,6 @@ import (
 )
 
 func (db *DB) Purge(ctx context.Context, revisionID int) error {
-	return db.Query(fmt.Sprintf("DROP TABLE IF EXISTS %s", sqlutil.OnlineTableName(revisionID))).
+	return db.Query(fmt.Sprintf("DROP TABLE IF EXISTS %s", sqlutil.OnlineBatchTableName(revisionID))).
 		WithContext(ctx).Exec()
 }

@@ -8,8 +8,8 @@ import (
 
 const BatchSize = 10
 
-func OnlineTableName(revisionID int) string {
-	return fmt.Sprintf("online_%d", revisionID)
+func OnlineBatchTableName(revisionID int) string {
+	return fmt.Sprintf("online_batch_%d", revisionID)
 }
 
 func deserializeByTag(i interface{}, valueType types.ValueType, backend types.BackendType) (interface{}, error) {

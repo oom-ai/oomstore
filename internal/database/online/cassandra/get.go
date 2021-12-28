@@ -14,7 +14,7 @@ import (
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
-	tableName := sqlutil.OnlineTableName(opt.RevisionID)
+	tableName := sqlutil.OnlineBatchTableName(opt.RevisionID)
 
 	query := fmt.Sprintf(`SELECT %s FROM %s WHERE %s = ?`,
 		strings.Join(opt.FeatureList.Names(), ","),
@@ -39,7 +39,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
 	var (
-		tableName    = sqlutil.OnlineTableName(opt.RevisionID)
+		tableName    = sqlutil.OnlineBatchTableName(opt.RevisionID)
 		placeholders = getPlaceholders(len(opt.EntityKeys))
 	)
 

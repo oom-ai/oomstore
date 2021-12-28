@@ -14,7 +14,7 @@ func Purge(ctx context.Context, db *sqlx.DB, revisionID int, backend types.Backe
 	if err != nil {
 		return err
 	}
-	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, qt(OnlineTableName(revisionID)))
+	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, qt(OnlineBatchTableName(revisionID)))
 	if _, err := db.ExecContext(ctx, query); err != nil {
 		return err
 	}
