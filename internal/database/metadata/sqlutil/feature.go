@@ -92,6 +92,7 @@ func ListFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 	if len(cond) > 0 {
 		query = fmt.Sprintf("%s WHERE %s", query, strings.Join(cond, " AND "))
 	}
+	query = fmt.Sprintf("%s ORDER BY id ASC", query)
 	if err := sqlxCtx.SelectContext(ctx, &features, sqlxCtx.Rebind(query), args...); err != nil {
 		return nil, err
 	}

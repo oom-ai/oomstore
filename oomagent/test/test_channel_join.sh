@@ -15,9 +15,9 @@ case1="api returns correct result"
 arg1='
 {
   "feature_names": [
-    "conv_rate",
-    "acc_rate",
-    "avg_daily_trips"
+    "driver_stats.conv_rate",
+    "driver_stats.acc_rate",
+    "driver_stats.avg_daily_trips"
   ],
   "entity_row": {
     "entity_key": "1",
@@ -31,9 +31,9 @@ expected1='
   "header": [
     "entity_key",
     "unix_milli",
-    "conv_rate",
-    "acc_rate",
-    "avg_daily_trips"
+    "driver_stats.conv_rate",
+    "driver_stats.acc_rate",
+    "driver_stats.avg_daily_trips"
   ],
   "joinedRow": [
     {

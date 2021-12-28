@@ -92,6 +92,7 @@ func ListGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, entityID *int,
 	if len(cond) > 0 {
 		query = fmt.Sprintf("%s WHERE %s", query, cond)
 	}
+	query = fmt.Sprintf("%s ORDER BY id ASC", query)
 	var groups types.GroupList
 	if err := sqlxCtx.SelectContext(ctx, &groups, sqlxCtx.Rebind(query), args...); err != nil {
 		return nil, err

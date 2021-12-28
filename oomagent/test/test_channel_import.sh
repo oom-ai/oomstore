@@ -24,9 +24,9 @@ assert_json_eq "$case" "$expected" "$actual"
 
 case="data actually imported"
 expected='
-user,state,credit_score,account_age_days,has_2fa_installed
+user,account.state,account.credit_score,account.account_age_days,account.has_2fa_installed
 10,Idaho,693,212,true
 '
 oomcli sync -r 3
-actual=$(oomcli get online --feature state,credit_score,account_age_days,has_2fa_installed -k 10 -o csv)
+actual=$(oomcli get online --feature account.state,account.credit_score,account.account_age_days,account.has_2fa_installed -k 10 -o csv)
 assert_eq "$case" "$expected" "$actual"

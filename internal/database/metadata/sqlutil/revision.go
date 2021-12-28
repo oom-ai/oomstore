@@ -89,6 +89,7 @@ func ListRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, groupID *in
 		query = fmt.Sprintf(`%s WHERE group_id = ?`, query)
 		args = append(args, *groupID)
 	}
+	query = fmt.Sprintf("%s ORDER BY id ASC", query)
 	var revisions types.RevisionList
 	if err := sqlxCtx.SelectContext(ctx, &revisions, sqlxCtx.Rebind(query), args...); err != nil {
 		return nil, err

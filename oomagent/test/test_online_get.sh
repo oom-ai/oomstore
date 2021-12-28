@@ -9,7 +9,7 @@ case="query single feature"
 arg='
 {
     "entity_key": "19",
-    "feature_names": ["state"]
+    "feature_names": ["account.state"]
 }
 '
 expected='
@@ -19,7 +19,7 @@ expected='
   },
   "result": {
     "map": {
-      "state": {
+      "account.state": {
         "stringValue": "Illinois"
       }
     }
@@ -33,7 +33,7 @@ case="query multiple features"
 arg='
 {
     "entity_key": "48",
-    "feature_names": ["state", "credit_score", "transaction_count_7d", "transaction_count_30d"]
+    "feature_names": ["account.state", "account.credit_score", "transaction_stats.transaction_count_7d", "transaction_stats.transaction_count_30d"]
 }
 '
 expected='
@@ -41,16 +41,16 @@ expected='
   "status": {},
   "result": {
     "map": {
-      "credit_score": {
+      "account.credit_score": {
         "int64Value": "708"
       },
-      "state": {
+      "account.state": {
         "stringValue": "Indiana"
       },
-      "transaction_count_30d": {
+      "transaction_stats.transaction_count_30d": {
         "int64Value": "45"
       },
-      "transaction_count_7d": {
+      "transaction_stats.transaction_count_7d": {
         "int64Value": "5"
       }
     }
