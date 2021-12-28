@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
 )
 
 func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateRevisionOpt) (int, string, error) {
@@ -27,7 +28,7 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 	}
 	if opt.SnapshotTable == nil {
 		updateQuery := "UPDATE feature_group_revision SET snapshot_table = $1 WHERE id = $2"
-		snapshotTable = fmt.Sprintf("offline_%d_%d", opt.GroupID, revisionID)
+		snapshotTable = sqlutil.OfflineBatchTableName(opt.GroupID, int64(revisionID))
 		result, err := sqlxCtx.ExecContext(ctx, updateQuery, snapshotTable, revisionID)
 		if err != nil {
 			return 0, "", err

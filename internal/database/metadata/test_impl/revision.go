@@ -62,7 +62,7 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 			expectedRevision: &types.Revision{
 				ID:            2,
 				Revision:      2000,
-				SnapshotTable: "offline_1_2",
+				SnapshotTable: "offline_batch_1_2",
 				Anchored:      false,
 				Description:   "description",
 				GroupID:       groupID,

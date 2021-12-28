@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/go-sql-driver/mysql"
+
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
 )
 
 func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateRevisionOpt) (int, string, error) {
@@ -31,7 +33,7 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 
 	if opt.SnapshotTable == nil {
 		updateQuery := "UPDATE feature_group_revision SET snapshot_table = ? WHERE id = ?"
-		snapshotTable = fmt.Sprintf("offline_%d_%d", opt.GroupID, revisionID)
+		snapshotTable = sqlutil.OfflineBatchTableName(opt.GroupID, revisionID)
 		result, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(updateQuery), snapshotTable, revisionID)
 		if err != nil {
 			return 0, "", err

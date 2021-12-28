@@ -9,7 +9,7 @@ import (
 )
 
 func (db *DB) Purge(ctx context.Context, revisionID int) error {
-	tableName := sqlutil.OnlineTableName(revisionID)
+	tableName := sqlutil.OnlineBatchTableName(revisionID)
 	_, err := db.DeleteTable(ctx, &dynamodb.DeleteTableInput{
 		TableName: aws.String(tableName),
 	})
