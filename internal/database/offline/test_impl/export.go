@@ -16,7 +16,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	dataTable := "offline_1_1"
+	snapshotTable := "offline_1_1"
 	features := []*types.Feature{
 		{
 			Name:      "model",
@@ -27,7 +27,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 			ValueType: types.Int64,
 		},
 	}
-	buildTestDataTable(ctx, t, store, features, dataTable, &offline.CSVSource{
+	buildTestSnapshotTable(ctx, t, store, features, snapshotTable, &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100
 1235,apple,200
 1236,huawei,300
@@ -44,18 +44,18 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 		{
 			description: "no features",
 			opt: offline.ExportOpt{
-				DataTable:  dataTable,
-				EntityName: "device",
-				Features:   types.FeatureList{},
+				SnapshotTable: snapshotTable,
+				EntityName:    "device",
+				Features:      types.FeatureList{},
 			},
 			expected: [][]interface{}{{"1234"}, {"1235"}, {"1236"}, {"1237"}},
 		},
 		{
 			description: "valid features and valid entity rows",
 			opt: offline.ExportOpt{
-				DataTable:  dataTable,
-				EntityName: "device",
-				Features:   features,
+				SnapshotTable: snapshotTable,
+				EntityName:    "device",
+				Features:      features,
 			},
 			expected: [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
 		},

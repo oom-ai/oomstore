@@ -13,7 +13,7 @@ type PrepareStoreFn func(t *testing.T) (context.Context, offline.Store)
 
 type DestroyStoreFn func()
 
-func buildTestDataTable(ctx context.Context, t *testing.T, store offline.Store, features []*types.Feature, dataTable string, source *offline.CSVSource) {
+func buildTestSnapshotTable(ctx context.Context, t *testing.T, store offline.Store, features []*types.Feature, snapshotTable string, source *offline.CSVSource) {
 	entity := &types.Entity{
 		Name:   "device",
 		Length: 10,
@@ -23,11 +23,11 @@ func buildTestDataTable(ctx context.Context, t *testing.T, store offline.Store, 
 		header = append(header, f.Name)
 	}
 	opt := offline.ImportOpt{
-		Entity:        entity,
-		DataTableName: dataTable,
-		Features:      features,
-		Header:        header,
-		Source:        source,
+		Entity:            entity,
+		SnapshotTableName: snapshotTable,
+		Features:          features,
+		Header:            header,
+		Source:            source,
 	}
 	_, err := store.Import(ctx, opt)
 	require.NoError(t, err)

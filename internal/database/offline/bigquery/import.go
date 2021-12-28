@@ -12,7 +12,7 @@ import (
 )
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	tableID := opt.DataTableName
+	tableID := opt.SnapshotTableName
 
 	// Step 1: define table schema
 	schema := make(bigquery.Schema, 0, len(opt.Features)+1)
@@ -44,7 +44,7 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 
 	// Step 2: create offline table
 	metaData := &bigquery.TableMetadata{
-		Name:   opt.DataTableName,
+		Name:   opt.SnapshotTableName,
 		Schema: schema,
 	}
 	tableRef := db.Dataset(db.datasetID).Table(tableID)

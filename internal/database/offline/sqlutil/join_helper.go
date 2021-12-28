@@ -25,7 +25,7 @@ SELECT
 	{{ columnJoin .Columns }}
 FROM
 	{{ qt .EntityRowsTableName }} AS l
-LEFT JOIN {{ qt .DataTable }} AS r
+LEFT JOIN {{ qt .SnapshotTable }} AS r
 ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
 WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
 `
@@ -261,7 +261,7 @@ type joinQueryParams struct {
 	UnixMilliStr        string
 	Columns             []string
 	EntityRowsTableName string
-	DataTable           string
+	SnapshotTable       string
 	Backend             types.BackendType
 	DatasetID           *string
 }
@@ -270,7 +270,7 @@ func buildJoinQuery(params joinQueryParams) (string, error) {
 	if params.Backend == types.BackendBigQuery {
 		params.TableName = fmt.Sprintf("%s.%s", *params.DatasetID, params.TableName)
 		params.EntityRowsTableName = fmt.Sprintf("%s.%s", *params.DatasetID, params.EntityRowsTableName)
-		params.DataTable = fmt.Sprintf("%s.%s", *params.DatasetID, params.DataTable)
+		params.SnapshotTable = fmt.Sprintf("%s.%s", *params.DatasetID, params.SnapshotTable)
 	}
 
 	qt, err := dbutil.QuoteFn(params.Backend)

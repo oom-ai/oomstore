@@ -23,11 +23,11 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 		Name:   "device",
 		Length: 16,
 	}
-	dataTable := "offline_1_1"
+	snapshotTable := "offline_1_1"
 
 	opt := offline.ImportOpt{
-		Entity:        &entity,
-		DataTableName: dataTable,
+		Entity:            &entity,
+		SnapshotTableName: snapshotTable,
 		Features: []*types.Feature{
 			{
 				Name:      "price",
@@ -71,8 +71,8 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 		assert.NoError(t, err)
 
 		stream, errch := store.Export(ctx, offline.ExportOpt{
-			DataTable:  dataTable,
-			EntityName: entity.Name,
+			SnapshotTable: snapshotTable,
+			EntityName:    entity.Name,
 			Features: []*types.Feature{
 				{Name: "model", ValueType: types.String},
 				{Name: "price", ValueType: types.Int64},

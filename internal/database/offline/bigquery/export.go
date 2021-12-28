@@ -13,7 +13,7 @@ import (
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
 	fieldStr := dbutil.Quote("`", append([]string{opt.EntityName}, opt.Features.Names()...)...)
-	tableName := dbutil.Quote("`", opt.DataTable)
+	tableName := dbutil.Quote("`", opt.SnapshotTable)
 
 	q := fmt.Sprintf(`SELECT %s FROM %s.%s`, fieldStr, db.datasetID, tableName)
 	if opt.Limit != nil {
