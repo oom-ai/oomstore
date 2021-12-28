@@ -12,6 +12,10 @@ func OnlineBatchTableName(revisionID int) string {
 	return fmt.Sprintf("online_batch_%d", revisionID)
 }
 
+func OnlineStreamTableName(groupID int) string {
+	return fmt.Sprintf("online_stream_%d", groupID)
+}
+
 func deserializeByTag(i interface{}, valueType types.ValueType, backend types.BackendType) (interface{}, error) {
 	if i == nil {
 		return nil, nil
