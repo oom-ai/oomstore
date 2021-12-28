@@ -22,10 +22,10 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 	group, err := store.GetGroup(ctx, groupID)
 	require.NoError(t, err)
 	opt := metadata.CreateRevisionOpt{
-		GroupID:     groupID,
-		Revision:    1000,
-		DataTable:   stringPtr("device_info_20211028"),
-		Description: "description",
+		GroupID:       groupID,
+		Revision:      1000,
+		SnapshotTable: stringPtr("device_info_20211028"),
+		Description:   "description",
 	}
 
 	testCases := []struct {
@@ -41,13 +41,13 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 			expectedError: nil,
 			expected:      1,
 			expectedRevision: &types.Revision{
-				ID:          1,
-				Revision:    1000,
-				DataTable:   "device_info_20211028",
-				Anchored:    false,
-				Description: "description",
-				GroupID:     groupID,
-				Group:       group,
+				ID:            1,
+				Revision:      1000,
+				SnapshotTable: "device_info_20211028",
+				Anchored:      false,
+				Description:   "description",
+				GroupID:       groupID,
+				Group:         group,
 			},
 		},
 		{
@@ -60,13 +60,13 @@ func TestCreateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 			expectedError: nil,
 			expected:      2,
 			expectedRevision: &types.Revision{
-				ID:          2,
-				Revision:    2000,
-				DataTable:   "offline_1_2",
-				Anchored:    false,
-				Description: "description",
-				GroupID:     groupID,
-				Group:       group,
+				ID:            2,
+				Revision:      2000,
+				SnapshotTable: "offline_1_2",
+				Anchored:      false,
+				Description:   "description",
+				GroupID:       groupID,
+				Group:         group,
 			},
 		},
 		{
@@ -103,10 +103,10 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 	revisionID, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:  1000,
-		GroupID:   groupID,
-		DataTable: stringPtr("device_info_1000"),
-		Anchored:  false,
+		Revision:      1000,
+		GroupID:       groupID,
+		SnapshotTable: stringPtr("device_info_1000"),
+		Anchored:      false,
 	})
 	require.NoError(t, err)
 
@@ -153,10 +153,10 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 	revisionID, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:  1000,
-		GroupID:   groupID,
-		DataTable: stringPtr("device_info_1000"),
-		Anchored:  false,
+		Revision:      1000,
+		GroupID:       groupID,
+		SnapshotTable: stringPtr("device_info_1000"),
+		Anchored:      false,
 	})
 	require.NoError(t, err)
 
@@ -164,12 +164,12 @@ func TestGetRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 	require.NoError(t, err)
 
 	revision := types.Revision{
-		ID:        revisionID,
-		Revision:  1000,
-		GroupID:   groupID,
-		DataTable: "device_info_1000",
-		Anchored:  false,
-		Group:     group,
+		ID:            revisionID,
+		Revision:      1000,
+		GroupID:       groupID,
+		SnapshotTable: "device_info_1000",
+		Anchored:      false,
+		Group:         group,
 	}
 
 	testCases := []struct {
@@ -216,10 +216,10 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreFn, destroyStore D
 
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 	revisionID, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:  1000,
-		GroupID:   groupID,
-		DataTable: stringPtr("device_info_1000"),
-		Anchored:  false,
+		Revision:      1000,
+		GroupID:       groupID,
+		SnapshotTable: stringPtr("device_info_1000"),
+		Anchored:      false,
 	})
 	require.NoError(t, err)
 
@@ -227,12 +227,12 @@ func TestGetRevisionBy(t *testing.T, prepareStore PrepareStoreFn, destroyStore D
 	require.NoError(t, err)
 
 	revision := types.Revision{
-		ID:        revisionID,
-		Revision:  1000,
-		GroupID:   groupID,
-		DataTable: "device_info_1000",
-		Anchored:  false,
-		Group:     group,
+		ID:            revisionID,
+		Revision:      1000,
+		GroupID:       groupID,
+		SnapshotTable: "device_info_1000",
+		Anchored:      false,
+		Group:         group,
 	}
 
 	testCases := []struct {
@@ -341,18 +341,18 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	require.NoError(t, err)
 	require.NoError(t, store.Refresh())
 	revisionID1, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:  1000,
-		GroupID:   groupID,
-		DataTable: stringPtr("device_info_1000"),
-		Anchored:  false,
+		Revision:      1000,
+		GroupID:       groupID,
+		SnapshotTable: stringPtr("device_info_1000"),
+		Anchored:      false,
 	})
 	require.NoError(t, err)
 
 	revisionID2, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:  2000,
-		GroupID:   groupID,
-		DataTable: stringPtr("device_info_2000"),
-		Anchored:  false,
+		Revision:      2000,
+		GroupID:       groupID,
+		SnapshotTable: stringPtr("device_info_2000"),
+		Anchored:      false,
 	})
 	require.NoError(t, err)
 
@@ -361,21 +361,21 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	require.NoError(t, err)
 
 	revision1 := &types.Revision{
-		ID:        revisionID1,
-		Revision:  1000,
-		GroupID:   groupID,
-		DataTable: "device_info_1000",
-		Anchored:  false,
-		Group:     group,
+		ID:            revisionID1,
+		Revision:      1000,
+		GroupID:       groupID,
+		SnapshotTable: "device_info_1000",
+		Anchored:      false,
+		Group:         group,
 	}
 
 	revision2 := &types.Revision{
-		ID:        revisionID2,
-		Revision:  2000,
-		GroupID:   groupID,
-		DataTable: "device_info_2000",
-		Anchored:  false,
-		Group:     group,
+		ID:            revisionID2,
+		Revision:      2000,
+		GroupID:       groupID,
+		SnapshotTable: "device_info_2000",
+		Anchored:      false,
+		Group:         group,
 	}
 
 	return entityID, groupID, []int{revisionID1, revisionID2}, types.RevisionList{revision1, revision2}

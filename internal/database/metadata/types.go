@@ -3,9 +3,9 @@ package metadata
 import "github.com/oom-ai/oomstore/pkg/oomstore/types"
 
 type RevisionRange struct {
-	MinRevision int64  `db:"min_revision"`
-	MaxRevision int64  `db:"max_revision"`
-	DataTable   string `db:"data_table"`
+	MinRevision   int64
+	MaxRevision   int64
+	SnapshotTable string
 }
 
 // Create
@@ -29,11 +29,11 @@ type CreateGroupOpt struct {
 }
 
 type CreateRevisionOpt struct {
-	Revision    int64
-	GroupID     int
-	DataTable   *string
-	Anchored    bool
-	Description string
+	Revision      int64
+	GroupID       int
+	SnapshotTable *string
+	Anchored      bool
+	Description   string
 }
 
 // Update
