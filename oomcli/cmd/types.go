@@ -44,11 +44,12 @@ type FlattenFeature struct {
 }
 
 type FlattenRevision struct {
-	ID          int    `oomcli:"ID"`
-	Revision    int64  `oomcli:"REVISION"`
-	Group       string `oomcli:"GROUP"`
-	DataTable   string `oomcli:"DATA-TABLE"`
-	Description string `oomcli:"DESCRIPTION,truncate"`
+	ID            int    `oomcli:"ID"`
+	Revision      int64  `oomcli:"REVISION"`
+	Group         string `oomcli:"GROUP"`
+	SnapshotTable string `oomcli:"SNAPSHOT-TABLE"`
+	CdcTable      string `oomcli:"CDC-TABLE"`
+	Description   string `oomcli:"DESCRIPTION,truncate"`
 
 	Anchored   bool      `oomcli:"ANCHORED,wide"`
 	CreateTime time.Time `oomcli:"CREATE-TIME,wide"`
@@ -117,14 +118,14 @@ func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenL
 		element = FlattenRevision{}
 		for _, e := range s {
 			tokens, err = parseTokens(FlattenRevision{
-				ID:          e.ID,
-				Revision:    e.Revision,
-				Group:       e.Group.Name,
-				DataTable:   e.DataTable,
-				Description: e.Description,
-				Anchored:    e.Anchored,
-				CreateTime:  e.CreateTime,
-				ModifyTime:  e.ModifyTime,
+				ID:            e.ID,
+				Revision:      e.Revision,
+				Group:         e.Group.Name,
+				SnapshotTable: e.SnapshotTable,
+				Description:   e.Description,
+				Anchored:      e.Anchored,
+				CreateTime:    e.CreateTime,
+				ModifyTime:    e.ModifyTime,
 			})
 			if err != nil {
 				return
