@@ -17,6 +17,7 @@ const (
 	BackendCassandra BackendType = "cassandra"
 	BackendBigQuery  BackendType = "bigquery"
 	BackendRedshift  BackendType = "redshift"
+	BackendTiKV      BackendType = "tikv"
 )
 
 type OomStoreConfig struct {
@@ -110,6 +111,10 @@ type CassandraOpt struct {
 	Password string        `yaml:"password"`
 	KeySpace string        `yaml:"keyspace"`
 	Timeout  time.Duration `yaml:"timeout"`
+}
+
+type TiKVOpt struct {
+	PdAddrs []string `yaml:"pd-addrs"`
 }
 
 func (cfg *OomStoreConfig) Validate() error {
