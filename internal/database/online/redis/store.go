@@ -31,3 +31,7 @@ func Open(opt *types.RedisOpt) *DB {
 	}
 	return &DB{redis.NewClient(&redisOpt)}
 }
+
+func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
+	panic("Implement me!")
+}

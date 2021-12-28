@@ -6,6 +6,7 @@ import (
 
 	"github.com/gocql/gocql"
 
+	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -13,6 +14,8 @@ const (
 	BatchSize   = 1000
 	BackendType = types.BackendCassandra
 )
+
+var _ online.Store = &DB{}
 
 type DB struct {
 	*gocql.Session
@@ -45,4 +48,8 @@ func Open(option *types.CassandraOpt) (*DB, error) {
 		return nil, err
 	}
 	return &DB{Session: session}, nil
+}
+
+func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
+	panic("Implement me!")
 }
