@@ -25,3 +25,8 @@ type ImportOpt struct {
 	ExportError  <-chan error
 	FeatureList  types.FeatureList
 }
+
+type PushOpt struct {
+	Entity  *types.Entity
+	Feature types.Feature
+}

@@ -43,3 +43,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 func (db *DB) Purge(ctx context.Context, revisionID int) error {
 	return sqlutil.Purge(ctx, db.DB, revisionID, BackendType)
 }
+
+func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
+	panic("Implement me!")
+}

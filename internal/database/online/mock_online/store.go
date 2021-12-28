@@ -121,3 +121,17 @@ func (mr *MockStoreMockRecorder) Purge(ctx, revisionID interface{}) *gomock.Call
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Purge", reflect.TypeOf((*MockStore)(nil).Purge), ctx, revisionID)
 }
+
+// Push mocks base method.
+func (m *MockStore) Push(ctx context.Context, opt online.PushOpt) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Push", ctx, opt)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Push indicates an expected call of Push.
+func (mr *MockStoreMockRecorder) Push(ctx, opt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*MockStore)(nil).Push), ctx, opt)
+}
