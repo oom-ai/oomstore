@@ -24,7 +24,7 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType
 		errs <- err
 		return stream, errs
 	}
-	query := fmt.Sprintf("SELECT %s FROM %s", qt(fields...), qt(opt.DataTable))
+	query := fmt.Sprintf("SELECT %s FROM %s", qt(fields...), qt(opt.SnapshotTable))
 	if opt.Limit != nil {
 		query += fmt.Sprintf(" LIMIT %d", *opt.Limit)
 	}

@@ -31,12 +31,12 @@ func TestChannelJoin(t *testing.T) {
 	}
 	revisions := types.RevisionList{
 		{
-			Revision:  1,
-			DataTable: "device_basic_1",
+			Revision:      1,
+			SnapshotTable: "device_basic_1",
 		},
 		{
-			Revision:  20,
-			DataTable: "device_basic_20",
+			Revision:      20,
+			SnapshotTable: "device_basic_20",
 		},
 	}
 

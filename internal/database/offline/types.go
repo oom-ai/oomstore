@@ -8,10 +8,10 @@ import (
 )
 
 type ExportOpt struct {
-	DataTable  string
-	EntityName string
-	Features   types.FeatureList
-	Limit      *uint64
+	SnapshotTable string
+	EntityName    string
+	Features      types.FeatureList
+	Limit         *uint64
 }
 
 type JoinOpt struct {
@@ -32,12 +32,12 @@ type JoinOneGroupOpt struct {
 }
 
 type ImportOpt struct {
-	Entity        *types.Entity
-	Features      types.FeatureList
-	Header        []string
-	Revision      *int64
-	DataTableName string
-	Source        *CSVSource
+	Entity            *types.Entity
+	Features          types.FeatureList
+	Header            []string
+	Revision          *int64
+	SnapshotTableName string
+	Source            *CSVSource
 }
 
 type CSVSource struct {

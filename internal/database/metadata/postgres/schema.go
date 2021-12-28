@@ -63,18 +63,20 @@ var META_TABLE_SCHEMAS = map[string]string{
 		`,
 	"feature_group_revision": `
 		CREATE TABLE feature_group_revision (
-			id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-			group_id    INT         NOT     NULL,
-			revision    BIGINT      NOT     NULL,
-			data_table  VARCHAR(64) NOT     NULL,
-			anchored    BOOLEAN     NOT     NULL,
-			description VARCHAR(64) DEFAULT '',
-			create_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP,
-			modify_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP,
+			id    	    	INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+			group_id    	INT         NOT NULL,
+			revision    	BIGINT      NOT NULL,
+			snapshot_table  VARCHAR(64) NOT	NULL,
+			cdc_table    	VARCHAR(64) NOT	NULL DEFAULT '',
+			anchored    	BOOLEAN     NOT NULL,
+			description 	VARCHAR(64) DEFAULT '',
+			create_time 	TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			modify_time 	TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			UNIQUE (group_id, revision)
 		);
 		COMMENT ON COLUMN feature_group_revision.revision   IS 'group data point-in-time epoch seconds';
-		COMMENT ON COLUMN feature_group_revision.data_table IS 'feature data table name';
+		COMMENT ON COLUMN feature_group_revision.snapshot_table IS 'batch & streaming feature snapshot table name';
+		COMMENT ON COLUMN feature_group_revision.cdc_table IS 'streaming feature cdc table name';
 		`,
 }
 

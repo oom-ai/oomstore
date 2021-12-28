@@ -28,19 +28,19 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 	oneGroupFeatures, oneGroupFeatureMap := prepareFeatures(true)
 	twoGroupFeatures, twoGroupFeatureMap := prepareFeatures(false)
 
-	buildTestDataTable(ctx, t, store, oneGroupFeatures, "offline_1_1", &offline.CSVSource{
+	buildTestSnapshotTable(ctx, t, store, oneGroupFeatures, "offline_1_1", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100
 1235,apple,200
 `)),
 		Delimiter: ",",
 	})
-	buildTestDataTable(ctx, t, store, oneGroupFeatures, "offline_1_2", &offline.CSVSource{
+	buildTestSnapshotTable(ctx, t, store, oneGroupFeatures, "offline_1_2", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,galaxy,300
 1235,oneplus,240
 `)),
 		Delimiter: ",",
 	})
-	buildTestDataTable(ctx, t, store, twoGroupFeatures[2:], "offline_2_1", &offline.CSVSource{
+	buildTestSnapshotTable(ctx, t, store, twoGroupFeatures[2:], "offline_2_1", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,1
 1235,0
 `)),
@@ -160,21 +160,21 @@ func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.Feature
 func prepareRevisionRanges(oneGroup bool) map[string][]*metadata.RevisionRange {
 	basic := []*metadata.RevisionRange{
 		{
-			MinRevision: 1,
-			MaxRevision: 15,
-			DataTable:   "offline_1_1",
+			MinRevision:   1,
+			MaxRevision:   15,
+			SnapshotTable: "offline_1_1",
 		},
 		{
-			MinRevision: 15,
-			MaxRevision: 25,
-			DataTable:   "offline_1_2",
+			MinRevision:   15,
+			MaxRevision:   25,
+			SnapshotTable: "offline_1_2",
 		},
 	}
 	advanced := []*metadata.RevisionRange{
 		{
-			MinRevision: 5,
-			MaxRevision: math.MaxInt64,
-			DataTable:   "offline_2_1",
+			MinRevision:   5,
+			MaxRevision:   math.MaxInt64,
+			SnapshotTable: "offline_2_1",
 		},
 	}
 	if oneGroup {

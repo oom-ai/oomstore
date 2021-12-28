@@ -117,7 +117,7 @@ func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGr
 			UnixMilliStr:        unixMilliStr,
 			Columns:             columns,
 			EntityRowsTableName: opt.EntityRowsTableName,
-			DataTable:           r.DataTable,
+			SnapshotTable:       r.SnapshotTable,
 			Backend:             dbOpt.Backend,
 			DatasetID:           dbOpt.DatasetID,
 		})

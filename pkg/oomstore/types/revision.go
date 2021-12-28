@@ -5,10 +5,11 @@ import (
 )
 
 type Revision struct {
-	ID        int    `db:"id"`
-	Revision  int64  `db:"revision"`
-	DataTable string `db:"data_table"`
-	Anchored  bool   `db:"anchored"`
+	ID            int    `db:"id"`
+	Revision      int64  `db:"revision"`
+	SnapshotTable string `db:"snapshot_table"`
+	CdcTable      string `db:"cdc_table"`
+	Anchored      bool   `db:"anchored"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`

@@ -54,10 +54,10 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 	}
 
 	stream, exportErr := s.offline.Export(ctx, offline.ExportOpt{
-		DataTable:  revision.DataTable,
-		EntityName: entity.Name,
-		Features:   features,
-		Limit:      opt.Limit,
+		SnapshotTable: revision.SnapshotTable,
+		EntityName:    entity.Name,
+		Features:      features,
+		Limit:         opt.Limit,
 	})
 	header := append([]string{entity.Name}, features.Names()...)
 	return types.NewExportResult(header, stream, exportErr), nil
