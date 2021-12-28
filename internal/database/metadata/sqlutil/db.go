@@ -9,7 +9,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func ListMetaData(ctx context.Context, db *sqlx.DB) (*informer.Cache, error) {
+func ListMetadata(ctx context.Context, db *sqlx.DB) (*informer.Cache, error) {
 	var cache *informer.Cache
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		entities := types.EntityList{}

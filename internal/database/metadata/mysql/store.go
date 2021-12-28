@@ -47,7 +47,7 @@ func Open(ctx context.Context, option *types.MySQLOpt) (*DB, error) {
 
 	// TODO: make the interval configurable
 	informer, err := informer.New(time.Second, func() (*informer.Cache, error) {
-		return sqlutil.ListMetaData(ctx, db)
+		return sqlutil.ListMetadata(ctx, db)
 	})
 	if err != nil {
 		db.Close()

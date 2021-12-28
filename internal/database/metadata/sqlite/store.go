@@ -33,7 +33,7 @@ func Open(ctx context.Context, opt *types.SQLiteOpt) (*DB, error) {
 		return nil, err
 	}
 	informer, err := informer.New(time.Second, func() (*informer.Cache, error) {
-		return sqlutil.ListMetaData(ctx, db)
+		return sqlutil.ListMetadata(ctx, db)
 	})
 	if err != nil {
 		db.Close()
