@@ -1,0 +1,35 @@
+redis:
+  host: 127.0.0.1
+  port: 26379
+  database: 0
+
+postgres:
+  host: 127.0.0.1
+  port: 25432
+  user: oomplay
+  password: oomplay
+  database: oomplay
+
+mysql:
+  host: 127.0.0.1
+  port: 23306
+  user: oomplay
+  password: oomplay
+  database: oomplay
+
+tidb:
+  host: 127.0.0.1
+  port: 24000
+  user: oomplay
+  password: oomplay
+  database: oomplay
+
+cassandra:
+  host: 127.0.0.1
+  port: 29042
+  user: oomplay
+  password: oomplay
+  keyspace: oomplay
+
+sqlite:
+  db-file: /tmp/oomstore/dbfile

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 SDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+PDIR="$SDIR/../.."
 
 PATH="$SDIR/../build:$PATH"
 
@@ -13,6 +14,11 @@ GRN=$(tput setaf 2 2>/dev/null || true)
 YLW=$(tput setaf 3 2>/dev/null || true)
 
 export OOMCLI_CONFIG="$SDIR/config.yaml"
+BACKENDS=${BACKENDS:-"postgres,postgres,postgres"}
+ONLINE_STORE=$(cut -d, -f1 <<<"$BACKENDS")
+OFFLINE_STORE=$(cut -d, -f2 <<<"$BACKENDS")
+METADATA_STORE=$(cut -d, -f3 <<<"$BACKENDS")
+"$PDIR/scripts/config_gen.sh" "$ONLINE_STORE" "$OFFLINE_STORE" "$METADATA_STORE" > "$OOMCLI_CONFIG"
 
 trim() {
     local var="$*"
@@ -80,8 +86,11 @@ init_store() {
     info "initialize feature store"
 
     # initialize backend database
-    oomplay init redis postgres
+    oomplay init "$ONLINE_STORE" "$OFFLINE_STORE" "$METADATA_STORE"
 
     # initialize feature store
-    oomcli init
+    for _i in {1..5}; do
+        oomcli init && break
+        sleep 2
+    done
 }
