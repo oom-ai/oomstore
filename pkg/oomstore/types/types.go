@@ -1,16 +1,11 @@
 package types
 
-type Category string
+type Category = string
 
 const (
 	CategoryBatch  Category = "batch"
 	CategoryStream Category = "stream"
 )
-
-// In order for cast.ToString to correctly resolve Category, Category needs to implement the interface String
-func (c Category) String() string {
-	return string(c)
-}
 
 type ExportRecord []interface{}
 

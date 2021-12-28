@@ -31,7 +31,6 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 
 		// apply group
 		for _, group := range stage.NewGroups {
-			group.Category = types.CategoryBatch
 			if err := s.applyGroup(c, tx, group); err != nil {
 				return err
 			}
@@ -177,8 +176,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 
 			stage.NewEntities = append(stage.NewEntities, buildApplyEntity(entity))
 
-			for _, group := range entity.BatchFeatures {
-				group.Name = group.Group
+			for _, group := range entity.Groups {
 				stage.NewGroups = append(stage.NewGroups, buildApplyGroup(group, entity.Name))
 
 				for _, feature := range group.Features {
@@ -191,7 +189,6 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 				return nil, err
 			}
 
-			group.Group = group.Name
 			stage.NewGroups = append(stage.NewGroups, buildApplyGroup(group, group.EntityName))
 
 			for _, feature := range group.Features {
@@ -225,7 +222,6 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 					return nil, err
 				}
 				for _, group := range groupItems.Items {
-					group.Group = group.Name
 					stage.NewGroups = append(stage.NewGroups, buildApplyGroup(group, group.EntityName))
 
 					for _, feature := range group.Features {
@@ -240,9 +236,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 				for _, entity := range entityItems.Items {
 					stage.NewEntities = append(stage.NewEntities, buildApplyEntity(entity))
 
-					for _, group := range entity.BatchFeatures {
-						group.Name = group.Group
-						group.Category = types.CategoryBatch
+					for _, group := range entity.Groups {
 						stage.NewGroups = append(stage.NewGroups, buildApplyGroup(group, entity.Name))
 
 						for _, feature := range group.Features {
@@ -277,7 +271,7 @@ func parseItemsKind(data map[string]interface{}) (string, error) {
 }
 
 func buildApplyEntity(entity apply.Entity) apply.Entity {
-	// We don't want entity.BatchFeature to have values.
+	// We don't want entity.Groups to have values.
 	// The whole stage should be a flat structure, not a nested structure.
 	return apply.Entity{
 		Kind:        entity.Kind,
@@ -293,7 +287,6 @@ func buildApplyGroup(group apply.Group, entityName string) apply.Group {
 	return apply.Group{
 		Kind:        "Group",
 		Name:        group.Name,
-		Group:       group.Group,
 		EntityName:  entityName,
 		Category:    group.Category,
 		Description: group.Description,

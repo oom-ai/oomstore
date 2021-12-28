@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 	"github.com/stretchr/testify/require"
 )
@@ -108,7 +109,6 @@ description: 'description'
 					{
 						Kind:        "Group",
 						Name:        "account",
-						Group:       "account",
 						EntityName:  "user",
 						Category:    "batch",
 						Description: "description",
@@ -116,7 +116,6 @@ description: 'description'
 					{
 						Kind:        "Group",
 						Name:        "device",
-						Group:       "device",
 						EntityName:  "user",
 						Category:    "batch",
 						Description: "description",
@@ -163,7 +162,6 @@ features:
 					{
 						Kind:        "Group",
 						Name:        "device",
-						Group:       "device",
 						EntityName:  "user",
 						Category:    "batch",
 						Description: "description",
@@ -196,8 +194,9 @@ kind: Entity
 name: user
 length: 8
 description: 'description'
-batch-features:
-- group: device
+groups:
+- name: device
+  category: batch
   description: description
   features:
   - name: model
@@ -206,7 +205,8 @@ batch-features:
   - name: price
     value-type: int64
     description: 'description'
-- group: user
+- name: user
+  category: batch
   description: description
   features:
   - name: age
@@ -229,14 +229,14 @@ batch-features:
 					{
 						Kind:        "Group",
 						Name:        "device",
-						Group:       "device",
+						Category:    types.CategoryBatch,
 						EntityName:  "user",
 						Description: "description",
 					},
 					{
 						Kind:        "Group",
 						Name:        "user",
-						Group:       "user",
+						Category:    types.CategoryBatch,
 						EntityName:  "user",
 						Description: "description",
 					},
@@ -388,7 +388,6 @@ items:
 					{
 						Kind:        "Group",
 						Name:        "account",
-						Group:       "account",
 						EntityName:  "user",
 						Category:    "batch",
 						Description: "user account info",
@@ -396,7 +395,6 @@ items:
 					{
 						Kind:        "Group",
 						Name:        "transaction_stats",
-						Group:       "transaction_stats",
 						EntityName:  "user",
 						Category:    "batch",
 						Description: "user transaction statistics",
@@ -451,8 +449,9 @@ items:
       name: user
       length: 8
       description: user ID
-      batch-features:
-        - group: account
+      groups:
+        - name: account
+          category: batch
           description: user account info
           features:
             - name: credit_score
@@ -464,7 +463,8 @@ items:
             - name: has_2fa_installed
               value-type: bool
               description: has_2fa_installed description
-        - group: transaction_stats
+        - name: transaction_stats
+          category: batch
           description: user transaction statistics
           features:
             - name: transaction_count_7d
@@ -477,8 +477,9 @@ items:
       name: device
       length: 8
       description: device info
-      batch-features:
-        - group: phone
+      groups:
+        - name: phone
+          category: batch
           description: phone info
           features:
             - name: model
@@ -508,7 +509,6 @@ items:
 					{
 						Kind:        "Group",
 						Name:        "account",
-						Group:       "account",
 						EntityName:  "user",
 						Category:    "batch",
 						Description: "user account info",
@@ -516,7 +516,6 @@ items:
 					{
 						Kind:        "Group",
 						Name:        "transaction_stats",
-						Group:       "transaction_stats",
 						EntityName:  "user",
 						Category:    "batch",
 						Description: "user transaction statistics",
@@ -524,7 +523,6 @@ items:
 					{
 						Kind:        "Group",
 						Name:        "phone",
-						Group:       "phone",
 						EntityName:  "device",
 						Category:    "batch",
 						Description: "phone info",

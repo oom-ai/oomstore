@@ -12,8 +12,8 @@ var registerBatchFeatureOpt types.CreateFeatureOpt
 var registerBatchFeatureValueType string
 
 var registerBatchFeatureCmd = &cobra.Command{
-	Use:   "batch-feature <feature_name>",
-	Short: "Register a new batch feature",
+	Use:   "feature <feature_name>",
+	Short: "Register a new feature",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		valueType, err := types.ParseValueType(registerBatchFeatureValueType)

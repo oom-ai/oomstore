@@ -4,19 +4,22 @@ import (
 	"context"
 	"log"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
+
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 var registerGroupOpt types.CreateGroupOpt
-var category string
 var registerGroupCmd = &cobra.Command{
 	Use:   "group <group_name>",
 	Short: "Register a new feature group",
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
+		if registerGroupOpt.Category != types.CategoryBatch && registerGroupOpt.Category != types.CategoryStream {
+			log.Fatalf("illegal category '%s', should be either 'stream' or 'batch'", registerGroupOpt.Category)
+		}
+
 		registerGroupOpt.GroupName = args[0]
-		registerGroupOpt.Category = types.Category(category)
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
@@ -37,8 +40,7 @@ func init() {
 	flags.StringVarP(&registerGroupOpt.EntityName, "entity", "e", "", "entity name")
 	_ = registerGroupCmd.MarkFlagRequired("entity")
 
-	flags.StringVarP(&category, "category", "c", "", "group category")
-	_ = registerGroupCmd.MarkFlagRequired("category")
+	flags.StringVarP(&registerGroupOpt.Category, "category", "c", "batch", "group category")
 
 	flags.StringVarP(&registerGroupOpt.Description, "description", "d", "", "group description")
 }

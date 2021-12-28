@@ -7,25 +7,27 @@ init_store
 register_features
 
 case='oomcli get meta group works'
-expected='ID,NAME,ENTITY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,phone,device,phone,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
-2,student,user,student
+expected='ID,NAME,ENTITY,CATEGORY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,phone,device,batch,phone,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+2,student,user,batch,student
+3,user-click,user,stream,user click post feature
 '
 actual=$(oomcli get meta group -o csv --wide)
-ignore_time() { cut -d ',' -f 1-4 <<<"$1"; }
+ignore_time() { cut -d ',' -f 1-5 <<<"$1"; }
 assert_eq "$case" "$(ignore_time "$expected" | sort)" "$(ignore_time "$actual" | sort)"
 
 case='oomcli get simplified group works'
-expected='ID,NAME,ENTITY,DESCRIPTION
-1,phone,device,phone
-2,student,user,student
+expected='ID,NAME,ENTITY,CATEGORY,DESCRIPTION
+1,phone,device,batch,phone
+2,student,user,batch,student
+3,user-click,user,stream,user click post feature
 '
 actual=$(oomcli get meta group -o csv)
 assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"
 
 case='oomcli get one group works'
-expected='ID,NAME,ENTITY,DESCRIPTION
-1,phone,device,phone
+expected='ID,NAME,ENTITY,CATEGORY,DESCRIPTION
+1,phone,device,batch,phone
 '
 actual=$(oomcli get meta group phone -o csv)
 assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"
@@ -73,6 +75,11 @@ items:
         - name: age
           value-type: int64
           description: age
+    - kind: Group
+      name: user-click
+      entity-name: user
+      category: stream
+      description: user click post feature
 '
 actual=$(oomcli get meta group -o yaml)
 assert_eq "$case" "$expected" "$actual"
