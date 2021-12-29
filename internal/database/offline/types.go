@@ -24,6 +24,7 @@ type JoinOpt struct {
 
 type JoinOneGroupOpt struct {
 	GroupName           string
+	Category            types.Category
 	Features            types.FeatureList
 	RevisionRanges      []*metadata.RevisionRange
 	Entity              types.Entity

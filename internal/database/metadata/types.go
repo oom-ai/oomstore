@@ -6,6 +6,7 @@ type RevisionRange struct {
 	MinRevision   int64
 	MaxRevision   int64
 	SnapshotTable string
+	CdcTable      string
 }
 
 // Create
