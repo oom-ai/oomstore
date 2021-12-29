@@ -220,6 +220,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 			ValueType: types.String,
 			GroupID:   1,
 			Group: &types.Group{
+				ID:               1,
 				EntityID:         1,
 				OnlineRevisionID: &revision1,
 				Category:         types.CategoryBatch,
@@ -231,6 +232,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 			ValueType: types.Int64,
 			GroupID:   2,
 			Group: &types.Group{
+				ID:               2,
 				EntityID:         1,
 				OnlineRevisionID: &revision2,
 				Category:         types.CategoryBatch,
@@ -242,6 +244,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 			ValueType: types.Int64,
 			GroupID:   3,
 			Group: &types.Group{
+				ID:               3,
 				EntityID:         2,
 				OnlineRevisionID: &revision2,
 				Category:         types.CategoryBatch,

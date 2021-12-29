@@ -42,12 +42,12 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 	}
 
 	featureMap := buildGroupToFeaturesMap(features)
-	revisionRangeMap := make(map[string][]*metadata.RevisionRange)
+	revisionRangeMap := make(map[string][]*offline.RevisionRange)
 	for groupName, featureList := range featureMap {
 		if len(featureList) == 0 {
 			continue
 		}
-		revisionRanges, err := s.buildRevisionRanges(ctx, featureList[0].GroupID)
+		revisionRanges, err := s.buildRevisionRanges(ctx, featureList[0].Group)
 		if err != nil {
 			return nil, err
 		}
@@ -96,8 +96,8 @@ func buildGroupToFeaturesMap(features types.FeatureList) map[string]types.Featur
 	return groups
 }
 
-func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int) ([]*metadata.RevisionRange, error) {
-	revisions, err := s.metadata.ListRevision(ctx, &groupID)
+func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) ([]*offline.RevisionRange, error) {
+	revisions, err := s.metadata.ListRevision(ctx, &group.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -109,20 +109,22 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, groupID int) ([]*met
 		return revisions[i].Revision < revisions[j].Revision
 	})
 
-	var ranges []*metadata.RevisionRange
+	var ranges []*offline.RevisionRange
 	for i := 1; i < len(revisions); i++ {
-		ranges = append(ranges, &metadata.RevisionRange{
+		ranges = append(ranges, &offline.RevisionRange{
 			MinRevision:   revisions[i-1].Revision,
 			MaxRevision:   revisions[i].Revision,
 			SnapshotTable: revisions[i-1].SnapshotTable,
+			CdcTable:      revisions[i-1].CdcTable,
 		})
 	}
-
-	return append(ranges, &metadata.RevisionRange{
+	ranges = append(ranges, &offline.RevisionRange{
 		MinRevision:   revisions[len(revisions)-1].Revision,
 		MaxRevision:   math.MaxInt64,
 		SnapshotTable: revisions[len(revisions)-1].SnapshotTable,
-	}), nil
+		CdcTable:      revisions[len(revisions)-1].CdcTable,
+	})
+	return ranges, nil
 }
 
 func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, []string, error) {

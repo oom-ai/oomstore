@@ -3,7 +3,6 @@ package offline
 import (
 	"bufio"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -14,11 +13,18 @@ type ExportOpt struct {
 	Limit         *uint64
 }
 
+type RevisionRange struct {
+	MinRevision   int64
+	MaxRevision   int64
+	SnapshotTable string
+	CdcTable      string
+}
+
 type JoinOpt struct {
 	Entity           types.Entity
 	EntityRows       <-chan types.EntityRow
 	FeatureMap       map[string]types.FeatureList
-	RevisionRangeMap map[string][]*metadata.RevisionRange
+	RevisionRangeMap map[string][]*RevisionRange
 	ValueNames       []string
 }
 
@@ -26,7 +32,7 @@ type JoinOneGroupOpt struct {
 	GroupName           string
 	Category            types.Category
 	Features            types.FeatureList
-	RevisionRanges      []*metadata.RevisionRange
+	RevisionRanges      []*RevisionRange
 	Entity              types.Entity
 	EntityRowsTableName string
 	ValueNames          []string

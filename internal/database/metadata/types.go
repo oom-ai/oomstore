@@ -2,13 +2,6 @@ package metadata
 
 import "github.com/oom-ai/oomstore/pkg/oomstore/types"
 
-type RevisionRange struct {
-	MinRevision   int64
-	MaxRevision   int64
-	SnapshotTable string
-	CdcTable      string
-}
-
 // Create
 type CreateEntityOpt struct {
 	types.CreateEntityOpt
