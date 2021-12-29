@@ -52,3 +52,11 @@ func TestGetNotExistedEntityKey(t *testing.T) {
 func TestMultiGet(t *testing.T) {
 	test_impl.TestMultiGet(t, prepareStore, destroyStore(t))
 }
+
+func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
+	test_impl.TestPurgeRemovesSpecifiedRevision(t, prepareStore, destroyStore(t))
+}
+
+func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
+	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore, destroyStore(t))
+}

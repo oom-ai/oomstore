@@ -35,10 +35,6 @@ func (db *DB) Ping(ctx context.Context) error {
 	return err
 }
 
-func (db *DB) Purge(ctx context.Context, revisionID int) error {
-	panic("implement me")
-}
-
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	panic("implement me")
 }
