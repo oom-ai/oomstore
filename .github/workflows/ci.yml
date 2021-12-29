@@ -48,7 +48,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      oomplay-version: '0.4.4'
+      oomplay-version: '0.5.0'
     steps:
     - uses: actions/checkout@v2
     - uses: satackey/action-docker-layer-caching@v0.0.11
