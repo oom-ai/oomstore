@@ -22,6 +22,9 @@ func UpdateRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 	if opt.NewAnchored != nil {
 		and["anchored"] = *opt.NewAnchored
 	}
+	if opt.NewSnapshotTable != nil {
+		and["snapshot_table"] = *opt.NewSnapshotTable
+	}
 	cond, args, err := dbutil.BuildConditions(and, nil)
 	if err != nil {
 		return err

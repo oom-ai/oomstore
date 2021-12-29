@@ -48,9 +48,10 @@ type UpdateGroupOpt struct {
 }
 
 type UpdateRevisionOpt struct {
-	RevisionID  int
-	NewRevision *int64
-	NewAnchored *bool
+	RevisionID       int
+	NewRevision      *int64
+	NewAnchored      *bool
+	NewSnapshotTable *string
 }
 
 type ListFeatureOpt struct {

@@ -102,6 +102,8 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 	defer store.Close()
 
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
+	group, err := store.GetGroup(ctx, groupID)
+	require.NoError(t, err)
 	revisionID, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:      1000,
 		GroupID:       groupID,
@@ -111,9 +113,10 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 	require.NoError(t, err)
 
 	testCases := []struct {
-		description string
-		opt         metadata.UpdateRevisionOpt
-		expected    error
+		description      string
+		opt              metadata.UpdateRevisionOpt
+		expected         error
+		expectedRevision *types.Revision
 	}{
 		{
 			description: "update revision successfully",
@@ -122,6 +125,30 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 				NewAnchored: boolPtr(true),
 			},
 			expected: nil,
+			expectedRevision: &types.Revision{
+				ID:            revisionID,
+				GroupID:       groupID,
+				Revision:      1000,
+				SnapshotTable: "device_info_1000",
+				Anchored:      true,
+				Group:         group,
+			},
+		},
+		{
+			description: "update revision snapshot_table successfully",
+			opt: metadata.UpdateRevisionOpt{
+				RevisionID:       revisionID,
+				NewSnapshotTable: stringPtr("new_table"),
+			},
+			expected: nil,
+			expectedRevision: &types.Revision{
+				ID:            revisionID,
+				GroupID:       groupID,
+				Revision:      1000,
+				SnapshotTable: "new_table",
+				Anchored:      true,
+				Group:         group,
+			},
 		},
 		{
 			description: "cannot update revision, return err",
@@ -137,9 +164,13 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 		t.Run(tc.description, func(t *testing.T) {
 			actual := store.UpdateRevision(ctx, tc.opt)
 			if tc.expected == nil {
-				require.NoError(t, actual)
+				assert.NoError(t, actual)
+				actualRevision, err := store.GetRevision(ctx, revisionID)
+				assert.NoError(t, err)
+				ignoreCreateAndModifyTime(actualRevision)
+				assert.Equal(t, tc.expectedRevision, actualRevision)
 			} else {
-				require.EqualError(t, actual, tc.expected.Error())
+				assert.EqualError(t, actual, tc.expected.Error())
 			}
 		})
 	}
