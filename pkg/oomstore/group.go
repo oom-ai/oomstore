@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -14,12 +15,25 @@ func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (i
 		return 0, err
 	}
 
-	return s.metadata.CreateGroup(ctx, metadata.CreateGroupOpt{
+	id, err := s.metadata.CreateGroup(ctx, metadata.CreateGroupOpt{
 		GroupName:   opt.GroupName,
 		EntityID:    entity.ID,
 		Description: opt.Description,
 		Category:    opt.Category,
 	})
+	if err != nil {
+		return 0, err
+	}
+
+	if opt.Category == types.CategoryStream {
+		if err = s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+			Entity:  entity,
+			GroupID: id,
+		}); err != nil {
+			return 0, err
+		}
+	}
+	return id, nil
 }
 
 // Get metadata of a feature group by ID.
