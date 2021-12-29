@@ -78,13 +78,39 @@ func getFeatureValueMapFromRows(rows *sqlx.Rows, features types.FeatureList, bac
 
 func deserializeIntoRowMap(values []interface{}, features types.FeatureList, backend types.BackendType) (dbutil.RowMap, error) {
 	rs := map[string]interface{}{}
-	for i := range values {
-		value := values[i]
-		typedValue, err := deserializeByTag(value, features[i].ValueType, backend)
+	for i, v := range values {
+		typedValue, err := deserializeByTag(v, features[i].ValueType, backend)
 		if err != nil {
 			return nil, err
 		}
 		rs[features[i].FullName] = typedValue
 	}
 	return rs, nil
+}
+
+func deserializeByTag(i interface{}, valueType types.ValueType, backend types.BackendType) (interface{}, error) {
+	if i == nil {
+		return nil, nil
+	}
+
+	switch valueType {
+	case types.String:
+		if backend == types.BackendMySQL {
+			return string(i.([]byte)), nil
+		}
+		return i, nil
+	case types.Bool:
+		if backend == types.BackendMySQL || backend == types.BackendSQLite {
+			if i == int64(1) {
+				return true, nil
+			} else if i == int64(0) {
+				return false, nil
+			} else {
+				return nil, fmt.Errorf("invalid bool value: %s", i)
+			}
+		}
+		return i, nil
+	default:
+		return i, nil
+	}
 }
