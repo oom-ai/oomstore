@@ -10,6 +10,8 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
+const importBatchSize = 10
+
 func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend types.BackendType) error {
 	columns := append([]string{opt.Entity.Name}, opt.FeatureList.Names()...)
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
@@ -25,18 +27,18 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 		}
 
 		// populate the data table
-		records := make([]interface{}, 0, BatchSize)
+		records := make([]interface{}, 0, importBatchSize)
 		for record := range opt.ExportStream {
 			if len(record) != len(opt.FeatureList)+1 {
 				return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.FeatureList)+1, len(record))
 			}
 			records = append(records, record)
 
-			if len(records) == BatchSize {
+			if len(records) == importBatchSize {
 				if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, backend); err != nil {
 					return err
 				}
-				records = make([]interface{}, 0, BatchSize)
+				records = make([]interface{}, 0, importBatchSize)
 			}
 		}
 
