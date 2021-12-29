@@ -29,7 +29,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	return sqlutil.DoJoin(ctx, dbOpt, doJoinOpt)
 }
 
-func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, header, tableNames []string) (*types.JoinResult, error) {
+func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, header dbutil.ColumnList, dropTableNames []string, backendType types.BackendType) (*types.JoinResult, error) {
 	rows, err := dbOpt.BigQueryDB.Query(query).Read(ctx)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 
 	go func() {
 		defer func() {
-			if err = dropTemporaryTables(ctx, dbOpt.BigQueryDB, tableNames); err != nil {
+			if err = dropTemporaryTables(ctx, dbOpt.BigQueryDB, dropTableNames); err != nil {
 				dropErr = err
 			}
 			defer close(data)
@@ -53,11 +53,17 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 			}
 			if err != nil {
 				scanErr = err
+				continue
 			}
 			record := make([]interface{}, 0, len(recordMap))
-			for _, h := range header {
-				column := strings.Split(h, ".")
-				record = append(record, recordMap[column[len(column)-1]])
+			for i := range header {
+				column := strings.Split(header[i].Name, ".")
+				deserializedValue, err := sqlutil.DeserializeByValueType(recordMap[column[len(column)-1]], header[i].ValueType, backendType)
+				if err != nil {
+					scanErr = err
+					continue
+				}
+				record = append(record, deserializedValue)
 			}
 			data <- record
 		}
@@ -69,7 +75,7 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 	}
 
 	return &types.JoinResult{
-		Header: header,
+		Header: header.Names(),
 		Data:   data,
 	}, dropErr
 }

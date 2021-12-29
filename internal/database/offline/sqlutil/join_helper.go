@@ -30,6 +30,31 @@ ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
 WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
 `
 
+const CDC_JOIN_QUERY = `
+INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{ columnJoinWithComma .ValueNames }} {{ columnJoin .FeatureNames }})
+SELECT
+	l.{{ .EntityKeyStr }} AS entity_key,
+	l.{{ .UnixMilliStr }} AS unix_milli,
+	{{ columnJoinWithComma .ValueNames }}
+	{{ featureValue .FeatureNames }}
+FROM
+	{{ qt .SnapshotJoinedTable }} AS l
+LEFT JOIN {{ qt .CdcTable }} AS r
+ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }} AND l.{{ .UnixMilliStr }} >= r.{{ .UnixMilliStr }}
+WHERE
+	l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ? AND
+	(
+		r.{{ .UnixMilliStr }} IS NULL OR
+		r.{{ .UnixMilliStr }} = (
+			SELECT MAX({{ .UnixMilliStr }})
+			FROM {{ qt .CdcTable }} AS r2
+			WHERE
+				l.{{ .EntityKeyStr }} = r2.{{ qt .EntityName }} AND
+				l.{{ .UnixMilliStr }} >= r2.{{ .UnixMilliStr }}
+		)
+	)
+`
+
 const READ_JOIN_RESULT_QUERY = `
 SELECT
 	{{ qt .EntityRowsTableName }}.{{ .EntityKeyStr }},
@@ -284,6 +309,58 @@ func buildJoinQuery(params joinQueryParams) (string, error) {
 			return qt(columns...)
 		},
 	}).Parse(JOIN_QUERY))
+
+	buf := bytes.NewBuffer(nil)
+	if err := t.Execute(buf, params); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
+type cdcJoinQueryParams struct {
+	TableName           string
+	EntityKeyStr        string
+	EntityName          string
+	UnixMilliStr        string
+	ValueNames          []string
+	FeatureNames        []string
+	SnapshotJoinedTable string
+	CdcTable            string
+	Backend             types.BackendType
+	DatasetID           *string
+}
+
+func buildCdcJoinQuery(params cdcJoinQueryParams) (string, error) {
+	if params.Backend == types.BackendBigQuery {
+		params.TableName = fmt.Sprintf("%s.%s", *params.DatasetID, params.TableName)
+		params.SnapshotJoinedTable = fmt.Sprintf("%s.%s", *params.DatasetID, params.SnapshotJoinedTable)
+		params.CdcTable = fmt.Sprintf("%s.%s", *params.DatasetID, params.CdcTable)
+	}
+
+	qt, err := dbutil.QuoteFn(params.Backend)
+	if err != nil {
+		return "", err
+	}
+
+	t := template.Must(template.New("cdc_join").Funcs(template.FuncMap{
+		"qt": qt,
+		"columnJoin": func(columns []string) string {
+			return qt(columns...)
+		},
+		"columnJoinWithComma": func(columns []string) string {
+			if len(columns) == 0 {
+				return ""
+			}
+			return fmt.Sprintf("%s,", qt(columns...))
+		},
+		"featureValue": func(features []string) string {
+			values := make([]string, 0, len(features))
+			for _, c := range features {
+				values = append(values, fmt.Sprintf("(CASE WHEN r.%s IS NULL THEN l.%s ELSE r.%s END) AS %s", qt("unix_milli"), qt(c), qt(c), c))
+			}
+			return strings.Join(values, ",")
+		},
+	}).Parse(CDC_JOIN_QUERY))
 
 	buf := bytes.NewBuffer(nil)
 	if err := t.Execute(buf, params); err != nil {

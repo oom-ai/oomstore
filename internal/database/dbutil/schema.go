@@ -21,18 +21,20 @@ CREATE TABLE "{{ .TableName }}" (
 	{{ columnJoin .Columns .Backend }}
 )`
 
+// TODO: Add back `PRIMARY KEY` back when we have functions for
+// creating cdc table
 var (
 	createSchemaFuncs = template.FuncMap{
 		"entity": func(entity types.Entity, backend types.BackendType) string {
 			switch backend {
 			case types.BackendCassandra, types.BackendSQLite:
-				return fmt.Sprintf(`"%s" TEXT PRIMARY KEY`, entity.Name)
+				return fmt.Sprintf(`"%s" TEXT`, entity.Name)
 			case types.BackendPostgres, types.BackendSnowflake:
-				return fmt.Sprintf(`"%s" VARCHAR(%d) PRIMARY KEY`, entity.Name, entity.Length)
+				return fmt.Sprintf(`"%s" VARCHAR(%d)`, entity.Name, entity.Length)
 			case types.BackendMySQL:
-				return fmt.Sprintf("`%s` VARCHAR(%d) PRIMARY KEY", entity.Name, entity.Length)
+				return fmt.Sprintf("`%s` VARCHAR(%d)", entity.Name, entity.Length)
 			default:
-				return fmt.Sprintf("%s VARCHAR(%d) PRIMARY KEY", entity.Name, entity.Length)
+				return fmt.Sprintf("%s VARCHAR(%d)", entity.Name, entity.Length)
 			}
 		},
 		"columnJoin": func(columns []Column, backend types.BackendType) string {
@@ -55,8 +57,19 @@ var (
 )
 
 type Column struct {
-	Name   string
-	DbType string
+	Name      string
+	DbType    string
+	ValueType types.ValueType
+}
+
+type ColumnList []Column
+
+func (c ColumnList) Names() []string {
+	names := make([]string, 0, len(c))
+	for _, column := range c {
+		names = append(names, column.Name)
+	}
+	return names
 }
 
 type CreateSchema struct {

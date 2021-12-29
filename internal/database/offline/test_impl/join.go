@@ -4,8 +4,11 @@ import (
 	"bufio"
 	"context"
 	"math"
+	"sort"
 	"strings"
 	"testing"
+
+	"github.com/spf13/cast"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -25,24 +28,41 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		Name:   "device",
 		Length: 10,
 	}
+	unixMilli := &types.Feature{
+		Name:      "unix_milli",
+		ValueType: types.Int64,
+	}
 	oneGroupFeatures, oneGroupFeatureMap := prepareFeatures(true)
 	twoGroupFeatures, twoGroupFeatureMap := prepareFeatures(false)
 
-	buildTestSnapshotTable(ctx, t, store, oneGroupFeatures, "offline_1_1", &offline.CSVSource{
+	buildTestSnapshotTable(ctx, t, store, oneGroupFeatures, "offline_snapshot_1_1", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100
 1235,apple,200
 `)),
 		Delimiter: ",",
 	})
-	buildTestSnapshotTable(ctx, t, store, oneGroupFeatures, "offline_1_2", &offline.CSVSource{
+	buildTestSnapshotTable(ctx, t, store, oneGroupFeatures, "offline_snapshot_1_2", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,galaxy,300
 1235,oneplus,240
 `)),
 		Delimiter: ",",
 	})
-	buildTestSnapshotTable(ctx, t, store, twoGroupFeatures[2:], "offline_2_1", &offline.CSVSource{
+	buildTestSnapshotTable(ctx, t, store, twoGroupFeatures[2:], "offline_snapshot_2_1", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,1
 1235,0
+`)),
+		Delimiter: ",",
+	})
+
+	buildTestSnapshotTable(ctx, t, store, append(oneGroupFeatures, unixMilli), "offline_cdc_1_1", &offline.CSVSource{
+		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi-1,120,2
+1235,apple-2,115,14
+1234,xiaomi-1,130,10
+`)),
+		Delimiter: ",",
+	})
+	buildTestSnapshotTable(ctx, t, store, append(oneGroupFeatures, unixMilli), "offline_cdc_1_2", &offline.CSVSource{
+		Reader: bufio.NewReader(strings.NewReader(`1234,galaxy-1,320,18
 `)),
 		Delimiter: ",",
 	})
@@ -69,35 +89,46 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 			expected: nil,
 		},
 		{
-			description: "one feature group",
+			description: "one batch feature group",
 			opt: offline.JoinOpt{
 				Entity:           *entity,
 				EntityRows:       prepareEntityRows(false, false),
 				FeatureMap:       oneGroupFeatureMap,
-				RevisionRangeMap: prepareRevisionRanges(true),
+				RevisionRangeMap: prepareRevisionRanges(true, false),
 			},
-			expected: prepareResult(true, false),
+			expected: prepareResult(true, false, prepareBatchResultValues()),
 		},
 		{
-			description: "two feature groups",
+			description: "two batch feature groups",
 			opt: offline.JoinOpt{
 				Entity:           *entity,
 				EntityRows:       prepareEntityRows(false, false),
 				FeatureMap:       twoGroupFeatureMap,
-				RevisionRangeMap: prepareRevisionRanges(false),
+				RevisionRangeMap: prepareRevisionRanges(false, false),
 			},
-			expected: prepareResult(false, false),
+			expected: prepareResult(false, false, prepareBatchResultValues()),
 		},
 		{
-			description: "two feature groups, with extra values",
+			description: "two batch feature groups, with extra values",
 			opt: offline.JoinOpt{
 				Entity:           *entity,
 				EntityRows:       prepareEntityRows(false, true),
 				FeatureMap:       twoGroupFeatureMap,
-				RevisionRangeMap: prepareRevisionRanges(false),
+				RevisionRangeMap: prepareRevisionRanges(false, false),
 				ValueNames:       []string{"value_1", "value_2"},
 			},
-			expected: prepareResult(false, true),
+			expected: prepareResult(false, true, prepareBatchResultValues()),
+		},
+		{
+			description: "one streaming feature group, one batch group",
+			opt: offline.JoinOpt{
+				Entity:           *entity,
+				EntityRows:       prepareEntityRows(false, true),
+				FeatureMap:       twoGroupFeatureMap,
+				RevisionRangeMap: prepareRevisionRanges(false, true),
+				ValueNames:       []string{"value_1", "value_2"},
+			},
+			expected: prepareResult(false, true, prepareStreamingResultValues()),
 		},
 	}
 
@@ -108,10 +139,12 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 			if tc.expected == nil {
 				assert.Equal(t, tc.expected, actual)
 			} else {
+				assert.ElementsMatch(t, tc.expected.Header, actual.Header)
 				expectedValues := extractValues(tc.expected.Data)
 				actualValues := extractValues(actual.Data)
-				assert.ElementsMatch(t, tc.expected.Header, actual.Header)
-				assert.ObjectsAreEqual(expectedValues, actualValues)
+				for i := range expectedValues {
+					assert.ElementsMatch(t, expectedValues[i], actualValues[i])
+				}
 			}
 		})
 	}
@@ -157,31 +190,36 @@ func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.Feature
 	}
 }
 
-func prepareRevisionRanges(oneGroup bool) map[string][]*metadata.RevisionRange {
+func prepareRevisionRanges(oneGroup bool, stream bool) map[string][]*metadata.RevisionRange {
 	basic := []*metadata.RevisionRange{
 		{
 			MinRevision:   1,
 			MaxRevision:   15,
-			SnapshotTable: "offline_1_1",
+			SnapshotTable: "offline_snapshot_1_1",
 		},
 		{
 			MinRevision:   15,
 			MaxRevision:   25,
-			SnapshotTable: "offline_1_2",
+			SnapshotTable: "offline_snapshot_1_2",
 		},
 	}
 	advanced := []*metadata.RevisionRange{
 		{
 			MinRevision:   5,
 			MaxRevision:   math.MaxInt64,
-			SnapshotTable: "offline_2_1",
+			SnapshotTable: "offline_snapshot_2_1",
 		},
+	}
+	if stream {
+		basic[0].CdcTable = "offline_cdc_1_1"
+		basic[1].CdcTable = "offline_cdc_1_2"
 	}
 	if oneGroup {
 		return map[string][]*metadata.RevisionRange{
 			"device_basic": basic,
 		}
 	}
+
 	return map[string][]*metadata.RevisionRange{
 		"device_basic":    basic,
 		"device_advanced": advanced,
@@ -227,12 +265,81 @@ func prepareEntityRows(isEmpty bool, withValue bool) <-chan types.EntityRow {
 	return entityRows
 }
 
-func prepareResult(oneGroup bool, withValue bool) *types.JoinResult {
+func prepareResult(oneGroup bool, withValue bool, values []map[string]interface{}) *types.JoinResult {
 	header := []string{"entity_key", "unix_milli", "device_basic.model", "device_basic.price", "device_advanced.is_active"}
 	if withValue {
 		header = []string{"entity_key", "unix_milli", "value_1", "value_2", "device_basic.model", "device_basic.price", "device_advanced.is_active"}
 	}
-	values := []map[string]interface{}{
+	if oneGroup {
+		header = header[:len(header)-1]
+	}
+	if !withValue {
+		for _, m := range values {
+			delete(m, "value_1")
+			delete(m, "value_2")
+		}
+	}
+
+	data := make(chan []interface{})
+	go func() {
+		defer close(data)
+		for _, item := range values {
+			record := make([]interface{}, 0, len(header))
+			for _, h := range header {
+				record = append(record, item[h])
+			}
+			data <- record
+		}
+	}()
+	return &types.JoinResult{
+		Header: header,
+		Data:   data,
+	}
+}
+
+func prepareStreamingResultValues() []map[string]interface{} {
+	return []map[string]interface{}{
+		{
+			"entity_key":                "1234",
+			"unix_milli":                int64(10),
+			"value_1":                   "1",
+			"value_2":                   "2",
+			"device_basic.model":        "xiaomi-1",
+			"device_basic.price":        int64(130),
+			"device_advanced.is_active": true,
+		},
+		{
+			"entity_key":                "1234",
+			"unix_milli":                int64(20),
+			"value_1":                   "3",
+			"value_2":                   "4",
+			"device_basic.model":        "galaxy-1",
+			"device_basic.price":        int64(320),
+			"device_advanced.is_active": true,
+		},
+		{
+			"entity_key":                "1235",
+			"unix_milli":                int64(5),
+			"value_1":                   "5",
+			"value_2":                   "6",
+			"device_basic.model":        "apple",
+			"device_basic.price":        int64(200),
+			"device_advanced.is_active": false,
+		},
+		{
+			"entity_key":                "1235",
+			"unix_milli":                int64(14),
+			"value_1":                   "7",
+			"value_2":                   "8",
+			"device_basic.model":        "apple-2",
+			"device_basic.price":        int64(115),
+			"device_advanced.is_active": false,
+		},
+	}
+}
+
+func prepareBatchResultValues() []map[string]interface{} {
+	return []map[string]interface{}{
 		{
 			"entity_key":                "1234",
 			"unix_milli":                int64(10),
@@ -270,31 +377,6 @@ func prepareResult(oneGroup bool, withValue bool) *types.JoinResult {
 			"device_advanced.is_active": false,
 		},
 	}
-	if oneGroup {
-		header = header[:len(header)-1]
-	}
-	if !withValue {
-		for _, m := range values {
-			delete(m, "value_1")
-			delete(m, "value_2")
-		}
-	}
-
-	data := make(chan []interface{})
-	go func() {
-		defer close(data)
-		for _, item := range values {
-			record := make([]interface{}, 0, len(header))
-			for _, h := range header {
-				record = append(record, item[h])
-			}
-			data <- record
-		}
-	}()
-	return &types.JoinResult{
-		Header: header,
-		Data:   data,
-	}
 }
 
 func extractValues(stream <-chan []interface{}) [][]interface{} {
@@ -302,5 +384,11 @@ func extractValues(stream <-chan []interface{}) [][]interface{} {
 	for item := range stream {
 		values = append(values, item)
 	}
+	sort.Slice(values, func(i, j int) bool {
+		if cast.ToString(values[i][0]) == cast.ToString(values[j][0]) {
+			return cast.ToInt(values[i][1]) < cast.ToInt(values[j][1])
+		}
+		return cast.ToString(values[i][0]) < cast.ToString(values[j][0])
+	})
 	return values
 }
