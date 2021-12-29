@@ -26,7 +26,6 @@ func destroyStore(t *testing.T) func() {
 			t.Fatal(err)
 		}
 		defer store.Close()
-
 		if err = store.DeleteRange(context.Background(), []byte(""), []byte{}); err != nil {
 			t.Fatal(err)
 		}
@@ -36,4 +35,20 @@ func destroyStore(t *testing.T) func() {
 
 func TestOpen(t *testing.T) {
 	test_impl.TestOpen(t, prepareStore, destroyStore(t))
+}
+
+func TestPing(t *testing.T) {
+	test_impl.TestPing(t, prepareStore, destroyStore(t))
+}
+
+func TestGetExisted(t *testing.T) {
+	test_impl.TestGetExisted(t, prepareStore, destroyStore(t))
+}
+
+func TestGetNotExistedEntityKey(t *testing.T) {
+	test_impl.TestGetNotExistedEntityKey(t, prepareStore, destroyStore(t))
+}
+
+func TestMultiGet(t *testing.T) {
+	test_impl.TestMultiGet(t, prepareStore, destroyStore(t))
 }
