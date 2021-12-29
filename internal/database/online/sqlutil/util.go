@@ -11,8 +11,6 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const BatchSize = 10
-
 func OnlineBatchTableName(revisionID int) string {
 	return fmt.Sprintf("online_batch_%d", revisionID)
 }
