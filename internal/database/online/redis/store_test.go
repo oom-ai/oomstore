@@ -51,6 +51,10 @@ func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
 	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore, destroyStore)
 }
 
+func TestPrepareStreamTable(t *testing.T) {
+	test_impl.TestPrepareStreamTable(t, prepareStore, destroyStore)
+}
+
 func TestPing(t *testing.T) {
 	test_impl.TestPing(t, prepareStore, destroyStore)
 }
