@@ -1,8 +1,10 @@
 package sqlutil
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -41,4 +43,26 @@ func deserializeByTag(i interface{}, valueType types.ValueType, backend types.Ba
 	default:
 		return i, nil
 	}
+}
+
+func CreateStreamTableSchema(ctx context.Context, tableName string, entity *types.Entity, backend types.BackendType) (string, error) {
+	var (
+		entityFormat string
+	)
+	switch backend {
+	case types.BackendMySQL:
+		entityFormat = fmt.Sprintf("`%s` VARCHAR(%d) PRIMARY KEY", entity.Name, entity.Length)
+	case types.BackendPostgres:
+		entityFormat = fmt.Sprintf(`"%s" VARCHAR(%d) PRIMARY KEY`, entity.Name, entity.Length)
+	case types.BackendCassandra, types.BackendSQLite:
+		entityFormat = fmt.Sprintf(`"%s" TEXY PRIMARY KEY`, entity.Name)
+	default:
+		return "", errdefs.InvalidAttribute(fmt.Errorf("backend %s not support", backend))
+	}
+
+	schema := fmt.Sprintf(`
+CREATE TABLE %s (
+   %s
+)`, tableName, entityFormat)
+	return schema, nil
 }
