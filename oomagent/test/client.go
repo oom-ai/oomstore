@@ -10,6 +10,7 @@ import (
 
 	"github.com/oom-ai/oomstore/oomagent/codegen"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -90,7 +91,7 @@ func Import() {
 }
 
 func prepareOomAgentClient(addr string) (c codegen.OomAgentClient, cancel func()) {
-	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	conn, err := grpc.Dial(addr, insecure.NewCredentials())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
