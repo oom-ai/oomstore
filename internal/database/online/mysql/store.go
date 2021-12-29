@@ -47,3 +47,7 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	panic("Implement me!")
 }
+
+func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
+	return sqlutil.SqlxPrapareStreamTable(ctx, db.DB, opt, types.BackendMySQL)
+}

@@ -11,6 +11,8 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline/mock_offline"
+	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/internal/database/online/mock_online"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -20,9 +22,10 @@ func TestCreateFeature(t *testing.T) {
 	defer ctrl.Finish()
 	ctx := context.Background()
 
+	onlineStore := mock_online.NewMockStore(ctrl)
 	offlineStore := mock_offline.NewMockStore(ctrl)
 	metadataStore := mock_metadata.NewMockStore(ctrl)
-	store := oomstore.TEST__New(nil, offlineStore, metadataStore)
+	store := oomstore.TEST__New(onlineStore, offlineStore, metadataStore)
 
 	testCases := []struct {
 		description string
@@ -72,8 +75,17 @@ func TestCreateFeature(t *testing.T) {
 				ValueType:   tc.valueType,
 				Description: tc.opt.Description,
 			}
-			metadataStore.EXPECT().CreateFeature(ctx, metadataOpt).Return(0, nil)
+			metadataStore.EXPECT().CreateFeature(ctx, metadataOpt).Return(1, nil)
 
+			if tc.group.Category == types.CategoryStream {
+				var feature types.Feature
+				metadataStore.EXPECT().GetFeature(ctx, 1).Return(&feature, nil)
+				onlineStore.EXPECT().PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+					Entity:  tc.group.Entity,
+					GroupID: tc.group.ID,
+					Feature: &feature,
+				})
+			}
 			_, err := store.CreateFeature(ctx, tc.opt)
 			assert.NoError(t, err)
 		})

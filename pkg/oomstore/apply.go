@@ -10,6 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
@@ -90,13 +91,24 @@ func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup
 		if !errdefs.IsNotFound(err) {
 			return err
 		}
-		_, err = tx.CreateGroup(ctx, metadata.CreateGroupOpt{
+
+		id, err := tx.CreateGroup(ctx, metadata.CreateGroupOpt{
 			GroupName:   newGroup.Name,
 			EntityID:    entity.ID,
 			Category:    newGroup.Category,
 			Description: newGroup.Description,
 		})
-		return err
+		if err != nil {
+			return err
+		}
+
+		if newGroup.Category == types.CategoryStream {
+			return s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+				Entity:  entity,
+				GroupID: id,
+			})
+		}
+		return nil
 	}
 
 	if newGroup.Description != group.Description {
@@ -118,7 +130,9 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 	if err != nil {
 		return err
 	}
-	feature, err := tx.GetFeatureByName(ctx, newFeature.Name)
+
+	featureFullName := fmt.Sprintf("%s.%s", newFeature.GroupName, newFeature.Name)
+	feature, err := tx.GetFeatureByName(ctx, featureFullName)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return err
@@ -127,14 +141,29 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 		if err != nil {
 			return err
 		}
-		_, err = tx.CreateFeature(ctx, metadata.CreateFeatureOpt{
+		id, err := tx.CreateFeature(ctx, metadata.CreateFeatureOpt{
 			FeatureName: newFeature.Name,
-			FullName:    fmt.Sprintf("%s.%s", group.Name, newFeature.Name),
+			FullName:    featureFullName,
 			GroupID:     group.ID,
 			Description: newFeature.Description,
 			ValueType:   valueType,
 		})
-		return err
+		if err != nil {
+			return err
+		}
+
+		if group.Category == types.CategoryStream {
+			feature, err := tx.GetFeature(ctx, id)
+			if err != nil {
+				return err
+			}
+			return s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+				Entity:  group.Entity,
+				GroupID: group.ID,
+				Feature: feature,
+			})
+		}
+		return nil
 	}
 
 	if newFeature.Description != feature.Description {

@@ -108,6 +108,20 @@ func (mr *MockStoreMockRecorder) Ping(ctx interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockStore)(nil).Ping), ctx)
 }
 
+// PrepareStreamTable mocks base method.
+func (m *MockStore) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PrepareStreamTable", ctx, opt)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PrepareStreamTable indicates an expected call of PrepareStreamTable.
+func (mr *MockStoreMockRecorder) PrepareStreamTable(ctx, opt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrepareStreamTable", reflect.TypeOf((*MockStore)(nil).PrepareStreamTable), ctx, opt)
+}
+
 // Purge mocks base method.
 func (m *MockStore) Purge(ctx context.Context, revisionID int) error {
 	m.ctrl.T.Helper()

@@ -30,3 +30,13 @@ type PushOpt struct {
 	Entity  *types.Entity
 	Feature types.Feature
 }
+
+type PrepareStreamTableOpt struct {
+	Entity *types.Entity
+
+	GroupID int
+
+	// Feature is not nil to add a new row to the stream table;
+	// otherwise it means the stream table will be created.
+	Feature *types.Feature
+}

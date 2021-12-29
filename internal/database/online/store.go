@@ -16,7 +16,10 @@ type Store interface {
 	Import(ctx context.Context, opt ImportOpt) error
 
 	// Push streaming feature to online store
+	// Note: Make sure that the table corresponding to the stream feature already exists before executing this method
 	Push(ctx context.Context, opt PushOpt) error
+
+	PrepareStreamTable(ctx context.Context, opt PrepareStreamTableOpt) error
 
 	Ping(ctx context.Context) error
 	io.Closer

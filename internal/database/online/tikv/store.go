@@ -3,11 +3,12 @@ package tikv
 import (
 	"context"
 
+	"github.com/tikv/client-go/v2/config"
+	"github.com/tikv/client-go/v2/rawkv"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/tikv/client-go/v2/config"
-	"github.com/tikv/client-go/v2/rawkv"
 )
 
 const BackendType = types.BackendTiKV
@@ -53,4 +54,8 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	panic("implement me")
+}
+
+func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
+	return nil
 }
