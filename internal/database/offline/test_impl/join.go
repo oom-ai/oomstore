@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -190,8 +189,8 @@ func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.Feature
 	}
 }
 
-func prepareRevisionRanges(oneGroup bool, stream bool) map[string][]*metadata.RevisionRange {
-	basic := []*metadata.RevisionRange{
+func prepareRevisionRanges(oneGroup bool, stream bool) map[string][]*offline.RevisionRange {
+	basic := []*offline.RevisionRange{
 		{
 			MinRevision:   1,
 			MaxRevision:   15,
@@ -203,7 +202,7 @@ func prepareRevisionRanges(oneGroup bool, stream bool) map[string][]*metadata.Re
 			SnapshotTable: "offline_snapshot_1_2",
 		},
 	}
-	advanced := []*metadata.RevisionRange{
+	advanced := []*offline.RevisionRange{
 		{
 			MinRevision:   5,
 			MaxRevision:   math.MaxInt64,
@@ -215,12 +214,12 @@ func prepareRevisionRanges(oneGroup bool, stream bool) map[string][]*metadata.Re
 		basic[1].CdcTable = "offline_cdc_1_2"
 	}
 	if oneGroup {
-		return map[string][]*metadata.RevisionRange{
+		return map[string][]*offline.RevisionRange{
 			"device_basic": basic,
 		}
 	}
 
-	return map[string][]*metadata.RevisionRange{
+	return map[string][]*offline.RevisionRange{
 		"device_basic":    basic,
 		"device_advanced": advanced,
 	}

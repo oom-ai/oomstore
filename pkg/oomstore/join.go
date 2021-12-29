@@ -42,7 +42,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 	}
 
 	featureMap := buildGroupToFeaturesMap(features)
-	revisionRangeMap := make(map[string][]*metadata.RevisionRange)
+	revisionRangeMap := make(map[string][]*offline.RevisionRange)
 	for groupName, featureList := range featureMap {
 		if len(featureList) == 0 {
 			continue
@@ -96,7 +96,7 @@ func buildGroupToFeaturesMap(features types.FeatureList) map[string]types.Featur
 	return groups
 }
 
-func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) ([]*metadata.RevisionRange, error) {
+func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) ([]*offline.RevisionRange, error) {
 	revisions, err := s.metadata.ListRevision(ctx, &group.ID)
 	if err != nil {
 		return nil, err
@@ -109,16 +109,16 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) 
 		return revisions[i].Revision < revisions[j].Revision
 	})
 
-	var ranges []*metadata.RevisionRange
+	var ranges []*offline.RevisionRange
 	for i := 1; i < len(revisions); i++ {
-		ranges = append(ranges, &metadata.RevisionRange{
+		ranges = append(ranges, &offline.RevisionRange{
 			MinRevision:   revisions[i-1].Revision,
 			MaxRevision:   revisions[i].Revision,
 			SnapshotTable: revisions[i-1].SnapshotTable,
 			CdcTable:      revisions[i-1].CdcTable,
 		})
 	}
-	ranges = append(ranges, &metadata.RevisionRange{
+	ranges = append(ranges, &offline.RevisionRange{
 		MinRevision:   revisions[len(revisions)-1].Revision,
 		MaxRevision:   math.MaxInt64,
 		SnapshotTable: revisions[len(revisions)-1].SnapshotTable,
