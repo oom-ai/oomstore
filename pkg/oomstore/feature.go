@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -59,11 +60,30 @@ func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt
 		return 0, err
 	}
 
-	return s.metadata.CreateFeature(ctx, metadata.CreateFeatureOpt{
+	id, err := s.metadata.CreateFeature(ctx, metadata.CreateFeatureOpt{
 		FeatureName: opt.FeatureName,
 		FullName:    fmt.Sprintf("%s.%s", group.Name, opt.FeatureName),
 		GroupID:     group.ID,
 		ValueType:   opt.ValueType,
 		Description: opt.Description,
 	})
+	if err != nil {
+		return 0, err
+	}
+
+	if group.Category == types.CategoryStream {
+		feature, err := s.metadata.GetFeature(ctx, id)
+		if err != nil {
+			return 0, err
+		}
+		if err := s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+			Entity:  group.Entity,
+			GroupID: group.ID,
+			Feature: feature,
+		}); err != nil {
+			return 0, err
+		}
+	}
+
+	return id, nil
 }

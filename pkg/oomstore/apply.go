@@ -141,14 +141,29 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 		if err != nil {
 			return err
 		}
-		_, err = tx.CreateFeature(ctx, metadata.CreateFeatureOpt{
+		id, err := tx.CreateFeature(ctx, metadata.CreateFeatureOpt{
 			FeatureName: newFeature.Name,
 			FullName:    featureFullName,
 			GroupID:     group.ID,
 			Description: newFeature.Description,
 			ValueType:   valueType,
 		})
-		return err
+		if err != nil {
+			return err
+		}
+
+		if group.Category == types.CategoryStream {
+			feature, err := tx.GetFeature(ctx, id)
+			if err != nil {
+				return err
+			}
+			return s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+				Entity:  group.Entity,
+				GroupID: group.ID,
+				Feature: feature,
+			})
+		}
+		return nil
 	}
 
 	if newFeature.Description != feature.Description {
