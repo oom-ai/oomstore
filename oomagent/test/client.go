@@ -91,7 +91,7 @@ func Import() {
 }
 
 func prepareOomAgentClient(addr string) (c codegen.OomAgentClient, cancel func()) {
-	conn, err := grpc.Dial(addr, insecure.NewCredentials())
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
