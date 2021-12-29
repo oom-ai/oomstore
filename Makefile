@@ -58,7 +58,7 @@ oomagent: codegen
 
 .PHONY: test
 test: codegen
-	@oomplay init $$(oomplay list)
+	@oomplay init $$(oomplay list) -j 16
 	@go test -race -coverprofile=coverage.out -covermode=atomic ./...
 
 .PHONY: integration-test
