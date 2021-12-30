@@ -3,10 +3,10 @@ package mysql
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
@@ -50,22 +50,19 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
 
-	insertColumns := append([]string{opt.Entity.Name}, opt.FeatureNames...)
-	insertValues := append([]interface{}{opt.EntityKey}, opt.FeatureValues...)
-
-	updateValues := opt.FeatureValues
-	updatePlaceholders := make([]string, 0, len(opt.FeatureNames))
-	for _, name := range opt.FeatureNames {
-		updatePlaceholders = append(updatePlaceholders, fmt.Sprintf("%s=?", name))
+	inserts, insertPlaceholders, updatePlaceholders, values, err := sqlutil.BuildPushCondition(opt, types.BackendMySQL)
+	if err != nil {
+		return err
 	}
 
 	query := fmt.Sprintf(`INSERT INTO %s (%s) VALUES(%s) ON DUPLICATE KEY UPDATE %s`,
 		tableName,
-		strings.Join(insertColumns, ","),
-		dbutil.Placeholders(len(insertColumns), "?", ","),
-		strings.Join(updatePlaceholders, ","),
+		inserts,
+		insertPlaceholders,
+		updatePlaceholders,
 	)
-	_, err := db.ExecContext(ctx, query, append(insertValues, updateValues...)...)
+
+	_, err = db.ExecContext(ctx, db.Rebind(query), values...)
 	return err
 }
 

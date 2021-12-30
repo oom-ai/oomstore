@@ -52,7 +52,7 @@ func TestPlaceholders(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.describe, func(t *testing.T) {
-			got := dbutil.Placeholders(c.size, c.elem, c.sep)
+			got := dbutil.Fill(c.size, c.elem, c.sep)
 			assert.Equal(t, c.want, got)
 		})
 	}
