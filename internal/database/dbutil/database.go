@@ -9,6 +9,8 @@ import (
 	"github.com/lib/pq"
 	"github.com/mattn/go-sqlite3"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/snowflakedb/gosnowflake"
+	"google.golang.org/api/googleapi"
 )
 
 func OpenSQLite(dbFile string) (*sqlx.DB, error) {
@@ -49,10 +51,11 @@ func DeserializeString(i interface{}, backend types.BackendType) string {
 	}
 }
 
+// TODO: Should return an error when bakcend is not supported ?
 func IsTableNotFoundError(err error, backend types.BackendType) bool {
 	switch backend {
+	// https://github.com/mattn/go-sqlite3/issues/244
 	case types.BackendSQLite:
-		// https://github.com/mattn/go-sqlite3/issues/244
 		if sqliteErr, ok := err.(sqlite3.Error); ok {
 			return sqliteErr.Code == sqlite3.ErrError
 		}
@@ -62,9 +65,18 @@ func IsTableNotFoundError(err error, backend types.BackendType) bool {
 		if e2, ok := err.(*mysql.MySQLError); ok {
 			return e2.Number == 1146
 		}
-	case types.BackendPostgres:
+	case types.BackendPostgres, types.BackendRedshift:
 		if e2, ok := err.(*pq.Error); ok {
 			return e2.Code == pgerrcode.UndefinedTable
+		}
+	case types.BackendSnowflake:
+		if e2, ok := err.(*gosnowflake.SnowflakeError); ok {
+			return e2.Number == gosnowflake.ErrObjectNotExistOrAuthorized
+		}
+	// https://cloud.google.com/bigquery/docs/error-messages
+	case types.BackendBigQuery:
+		if e2, ok := err.(*googleapi.Error); ok {
+			return e2.Code == 404
 		}
 	}
 	return false
