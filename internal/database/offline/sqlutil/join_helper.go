@@ -157,10 +157,7 @@ func prepareTableSchema(dbOpt dbutil.DBOpt, entity types.Entity, tableName strin
 	if err != nil {
 		return "", nil, err
 	}
-	qt, err := dbutil.QuoteFn(dbOpt.Backend)
-	if err != nil {
-		return "", nil, err
-	}
+	qt := dbutil.QuoteFn(dbOpt.Backend)
 
 	// TODO: infer db_type from value_type
 	var entityType, valueType, qtTableName string
@@ -261,10 +258,7 @@ type readJoinResultQueryParams struct {
 }
 
 func buildReadJoinResultQuery(query string, params readJoinResultQueryParams) (string, error) {
-	qt, err := dbutil.QuoteFn(params.Backend)
-	if err != nil {
-		return "", err
-	}
+	qt := dbutil.QuoteFn(params.Backend)
 	t := template.Must(template.New("temp_join").Funcs(template.FuncMap{
 		"qt": qt,
 		"fieldJoin": func(fields []string) string {
@@ -298,11 +292,7 @@ func buildJoinQuery(params joinQueryParams) (string, error) {
 		params.SnapshotTable = fmt.Sprintf("%s.%s", *params.DatasetID, params.SnapshotTable)
 	}
 
-	qt, err := dbutil.QuoteFn(params.Backend)
-	if err != nil {
-		return "", err
-	}
-
+	qt := dbutil.QuoteFn(params.Backend)
 	t := template.Must(template.New("join").Funcs(template.FuncMap{
 		"qt": qt,
 		"columnJoin": func(columns []string) string {
@@ -337,11 +327,7 @@ func buildCdcJoinQuery(params cdcJoinQueryParams) (string, error) {
 		params.CdcTable = fmt.Sprintf("%s.%s", *params.DatasetID, params.CdcTable)
 	}
 
-	qt, err := dbutil.QuoteFn(params.Backend)
-	if err != nil {
-		return "", err
-	}
-
+	qt := dbutil.QuoteFn(params.Backend)
 	t := template.Must(template.New("cdc_join").Funcs(template.FuncMap{
 		"qt": qt,
 		"columnJoin": func(columns []string) string {
