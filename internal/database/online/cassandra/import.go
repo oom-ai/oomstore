@@ -55,6 +55,6 @@ func buildInsertStatement(tableName string, columns []string) string {
 
 	return fmt.Sprintf(`INSERT INTO "%s" (%s) VALUES (%s)`,
 		tableName,
-		dbutil.Quote(`"`, columns...),
+		dbutil.QuoteFn(Backend)(columns...),
 		strings.Join(valueFlags, ","))
 }

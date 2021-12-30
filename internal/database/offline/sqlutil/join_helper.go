@@ -205,13 +205,13 @@ func insertEntityRows(ctx context.Context,
 		records = append(records, record)
 		if len(records) == InsertBatchSize {
 
-			if err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, records, columns); err != nil {
+			if err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, records, columns, dbOpt.Backend); err != nil {
 				return err
 			}
 			records = make([]interface{}, 0, InsertBatchSize)
 		}
 	}
-	if err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, records, columns); err != nil {
+	if err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, records, columns, dbOpt.Backend); err != nil {
 		return err
 	}
 	return nil

@@ -27,8 +27,8 @@ func BuildConditions(equal map[string]interface{}, in map[string]interface{}) ([
 	return cond, args, nil
 }
 
-func InsertRecordsToTable(ctx context.Context, dbOpt DBOpt, tableName string, records []interface{}, columns []string) error {
-	query, args, err := dbOpt.BuildInsertQuery(tableName, records, columns)
+func InsertRecordsToTable(ctx context.Context, dbOpt DBOpt, tableName string, records []interface{}, columns []string, backed types.BackendType) error {
+	query, args, err := dbOpt.BuildInsertQuery(tableName, records, columns, backed)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func InsertRecordsToTableTx(tx *sqlx.Tx, ctx context.Context, tableName string, 
 	dbOpt := DBOpt{
 		Backend: backendType,
 	}
-	query, args, err := dbOpt.BuildInsertQuery(tableName, records, columns)
+	query, args, err := dbOpt.BuildInsertQuery(tableName, records, columns, backendType)
 	if err != nil {
 		return err
 	}
@@ -54,14 +54,6 @@ func InsertRecordsToTableTx(tx *sqlx.Tx, ctx context.Context, tableName string, 
 		return err
 	}
 	return nil
-}
-
-func Quote(quote string, fields ...string) string {
-	var rs []string
-	for _, f := range fields {
-		rs = append(rs, quote+f+quote)
-	}
-	return strings.Join(rs, ",")
 }
 
 func GetColumnFormat(backendType types.BackendType) (string, error) {
@@ -78,16 +70,20 @@ func GetColumnFormat(backendType types.BackendType) (string, error) {
 }
 
 func QuoteFn(backendType types.BackendType) func(...string) string {
-	var quote string
+	var q string
 	switch backendType {
 	case types.BackendPostgres, types.BackendSnowflake, types.BackendRedshift:
-		quote = `"`
+		q = `"`
 	case types.BackendMySQL, types.BackendSQLite, types.BackendBigQuery:
-		quote = "`"
+		q = "`"
 	default:
 		panic(fmt.Sprintf("unsupported backend type %s", backendType))
 	}
 	return func(fields ...string) string {
-		return Quote(quote, fields...)
+		var rs []string
+		for _, f := range fields {
+			rs = append(rs, q+f+q)
+		}
+		return strings.Join(rs, ",")
 	}
 }
