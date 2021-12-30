@@ -11,6 +11,11 @@ import (
 )
 
 func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
+	// dynamodb has no "column", so we do nothing to "add column". see https://stackoverflow.com/a/25610645/16428442
+	if opt.Feature != nil {
+		return nil
+	}
+
 	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
 
 	_, err := db.CreateTable(ctx, &dynamodb.CreateTableInput{

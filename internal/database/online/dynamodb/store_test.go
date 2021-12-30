@@ -64,3 +64,7 @@ func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
 func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
 	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore, destroyStore(t))
 }
+
+func TestPrepareStreamTable(t *testing.T) {
+	test_impl.TestPrepareStreamTable(t, prepareStore, destroyStore(t))
+}

@@ -14,7 +14,7 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
 
 	if opt.Feature == nil {
-		schema, err := sqlutil.CreateStreamTableSchema(ctx, tableName, opt.Entity, types.BackendMySQL)
+		schema, err := sqlutil.CreateStreamTableSchema(ctx, tableName, opt.Entity, types.BackendCassandra)
 		if err != nil {
 			return err
 		}
@@ -27,6 +27,7 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 		return err
 	}
 
-	sql := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", tableName, opt.Feature.Name, dbValueType)
+	sql := fmt.Sprintf("ALTER TABLE %s ADD %s %s", tableName, opt.Feature.Name, dbValueType)
+
 	return db.Query(sql).WithContext(ctx).Exec()
 }
