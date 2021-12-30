@@ -29,7 +29,7 @@ func RandString(n int) string {
 	return string(b)
 }
 
-func Placeholders(size int, elem string, sep string) string {
+func Fill(size int, elem string, sep string) string {
 	r := make([]string, 0, size)
 
 	for i := 0; i < size; i++ {

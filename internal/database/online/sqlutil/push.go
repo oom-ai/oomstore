@@ -24,7 +24,7 @@ func BuildPushCondition(opt online.PushOpt, backend types.BackendType) (string, 
 	}
 
 	return qt(insertColumns...),
-		dbutil.Placeholders(len(insertColumns), "?", ","),
+		dbutil.Fill(len(insertColumns), "?", ","),
 		strings.Join(updatePlaceholders, ","),
 		append(insertValues, opt.FeatureValues...),
 		nil
