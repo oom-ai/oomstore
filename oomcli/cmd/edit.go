@@ -16,7 +16,7 @@ var editor = "vi"
 
 var editCmd = &cobra.Command{
 	Use:   "edit",
-	Short: "Edit a resource from the default editor.",
+	Short: "Edit a resource from the default editor",
 }
 
 func init() {
