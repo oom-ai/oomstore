@@ -42,7 +42,7 @@ func OnlineGet() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	r, err := c.OnlineGet(ctx, &codegen.OnlineGetRequest{EntityKey: "1", FeatureNames: []string{"model"}})
+	r, err := c.OnlineGet(ctx, &codegen.OnlineGetRequest{EntityKey: "1", FeatureFullNames: []string{"model"}})
 	if err != nil {
 		log.Fatalf("could not get: %v", err)
 	}
