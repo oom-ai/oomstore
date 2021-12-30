@@ -18,54 +18,54 @@ const (
 )
 
 const JOIN_QUERY = `
-INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{ columnJoin .Columns }})
+INSERT INTO {{ qt .TableName }} ( {{ qt .EntityKey }}, {{ qt .UnixMilli }}, {{ columnJoin .Columns }})
 SELECT
-	l.{{ .EntityKeyStr }} AS entity_key,
-	l.{{ .UnixMilliStr }} AS unix_milli,
+	l.{{ qt .EntityKey }},
+	l.{{ qt .UnixMilli }},
 	{{ columnJoin .Columns }}
 FROM
 	{{ qt .EntityRowsTableName }} AS l
 LEFT JOIN {{ qt .SnapshotTable }} AS r
-ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }}
-WHERE l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ?
+ON l.{{ qt .EntityKey }} = r.{{ qt .EntityName }}
+WHERE l.{{ qt .UnixMilli }} >= ? AND l.{{ qt .UnixMilli }} < ?
 `
 
 const CDC_JOIN_QUERY = `
-INSERT INTO {{ qt .TableName }} ( {{ .EntityKeyStr }}, {{ .UnixMilliStr }}, {{ columnJoinWithComma .ValueNames }} {{ columnJoin .FeatureNames }})
+INSERT INTO {{ qt .TableName }} ( {{ qt .EntityKey }}, {{ qt .UnixMilli }}, {{ columnJoinWithComma .ValueNames }} {{ columnJoin .FeatureNames }})
 SELECT
-	l.{{ .EntityKeyStr }} AS entity_key,
-	l.{{ .UnixMilliStr }} AS unix_milli,
+	l.{{ qt .EntityKey }},
+	l.{{ qt .UnixMilli }},
 	{{ columnJoinWithComma .ValueNames }}
 	{{ featureValue .FeatureNames }}
 FROM
 	{{ qt .SnapshotJoinedTable }} AS l
 LEFT JOIN {{ qt .CdcTable }} AS r
-ON l.{{ .EntityKeyStr }} = r.{{ qt .EntityName }} AND l.{{ .UnixMilliStr }} >= r.{{ .UnixMilliStr }}
+ON l.{{ qt .EntityKey }} = r.{{ qt .EntityName }} AND l.{{ qt .UnixMilli }} >= r.{{ qt .UnixMilli }}
 WHERE
-	l.{{ .UnixMilliStr }} >= ? AND l.{{ .UnixMilliStr }} < ? AND
+	l.{{ qt .UnixMilli }} >= ? AND l.{{ qt .UnixMilli }} < ? AND
 	(
-		r.{{ .UnixMilliStr }} IS NULL OR
-		r.{{ .UnixMilliStr }} = (
-			SELECT MAX({{ .UnixMilliStr }})
+		r.{{ qt .UnixMilli }} IS NULL OR
+		r.{{ qt .UnixMilli }} = (
+			SELECT MAX({{ qt .UnixMilli }})
 			FROM {{ qt .CdcTable }} AS r2
 			WHERE
-				l.{{ .EntityKeyStr }} = r2.{{ qt .EntityName }} AND
-				l.{{ .UnixMilliStr }} >= r2.{{ .UnixMilliStr }}
+				l.{{ qt .EntityKey }} = r2.{{ qt .EntityName }} AND
+				l.{{ qt .UnixMilli }} >= r2.{{ qt .UnixMilli }}
 		)
 	)
 `
 
 const READ_JOIN_RESULT_QUERY = `
 SELECT
-	{{ qt .EntityRowsTableName }}.{{ .EntityKeyStr }},
-	{{ qt .EntityRowsTableName }}.{{ .UnixMilliStr }},
+	{{ qt .EntityRowsTableName }}.{{ qt .EntityKey }},
+	{{ qt .EntityRowsTableName }}.{{ qt .UnixMilli }},
 	{{ fieldJoin .Fields }}
 FROM {{ qt .EntityRowsTableName }}
 {{ range $pair := .JoinTables }}
 	{{- $t1 := qt $pair.LeftTable -}}
 	{{- $t2 := qt $pair.RightTable -}}
 lEFT JOIN {{ $t2 }}
-ON {{ $t1 }}.{{ $.UnixMilliStr }} = {{ $t2 }}.{{ $.UnixMilliStr }} AND {{ $t1 }}.{{ $.EntityKeyStr }} = {{ $t2 }}.{{ $.EntityKeyStr }}
+ON {{ $t1 }}.{{ qt $.UnixMilli }} = {{ $t2 }}.{{ qt $.UnixMilli }} AND {{ $t1 }}.{{ qt $.EntityKey }} = {{ $t2 }}.{{ qt $.EntityKey }}
 {{end}}`
 
 func PrepareJoinedTable(
@@ -252,8 +252,8 @@ type joinTablePair struct {
 
 type readJoinResultQueryParams struct {
 	EntityRowsTableName string
-	EntityKeyStr        string
-	UnixMilliStr        string
+	EntityKey           string
+	UnixMilli           string
 	Fields              []string
 	JoinTables          []joinTablePair
 	Backend             types.BackendType
@@ -281,9 +281,9 @@ func buildReadJoinResultQuery(query string, params readJoinResultQueryParams) (s
 
 type joinQueryParams struct {
 	TableName           string
-	EntityKeyStr        string
 	EntityName          string
-	UnixMilliStr        string
+	EntityKey           string
+	UnixMilli           string
 	Columns             []string
 	EntityRowsTableName string
 	SnapshotTable       string
@@ -319,9 +319,9 @@ func buildJoinQuery(params joinQueryParams) (string, error) {
 
 type cdcJoinQueryParams struct {
 	TableName           string
-	EntityKeyStr        string
 	EntityName          string
-	UnixMilliStr        string
+	EntityKey           string
+	UnixMilli           string
 	ValueNames          []string
 	FeatureNames        []string
 	SnapshotJoinedTable string
