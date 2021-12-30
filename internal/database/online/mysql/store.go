@@ -52,19 +52,19 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
 
-	inserts, insertPlaceholders, updatePlaceholders, values, err := sqlutil.BuildPushCondition(opt, Backend)
+	cond, err := sqlutil.BuildPushCondition(opt, Backend)
 	if err != nil {
 		return err
 	}
 
 	query := fmt.Sprintf(`INSERT INTO %s (%s) VALUES(%s) ON DUPLICATE KEY UPDATE %s`,
 		tableName,
-		inserts,
-		insertPlaceholders,
-		updatePlaceholders,
+		cond.Inserts,
+		cond.InsertPlaceholders,
+		cond.UpdatePlaceholders,
 	)
 
-	_, err = db.ExecContext(ctx, db.Rebind(query), values...)
+	_, err = db.ExecContext(ctx, db.Rebind(query), append(cond.InsertValues, cond.UpdateValues...)...)
 	return err
 }
 
