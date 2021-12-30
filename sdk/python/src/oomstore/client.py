@@ -43,22 +43,22 @@ class Client(object):
             response = stub.HealthCheck(oomagent_pb2.HealthCheckRequest())
             return response.status.code == 0
 
-    def online_get(self, entity_key, feature_names):
+    def online_get(self, entity_key, feature_full_names):
         with grpc.insecure_channel(self.addr) as channel:
             stub = oomagent_pb2_grpc.OomAgentStub(channel)
             response = stub.OnlineGet(
                 oomagent_pb2.OnlineGetRequest(
-                    entity_key=entity_key, feature_names=feature_names
+                    entity_key=entity_key, feature_full_names=feature_full_names
                 )
             )
         return map_container_to_dict(response.result.map)
 
-    def online_multi_get(self, entity_keys, feature_names):
+    def online_multi_get(self, entity_keys, feature_full_names):
         with grpc.insecure_channel(self.addr) as channel:
             stub = oomagent_pb2_grpc.OomAgentStub(channel)
             response = stub.OnlineMultiGet(
                 oomagent_pb2.OnlineMultiGetRequest(
-                    entity_keys=entity_keys, feature_names=feature_names
+                    entity_keys=entity_keys, feature_full_names=feature_full_names
                 )
             )
         return dict(
@@ -95,12 +95,12 @@ class Client(object):
             )
         return response.revision_id
 
-    def join(self, feature_names, input_file_path, output_file_path):
+    def join(self, feature_full_names, input_file_path, output_file_path):
         with grpc.insecure_channel(self.addr) as channel:
             stub = oomagent_pb2_grpc.OomAgentStub(channel)
             stub.Join(
                 oomagent_pb2.JoinRequest(
-                    feature_names=feature_names,
+                    feature_full_names=feature_full_names,
                     input_file_path=input_file_path,
                     output_file_path=output_file_path,
                 )
