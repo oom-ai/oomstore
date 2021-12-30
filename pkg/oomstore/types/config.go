@@ -33,7 +33,9 @@ type OnlineStoreConfig struct {
 	MySQL     *MySQLOpt     `yaml:"mysql"`
 	DynamoDB  *DynamoDBOpt  `yaml:"dynamodb"`
 	Cassandra *CassandraOpt `yaml:"cassandra"`
+	SQLite    *SQLiteOpt    `yaml:"sqlite"`
 	TiDB      *MySQLOpt     `yaml:"tidb"`
+	TiKV      *TiKVOpt      `yaml:"tikv"`
 }
 
 type OfflineStoreConfig struct {
@@ -43,6 +45,7 @@ type OfflineStoreConfig struct {
 	Snowflake *SnowflakeOpt `yaml:"snowflake"`
 	BigQuery  *BigQueryOpt  `yaml:"bigquery"`
 	Redshift  *RedshiftOpt  `yaml:"redshift"`
+	SQLite    *SQLiteOpt    `yaml:"sqlite"`
 	TiDB      *MySQLOpt     `yaml:"tidb"`
 }
 
@@ -140,6 +143,14 @@ func (cfg *MetadataStoreConfig) Validate() error {
 		cfg.Backend = BackendMySQL
 		n++
 	}
+	if cfg.SQLite != nil {
+		cfg.Backend = BackendSQLite
+		n++
+	}
+	if cfg.TiDB != nil {
+		cfg.Backend = BackendMySQL
+		n++
+	}
 	if n != 1 {
 		return fmt.Errorf("require exactly one metadata store backend")
 	}
@@ -164,6 +175,22 @@ func (cfg *OnlineStoreConfig) Validate() error {
 		cfg.Backend = BackendDynamoDB
 		n++
 	}
+	if cfg.Cassandra != nil {
+		cfg.Backend = BackendCassandra
+		n++
+	}
+	if cfg.SQLite != nil {
+		cfg.Backend = BackendSQLite
+		n++
+	}
+	if cfg.TiDB != nil {
+		cfg.Backend = BackendMySQL
+		n++
+	}
+	if cfg.TiKV != nil {
+		cfg.Backend = BackendTiKV
+		n++
+	}
 	if n != 1 {
 		return fmt.Errorf("require exactly one online store backend")
 	}
@@ -182,6 +209,22 @@ func (cfg *OfflineStoreConfig) Validate() error {
 	}
 	if cfg.Snowflake != nil {
 		cfg.Backend = BackendSnowflake
+		n++
+	}
+	if cfg.BigQuery != nil {
+		cfg.Backend = BackendBigQuery
+		n++
+	}
+	if cfg.Redshift != nil {
+		cfg.Backend = BackendRedshift
+		n++
+	}
+	if cfg.SQLite != nil {
+		cfg.Backend = BackendSQLite
+		n++
+	}
+	if cfg.TiDB != nil {
+		cfg.Backend = BackendMySQL
 		n++
 	}
 	if n != 1 {

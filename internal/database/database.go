@@ -17,6 +17,7 @@ import (
 	offlinePG "github.com/oom-ai/oomstore/internal/database/offline/postgres"
 	offlineRedshift "github.com/oom-ai/oomstore/internal/database/offline/redshift"
 	offlineSnowflake "github.com/oom-ai/oomstore/internal/database/offline/snowflake"
+	offlineSQLite "github.com/oom-ai/oomstore/internal/database/offline/sqlite"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
 	onlineCassandra "github.com/oom-ai/oomstore/internal/database/online/cassandra"
@@ -24,6 +25,8 @@ import (
 	onlineMySQL "github.com/oom-ai/oomstore/internal/database/online/mysql"
 	onlinePG "github.com/oom-ai/oomstore/internal/database/online/postgres"
 	onlineRedis "github.com/oom-ai/oomstore/internal/database/online/redis"
+	onlineSQLite "github.com/oom-ai/oomstore/internal/database/online/sqlite"
+	onlineTiKV "github.com/oom-ai/oomstore/internal/database/online/tikv"
 )
 
 func OpenOnlineStore(opt types.OnlineStoreConfig) (online.Store, error) {
@@ -38,6 +41,10 @@ func OpenOnlineStore(opt types.OnlineStoreConfig) (online.Store, error) {
 		return onlineDynamoDB.Open(opt.DynamoDB)
 	case types.BackendCassandra:
 		return onlineCassandra.Open(opt.Cassandra)
+	case types.BackendSQLite:
+		return onlineSQLite.Open(opt.SQLite)
+	case types.BackendTiKV:
+		return onlineTiKV.Open(opt.TiKV)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
@@ -81,6 +88,8 @@ func OpenOfflineStore(ctx context.Context, opt types.OfflineStoreConfig) (offlin
 		return offlineBigQuery.Open(ctx, opt.BigQuery)
 	case types.BackendRedshift:
 		return offlineRedshift.Open(opt.Redshift)
+	case types.BackendSQLite:
+		return offlineSQLite.Open(opt.SQLite)
 	default:
 		return nil, fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
