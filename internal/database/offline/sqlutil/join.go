@@ -108,12 +108,6 @@ func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGr
 	if len(opt.Features) == 0 {
 		return nil, nil
 	}
-	qt, err := dbutil.QuoteFn(dbOpt.Backend)
-	if err != nil {
-		return nil, err
-	}
-	entityKeyStr := qt("entity_key")
-	unixMilliStr := qt("unix_milli")
 
 	// Step 1: create temporary joined table
 	snapshotJoinedTableName, err := PrepareJoinedTable(ctx, dbOpt, opt.Features, opt.Entity, opt.GroupName, opt.ValueNames)
@@ -126,9 +120,9 @@ func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGr
 	for _, r := range opt.RevisionRanges {
 		query, err := buildJoinQuery(joinQueryParams{
 			TableName:           snapshotJoinedTableName,
-			EntityKeyStr:        entityKeyStr,
 			EntityName:          opt.Entity.Name,
-			UnixMilliStr:        unixMilliStr,
+			EntityKey:           "entity_key",
+			UnixMilli:           "unix_milli",
 			Columns:             columns,
 			EntityRowsTableName: opt.EntityRowsTableName,
 			SnapshotTable:       r.SnapshotTable,
@@ -154,9 +148,9 @@ func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGr
 	for _, r := range opt.RevisionRanges {
 		query, err := buildCdcJoinQuery(cdcJoinQueryParams{
 			TableName:           cdcJoinedTableName,
-			EntityKeyStr:        entityKeyStr,
+			EntityKey:           "entity_key",
 			EntityName:          opt.Entity.Name,
-			UnixMilliStr:        unixMilliStr,
+			UnixMilli:           "unix_milli",
 			ValueNames:          opt.ValueNames,
 			FeatureNames:        opt.Features.Names(),
 			SnapshotJoinedTable: snapshotJoinedTableName,
@@ -184,8 +178,6 @@ func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTabl
 	if err != nil {
 		return nil, err
 	}
-	entityKeyStr := qt("entity_key")
-	unixMilliStr := qt("unix_milli")
 
 	// Step 1: join temporary tables
 	/*
@@ -243,8 +235,8 @@ func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTabl
 	}
 	query, err := buildReadJoinResultQuery(opt.ReadJoinResultQuery, readJoinResultQueryParams{
 		EntityRowsTableName: opt.EntityRowsTableName,
-		EntityKeyStr:        entityKeyStr,
-		UnixMilliStr:        unixMilliStr,
+		EntityKey:           "entity_key",
+		UnixMilli:           "unix_milli",
 		Fields:              fields,
 		JoinTables:          joinTablePairs,
 		Backend:             dbOpt.Backend,
