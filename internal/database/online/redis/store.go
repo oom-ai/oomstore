@@ -9,7 +9,10 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const PipelineBatchSize = 10
+const (
+	Backend           = types.BackendRedis
+	PipelineBatchSize = 10
+)
 
 var _ online.Store = &DB{}
 

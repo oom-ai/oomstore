@@ -17,7 +17,7 @@ import (
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
 	dbOpt := dbutil.DBOpt{
-		Backend:    types.BackendBigQuery,
+		Backend:    Backend,
 		BigQueryDB: db.Client,
 		DatasetID:  &db.datasetID,
 	}

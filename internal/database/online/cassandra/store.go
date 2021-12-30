@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	BatchSize   = 1000
-	BackendType = types.BackendCassandra
+	Backend   = types.BackendCassandra
+	BatchSize = 1000
 )
 
 var _ online.Store = &DB{}

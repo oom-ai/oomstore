@@ -10,9 +10,10 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const BackendType = types.BackendRedshift
-
-const RedshiftBatchSize = 20
+const (
+	Backend           = types.BackendRedshift
+	RedshiftBatchSize = 20
+)
 
 var _ offline.Store = &DB{}
 
@@ -30,15 +31,15 @@ func Open(option *types.RedshiftOpt) (*DB, error) {
 }
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
-	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(BackendType, RedshiftBatchSize), BackendType)
+	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(Backend, RedshiftBatchSize), Backend)
 }
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
-	return sqlutil.Export(ctx, db.DB, opt, BackendType)
+	return sqlutil.Export(ctx, db.DB, opt, Backend)
 }
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
-	return sqlutil.Join(ctx, db.DB, opt, BackendType)
+	return sqlutil.Join(ctx, db.DB, opt, Backend)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
@@ -46,13 +47,10 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 	if err != nil {
 		return nil, err
 	}
-	return sqlutil.SqlxTableSchema(ctx, db, BackendType, rows)
+	return sqlutil.SqlxTableSchema(ctx, db, Backend, rows)
 }
 
 func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
-	dbOpt := dbutil.DBOpt{
-		Backend: types.BackendRedshift,
-		SqlxDB:  db.DB,
-	}
+	dbOpt := dbutil.DBOpt{Backend: Backend, SqlxDB: db.DB}
 	return sqlutil.Snapshot(ctx, dbOpt, opt)
 }

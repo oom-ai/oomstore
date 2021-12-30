@@ -10,7 +10,9 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const BackendType = types.BackendTiKV
+const (
+	Backend = types.BackendTiKV
+)
 
 var _ online.Store = &DB{}
 
