@@ -51,16 +51,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
 
 	insertColumns := append([]string{opt.Entity.Name}, opt.FeatureNames...)
-	insertColumnPlaceholders := make([]string, 0, len(insertColumns))
-	for i := 0; i < len(insertColumnPlaceholders); i++ {
-		insertColumnPlaceholders = append(insertColumnPlaceholders, "?")
-	}
-
 	insertValues := append([]interface{}{opt.EntityKey}, opt.FeatureValues...)
-	insertValuePlaceholders := make([]string, 0, len(insertValues))
-	for i := 0; i < len(insertValues); i++ {
-		insertValuePlaceholders = append(insertValuePlaceholders, "?")
-	}
 
 	updateValues := opt.FeatureValues
 	updatePlaceholders := make([]string, 0, len(opt.FeatureNames))
@@ -71,7 +62,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	query := fmt.Sprintf(`INSERT INTO %s (%s) VALUES(%s) ON DUPLICATE KEY UPDATE %s`,
 		tableName,
 		strings.Join(insertColumns, ","),
-		strings.Join(insertValuePlaceholders, ","),
+		dbutil.Placeholders(len(insertColumns), "?", ","),
 		strings.Join(updatePlaceholders, ","),
 	)
 	_, err := db.ExecContext(ctx, query, append(insertValues, updateValues...)...)

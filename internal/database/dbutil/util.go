@@ -3,6 +3,7 @@ package dbutil
 import (
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -26,4 +27,14 @@ func RandString(n int) string {
 		b[i] = letterRunes[random.Intn(len(letterRunes))]
 	}
 	return string(b)
+}
+
+func Placeholders(size int, elem string, sep string) string {
+	r := make([]string, 0, size)
+
+	for i := 0; i < size; i++ {
+		r = append(r, elem)
+	}
+
+	return strings.Join(r, sep)
 }
