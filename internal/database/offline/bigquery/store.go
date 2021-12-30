@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
+
 	"github.com/spf13/cast"
 	"google.golang.org/api/iterator"
 
@@ -67,4 +69,13 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 	}
 
 	return &schema, nil
+}
+
+func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
+	dbOpt := dbutil.DBOpt{
+		Backend:    types.BackendBigQuery,
+		BigQueryDB: db.Client,
+		DatasetID:  &db.datasetID,
+	}
+	return sqlutil.Snapshot(ctx, dbOpt, opt)
 }
