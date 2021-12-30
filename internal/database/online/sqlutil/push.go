@@ -18,11 +18,7 @@ type PushCondition struct {
 }
 
 func BuildPushCondition(opt online.PushOpt, backend types.BackendType) (*PushCondition, error) {
-	qt, err := dbutil.QuoteFn(backend)
-	if err != nil {
-		return nil, err
-	}
-
+	qt := dbutil.QuoteFn(backend)
 	cond := PushCondition{}
 
 	cond.Inserts = qt(append([]string{opt.Entity.Name}, opt.FeatureNames...)...)

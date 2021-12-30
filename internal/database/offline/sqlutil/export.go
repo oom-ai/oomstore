@@ -17,11 +17,7 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType
 		stream = make(chan types.ExportRecord)
 		errs   = make(chan error, 1) // at most 1 error
 	)
-	qt, err := dbutil.QuoteFn(backendType)
-	if err != nil {
-		errs <- err
-		return stream, errs
-	}
+	qt := dbutil.QuoteFn(backendType)
 	query := fmt.Sprintf("SELECT %s FROM %s", qt(fields...), qt(opt.SnapshotTable))
 	if opt.Limit != nil {
 		query += fmt.Sprintf(" LIMIT %d", *opt.Limit)

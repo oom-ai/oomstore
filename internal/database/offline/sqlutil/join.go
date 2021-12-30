@@ -174,10 +174,7 @@ func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTabl
 	if len(tableNames) == 0 {
 		return nil, nil
 	}
-	qt, err := dbutil.QuoteFn(dbOpt.Backend)
-	if err != nil {
-		return nil, err
-	}
+	qt := dbutil.QuoteFn(dbOpt.Backend)
 
 	// Step 1: join temporary tables
 	/*

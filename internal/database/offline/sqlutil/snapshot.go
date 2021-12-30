@@ -114,11 +114,7 @@ func buildSnapshotQuery(params snapshotQueryParams) (string, error) {
 	} else {
 		params.Union = "UNION"
 	}
-	qt, err := dbutil.QuoteFn(params.Backend)
-	if err != nil {
-		return "", err
-	}
-
+	qt := dbutil.QuoteFn(params.Backend)
 	t := template.Must(template.New("snapshot").Funcs(template.FuncMap{
 		"qt": qt,
 		"columnJoin": func(columns []string) string {
