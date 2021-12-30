@@ -37,8 +37,11 @@ You can interact with oomstore with CLI, Go API or Python API. See [Architecture
 Compared to other feature store implementations, oomstore has its edges:
 
 - Fast. Benchmark shows oomstore performs QPS > 50k and latency < 0.3 ms using Redis as the Online Store. For more details, see [benchmark](https://oom.ai/docs/benchmark).
-- Pluggable. We support a wide range of databases: PostgreSQL and Redis for Online Store, PostgreSQL for Metadata Store, and PostgreSQL for Offline Store. There are more to come, and you can easily add!
-- Simple. In the minimal, oomstore can run aganist a PostgreSQL database. This helps get started quickly, and you can always switch to a different database later without having to rewrite your code.
+- Pluggable. We support a wide range of databases already (see below), and there are more to come.
+  - Online Store: DynamoDB, Redis, TiKV, Cassandra, TiDB, PostgreSQL, MySQL, SQLite.
+  - Offline Store: Snowflake, Redshift, BigQuery, TiDB, PostgreSQL, MySQL, SQLite.
+  - Metadata Store: TiDB, PostgreSQL, MySQL, SQLite.
+- Simple. In the minimal, oomstore can run aganist a single MySQL/PostgreSQL database. This helps get started quickly, and you can always switch to a different database later without having to rewrite your code.
 
 ## Quickstart
 
