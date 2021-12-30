@@ -57,6 +57,10 @@ func TestPrepareStreamTable(t *testing.T) {
 	test_impl.TestPrepareStreamTable(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
+func TestPush(t *testing.T) {
+	test_impl.TestPush(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
+}
+
 func TestPing(t *testing.T) {
 	test_impl.TestPing(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }

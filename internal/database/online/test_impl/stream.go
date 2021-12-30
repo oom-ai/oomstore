@@ -98,3 +98,58 @@ func TestPrepareStreamTable(t *testing.T, prepareStore PrepareStoreFn, destroySt
 		})
 	}
 }
+
+func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroyStoreFn) {
+	t.Cleanup(destoryStore)
+
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	var (
+		entity   = simpleStreamData.entity
+		group    = simpleStreamData.groups[0]
+		feature1 = simpleStreamData.features[0]
+		feature2 = simpleStreamData.features[1]
+	)
+
+	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+		Entity:  &entity,
+		GroupID: group.ID,
+	}))
+
+	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+		Entity:  &entity,
+		GroupID: group.ID,
+		Feature: feature1,
+	}))
+
+	assert.NoError(t, store.Push(ctx, online.PushOpt{
+		Entity:        &entity,
+		EntityKey:     "user1",
+		GroupID:       group.ID,
+		FeatureNames:  []string{simpleStreamData.features[0].Name},
+		FeatureValues: []interface{}{"post1"},
+	}))
+
+	assert.NoError(t, store.Push(ctx, online.PushOpt{
+		Entity:        &entity,
+		EntityKey:     "user1",
+		GroupID:       group.ID,
+		FeatureNames:  []string{simpleStreamData.features[0].Name},
+		FeatureValues: []interface{}{"post2"},
+	}))
+
+	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+		Entity:  &entity,
+		GroupID: group.ID,
+		Feature: feature2,
+	}))
+
+	assert.NoError(t, store.Push(ctx, online.PushOpt{
+		Entity:        &entity,
+		EntityKey:     "user1",
+		GroupID:       group.ID,
+		FeatureNames:  []string{feature1.Name, feature2.Name},
+		FeatureValues: []interface{}{"post1", "post2"},
+	}))
+}
