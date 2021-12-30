@@ -58,15 +58,12 @@ func CreateStreamTableSchema(ctx context.Context, tableName string, entity *type
 	case types.BackendPostgres:
 		entityFormat = fmt.Sprintf(`"%s" VARCHAR(%d) PRIMARY KEY`, entity.Name, entity.Length)
 	case types.BackendCassandra, types.BackendSQLite:
-		entityFormat = fmt.Sprintf(`"%s" TEXY PRIMARY KEY`, entity.Name)
+		entityFormat = fmt.Sprintf(`"%s" TEXT PRIMARY KEY`, entity.Name)
 	default:
 		return "", errdefs.InvalidAttribute(fmt.Errorf("backend %s not support", backend))
 	}
 
-	schema := fmt.Sprintf(`
-CREATE TABLE %s (
-   %s
-)`, tableName, entityFormat)
+	schema := fmt.Sprintf("CREATE TABLE %s ( %s )", tableName, entityFormat)
 	return schema, nil
 }
 
