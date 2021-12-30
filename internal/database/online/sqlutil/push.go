@@ -9,24 +9,32 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func BuildPushCondition(opt online.PushOpt, backend types.BackendType) (string, string, string, []interface{}, error) {
+type PushCondition struct {
+	Inserts            string
+	InsertPlaceholders string
+	InsertValues       []interface{}
+	UpdateValues       []interface{}
+	UpdatePlaceholders string
+}
+
+func BuildPushCondition(opt online.PushOpt, backend types.BackendType) (*PushCondition, error) {
 	qt, err := dbutil.QuoteFn(backend)
 	if err != nil {
-		return "", "", "", nil, err
+		return nil, err
 	}
 
-	insertColumns := append([]string{opt.Entity.Name}, opt.FeatureNames...)
-	insertValues := append([]interface{}{opt.EntityKey}, opt.FeatureValues...)
+	cond := PushCondition{}
+
+	cond.Inserts = qt(append([]string{opt.Entity.Name}, opt.FeatureNames...)...)
+	cond.InsertValues = append([]interface{}{opt.EntityKey}, opt.FeatureValues...)
+	cond.InsertPlaceholders = dbutil.Fill(len(cond.InsertValues), "?", ",")
 
 	updatePlaceholders := make([]string, 0, len(opt.FeatureNames))
 	for _, name := range opt.FeatureNames {
 		updatePlaceholders = append(updatePlaceholders, fmt.Sprintf("%s=?", qt(name)))
 	}
+	cond.UpdatePlaceholders = strings.Join(updatePlaceholders, ",")
+	cond.UpdateValues = opt.FeatureValues
 
-	return qt(insertColumns...),
-		dbutil.Fill(len(insertColumns), "?", ","),
-		strings.Join(updatePlaceholders, ","),
-		append(insertValues, opt.FeatureValues...),
-		nil
-
+	return &cond, nil
 }
