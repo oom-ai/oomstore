@@ -49,9 +49,11 @@ type ImportOpt struct {
 }
 
 type PushOpt struct {
-	GroupID       int
-	Revision      int64
-	FeatureNames  []string
+	GroupID      int
+	Revision     int64
+	FeatureNames []string
+
+	// Two-dimension array, each row represents a record
 	FeatureValues []interface{}
 }
 
