@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/spf13/cast"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -93,6 +94,7 @@ func deserializeByTag(i interface{}, valueType types.ValueType, backend types.Ba
 		return nil, nil
 	}
 
+	// TODO: merge with DeserializeByValueType in internal/database/offline/sqlutil/serialize.go
 	switch valueType {
 	case types.String:
 		if backend == types.BackendMySQL {
@@ -101,9 +103,10 @@ func deserializeByTag(i interface{}, valueType types.ValueType, backend types.Ba
 		return i, nil
 	case types.Bool:
 		if backend == types.BackendMySQL || backend == types.BackendSQLite {
-			if i == int64(1) {
+			s := cast.ToString(i)
+			if s == "1" || s == "true" {
 				return true, nil
-			} else if i == int64(0) {
+			} else if s == "0" || s == "false" {
 				return false, nil
 			} else {
 				return nil, fmt.Errorf("invalid bool value: %s", i)
