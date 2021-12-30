@@ -27,7 +27,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 			ValueType: types.Int64,
 		},
 	}
-	buildTestSnapshotTable(ctx, t, store, features, snapshotTable, &offline.CSVSource{
+	buildTestSnapshotTable(ctx, t, store, features, 1, snapshotTable, &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100
 1235,apple,200
 1236,huawei,300

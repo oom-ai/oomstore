@@ -33,7 +33,7 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 	}
 	features, _ := prepareFeatures(true)
 
-	buildTestSnapshotTable(ctx, t, store, features, "offline_stream_snapshot_1_1", &offline.CSVSource{
+	buildTestSnapshotTable(ctx, t, store, features, 1, "offline_stream_snapshot_1_1", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100
 1235,apple,200
 1236,oneplus,155
@@ -41,7 +41,7 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 		Delimiter: ",",
 	})
 
-	buildTestSnapshotTable(ctx, t, store, append(features, unixMilli), "offline_stream_cdc_1_2", &offline.CSVSource{
+	buildTestSnapshotTable(ctx, t, store, append(features, unixMilli), 2, "offline_stream_cdc_1_2", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi-1,120,2
 1235,apple-2,115,14
 1234,xiaomi-1,130,10
@@ -52,10 +52,10 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 	})
 
 	err := store.Snapshot(ctx, offline.SnapshotOpt{
-		Group:          group,
-		Features:       features,
-		RevisionID:     2,
-		PrevRevisionID: 1,
+		Group:        group,
+		Features:     features,
+		Revision:     2,
+		PrevRevision: 1,
 	})
 	assert.NoError(t, err)
 

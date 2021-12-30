@@ -27,11 +27,11 @@ func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 		if revision.SnapshotTable != "" {
 			continue
 		}
-		tableName := sqlutil.OfflineStreamSnapshotTableName(group.ID, revision.ID)
+		tableName := sqlutil.OfflineStreamSnapshotTableName(group.ID, revision.Revision)
 		if err = s.offline.Snapshot(ctx, offline.SnapshotOpt{
-			Group:          group,
-			RevisionID:     revisions[i].ID,
-			PrevRevisionID: revisions[i-1].ID,
+			Group:        group,
+			Revision:     revisions[i].Revision,
+			PrevRevision: revisions[i-1].Revision,
 		}); err != nil {
 			return err
 		}
