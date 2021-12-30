@@ -33,6 +33,8 @@ var (
 				return fmt.Sprintf(`"%s" VARCHAR(%d)`, entity.Name, entity.Length)
 			case types.BackendMySQL:
 				return fmt.Sprintf("`%s` VARCHAR(%d)", entity.Name, entity.Length)
+			case types.BackendBigQuery:
+				return fmt.Sprintf(`%s STRING`, entity.Name)
 			default:
 				return fmt.Sprintf("%s VARCHAR(%d)", entity.Name, entity.Length)
 			}
