@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -46,7 +47,23 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 }
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	panic("Implement me!")
+	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
+
+	inserts, insertPlaceholders, updatePlaceholders, values, err := sqlutil.BuildPushCondition(opt, types.BackendPostgres)
+	if err != nil {
+		return err
+	}
+
+	query := fmt.Sprintf(`INSERT INTO %s(%s) VALUES(%s) ON CONFLICT ("%s") DO UPDATE SET %s`,
+		tableName,
+		inserts,
+		insertPlaceholders,
+		opt.Entity.Name,
+		updatePlaceholders,
+	)
+
+	_, err = db.ExecContext(ctx, db.Rebind(query), values...)
+	return err
 }
 
 func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
