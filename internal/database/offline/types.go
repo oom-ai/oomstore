@@ -53,8 +53,8 @@ type CSVSource struct {
 }
 
 type SnapshotOpt struct {
-	Group          *types.Group
-	Features       types.FeatureList
-	RevisionID     int
-	PrevRevisionID int
+	Group        *types.Group
+	Features     types.FeatureList
+	Revision     int64
+	PrevRevision int64
 }
