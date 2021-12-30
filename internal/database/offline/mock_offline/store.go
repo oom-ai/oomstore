@@ -109,6 +109,20 @@ func (mr *MockStoreMockRecorder) Ping(ctx interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockStore)(nil).Ping), ctx)
 }
 
+// Snapshot mocks base method.
+func (m *MockStore) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Snapshot", ctx, opt)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Snapshot indicates an expected call of Snapshot.
+func (mr *MockStoreMockRecorder) Snapshot(ctx, opt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Snapshot", reflect.TypeOf((*MockStore)(nil).Snapshot), ctx, opt)
+}
+
 // TableSchema mocks base method.
 func (m *MockStore) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
 	m.ctrl.T.Helper()
