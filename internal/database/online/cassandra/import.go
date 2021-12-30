@@ -10,14 +10,13 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	columns := append([]string{opt.Entity.Name}, opt.FeatureList.Names()...)
 	tableName := sqlutil.OnlineBatchTableName(opt.Revision.ID)
 
-	table, err := dbutil.BuildCreateSchema(tableName, opt.Entity, opt.FeatureList, types.BackendCassandra)
+	table, err := dbutil.BuildCreateSchema(tableName, opt.Entity, opt.FeatureList, Backend)
 	if err != nil {
 		return err
 	}

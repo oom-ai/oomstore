@@ -16,7 +16,9 @@ import (
 	"google.golang.org/api/option"
 )
 
-const BackendType = types.BackendBigQuery
+const (
+	Backend = types.BackendBigQuery
+)
 
 var _ offline.Store = &DB{}
 
@@ -58,7 +60,7 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 		if err != nil {
 			return nil, err
 		}
-		valueType, err := dbutil.ValueType(BackendType, cast.ToString(recordMap["data_type"]))
+		valueType, err := dbutil.ValueType(Backend, cast.ToString(recordMap["data_type"]))
 		if err != nil {
 			return nil, err
 		}
@@ -73,7 +75,7 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 
 func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
 	dbOpt := dbutil.DBOpt{
-		Backend:    types.BackendBigQuery,
+		Backend:    Backend,
 		BigQueryDB: db.Client,
 		DatasetID:  &db.datasetID,
 	}

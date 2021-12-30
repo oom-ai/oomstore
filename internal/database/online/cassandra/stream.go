@@ -7,14 +7,13 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
 	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
 
 	if opt.Feature == nil {
-		schema, err := sqlutil.CreateStreamTableSchema(ctx, tableName, opt.Entity, types.BackendCassandra)
+		schema, err := sqlutil.CreateStreamTableSchema(ctx, tableName, opt.Entity, Backend)
 		if err != nil {
 			return err
 		}
@@ -22,7 +21,7 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 		return db.Query(schema).WithContext(ctx).Exec()
 	}
 
-	dbValueType, err := dbutil.DBValueType(types.BackendCassandra, opt.Feature.ValueType)
+	dbValueType, err := dbutil.DBValueType(Backend, opt.Feature.ValueType)
 	if err != nil {
 		return err
 	}
