@@ -5,7 +5,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/redis"
+	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -33,14 +33,14 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 }
 
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
-	serializedRevisionID, err := redis.SerializeByValue(opt.RevisionID)
+	serializedRevisionID, err := kvutil.SerializeByValue(opt.RevisionID)
 	if err != nil {
 		return nil, err
 	}
 
 	var serializedEntityKeys []string
 	for _, entityKey := range opt.EntityKeys {
-		serializedEntityKey, err := redis.SerializeByValue(entityKey)
+		serializedEntityKey, err := kvutil.SerializeByValue(entityKey)
 		if err != nil {
 			return nil, err
 		}
@@ -49,7 +49,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 
 	var serializedFeatureIDs []string
 	for _, feature := range opt.FeatureList {
-		serializedFeatureID, err := redis.SerializeByValue(feature.ID)
+		serializedFeatureID, err := kvutil.SerializeByValue(feature.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -83,7 +83,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		if v == nil {
 			continue
 		}
-		typedValue, err := redis.DeserializeByTag(string(v), inputs[i].feature.ValueType)
+		typedValue, err := kvutil.DeserializeByValueType(string(v), inputs[i].feature.ValueType)
 		if err != nil {
 			return nil, err
 		}

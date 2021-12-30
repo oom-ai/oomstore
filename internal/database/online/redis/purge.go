@@ -2,10 +2,12 @@ package redis
 
 import (
 	"context"
+
+	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
 
 func (db *DB) Purge(ctx context.Context, revisionID int) error {
-	prefix, err := SerializeByValue(revisionID)
+	prefix, err := kvutil.SerializeByValue(revisionID)
 	if err != nil {
 		return nil
 	}

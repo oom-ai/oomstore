@@ -5,17 +5,18 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
-	key, err := SerializeRedisKey(opt.RevisionID, opt.EntityKey)
+	key, err := serializeRedisKey(opt.RevisionID, opt.EntityKey)
 	if err != nil {
 		return nil, err
 	}
 
 	featureIDs := []string{}
 	for _, f := range opt.FeatureList {
-		id, err := SerializeByValue(f.ID)
+		id, err := kvutil.SerializeByValue(f.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -32,7 +33,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		if v == nil {
 			continue
 		}
-		typedValue, err := DeserializeByTag(v, opt.FeatureList[i].ValueType)
+		typedValue, err := kvutil.DeserializeByValueType(v, opt.FeatureList[i].ValueType)
 		if err != nil {
 			return nil, err
 		}
