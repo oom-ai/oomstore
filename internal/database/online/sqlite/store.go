@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 
@@ -47,7 +48,21 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 }
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	panic("Implement me!")
+	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
+
+	cond, err := sqlutil.BuildPushCondition(opt, Backend)
+	if err != nil {
+		return err
+	}
+
+	query := fmt.Sprintf("REPLACE INTO %s (%s) VALUES(%s)",
+		tableName,
+		cond.Inserts,
+		cond.InsertPlaceholders,
+	)
+
+	_, err = db.ExecContext(ctx, db.Rebind(query), cond.InsertValues...)
+	return err
 }
 
 func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
