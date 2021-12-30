@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/redis"
+	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
 
 const BatchSize = 100
@@ -13,14 +13,14 @@ const BatchSize = 100
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	var seq int64
 
-	serializedRevisionID, err := redis.SerializeByValue(opt.Revision.ID)
+	serializedRevisionID, err := kvutil.SerializeByValue(opt.Revision.ID)
 	if err != nil {
 		return err
 	}
 
 	var serializedFeatureIDs []string
 	for _, feature := range opt.FeatureList {
-		serializedFeatureID, err := redis.SerializeByValue(feature.ID)
+		serializedFeatureID, err := kvutil.SerializeByValue(feature.ID)
 		if err != nil {
 			return err
 		}
@@ -38,7 +38,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 		entityKey, featureValues := record[0], record[1:]
 
-		serializedEntityKey, err := redis.SerializeByValue(entityKey)
+		serializedEntityKey, err := kvutil.SerializeByValue(entityKey)
 		if err != nil {
 			return err
 		}
@@ -49,7 +49,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 				continue
 			}
 
-			serializedFeatureValue, err := redis.SerializeByTag(featureValues[i], opt.FeatureList[i].ValueType)
+			serializedFeatureValue, err := kvutil.SerializeByValueType(featureValues[i], opt.FeatureList[i].ValueType)
 			if err != nil {
 				return err
 			}

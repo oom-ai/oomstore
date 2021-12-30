@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
@@ -19,7 +20,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 		entityKey, values := record[0], record[1:]
 
-		key, err := SerializeRedisKey(opt.Revision.ID, entityKey)
+		key, err := serializeRedisKey(opt.Revision.ID, entityKey)
 		if err != nil {
 			return err
 		}
@@ -30,12 +31,12 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			if values[i] == nil {
 				continue
 			}
-			featureValue, err := SerializeByTag(values[i], opt.FeatureList[i].ValueType)
+			featureValue, err := kvutil.SerializeByValueType(values[i], opt.FeatureList[i].ValueType)
 			if err != nil {
 				return err
 			}
 
-			featureID, err := SerializeByValue(opt.FeatureList[i].ID)
+			featureID, err := kvutil.SerializeByValue(opt.FeatureList[i].ID)
 			if err != nil {
 				return err
 			}
