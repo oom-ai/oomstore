@@ -51,3 +51,10 @@ type CSVSource struct {
 	Reader    *bufio.Reader
 	Delimiter string
 }
+
+type SnapshotOpt struct {
+	Group          *types.Group
+	Features       types.FeatureList
+	RevisionID     int
+	PrevRevisionID int
+}

@@ -48,3 +48,11 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 	}
 	return sqlutil.SqlxTableSchema(ctx, db, BackendType, rows)
 }
+
+func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
+	dbOpt := dbutil.DBOpt{
+		Backend: types.BackendRedshift,
+		SqlxDB:  db.DB,
+	}
+	return sqlutil.Snapshot(ctx, dbOpt, opt)
+}

@@ -44,3 +44,11 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
 	return nil, fmt.Errorf("not implemented")
 }
+
+func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
+	dbOpt := dbutil.DBOpt{
+		Backend: types.BackendSQLite,
+		SqlxDB:  db.DB,
+	}
+	return sqlutil.Snapshot(ctx, dbOpt, opt)
+}
