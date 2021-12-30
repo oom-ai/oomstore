@@ -48,6 +48,13 @@ type ImportOpt struct {
 	NoPK              bool // TODO: to import cdc data temporarily for testing
 }
 
+type PushOpt struct {
+	GroupID       int
+	Revision      int64
+	FeatureNames  []string
+	FeatureValues []interface{}
+}
+
 type CSVSource struct {
 	Reader    *bufio.Reader
 	Delimiter string

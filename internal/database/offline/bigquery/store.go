@@ -4,15 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
-
-	"github.com/spf13/cast"
-	"google.golang.org/api/iterator"
-
 	"cloud.google.com/go/bigquery"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/spf13/cast"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
 
@@ -85,6 +83,14 @@ func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
 func (db *DB) CreateTable(ctx context.Context, opt offline.CreateTableOpt) error {
 	schema := dbutil.BuildTableSchema(opt.TableName, opt.Entity, opt.IsCDC, opt.Features, nil, Backend)
 	if _, err := db.Client.Query(schema).Run(ctx); err != nil {
+		return nil
+	}
+	return nil
+}
+
+func (db *DB) Push(ctx context.Context, opt offline.PushOpt) error {
+	dbOpt := dbutil.DBOpt{Backend: Backend, BigQueryDB: db.Client, DatasetID: &db.datasetID}
+	if err := sqlutil.Push(ctx, dbOpt, opt); err != nil {
 		return err
 	}
 	return nil
