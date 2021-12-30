@@ -27,8 +27,11 @@ type ImportOpt struct {
 }
 
 type PushOpt struct {
-	Entity  *types.Entity
-	Feature types.Feature
+	Entity        *types.Entity
+	EntityKey     string
+	GroupID       int
+	FeatureNames  []string
+	FeatureValues []interface{}
 }
 
 type PrepareStreamTableOpt struct {
