@@ -102,3 +102,7 @@ func TestTableSchema(t *testing.T) {
 		}
 	})
 }
+
+func TestSnapshot(t *testing.T) {
+	test_impl.TestSnapshot(t, prepareStore, destroyStore(DATASET_ID))
+}

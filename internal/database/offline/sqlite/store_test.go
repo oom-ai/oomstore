@@ -43,3 +43,7 @@ func TestImport(t *testing.T) {
 func TestJoin(t *testing.T) {
 	test_impl.TestJoin(t, prepareStore, destroyStore)
 }
+
+func TestSnapshot(t *testing.T) {
+	test_impl.TestSnapshot(t, prepareStore, destroyStore)
+}

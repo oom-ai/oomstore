@@ -44,3 +44,7 @@ func TestImport(t *testing.T) {
 func TestJoin(t *testing.T) {
 	test_impl.TestJoin(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
+
+func TestSnapshot(t *testing.T) {
+	test_impl.TestSnapshot(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
+}

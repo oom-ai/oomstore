@@ -17,8 +17,8 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroyStoreFn) {
-	t.Cleanup(destoryStore)
+func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
 
 	ctx, store := prepareStore(t)
 	defer store.Close()
