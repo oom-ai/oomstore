@@ -16,7 +16,7 @@ type Store interface {
 	io.Closer
 }
 
-// The interface defines the methods that a database backed store must implement.
+// The interface defines the methods that a database backend store must implement.
 type DBStore interface {
 	// entity
 	CreateEntity(ctx context.Context, opt CreateEntityOpt) (int, error)
@@ -50,7 +50,7 @@ type DBStore interface {
 	WithTransaction(ctx context.Context, fn func(context.Context, DBStore) error) error
 }
 
-// The interface defines methods that a memory backed store must implement.
+// The interface defines methods that a memory backend store must implement.
 type CacheStore interface {
 	CacheListFeature(ctx context.Context, opt ListFeatureOpt) types.FeatureList
 

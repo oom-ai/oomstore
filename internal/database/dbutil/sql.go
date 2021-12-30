@@ -27,8 +27,8 @@ func BuildConditions(equal map[string]interface{}, in map[string]interface{}) ([
 	return cond, args, nil
 }
 
-func InsertRecordsToTable(ctx context.Context, dbOpt DBOpt, tableName string, records []interface{}, columns []string, backed types.BackendType) error {
-	query, args, err := dbOpt.BuildInsertQuery(tableName, records, columns, backed)
+func InsertRecordsToTable(ctx context.Context, dbOpt DBOpt, tableName string, records []interface{}, columns []string, backend types.BackendType) error {
+	query, args, err := dbOpt.BuildInsertQuery(tableName, records, columns, backend)
 	if err != nil {
 		return err
 	}
