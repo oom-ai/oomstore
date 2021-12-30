@@ -141,7 +141,7 @@ if __name__ == "__main__":
     print(
         c.online_get(
             entity_key="1006",
-            feature_names=[
+            feature_full_names=[
                 "state",
                 "credit_score",
                 "account_age_days",
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     print(
         c.online_multi_get(
             entity_keys=["1006", "1007"],
-            feature_names=[
+            feature_full_names=[
                 "state",
                 "credit_score",
                 "account_age_days",
@@ -165,7 +165,7 @@ if __name__ == "__main__":
         )
     )
     c.join(
-        feature_names=[
+        feature_full_names=[
             "state",
             "credit_score",
             "account_age_days",

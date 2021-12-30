@@ -43,7 +43,7 @@ message Value {
 
 message OnlineGetRequest {
   string entity_key = 1;
-  repeated string feature_names = 2;
+  repeated string feature_full_names = 2;
 }
 
 message FeatureValueMap {
@@ -57,7 +57,7 @@ message OnlineGetResponse {
 
 message OnlineMultiGetRequest {
   repeated string entity_keys = 1;
-  repeated string feature_names = 2;
+  repeated string feature_full_names = 2;
 }
 
 message OnlineMultiGetResponse {
@@ -100,7 +100,7 @@ message EntityRow {
 }
 
 message ChannelJoinRequest {
-  repeated string feature_names = 1;
+  repeated string feature_full_names = 1;
   EntityRow entity_row = 2;
   repeated string value_names = 3;
 }
@@ -112,7 +112,7 @@ message ChannelJoinResponse {
 }
 
 message JoinRequest {
-  repeated string feature_names = 1;
+  repeated string feature_full_names = 1;
   string input_file_path = 2;
   string output_file_path = 3;
 }

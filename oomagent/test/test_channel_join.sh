@@ -14,7 +14,7 @@ done
 case1="api returns correct result"
 arg1='
 {
-  "feature_names": [
+  "feature_full_names": [
     "driver_stats.conv_rate",
     "driver_stats.acc_rate",
     "driver_stats.avg_daily_trips"
