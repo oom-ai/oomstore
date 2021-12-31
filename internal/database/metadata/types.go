@@ -26,6 +26,7 @@ type CreateRevisionOpt struct {
 	Revision      int64
 	GroupID       int
 	SnapshotTable *string
+	CdcTable      *string
 	Anchored      bool
 	Description   string
 }
