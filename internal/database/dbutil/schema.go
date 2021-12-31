@@ -26,32 +26,22 @@ CREATE TABLE "{{ .TableName }}" (
 var (
 	createSchemaFuncs = template.FuncMap{
 		"entity": func(entity types.Entity, backend types.BackendType) string {
+			entityName := QuoteFn(backend)(entity.Name)
 			switch backend {
 			case types.BackendCassandra, types.BackendSQLite:
-				return fmt.Sprintf(`"%s" TEXT`, entity.Name)
-			case types.BackendPostgres, types.BackendSnowflake:
-				return fmt.Sprintf(`"%s" VARCHAR(%d)`, entity.Name, entity.Length)
-			case types.BackendMySQL:
-				return fmt.Sprintf("`%s` VARCHAR(%d)", entity.Name, entity.Length)
+				return fmt.Sprintf(`%s TEXT`, entityName)
+			case types.BackendPostgres, types.BackendRedshift, types.BackendSnowflake, types.BackendMySQL:
+				return fmt.Sprintf(`%s VARCHAR(%d)`, entityName, entity.Length)
 			case types.BackendBigQuery:
-				return fmt.Sprintf(`%s STRING`, entity.Name)
+				return fmt.Sprintf(`%s STRING`, entityName)
 			default:
-				return fmt.Sprintf("%s VARCHAR(%d)", entity.Name, entity.Length)
+				panic(fmt.Sprintf("unsupported backend type %s", backend))
 			}
 		},
 		"columnJoin": func(columns []Column, backend types.BackendType) string {
-			var format string
-			switch backend {
-			case types.BackendPostgres, types.BackendSnowflake, types.BackendCassandra:
-				format = `"%s" %s`
-			case types.BackendMySQL:
-				format = "`%s` %s"
-			default:
-				format = "%s %s"
-			}
 			rs := make([]string, 0, len(columns))
 			for _, column := range columns {
-				rs = append(rs, fmt.Sprintf(format, column.Name, column.DbType))
+				rs = append(rs, fmt.Sprintf("%s %s", QuoteFn(backend)(column.Name), column.DbType))
 			}
 			return strings.Join(rs, ",\n\t")
 		},
@@ -84,10 +74,9 @@ type CreateSchema struct {
 
 func BuildCreateSchema(tableName string, entity *types.Entity, features types.FeatureList, backend types.BackendType) (string, error) {
 	var text string
-	switch backend {
-	case types.BackendSnowflake:
+	if backend == types.BackendSnowflake {
 		text = snowflakeCreateSchema
-	default:
+	} else {
 		text = createSchema
 	}
 	buf := bytes.NewBuffer(nil)
