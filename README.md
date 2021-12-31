@@ -1,11 +1,22 @@
-# oomstore
+<h1 align="center">OomStore</h1>
+<p align="center">
+    <em>A Fast Feature Store Powered by Go.</em>
+</p>
 
-[![CI](https://github.com/oom-ai/oomstore/actions/workflows/ci.yml/badge.svg)](https://github.com/oom-ai/oomstore/actions/workflows/ci.yml)
-[![GoReport](https://goreportcard.com/badge/oom-ai/oomstore)](https://goreportcard.com/report/oom-ai/oomstore)
-[![GoDoc](https://godoc.org/github.com/oom-ai/oomstore?status.png)](http://godoc.org/github.com/oom-ai/oomstore)
-[![codecov](https://codecov.io/gh/oom-ai/oomstore/branch/main/graph/badge.svg?token=C59L7LTRM4)](https://codecov.io/gh/oom-ai/oomstore)
-
-The name "OOM" is derived from **O**nline Store, **O**ffline Store, and **M**etadata Store that put together oomstore.
+<p align="center">
+    <a href="https://github.com/oom-ai/oomstore/actions/workflows/ci.yml">
+        <img src="https://github.com/oom-ai/oomstore/actions/workflows/ci.yml/badge.svg" alt="CICD"/>
+    </a>
+    <a href="https://goreportcard.com/report/oom-ai/oomstore">
+        <img src="https://goreportcard.com/badge/oom-ai/oomstore" alt="Version">
+    </a>
+    <a href="http://godoc.org/github.com/oom-ai/oomstore">
+        <img src="https://godoc.org/github.com/oom-ai/oomstore?status.png" alt="Version">
+    </a>
+    <a href="https://codecov.io/gh/oom-ai/oomstore">
+        <img src="https://codecov.io/gh/oom-ai/oomstore/branch/main/graph/badge.svg?token=C59L7LTRM4" alt="Platform"/>
+    </a>
+</p>
 
 <p align="center">
   <a href="https://oom.ai/docs/quickstart">Quickstart</a>
@@ -17,10 +28,11 @@ The name "OOM" is derived from **O**nline Store, **O**ffline Store, and **M**eta
 
 ## Overview
 
-oomstore is a **Fast** Feature Store powered by Go.
+The name "OOM" is derived from **O**nline Store, **O**ffline Store, and **M**etadata Store that put together oomstore.
 It allows you to define features with YAML,
 store features in databases of choice,
 and retrieve features in both online and offline use cases, fast.
+
 
 Please see our [docs](https://oom.ai/docs) for more details.
 
