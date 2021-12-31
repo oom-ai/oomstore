@@ -63,7 +63,6 @@ Compared to other feature store implementations, oomstore has its edges:
 
 ```yaml
 store: &pg
-  backend: postgres
   postgres:
     host: 127.0.0.1
     port: 5432
