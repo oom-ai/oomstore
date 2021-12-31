@@ -19,8 +19,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		}
 
 		entityKey, values := record[0], record[1:]
-
-		key, err := serializeRedisKey(opt.Revision.ID, entityKey)
+		key, err := serializeRedisKeyForBatchFeature(opt.Revision.ID, entityKey)
 		if err != nil {
 			return err
 		}

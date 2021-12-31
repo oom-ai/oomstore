@@ -3,9 +3,10 @@ package test_impl
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/stretchr/testify/assert"
 )
 
 type StreamData struct {
@@ -127,7 +128,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		Entity:        &entity,
 		EntityKey:     "user1",
 		GroupID:       group.ID,
-		FeatureNames:  []string{simpleStreamData.features[0].Name},
+		FeatureList:   types.FeatureList{feature1},
 		FeatureValues: []interface{}{"post1"},
 	}))
 
@@ -135,7 +136,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		Entity:        &entity,
 		EntityKey:     "user1",
 		GroupID:       group.ID,
-		FeatureNames:  []string{simpleStreamData.features[0].Name},
+		FeatureList:   types.FeatureList{feature1},
 		FeatureValues: []interface{}{"post2"},
 	}))
 
@@ -149,7 +150,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		Entity:        &entity,
 		EntityKey:     "user1",
 		GroupID:       group.ID,
-		FeatureNames:  []string{feature1.Name, feature2.Name},
+		FeatureList:   types.FeatureList{feature1, feature2},
 		FeatureValues: []interface{}{"post1", "post2"},
 	}))
 }

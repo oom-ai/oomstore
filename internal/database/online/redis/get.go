@@ -9,7 +9,7 @@ import (
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
-	key, err := serializeRedisKey(opt.RevisionID, opt.EntityKey)
+	key, err := serializeRedisKeyForBatchFeature(opt.RevisionID, opt.EntityKey)
 	if err != nil {
 		return nil, err
 	}

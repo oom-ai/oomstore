@@ -11,7 +11,7 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 	if err != nil {
 		return nil
 	}
-	pattern := prefix + ":*"
+	pattern := "b" + prefix + ":*"
 
 	var cursor uint64
 	var keys []string
