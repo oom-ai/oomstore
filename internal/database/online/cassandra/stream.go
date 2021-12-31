@@ -35,7 +35,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
 
 	cond := sqlutil.BuildPushCondition(opt, Backend)
-	// cassandra's insert is equivalent to insert or update.
+	// cassandra's `insert` is equivalent to `insert_or_update`.
 	// see: https://cassandra.apache.org/doc/latest/cassandra/cql/dml.html#insert-statement
 	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES(%s)",
 		tableName,
