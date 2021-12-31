@@ -7,7 +7,6 @@ import (
 	"github.com/tikv/client-go/v2/rawkv"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
