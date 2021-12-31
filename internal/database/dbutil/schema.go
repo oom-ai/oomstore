@@ -9,16 +9,16 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const createSchema = `
+const tableSchemaTmpl = `
 CREATE TABLE {{ .TableName }} (
 	{{ entity .Entity .Backend }},
-	{{ fields .Columns .Backend }}
+	{{ fields .Fields .Backend }}
 )`
 
 // TODO: Add back `PRIMARY KEY` back when we have functions for
 // creating cdc table
 var (
-	createSchemaFuncs = template.FuncMap{
+	tableSchemaTmplFuncMap = template.FuncMap{
 		"entity": func(entity types.Entity, backend types.BackendType) string {
 			entityName := QuoteFn(backend)(entity.Name)
 			switch backend {
@@ -58,15 +58,14 @@ func (c ColumnList) Names() []string {
 	return names
 }
 
-type CreateSchema struct {
+type TableSchemaTmplOpts struct {
 	TableName string
 	Entity    types.Entity
-	Columns   []Column
-
-	Backend types.BackendType
+	Fields    []Column
+	Backend   types.BackendType
 }
 
-func BuildCreateSchema(
+func BuildTableSchema(
 	tableName string,
 	entity *types.Entity,
 	withUnixMillis bool,
@@ -74,27 +73,27 @@ func BuildCreateSchema(
 	backend types.BackendType,
 ) string {
 	buf := bytes.NewBuffer(nil)
-	schema := newSchema(tableName, *entity, withUnixMillis, features, backend)
-	t := template.Must(template.New("schema").Funcs(createSchemaFuncs).Parse(createSchema))
-	if err := t.Execute(buf, schema); err != nil {
+	opt := tableSchemaTmplOpts(tableName, *entity, withUnixMillis, features, backend)
+	tmpl := template.Must(template.New("schema").Funcs(tableSchemaTmplFuncMap).Parse(tableSchemaTmpl))
+	if err := tmpl.Execute(buf, opt); err != nil {
 		panic(err)
 	}
 	return buf.String()
 }
 
-func newSchema(tableName string,
+func tableSchemaTmplOpts(tableName string,
 	entity types.Entity,
 	withUnixMillis bool,
 	features types.FeatureList,
 	backend types.BackendType,
-) *CreateSchema {
-	columns := make([]Column, 0, len(features))
+) *TableSchemaTmplOpts {
+	fields := make([]Column, 0, len(features))
 	if withUnixMillis {
 		dbType, err := DBValueType(backend, types.Int64)
 		if err != nil {
 			panic(err)
 		}
-		columns = append(columns, Column{
+		fields = append(fields, Column{
 			Name:   "unix_milli",
 			DbType: dbType,
 		})
@@ -104,16 +103,16 @@ func newSchema(tableName string,
 		if err != nil {
 			panic(err)
 		}
-		columns = append(columns, Column{
+		fields = append(fields, Column{
 			Name:   feature.Name,
 			DbType: dbType,
 		})
 	}
 
-	return &CreateSchema{
+	return &TableSchemaTmplOpts{
 		TableName: QuoteFn(backend)(tableName),
 		Entity:    entity,
-		Columns:   columns,
+		Fields:    fields,
 		Backend:   backend,
 	}
 }

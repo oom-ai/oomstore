@@ -16,7 +16,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	columns := append([]string{opt.Entity.Name}, opt.FeatureList.Names()...)
 	tableName := sqlutil.OnlineBatchTableName(opt.Revision.ID)
 
-	table := dbutil.BuildCreateSchema(tableName, opt.Entity, false, opt.FeatureList, Backend)
+	table := dbutil.BuildTableSchema(tableName, opt.Entity, false, opt.FeatureList, Backend)
 
 	// create table
 	if err := db.Query(table).Exec(); err != nil {
