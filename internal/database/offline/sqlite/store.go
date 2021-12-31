@@ -2,7 +2,6 @@ package sqlite
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 
@@ -45,7 +44,19 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
-	return nil, fmt.Errorf("not implemented")
+	query := `
+		SELECT
+			p.name as column_name,
+			p.type AS data_type
+		FROM sqlite_master AS m
+		LEFT OUTER JOIN pragma_table_info((m.name)) AS p
+		WHERE m.type = 'table' AND m.name = ?
+`
+	rows, err := db.QueryxContext(ctx, query, tableName)
+	if err != nil {
+		return nil, err
+	}
+	return sqlutil.SqlxTableSchema(ctx, db, types.BackendSQLite, rows)
 }
 
 func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {

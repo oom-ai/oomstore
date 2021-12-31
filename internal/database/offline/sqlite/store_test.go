@@ -11,8 +11,11 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/offline/test_impl"
 )
 
+var DATABASE string
+
 func prepareStore(t *testing.T) (context.Context, offline.Store) {
-	file, err := os.CreateTemp(t.TempDir(), "")
+	DATABASE = t.TempDir() + "/test.db"
+	file, err := os.Create(DATABASE)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -26,7 +29,12 @@ func prepareStore(t *testing.T) (context.Context, offline.Store) {
 	return context.Background(), &sqlite.DB{conn}
 }
 
-func destroyStore() {}
+func destroyStore() {
+	if err := os.RemoveAll(DATABASE); err != nil {
+		panic(err)
+	}
+
+}
 
 func TestPing(t *testing.T) {
 	test_impl.TestPing(t, prepareStore, destroyStore)
@@ -46,4 +54,17 @@ func TestJoin(t *testing.T) {
 
 func TestSnapshot(t *testing.T) {
 	test_impl.TestSnapshot(t, prepareStore, destroyStore)
+}
+
+func TestTableSchema(t *testing.T) {
+	test_impl.TestTableSchema(t, prepareStore, destroyStore, func(ctx context.Context) {
+		db, err := dbutil.OpenSQLite(DATABASE)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer db.Close()
+		if _, err := db.ExecContext(ctx, "create table `offline_batch_1_1`(`user` varchar(16), `age` smallint)"); err != nil {
+			t.Fatal(err)
+		}
+	})
 }
