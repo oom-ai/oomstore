@@ -72,9 +72,9 @@ func GetColumnFormat(backendType types.BackendType) (string, error) {
 func QuoteFn(backendType types.BackendType) func(...string) string {
 	var q string
 	switch backendType {
-	case types.BackendPostgres, types.BackendSnowflake, types.BackendRedshift:
+	case types.BackendPostgres, types.BackendSnowflake, types.BackendRedshift, types.BackendCassandra, types.BackendSQLite:
 		q = `"`
-	case types.BackendMySQL, types.BackendSQLite, types.BackendBigQuery:
+	case types.BackendMySQL, types.BackendBigQuery:
 		q = "`"
 	default:
 		panic(fmt.Sprintf("unsupported backend type %s", backendType))

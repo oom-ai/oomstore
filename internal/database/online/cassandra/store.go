@@ -49,7 +49,3 @@ func Open(option *types.CassandraOpt) (*DB, error) {
 	}
 	return &DB{Session: session}, nil
 }
-
-func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	panic("Implement me!")
-}
