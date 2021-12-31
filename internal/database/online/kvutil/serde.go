@@ -8,7 +8,12 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const serializeIntBase = 36
+const (
+	serializeIntBase = 36
+
+	KeyPrefixForBatchFeature  = "b"
+	KeyPrefixForStreamFeature = "s"
+)
 
 func SerializeByValueType(i interface{}, valueType types.ValueType) (s string, err error) {
 	defer func() {

@@ -60,7 +60,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	var keys [][]byte
 	for _, serializedEntityKey := range serializedEntityKeys {
 		for _, serializedFeatureID := range serializedFeatureIDs {
-			keys = append(keys, getKey(serializedRevisionID, serializedEntityKey, serializedFeatureID))
+			keys = append(keys, getKeyOfBatchFeature(serializedRevisionID, serializedEntityKey, serializedFeatureID))
 		}
 	}
 
