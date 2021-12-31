@@ -16,7 +16,7 @@ func TestTableSchema(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 
 	prepareSampleTable(ctx)
 
-	actual, err := store.TableSchema(ctx, "user")
+	actual, err := store.TableSchema(ctx, "offline_batch_1_1")
 	require.NoError(t, err)
 	require.Equal(t, 2, len(actual.Fields))
 
