@@ -57,6 +57,10 @@ func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
 	test_impl.TestPurgeRemovesSpecifiedRevision(t, prepareStore, destroyStore(t))
 }
 
+func TestPust(t *testing.T) {
+	test_impl.TestPush(t, prepareStore, destroyStore(t))
+}
+
 func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
 	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore, destroyStore(t))
 }
