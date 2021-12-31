@@ -53,6 +53,10 @@ func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
 	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
 }
 
+func TestPush(t *testing.T) {
+	test_impl.TestPush(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+}
+
 func TestPing(t *testing.T) {
 	test_impl.TestPing(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
 }
