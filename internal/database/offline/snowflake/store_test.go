@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/snowflake"
@@ -70,4 +72,34 @@ func TestJoin(t *testing.T) {
 
 func TestSnapshot(t *testing.T) {
 	test_impl.TestSnapshot(t, prepareStore, destroyStore(DATABASE))
+}
+
+// We don't use test_impl.TestTableSchema because snowflake cannot be
+// accessed by two different sessions.
+func TestTableSchema(t *testing.T) {
+	ctx, store := prepareStore(t)
+	defer store.Close()
+	db := store.(*snowflake.DB)
+
+	if _, err := db.ExecContext(ctx, `create table "offline_batch_1_1"("user" varchar(16), "age" smallint)`); err != nil {
+		t.Fatal(err)
+	}
+
+	actual, err := store.TableSchema(ctx, "offline_batch_1_1")
+	require.NoError(t, err)
+	require.Equal(t, 2, len(actual.Fields))
+
+	expected := types.DataTableSchema{
+		Fields: []types.DataTableFieldSchema{
+			{
+				Name:      "user",
+				ValueType: types.String,
+			},
+			{
+				Name:      "age",
+				ValueType: types.Int64,
+			},
+		},
+	}
+	require.ElementsMatch(t, expected.Fields, actual.Fields)
 }

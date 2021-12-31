@@ -2,7 +2,6 @@ package snowflake
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
@@ -59,7 +58,11 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
-	return nil, fmt.Errorf("not implemented")
+	rows, err := db.QueryxContext(ctx, "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = ?", tableName)
+	if err != nil {
+		return nil, err
+	}
+	return sqlutil.SqlxTableSchema(ctx, db, types.BackendSnowflake, rows)
 }
 
 func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
