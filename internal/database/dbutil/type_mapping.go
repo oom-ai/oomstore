@@ -57,11 +57,16 @@ func ValueType(backend types.BackendType, dbValueType string) (types.ValueType, 
 	default:
 		return 0, errdefs.InvalidAttribute(fmt.Errorf("unsupported backend: %s", backend))
 	}
-
-	t, ok := mp[strings.ToLower(dbValueType)]
+	dbValueType = strings.ToLower(dbValueType)
+	i := strings.Index(dbValueType, "(")
+	if i != -1 {
+		dbValueType = dbValueType[0:i]
+	}
+	t, ok := mp[dbValueType]
 	if !ok {
 		return 0, errdefs.InvalidAttribute(fmt.Errorf("unsupported db value type: %s", dbValueType))
 	}
+
 	return t, nil
 }
 
@@ -235,6 +240,7 @@ var (
 		"bigint":   types.Int64,
 		"tinyint":  types.Int64,
 		"byteint":  types.Int64,
+		"number":   types.Int64,
 
 		"double":           types.Float64,
 		"double precision": types.Float64,
@@ -256,11 +262,32 @@ var (
 	}
 	sqliteTypeToValueType = map[string]types.ValueType{
 		"integer":   types.Int64,
-		"float":     types.Float64,
-		"blob":      types.Bytes,
-		"text":      types.String,
-		"timestamp": types.Time,
-		"datetime":  types.Time,
+		"int":       types.Int64,
+		"tinyint":   types.Int64,
+		"smallint":  types.Int64,
+		"bigint":    types.Int64,
+		"mediumint": types.Int64,
+
+		"float":            types.Float64,
+		"real":             types.Float64,
+		"double":           types.Float64,
+		"double precision": types.Float64,
+		"numeric":          types.Float64,
+		"decimal":          types.Float64,
+
+		"blob": types.Bytes,
+
+		"text":              types.String,
+		"clob":              types.String,
+		"character varying": types.String,
+		"varchar":           types.String,
+		"nvarchar":          types.String,
+		"nchar":             types.String,
+		"character":         types.String,
+		"native character":  types.String,
+
+		"boolean":  types.Bool,
+		"datetime": types.Time,
 	}
 	// Redshift data type: https://docs.aws.amazon.com/redshift/latest/dg/c_Supported_data_types.html
 	redshiftTypeToValueType = map[string]types.ValueType{
