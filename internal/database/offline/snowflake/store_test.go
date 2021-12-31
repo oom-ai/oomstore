@@ -77,6 +77,8 @@ func TestSnapshot(t *testing.T) {
 // We don't use test_impl.TestTableSchema because snowflake cannot be
 // accessed by two different sessions.
 func TestTableSchema(t *testing.T) {
+	t.Cleanup(destroyStore(DATABASE))
+
 	ctx, store := prepareStore(t)
 	defer store.Close()
 	db := store.(*snowflake.DB)
