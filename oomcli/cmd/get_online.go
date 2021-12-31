@@ -40,7 +40,7 @@ func init() {
 
 	flags := getOnlineCmd.Flags()
 
-	flags.StringVarP(&onlineGetOpt.EntityKey, "entity-key", "k", "", "entity keys")
+	flags.StringVarP(&onlineGetOpt.EntityKey, "entity-key", "k", "", "entity key")
 	_ = getOnlineCmd.MarkFlagRequired("entity-key")
 
 	flags.StringSliceVar(&onlineGetOpt.FeatureFullNames, "feature", nil, "feature full names")
