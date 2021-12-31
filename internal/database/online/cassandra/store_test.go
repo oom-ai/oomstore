@@ -83,6 +83,10 @@ func TestPrepareStreamTable(t *testing.T) {
 	test_impl.TestPrepareStreamTable(t, prepareStore, destroyStore(KEYSPACE))
 }
 
+func TestPush(t *testing.T) {
+	test_impl.TestPush(t, prepareStore, destroyStore(KEYSPACE))
+}
+
 func TestPing(t *testing.T) {
 	test_impl.TestPing(t, prepareStore, destroyStore(KEYSPACE))
 }
