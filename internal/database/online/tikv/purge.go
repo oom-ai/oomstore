@@ -15,5 +15,5 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 	if err != nil {
 		return err
 	}
-	return db.DeleteRange(ctx, []byte(startKey), []byte(endKey))
+	return db.DeleteRange(ctx, []byte(kvutil.KeyPrefixForBatchFeature+startKey), []byte(kvutil.KeyPrefixForBatchFeature+endKey))
 }

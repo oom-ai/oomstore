@@ -54,7 +54,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 				return err
 			}
 
-			putKeys = append(putKeys, getKey(serializedRevisionID, serializedEntityKey, serializedFeatureIDs[i]))
+			putKeys = append(putKeys, getKeyOfBatchFeature(serializedRevisionID, serializedEntityKey, serializedFeatureIDs[i]))
 			putVals = append(putVals, []byte(serializedFeatureValue))
 		}
 
