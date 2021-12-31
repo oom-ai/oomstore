@@ -17,7 +17,7 @@ type PushCondition struct {
 	UpdatePlaceholders string
 }
 
-func BuildPushCondition(opt online.PushOpt, backend types.BackendType) (*PushCondition, error) {
+func BuildPushCondition(opt online.PushOpt, backend types.BackendType) *PushCondition {
 	qt := dbutil.QuoteFn(backend)
 	cond := PushCondition{}
 
@@ -32,5 +32,5 @@ func BuildPushCondition(opt online.PushOpt, backend types.BackendType) (*PushCon
 	cond.UpdatePlaceholders = strings.Join(updatePlaceholders, ",")
 	cond.UpdateValues = opt.FeatureValues
 
-	return &cond, nil
+	return &cond
 }

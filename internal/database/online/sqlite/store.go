@@ -50,10 +50,7 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
 
-	cond, err := sqlutil.BuildPushCondition(opt, Backend)
-	if err != nil {
-		return err
-	}
+	cond := sqlutil.BuildPushCondition(opt, Backend)
 
 	query := fmt.Sprintf("REPLACE INTO %s (%s) VALUES(%s)",
 		tableName,
@@ -61,7 +58,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 		cond.InsertPlaceholders,
 	)
 
-	_, err = db.ExecContext(ctx, db.Rebind(query), cond.InsertValues...)
+	_, err := db.ExecContext(ctx, db.Rebind(query), cond.InsertValues...)
 	return err
 }
 

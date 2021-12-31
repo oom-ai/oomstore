@@ -51,10 +51,7 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
 
-	cond, err := sqlutil.BuildPushCondition(opt, Backend)
-	if err != nil {
-		return err
-	}
+	cond := sqlutil.BuildPushCondition(opt, Backend)
 
 	query := fmt.Sprintf(`INSERT INTO %s(%s) VALUES(%s) ON CONFLICT ("%s") DO UPDATE SET %s`,
 		tableName,
@@ -64,7 +61,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 		cond.UpdatePlaceholders,
 	)
 
-	_, err = db.ExecContext(ctx, db.Rebind(query), append(cond.InsertValues, cond.UpdateValues...)...)
+	_, err := db.ExecContext(ctx, db.Rebind(query), append(cond.InsertValues, cond.UpdateValues...)...)
 	return err
 }
 
