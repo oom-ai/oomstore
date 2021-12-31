@@ -12,13 +12,7 @@ import (
 const createSchema = `
 CREATE TABLE {{ .TableName }} (
 	{{ entity .Entity .Backend }},
-	{{ columnJoin .Columns .Backend }}
-)`
-
-const snowflakeCreateSchema = `
-CREATE TABLE "{{ .TableName }}" (
-	{{ entity .Entity .Backend }},
-	{{ columnJoin .Columns .Backend }}
+	{{ fields .Columns .Backend }}
 )`
 
 // TODO: Add back `PRIMARY KEY` back when we have functions for
@@ -38,7 +32,7 @@ var (
 				panic(fmt.Sprintf("unsupported backend type %s", backend))
 			}
 		},
-		"columnJoin": func(columns []Column, backend types.BackendType) string {
+		"fields": func(columns []Column, backend types.BackendType) string {
 			rs := make([]string, 0, len(columns))
 			for _, column := range columns {
 				rs = append(rs, fmt.Sprintf("%s %s", QuoteFn(backend)(column.Name), column.DbType))
@@ -72,44 +66,54 @@ type CreateSchema struct {
 	Backend types.BackendType
 }
 
-func BuildCreateSchema(tableName string, entity *types.Entity, features types.FeatureList, backend types.BackendType) (string, error) {
-	var text string
-	if backend == types.BackendSnowflake {
-		text = snowflakeCreateSchema
-	} else {
-		text = createSchema
-	}
+func BuildCreateSchema(
+	tableName string,
+	entity *types.Entity,
+	withUnixMillis bool,
+	features types.FeatureList,
+	backend types.BackendType,
+) string {
 	buf := bytes.NewBuffer(nil)
-	schema, err := newSchema(tableName, *entity, features, backend)
-	if err != nil {
-		return "", err
+	schema := newSchema(tableName, *entity, withUnixMillis, features, backend)
+	t := template.Must(template.New("schema").Funcs(createSchemaFuncs).Parse(createSchema))
+	if err := t.Execute(buf, schema); err != nil {
+		panic(err)
 	}
-
-	t := template.Must(template.New("schema").Funcs(createSchemaFuncs).Parse(text))
-	if err = t.Execute(buf, schema); err != nil {
-		return "", err
-	}
-	return buf.String(), nil
+	return buf.String()
 }
 
-func newSchema(tableName string, entity types.Entity, features types.FeatureList, backend types.BackendType) (CreateSchema, error) {
+func newSchema(tableName string,
+	entity types.Entity,
+	withUnixMillis bool,
+	features types.FeatureList,
+	backend types.BackendType,
+) *CreateSchema {
 	columns := make([]Column, 0, len(features))
+	if withUnixMillis {
+		dbType, err := DBValueType(backend, types.Int64)
+		if err != nil {
+			panic(err)
+		}
+		columns = append(columns, Column{
+			Name:   "unix_milli",
+			DbType: dbType,
+		})
+	}
 	for _, feature := range features {
 		dbType, err := DBValueType(backend, feature.ValueType)
 		if err != nil {
-			return CreateSchema{}, err
+			panic(err)
 		}
-
 		columns = append(columns, Column{
 			Name:   feature.Name,
 			DbType: dbType,
 		})
 	}
 
-	return CreateSchema{
-		TableName: tableName,
+	return &CreateSchema{
+		TableName: QuoteFn(backend)(tableName),
 		Entity:    entity,
 		Columns:   columns,
 		Backend:   backend,
-	}, nil
+	}
 }

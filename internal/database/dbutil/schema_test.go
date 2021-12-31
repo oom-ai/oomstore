@@ -41,7 +41,7 @@ func TestBuildSchema(t *testing.T) {
 			features: features,
 
 			want: `
-CREATE TABLE user (
+CREATE TABLE "user" (
 	"user_id" VARCHAR(32),
 	"age" bigint,
 	"gender" text
@@ -59,7 +59,7 @@ CREATE TABLE user (
 			features: features,
 
 			want: "\n" +
-				"CREATE TABLE user (\n" +
+				"CREATE TABLE `user` (\n" +
 				"	`user_id` VARCHAR(32),\n" +
 				"	`age` bigint,\n" +
 				"	`gender` text\n)",
@@ -76,7 +76,7 @@ CREATE TABLE user (
 
 			wantErr: nil,
 			want: `
-CREATE TABLE user (
+CREATE TABLE "user" (
 	"user_id" TEXT,
 	"age" bigint,
 	"gender" text
@@ -86,8 +86,7 @@ CREATE TABLE user (
 
 	for _, c := range cases {
 		t.Run(c.description, func(t *testing.T) {
-			schema, err := dbutil.BuildCreateSchema(c.tableName, c.entity, c.features, c.backend)
-			require.Equal(t, c.wantErr, err)
+			schema := dbutil.BuildCreateSchema(c.tableName, c.entity, false, c.features, c.backend)
 			require.Equal(t, c.want, schema)
 		})
 	}

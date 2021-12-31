@@ -16,10 +16,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	columns := append([]string{opt.Entity.Name}, opt.FeatureList.Names()...)
 	tableName := sqlutil.OnlineBatchTableName(opt.Revision.ID)
 
-	table, err := dbutil.BuildCreateSchema(tableName, opt.Entity, opt.FeatureList, Backend)
-	if err != nil {
-		return err
-	}
+	table := dbutil.BuildCreateSchema(tableName, opt.Entity, false, opt.FeatureList, Backend)
 
 	// create table
 	if err := db.Query(table).Exec(); err != nil {
@@ -38,7 +35,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		if batch.Size() != BatchSize {
 			batch.Query(insertStmt, record...)
 		} else {
-			if err = db.ExecuteBatch(batch); err != nil {
+			if err := db.ExecuteBatch(batch); err != nil {
 				return err
 			}
 			batch = db.NewBatch(gocql.LoggedBatch)

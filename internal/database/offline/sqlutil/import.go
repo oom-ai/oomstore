@@ -16,11 +16,8 @@ func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData Lo
 	var revision int64
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		schema, err := dbutil.BuildCreateSchema(opt.SnapshotTableName, opt.Entity, opt.Features, backendType)
-		if err != nil {
-			return err
-		}
-		_, err = tx.ExecContext(ctx, schema)
+		schema := dbutil.BuildCreateSchema(opt.SnapshotTableName, opt.Entity, false, opt.Features, backendType)
+		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return err
 		}
