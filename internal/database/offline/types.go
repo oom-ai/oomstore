@@ -58,3 +58,10 @@ type SnapshotOpt struct {
 	Revision     int64
 	PrevRevision int64
 }
+
+type CreateTableOpt struct {
+	TableName      string
+	Entity         *types.Entity
+	Features       types.FeatureList
+	WithUnixMillis bool
+}

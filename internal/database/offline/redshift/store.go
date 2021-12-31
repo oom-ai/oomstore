@@ -54,3 +54,7 @@ func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
 	dbOpt := dbutil.DBOpt{Backend: Backend, SqlxDB: db.DB}
 	return sqlutil.Snapshot(ctx, dbOpt, opt)
 }
+
+func (db *DB) CreateTable(ctx context.Context, opt offline.CreateTableOpt) error {
+	return sqlutil.CreateTable(ctx, db.DB, opt, Backend)
+}
