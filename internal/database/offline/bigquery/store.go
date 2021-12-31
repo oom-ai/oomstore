@@ -81,3 +81,11 @@ func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
 	}
 	return sqlutil.Snapshot(ctx, dbOpt, opt)
 }
+
+func (db *DB) CreateTable(ctx context.Context, opt offline.CreateTableOpt) error {
+	schema := dbutil.BuildTableSchema(opt.TableName, opt.Entity, opt.WithUnixMillis, opt.Features, Backend)
+	if _, err := db.Client.Query(schema).Run(ctx); err != nil {
+		return err
+	}
+	return nil
+}
