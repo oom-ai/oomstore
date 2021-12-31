@@ -53,7 +53,7 @@ func TestTableSchema(t *testing.T) {
 			t.Fatal(err)
 		}
 		defer db.Close()
-		if _, err := db.ExecContext(ctx, `create table "user"("user" varchar(16), "age" smallint)`); err != nil {
+		if _, err := db.ExecContext(ctx, `create table "offline_batch_1_1"("user" varchar(16), "age" smallint)`); err != nil {
 			t.Fatal(err)
 		}
 	})

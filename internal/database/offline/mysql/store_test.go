@@ -48,3 +48,17 @@ func TestJoin(t *testing.T) {
 func TestSnapshot(t *testing.T) {
 	test_impl.TestSnapshot(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
+
+func TestTableSchema(t *testing.T) {
+	test_impl.TestTableSchema(t, prepareStore, runtime_mysql.DestroyStore(DATABASE), func(ctx context.Context) {
+		opt := runtime_mysql.GetOpt(DATABASE)
+		db, err := dbutil.OpenMysqlDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer db.Close()
+		if _, err := db.ExecContext(ctx, "create table `offline_batch_1_1`(`user` varchar(16), `age` smallint)"); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
