@@ -7,13 +7,12 @@ import (
 )
 
 func (db *DB) Purge(ctx context.Context, revisionID int) error {
-	startKey, err := kvutil.SerializeByValue(revisionID)
+	serializedRevisionID, err := kvutil.SerializeByValue(revisionID)
 	if err != nil {
 		return err
 	}
-	endKey, err := kvutil.SerializeByValue(revisionID + 1)
-	if err != nil {
-		return err
-	}
-	return db.DeleteRange(ctx, []byte(kvutil.KeyPrefixForBatchFeature+startKey), []byte(kvutil.KeyPrefixForBatchFeature+endKey))
+	startKey := append([]byte(kvutil.KeyPrefixForBatchFeature+serializedRevisionID), byte(keyDelimiter))
+	endKey := append([]byte(kvutil.KeyPrefixForBatchFeature+serializedRevisionID), byte(keyDelimiter+1))
+
+	return db.DeleteRange(ctx, startKey, endKey)
 }
