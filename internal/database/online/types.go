@@ -30,7 +30,7 @@ type PushOpt struct {
 	Entity        *types.Entity
 	EntityKey     string
 	GroupID       int
-	FeatureNames  []string
+	FeatureList   types.FeatureList
 	FeatureValues []interface{}
 }
 
