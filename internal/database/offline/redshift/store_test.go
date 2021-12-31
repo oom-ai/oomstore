@@ -89,3 +89,16 @@ func TestImport(t *testing.T) {
 func TestJoin(t *testing.T) {
 	test_impl.TestJoin(t, prepareStore, destroyStore(DATABASE))
 }
+
+func TestTableSchema(t *testing.T) {
+	test_impl.TestTableSchema(t, prepareStore, destroyStore(DATABASE), func(ctx context.Context) {
+		db, err := redshift.Open(getOpt(DATABASE))
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer db.Close()
+		if _, err = db.ExecContext(ctx, `create table "offline_batch_1_1"("user" varchar(16), "age" smallint)`); err != nil {
+			t.Fatal(err)
+		}
+	})
+}

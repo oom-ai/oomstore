@@ -96,7 +96,7 @@ func TestTableSchema(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		query := fmt.Sprintf("CREATE TABLE %s.user(`user` STRING, `age` BIGINT)", DATASET_ID)
+		query := fmt.Sprintf("CREATE TABLE %s.offline_batch_1_1(`user` STRING, `age` BIGINT)", DATASET_ID)
 		if _, err = db.Query(query).Read(ctx); err != nil {
 			t.Fatal(err)
 		}

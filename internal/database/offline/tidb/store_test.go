@@ -44,3 +44,16 @@ func TestImport(t *testing.T) {
 func TestJoin(t *testing.T) {
 	test_impl.TestJoin(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
 }
+
+func TestTableSchema(t *testing.T) {
+	test_impl.TestTableSchema(t, prepareStore, runtime_tidb.DestroyStore(DATABASE), func(ctx context.Context) {
+		db, err := mysql.Open(runtime_tidb.GetOpt(DATABASE))
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer db.Close()
+		if _, err = db.ExecContext(ctx, "create table `offline_batch_1_1`(`user` varchar(16), `age` smallint)"); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
