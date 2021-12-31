@@ -28,17 +28,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 	opt := offline.ImportOpt{
 		Entity:            &entity,
 		SnapshotTableName: snapshotTable,
-		Features: []*types.Feature{
-			{
-				Name:      "price",
-				ValueType: types.Int64,
-			},
-			{
-				Name:      "model",
-				ValueType: -1,
-			},
-		},
-		Header: []string{"device", "model", "price"},
+		Header:            []string{"device", "model", "price"},
 		Source: &offline.CSVSource{
 			Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,1899
 1235,apple,4999
@@ -48,11 +38,6 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 			Delimiter: ",",
 		},
 	}
-
-	t.Run("invalid value type", func(t *testing.T) {
-		_, err := store.Import(ctx, opt)
-		assert.Error(t, err)
-	})
 
 	t.Run("normal import call", func(t *testing.T) {
 		revision := int64(1234)

@@ -69,12 +69,8 @@ func Snapshot(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.SnapshotOpt) 
 		currCdcTableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, currCdcTableName)
 	}
 
-	schema, err := dbutil.BuildCreateSchema(currSnapshotTableName, opt.Group.Entity, opt.Features, dbOpt.Backend)
-	if err != nil {
-		return err
-	}
-
-	if err = dbOpt.ExecContext(ctx, schema, nil); err != nil {
+	schema := dbutil.BuildTableSchema(currSnapshotTableName, opt.Group.Entity, false, opt.Features, dbOpt.Backend)
+	if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
 		return err
 	}
 	query, err := buildSnapshotQuery(snapshotQueryParams{

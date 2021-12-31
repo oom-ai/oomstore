@@ -9,49 +9,33 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const createSchema = `
+const tableSchemaTmpl = `
 CREATE TABLE {{ .TableName }} (
 	{{ entity .Entity .Backend }},
-	{{ columnJoin .Columns .Backend }}
-)`
-
-const snowflakeCreateSchema = `
-CREATE TABLE "{{ .TableName }}" (
-	{{ entity .Entity .Backend }},
-	{{ columnJoin .Columns .Backend }}
+	{{ fields .Fields .Backend }}
 )`
 
 // TODO: Add back `PRIMARY KEY` back when we have functions for
 // creating cdc table
 var (
-	createSchemaFuncs = template.FuncMap{
+	tableSchemaTmplFuncMap = template.FuncMap{
 		"entity": func(entity types.Entity, backend types.BackendType) string {
+			entityName := QuoteFn(backend)(entity.Name)
 			switch backend {
 			case types.BackendCassandra, types.BackendSQLite:
-				return fmt.Sprintf(`"%s" TEXT`, entity.Name)
-			case types.BackendPostgres, types.BackendSnowflake:
-				return fmt.Sprintf(`"%s" VARCHAR(%d)`, entity.Name, entity.Length)
-			case types.BackendMySQL:
-				return fmt.Sprintf("`%s` VARCHAR(%d)", entity.Name, entity.Length)
+				return fmt.Sprintf(`%s TEXT`, entityName)
+			case types.BackendPostgres, types.BackendRedshift, types.BackendSnowflake, types.BackendMySQL:
+				return fmt.Sprintf(`%s VARCHAR(%d)`, entityName, entity.Length)
 			case types.BackendBigQuery:
-				return fmt.Sprintf(`%s STRING`, entity.Name)
+				return fmt.Sprintf(`%s STRING`, entityName)
 			default:
-				return fmt.Sprintf("%s VARCHAR(%d)", entity.Name, entity.Length)
+				panic(fmt.Sprintf("unsupported backend type %s", backend))
 			}
 		},
-		"columnJoin": func(columns []Column, backend types.BackendType) string {
-			var format string
-			switch backend {
-			case types.BackendPostgres, types.BackendSnowflake, types.BackendCassandra:
-				format = `"%s" %s`
-			case types.BackendMySQL:
-				format = "`%s` %s"
-			default:
-				format = "%s %s"
-			}
+		"fields": func(columns []Column, backend types.BackendType) string {
 			rs := make([]string, 0, len(columns))
 			for _, column := range columns {
-				rs = append(rs, fmt.Sprintf(format, column.Name, column.DbType))
+				rs = append(rs, fmt.Sprintf("%s %s", QuoteFn(backend)(column.Name), column.DbType))
 			}
 			return strings.Join(rs, ",\n\t")
 		},
@@ -74,53 +58,61 @@ func (c ColumnList) Names() []string {
 	return names
 }
 
-type CreateSchema struct {
+type TableSchemaTmplOpts struct {
 	TableName string
 	Entity    types.Entity
-	Columns   []Column
-
-	Backend types.BackendType
+	Fields    []Column
+	Backend   types.BackendType
 }
 
-func BuildCreateSchema(tableName string, entity *types.Entity, features types.FeatureList, backend types.BackendType) (string, error) {
-	var text string
-	switch backend {
-	case types.BackendSnowflake:
-		text = snowflakeCreateSchema
-	default:
-		text = createSchema
-	}
+func BuildTableSchema(
+	tableName string,
+	entity *types.Entity,
+	withUnixMillis bool,
+	features types.FeatureList,
+	backend types.BackendType,
+) string {
 	buf := bytes.NewBuffer(nil)
-	schema, err := newSchema(tableName, *entity, features, backend)
-	if err != nil {
-		return "", err
+	opt := tableSchemaTmplOpts(tableName, *entity, withUnixMillis, features, backend)
+	tmpl := template.Must(template.New("schema").Funcs(tableSchemaTmplFuncMap).Parse(tableSchemaTmpl))
+	if err := tmpl.Execute(buf, opt); err != nil {
+		panic(err)
 	}
-
-	t := template.Must(template.New("schema").Funcs(createSchemaFuncs).Parse(text))
-	if err = t.Execute(buf, schema); err != nil {
-		return "", err
-	}
-	return buf.String(), nil
+	return buf.String()
 }
 
-func newSchema(tableName string, entity types.Entity, features types.FeatureList, backend types.BackendType) (CreateSchema, error) {
-	columns := make([]Column, 0, len(features))
+func tableSchemaTmplOpts(tableName string,
+	entity types.Entity,
+	withUnixMillis bool,
+	features types.FeatureList,
+	backend types.BackendType,
+) *TableSchemaTmplOpts {
+	fields := make([]Column, 0, len(features))
+	if withUnixMillis {
+		dbType, err := DBValueType(backend, types.Int64)
+		if err != nil {
+			panic(err)
+		}
+		fields = append(fields, Column{
+			Name:   "unix_milli",
+			DbType: dbType,
+		})
+	}
 	for _, feature := range features {
 		dbType, err := DBValueType(backend, feature.ValueType)
 		if err != nil {
-			return CreateSchema{}, err
+			panic(err)
 		}
-
-		columns = append(columns, Column{
+		fields = append(fields, Column{
 			Name:   feature.Name,
 			DbType: dbType,
 		})
 	}
 
-	return CreateSchema{
-		TableName: tableName,
+	return &TableSchemaTmplOpts{
+		TableName: QuoteFn(backend)(tableName),
 		Entity:    entity,
-		Columns:   columns,
+		Fields:    fields,
 		Backend:   backend,
-	}, nil
+	}
 }
