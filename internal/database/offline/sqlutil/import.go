@@ -16,7 +16,11 @@ func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData Lo
 	var revision int64
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		schema := dbutil.BuildTableSchema(opt.SnapshotTableName, opt.Entity, false, opt.Features, []string{opt.Entity.Name}, backendType)
+		pkFields := []string{opt.Entity.Name}
+		if opt.NoPK {
+			pkFields = nil
+		}
+		schema := dbutil.BuildTableSchema(opt.SnapshotTableName, opt.Entity, false, opt.Features, pkFields, backendType)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return err

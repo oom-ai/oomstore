@@ -45,6 +45,7 @@ type ImportOpt struct {
 	Revision          *int64
 	SnapshotTableName string
 	Source            *CSVSource
+	NoPK              bool // TODO: to import cdc data temporarily for testing
 }
 
 type CSVSource struct {
