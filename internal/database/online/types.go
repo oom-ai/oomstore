@@ -5,17 +5,17 @@ import (
 )
 
 type GetOpt struct {
-	Entity      *types.Entity
-	RevisionID  int
-	EntityKey   string
-	FeatureList types.FeatureList
+	Entity     *types.Entity
+	RevisionID int
+	EntityKey  string
+	Features   types.FeatureList
 }
 
 type MultiGetOpt struct {
-	Entity      *types.Entity
-	RevisionID  int
-	EntityKeys  []string
-	FeatureList types.FeatureList
+	Entity     *types.Entity
+	RevisionID int
+	EntityKeys []string
+	Features   types.FeatureList
 }
 
 type ImportOpt struct {
@@ -23,14 +23,14 @@ type ImportOpt struct {
 	Entity       *types.Entity
 	ExportStream <-chan types.ExportRecord
 	ExportError  <-chan error
-	FeatureList  types.FeatureList
+	Features     types.FeatureList
 }
 
 type PushOpt struct {
 	Entity        *types.Entity
 	EntityKey     string
 	GroupID       int
-	FeatureList   types.FeatureList
+	Features      types.FeatureList
 	FeatureValues []interface{}
 }
 

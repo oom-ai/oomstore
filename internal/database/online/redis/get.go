@@ -15,7 +15,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	}
 
 	featureIDs := []string{}
-	for _, f := range opt.FeatureList {
+	for _, f := range opt.Features {
 		id, err := kvutil.SerializeByValue(f.ID)
 		if err != nil {
 			return nil, err
@@ -33,11 +33,11 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		if v == nil {
 			continue
 		}
-		typedValue, err := kvutil.DeserializeByValueType(v, opt.FeatureList[i].ValueType)
+		typedValue, err := kvutil.DeserializeByValueType(v, opt.Features[i].ValueType)
 		if err != nil {
 			return nil, err
 		}
-		rowMap[opt.FeatureList[i].FullName] = typedValue
+		rowMap[opt.Features[i].FullName] = typedValue
 	}
 	return rowMap, nil
 }
@@ -47,10 +47,10 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	res := make(map[string]dbutil.RowMap)
 	for _, entityKey := range opt.EntityKeys {
 		rowMap, err := db.Get(ctx, online.GetOpt{
-			Entity:      opt.Entity,
-			RevisionID:  opt.RevisionID,
-			EntityKey:   entityKey,
-			FeatureList: opt.FeatureList,
+			Entity:     opt.Entity,
+			RevisionID: opt.RevisionID,
+			EntityKey:  entityKey,
+			Features:   opt.Features,
 		})
 		if err != nil {
 			return res, err

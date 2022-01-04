@@ -37,7 +37,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		}
 		return nil, err
 	}
-	return deserializeFeatureValues(opt.FeatureList, result.Item)
+	return deserializeFeatureValues(opt.Features, result.Item)
 }
 
 // response: map[entity_key]map[feature_name]feature_value
@@ -54,13 +54,13 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 			opt.Entity.Name: entityKeyValue,
 		})
 		if len(keys) == BatchGetItemCapacity {
-			if err = batchGetItem(ctx, db, keys, tableName, opt.Entity.Name, opt.FeatureList, res); err != nil {
+			if err = batchGetItem(ctx, db, keys, tableName, opt.Entity.Name, opt.Features, res); err != nil {
 				return nil, err
 			}
 			keys = make([]map[string]types.AttributeValue, 0, BatchGetItemCapacity)
 		}
 	}
-	if err := batchGetItem(ctx, db, keys, tableName, opt.Entity.Name, opt.FeatureList, res); err != nil {
+	if err := batchGetItem(ctx, db, keys, tableName, opt.Entity.Name, opt.Features, res); err != nil {
 		return nil, err
 	}
 	return res, nil

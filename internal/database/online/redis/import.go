@@ -14,8 +14,8 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	defer pipe.Close()
 
 	for record := range opt.ExportStream {
-		if len(record) != len(opt.FeatureList)+1 {
-			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.FeatureList)+1, len(record))
+		if len(record) != len(opt.Features)+1 {
+			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
 		}
 
 		entityKey, values := record[0], record[1:]
@@ -25,17 +25,17 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		}
 
 		featureValues := make(map[string]string)
-		for i := range opt.FeatureList {
+		for i := range opt.Features {
 			// omit nil feature value
 			if values[i] == nil {
 				continue
 			}
-			featureValue, err := kvutil.SerializeByValueType(values[i], opt.FeatureList[i].ValueType)
+			featureValue, err := kvutil.SerializeByValueType(values[i], opt.Features[i].ValueType)
 			if err != nil {
 				return err
 			}
 
-			featureID, err := kvutil.SerializeByValue(opt.FeatureList[i].ID)
+			featureID, err := kvutil.SerializeByValue(opt.Features[i].ID)
 			if err != nil {
 				return err
 			}

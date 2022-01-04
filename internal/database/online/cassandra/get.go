@@ -17,7 +17,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	tableName := sqlutil.OnlineBatchTableName(opt.RevisionID)
 
 	query := fmt.Sprintf(`SELECT %s FROM %s WHERE %s = ?`,
-		strings.Join(opt.FeatureList.Names(), ","),
+		strings.Join(opt.Features.Names(), ","),
 		tableName,
 		opt.Entity.Name,
 	)
@@ -30,7 +30,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		return nil, err
 	}
 
-	for _, feature := range opt.FeatureList {
+	for _, feature := range opt.Features {
 		rs[feature.FullName] = deserializeString(rs[feature.Name])
 	}
 	return rs, nil
@@ -45,7 +45,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 
 	query := fmt.Sprintf(`SELECT %s, %s FROM %s WHERE %s in (%s)`,
 		opt.Entity.Name,
-		strings.Join(opt.FeatureList.Names(), ","),
+		strings.Join(opt.Features.Names(), ","),
 		tableName,
 		opt.Entity.Name,
 		placeholders,
@@ -63,7 +63,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	}
 
 	for _, s := range slice {
-		entityKey, value := deserializeIntoRowMap(s, opt.Entity.Name, opt.FeatureList)
+		entityKey, value := deserializeIntoRowMap(s, opt.Entity.Name, opt.Features)
 		rs[entityKey] = value
 
 	}

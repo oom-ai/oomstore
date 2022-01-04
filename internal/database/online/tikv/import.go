@@ -19,7 +19,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	}
 
 	var serializedFeatureIDs []string
-	for _, feature := range opt.FeatureList {
+	for _, feature := range opt.Features {
 		serializedFeatureID, err := kvutil.SerializeByValue(feature.ID)
 		if err != nil {
 			return err
@@ -32,8 +32,8 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	var putVals [][]byte
 
 	for record := range opt.ExportStream {
-		if len(record) != len(opt.FeatureList)+1 {
-			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.FeatureList)+1, len(record))
+		if len(record) != len(opt.Features)+1 {
+			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
 		}
 
 		entityKey, featureValues := record[0], record[1:]
@@ -43,13 +43,13 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			return err
 		}
 
-		for i := range opt.FeatureList {
+		for i := range opt.Features {
 			// omit nil feature value
 			if featureValues[i] == nil {
 				continue
 			}
 
-			serializedFeatureValue, err := kvutil.SerializeByValueType(featureValues[i], opt.FeatureList[i].ValueType)
+			serializedFeatureValue, err := kvutil.SerializeByValueType(featureValues[i], opt.Features[i].ValueType)
 			if err != nil {
 				return err
 			}

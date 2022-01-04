@@ -115,7 +115,7 @@ func importSample(t *testing.T, ctx context.Context, store online.Store, samples
 		}(sample)
 
 		err := store.Import(ctx, online.ImportOpt{
-			FeatureList:  sample.Features,
+			Features:     sample.Features,
 			Revision:     sample.Revision,
 			Entity:       sample.Entity,
 			ExportStream: stream,

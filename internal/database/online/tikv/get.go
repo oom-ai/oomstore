@@ -17,10 +17,10 @@ type input struct {
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
 	// Proxy to MultiGet
 	res, err := db.MultiGet(ctx, online.MultiGetOpt{
-		Entity:      opt.Entity,
-		RevisionID:  opt.RevisionID,
-		EntityKeys:  []string{opt.EntityKey},
-		FeatureList: opt.FeatureList,
+		Entity:     opt.Entity,
+		RevisionID: opt.RevisionID,
+		EntityKeys: []string{opt.EntityKey},
+		Features:   opt.Features,
 	})
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	}
 
 	var serializedFeatureIDs []string
-	for _, feature := range opt.FeatureList {
+	for _, feature := range opt.Features {
 		serializedFeatureID, err := kvutil.SerializeByValue(feature.ID)
 		if err != nil {
 			return nil, err
@@ -73,7 +73,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	// What we need to align with the result
 	var inputs []input
 	for _, entityKey := range opt.EntityKeys {
-		for _, feature := range opt.FeatureList {
+		for _, feature := range opt.Features {
 			inputs = append(inputs, input{entityKey, *feature})
 		}
 	}

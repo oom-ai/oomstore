@@ -91,7 +91,7 @@ func buildItem(record oomTypes.ExportRecord, opt online.ImportOpt) (map[string]t
 	}
 	item[opt.Entity.Name] = entityKeyValue
 
-	for i, feature := range opt.FeatureList {
+	for i, feature := range opt.Features {
 		value, err := serializeByTag(record.ValueAt(i), feature.ValueType)
 		if err != nil {
 			return nil, err

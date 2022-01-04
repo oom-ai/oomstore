@@ -27,12 +27,12 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 			continue
 		}
 
-		serializedFeatureID, err := kvutil.SerializeByValue(opt.FeatureList[i].ID)
+		serializedFeatureID, err := kvutil.SerializeByValue(opt.Features[i].ID)
 		if err != nil {
 			return err
 		}
 
-		serializedFeatureValue, err := kvutil.SerializeByValueType(value, opt.FeatureList[i].ValueType)
+		serializedFeatureValue, err := kvutil.SerializeByValueType(value, opt.Features[i].ValueType)
 		if err != nil {
 			return err
 		}
