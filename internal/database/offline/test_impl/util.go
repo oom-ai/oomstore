@@ -37,6 +37,7 @@ func buildTestSnapshotTable(
 		Header:            header,
 		Source:            source,
 		Revision:          &revision,
+		NoPK:              true,
 	}
 	_, err := store.Import(ctx, opt)
 	require.NoError(t, err)

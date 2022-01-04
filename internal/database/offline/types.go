@@ -45,6 +45,7 @@ type ImportOpt struct {
 	Revision          *int64
 	SnapshotTableName string
 	Source            *CSVSource
+	NoPK              bool // TODO: to import cdc data temporarily for testing
 }
 
 type CSVSource struct {
@@ -60,8 +61,8 @@ type SnapshotOpt struct {
 }
 
 type CreateTableOpt struct {
-	TableName      string
-	Entity         *types.Entity
-	Features       types.FeatureList
-	WithUnixMillis bool
+	TableName string
+	Entity    *types.Entity
+	Features  types.FeatureList
+	IsCDC     bool
 }
