@@ -37,6 +37,8 @@ func OpenOnlineStore(opt types.OnlineStoreConfig) (online.Store, error) {
 		return onlineRedis.Open(opt.Redis), nil
 	case types.BackendMySQL:
 		return onlineMySQL.Open(opt.MySQL)
+	case types.BackendTiDB:
+		return onlineMySQL.Open(opt.TiDB)
 	case types.BackendDynamoDB:
 		return onlineDynamoDB.Open(opt.DynamoDB)
 	case types.BackendCassandra:
@@ -56,6 +58,8 @@ func OpenMetadataStore(opt types.MetadataStoreConfig) (metadata.Store, error) {
 		return metadataPG.Open(context.Background(), opt.Postgres)
 	case types.BackendMySQL:
 		return metadataMySQL.Open(context.Background(), opt.MySQL)
+	case types.BackendTiDB:
+		return metadataMySQL.Open(context.Background(), opt.TiDB)
 	case types.BackendSQLite:
 		return metadataSQLite.Open(context.Background(), opt.SQLite)
 	default:
@@ -69,6 +73,8 @@ func CreateMetadataDatabase(ctx context.Context, opt types.MetadataStoreConfig) 
 		return metadataPG.CreateDatabase(ctx, *opt.Postgres)
 	case types.BackendMySQL:
 		return metadataMySQL.CreateDatabase(ctx, *opt.MySQL)
+	case types.BackendTiDB:
+		return metadataMySQL.CreateDatabase(ctx, *opt.TiDB)
 	case types.BackendSQLite:
 		return metadataSQLite.CreateDatabase(ctx, *opt.SQLite)
 	default:
@@ -82,6 +88,8 @@ func OpenOfflineStore(ctx context.Context, opt types.OfflineStoreConfig) (offlin
 		return offlinePG.Open(opt.Postgres)
 	case types.BackendMySQL:
 		return offlineMySQL.Open(opt.MySQL)
+	case types.BackendTiDB:
+		return offlineMySQL.Open(opt.TiDB)
 	case types.BackendSnowflake:
 		return offlineSnowflake.Open(opt.Snowflake)
 	case types.BackendBigQuery:

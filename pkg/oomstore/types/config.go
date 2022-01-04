@@ -17,6 +17,7 @@ const (
 	BackendCassandra BackendType = "cassandra"
 	BackendBigQuery  BackendType = "bigquery"
 	BackendRedshift  BackendType = "redshift"
+	BackendTiDB      BackendType = "tidb"
 	BackendTiKV      BackendType = "tikv"
 )
 
@@ -148,7 +149,7 @@ func (cfg *MetadataStoreConfig) Validate() error {
 		n++
 	}
 	if cfg.TiDB != nil {
-		cfg.Backend = BackendMySQL
+		cfg.Backend = BackendTiDB
 		n++
 	}
 	if n != 1 {
@@ -184,7 +185,7 @@ func (cfg *OnlineStoreConfig) Validate() error {
 		n++
 	}
 	if cfg.TiDB != nil {
-		cfg.Backend = BackendMySQL
+		cfg.Backend = BackendTiDB
 		n++
 	}
 	if cfg.TiKV != nil {
@@ -224,7 +225,7 @@ func (cfg *OfflineStoreConfig) Validate() error {
 		n++
 	}
 	if cfg.TiDB != nil {
-		cfg.Backend = BackendMySQL
+		cfg.Backend = BackendTiDB
 		n++
 	}
 	if n != 1 {
