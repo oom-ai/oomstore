@@ -25,7 +25,7 @@ func prepareStore(t *testing.T) (context.Context, metadata.Store) {
 	ctx := context.Background()
 	opt := runtime_tidb.GetOpt(DATABASE)
 
-	if err := mysql.CreateDatabase(ctx, *opt); err != nil {
+	if err := mysql.CreateDatabase(ctx, opt); err != nil {
 		t.Fatal(err)
 	}
 	store, err := mysql.Open(ctx, opt)
@@ -44,7 +44,7 @@ func TestCreateDatabase(t *testing.T) {
 
 	ctx := context.Background()
 	opt := runtime_tidb.GetOpt(DATABASE)
-	if err := mysql.CreateDatabase(ctx, *opt); err != nil {
+	if err := mysql.CreateDatabase(ctx, opt); err != nil {
 		t.Fatal(err)
 	}
 	store, err := mysql.Open(ctx, opt)

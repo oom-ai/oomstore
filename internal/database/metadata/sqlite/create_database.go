@@ -9,7 +9,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func CreateDatabase(ctx context.Context, opt types.SQLiteOpt) (err error) {
+func CreateDatabase(ctx context.Context, opt *types.SQLiteOpt) (err error) {
 	db, err := dbutil.OpenSQLite(opt.DBFile)
 	if err != nil {
 		return err

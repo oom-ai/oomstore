@@ -59,7 +59,7 @@ func Open(ctx context.Context, option *types.MySQLOpt) (*DB, error) {
 	}, nil
 }
 
-func CreateDatabase(ctx context.Context, opt types.MySQLOpt) (err error) {
+func CreateDatabase(ctx context.Context, opt *types.MySQLOpt) (err error) {
 	defaultDB, err := dbutil.OpenMysqlDB(opt.Host, opt.Port, opt.User, opt.Password, "")
 	if err != nil {
 		return

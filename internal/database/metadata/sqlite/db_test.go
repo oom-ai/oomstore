@@ -29,7 +29,7 @@ func prepareDB(t *testing.T) (context.Context, *sqlite.DB) {
 	}
 	file.Close()
 
-	err = sqlite.CreateDatabase(ctx, types.SQLiteOpt{
+	err = sqlite.CreateDatabase(ctx, &types.SQLiteOpt{
 		DBFile: file.Name(),
 	})
 	if err != nil {
