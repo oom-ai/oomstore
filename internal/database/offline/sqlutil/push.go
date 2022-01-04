@@ -15,7 +15,7 @@ func cdcTableName(groupID int, revision int64) string {
 
 func Push(ctx context.Context, dbOpt dbutil.DBOpt, pushOpt offline.PushOpt) error {
 	tableName := cdcTableName(pushOpt.GroupID, pushOpt.Revision)
-	err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, pushOpt.FeatureValues, pushOpt.FeatureNames, dbOpt.Backend)
+	err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, pushOpt.FeatureValues, pushOpt.FeatureNames)
 	if err != nil && dbutil.IsTableNotFoundError(err, dbOpt.Backend) {
 		return errdefs.NotFound(err)
 	}
