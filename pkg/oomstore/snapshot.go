@@ -4,10 +4,8 @@ import (
 	"context"
 	"sort"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
-
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-
 	"github.com/oom-ai/oomstore/internal/database/offline"
 )
 
@@ -35,7 +33,7 @@ func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 		if revision.SnapshotTable != "" {
 			continue
 		}
-		tableName := sqlutil.OfflineStreamSnapshotTableName(group.ID, revision.Revision)
+		tableName := dbutil.OfflineStreamSnapshotTableName(group.ID, revision.Revision)
 		if err = s.offline.Snapshot(ctx, offline.SnapshotOpt{
 			Group:        group,
 			Revision:     revisions[i].Revision,

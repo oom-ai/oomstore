@@ -3,7 +3,7 @@ package test_impl
 import (
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -63,7 +63,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 
 	t.Run("push when cdc table exists", func(t *testing.T) {
 		err := store.CreateTable(ctx, offline.CreateTableOpt{
-			TableName: sqlutil.OfflineStreamCdcTableName(group.ID, revision),
+			TableName: dbutil.OfflineStreamCdcTableName(group.ID, revision),
 			Entity:    &entity,
 			Features:  features,
 			IsCDC:     true,

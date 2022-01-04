@@ -3,12 +3,9 @@ package oomstore
 import (
 	"context"
 
-	"github.com/oom-ai/oomstore/internal/database/offline"
-
-	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
-
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-
+	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -28,7 +25,7 @@ func (s *OomStore) GetRevisionBy(ctx context.Context, groupID int, revision int6
 }
 
 func (s *OomStore) createFirstSnapshotTable(ctx context.Context, revision *types.Revision) error {
-	snapshotTable := sqlutil.OfflineStreamSnapshotTableName(revision.GroupID, revision.Revision)
+	snapshotTable := dbutil.OfflineStreamSnapshotTableName(revision.GroupID, revision.Revision)
 
 	// Update snapshot_table in feature_group_revision table
 	err := s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{

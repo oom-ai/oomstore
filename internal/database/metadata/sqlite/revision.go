@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/mattn/go-sqlite3"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
 )
 
 func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateRevisionOpt) (int, string, error) {
@@ -35,7 +35,7 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 
 	if opt.SnapshotTable == nil {
 		updateQuery := "UPDATE feature_group_revision SET snapshot_table = ? WHERE id = ?"
-		snapshotTable = sqlutil.OfflineBatchTableName(opt.GroupID, revisionID)
+		snapshotTable = dbutil.OfflineBatchTableName(opt.GroupID, revisionID)
 		result, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(updateQuery), snapshotTable, revisionID)
 		if err != nil {
 			return 0, "", err

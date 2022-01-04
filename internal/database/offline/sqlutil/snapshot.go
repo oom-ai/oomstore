@@ -10,7 +10,6 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 )
 
@@ -59,9 +58,9 @@ ON l.{{ qt .EntityName }} = r.{{ qt .EntityName }}
 `
 
 func Snapshot(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.SnapshotOpt) error {
-	prevSnapshotTableName := sqlutil.OfflineStreamSnapshotTableName(opt.Group.ID, opt.PrevRevision)
-	currSnapshotTableName := sqlutil.OfflineStreamSnapshotTableName(opt.Group.ID, opt.Revision)
-	currCdcTableName := sqlutil.OfflineStreamCdcTableName(opt.Group.ID, opt.Revision)
+	prevSnapshotTableName := dbutil.OfflineStreamSnapshotTableName(opt.Group.ID, opt.PrevRevision)
+	currSnapshotTableName := dbutil.OfflineStreamSnapshotTableName(opt.Group.ID, opt.Revision)
+	currCdcTableName := dbutil.OfflineStreamCdcTableName(opt.Group.ID, opt.Revision)
 
 	if dbOpt.Backend == types.BackendBigQuery {
 		currSnapshotTableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, currSnapshotTableName)
