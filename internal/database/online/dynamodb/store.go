@@ -53,7 +53,3 @@ func (db *DB) Ping(ctx context.Context) error {
 func (db *DB) Close() error {
 	return nil
 }
-
-func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	panic("Implement me!")
-}

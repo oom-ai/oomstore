@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -36,6 +37,37 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 			ReadCapacityUnits:  aws.Int64(10),
 			WriteCapacityUnits: aws.Int64(10),
 		},
+	})
+	return err
+}
+
+func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
+	var (
+		tableName = sqlutil.OnlineStreamTableName(opt.GroupID)
+		item      = make(map[string]types.AttributeValue)
+	)
+
+	entityKeyValue, err := attributevalue.Marshal(opt.EntityKey)
+	if err != nil {
+		return err
+	}
+	item[opt.Entity.Name] = entityKeyValue
+
+	for i, feature := range opt.Features {
+		value, err := serializeByTag(opt.FeatureValues[i], feature.ValueType)
+		if err != nil {
+			return err
+		}
+		attributevalue, err := attributevalue.Marshal(value)
+		if err != nil {
+			return err
+		}
+		item[feature.Name] = attributevalue
+	}
+
+	_, err = db.Client.PutItem(ctx, &dynamodb.PutItemInput{
+		TableName: &tableName,
+		Item:      item,
 	})
 	return err
 }
