@@ -43,7 +43,11 @@ func TestOnlineGet(t *testing.T) {
 			},
 			features:      unavailableFeatures,
 			expectedError: nil,
-			expected:      nil,
+			expected: &types.FeatureValues{
+				EntityKey:        "1234",
+				FeatureFullNames: consistentFeatures.FullNames(),
+				FeatureValueMap:  map[string]interface{}{},
+			},
 		},
 		{
 			description: "inconsistent entity type, fail",
@@ -127,7 +131,7 @@ func TestOnlineMultiGet(t *testing.T) {
 			},
 			features:      unavailableFeatures,
 			expectedError: nil,
-			expected:      nil,
+			expected:      map[string]*types.FeatureValues{},
 		},
 		{
 			description: "inconsistent entity type, fail",

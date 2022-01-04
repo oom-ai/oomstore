@@ -33,7 +33,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	})
 	if err != nil {
 		if apiErr := new(types.ResourceNotFoundException); errors.As(err, &apiErr) {
-			return nil, nil
+			return make(dbutil.RowMap), nil
 		}
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func batchGetItem(ctx context.Context, db *DB, keys []map[string]types.Attribute
 
 func deserializeFeatureValues(features oomTypes.FeatureList, item map[string]types.AttributeValue) (dbutil.RowMap, error) {
 	if item == nil {
-		return nil, nil
+		return make(dbutil.RowMap), nil
 	}
 	rowMap := make(dbutil.RowMap)
 	var value interface{}

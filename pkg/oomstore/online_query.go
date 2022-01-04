@@ -10,28 +10,27 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-// Get online features of a particular entity instance.
+// OnlineGet gets online features of a particular entity instance.
 func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*types.FeatureValues, error) {
+	rs := types.FeatureValues{
+		EntityKey:        opt.EntityKey,
+		FeatureFullNames: opt.FeatureFullNames,
+		FeatureValueMap:  make(map[string]interface{}),
+	}
 	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureFullNames: &opt.FeatureFullNames,
 	}).Filter(func(f *types.Feature) bool {
 		return f.Group.OnlineRevisionID != nil
 	})
 	if len(features) == 0 {
-		return nil, nil
+		return &rs, nil
 	}
 
 	entity, err := getSharedEntity(features)
 	if err != nil {
 		return nil, err
 	}
-
-	rs := types.FeatureValues{
-		EntityName:       entity.Name,
-		EntityKey:        opt.EntityKey,
-		FeatureFullNames: opt.FeatureFullNames,
-		FeatureValueMap:  make(map[string]interface{}),
-	}
+	rs.EntityName = entity.Name
 
 	featureMap := groupFeaturesByRevisionID(features)
 
@@ -55,8 +54,9 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 	return &rs, nil
 }
 
-// Get online features of multiple entity instances.
+// OnlineMultiGet gets online features of multiple entity instances.
 func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetOpt) (map[string]*types.FeatureValues, error) {
+	result := make(map[string]*types.FeatureValues)
 	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureFullNames: &opt.FeatureFullNames,
 	})
@@ -65,7 +65,7 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 		return f.OnlineRevisionID() != nil
 	})
 	if len(features) == 0 {
-		return nil, nil
+		return result, nil
 	}
 
 	entity, err := getSharedEntity(features)
@@ -83,7 +83,6 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 		return nil, err
 	}
 
-	result := make(map[string]*types.FeatureValues)
 	for _, entityKey := range opt.EntityKeys {
 		result[entityKey] = &types.FeatureValues{
 			EntityName:       entity.Name,

@@ -76,7 +76,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 			opt: offline.JoinOpt{
 				FeatureMap: make(map[string]types.FeatureList),
 			},
-			expected: nil,
+			expected: prepareEmptyResult(),
 		},
 		{
 			description: "no entity rows",
@@ -85,7 +85,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 				FeatureMap: oneGroupFeatureMap,
 				EntityRows: prepareEntityRows(true, false),
 			},
-			expected: nil,
+			expected: prepareEmptyResult(),
 		},
 		{
 			description: "one batch feature group",
@@ -135,15 +135,12 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 		t.Run(tc.description, func(t *testing.T) {
 			actual, err := store.Join(context.Background(), tc.opt)
 			require.NoError(t, err)
-			if tc.expected == nil {
-				assert.Equal(t, tc.expected, actual)
-			} else {
-				assert.ElementsMatch(t, tc.expected.Header, actual.Header)
-				expectedValues := extractValues(tc.expected.Data)
-				actualValues := extractValues(actual.Data)
-				for i := range expectedValues {
-					assert.ElementsMatch(t, expectedValues[i], actualValues[i])
-				}
+
+			assert.ElementsMatch(t, tc.expected.Header, actual.Header)
+			expectedValues := extractValues(tc.expected.Data)
+			actualValues := extractValues(actual.Data)
+			for i := range expectedValues {
+				assert.ElementsMatch(t, expectedValues[i], actualValues[i])
 			}
 		})
 	}
@@ -296,6 +293,13 @@ func prepareResult(oneGroup bool, withValue bool, values []map[string]interface{
 	}
 }
 
+func prepareEmptyResult() *types.JoinResult {
+	data := make(chan []interface{})
+	defer close(data)
+	return &types.JoinResult{
+		Data: data,
+	}
+}
 func prepareStreamingResultValues() []map[string]interface{} {
 	return []map[string]interface{}{
 		{

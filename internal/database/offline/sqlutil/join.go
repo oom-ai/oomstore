@@ -44,13 +44,18 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType typ
 }
 
 func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.JoinResult, error) {
+	data := make(chan []interface{})
+	defer close(data)
+	emptyResult := &types.JoinResult{
+		Data: data,
+	}
 	// Step 1: prepare temporary table entity_rows
 	features := types.FeatureList{}
 	for _, featureList := range opt.FeatureMap {
 		features = append(features, featureList...)
 	}
 	if len(features) == 0 {
-		return nil, nil
+		return emptyResult, nil
 	}
 	entityRowsTableName, err := PrepareEntityRowsTable(ctx, dbOpt, opt.Entity, opt.EntityRows, opt.ValueNames)
 	if err != nil {
@@ -169,10 +174,15 @@ func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGr
 }
 
 func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTableOpt) (*types.JoinResult, error) {
+	data := make(chan []interface{})
+	defer close(data)
+	emptyResult := &types.JoinResult{
+		Data: data,
+	}
 	tableNames := opt.TableNames
 	dropTableNames := append([]string{opt.EntityRowsTableName}, opt.AllTableNames...)
 	if len(tableNames) == 0 {
-		return nil, nil
+		return emptyResult, nil
 	}
 	qt := dbutil.QuoteFn(dbOpt.Backend)
 
