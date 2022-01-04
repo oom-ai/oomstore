@@ -18,7 +18,7 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSou
 	defer stmt.Close()
 
 	for {
-		record, err := dbutil.ReadLine(source.Reader, source.Delimiter)
+		record, err := dbutil.ReadLine(source.Reader, source.Delimiter, Backend)
 		if err == io.EOF {
 			break
 		}
@@ -28,11 +28,7 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSou
 		if len(record) != len(header) {
 			continue
 		}
-		args := make([]interface{}, 0, len(record))
-		for _, v := range record {
-			args = append(args, v)
-		}
-		if _, err := stmt.ExecContext(ctx, args...); err != nil {
+		if _, err := stmt.ExecContext(ctx, record...); err != nil {
 			return err
 		}
 	}

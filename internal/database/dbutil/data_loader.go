@@ -21,7 +21,7 @@ func LoadDataFromSource(backendType types.BackendType, batchSize int) func(tx *s
 func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, backendType types.BackendType, batchSize int) error {
 	records := make([]interface{}, 0, batchSize)
 	for {
-		record, err := ReadLine(source.Reader, source.Delimiter)
+		record, err := ReadLine(source.Reader, source.Delimiter, backendType)
 		if err == io.EOF {
 			break
 		}
@@ -45,10 +45,28 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSou
 	return nil
 }
 
-func ReadLine(reader *bufio.Reader, delimiter string) ([]string, error) {
+func ReadLine(reader *bufio.Reader, delimiter string, backend types.BackendType) ([]interface{}, error) {
 	row, err := reader.ReadString('\n')
 	if err != nil {
 		return nil, err
 	}
-	return strings.Split(strings.Trim(row, "\n"), delimiter), nil
+	rowSlice := strings.Split(strings.Trim(row, "\n"), delimiter)
+	line := make([]interface{}, 0, len(rowSlice))
+	for _, ele := range rowSlice {
+		line = append(line, castElement(ele, backend))
+	}
+	return line, nil
+}
+
+func castElement(s string, backend types.BackendType) interface{} {
+	if backend != types.BackendMySQL {
+		return s
+	}
+	if s == "true" || s == "TRUE" {
+		return 1
+	}
+	if s == "false" || s == "FALSE" {
+		return 0
+	}
+	return s
 }
