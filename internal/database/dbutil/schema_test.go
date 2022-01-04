@@ -1,6 +1,7 @@
 package dbutil_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
@@ -86,8 +87,8 @@ CREATE TABLE "user" (
 
 	for _, c := range cases {
 		t.Run(c.description, func(t *testing.T) {
-			schema := dbutil.BuildTableSchema(c.tableName, c.entity, false, c.features, c.backend)
-			require.Equal(t, c.want, schema)
+			schema := dbutil.BuildTableSchema(c.tableName, c.entity, false, c.features, nil, c.backend)
+			require.Equal(t, strings.TrimSpace(c.want), schema)
 		})
 	}
 }

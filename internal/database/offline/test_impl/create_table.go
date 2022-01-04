@@ -36,21 +36,21 @@ func TestCreateTable(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 		expectedError error
 	}{
 		{
-			describtion: "with unix milli",
+			describtion: "cdc table (with unix_milli)",
 			opt: offline.CreateTableOpt{
-				TableName:      tableName,
-				Entity:         &entity,
-				Features:       features,
-				WithUnixMillis: true,
+				TableName: tableName,
+				Entity:    &entity,
+				Features:  features,
+				IsCDC:     true,
 			},
 		},
 		{
-			describtion: "without milli",
+			describtion: "snapshot table (without_milli)",
 			opt: offline.CreateTableOpt{
-				TableName:      tableName,
-				Entity:         &entity,
-				Features:       features,
-				WithUnixMillis: false,
+				TableName: tableName,
+				Entity:    &entity,
+				Features:  features,
+				IsCDC:     false,
 			},
 		},
 	}

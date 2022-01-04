@@ -60,8 +60,8 @@ type SnapshotOpt struct {
 }
 
 type CreateTableOpt struct {
-	TableName      string
-	Entity         *types.Entity
-	Features       types.FeatureList
-	WithUnixMillis bool
+	TableName string
+	Entity    *types.Entity
+	Features  types.FeatureList
+	IsCDC     bool
 }
