@@ -37,12 +37,12 @@ func (d *DBOpt) ExecContext(ctx context.Context, query string, args []interface{
 	}
 }
 
-func (d *DBOpt) BuildInsertQuery(tableName string, records []interface{}, columns []string, backend types.BackendType) (string, []interface{}, error) {
+func (d *DBOpt) BuildInsertQuery(tableName string, records []interface{}, columns []string) (string, []interface{}, error) {
 	if len(records) == 0 {
 		return "", nil, nil
 	}
 
-	qt := QuoteFn(backend)
+	qt := QuoteFn(d.Backend)
 	columnStr := qt(columns...)
 	tableName = qt(tableName)
 

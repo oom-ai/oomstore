@@ -49,6 +49,10 @@ func TestSnapshot(t *testing.T) {
 	test_impl.TestSnapshot(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
+func TestPush(t *testing.T) {
+	test_impl.TestPush(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
+}
+
 func TestTableSchema(t *testing.T) {
 	test_impl.TestTableSchema(t, prepareStore, runtime_mysql.DestroyStore(DATABASE), func(ctx context.Context) {
 		opt := runtime_mysql.GetOpt(DATABASE)
