@@ -12,7 +12,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func CreateDatabase(ctx context.Context, opt types.PostgresOpt) (err error) {
+func CreateDatabase(ctx context.Context, opt *types.PostgresOpt) (err error) {
 	defaultDB, err := dbutil.OpenPostgresDB(opt.Host, opt.Port, opt.User, opt.Password, "")
 	if err != nil {
 		return

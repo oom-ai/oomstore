@@ -70,13 +70,13 @@ func OpenMetadataStore(opt types.MetadataStoreConfig) (metadata.Store, error) {
 func CreateMetadataDatabase(ctx context.Context, opt types.MetadataStoreConfig) error {
 	switch opt.Backend {
 	case types.BackendPostgres:
-		return metadataPG.CreateDatabase(ctx, *opt.Postgres)
+		return metadataPG.CreateDatabase(ctx, opt.Postgres)
 	case types.BackendMySQL:
-		return metadataMySQL.CreateDatabase(ctx, *opt.MySQL)
+		return metadataMySQL.CreateDatabase(ctx, opt.MySQL)
 	case types.BackendTiDB:
-		return metadataMySQL.CreateDatabase(ctx, *opt.TiDB)
+		return metadataMySQL.CreateDatabase(ctx, opt.TiDB)
 	case types.BackendSQLite:
-		return metadataSQLite.CreateDatabase(ctx, *opt.SQLite)
+		return metadataSQLite.CreateDatabase(ctx, opt.SQLite)
 	default:
 		return fmt.Errorf("unsupported backend: %s", opt.Backend)
 	}
