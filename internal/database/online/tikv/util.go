@@ -6,7 +6,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
 
-const keyDelimiter = ":"
+const keyDelimiter = ':'
 
 func getKeyOfBatchFeature(revisionID string, entityKey string, featureID string) []byte {
 	return []byte(kvutil.KeyPrefixForBatchFeature + getKey(revisionID, entityKey, featureID))
@@ -17,5 +17,5 @@ func getKeyOfStreamFeature(groupID string, entityKey string, featureID string) [
 }
 
 func getKey(revisionID string, entityKey string, featureID string) string {
-	return strings.Join([]string{revisionID, entityKey, featureID}, keyDelimiter)
+	return strings.Join([]string{revisionID, entityKey, featureID}, string(keyDelimiter))
 }
