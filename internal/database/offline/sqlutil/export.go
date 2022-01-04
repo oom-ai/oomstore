@@ -49,19 +49,12 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType
 				if record[i+1] == nil {
 					continue
 				}
-				if backendType == types.BackendSnowflake {
-
-					v, err := deserializeByTagForSnowflake(record[i+1], f.ValueType)
-					if err != nil {
-						errs <- fmt.Errorf("failed at deserializeByTag, err=%v", err)
-						return
-					}
-					record[i+1] = v
-				} else {
-					if f.ValueType == types.String {
-						record[i+1] = cast.ToString(record[i+1])
-					}
+				v, err := DeserializeByValueType(record[i+1], f.ValueType, backendType)
+				if err != nil {
+					errs <- err
+					return
 				}
+				record[i+1] = v
 			}
 			stream <- record
 		}

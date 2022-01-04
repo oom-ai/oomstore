@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/spf13/cast"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -44,15 +46,16 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) (int, error) {
 	//make sure csv data source has all defined columns
 	reader := bufio.NewReader(dataSource.Reader)
-	header, err := dbutil.ReadLine(reader, dataSource.Delimiter)
+	// read header does not need pass down features
+	header, err := dbutil.ReadLine(reader, dataSource.Delimiter, nil, "")
 	if err != nil {
 		return 0, err
 	}
-	if hasDup(header) {
+	if hasDup(cast.ToStringSlice(header)) {
 		return 0, fmt.Errorf("csv data source has duplicated columns: %v", header)
 	}
 	columnNames := append([]string{opt.entity.Name}, opt.features.Names()...)
-	if !stringSliceEqual(header, columnNames) {
+	if !stringSliceEqual(cast.ToStringSlice(header), columnNames) {
 		return 0, fmt.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
@@ -70,7 +73,7 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 	revision, err := s.offline.Import(ctx, offline.ImportOpt{
 		Entity:            opt.entity,
 		Features:          opt.features,
-		Header:            header,
+		Header:            cast.ToStringSlice(header),
 		Revision:          opt.Revision,
 		SnapshotTableName: snapshotTableName,
 		Source: &offline.CSVSource{
