@@ -53,7 +53,7 @@ type PushOpt struct {
 	Revision     int64
 	FeatureNames []string
 
-	// Two-dimension array, each row represents a record
+	// Two-dimension slice, each row represents a record
 	FeatureValues []interface{}
 }
 

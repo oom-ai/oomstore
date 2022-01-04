@@ -12,7 +12,7 @@ import (
 func CreateTable(ctx context.Context, db *sqlx.DB, opt offline.CreateTableOpt, backend types.BackendType) error {
 	if opt.IsCDC {
 		// Create index (entity_key, unix_milli) on cdc table
-		schema := dbutil.BuildTableSchema(opt.TableName, opt.Entity, false, opt.Features, nil, backend)
+		schema := dbutil.BuildTableSchema(opt.TableName, opt.Entity, true, opt.Features, nil, backend)
 		if _, err := db.ExecContext(ctx, schema); err != nil {
 			return err
 		}

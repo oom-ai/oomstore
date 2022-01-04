@@ -1,0 +1,76 @@
+package test_impl
+
+import (
+	"testing"
+
+	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
+	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/stretchr/testify/require"
+)
+
+func TestPush(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	entity := types.Entity{
+		ID:     18,
+		Name:   "user",
+		Length: 10,
+	}
+	group := types.Group{
+		ID:       1,
+		Name:     "vip",
+		Category: types.CategoryStream,
+		EntityID: entity.ID,
+	}
+	features := types.FeatureList{
+		&types.Feature{
+			ID:        1,
+			Name:      "age",
+			ValueType: types.Int64,
+			GroupID:   group.ID,
+		},
+		&types.Feature{
+			ID:        2,
+			Name:      "gender",
+			ValueType: types.String,
+			GroupID:   group.ID,
+		},
+	}
+	revision := int64(2)
+
+	featureValues := []interface{}{
+		[]interface{}{18, "F"},
+		[]interface{}{21, "M"},
+	}
+
+	pushOpt := offline.PushOpt{
+		GroupID:       group.ID,
+		Revision:      revision,
+		FeatureNames:  features.Names(),
+		FeatureValues: featureValues,
+	}
+
+	t.Run("push when cdc table not exists", func(t *testing.T) {
+		err := store.Push(ctx, pushOpt)
+		require.Error(t, err)
+		require.True(t, errdefs.IsNotFound(err))
+	})
+
+	t.Run("push when cdc table exists", func(t *testing.T) {
+		err := store.CreateTable(ctx, offline.CreateTableOpt{
+			TableName: sqlutil.OfflineStreamCdcTableName(group.ID, revision),
+			Entity:    &entity,
+			Features:  features,
+			IsCDC:     true,
+		})
+		require.NoError(t, err)
+
+		err = store.Push(ctx, pushOpt)
+		require.NoError(t, err)
+	})
+}
