@@ -25,7 +25,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	rs := make(map[string]interface{})
 	if err := db.Query(query, opt.EntityKey).WithContext(ctx).MapScan(rs); err != nil {
 		if err == gocql.ErrNotFound || isTableNotFoundError(err, tableName) {
-			return nil, nil
+			return rs, nil
 		}
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		Iter().SliceMap()
 	if err != nil {
 		if err == gocql.ErrNotFound || isTableNotFoundError(err, tableName) {
-			return nil, nil
+			return rs, nil
 		}
 		return nil, err
 	}

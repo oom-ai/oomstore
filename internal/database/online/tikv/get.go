@@ -26,7 +26,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		return nil, err
 	}
 	if rowMap, ok := res[opt.EntityKey]; !ok {
-		return nil, nil
+		return make(dbutil.RowMap), nil
 	} else {
 		return rowMap, nil
 	}

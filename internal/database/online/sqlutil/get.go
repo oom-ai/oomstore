@@ -22,7 +22,7 @@ func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.Back
 	record, err := db.QueryRowxContext(ctx, db.Rebind(query), opt.EntityKey).SliceScan()
 	if err != nil {
 		if err == sql.ErrNoRows || dbutil.IsTableNotFoundError(err, backend) {
-			return nil, nil
+			return make(dbutil.RowMap), nil
 		}
 		return nil, err
 	}
