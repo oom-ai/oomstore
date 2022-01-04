@@ -40,7 +40,6 @@ func TestChannelJoin(t *testing.T) {
 		},
 	}
 
-	var emptyResult *types.JoinResult
 	validResult := prepareResult()
 	entityRows := make(chan types.EntityRow)
 
@@ -62,7 +61,7 @@ func TestChannelJoin(t *testing.T) {
 			},
 			features:      streamFeatures,
 			expectedError: nil,
-			expected:      emptyResult,
+			expected:      prepareEmptyResult(),
 		},
 		{
 			description: "inconsistent features, return nil",
@@ -86,9 +85,9 @@ func TestChannelJoin(t *testing.T) {
 				"device_basic":    {consistentFeatures[0]},
 				"device_advanced": {consistentFeatures[1]},
 			},
-			joined:        nil,
+			joined:        prepareEmptyResult(),
 			expectedError: nil,
-			expected:      emptyResult,
+			expected:      prepareEmptyResult(),
 		},
 		{
 			description: "consistent entity type, succeed",
@@ -122,8 +121,6 @@ func TestChannelJoin(t *testing.T) {
 			actual, err := store.ChannelJoin(context.Background(), tc.opt)
 			if tc.expectedError != nil {
 				assert.Error(t, err, tc.expectedError)
-			} else if tc.expected == nil {
-				assert.Equal(t, tc.expected, actual)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.expected.Header, actual.Header)
@@ -151,8 +148,19 @@ func prepareResult() *types.JoinResult {
 
 func extractValues(stream <-chan []interface{}) [][]interface{} {
 	values := make([][]interface{}, 0)
+	if stream == nil {
+		return values
+	}
 	for item := range stream {
 		values = append(values, item)
 	}
 	return values
+}
+
+func prepareEmptyResult() *types.JoinResult {
+	data := make(chan []interface{})
+	defer close(data)
+	return &types.JoinResult{
+		Data: data,
+	}
 }
