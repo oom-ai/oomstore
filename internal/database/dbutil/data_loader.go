@@ -12,16 +12,16 @@ import (
 )
 
 // Currying
-func LoadDataFromSource(backendType types.BackendType, batchSize int) func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string) error {
-	return func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string) error {
-		return loadDataFromSource(tx, ctx, source, tableName, header, backendType, batchSize)
+func LoadDataFromSource(backendType types.BackendType, batchSize int) func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, features types.FeatureList) error {
+	return func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, features types.FeatureList) error {
+		return loadDataFromSource(tx, ctx, source, tableName, header, features, backendType, batchSize)
 	}
 }
 
-func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, backendType types.BackendType, batchSize int) error {
+func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, features types.FeatureList, backendType types.BackendType, batchSize int) error {
 	records := make([]interface{}, 0, batchSize)
 	for {
-		record, err := ReadLine(source.Reader, source.Delimiter, backendType)
+		record, err := ReadLine(source.Reader, source.Delimiter, features, backendType)
 		if err == io.EOF {
 			break
 		}
@@ -45,21 +45,29 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSou
 	return nil
 }
 
-func ReadLine(reader *bufio.Reader, delimiter string, backend types.BackendType) ([]interface{}, error) {
+func ReadLine(reader *bufio.Reader, delimiter string, features types.FeatureList, backend types.BackendType) ([]interface{}, error) {
 	row, err := reader.ReadString('\n')
 	if err != nil {
 		return nil, err
 	}
 	rowSlice := strings.Split(strings.Trim(row, "\n"), delimiter)
 	line := make([]interface{}, 0, len(rowSlice))
-	for _, ele := range rowSlice {
-		line = append(line, castElement(ele, backend))
+	for i, ele := range rowSlice {
+		if i == 0 || len(features) == 0 {
+			// entity_key doesn't need to change type
+			line = append(line, ele)
+		} else {
+			line = append(line, castElement(ele, features[i-1].ValueType, backend))
+		}
 	}
 	return line, nil
 }
 
-func castElement(s string, backend types.BackendType) interface{} {
+func castElement(s string, valueType types.ValueType, backend types.BackendType) interface{} {
 	if backend != types.BackendMySQL {
+		return s
+	}
+	if valueType != types.Bool {
 		return s
 	}
 	if s == "true" || s == "TRUE" {

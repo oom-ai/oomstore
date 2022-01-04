@@ -10,7 +10,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-type LoadData func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string) error
+type LoadData func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, features types.FeatureList) error
 
 func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData LoadData, backendType types.BackendType) (int64, error) {
 	var revision int64
@@ -23,7 +23,7 @@ func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData Lo
 		}
 
 		// populate the data table
-		err = loadData(tx, ctx, opt.Source, opt.SnapshotTableName, opt.Header)
+		err = loadData(tx, ctx, opt.Source, opt.SnapshotTableName, opt.Header, opt.Features)
 		if err != nil {
 			return err
 		}
