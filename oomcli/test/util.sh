@@ -89,6 +89,9 @@ init_store() {
     oomplay init "$ONLINE_STORE" "$OFFLINE_STORE" "$METADATA_STORE"
 
     # initialize feature store
+    # for db such as mysql, a successful ping in one process
+    # doesn't mean the other processes can connect to it
+    # so we try 5 times until we give up
     for _i in {1..5}; do
         oomcli init && break
         sleep 2
