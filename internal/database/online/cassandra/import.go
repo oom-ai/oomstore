@@ -13,10 +13,10 @@ import (
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
-	columns := append([]string{opt.Entity.Name}, opt.FeatureList.Names()...)
+	columns := append([]string{opt.Entity.Name}, opt.Features.Names()...)
 	tableName := sqlutil.OnlineBatchTableName(opt.Revision.ID)
 
-	table := dbutil.BuildTableSchema(tableName, opt.Entity, false, opt.FeatureList, Backend)
+	table := dbutil.BuildTableSchema(tableName, opt.Entity, false, opt.Features, Backend)
 
 	// create table
 	if err := db.Query(table).Exec(); err != nil {
@@ -28,8 +28,8 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		batch      = db.NewBatch(gocql.LoggedBatch)
 	)
 	for record := range opt.ExportStream {
-		if len(record) != len(opt.FeatureList)+1 {
-			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.FeatureList)+1, len(record))
+		if len(record) != len(opt.Features)+1 {
+			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
 		}
 
 		if batch.Size() != BatchSize {

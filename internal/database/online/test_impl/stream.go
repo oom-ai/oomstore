@@ -128,7 +128,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		Entity:        &entity,
 		EntityKey:     "user1",
 		GroupID:       group.ID,
-		FeatureList:   types.FeatureList{feature1},
+		Features:      types.FeatureList{feature1},
 		FeatureValues: []interface{}{"post1"},
 	}))
 
@@ -136,7 +136,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		Entity:        &entity,
 		EntityKey:     "user1",
 		GroupID:       group.ID,
-		FeatureList:   types.FeatureList{feature1},
+		Features:      types.FeatureList{feature1},
 		FeatureValues: []interface{}{"post2"},
 	}))
 
@@ -150,7 +150,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		Entity:        &entity,
 		EntityKey:     "user1",
 		GroupID:       group.ID,
-		FeatureList:   types.FeatureList{feature1, feature2},
+		Features:      types.FeatureList{feature1, feature2},
 		FeatureValues: []interface{}{"post1", "post2"},
 	}))
 }

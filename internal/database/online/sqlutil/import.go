@@ -13,11 +13,11 @@ import (
 const importBatchSize = 10
 
 func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend types.BackendType) error {
-	columns := append([]string{opt.Entity.Name}, opt.FeatureList.Names()...)
+	columns := append([]string{opt.Entity.Name}, opt.Features.Names()...)
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tableName := OnlineBatchTableName(opt.Revision.ID)
-		schema := dbutil.BuildTableSchema(tableName, opt.Entity, false, opt.FeatureList, backend)
+		schema := dbutil.BuildTableSchema(tableName, opt.Entity, false, opt.Features, backend)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return err
@@ -26,8 +26,8 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 		// populate the data table
 		records := make([]interface{}, 0, importBatchSize)
 		for record := range opt.ExportStream {
-			if len(record) != len(opt.FeatureList)+1 {
-				return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.FeatureList)+1, len(record))
+			if len(record) != len(opt.Features)+1 {
+				return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
 			}
 			records = append(records, record)
 

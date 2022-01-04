@@ -14,7 +14,7 @@ import (
 )
 
 func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.BackendType) (dbutil.RowMap, error) {
-	featureNames := opt.FeatureList.Names()
+	featureNames := opt.Features.Names()
 	tableName := OnlineBatchTableName(opt.RevisionID)
 	qt := dbutil.QuoteFn(backend)
 	query := fmt.Sprintf(`SELECT %s FROM %s WHERE %s = ?`, qt(featureNames...), qt(tableName), qt(opt.Entity.Name))
@@ -27,7 +27,7 @@ func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.Back
 		return nil, err
 	}
 
-	rs, err := deserializeIntoRowMap(record, opt.FeatureList, backend)
+	rs, err := deserializeIntoRowMap(record, opt.Features, backend)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.Back
 
 // response: map[entity_key]map[feature_name]feature_value
 func MultiGet(ctx context.Context, db *sqlx.DB, opt online.MultiGetOpt, backend types.BackendType) (map[string]dbutil.RowMap, error) {
-	featureNames := opt.FeatureList.Names()
+	featureNames := opt.Features.Names()
 	tableName := OnlineBatchTableName(opt.RevisionID)
 	qt := dbutil.QuoteFn(backend)
 	query := fmt.Sprintf(`SELECT %s, %s FROM %s WHERE %s in (?);`, qt(opt.Entity.Name), qt(featureNames...), qt(tableName), qt(opt.Entity.Name))
@@ -51,7 +51,7 @@ func MultiGet(ctx context.Context, db *sqlx.DB, opt online.MultiGetOpt, backend 
 	}
 	defer rows.Close()
 
-	return getFeatureValueMapFromRows(rows, opt.FeatureList, backend)
+	return getFeatureValueMapFromRows(rows, opt.Features, backend)
 }
 
 func getFeatureValueMapFromRows(rows *sqlx.Rows, features types.FeatureList, backend types.BackendType) (map[string]dbutil.RowMap, error) {

@@ -45,7 +45,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	})
 
 	if err = s.online.Import(ctx, online.ImportOpt{
-		FeatureList:  features,
+		Features:     features,
 		Revision:     revision,
 		Entity:       group.Entity,
 		ExportStream: exportStream,

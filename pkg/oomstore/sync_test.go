@@ -81,8 +81,8 @@ func TestSync(t *testing.T) {
 				}).Return(stream, nil)
 
 				onlineStore.EXPECT().Import(ctx, online.ImportOpt{
-					FeatureList: features,
-					Revision:    revision,
+					Features: features,
+					Revision: revision,
 					Entity: &types.Entity{
 						Name: "device",
 					},
@@ -116,8 +116,8 @@ func TestSync(t *testing.T) {
 				}).Return(stream, nil)
 
 				onlineStore.EXPECT().Import(ctx, online.ImportOpt{
-					FeatureList: features,
-					Revision:    revision,
+					Features: features,
+					Revision: revision,
 					Entity: &types.Entity{
 						Name: "device",
 					},
