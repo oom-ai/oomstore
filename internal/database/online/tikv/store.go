@@ -3,8 +3,10 @@ package tikv
 import (
 	"context"
 
+	"github.com/pingcap/log"
 	"github.com/tikv/client-go/v2/config"
 	"github.com/tikv/client-go/v2/rawkv"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -13,6 +15,11 @@ import (
 const Backend = types.BackendTiKV
 
 var _ online.Store = &DB{}
+
+func init() {
+	// By default, TiKV logs at INFO level. Set log level to FATAL to avoid spamming
+	log.SetLevel(zapcore.FatalLevel)
+}
 
 type DB struct {
 	*rawkv.Client
