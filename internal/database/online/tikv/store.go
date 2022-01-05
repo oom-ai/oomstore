@@ -17,6 +17,7 @@ const Backend = types.BackendTiKV
 var _ online.Store = &DB{}
 
 func init() {
+	// By default, TiKV logs at INFO level. Set log level to FATAL to avoid spamming
 	log.SetLevel(zapcore.FatalLevel)
 }
 
