@@ -43,7 +43,7 @@ func TestBuildSchema(t *testing.T) {
 
 			want: `
 CREATE TABLE "user" (
-	"user_id" VARCHAR(32),
+	"user_id" TEXT,
 	"age" bigint,
 	"gender" text
 )`,
@@ -61,7 +61,7 @@ CREATE TABLE "user" (
 
 			want: "\n" +
 				"CREATE TABLE `user` (\n" +
-				"	`user_id` VARCHAR(32),\n" +
+				"	`user_id` VARCHAR(255),\n" +
 				"	`age` bigint,\n" +
 				"	`gender` text\n)",
 			wantErr: nil,
