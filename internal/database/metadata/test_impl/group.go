@@ -15,7 +15,6 @@ func prepareEntity(t *testing.T, ctx context.Context, store metadata.Store, name
 	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  name,
-			Length:      32,
 			Description: "description",
 		},
 	})

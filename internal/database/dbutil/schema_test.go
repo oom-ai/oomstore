@@ -35,11 +35,8 @@ func TestBuildSchema(t *testing.T) {
 			description: "postgres schema",
 			backend:     types.BackendPostgres,
 			tableName:   "user",
-			entity: &types.Entity{
-				Name:   "user_id",
-				Length: 32,
-			},
-			features: features,
+			entity:      &types.Entity{Name: "user_id"},
+			features:    features,
 
 			want: `
 CREATE TABLE "user" (
@@ -53,11 +50,8 @@ CREATE TABLE "user" (
 			description: "mysql schema",
 			backend:     types.BackendMySQL,
 			tableName:   "user",
-			entity: &types.Entity{
-				Name:   "user_id",
-				Length: 32,
-			},
-			features: features,
+			entity:      &types.Entity{Name: "user_id"},
+			features:    features,
 
 			want: "\n" +
 				"CREATE TABLE `user` (\n" +

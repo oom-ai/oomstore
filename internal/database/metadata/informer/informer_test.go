@@ -14,9 +14,8 @@ import (
 
 func sampleCache() *informer.Cache {
 	entity := types.Entity{
-		ID:     1,
-		Length: 10,
-		Name:   "entity",
+		ID:   1,
+		Name: "entity",
 	}
 	group := types.Group{
 		ID:       100,

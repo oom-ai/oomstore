@@ -10,8 +10,8 @@ import (
 )
 
 func createEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateEntityOpt) (int, error) {
-	query := "INSERT INTO entity(name, length, description) VALUES(?, ?, ?)"
-	res, err := sqlxCtx.ExecContext(ctx, query, opt.EntityName, opt.Length, opt.Description)
+	query := "INSERT INTO entity(name, description) VALUES(?, ?)"
+	res, err := sqlxCtx.ExecContext(ctx, query, opt.EntityName, opt.Description)
 	if err != nil {
 		if er, ok := err.(sqlite3.Error); ok {
 			if er.ExtendedCode == sqlite3.ErrConstraintUnique {

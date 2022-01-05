@@ -83,7 +83,7 @@ func parseColumns(entity *types.Entity, isCDC bool, features types.FeatureList, 
 		case types.BackendCassandra, types.BackendSQLite, types.BackendPostgres, types.BackendRedshift, types.BackendSnowflake:
 			c.DbType = "TEXT"
 		case types.BackendMySQL:
-			c.DbType = fmt.Sprintf(`VARCHAR(255)`)
+			c.DbType = "VARCHAR(255)"
 		case types.BackendBigQuery:
 			c.DbType = "STRING"
 		default:

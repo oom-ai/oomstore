@@ -54,7 +54,6 @@ description: 'description'
 					{
 						Kind:        "Entity",
 						Name:        "user",
-						Length:      8,
 						Description: "description",
 					},
 				},
@@ -102,7 +101,6 @@ description: 'description'
 					{
 						Kind:        "Entity",
 						Name:        "user",
-						Length:      8,
 						Description: "description",
 					},
 				}, NewGroups: []apply.Group{
@@ -221,7 +219,6 @@ groups:
 					{
 						Kind:        "Entity",
 						Name:        "user",
-						Length:      8,
 						Description: "description",
 					},
 				},
@@ -495,13 +492,11 @@ items:
 					{
 						Kind:        "Entity",
 						Name:        "user",
-						Length:      8,
 						Description: "user ID",
 					},
 					{
 						Kind:        "Entity",
 						Name:        "device",
-						Length:      8,
 						Description: "device info",
 					},
 				},

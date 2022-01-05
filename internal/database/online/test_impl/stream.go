@@ -19,9 +19,8 @@ var simpleStreamData StreamData
 
 func init() {
 	entity := types.Entity{
-		ID:     1,
-		Name:   "user",
-		Length: 16,
+		ID:   1,
+		Name: "user",
 	}
 
 	group1 := &types.Group{

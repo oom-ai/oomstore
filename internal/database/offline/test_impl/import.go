@@ -19,10 +19,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	entity := types.Entity{
-		Name:   "device",
-		Length: 16,
-	}
+	entity := types.Entity{Name: "device"}
 	snapshotTable := "offline_1_1"
 
 	opt := offline.ImportOpt{

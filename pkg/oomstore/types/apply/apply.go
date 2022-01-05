@@ -136,7 +136,6 @@ func (g *Group) Validate() error {
 type Entity struct {
 	Kind        string `mapstructure:"kind" yaml:"kind"`
 	Name        string `mapstructure:"name" yaml:"name"`
-	Length      int    `mapstructure:"length" yaml:"length"`
 	Description string `mapstructure:"description" yaml:"description"`
 
 	Groups []Group `mapstructure:"groups" yaml:"groups,omitempty"`
@@ -158,7 +157,6 @@ func FromEntityList(entities types.EntityList, groups *GroupItems) (items Entity
 		items.Items = append(items.Items, Entity{
 			Kind:        "Entity",
 			Name:        entity.Name,
-			Length:      entity.Length,
 			Description: entity.Description,
 			Groups: groups.Filter(func(g Group) bool {
 				return g.EntityName == entity.Name

@@ -166,8 +166,12 @@ func prepareTableSchema(dbOpt dbutil.DBOpt, entity types.Entity, tableName strin
 		entityType = "STRING"
 		valueType = "STRING"
 		qtTableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, qt(tableName))
+	case types.BackendMySQL:
+		entityType = "VARCHAR(255)"
+		valueType = "TEXT"
+		qtTableName = qt(tableName)
 	default:
-		entityType = fmt.Sprintf("VARCHAR(%d)", entity.Length)
+		entityType = "TEXT"
 		valueType = "TEXT"
 		qtTableName = qt(tableName)
 	}

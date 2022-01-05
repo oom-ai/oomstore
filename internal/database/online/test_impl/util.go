@@ -83,7 +83,7 @@ func init() {
 					Category: types.CategoryBatch,
 				},
 			},
-			Entity: &types.Entity{ID: 5, Name: "user", Length: 4},
+			Entity: &types.Entity{ID: 5, Name: "user"},
 			Data: []types.ExportRecord{
 				[]interface{}{"3215", int64(18), "F", 1.1, true, time.Now()},
 				[]interface{}{"3216", int64(29), nil, 2.0, false, time.Now()},
@@ -106,11 +106,11 @@ func init() {
 		}
 
 		revision := &types.Revision{ID: 9, GroupID: 2, Group: &types.Group{ID: 2, Category: types.CategoryBatch}}
-		entity := &types.Entity{ID: 5, Name: "user", Length: 5}
+		entity := &types.Entity{ID: 5, Name: "user"}
 		var data []types.ExportRecord
 
 		for i := 0; i < 100; i++ {
-			record := []interface{}{dbutil.RandString(entity.Length), rand.Float64()}
+			record := []interface{}{dbutil.RandString(10), rand.Float64()}
 			data = append(data, record)
 		}
 		SampleMedium = Sample{features, revision, entity, data}

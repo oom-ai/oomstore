@@ -21,11 +21,8 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 	defer store.Close()
 
 	group := &types.Group{
-		ID: 1,
-		Entity: &types.Entity{
-			Name:   "device",
-			Length: 10,
-		},
+		ID:     1,
+		Entity: &types.Entity{Name: "device"},
 	}
 	unixMilli := &types.Feature{
 		Name:      "unix_milli",

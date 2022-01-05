@@ -22,10 +22,7 @@ func buildTestSnapshotTable(
 	snapshotTable string,
 	source *offline.CSVSource,
 ) {
-	entity := &types.Entity{
-		Name:   "device",
-		Length: 10,
-	}
+	entity := &types.Entity{Name: "device"}
 	header := []string{"device"}
 	for _, f := range features {
 		header = append(header, f.Name)

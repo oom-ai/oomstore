@@ -60,7 +60,6 @@ func (s *OomStore) applyEntity(ctx context.Context, tx metadata.DBStore, newEnti
 		_, err = tx.CreateEntity(ctx, metadata.CreateEntityOpt{
 			CreateEntityOpt: types.CreateEntityOpt{
 				EntityName:  newEntity.Name,
-				Length:      newEntity.Length,
 				Description: newEntity.Description,
 			},
 		})
@@ -305,7 +304,6 @@ func buildApplyEntity(entity apply.Entity) apply.Entity {
 	return apply.Entity{
 		Kind:        entity.Kind,
 		Name:        entity.Name,
-		Length:      entity.Length,
 		Description: entity.Description,
 	}
 }

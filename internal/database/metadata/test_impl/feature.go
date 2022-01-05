@@ -17,7 +17,6 @@ func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Sto
 	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "device",
-			Length:      32,
 			Description: "description",
 		},
 	})

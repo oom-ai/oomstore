@@ -23,10 +23,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	entity := &types.Entity{
-		Name:   "device",
-		Length: 10,
-	}
+	entity := &types.Entity{Name: "device"}
 	unixMilli := &types.Feature{
 		Name:      "unix_milli",
 		ValueType: types.Int64,
