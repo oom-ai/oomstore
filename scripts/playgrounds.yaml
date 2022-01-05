@@ -39,4 +39,4 @@ dynamodb:
   source: .
 
 sqlite:
-  db-file: /tmp/oomstore/dbfile
+  db-file: /tmp/oomplay.db
