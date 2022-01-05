@@ -25,11 +25,18 @@ tidb:
   database: oomplay
 
 cassandra:
-  host: 127.0.0.1
-  port: 29042
+  hosts: ['127.0.0.1:29042']
   user: oomplay
   password: oomplay
   keyspace: oomplay
+
+dynamodb:
+  region: .
+  endpoint-url: http://127.0.0.1:24566
+  access-key-id: .
+  secret-access-key: .
+  session-token: .
+  source: .
 
 sqlite:
   db-file: /tmp/oomstore/dbfile

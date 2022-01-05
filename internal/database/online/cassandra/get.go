@@ -22,16 +22,17 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		opt.Entity.Name,
 	)
 
-	rs := make(map[string]interface{})
-	if err := db.Query(query, opt.EntityKey).WithContext(ctx).MapScan(rs); err != nil {
+	scan := make(map[string]interface{})
+	if err := db.Query(query, opt.EntityKey).WithContext(ctx).MapScan(scan); err != nil {
 		if err == gocql.ErrNotFound || isTableNotFoundError(err, tableName) {
-			return rs, nil
+			return scan, nil
 		}
 		return nil, err
 	}
 
+	rs := make(map[string]interface{})
 	for _, feature := range opt.Features {
-		rs[feature.FullName] = deserializeString(rs[feature.Name])
+		rs[feature.FullName] = deserializeString(scan[feature.Name])
 	}
 	return rs, nil
 }
@@ -52,7 +53,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	)
 
 	rs := make(map[string]dbutil.RowMap)
-	slice, err := db.Query(query, toInterfaceSlice(opt.EntityKeys)...).
+	scan, err := db.Query(query, toInterfaceSlice(opt.EntityKeys)...).
 		WithContext(ctx).
 		Iter().SliceMap()
 	if err != nil {
@@ -62,7 +63,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		return nil, err
 	}
 
-	for _, s := range slice {
+	for _, s := range scan {
 		entityKey, value := deserializeIntoRowMap(s, opt.Entity.Name, opt.Features)
 		rs[entityKey] = value
 
@@ -82,12 +83,12 @@ func deserializeString(i interface{}) interface{} {
 
 func deserializeIntoRowMap(values map[string]interface{}, entityName string, features types.FeatureList) (string, dbutil.RowMap) {
 	entityKey := values[entityName].(string)
-	delete(values, entityName)
 
+	rs := make(dbutil.RowMap)
 	for _, feature := range features {
-		values[feature.FullName] = deserializeString(values[feature.Name])
+		rs[feature.FullName] = deserializeString(values[feature.Name])
 	}
-	return entityKey, values
+	return entityKey, rs
 }
 
 func isTableNotFoundError(err error, tableName string) bool {
