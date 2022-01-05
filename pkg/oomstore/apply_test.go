@@ -24,7 +24,6 @@ func TestBuildApplyStage(t *testing.T) {
 			opt: apply.ApplyOpt{R: strings.NewReader(`
 # kind: Entity
 name: user
-length: 8
 description: 'User ID'
 `)},
 			wantStage: nil,
@@ -35,7 +34,6 @@ description: 'User ID'
 			opt: apply.ApplyOpt{R: strings.NewReader(`
 kind: Entit
 name: user
-length: 8
 description: 'description'
 `)},
 			wantStage: nil,
@@ -46,7 +44,6 @@ description: 'description'
 			opt: apply.ApplyOpt{R: strings.NewReader(`
 kind: Entity
 name: user
-length: 8
 description: 'description'
 `)},
 			wantStage: &apply.ApplyStage{
@@ -67,7 +64,6 @@ description: 'description'
 			opt: apply.ApplyOpt{R: strings.NewReader(`
 kind: Entity
 name: user
-length: 8
 description: 'description'
 ---
 kind: Group
@@ -190,7 +186,6 @@ features:
 			opt: apply.ApplyOpt{R: strings.NewReader(`
 kind: Entity
 name: user
-length: 8
 description: 'description'
 groups:
 - name: device
@@ -444,7 +439,6 @@ items:
 items:
     - kind: Entity
       name: user
-      length: 8
       description: user ID
       groups:
         - name: account
@@ -472,7 +466,6 @@ items:
               description: transaction_count_30d description
     - kind: Entity
       name: device
-      length: 8
       description: device info
       groups:
         - name: phone

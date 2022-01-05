@@ -1,6 +1,5 @@
 kind: Entity
 name: user
-length: 12
 description: 'user id'
 groups:
 - name: account
