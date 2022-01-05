@@ -18,6 +18,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	// Proxy to MultiGet
 	res, err := db.MultiGet(ctx, online.MultiGetOpt{
 		Entity:     opt.Entity,
+		Group:      opt.Group,
 		RevisionID: opt.RevisionID,
 		EntityKeys: []string{opt.EntityKey},
 		Features:   opt.Features,
@@ -33,7 +34,19 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 }
 
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
-	serializedRevisionID, err := kvutil.SerializeByValue(opt.RevisionID)
+	var (
+		allBatch            bool
+		serializedPrefixKey string
+		err                 error
+	)
+
+	allBatch = (opt.Group.Category == types.CategoryBatch)
+
+	if allBatch {
+		serializedPrefixKey, err = kvutil.SerializeByValue(*opt.RevisionID)
+	} else {
+		serializedPrefixKey, err = kvutil.SerializeByValue(opt.Group.ID)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +73,11 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	var keys [][]byte
 	for _, serializedEntityKey := range serializedEntityKeys {
 		for _, serializedFeatureID := range serializedFeatureIDs {
-			keys = append(keys, getKeyOfBatchFeature(serializedRevisionID, serializedEntityKey, serializedFeatureID))
+			if allBatch {
+				keys = append(keys, getKeyOfBatchFeature(serializedPrefixKey, serializedEntityKey, serializedFeatureID))
+			} else {
+				keys = append(keys, getKeyOfStreamFeature(serializedPrefixKey, serializedEntityKey, serializedFeatureID))
+			}
 		}
 	}
 

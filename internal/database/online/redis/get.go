@@ -6,10 +6,20 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
-	key, err := serializeRedisKeyForBatchFeature(opt.RevisionID, opt.EntityKey)
+	var (
+		key string
+		err error
+	)
+
+	if opt.Group.Category == types.CategoryBatch {
+		key, err = serializeRedisKeyForBatchFeature(*opt.RevisionID, opt.EntityKey)
+	} else {
+		key, err = serializeRedisKeyForStreamFeature(opt.Group.ID, opt.EntityKey)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +59,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		rowMap, err := db.Get(ctx, online.GetOpt{
 			Entity:     opt.Entity,
 			RevisionID: opt.RevisionID,
+			Group:      opt.Group,
 			EntityKey:  entityKey,
 			Features:   opt.Features,
 		})

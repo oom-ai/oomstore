@@ -20,7 +20,13 @@ const (
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
-	tableName := sqlutil.OnlineBatchTableName(opt.RevisionID)
+	var tableName string
+	if opt.Group.Category == oomTypes.CategoryBatch {
+		tableName = sqlutil.OnlineBatchTableName(*opt.RevisionID)
+	} else {
+		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
+	}
+
 	entityKeyValue, err := attributevalue.Marshal(opt.EntityKey)
 	if err != nil {
 		return nil, err
@@ -42,8 +48,14 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
+	var tableName string
+	if opt.Group.Category == oomTypes.CategoryBatch {
+		tableName = sqlutil.OnlineBatchTableName(*opt.RevisionID)
+	} else {
+		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
+	}
+
 	res := make(map[string]dbutil.RowMap)
-	tableName := sqlutil.OnlineBatchTableName(opt.RevisionID)
 	keys := make([]map[string]types.AttributeValue, 0, BatchGetItemCapacity)
 	for _, entityKey := range opt.EntityKeys {
 		entityKeyValue, err := attributevalue.Marshal(entityKey)
