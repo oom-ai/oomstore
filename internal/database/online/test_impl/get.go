@@ -18,7 +18,8 @@ func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn, destroyStore Dest
 	for _, target := range s.Data {
 		opt := online.GetOpt{
 			Entity:     s.Entity,
-			RevisionID: s.Revision.ID,
+			RevisionID: &s.Revision.ID,
+			Group:      s.Revision.Group,
 			Features:   s.Features,
 			EntityKey:  target.EntityKey(),
 		}
@@ -41,7 +42,8 @@ func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreFn, destr
 
 	rs, err := store.Get(ctx, online.GetOpt{
 		Entity:     s.Entity,
-		RevisionID: s.Revision.ID,
+		RevisionID: &s.Revision.ID,
+		Group:      s.Revision.Group,
 		Features:   s.Features,
 		EntityKey:  "not-existed-key",
 	})
@@ -63,7 +65,8 @@ func TestMultiGet(t *testing.T, prepareStore PrepareStoreFn, destroystore Destro
 	}
 	rs, err := store.MultiGet(ctx, online.MultiGetOpt{
 		Entity:     s.Entity,
-		RevisionID: s.Revision.ID,
+		RevisionID: &s.Revision.ID,
+		Group:      s.Revision.Group,
 		Features:   s.Features,
 		EntityKeys: keys,
 	})

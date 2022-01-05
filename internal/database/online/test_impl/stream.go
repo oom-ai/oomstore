@@ -131,6 +131,17 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		Features:      types.FeatureList{feature1},
 		FeatureValues: []interface{}{"post1"},
 	}))
+	rs, err := store.Get(ctx, online.GetOpt{
+		Entity:     &entity,
+		EntityKey:  "user1",
+		RevisionID: nil,
+		Group:      group,
+		Features:   types.FeatureList{feature1},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{
+		feature1.FullName: "post1",
+	}, rs)
 
 	assert.NoError(t, store.Push(ctx, online.PushOpt{
 		Entity:        &entity,
@@ -139,6 +150,17 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		Features:      types.FeatureList{feature1},
 		FeatureValues: []interface{}{"post2"},
 	}))
+	rs, err = store.Get(ctx, online.GetOpt{
+		Entity:     &entity,
+		EntityKey:  "user1",
+		RevisionID: nil,
+		Group:      group,
+		Features:   types.FeatureList{feature1},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{
+		feature1.FullName: "post2",
+	}, rs)
 
 	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
 		Entity:  &entity,
@@ -153,4 +175,16 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		Features:      types.FeatureList{feature1, feature2},
 		FeatureValues: []interface{}{"post1", "post2"},
 	}))
+	rs, err = store.Get(ctx, online.GetOpt{
+		Entity:     &entity,
+		EntityKey:  "user1",
+		RevisionID: nil,
+		Group:      group,
+		Features:   types.FeatureList{feature1, feature2},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{
+		feature1.FullName: "post1",
+		feature2.FullName: "post2",
+	}, rs)
 }
