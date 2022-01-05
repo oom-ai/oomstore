@@ -14,8 +14,14 @@ import (
 )
 
 func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.BackendType) (dbutil.RowMap, error) {
+	var tableName string
+	if opt.Group.Category == types.CategoryBatch {
+		tableName = OnlineBatchTableName(*opt.RevisionID)
+	} else {
+		tableName = OnlineStreamTableName(opt.Group.ID)
+	}
+
 	featureNames := opt.Features.Names()
-	tableName := OnlineBatchTableName(opt.RevisionID)
 	qt := dbutil.QuoteFn(backend)
 	query := fmt.Sprintf(`SELECT %s FROM %s WHERE %s = ?`, qt(featureNames...), qt(tableName), qt(opt.Entity.Name))
 
@@ -36,8 +42,14 @@ func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.Back
 
 // response: map[entity_key]map[feature_name]feature_value
 func MultiGet(ctx context.Context, db *sqlx.DB, opt online.MultiGetOpt, backend types.BackendType) (map[string]dbutil.RowMap, error) {
+	var tableName string
+	if opt.Group.Category == types.CategoryBatch {
+		tableName = OnlineBatchTableName(*opt.RevisionID)
+	} else {
+		tableName = OnlineStreamTableName(opt.Group.ID)
+	}
+
 	featureNames := opt.Features.Names()
-	tableName := OnlineBatchTableName(opt.RevisionID)
 	qt := dbutil.QuoteFn(backend)
 	query := fmt.Sprintf(`SELECT %s, %s FROM %s WHERE %s in (?);`, qt(opt.Entity.Name), qt(featureNames...), qt(tableName), qt(opt.Entity.Name))
 	sql, args, err := sqlx.In(query, opt.EntityKeys)

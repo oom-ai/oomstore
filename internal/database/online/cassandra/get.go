@@ -14,7 +14,12 @@ import (
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
-	tableName := sqlutil.OnlineBatchTableName(opt.RevisionID)
+	var tableName string
+	if opt.Group.Category == types.CategoryBatch {
+		tableName = sqlutil.OnlineBatchTableName(*opt.RevisionID)
+	} else {
+		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
+	}
 
 	query := fmt.Sprintf(`SELECT %s FROM %s WHERE %s = ?`,
 		strings.Join(opt.Features.Names(), ","),
@@ -30,7 +35,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		return nil, err
 	}
 
-	rs := make(map[string]interface{})
+	rs := make(map[string]interface{}, len(scan))
 	for _, feature := range opt.Features {
 		rs[feature.FullName] = deserializeString(scan[feature.Name])
 	}
@@ -40,9 +45,15 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
 	var (
-		tableName    = sqlutil.OnlineBatchTableName(opt.RevisionID)
+		tableName    string
 		placeholders = getPlaceholders(len(opt.EntityKeys))
 	)
+
+	if opt.Group.Category == types.CategoryBatch {
+		tableName = sqlutil.OnlineBatchTableName(*opt.RevisionID)
+	} else {
+		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
+	}
 
 	query := fmt.Sprintf(`SELECT %s, %s FROM %s WHERE %s in (%s)`,
 		opt.Entity.Name,

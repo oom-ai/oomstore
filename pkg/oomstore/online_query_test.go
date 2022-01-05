@@ -25,7 +25,6 @@ func TestOnlineGet(t *testing.T) {
 	entityName := "device"
 	consistentFeatures := prepareFeatures(true, true)
 	inconsistentFeatures := prepareFeatures(false, true)
-	unavailableFeatures := prepareFeatures(true, false)
 
 	testCases := []struct {
 		description   string
@@ -38,14 +37,14 @@ func TestOnlineGet(t *testing.T) {
 		{
 			description: "no available features",
 			opt: types.OnlineGetOpt{
-				FeatureFullNames: unavailableFeatures.FullNames(),
+				FeatureFullNames: []string{"f1", "f2"},
 				EntityKey:        "1234",
 			},
-			features:      unavailableFeatures,
+			features:      nil,
 			expectedError: nil,
 			expected: &types.FeatureValues{
 				EntityKey:        "1234",
-				FeatureFullNames: consistentFeatures.FullNames(),
+				FeatureFullNames: []string{"f1", "f2"},
 				FeatureValueMap:  map[string]interface{}{},
 			},
 		},
@@ -113,7 +112,6 @@ func TestOnlineMultiGet(t *testing.T) {
 	entityName := "device"
 	consistentFeatures := prepareFeatures(true, true)
 	inconsistentFeatures := prepareFeatures(false, true)
-	unavailableFeatures := prepareFeatures(true, false)
 
 	testCases := []struct {
 		description   string
@@ -126,10 +124,10 @@ func TestOnlineMultiGet(t *testing.T) {
 		{
 			description: "no available features, return nil",
 			opt: types.OnlineMultiGetOpt{
-				FeatureFullNames: unavailableFeatures.FullNames(),
+				FeatureFullNames: []string{"f1", "f2"},
 				EntityKeys:       []string{"1234", "1235"},
 			},
-			features:      unavailableFeatures,
+			features:      nil,
 			expectedError: nil,
 			expected:      map[string]*types.FeatureValues{},
 		},

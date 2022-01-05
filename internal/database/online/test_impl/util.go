@@ -39,6 +39,7 @@ func init() {
 					Name:      "age",
 					FullName:  "user.age",
 					GroupID:   1,
+					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
 					ValueType: types.Int64,
 				},
 				&types.Feature{
@@ -46,6 +47,7 @@ func init() {
 					Name:      "gender",
 					FullName:  "user.gender",
 					GroupID:   1,
+					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
 					ValueType: types.String,
 				},
 				&types.Feature{
@@ -53,6 +55,7 @@ func init() {
 					Name:      "account",
 					FullName:  "user.account",
 					GroupID:   1,
+					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
 					ValueType: types.Float64,
 				},
 				&types.Feature{
@@ -60,6 +63,7 @@ func init() {
 					Name:      "is_active",
 					FullName:  "user.is_active",
 					GroupID:   1,
+					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
 					ValueType: types.Bool,
 				},
 				&types.Feature{
@@ -67,11 +71,19 @@ func init() {
 					Name:      "register_time",
 					FullName:  "user.register_time",
 					GroupID:   1,
+					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
 					ValueType: types.Time,
 				},
 			},
-			Revision: &types.Revision{ID: 3, GroupID: 1},
-			Entity:   &types.Entity{ID: 5, Name: "user", Length: 4},
+			Revision: &types.Revision{
+				ID:      3,
+				GroupID: 1,
+				Group: &types.Group{
+					ID:       1,
+					Category: types.CategoryBatch,
+				},
+			},
+			Entity: &types.Entity{ID: 5, Name: "user", Length: 4},
 			Data: []types.ExportRecord{
 				[]interface{}{"3215", int64(18), "F", 1.1, true, time.Now()},
 				[]interface{}{"3216", int64(29), nil, 2.0, false, time.Now()},
@@ -88,11 +100,12 @@ func init() {
 				Name:      "charge",
 				FullName:  "user.charge",
 				GroupID:   2,
+				Group:     &types.Group{ID: 2, Category: types.CategoryBatch},
 				ValueType: types.Float64,
 			},
 		}
 
-		revision := &types.Revision{ID: 9, GroupID: 2}
+		revision := &types.Revision{ID: 9, GroupID: 2, Group: &types.Group{ID: 2, Category: types.CategoryBatch}}
 		entity := &types.Entity{ID: 5, Name: "user", Length: 5}
 		var data []types.ExportRecord
 

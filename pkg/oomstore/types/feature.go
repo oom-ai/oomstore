@@ -35,6 +35,9 @@ func (f *Feature) Entity() *Entity {
 }
 
 func (f *Feature) OnlineRevisionID() *int {
+	if f.Group.Category == CategoryStream {
+		return nil
+	}
 	return f.Group.OnlineRevisionID
 }
 
