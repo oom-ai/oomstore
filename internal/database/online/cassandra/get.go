@@ -22,16 +22,17 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		opt.Entity.Name,
 	)
 
-	rs := make(map[string]interface{})
-	if err := db.Query(query, opt.EntityKey).WithContext(ctx).MapScan(rs); err != nil {
+	scan := make(map[string]interface{})
+	if err := db.Query(query, opt.EntityKey).WithContext(ctx).MapScan(scan); err != nil {
 		if err == gocql.ErrNotFound || isTableNotFoundError(err, tableName) {
-			return rs, nil
+			return scan, nil
 		}
 		return nil, err
 	}
 
+	rs := make(map[string]interface{})
 	for _, feature := range opt.Features {
-		rs[feature.FullName] = deserializeString(rs[feature.Name])
+		rs[feature.FullName] = deserializeString(scan[feature.Name])
 	}
 	return rs, nil
 }
