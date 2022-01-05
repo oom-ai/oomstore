@@ -2,9 +2,9 @@ package sqlite
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/mattn/go-sqlite3"
+	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
@@ -18,15 +18,15 @@ func createFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metada
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok {
 			if sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-				return 0, fmt.Errorf("feature %s already exists", opt.FeatureName)
+				return 0, errors.Errorf("feature %s already exists", opt.FeatureName)
 			}
 		}
-		return 0, err
+		return 0, errors.WithStack(err)
 	}
 
 	featureID, err := res.LastInsertId()
 	if err != nil {
-		return 0, err
+		return 0, errors.WithStack(err)
 	}
-	return int(featureID), err
+	return int(featureID), nil
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
 	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
+	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 
@@ -54,7 +55,7 @@ func (db *DB) Close() error {
 		return err
 	}
 	if err := db.DB.Close(); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }

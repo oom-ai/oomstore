@@ -9,12 +9,14 @@ import (
 	"github.com/lib/pq"
 	"github.com/mattn/go-sqlite3"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/pkg/errors"
 	"github.com/snowflakedb/gosnowflake"
 	"google.golang.org/api/googleapi"
 )
 
 func OpenSQLite(dbFile string) (*sqlx.DB, error) {
-	return sqlx.Open("sqlite3", dbFile)
+	db, err := sqlx.Open("sqlite3", dbFile)
+	return db, errors.WithStack(err)
 }
 
 func OpenMysqlDB(host, port, user, password, database string) (*sqlx.DB, error) {
@@ -25,11 +27,12 @@ func OpenMysqlDB(host, port, user, password, database string) (*sqlx.DB, error) 
 	cfg.DBName = database
 	cfg.ParseTime = true
 
-	return sqlx.Open("mysql", cfg.FormatDSN())
+	db, err := sqlx.Open("mysql", cfg.FormatDSN())
+	return db, errors.WithStack(err)
 }
 
 func OpenPostgresDB(host, port, user, password, database string) (*sqlx.DB, error) {
-	return sqlx.Open(
+	db, err := sqlx.Open(
 		"postgres",
 		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 			user,
@@ -38,6 +41,7 @@ func OpenPostgresDB(host, port, user, password, database string) (*sqlx.DB, erro
 			port,
 			database),
 	)
+	return db, errors.WithStack(err)
 }
 
 var OpenRedshiftDB = OpenPostgresDB

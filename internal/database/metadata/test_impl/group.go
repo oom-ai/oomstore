@@ -2,7 +2,6 @@ package test_impl
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
@@ -147,7 +146,7 @@ func TestCreateGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 
 	// cannot create feature group with same name
 	_, err = store.CreateGroup(ctx, opt)
-	require.Equal(t, fmt.Errorf("feature group device_info already exists"), err)
+	require.Equal(t, "feature group device_info already exists", err.Error())
 
 	// cannot create feature group with invalid category
 	opt.Category = "invalid-category"

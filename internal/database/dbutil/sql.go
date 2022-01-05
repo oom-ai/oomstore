@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -19,7 +21,7 @@ func BuildConditions(equal map[string]interface{}, in map[string]interface{}) ([
 	for key, value := range in {
 		s, inArgs, err := sqlx.In(fmt.Sprintf("%s IN (?)", key), value)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.WithStack(err)
 		}
 		cond = append(cond, s)
 		args = append(args, inArgs...)

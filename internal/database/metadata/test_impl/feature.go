@@ -2,7 +2,6 @@ package test_impl
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -69,7 +68,7 @@ func TestCreateFeatureWithSameName(t *testing.T, prepareStore PrepareStoreFn, de
 	require.NoError(t, err)
 
 	_, err = store.CreateFeature(ctx, opt)
-	assert.Equal(t, err, fmt.Errorf("feature phone already exists"))
+	assert.Equal(t, "feature phone already exists", err.Error())
 }
 
 func TestCreateFeatureWithSQLKeyword(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
