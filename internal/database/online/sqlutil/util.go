@@ -25,10 +25,8 @@ func CreateStreamTableSchema(ctx context.Context, tableName string, entity *type
 	)
 	switch backend {
 	case types.BackendMySQL:
-		entityFormat = fmt.Sprintf("`%s` VARCHAR(%d) PRIMARY KEY", entity.Name, entity.Length)
-	case types.BackendPostgres:
-		entityFormat = fmt.Sprintf(`"%s" VARCHAR(%d) PRIMARY KEY`, entity.Name, entity.Length)
-	case types.BackendCassandra, types.BackendSQLite:
+		entityFormat = fmt.Sprintf("`%s` VARCHAR(255) PRIMARY KEY", entity.Name)
+	case types.BackendPostgres, types.BackendCassandra, types.BackendSQLite:
 		entityFormat = fmt.Sprintf(`"%s" TEXT PRIMARY KEY`, entity.Name)
 	default:
 		return "", errdefs.InvalidAttribute(fmt.Errorf("backend %s not support", backend))

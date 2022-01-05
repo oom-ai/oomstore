@@ -20,7 +20,6 @@ func TestCreateEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore De
 	opt := metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "device",
-			Length:      32,
 			Description: "description",
 		},
 	}
@@ -30,7 +29,6 @@ func TestCreateEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore De
 	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "device",
-			Length:      32,
 			Description: "description",
 		},
 	})
@@ -46,7 +44,6 @@ func TestGetEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destr
 	opt := metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "device",
-			Length:      32,
 			Description: "description",
 		},
 	}
@@ -57,7 +54,6 @@ func TestGetEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destr
 	entity, err := store.GetEntity(ctx, id)
 	require.NoError(t, err)
 	require.Equal(t, opt.EntityName, entity.Name)
-	require.Equal(t, opt.Length, entity.Length)
 	require.Equal(t, opt.Description, entity.Description)
 
 	_, err = store.GetEntity(ctx, 0)
@@ -73,7 +69,6 @@ func TestUpdateEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore De
 	id, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "device",
-			Length:      32,
 			Description: "description",
 		},
 	})
@@ -109,7 +104,6 @@ func TestListEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore Dest
 	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "device",
-			Length:      32,
 			Description: "description",
 		},
 	})
@@ -122,7 +116,6 @@ func TestListEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore Dest
 	_, err = store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "user",
-			Length:      16,
 			Description: "description",
 		},
 	})

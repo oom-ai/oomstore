@@ -26,8 +26,7 @@ func TestChannelJoin(t *testing.T) {
 	consistentFeatures := prepareFeatures(true, true)
 
 	entity := types.Entity{
-		Name:   "device",
-		Length: 10,
+		Name: "device",
 	}
 	revisions := types.RevisionList{
 		{

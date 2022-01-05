@@ -33,8 +33,5 @@ func init() {
 
 	flags := registerEntityCmd.Flags()
 
-	flags.IntVarP(&registerEntityOpt.Length, "length", "l", 0, "entity value length")
-	_ = registerEntityCmd.MarkFlagRequired("length")
-
 	flags.StringVarP(&registerEntityOpt.Description, "description", "d", "", "entity description")
 }

@@ -10,7 +10,6 @@ apply_multiple_files_of_feature() {
     cat <<EOF | oomcli apply -f /dev/stdin
 kind: Entity
 name: user
-length: 8
 description: 'description'
 ---
 kind: Group
@@ -49,7 +48,6 @@ apply_feature_items() {
     cat <<EOF | oomcli apply -f /dev/stdin
 kind: Entity
 name: user
-length: 8
 description: user ID
 ---
 kind: Group

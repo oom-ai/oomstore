@@ -15,10 +15,7 @@ func TestCreateTable(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 	defer store.Close()
 
 	tableName := "new_table"
-	entity := types.Entity{
-		Name:   "device",
-		Length: 16,
-	}
+	entity := types.Entity{Name: "device"}
 	features := []*types.Feature{
 		{
 			Name:      "price",

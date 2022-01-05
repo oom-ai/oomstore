@@ -5,9 +5,8 @@ import (
 )
 
 type Entity struct {
-	ID     int    `db:"id"`
-	Name   string `db:"name"`
-	Length int    `db:"length"`
+	ID   int    `db:"id"`
+	Name string `db:"name"`
 
 	Description string    `db:"description"`
 	CreateTime  time.Time `db:"create_time"`

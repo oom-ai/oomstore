@@ -1,7 +1,6 @@
 ---
 kind: Entity
 name: driver
-length: 2
 groups:
   - name: driver_stats
     category: batch

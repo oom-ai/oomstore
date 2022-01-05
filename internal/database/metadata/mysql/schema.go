@@ -32,7 +32,6 @@ var META_TABLE_SCHEMAS = map[string]string{
 		CREATE TABLE entity (
 			id				INT 			NOT	NULL AUTO_INCREMENT PRIMARY KEY,
 			name        	VARCHAR(32) 	NOT	NULL,
-			length      	SMALLINT    	NOT	NULL COMMENT "feature entity value max length",
 			description 	VARCHAR(64) 	DEFAULT '',
 			create_time 	TIMESTAMP   	NOT	NULL DEFAULT CURRENT_TIMESTAMP,
 			modify_time 	TIMESTAMP   	NOT	NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -17,9 +17,8 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 	defer store.Close()
 
 	entity := types.Entity{
-		ID:     18,
-		Name:   "user",
-		Length: 10,
+		ID:   18,
+		Name: "user",
 	}
 	group := types.Group{
 		ID:       1,

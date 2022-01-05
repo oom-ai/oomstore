@@ -25,7 +25,6 @@ class Data:
             f.write(
                 """kind: Entity
 name: user
-length: 8
 description: "user ID"
 groups:
   - name: account

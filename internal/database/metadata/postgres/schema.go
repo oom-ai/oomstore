@@ -53,13 +53,11 @@ var META_TABLE_SCHEMAS = map[string]string{
 		CREATE TABLE entity (
 			id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 			name        VARCHAR(32) NOT     NULL,
-			length      SMALLINT    NOT     NULL,
 			description VARCHAR(64) DEFAULT '',
 			create_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP,
 			modify_time TIMESTAMP   NOT     NULL DEFAULT CURRENT_TIMESTAMP,
 			UNIQUE (name)
 		);
-		COMMENT ON COLUMN entity.length IS 'feature entity value max length';
 		`,
 	"feature_group_revision": `
 		CREATE TABLE feature_group_revision (

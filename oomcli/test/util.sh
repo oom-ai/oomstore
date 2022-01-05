@@ -52,8 +52,8 @@ assert_eq() {
 
 # register features for the sample data
 register_features() {
-    oomcli register entity device --length 32     --description "device"
-    oomcli register entity user   --length 64     --description "user"
+    oomcli register entity device --description "device"
+    oomcli register entity user   --description "user"
 
     oomcli register group phone      --entity device --category "batch"  --description "phone"
     oomcli register group student    --entity user   --category "batch"  --description "student"

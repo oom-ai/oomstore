@@ -8,7 +8,6 @@ apply_single_complex_entity() {
     cat <<EOF | oomcli apply -f /dev/stdin
 kind: Entity
 name: user
-length: 8
 description: 'description'
 groups:
 - name: device
@@ -34,8 +33,8 @@ groups:
 EOF
 
     entity_expected='
-ID,NAME,LENGTH,DESCRIPTION
-1,user,8,description
+ID,NAME,DESCRIPTION
+1,user,description
 '
     entity_actual=$(oomcli get meta entity -o csv)
     assert_eq "apply_single_complex_entity: check entity" "$(sort <<< "$entity_expected")" "$(sort <<< "$entity_actual")"
@@ -66,7 +65,6 @@ apply_multiple_files_of_entity() {
     cat <<EOF | oomcli apply -f /dev/stdin
 kind: Entity
 name: user
-length: 8
 description: 'description'
 groups:
 - name: student
@@ -75,21 +73,19 @@ groups:
 ---
 kind: Entity
 name: device
-length: 16
 description: 'description'
 ---
 kind: Entity
 name: test
-length: 32
 description: 'description'
 EOF
 
 
   entity_expected='
-ID,NAME,LENGTH,DESCRIPTION
-1,user,8,description
-2,device,16,description
-3,test,32,description
+ID,NAME,DESCRIPTION
+1,user,description
+2,device,description
+3,test,description
 '
     entity_actual=$(oomcli get meta entity -o csv)
     assert_eq "apply_multiple_files_of_entity: oomcli get meta entity" "$entity_expected" "$entity_actual"
@@ -110,7 +106,6 @@ apply_entity_items() {
 items:
   - kind: Entity
     name: user
-    length: 8
     description: user ID
     groups:
       - name: account
@@ -138,7 +133,6 @@ items:
             description: transaction_count_30d description
   - kind: Entity
     name: device
-    length: 8
     description: device info
     groups:
       - name: phone
@@ -154,9 +148,9 @@ items:
 EOF
 
       entity_expected='
-ID,NAME,LENGTH,DESCRIPTION
-1,user,8,user ID
-2,device,8,device info
+ID,NAME,DESCRIPTION
+1,user,user ID
+2,device,device info
 '
       entity_actual=$(oomcli get meta entity -o csv)
       assert_eq "apply_entity_items: oomcli apply mutiple entity: check entity" "$(sort <<< "$entity_expected")" "$(sort <<< "$entity_actual")"

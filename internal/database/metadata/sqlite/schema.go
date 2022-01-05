@@ -43,7 +43,6 @@ var META_TABLE_SCHEMAS = map[string]string{
 		CREATE TABLE entity (
 			id				INTEGER 		NOT	NULL PRIMARY KEY AUTOINCREMENT,
 			name        	VARCHAR(32) 	NOT	NULL,
-			length      	SMALLINT    	NOT	NULL,
 			description 	VARCHAR(64) 	DEFAULT '',
 			create_time 	TIMESTAMP   	NOT	NULL DEFAULT CURRENT_TIMESTAMP,
 			modify_time 	TIMESTAMP   	NOT	NULL DEFAULT CURRENT_TIMESTAMP,

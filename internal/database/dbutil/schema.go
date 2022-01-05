@@ -80,10 +80,10 @@ func parseColumns(entity *types.Entity, isCDC bool, features types.FeatureList, 
 	{
 		c := Column{Name: entity.Name, ValueType: types.String}
 		switch backend {
-		case types.BackendCassandra, types.BackendSQLite:
+		case types.BackendCassandra, types.BackendSQLite, types.BackendPostgres, types.BackendRedshift, types.BackendSnowflake:
 			c.DbType = "TEXT"
-		case types.BackendPostgres, types.BackendRedshift, types.BackendSnowflake, types.BackendMySQL:
-			c.DbType = fmt.Sprintf(`VARCHAR(%d)`, entity.Length)
+		case types.BackendMySQL:
+			c.DbType = "VARCHAR(255)"
 		case types.BackendBigQuery:
 			c.DbType = "STRING"
 		default:

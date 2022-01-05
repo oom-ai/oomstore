@@ -80,7 +80,6 @@ metadata-store: *pg
 ```yaml
 kind: Entity
 name: user
-length: 8
 description: 'user ID'
 groups:
 - name: account

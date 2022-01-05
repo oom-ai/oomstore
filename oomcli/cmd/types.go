@@ -10,7 +10,6 @@ import (
 type FlattenEntity struct {
 	ID          int    `oomcli:"ID"`
 	Name        string `oomcli:"NAME"`
-	Length      int    `oomcli:"LENGTH"`
 	Description string `oomcli:"DESCRIPTION,truncate"`
 
 	CreateTime time.Time `oomcli:"CREATE-TIME,wide"`
@@ -66,7 +65,6 @@ func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenL
 			tokens, err = parseTokens(FlattenEntity{
 				ID:          e.ID,
 				Name:        e.Name,
-				Length:      e.Length,
 				Description: e.Description,
 				CreateTime:  e.CreateTime,
 				ModifyTime:  e.ModifyTime,
