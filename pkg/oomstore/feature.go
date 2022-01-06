@@ -26,6 +26,9 @@ func (s *OomStore) GetFeatureByName(ctx context.Context, fullName string) (*type
 
 // List metadata of features meeting particular criteria.
 func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
+	if err := validateFeatureFullNames(*opt.FeatureFullNames); err != nil {
+		return nil, err
+	}
 	metadataOpt := metadata.ListFeatureOpt{
 		FeatureFullNames: opt.FeatureFullNames,
 	}
@@ -48,6 +51,9 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 
 // Update metadata of a feature.
 func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
+	if err := validateFeatureFullNames([]string{opt.FeatureFullName}); err != nil {
+		return err
+	}
 	feature, err := s.metadata.GetFeatureByName(ctx, opt.FeatureFullName)
 	if err != nil {
 		return err
