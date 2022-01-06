@@ -2,7 +2,8 @@ package sqlite
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/pkg/errors"
 
 	"github.com/mattn/go-sqlite3"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
@@ -12,7 +13,7 @@ import (
 
 func createGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateGroupOpt) (int, error) {
 	if opt.Category != types.CategoryBatch && opt.Category != types.CategoryStream {
-		return 0, errdefs.InvalidAttribute(fmt.Errorf("illegal category '%s', should be either 'stream' or 'batch'", opt.Category))
+		return 0, errdefs.InvalidAttribute(errors.Errorf("illegal category '%s', should be either 'stream' or 'batch'", opt.Category))
 	}
 
 	query := "INSERT INTO feature_group(name, entity_id, category, description) VALUES(?, ?, ?, ?)"
@@ -20,16 +21,16 @@ func createGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok {
 			if sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-				return 0, fmt.Errorf("feature group %s already exists", opt.GroupName)
+				return 0, errors.Errorf("feature group %s already exists", opt.GroupName)
 			}
 		}
-		return 0, err
+		return 0, errors.WithStack(err)
 	}
 
 	groupID, err := res.LastInsertId()
 	if err != nil {
-		return 0, err
+		return 0, errors.WithStack(err)
 	}
 
-	return int(groupID), err
+	return int(groupID), nil
 }

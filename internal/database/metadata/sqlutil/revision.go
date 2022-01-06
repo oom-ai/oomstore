@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -30,21 +32,21 @@ func UpdateRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 		return err
 	}
 	if len(cond) == 0 {
-		return fmt.Errorf("invliad option: nothing to update")
+		return errors.Errorf("invliad option: nothing to update")
 	}
 	args = append(args, opt.RevisionID)
 
 	query := fmt.Sprintf("UPDATE feature_group_revision SET %s WHERE id = ?", strings.Join(cond, ","))
 	result, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(query), args...)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	if rowsAffected != 1 {
-		return fmt.Errorf("failed to update revision %d: revision not found", opt.RevisionID)
+		return errors.Errorf("failed to update revision %d: revision not found", opt.RevisionID)
 	}
 	return nil
 }
@@ -54,9 +56,9 @@ func GetRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*ty
 	query := `SELECT * FROM feature_group_revision WHERE id = ?`
 	if err := sqlxCtx.GetContext(ctx, &revision, sqlxCtx.Rebind(query), id); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errdefs.NotFound(fmt.Errorf("revision %d not found", id))
+			return nil, errdefs.NotFound(errors.Errorf("revision %d not found", id))
 		}
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	group, err := GetGroup(ctx, sqlxCtx, revision.GroupID)
@@ -72,9 +74,9 @@ func GetRevisionBy(ctx context.Context, sqlxCtx metadata.SqlxContext, groupID in
 	query := `SELECT * FROM feature_group_revision WHERE group_id = ? AND revision = ?`
 	if err := sqlxCtx.GetContext(ctx, &r, sqlxCtx.Rebind(query), groupID, revision); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errdefs.NotFound(fmt.Errorf("revision not found by group %d and revision %d", groupID, revision))
+			return nil, errdefs.NotFound(errors.Errorf("revision not found by group %d and revision %d", groupID, revision))
 		}
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	group, err := GetGroup(ctx, sqlxCtx, r.GroupID)
@@ -95,7 +97,7 @@ func ListRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, groupID *in
 	query = fmt.Sprintf("%s ORDER BY id ASC", query)
 	var revisions types.RevisionList
 	if err := sqlxCtx.SelectContext(ctx, &revisions, sqlxCtx.Rebind(query), args...); err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	if err := enrichRevisions(ctx, sqlxCtx, revisions); err != nil {
@@ -115,7 +117,7 @@ func enrichRevisions(ctx context.Context, sqlxCtx metadata.SqlxContext, revision
 			return revision.GroupID == g.ID
 		})
 		if group == nil {
-			return fmt.Errorf("cannot find group %d for revision %d", revision.GroupID, revision.ID)
+			return errors.Errorf("cannot find group %d for revision %d", revision.GroupID, revision.ID)
 		}
 		revision.Group = group
 	}

@@ -2,10 +2,11 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
@@ -24,24 +25,24 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 	if err := sqlxCtx.GetContext(ctx, &revisionID, insertQuery, opt.GroupID, opt.Revision, snapshotTable, cdcTable, opt.Anchored, opt.Description); err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
-				return 0, "", fmt.Errorf("revision already exists: groupID=%d, revision=%d", opt.GroupID, opt.Revision)
+				return 0, "", errors.Errorf("revision already exists: groupID=%d, revision=%d", opt.GroupID, opt.Revision)
 			}
 		}
-		return 0, "", err
+		return 0, "", errors.WithStack(err)
 	}
 	if opt.SnapshotTable == nil {
 		updateQuery := "UPDATE feature_group_revision SET snapshot_table = $1 WHERE id = $2"
 		snapshotTable = dbutil.OfflineBatchTableName(opt.GroupID, int64(revisionID))
 		result, err := sqlxCtx.ExecContext(ctx, updateQuery, snapshotTable, revisionID)
 		if err != nil {
-			return 0, "", err
+			return 0, "", errors.WithStack(err)
 		}
 		rowsAffected, err := result.RowsAffected()
 		if err != nil {
-			return 0, "", err
+			return 0, "", errors.WithStack(err)
 		}
 		if rowsAffected != 1 {
-			return 0, "", fmt.Errorf("failed to update revision %d: revision not found", revisionID)
+			return 0, "", errors.Errorf("failed to update revision %d: revision not found", revisionID)
 		}
 	}
 

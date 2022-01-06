@@ -2,11 +2,11 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/pkg/errors"
 )
 
 func createFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateFeatureOpt) (int, error) {
@@ -19,9 +19,9 @@ func createFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metada
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {
-				return 0, fmt.Errorf("feature %s already exists", opt.FeatureName)
+				return 0, errors.Errorf("feature %s already exists", opt.FeatureName)
 			}
 		}
 	}
-	return featureID, err
+	return featureID, errors.WithStack(err)
 }

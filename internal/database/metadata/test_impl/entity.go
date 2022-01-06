@@ -1,7 +1,6 @@
 package test_impl
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -32,7 +31,7 @@ func TestCreateEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore De
 			Description: "description",
 		},
 	})
-	require.Equal(t, fmt.Errorf("entity device already exists"), err)
+	require.Equal(t, "entity device already exists", err.Error())
 }
 
 func TestGetEntity(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
