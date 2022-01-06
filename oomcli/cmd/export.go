@@ -25,7 +25,7 @@ var exportCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if err := export(ctx, oomStore, exportOpt, *exportOutput); err != nil {
-			log.Fatalf("failed exporting features: %v\n", err)
+			log.Fatalf("failed exporting features: %+v\n", err)
 		}
 	},
 }

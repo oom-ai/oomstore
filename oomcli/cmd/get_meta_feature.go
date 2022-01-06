@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -42,7 +43,7 @@ var getMetaFeatureCmd = &cobra.Command{
 		}
 
 		if err := serializeFeatureToWriter(os.Stdout, features, *getMetaOutput); err != nil {
-			log.Fatalf("failed printing features: %v\n", err)
+			log.Fatalf("failed printing features: %+v\n", err)
 		}
 	},
 }
@@ -62,7 +63,7 @@ func queryFeatures(ctx context.Context, oomStore *oomstore.OomStore, opt types.L
 	}
 
 	if opt.FeatureFullNames != nil && len(features) == 0 {
-		return nil, fmt.Errorf("feature '%s' not found", (*opt.FeatureFullNames)[0])
+		return nil, errors.Errorf("feature '%s' not found", (*opt.FeatureFullNames)[0])
 	}
 
 	return features, nil

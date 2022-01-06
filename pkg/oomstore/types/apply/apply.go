@@ -1,8 +1,9 @@
 package apply
 
 import (
-	"fmt"
 	"io"
+
+	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -36,10 +37,10 @@ type Feature struct {
 
 func (f *Feature) Validate() error {
 	if f.Name == "" {
-		return errdefs.InvalidAttribute(fmt.Errorf("the name of feature should not be empty"))
+		return errdefs.InvalidAttribute(errors.Errorf("the name of feature should not be empty"))
 	}
 	if f.ValueType == "" {
-		return errdefs.InvalidAttribute(fmt.Errorf("the value type of feature should not be empty"))
+		return errdefs.InvalidAttribute(errors.Errorf("the value type of feature should not be empty"))
 	}
 	return nil
 }
@@ -128,7 +129,7 @@ func FromGroupList(groups types.GroupList, features types.FeatureList) *GroupIte
 
 func (g *Group) Validate() error {
 	if g.Name == "" {
-		return errdefs.InvalidAttribute(fmt.Errorf("the name of group should not be empty"))
+		return errdefs.InvalidAttribute(errors.Errorf("the name of group should not be empty"))
 	}
 	return nil
 }
@@ -143,7 +144,7 @@ type Entity struct {
 
 func (e *Entity) Validate() error {
 	if e.Name == "" {
-		return errdefs.InvalidAttribute(fmt.Errorf("the name of entity should not be empty"))
+		return errdefs.InvalidAttribute(errors.Errorf("the name of entity should not be empty"))
 	}
 	return nil
 }

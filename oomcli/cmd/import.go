@@ -41,7 +41,7 @@ var importCmd = &cobra.Command{
 		log.Println("importing features ...")
 		revisionID, err := oomStore.Import(ctx, importOpt)
 		if err != nil {
-			log.Fatalf("failed importing features: %v\n", err)
+			log.Fatalf("failed importing features: %+v\n", err)
 		}
 		log.Println("succeeded")
 		fmt.Printf("RevisionID: %d\n", revisionID)

@@ -20,7 +20,7 @@ var syncCmd = &cobra.Command{
 
 		log.Println("syncing features ...")
 		if err := oomStore.Sync(ctx, syncOpt); err != nil {
-			log.Fatalf("failed sync features: %v\n", err)
+			log.Fatalf("failed sync features: %+v\n", err)
 		}
 		log.Println("succeeded.")
 	},

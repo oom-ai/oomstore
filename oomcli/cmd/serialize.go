@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"encoding/csv"
-	"fmt"
 	"io"
 	"os"
 	"reflect"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/fatih/structtag"
 	"github.com/olekukonko/tablewriter"
+	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 	"gopkg.in/yaml.v3"
 )
@@ -109,7 +109,7 @@ func serializeMetadata(w io.Writer, i interface{}, format string, wide bool) err
 	case Column:
 		return serializeInASCIITable(w, header, records, false)
 	default:
-		return fmt.Errorf("unsupported output format %s", format)
+		return errors.Errorf("unsupported output format %s", format)
 	}
 }
 

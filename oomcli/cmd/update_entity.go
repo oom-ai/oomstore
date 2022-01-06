@@ -26,7 +26,7 @@ var updateEntityCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if err := oomStore.UpdateEntity(ctx, updateEntityOpt); err != nil {
-			log.Fatalf("failed to update entity id=%s, err %v\n", updateEntityOpt.EntityName, err)
+			log.Fatalf("failed to update entity id=%s, err %+v\n", updateEntityOpt.EntityName, err)
 		}
 	},
 }

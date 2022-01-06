@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/pkg/errors"
+	"github.com/spf13/cast"
+
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/spf13/cast"
 )
 
 /*
@@ -50,7 +52,7 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 
 	entity := revision.Group.Entity
 	if entity == nil {
-		return nil, fmt.Errorf("failed to get entity id=%d", revision.GroupID)
+		return nil, errors.Errorf("failed to get entity id=%d", revision.GroupID)
 	}
 
 	stream, exportErr := s.offline.Export(ctx, offline.ExportOpt{

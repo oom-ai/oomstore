@@ -1,8 +1,9 @@
 package types
 
 import (
-	"fmt"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type BackendType string
@@ -153,7 +154,7 @@ func (cfg *MetadataStoreConfig) Validate() error {
 		n++
 	}
 	if n != 1 {
-		return fmt.Errorf("require exactly one metadata store backend")
+		return errors.Errorf("require exactly one metadata store backend")
 	}
 	return nil
 }
@@ -193,7 +194,7 @@ func (cfg *OnlineStoreConfig) Validate() error {
 		n++
 	}
 	if n != 1 {
-		return fmt.Errorf("require exactly one online store backend")
+		return errors.Errorf("require exactly one online store backend")
 	}
 	return nil
 }
@@ -229,7 +230,7 @@ func (cfg *OfflineStoreConfig) Validate() error {
 		n++
 	}
 	if n != 1 {
-		return fmt.Errorf("require exactly one offline store backend")
+		return errors.Errorf("require exactly one offline store backend")
 	}
 	return nil
 }

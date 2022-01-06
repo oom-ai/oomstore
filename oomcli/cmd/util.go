@@ -23,7 +23,7 @@ const (
 func mustOpenOomStore(ctx context.Context, opt types.OomStoreConfig) *oomstore.OomStore {
 	store, err := oomstore.Open(ctx, oomStoreCfg)
 	if err != nil {
-		log.Fatalf("failed opening OomStore: %v", err)
+		log.Fatalf("failed opening OomStore: %+v", err)
 	}
 	return store
 }

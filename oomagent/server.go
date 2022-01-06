@@ -2,17 +2,18 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"time"
 
-	"github.com/oom-ai/oomstore/oomagent/codegen"
-	"github.com/oom-ai/oomstore/pkg/oomstore"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/pkg/errors"
 	code "google.golang.org/genproto/googleapis/rpc/code"
 	status "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/oom-ai/oomstore/oomagent/codegen"
+	"github.com/oom-ai/oomstore/pkg/oomstore"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 type server struct {
@@ -257,7 +258,7 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 			break
 		}
 		if req.GetEntityRow() == nil {
-			globalErr = fmt.Errorf("cannot process nil entity row")
+			globalErr = errors.Errorf("cannot process nil entity row")
 			break
 		}
 		entityRows <- types.EntityRow{
@@ -422,7 +423,7 @@ func convertInterfaceToValue(i interface{}) (*codegen.Value, error) {
 			},
 		}, nil
 	default:
-		return nil, fmt.Errorf("unsupported value type %T", i)
+		return nil, errors.Errorf("unsupported value type %T", i)
 	}
 }
 
@@ -431,7 +432,7 @@ func convertJoinedRow(row []interface{}) ([]*codegen.Value, error) {
 	for _, value := range row {
 		v, err := convertInterfaceToValue(value)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal %v", value)
+			return nil, errors.Errorf("failed to marshal %v", value)
 		}
 		res = append(res, v)
 	}

@@ -29,7 +29,7 @@ var registerBatchFeatureCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if _, err := oomStore.CreateFeature(ctx, registerBatchFeatureOpt); err != nil {
-			log.Fatalf("failed registering new feature: %v\n", err)
+			log.Fatalf("failed registering new feature: %+v\n", err)
 		}
 	},
 }

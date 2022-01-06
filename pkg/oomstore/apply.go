@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 	"gopkg.in/yaml.v3"
 
@@ -274,7 +275,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 				}
 			}
 		default:
-			return nil, fmt.Errorf("invalid kind '%s'", kind)
+			return nil, errors.Errorf("invalid kind '%s'", kind)
 		}
 	}
 	return stage, nil
@@ -287,7 +288,7 @@ func parseKind(data map[string]interface{}) (string, error) {
 	if _, ok := data["items"]; ok {
 		return "Items", nil
 	}
-	return "", fmt.Errorf("invalid yaml: missing kind or items")
+	return "", errors.Errorf("invalid yaml: missing kind or items")
 }
 
 func parseItemsKind(data map[string]interface{}) (string, error) {

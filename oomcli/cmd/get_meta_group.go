@@ -9,6 +9,7 @@ import (
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -40,11 +41,11 @@ var getMetaGroupCmd = &cobra.Command{
 
 		groups, err := queryGroups(ctx, oomStore, getMetaGroupOpt.entityName, getMetaGroupOpt.groupName)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("%+v", err)
 		}
 
 		if err = serializeGroupToWriter(ctx, os.Stdout, oomStore, groups, *getMetaOutput); err != nil {
-			log.Fatal(err)
+			log.Fatalf("%+v", err)
 		}
 	},
 }
@@ -67,7 +68,7 @@ func queryGroups(ctx context.Context, oomStore *oomstore.OomStore, entityName, g
 		}
 
 		if entityName != nil && group.Entity.Name != *entityName {
-			return nil, fmt.Errorf("group '%s' entityName is '%s' not '%s'", *groupName, group.Entity.Name, *entityName)
+			return nil, errors.Errorf("group '%s' entityName is '%s' not '%s'", *groupName, group.Entity.Name, *entityName)
 		}
 		return types.GroupList{group}, err
 	}

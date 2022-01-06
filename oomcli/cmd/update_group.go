@@ -26,7 +26,7 @@ var updateGroupCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if err := oomStore.UpdateGroup(ctx, updateGroupOpt); err != nil {
-			log.Fatalf("failed updating group %s, err %v\n", updateGroupOpt.GroupName, err)
+			log.Fatalf("failed updating group %s, err %+v\n", updateGroupOpt.GroupName, err)
 		}
 	},
 }
