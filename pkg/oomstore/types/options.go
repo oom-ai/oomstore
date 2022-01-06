@@ -80,3 +80,10 @@ type SyncOpt struct {
 	RevisionID int
 	PurgeDelay int
 }
+
+type PushOpt struct {
+	EntityKey     string
+	GroupName     string
+	FeatureNames  []string
+	FeatureValues []interface{}
+}
