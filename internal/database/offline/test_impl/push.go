@@ -41,17 +41,27 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 		},
 	}
 	revision := int64(2)
+	records := []types.StreamRecord{
+		{
 
-	featureValues := []interface{}{
-		[]interface{}{18, "F"},
-		[]interface{}{21, "M"},
+			EntityKey: "1000",
+			UnixMilli: 8000,
+			Values:    []interface{}{18, "F"},
+		},
+		{
+
+			EntityKey: "1001",
+			UnixMilli: 8001,
+			Values:    []interface{}{21, "M"},
+		},
 	}
 
 	pushOpt := offline.PushOpt{
-		GroupID:       group.ID,
-		Revision:      revision,
-		FeatureNames:  features.Names(),
-		FeatureValues: featureValues,
+		GroupID:      group.ID,
+		Revision:     revision,
+		EntityName:   entity.Name,
+		FeatureNames: features.Names(),
+		Records:      records,
 	}
 
 	t.Run("push when cdc table not exists", func(t *testing.T) {

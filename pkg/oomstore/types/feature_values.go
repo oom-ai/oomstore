@@ -14,3 +14,16 @@ func (fv *FeatureValues) FeatureValueSlice() []interface{} {
 	}
 	return values
 }
+
+type StreamRecord struct {
+	GroupID   int
+	EntityKey string
+	UnixMilli int64
+	Values    []interface{}
+}
+
+func (r *StreamRecord) ToRow() []interface{} {
+	row := make([]interface{}, 0, len(r.Values)+2)
+	row = append(row, r.EntityKey, r.UnixMilli)
+	return append(row, r.Values...)
+}
