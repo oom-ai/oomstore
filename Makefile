@@ -56,9 +56,16 @@ oomcli:
 oomagent: codegen
 	$(MAKE) -C oomagent build
 
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	TEST_PLAYGROUNDS := redis postgres mysql dynamodb cassandra tidb tikv sqlite
+else
+	TEST_PLAYGROUNDS := redis postgres mysql dynamodb cassandra tidbext tikvext sqlite
+endif
+
 .PHONY: test
 test: codegen
-	@oomplay init $$(oomplay list) -j 16
+	@oomplay init $(TEST_PLAYGROUNDS) -j 16
 	@go test -race -coverprofile=coverage.out -covermode=atomic ./...
 
 .PHONY: integration-test
