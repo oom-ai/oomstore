@@ -3,10 +3,15 @@ package oomstore
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+)
+
+const (
+	FeatureFullNameSeparator = "."
 )
 
 // Get metadata of a feature by ID.
@@ -86,4 +91,14 @@ func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt
 	}
 
 	return id, nil
+}
+
+func validateFeatureFullNames(names []string) error {
+	for _, name := range names {
+		nameSlice := strings.Split(name, FeatureFullNameSeparator)
+		if len(nameSlice) != 2 {
+			return fmt.Errorf("invalid feature full name %s", name)
+		}
+	}
+	return nil
 }
