@@ -19,6 +19,9 @@ import (
 // ChannelJoin gets point-in-time correct feature values for each entity row.
 // Currently, this API only supports batch features.
 func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*types.JoinResult, error) {
+	if err := validateFeatureFullNames(opt.FeatureFullNames); err != nil {
+		return nil, err
+	}
 	data := make(chan []interface{})
 	defer close(data)
 	emptyResult := &types.JoinResult{
@@ -73,6 +76,9 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 // Input File should contain header, the first two columns of Input File should be
 // entity_key, unix_milli, then followed by other real-time feature values.
 func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) error {
+	if err := validateFeatureFullNames(opt.FeatureFullNames); err != nil {
+		return err
+	}
 	entityRows, header, err := GetEntityRowsFromInputFile(opt.InputFilePath)
 	if err != nil {
 		return err

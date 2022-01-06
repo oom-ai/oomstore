@@ -12,6 +12,9 @@ import (
 
 // OnlineGet gets online features of a particular entity instance.
 func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*types.FeatureValues, error) {
+	if err := validateFeatureFullNames(opt.FeatureFullNames); err != nil {
+		return nil, err
+	}
 	rs := types.FeatureValues{
 		EntityKey:        opt.EntityKey,
 		FeatureFullNames: opt.FeatureFullNames,
@@ -57,6 +60,9 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 
 // OnlineMultiGet gets online features of multiple entity instances.
 func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetOpt) (map[string]*types.FeatureValues, error) {
+	if err := validateFeatureFullNames(opt.FeatureFullNames); err != nil {
+		return nil, err
+	}
 	result := make(map[string]*types.FeatureValues)
 	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureFullNames: &opt.FeatureFullNames,

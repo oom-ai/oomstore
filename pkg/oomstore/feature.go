@@ -3,10 +3,15 @@ package oomstore
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+)
+
+const (
+	FeatureFullNameSeparator = "."
 )
 
 // Get metadata of a feature by ID.
@@ -21,6 +26,9 @@ func (s *OomStore) GetFeatureByName(ctx context.Context, fullName string) (*type
 
 // List metadata of features meeting particular criteria.
 func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
+	if err := validateFeatureFullNames(*opt.FeatureFullNames); err != nil {
+		return nil, err
+	}
 	metadataOpt := metadata.ListFeatureOpt{
 		FeatureFullNames: opt.FeatureFullNames,
 	}
@@ -43,6 +51,9 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 
 // Update metadata of a feature.
 func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
+	if err := validateFeatureFullNames([]string{opt.FeatureFullName}); err != nil {
+		return err
+	}
 	feature, err := s.metadata.GetFeatureByName(ctx, opt.FeatureFullName)
 	if err != nil {
 		return err
@@ -86,4 +97,14 @@ func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt
 	}
 
 	return id, nil
+}
+
+func validateFeatureFullNames(names []string) error {
+	for _, name := range names {
+		nameSlice := strings.Split(name, FeatureFullNameSeparator)
+		if len(nameSlice) != 2 {
+			return fmt.Errorf("invalid feature full name %s", name)
+		}
+	}
+	return nil
 }
