@@ -19,15 +19,4 @@ expected='device,price
 9,4500
 '
 actual=$(oomcli export --feature price --revision-id 1 -o csv)
-assert_eq "$case" "$expected" "$actual"
-
-case='get with limit'
-expected='device,price
-1,3999
-2,5299
-3,3999
-4,1999
-5,999
-'
-actual=$(oomcli export --feature price --revision-id 1 --limit 5 -o csv)
-assert_eq "$case" "$expected" "$actual"
+assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"
