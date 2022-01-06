@@ -10,7 +10,17 @@ import (
 
 func Push(ctx context.Context, dbOpt dbutil.DBOpt, pushOpt offline.PushOpt) error {
 	tableName := dbutil.OfflineStreamCdcTableName(pushOpt.GroupID, pushOpt.Revision)
-	err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, pushOpt.FeatureValues, pushOpt.FeatureNames)
+
+	columns := make([]string, 0, len(pushOpt.FeatureNames)+2)
+	columns = append(columns, pushOpt.EntityName, "unix_milli")
+	columns = append(columns, pushOpt.FeatureNames...)
+
+	rows := make([]interface{}, 0, len(pushOpt.Records))
+	for _, record := range pushOpt.Records {
+		rows = append(rows, record.ToRow())
+	}
+
+	err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, rows, columns)
 	if err != nil && dbutil.IsTableNotFoundError(err, dbOpt.Backend) {
 		return errdefs.NotFound(err)
 	}

@@ -51,10 +51,9 @@ type ImportOpt struct {
 type PushOpt struct {
 	GroupID      int
 	Revision     int64
+	EntityName   string
 	FeatureNames []string
-
-	// Two-dimension slice, each row represents a record
-	FeatureValues []interface{}
+	Records      []types.StreamRecord
 }
 
 type CSVSource struct {
