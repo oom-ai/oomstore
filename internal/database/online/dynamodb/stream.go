@@ -7,6 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
 )
@@ -38,7 +40,7 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 			WriteCapacityUnits: aws.Int64(10),
 		},
 	})
-	return err
+	return errors.WithStack(err)
 }
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
@@ -49,7 +51,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 
 	entityKeyValue, err := attributevalue.Marshal(opt.EntityKey)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	item[opt.Entity.Name] = entityKeyValue
 
@@ -60,7 +62,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 		}
 		attributevalue, err := attributevalue.Marshal(value)
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 		item[feature.Name] = attributevalue
 	}
@@ -69,5 +71,5 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 		TableName: &tableName,
 		Item:      item,
 	})
-	return err
+	return errors.WithStack(err)
 }

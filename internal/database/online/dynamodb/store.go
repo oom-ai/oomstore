@@ -7,6 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -38,7 +40,7 @@ func Open(opt *types.DynamoDBOpt) (*DB, error) {
 		}),
 	)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return &DB{dynamodb.NewFromConfig(cfg)}, nil
@@ -46,7 +48,7 @@ func Open(opt *types.DynamoDBOpt) (*DB, error) {
 
 func (db *DB) Ping(ctx context.Context) error {
 	_, err := db.ListTables(ctx, nil)
-	return err
+	return errors.WithStack(err)
 }
 
 // dynamodb is serverless so Close won't do anything

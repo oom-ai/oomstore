@@ -3,6 +3,8 @@ package tikv
 import (
 	"context"
 
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
@@ -84,7 +86,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	// Result order is the same as input order
 	batchGetResult, err := db.BatchGet(ctx, keys)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	// What we need to align with the result

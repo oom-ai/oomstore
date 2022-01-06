@@ -3,6 +3,8 @@ package redis
 import (
 	"context"
 
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
 
@@ -18,12 +20,12 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 	for {
 		keys, cursor, err = db.Scan(ctx, cursor, pattern, PipelineBatchSize).Result()
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 
 		if len(keys) > 0 {
 			if _, err = db.Del(ctx, keys...).Result(); err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 		}
 

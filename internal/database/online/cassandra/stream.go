@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pingcap/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
@@ -28,7 +30,8 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 
 	sql := fmt.Sprintf("ALTER TABLE %s ADD %s %s", tableName, opt.Feature.Name, dbValueType)
 
-	return db.Query(sql).WithContext(ctx).Exec()
+	err = db.Query(sql).WithContext(ctx).Exec()
+	return errors.WithStack(err)
 }
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
@@ -43,5 +46,6 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 		cond.InsertPlaceholders,
 	)
 
-	return db.Query(query, cond.InsertValues...).WithContext(ctx).Exec()
+	err := db.Query(query, cond.InsertValues...).WithContext(ctx).Exec()
+	return errors.WithStack(err)
 }

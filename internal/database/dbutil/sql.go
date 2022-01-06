@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -19,7 +21,7 @@ func BuildConditions(equal map[string]interface{}, in map[string]interface{}) ([
 	for key, value := range in {
 		s, inArgs, err := sqlx.In(fmt.Sprintf("%s IN (?)", key), value)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.WithStack(err)
 		}
 		cond = append(cond, s)
 		args = append(args, inArgs...)
@@ -51,7 +53,7 @@ func InsertRecordsToTableTx(tx *sqlx.Tx, ctx context.Context, tableName string, 
 		return nil
 	}
 	if _, err := tx.ExecContext(ctx, tx.Rebind(query), args...); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -64,7 +66,7 @@ func GetColumnFormat(backendType types.BackendType) (string, error) {
 	case types.BackendMySQL, types.BackendSQLite, types.BackendBigQuery:
 		columnFormat = "`%s` %s"
 	default:
-		return "", fmt.Errorf("unsupported backend type %s", backendType)
+		return "", errors.Errorf("unsupported backend type %s", backendType)
 	}
 	return columnFormat, nil
 }

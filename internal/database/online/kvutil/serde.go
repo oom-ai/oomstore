@@ -1,9 +1,10 @@
 package kvutil
 
 import (
-	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -18,7 +19,7 @@ const (
 func SerializeByValueType(i interface{}, valueType types.ValueType) (s string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("failed to serailize by tag: %v", r)
+			err = errors.Errorf("failed to serailize by tag: %v", r)
 		}
 	}()
 
@@ -41,7 +42,7 @@ func SerializeByValueType(i interface{}, valueType types.ValueType) (s string, e
 	case types.Bytes:
 		return string(i.([]byte)), nil
 	default:
-		return "", fmt.Errorf("unable to serialize %#v of type %T to string", i, i)
+		return "", errors.Errorf("unable to serialize %#v of type %T to string", i, i)
 	}
 }
 
@@ -89,7 +90,7 @@ func SerializeByValue(i interface{}) (string, error) {
 		}
 
 	default:
-		return "", fmt.Errorf("unable to serialize %#v of type %T to string", i, i)
+		return "", errors.Errorf("unable to serialize %#v of type %T to string", i, i)
 	}
 }
 
@@ -100,7 +101,7 @@ func DeserializeByValueType(i interface{}, valueType types.ValueType) (interface
 
 	s, ok := i.(string)
 	if !ok {
-		return nil, fmt.Errorf("not a string or nil: %v", i)
+		return nil, errors.Errorf("not a string or nil: %v", i)
 	}
 
 	switch valueType {
@@ -121,7 +122,7 @@ func DeserializeByValueType(i interface{}, valueType types.ValueType) (interface
 		} else if s == "0" {
 			return false, nil
 		} else {
-			return nil, fmt.Errorf("invalid bool value: %s", s)
+			return nil, errors.Errorf("invalid bool value: %s", s)
 		}
 	case types.Time:
 		x, err := strconv.ParseInt(s, serializeIntBase, 64)
@@ -130,6 +131,6 @@ func DeserializeByValueType(i interface{}, valueType types.ValueType) (interface
 	case types.Bytes:
 		return []byte(s), nil
 	default:
-		return "", fmt.Errorf("unsupported value type: %s", valueType)
+		return "", errors.Errorf("unsupported value type: %s", valueType)
 	}
 }

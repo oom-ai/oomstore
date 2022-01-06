@@ -2,7 +2,8 @@ package tikv
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
@@ -33,7 +34,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 	for record := range opt.ExportStream {
 		if len(record) != len(opt.Features)+1 {
-			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
+			return errors.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
 		}
 
 		entityKey, featureValues := record[0], record[1:]
@@ -62,7 +63,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		if seq%BatchSize == 0 {
 			// We don't expire keys using TTL
 			if err = db.BatchPut(ctx, putKeys, putVals, []uint64{}); err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 			// Reset the slices
 			putKeys, putVals = nil, nil
@@ -72,7 +73,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	if seq%BatchSize != 0 {
 		// We don't expire keys using TTL
 		if err := db.BatchPut(ctx, putKeys, putVals, []uint64{}); err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 	}
 
