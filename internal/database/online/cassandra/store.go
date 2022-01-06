@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gocql/gocql"
+	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -45,7 +46,7 @@ func Open(option *types.CassandraOpt) (*DB, error) {
 
 	session, err := cluster.CreateSession()
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	return &DB{Session: session}, nil
 }

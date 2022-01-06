@@ -5,6 +5,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
+	"github.com/pkg/errors"
 )
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
@@ -42,5 +43,6 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	}
 
 	// We don't expire keys using TTL
-	return db.BatchPut(ctx, putKeys, putVals, []uint64{})
+	err = db.BatchPut(ctx, putKeys, putVals, []uint64{})
+	return errors.WithStack(err)
 }

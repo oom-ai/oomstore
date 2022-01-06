@@ -57,6 +57,7 @@ func DeserializeString(i interface{}, backend types.BackendType) string {
 
 // TODO: Should return an error when bakcend is not supported ?
 func IsTableNotFoundError(err error, backend types.BackendType) bool {
+	err = errors.Cause(err)
 	switch backend {
 	// https://github.com/mattn/go-sqlite3/issues/244
 	case types.BackendSQLite:

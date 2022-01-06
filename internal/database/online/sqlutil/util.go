@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -29,7 +31,7 @@ func CreateStreamTableSchema(ctx context.Context, tableName string, entity *type
 	case types.BackendPostgres, types.BackendCassandra, types.BackendSQLite:
 		entityFormat = fmt.Sprintf(`"%s" TEXT PRIMARY KEY`, entity.Name)
 	default:
-		return "", errdefs.InvalidAttribute(fmt.Errorf("backend %s not support", backend))
+		return "", errdefs.InvalidAttribute(errors.Errorf("backend %s not support", backend))
 	}
 
 	schema := fmt.Sprintf("CREATE TABLE %s ( %s )", tableName, entityFormat)
@@ -45,7 +47,7 @@ func SqlxPrapareStreamTable(ctx context.Context, db *sqlx.DB, opt online.Prepare
 			return err
 		}
 		_, err = db.ExecContext(ctx, schema)
-		return err
+		return errors.WithStack(err)
 	}
 
 	dbValueType, err := dbutil.DBValueType(backend, opt.Feature.ValueType)
@@ -55,5 +57,5 @@ func SqlxPrapareStreamTable(ctx context.Context, db *sqlx.DB, opt online.Prepare
 
 	sql := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", tableName, opt.Feature.Name, dbValueType)
 	_, err = db.ExecContext(ctx, sql)
-	return err
+	return errors.WithStack(err)
 }

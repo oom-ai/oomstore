@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
@@ -47,14 +49,14 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		seq++
 		if seq%PipelineBatchSize == 0 {
 			if _, err := pipe.Exec(ctx); err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 		}
 	}
 
 	if seq%PipelineBatchSize != 0 {
 		if _, err := pipe.Exec(ctx); err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 	}
 	if opt.ExportError != nil {

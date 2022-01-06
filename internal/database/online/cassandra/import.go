@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gocql/gocql"
+	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -20,7 +21,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 	// create table
 	if err := db.Query(table).Exec(); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	var (
@@ -29,19 +30,19 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	)
 	for record := range opt.ExportStream {
 		if len(record) != len(opt.Features)+1 {
-			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
+			return errors.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
 		}
 
 		if batch.Size() != BatchSize {
 			batch.Query(insertStmt, record...)
 		} else {
 			if err := db.ExecuteBatch(batch); err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 			batch = db.NewBatch(gocql.LoggedBatch)
 		}
 	}
-	return db.ExecuteBatch(batch)
+	return errors.WithStack(db.ExecuteBatch(batch))
 }
 
 func buildInsertStatement(tableName string, columns []string) string {

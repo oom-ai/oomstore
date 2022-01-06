@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 
 	"cloud.google.com/go/bigquery"
@@ -30,10 +31,10 @@ func (d *DBOpt) ExecContext(ctx context.Context, query string, args []interface{
 			query = strings.Replace(query, "?", cast.ToString(arg), 1)
 		}
 		_, err := d.BigQueryDB.Query(query).Read(ctx)
-		return err
+		return errors.WithStack(err)
 	default:
 		_, err := d.SqlxDB.ExecContext(ctx, d.SqlxDB.Rebind(query), args...)
-		return err
+		return errors.WithStack(err)
 	}
 }
 
@@ -53,7 +54,8 @@ func (d *DBOpt) BuildInsertQuery(tableName string, records []interface{}, column
 	if d.Backend == types.BackendBigQuery {
 		tableName = fmt.Sprintf("%s.%s", *d.DatasetID, tableName)
 	}
-	return sqlx.In(
+	query, args, err := sqlx.In(
 		fmt.Sprintf(`INSERT INTO %s (%s) VALUES %s`, tableName, columnStr, strings.Join(valueFlags, ",")),
 		records...)
+	return query, args, errors.WithStack(err)
 }

@@ -2,12 +2,12 @@ package sqlutil
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/pkg/errors"
 )
 
 const importBatchSize = 10
@@ -20,14 +20,14 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 		schema := dbutil.BuildTableSchema(tableName, opt.Entity, false, opt.Features, []string{opt.Entity.Name}, backend)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 
 		// populate the data table
 		records := make([]interface{}, 0, importBatchSize)
 		for record := range opt.ExportStream {
 			if len(record) != len(opt.Features)+1 {
-				return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
+				return errors.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
 			}
 			records = append(records, record)
 

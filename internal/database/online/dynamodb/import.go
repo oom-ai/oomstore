@@ -10,6 +10,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
 	oomTypes "github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -39,7 +40,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		},
 	})
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	// Step 2: import items to the table
@@ -87,7 +88,7 @@ func buildItem(record oomTypes.ExportRecord, opt online.ImportOpt) (map[string]t
 	item := make(map[string]types.AttributeValue)
 	entityKeyValue, err := attributevalue.Marshal(record.EntityKey())
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	item[opt.Entity.Name] = entityKeyValue
 
@@ -98,7 +99,7 @@ func buildItem(record oomTypes.ExportRecord, opt online.ImportOpt) (map[string]t
 		}
 		attributeValue, err := attributevalue.Marshal(value)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		item[feature.Name] = attributeValue
 	}

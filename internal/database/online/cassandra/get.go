@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gocql/gocql"
+	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -32,7 +33,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		if err == gocql.ErrNotFound || isTableNotFoundError(err, tableName) {
 			return scan, nil
 		}
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	rs := make(map[string]interface{}, len(scan))
@@ -71,7 +72,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		if err == gocql.ErrNotFound || isTableNotFoundError(err, tableName) {
 			return rs, nil
 		}
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	for _, s := range scan {

@@ -53,7 +53,7 @@ func InsertRecordsToTableTx(tx *sqlx.Tx, ctx context.Context, tableName string, 
 		return nil
 	}
 	if _, err := tx.ExecContext(ctx, tx.Rebind(query), args...); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -66,7 +66,7 @@ func GetColumnFormat(backendType types.BackendType) (string, error) {
 	case types.BackendMySQL, types.BackendSQLite, types.BackendBigQuery:
 		columnFormat = "`%s` %s"
 	default:
-		return "", fmt.Errorf("unsupported backend type %s", backendType)
+		return "", errors.Errorf("unsupported backend type %s", backendType)
 	}
 	return columnFormat, nil
 }

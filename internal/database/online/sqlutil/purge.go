@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -12,8 +14,6 @@ import (
 func Purge(ctx context.Context, db *sqlx.DB, revisionID int, backend types.BackendType) error {
 	qt := dbutil.QuoteFn(backend)
 	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, qt(OnlineBatchTableName(revisionID)))
-	if _, err := db.ExecContext(ctx, query); err != nil {
-		return err
-	}
-	return nil
+	_, err := db.ExecContext(ctx, query)
+	return errors.WithStack(err)
 }
