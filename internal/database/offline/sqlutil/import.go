@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -23,7 +25,7 @@ func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData Lo
 		schema := dbutil.BuildTableSchema(opt.SnapshotTableName, opt.Entity, false, opt.Features, pkFields, backendType)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 
 		// populate the data table

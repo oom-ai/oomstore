@@ -7,10 +7,11 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/pkg/errors"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 const SNAPSHOT_QUERY = `
@@ -70,7 +71,7 @@ func Snapshot(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.SnapshotOpt) 
 
 	schema := dbutil.BuildTableSchema(currSnapshotTableName, opt.Group.Entity, false, opt.Features, []string{opt.Group.Entity.Name}, dbOpt.Backend)
 	if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	query, err := buildSnapshotQuery(snapshotQueryParams{
 		EntityName:            opt.Group.Entity.Name,
@@ -85,7 +86,7 @@ func Snapshot(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.SnapshotOpt) 
 		return err
 	}
 	if err = dbOpt.ExecContext(ctx, query, nil); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -126,7 +127,7 @@ func buildSnapshotQuery(params snapshotQueryParams) (string, error) {
 
 	buf := bytes.NewBuffer(nil)
 	if err := t.Execute(buf, params); err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 	return buf.String(), nil
 }

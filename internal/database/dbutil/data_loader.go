@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -22,7 +24,7 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSou
 	records := make([]interface{}, 0, batchSize)
 	for {
 		record, err := ReadLine(source.Reader, source.Delimiter, features, backendType)
-		if err == io.EOF {
+		if errors.Cause(err) == io.EOF {
 			break
 		}
 		if err != nil {
@@ -48,7 +50,7 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSou
 func ReadLine(reader *bufio.Reader, delimiter string, features types.FeatureList, backend types.BackendType) ([]interface{}, error) {
 	row, err := reader.ReadString('\n')
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	rowSlice := strings.Split(strings.Trim(row, "\n"), delimiter)
 	line := make([]interface{}, 0, len(rowSlice))

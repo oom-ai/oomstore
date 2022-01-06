@@ -8,6 +8,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 )
 
@@ -28,20 +29,20 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType
 		defer close(errs)
 		stmt, err := db.Preparex(query)
 		if err != nil {
-			errs <- err
+			errs <- errors.WithStack(err)
 			return
 		}
 		defer stmt.Close()
 		rows, err := stmt.Queryx()
 		if err != nil {
-			errs <- err
+			errs <- errors.WithStack(err)
 			return
 		}
 		defer rows.Close()
 		for rows.Next() {
 			record, err := rows.SliceScan()
 			if err != nil {
-				errs <- fmt.Errorf("failed at rows.SliceScan, err=%v", err)
+				errs <- errors.Errorf("failed at rows.SliceScan, err=%v", err)
 				return
 			}
 			record[0] = cast.ToString(record[0])

@@ -8,6 +8,7 @@ import (
 	"text/template"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -234,7 +235,7 @@ func dropTemporaryTables(ctx context.Context, db *sqlx.DB, tableNames []string) 
 func dropTable(ctx context.Context, db *sqlx.DB, tableName string) error {
 	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
 	_, err := db.ExecContext(ctx, query)
-	return err
+	return errors.WithStack(err)
 }
 
 func supportIndex(backendType types.BackendType) bool {
@@ -272,7 +273,7 @@ func buildReadJoinResultQuery(query string, params readJoinResultQueryParams) (s
 
 	buf := bytes.NewBuffer(nil)
 	if err := t.Execute(buf, params); err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 	return buf.String(), nil
 }
@@ -306,7 +307,7 @@ func buildJoinQuery(params joinQueryParams) (string, error) {
 
 	buf := bytes.NewBuffer(nil)
 	if err := t.Execute(buf, params); err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 	return buf.String(), nil
 }
@@ -354,7 +355,7 @@ func buildCdcJoinQuery(params cdcJoinQueryParams) (string, error) {
 
 	buf := bytes.NewBuffer(nil)
 	if err := t.Execute(buf, params); err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 	return buf.String(), nil
 }
