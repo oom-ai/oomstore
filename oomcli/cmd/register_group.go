@@ -27,7 +27,7 @@ var registerGroupCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if _, err := oomStore.CreateGroup(ctx, registerGroupOpt); err != nil {
-			log.Fatalf("failed registering new group: %v\n", err)
+			log.Fatalf("failed registering new group: %+v\n", err)
 		}
 	},
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -17,7 +19,7 @@ import (
 // where size of the particular revision outgrows memory limit of your machine.
 func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	if err := s.metadata.Refresh(); err != nil {
-		return fmt.Errorf("failed to refresh informer, err=%+v", err)
+		return fmt.Errorf("failed to refresh informer, err=%v", err)
 	}
 	revision, err := s.GetRevision(ctx, opt.RevisionID)
 	if err != nil {
@@ -27,7 +29,7 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	group := revision.Group
 	prevOnlineRevisionID := group.OnlineRevisionID
 	if prevOnlineRevisionID != nil && *prevOnlineRevisionID == opt.RevisionID {
-		return fmt.Errorf("the specific revision was synced to the online store, won't do it again this time")
+		return errors.Errorf("the specific revision was synced to the online store, won't do it again this time")
 	}
 
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{

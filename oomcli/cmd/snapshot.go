@@ -23,7 +23,7 @@ var snapshotCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if err := oomStore.Snapshot(ctx, snapshotGroupName); err != nil {
-			log.Fatalf("failed to take snapshot for the group %s: %v\n", snapshotGroupName, err)
+			log.Fatalf("failed to take snapshot for the group %s: %+v\n", snapshotGroupName, err)
 		}
 	},
 }

@@ -3,11 +3,11 @@ package cmd
 import (
 	"context"
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 
@@ -26,11 +26,11 @@ var getOnlineCmd = &cobra.Command{
 
 		featureValues, err := oomStore.OnlineGet(ctx, onlineGetOpt)
 		if err != nil {
-			log.Fatalf("failed getting online features: %v", err)
+			log.Fatalf("failed getting online features: %+v", err)
 		}
 
 		if err := printOnlineFeatures(featureValues, *getOutput); err != nil {
-			log.Fatalf("failed printing online feature values, error %v\n", err)
+			log.Fatalf("failed printing online feature values, error %+v\n", err)
 		}
 	},
 }
@@ -54,7 +54,7 @@ func printOnlineFeatures(featureValues *types.FeatureValues, output string) erro
 	case ASCIITable:
 		return printOnlineFeaturesInASCIITable(featureValues)
 	default:
-		return fmt.Errorf("unsupported output format %s", output)
+		return errors.Errorf("unsupported output format %s", output)
 	}
 }
 

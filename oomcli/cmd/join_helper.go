@@ -3,13 +3,14 @@ package cmd
 import (
 	"context"
 	"encoding/csv"
-	"fmt"
 	"os"
+
+	"github.com/pkg/errors"
+	"github.com/spf13/cast"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/spf13/cast"
 )
 
 type JoinOpt struct {
@@ -46,7 +47,7 @@ func printJoinResult(joinResult *types.JoinResult, output string) error {
 	case ASCIITable:
 		return printJoinResultInASCIITable(joinResult)
 	default:
-		return fmt.Errorf("unsupported output format %s", output)
+		return errors.Errorf("unsupported output format %s", output)
 	}
 }
 

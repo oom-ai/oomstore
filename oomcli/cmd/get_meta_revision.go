@@ -38,14 +38,14 @@ var getMetaRevisionCmd = &cobra.Command{
 		if getRevisionOpt.groupName != nil {
 			group, err := oomStore.GetGroupByName(ctx, *getRevisionOpt.groupName)
 			if err != nil {
-				log.Fatalf("failed to get feature group name=%s: %v", *getRevisionOpt.groupName, err)
+				log.Fatalf("failed to get feature group name=%s: %+v", *getRevisionOpt.groupName, err)
 			}
 			groupID = &group.ID
 		}
 
 		revisions, err := oomStore.ListRevision(ctx, groupID)
 		if err != nil {
-			log.Fatalf("failed geting revisions, error %v\n", err)
+			log.Fatalf("failed geting revisions, error %+v\n", err)
 		}
 
 		if len(args) > 0 {
@@ -57,7 +57,7 @@ var getMetaRevisionCmd = &cobra.Command{
 		}
 
 		if err := serializeMetadata(os.Stdout, revisions, *getMetaOutput, *getMetaWide); err != nil {
-			log.Fatalf("failed printing entities, error %v\n", err)
+			log.Fatalf("failed printing entities, error %+v\n", err)
 		}
 	},
 }

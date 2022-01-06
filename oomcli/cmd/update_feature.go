@@ -26,7 +26,7 @@ var updateFeatureCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if err := oomStore.UpdateFeature(ctx, updateFeatureOpt); err != nil {
-			log.Fatalf("failed to update feature %s, err %v\n", updateFeatureOpt.FeatureFullName, err)
+			log.Fatalf("failed to update feature %s, err %+v\n", updateFeatureOpt.FeatureFullName, err)
 		}
 	},
 }

@@ -2,7 +2,8 @@ package oomstore
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
@@ -76,7 +77,7 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 		return nil, err
 	}
 	if entity == nil {
-		return nil, fmt.Errorf("failed to get shared entity")
+		return nil, errors.Errorf("failed to get shared entity")
 	}
 	featureMap := groupFeaturesByGroupID(features)
 
@@ -147,11 +148,11 @@ func getSharedEntity(features types.FeatureList) (*types.Entity, error) {
 		m[f.Group.EntityID] = f.Group.Entity
 	}
 	if len(m) != 1 {
-		return nil, fmt.Errorf("expected 1 entity, got %d entities", len(m))
+		return nil, errors.Errorf("expected 1 entity, got %d entities", len(m))
 	}
 
 	for _, entity := range m {
 		return entity, nil
 	}
-	return nil, fmt.Errorf("expected 1 entity, got 0")
+	return nil, errors.Errorf("expected 1 entity, got 0")
 }

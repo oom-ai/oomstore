@@ -42,7 +42,7 @@ var editEntityCmd = &cobra.Command{
 		}
 
 		if err = edit(ctx, oomStore, fileName); err != nil {
-			log.Fatalf("apply failed: %v", err)
+			log.Fatalf("apply failed: %+v", err)
 		}
 		log.Println("applied")
 	},

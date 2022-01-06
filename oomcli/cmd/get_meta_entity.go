@@ -6,10 +6,11 @@ import (
 	"log"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
-	"github.com/spf13/cobra"
 )
 
 type getMetaEntityOption struct {
@@ -39,7 +40,7 @@ var getMetaEntityCmd = &cobra.Command{
 		}
 
 		if err = serializeEntitiesToWriter(ctx, os.Stdout, oomStore, entities, *getMetaOutput); err != nil {
-			log.Fatalf("failed printing entities, error: %v\n", err)
+			log.Fatalf("failed printing entities, error: %+v\n", err)
 		}
 	},
 }

@@ -7,9 +7,11 @@ import (
 	"os"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/pkg/errors"
+	"github.com/spf13/cast"
+
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/spf13/cast"
 )
 
 func export(ctx context.Context, store *oomstore.OomStore, opt types.ChannelExportOpt, output string) error {
@@ -30,7 +32,7 @@ func printExportResult(exportResult *types.ExportResult, output string) error {
 	case ASCIITable:
 		return printExportResultInASCIITable(exportResult)
 	default:
-		return fmt.Errorf("unsupported output format %s", output)
+		return errors.Errorf("unsupported output format %s", output)
 	}
 }
 

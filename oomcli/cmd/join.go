@@ -24,7 +24,7 @@ var joinCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if err := join(ctx, oomStore, joinOpt, *joinOutput); err != nil {
-			log.Fatalf("failed joining historical features: %v\n", err)
+			log.Fatalf("failed joining historical features: %+v\n", err)
 		}
 	},
 }
