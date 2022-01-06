@@ -1,12 +1,13 @@
 package sqlutil
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/pkg/errors"
 	"github.com/spf13/cast"
+
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func DeserializeByValueType(i interface{}, valueType types.ValueType, backend types.BackendType) (interface{}, error) {
@@ -22,7 +23,7 @@ func DeserializeByValueType(i interface{}, valueType types.ValueType, backend ty
 		} else if s == "0" || s == "false" {
 			return false, nil
 		}
-		return nil, fmt.Errorf("invalid bool value %v", i)
+		return nil, errors.Errorf("invalid bool value %v", i)
 	case types.String:
 		return cast.ToString(i), nil
 	default:
@@ -45,7 +46,7 @@ func deserializeByTagForSnowflake(i interface{}, valueType types.ValueType) (int
 
 	s, ok := i.(string)
 	if !ok {
-		return nil, fmt.Errorf("not a string or nil: %v", i)
+		return nil, errors.Errorf("not a string or nil: %v", i)
 	}
 
 	switch valueType {
@@ -54,11 +55,11 @@ func deserializeByTagForSnowflake(i interface{}, valueType types.ValueType) (int
 
 	case types.Int64:
 		x, err := strconv.ParseInt(s, 10, 64)
-		return x, err
+		return x, errors.WithStack(err)
 
 	case types.Float64:
 		x, err := strconv.ParseFloat(s, 64)
-		return x, err
+		return x, errors.WithStack(err)
 
 	case types.Bool:
 		if s == "1" {
@@ -66,7 +67,7 @@ func deserializeByTagForSnowflake(i interface{}, valueType types.ValueType) (int
 		} else if s == "0" {
 			return false, nil
 		} else {
-			return nil, fmt.Errorf("invalid bool value: %s", s)
+			return nil, errors.Errorf("invalid bool value: %s", s)
 		}
 	case types.Time:
 		x, err := strconv.ParseInt(s, 10, 64)
@@ -75,6 +76,6 @@ func deserializeByTagForSnowflake(i interface{}, valueType types.ValueType) (int
 	case types.Bytes:
 		return []byte(s), nil
 	default:
-		return "", fmt.Errorf("unsupported value type: %s", valueType)
+		return "", errors.Errorf("unsupported value type: %s", valueType)
 	}
 }

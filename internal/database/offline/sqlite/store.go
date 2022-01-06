@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -23,12 +24,13 @@ type DB struct {
 }
 
 func (db *DB) Ping(ctx context.Context) error {
-	return db.PingContext(ctx)
+	err := db.PingContext(ctx)
+	return errors.WithStack(err)
 }
 
 func Open(option *types.SQLiteOpt) (*DB, error) {
 	db, err := dbutil.OpenSQLite(option.DBFile)
-	return &DB{db}, err
+	return &DB{db}, errors.WithStack(err)
 }
 
 func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
@@ -54,7 +56,7 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 `
 	rows, err := db.QueryxContext(ctx, query, tableName)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	return sqlutil.SqlxTableSchema(ctx, db, types.BackendSQLite, rows)
 }

@@ -5,10 +5,12 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/pkg/errors"
+	"google.golang.org/api/iterator"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"google.golang.org/api/iterator"
 )
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
@@ -39,7 +41,7 @@ func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.E
 				break
 			}
 			if err != nil {
-				errs <- fmt.Errorf("failed at rows.Next, err=%v", err)
+				errs <- errors.Errorf("failed at rows.Next, err=%v", err)
 				return
 			}
 			record := make([]interface{}, 0, len(recordMap))

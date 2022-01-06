@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
-
 	"cloud.google.com/go/bigquery"
+	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -32,7 +32,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, header dbutil.ColumnList, dropTableNames []string, backendType types.BackendType) (*types.JoinResult, error) {
 	rows, err := dbOpt.BigQueryDB.Query(query).Read(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	data := make(chan []interface{})
@@ -52,7 +52,7 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 				break
 			}
 			if err != nil {
-				scanErr = err
+				scanErr = errors.WithStack(err)
 				continue
 			}
 			record := make([]interface{}, 0, len(recordMap))
@@ -93,7 +93,7 @@ func dropTemporaryTables(ctx context.Context, db *bigquery.Client, tableNames []
 func dropTable(ctx context.Context, db *bigquery.Client, tableName string) error {
 	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
 	_, err := db.Query(query).Read(ctx)
-	return err
+	return errors.WithStack(err)
 }
 
 const READ_JOIN_RESULT_QUERY = `

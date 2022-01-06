@@ -2,9 +2,10 @@ package sqlutil
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -18,7 +19,7 @@ func SqlxTableSchema(ctx context.Context, store offline.Store, backend types.Bac
 	for rows.Next() {
 		var fieldName, dbValueType string
 		if err := rows.Scan(&fieldName, &dbValueType); err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		valueType, err := dbutil.ValueType(backend, dbValueType)
 		if err != nil {
@@ -30,7 +31,7 @@ func SqlxTableSchema(ctx context.Context, store offline.Store, backend types.Bac
 		})
 	}
 	if len(schema.Fields) == 0 {
-		return nil, fmt.Errorf("table not found")
+		return nil, errors.Errorf("table not found")
 	}
 	return &schema, nil
 }
