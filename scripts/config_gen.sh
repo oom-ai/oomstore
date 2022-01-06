@@ -17,19 +17,20 @@ metadata=$3
 
 filter_config() {
     local name=$1
-    cfg=$(sed -n "/$name:/, /^\$/p" ./playgrounds.yaml | grep -v '^$')
-    if [[ -z $cfg ]]; then
-        erro "config not found: '$name'"
-        exit 1
-    fi
-    echo "$cfg"
+    for source in ./config_source*.yaml; do
+        cfg=$(sed -n "/$name:/, /^\$/p" "$source" | grep -v '^$')
+        [[ -n $cfg ]] && echo "$cfg" && return
+    done
+
+    erro "config not found: '$name'"
+    exit 1
 }
 
 indent() { sed 's/^/  /'; }
 
-online_cfg=$(filter_config "$online")
-offline_cfg=$(filter_config "$offline")
-metadata_cfg=$(filter_config "$metadata")
+online_cfg=$(filter_config   "$online"   | sed 's/ext:$/:/')
+offline_cfg=$(filter_config  "$offline"  | sed 's/ext:$/:/')
+metadata_cfg=$(filter_config "$metadata" | sed 's/ext:$/:/')
 
 cat <<-EOF
 online-store:
