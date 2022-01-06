@@ -574,7 +574,10 @@ items:
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			stage, err := buildApplyStage(context.Background(), tc.opt)
-			require.Equal(t, tc.wantErr, err)
+			if tc.wantErr != nil {
+				require.Error(t, err)
+				require.Equal(t, tc.wantErr.Error(), err.Error())
+			}
 			require.Equal(t, tc.wantStage, stage)
 		})
 	}
