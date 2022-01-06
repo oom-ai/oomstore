@@ -17,6 +17,8 @@ type OomStore struct {
 	online   online.Store
 	offline  offline.Store
 	metadata metadata.Store
+
+	streamPushProcessor *StreamPushProcessor
 }
 
 // Return an OomStore instance given the configuration.
@@ -39,11 +41,14 @@ func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 		return nil, err
 	}
 
-	return &OomStore{
+	store := &OomStore{
 		online:   onlineStore,
 		offline:  offlineStore,
 		metadata: metadataStore,
-	}, nil
+	}
+	store.InitStreamPushProcessor(ctx)
+
+	return store, nil
 }
 
 // Create a new OomStore instance.
@@ -73,9 +78,9 @@ func (s *OomStore) Ping(ctx context.Context) error {
 
 // Close the connections to underlying databases.
 func (s *OomStore) Close() error {
-	errs := []error{}
+	errs := make([]error, 0)
 
-	for _, closer := range []io.Closer{s.online, s.offline, s.metadata} {
+	for _, closer := range []io.Closer{s.online, s.offline, s.metadata, s.streamPushProcessor} {
 		if err := closer.Close(); err != nil {
 			errs = append(errs, err)
 		}
