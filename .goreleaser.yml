@@ -9,7 +9,7 @@ builds:
     id: "oomcli"
     binary: oomcli
     env:
-      - CGO_ENABLED=0
+      - CGO_ENABLED=1
     goos:
       - linux
       - darwin
@@ -23,7 +23,7 @@ builds:
     id: "oomagent"
     binary: oomagent
     env:
-      - CGO_ENABLED=0
+      - CGO_ENABLED=1
     goos:
       - linux
       - darwin
