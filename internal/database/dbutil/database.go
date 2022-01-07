@@ -46,15 +46,6 @@ func OpenPostgresDB(host, port, user, password, database string) (*sqlx.DB, erro
 
 var OpenRedshiftDB = OpenPostgresDB
 
-func DeserializeString(i interface{}, backend types.BackendType) string {
-	switch backend {
-	case types.BackendMySQL:
-		return string(i.([]byte))
-	default:
-		return i.(string)
-	}
-}
-
 // TODO: Should return an error when bakcend is not supported ?
 func IsTableNotFoundError(err error, backend types.BackendType) bool {
 	err = errors.Cause(err)

@@ -73,12 +73,16 @@ func getFeatureValueMapFromRows(rows *sqlx.Rows, features types.FeatureList, bac
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
-		entityKey, values := dbutil.DeserializeString(record[0], backend), record[1:]
+		entityKey, err := dbutil.DeserializeByValueType(record[0], types.String, backend)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		values := record[1:]
 		rowMap, err := deserializeIntoRowMap(values, features, backend)
 		if err != nil {
 			return nil, err
 		}
-		featureValueMap[entityKey] = rowMap
+		featureValueMap[entityKey.(string)] = rowMap
 	}
 	return featureValueMap, nil
 }
