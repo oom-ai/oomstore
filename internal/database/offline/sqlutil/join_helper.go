@@ -65,7 +65,7 @@ FROM {{ qt .EntityRowsTableName }}
 {{ range $pair := .JoinTables }}
 	{{- $t1 := qt $pair.LeftTable -}}
 	{{- $t2 := qt $pair.RightTable -}}
-lEFT JOIN {{ $t2 }}
+LEFT JOIN {{ $t2 }}
 ON {{ $t1 }}.{{ qt $.UnixMilli }} = {{ $t2 }}.{{ qt $.UnixMilli }} AND {{ $t1 }}.{{ qt $.EntityKey }} = {{ $t2 }}.{{ qt $.EntityKey }}
 {{end}}`
 

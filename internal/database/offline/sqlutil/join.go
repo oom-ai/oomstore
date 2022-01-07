@@ -233,7 +233,7 @@ func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTabl
 	tableNames = append([]string{opt.EntityRowsTableName}, tableNames...)
 	for i := 0; i < len(tableNames)-1; i++ {
 		joinTablePairs = append(joinTablePairs, joinTablePair{
-			LeftTable:  tableNames[i],
+			LeftTable:  tableNames[0],
 			RightTable: tableNames[i+1],
 		})
 	}
@@ -290,7 +290,6 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 				deserializedValue, err := dbutil.DeserializeByValueType(r, header[i].ValueType, backendType)
 				if err != nil {
 					scanErr = err
-					continue
 				}
 				serializedRecord = append(serializedRecord, deserializedValue)
 			}
