@@ -10,10 +10,14 @@ repos:
     rev: v4.0.1
     hooks:
       - id: trailing-whitespace
+        exclude: \.pvt\.
       - id: end-of-file-fixer
+        exclude: \.pvt\.
       - id: check-yaml
+        exclude: \.pvt\.
       - id: check-added-large-files
       - id: mixed-line-ending
+        exclude: \.pvt\.
   - repo: git://github.com/dnephin/pre-commit-golang
     rev: v0.4.0
     hooks:

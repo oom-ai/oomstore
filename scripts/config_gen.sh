@@ -18,7 +18,7 @@ metadata=$3
 filter_config() {
     local name=$1
     for source in ./config_source*.yaml; do
-        cfg=$(sed -n "/$name:/, /^\$/p" "$source" | grep -v '^$')
+        cfg=$(sed -n "/$name:/, /^\$/p" "$source" | grep -v '^$' | sed "s/{{PLAYDB}}/${PLAYDB:-playdb}/g")
         [[ -n $cfg ]] && echo "$cfg" && return
     done
 
