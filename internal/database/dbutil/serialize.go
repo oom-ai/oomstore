@@ -1,23 +1,39 @@
-package sqlutil
+package dbutil
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/pkg/errors"
 )
 
 func DeserializeByValueType(i interface{}, valueType types.ValueType, backend types.BackendType) (interface{}, error) {
-	if backend == types.BackendSnowflake {
-		return deserializeByTagForSnowflake(i, valueType)
+	if i == nil {
+		return nil, nil
+	}
+	var deserializer func(i interface{}, valueType types.ValueType) (interface{}, error)
+	switch backend {
+	case types.BackendSnowflake:
+		deserializer = snowflakeDeserializer
+	default:
+		deserializer = defaultDeserializer
 	}
 
+	value, err := deserializer(i, valueType)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return value, nil
+}
+
+func defaultDeserializer(i interface{}, valueType types.ValueType) (interface{}, error) {
 	switch valueType {
 	case types.Bool:
-		s := cast.ToString(i)
+		s := strings.ToLower(cast.ToString(i))
 		if s == "1" || s == "true" {
 			return true, nil
 		} else if s == "0" || s == "false" {
@@ -31,12 +47,7 @@ func DeserializeByValueType(i interface{}, valueType types.ValueType, backend ty
 	}
 }
 
-// gosnowflake Scan always produce string when the destination is interface{}
-// See https://github.com/snowflakedb/gosnowflake/issues/517
-// As a work around, we cast the string to interface{} based on ValueType
-// This method is mostly copied from redis.DeserializeByTag, except we use 10 rather than 36 as the base
-// TODO: we should let the snowflake team fix the gosnowflake converter
-func deserializeByTagForSnowflake(i interface{}, valueType types.ValueType) (interface{}, error) {
+func snowflakeDeserializer(i interface{}, valueType types.ValueType) (interface{}, error) {
 	if i == nil {
 		return nil, nil
 	}
