@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"log"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
@@ -23,7 +22,7 @@ var registerEntityCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if _, err := oomStore.CreateEntity(ctx, registerEntityOpt); err != nil {
-			log.Fatalf("failed registering new entity: %+v\n", err)
+			exitf("failed registering new entity: %+v\n", err)
 		}
 	},
 }

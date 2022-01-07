@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 
@@ -26,7 +27,7 @@ var editGroupCmd = &cobra.Command{
 		}
 
 		if len(args) > 1 {
-			log.Fatalf("argument at most one, got %d", len(args))
+			exitf("argument at most one, got %d", len(args))
 		} else if len(args) == 1 {
 			editGroupOpt.groupName = &args[0]
 		}
@@ -38,18 +39,18 @@ var editGroupCmd = &cobra.Command{
 
 		groups, err := queryGroups(ctx, oomStore, editGroupOpt.entityName, editGroupOpt.groupName)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 
 		fileName, err := writeGroupsToTempFile(ctx, oomStore, groups)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 
 		if err = edit(ctx, oomStore, fileName); err != nil {
-			log.Fatalf("apply failed: %+v", err)
+			exitf("apply failed: %+v", err)
 		}
-		log.Println("applied")
+		fmt.Fprintf(os.Stderr, "applied")
 	},
 }
 

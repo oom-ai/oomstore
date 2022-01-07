@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"log"
 	"os"
 	"strconv"
 
@@ -26,7 +25,7 @@ var getMetaRevisionCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
-			log.Fatalf("argument at most one, got %d", len(args))
+			exitf("argument at most one, got %d", len(args))
 		}
 
 		ctx := context.Background()
@@ -38,26 +37,26 @@ var getMetaRevisionCmd = &cobra.Command{
 		if getRevisionOpt.groupName != nil {
 			group, err := oomStore.GetGroupByName(ctx, *getRevisionOpt.groupName)
 			if err != nil {
-				log.Fatalf("failed to get feature group name=%s: %+v", *getRevisionOpt.groupName, err)
+				exitf("failed to get feature group name=%s: %+v", *getRevisionOpt.groupName, err)
 			}
 			groupID = &group.ID
 		}
 
 		revisions, err := oomStore.ListRevision(ctx, groupID)
 		if err != nil {
-			log.Fatalf("failed geting revisions, error %+v\n", err)
+			exitf("failed geting revisions, error %+v\n", err)
 		}
 
 		if len(args) > 0 {
 			if revisions = revisions.Filter(func(r *types.Revision) bool {
 				return strconv.Itoa(r.ID) == args[0]
 			}); len(revisions) == 0 {
-				log.Fatalf("revision '%s' not found", args[0])
+				exitf("revision '%s' not found", args[0])
 			}
 		}
 
 		if err := serializeMetadata(os.Stdout, revisions, *getMetaOutput, *getMetaWide); err != nil {
-			log.Fatalf("failed printing entities, error %+v\n", err)
+			exitf("failed printing entities, error %+v\n", err)
 		}
 	},
 }

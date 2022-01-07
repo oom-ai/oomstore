@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -26,15 +26,15 @@ var applyCmd = &cobra.Command{
 
 		file, err := os.Open(applyOpt.FilePath)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 		defer file.Close()
 
 		if err := oomStore.Apply(ctx, apply.ApplyOpt{R: file}); err != nil {
-			log.Fatalf("apply failed: %+v", err)
+			exitf("apply failed: %+v", err)
 		}
 
-		log.Println("applied")
+		fmt.Fprintf(os.Stderr, "applied")
 	},
 }
 

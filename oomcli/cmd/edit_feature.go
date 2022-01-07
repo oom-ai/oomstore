@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"os"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -27,7 +28,7 @@ var editFeatureCmd = &cobra.Command{
 		}
 
 		if len(args) > 1 {
-			log.Fatalf("argument at most one, got %d", len(args))
+			exitf("argument at most one, got %d", len(args))
 		} else if len(args) == 1 {
 			editFeatureOpt.FeatureFullNames = &[]string{args[0]}
 		}
@@ -40,18 +41,18 @@ var editFeatureCmd = &cobra.Command{
 
 		features, err := queryFeatures(ctx, oomStore, editFeatureOpt.ListFeatureOpt)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 
 		fileName, err := writeFeaturesToTempFile(ctx, oomStore, features)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 
 		if err = edit(ctx, oomStore, fileName); err != nil {
-			log.Fatalf("apply failed: %+v", err)
+			exitf("apply failed: %+v", err)
 		}
-		log.Println("applied")
+		fmt.Fprintf(os.Stderr, "applied")
 	},
 }
 

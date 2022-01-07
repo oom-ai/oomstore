@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"log"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
@@ -26,7 +25,7 @@ var updateFeatureCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if err := oomStore.UpdateFeature(ctx, updateFeatureOpt); err != nil {
-			log.Fatalf("failed to update feature %s, err %+v\n", updateFeatureOpt.FeatureFullName, err)
+			exitf("failed to update feature %s, err %+v\n", updateFeatureOpt.FeatureFullName, err)
 		}
 	},
 }

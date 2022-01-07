@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 
@@ -21,7 +22,7 @@ var editEntityCmd = &cobra.Command{
 	Short: "Edit entity resources",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
-			log.Fatalf("argument at most one, got %d", len(args))
+			exitf("argument at most one, got %d", len(args))
 		} else if len(args) == 1 {
 			editEntityOpt.entityName = &args[0]
 		}
@@ -33,18 +34,18 @@ var editEntityCmd = &cobra.Command{
 
 		entities, err := queryEntities(ctx, oomStore, editEntityOpt.entityName)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 
 		fileName, err := writeEntitiesToTempFile(ctx, oomStore, entities)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 
 		if err = edit(ctx, oomStore, fileName); err != nil {
-			log.Fatalf("apply failed: %+v", err)
+			exitf("apply failed: %+v", err)
 		}
-		log.Println("applied")
+		fmt.Fprintf(os.Stderr, "applied")
 	},
 }
 
@@ -55,7 +56,7 @@ func init() {
 func writeEntitiesToTempFile(ctx context.Context, oomStore *oomstore.OomStore, entities types.EntityList) (string, error) {
 	tempFile, err := getTempFile()
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	defer tempFile.Close()
 

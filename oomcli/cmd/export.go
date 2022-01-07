@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"log"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
@@ -25,7 +24,7 @@ var exportCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if err := export(ctx, oomStore, exportOpt, *exportOutput); err != nil {
-			log.Fatalf("failed exporting features: %+v\n", err)
+			exitf("failed exporting features: %+v\n", err)
 		}
 	},
 }

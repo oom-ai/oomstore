@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"log"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
@@ -26,7 +25,7 @@ var updateGroupCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if err := oomStore.UpdateGroup(ctx, updateGroupOpt); err != nil {
-			log.Fatalf("failed updating group %s, err %+v\n", updateGroupOpt.GroupName, err)
+			exitf("failed updating group %s, err %+v\n", updateGroupOpt.GroupName, err)
 		}
 	},
 }

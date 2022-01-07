@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"log"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
@@ -18,7 +17,7 @@ var registerBatchFeatureCmd = &cobra.Command{
 	PreRun: func(cmd *cobra.Command, args []string) {
 		valueType, err := types.ParseValueType(registerBatchFeatureValueType)
 		if err != nil {
-			log.Fatalf("failed registering new feature: %v\n", err)
+			exitf("failed registering new feature: %v\n", err)
 		}
 		registerBatchFeatureOpt.ValueType = valueType
 		registerBatchFeatureOpt.FeatureName = args[0]
@@ -29,7 +28,7 @@ var registerBatchFeatureCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if _, err := oomStore.CreateFeature(ctx, registerBatchFeatureOpt); err != nil {
-			log.Fatalf("failed registering new feature: %+v\n", err)
+			exitf("failed registering new feature: %+v\n", err)
 		}
 	},
 }

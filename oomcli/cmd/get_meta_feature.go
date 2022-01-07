@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"os"
 
 	"github.com/pkg/errors"
@@ -39,11 +38,11 @@ var getMetaFeatureCmd = &cobra.Command{
 
 		features, err := queryFeatures(ctx, oomStore, getMetaFeatureOpt)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 
 		if err := serializeFeatureToWriter(os.Stdout, features, *getMetaOutput); err != nil {
-			log.Fatalf("failed printing features: %+v\n", err)
+			exitf("failed printing features: %+v\n", err)
 		}
 	},
 }

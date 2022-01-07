@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"os"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -23,7 +24,7 @@ const (
 func mustOpenOomStore(ctx context.Context, opt types.OomStoreConfig) *oomstore.OomStore {
 	store, err := oomstore.Open(ctx, oomStoreCfg)
 	if err != nil {
-		log.Fatalf("failed opening OomStore: %+v", err)
+		exitf("failed opening OomStore: %+v", err)
 	}
 	return store
 }
@@ -39,4 +40,16 @@ func groupsToApplyGroupItems(ctx context.Context, store *oomstore.OomStore, grou
 		return nil, err
 	}
 	return apply.FromGroupList(groups, features), nil
+}
+
+func exitf(format string, a ...interface{}) {
+	msg := fmt.Sprintf(format, a...)
+	fmt.Fprintf(os.Stderr, "Error: %s", msg)
+	os.Exit(1)
+}
+
+func exit(a ...interface{}) {
+	msg := fmt.Sprint(a...)
+	fmt.Fprintf(os.Stderr, "Error: %s", msg)
+	os.Exit(1)
 }

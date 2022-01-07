@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"log"
 
 	"github.com/spf13/cobra"
 
@@ -16,7 +15,7 @@ var registerGroupCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if registerGroupOpt.Category != types.CategoryBatch && registerGroupOpt.Category != types.CategoryStream {
-			log.Fatalf("illegal category '%s', should be either 'stream' or 'batch'", registerGroupOpt.Category)
+			exitf("illegal category '%s', should be either 'stream' or 'batch'", registerGroupOpt.Category)
 		}
 
 		registerGroupOpt.GroupName = args[0]
@@ -27,7 +26,7 @@ var registerGroupCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if _, err := oomStore.CreateGroup(ctx, registerGroupOpt); err != nil {
-			log.Fatalf("failed registering new group: %+v\n", err)
+			exitf("failed registering new group: %+v\n", err)
 		}
 	},
 }
