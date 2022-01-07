@@ -37,14 +37,14 @@ func TestOnlineGet(t *testing.T) {
 		{
 			description: "no available features",
 			opt: types.OnlineGetOpt{
-				FeatureFullNames: []string{"f1", "f2"},
+				FeatureFullNames: []string{"a.f1", "a.f2"},
 				EntityKey:        "1234",
 			},
 			features:      nil,
 			expectedError: nil,
 			expected: &types.FeatureValues{
 				EntityKey:        "1234",
-				FeatureFullNames: []string{"f1", "f2"},
+				FeatureFullNames: []string{"a.f1", "a.f2"},
 				FeatureValueMap:  map[string]interface{}{},
 			},
 		},
@@ -124,7 +124,7 @@ func TestOnlineMultiGet(t *testing.T) {
 		{
 			description: "no available features, return nil",
 			opt: types.OnlineMultiGetOpt{
-				FeatureFullNames: []string{"f1", "f2"},
+				FeatureFullNames: []string{"a.f1", "a.f2"},
 				EntityKeys:       []string{"1234", "1235"},
 			},
 			features:      nil,
@@ -219,6 +219,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 	features := types.FeatureList{
 		{
 			Name:      "model",
+			FullName:  "device.model",
 			ValueType: types.String,
 			GroupID:   1,
 			Group: &types.Group{
@@ -231,6 +232,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 		},
 		{
 			Name:      "price",
+			FullName:  "device.price",
 			ValueType: types.Int64,
 			GroupID:   2,
 			Group: &types.Group{
@@ -243,6 +245,7 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 		},
 		{
 			Name:      "age",
+			FullName:  "user.age",
 			ValueType: types.Int64,
 			GroupID:   3,
 			Group: &types.Group{

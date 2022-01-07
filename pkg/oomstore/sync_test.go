@@ -134,7 +134,11 @@ func TestSync(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 			tc.mockFn()
-			require.Equal(t, tc.expectedError, store.Sync(ctx, tc.opt))
+			err := store.Sync(ctx, tc.opt)
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.Equal(t, tc.expectedError.Error(), err.Error())
+			}
 		})
 	}
 }
