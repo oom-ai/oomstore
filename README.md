@@ -28,11 +28,11 @@
 
 ## Overview
 
-The name "OOM" is derived from **O**nline Store, **O**ffline Store, and **M**etadata Store that put together oomstore.
-It allows you to define features with YAML,
-store features in databases of choice,
-and retrieve features in both online and offline use cases, fast.
+oomstore allows you to:
 
+- Define features with YAML
+- Store features in databases of choice (see [supported databases](https://oom.ai/docs/supported-databases))
+- Retrieve features for both online and offline use, fast (see [benchmark](https://oom.ai/docs/benchmark))
 
 Please see our [docs](https://oom.ai/docs) for more details.
 
@@ -62,17 +62,17 @@ Compared to other feature store implementations, oomstore has its edges:
 2. `oomcli init` to initialize oomstore. Make sure there is a `~/.config/oomstore/config.yaml` as below.
 
 ```yaml
-store: &pg
-  postgres:
-    host: 127.0.0.1
-    port: 5432
-    user: postgres
-    password: postgres
-    database: oomstore
+online-store:
+  sqlite:
+    db-file: /tmp/oomstore.db
 
-online-store: *pg
-offline-store: *pg
-metadata-store: *pg
+offline-store:
+  sqlite:
+    db-file: /tmp/oomstore.db
+
+metadata-store:
+  sqlite:
+    db-file: /tmp/oomstore.db
 ```
 
 3. `oomcli apply -f config.yaml` to register metadata. See config.yaml below.
@@ -80,6 +80,7 @@ metadata-store: *pg
 ```yaml
 kind: Entity
 name: user
+length: 8
 description: 'user ID'
 groups:
 - name: account
@@ -129,48 +130,47 @@ oomcli sync --revision-id 2
 ```bash
 oomcli get online \
   --entity-key 1006 \
-  --feature state,credit_score,account_age_days,has_2fa_installed,transaction_count_7d,transaction_count_30d
+  --feature account.state,account.credit_score,account.account_age_days,account.has_2fa_installed,transaction_stats.transaction_count_7d,transaction_stats.transaction_count_30d
 ```
 
 ```text
-+------+-----------+--------------+------------------+-------------------+----------------------+-----------------------+
-| user |   state   | credit_score | account_age_days | has_2fa_installed | transaction_count_7d | transaction_count_30d |
-+------+-----------+--------------+------------------+-------------------+----------------------+-----------------------+
-| 1006 | Louisiana |          710 |               32 | false             |                    8 |                    22 |
-+------+-----------+--------------+------------------+-------------------+----------------------+-----------------------+
++------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
+| user | account.state | account.credit_score | account.account_age_days | account.has_2fa_installed | transaction_stats.transaction_count_7d | transaction_stats.transaction_count_30d |
++------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
+| 1006 | Louisiana     |                  710 |                       32 | false                     |                                      8 |                                      22 |
++------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
 ```
 
 7. Generate training datasets via point-in-time join.
 
 ```sh
 oomcli join \
-  --feature state,credit_score,account_age_days,has_2fa_installed,transaction_count_7d,transaction_count_30d \
-  --input-file label.csv
+	--feature account.state,account.credit_score,account.account_age_days,account.has_2fa_installed,transaction_stats.transaction_count_7d,transaction_stats.transaction_count_30d \
+	--input-file label.csv
 ```
 
 ```text
-+------------+------------+--------------+--------------+------------------+-------------------+----------------------+-----------------------+
-| entity_key | unix_time  |    state     | credit_score | account_age_days | has_2fa_installed | transaction_count_7d | transaction_count_30d |
-+------------+------------+--------------+--------------+------------------+-------------------+----------------------+-----------------------+
-|       1001 | 1950049136 | Arizona      |          685 |             1547 | false             |                    9 |                    41 |
-|       1002 | 1950236233 | Hawaii       |          625 |              861 | true              |                   11 |                    36 |
-|       1003 | 1950411318 | Arkansas     |          730 |              958 | false             |                    0 |                    16 |
-|       1004 | 1950653614 | Louisiana    |          610 |             1570 | false             |                   12 |                    26 |
-|       1005 | 1950166137 | South Dakota |          635 |             1953 | false             |                    7 |                    30 |
-|       1006 | 1950403162 | Louisiana    |          710 |               32 | false             |                    8 |                    22 |
-|       1007 | 1950160030 | New Mexico   |          645 |               37 | true              |                    5 |                    40 |
-|       1008 | 1950274859 | Nevada       |          735 |             1627 | false             |                   12 |                    51 |
-|       1009 | 1949958846 | Kentucky     |          650 |               88 | true              |                   11 |                    23 |
-|       1010 | 1949920686 | Delaware     |          680 |             1687 | false             |                    2 |                    39 |
-+------------+------------+--------------+--------------+------------------+-------------------+----------------------+-----------------------+
++------------+------------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
+| entity_key | unix_milli | account.state | account.credit_score | account.account_age_days | account.has_2fa_installed | transaction_stats.transaction_count_7d | transaction_stats.transaction_count_30d |
++------------+------------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
+|       1002 | 1950236233 | Hawaii        |                  625 |                      861 | true                      |                                     11 |                                      36 |
+|       1003 | 1950411318 | Arkansas      |                  730 |                      958 | false                     |                                      0 |                                      16 |
+|       1004 | 1950653614 | Louisiana     |                  610 |                     1570 | false                     |                                     12 |                                      26 |
+|       1005 | 1950166137 | South Dakota  |                  635 |                     1953 | false                     |                                      7 |                                      30 |
+|       1006 | 1950403162 | Louisiana     |                  710 |                       32 | false                     |                                      8 |                                      22 |
+|       1007 | 1950160030 | New Mexico    |                  645 |                       37 | true                      |                                      5 |                                      40 |
+|       1008 | 1950274859 | Nevada        |                  735 |                     1627 | false                     |                                     12 |                                      51 |
+|       1009 | 1949958846 | Kentucky      |                  650 |                       88 | true                      |                                     11 |                                      23 |
+|       1010 | 1949920686 | Delaware      |                  680 |                     1687 | false                     |                                      2 |                                      39 |
++------------+------------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
 ```
 
 See [Quickstart](https://oom.ai/docs/quickstart) for more complete details.
 
 ## Roadmap
 
-We are looking to support stream features. See [Roadmap](https://oom.ai/docs/roadmap) for more details.
+See [Roadmap](https://oom.ai/docs/roadmap) for more details.
 
 ## Community
 
-Feel free to join our [Slack Community](https://oom.ai/slack) for questions and suggestions!
+Feel free to [join the community](https://oom.ai/slack) for questions and suggestions!
