@@ -43,7 +43,7 @@ var importCmd = &cobra.Command{
 		if err != nil {
 			exitf("failed importing features: %+v\n", err)
 		}
-		fmt.Fprintf(os.Stderr, "succeeded")
+		fmt.Fprintln(os.Stderr, "succeeded")
 		fmt.Printf("RevisionID: %d\n", revisionID)
 	},
 }

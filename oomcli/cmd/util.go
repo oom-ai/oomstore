@@ -44,12 +44,12 @@ func groupsToApplyGroupItems(ctx context.Context, store *oomstore.OomStore, grou
 
 func exitf(format string, a ...interface{}) {
 	msg := fmt.Sprintf(format, a...)
-	fmt.Fprintf(os.Stderr, "Error: %s", msg)
+	fmt.Fprintf(os.Stderr, "Error: %s\n", msg)
 	os.Exit(1)
 }
 
 func exit(a ...interface{}) {
 	msg := fmt.Sprint(a...)
-	fmt.Fprintf(os.Stderr, "Error: %s", msg)
+	fmt.Fprintf(os.Stderr, "Error: %s\n", msg)
 	os.Exit(1)
 }

@@ -52,7 +52,7 @@ var editFeatureCmd = &cobra.Command{
 		if err = edit(ctx, oomStore, fileName); err != nil {
 			exitf("apply failed: %+v", err)
 		}
-		fmt.Fprintf(os.Stderr, "applied")
+		fmt.Fprintln(os.Stderr, "applied")
 	},
 }
 
