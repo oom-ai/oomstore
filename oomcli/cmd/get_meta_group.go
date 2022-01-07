@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"os"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -29,7 +28,7 @@ var getMetaGroupCmd = &cobra.Command{
 		}
 
 		if len(args) > 1 {
-			log.Fatalf("argument at most one, got %d", len(args))
+			exitf("argument at most one, got %d", len(args))
 		} else if len(args) == 1 {
 			getMetaGroupOpt.groupName = &args[0]
 		}
@@ -41,11 +40,11 @@ var getMetaGroupCmd = &cobra.Command{
 
 		groups, err := queryGroups(ctx, oomStore, getMetaGroupOpt.entityName, getMetaGroupOpt.groupName)
 		if err != nil {
-			log.Fatalf("%+v", err)
+			exitf("%+v", err)
 		}
 
 		if err = serializeGroupToWriter(ctx, os.Stdout, oomStore, groups, *getMetaOutput); err != nil {
-			log.Fatalf("%+v", err)
+			exitf("%+v", err)
 		}
 	},
 }

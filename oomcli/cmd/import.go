@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"log"
+	"os"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
@@ -38,12 +38,12 @@ var importCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		log.Println("importing features ...")
+		fmt.Println("importing features ...")
 		revisionID, err := oomStore.Import(ctx, importOpt)
 		if err != nil {
-			log.Fatalf("failed importing features: %+v\n", err)
+			exitf("failed importing features: %+v\n", err)
 		}
-		log.Println("succeeded")
+		fmt.Fprintf(os.Stderr, "succeeded")
 		fmt.Printf("RevisionID: %d\n", revisionID)
 	},
 }

@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"encoding/csv"
-	"log"
 	"os"
 
 	"github.com/olekukonko/tablewriter"
@@ -26,11 +25,11 @@ var getOnlineCmd = &cobra.Command{
 
 		featureValues, err := oomStore.OnlineGet(ctx, onlineGetOpt)
 		if err != nil {
-			log.Fatalf("failed getting online features: %+v", err)
+			exitf("failed getting online features: %+v", err)
 		}
 
 		if err := printOnlineFeatures(featureValues, *getOutput); err != nil {
-			log.Fatalf("failed printing online feature values, error %+v\n", err)
+			exitf("failed printing online feature values, error %+v\n", err)
 		}
 	},
 }

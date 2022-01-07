@@ -54,12 +54,10 @@ func initConfig() {
 	}
 	cfgContent, err := ioutil.ReadFile(cfgFile)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed reading config file: %v\n", err)
-		os.Exit(1)
+		exitf("failed reading config file: %v\n", err)
 	}
 
 	if err := yaml.Unmarshal(cfgContent, &oomStoreCfg); err != nil {
-		fmt.Fprintf(os.Stderr, "failed loading config : %v\n", err)
-		os.Exit(1)
+		exitf("failed loading config : %v\n", err)
 	}
 }

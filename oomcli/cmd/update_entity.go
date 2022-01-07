@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"log"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
@@ -26,7 +25,7 @@ var updateEntityCmd = &cobra.Command{
 		defer oomStore.Close()
 
 		if err := oomStore.UpdateEntity(ctx, updateEntityOpt); err != nil {
-			log.Fatalf("failed to update entity id=%s, err %+v\n", updateEntityOpt.EntityName, err)
+			exitf("failed to update entity id=%s, err %+v\n", updateEntityOpt.EntityName, err)
 		}
 	},
 }

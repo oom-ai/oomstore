@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"io"
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -24,7 +23,7 @@ var getMetaEntityCmd = &cobra.Command{
 	Short: "Get existing entity given specific conditions",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
-			log.Fatalf("argument at most one, got %d", len(args))
+			exitf("argument at most one, got %d", len(args))
 		} else if len(args) == 1 {
 			getMetaEntityOpt.entityName = &args[0]
 		}
@@ -36,11 +35,11 @@ var getMetaEntityCmd = &cobra.Command{
 
 		entities, err := queryEntities(ctx, oomStore, getMetaEntityOpt.entityName)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 
 		if err = serializeEntitiesToWriter(ctx, os.Stdout, oomStore, entities, *getMetaOutput); err != nil {
-			log.Fatalf("failed printing entities, error: %+v\n", err)
+			exitf("failed printing entities, error: %+v\n", err)
 		}
 	},
 }

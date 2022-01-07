@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"os"
+
+	"github.com/spf13/cobra"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/spf13/cobra"
 )
 
 var syncOpt types.SyncOpt
@@ -18,11 +20,12 @@ var syncCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		log.Println("syncing features ...")
+		fmt.Fprintf(os.Stderr, "syncing features ...")
 		if err := oomStore.Sync(ctx, syncOpt); err != nil {
-			log.Fatalf("failed sync features: %+v\n", err)
+			exitf("failed sync features: %+v\n", err)
 		}
-		log.Println("succeeded.")
+
+		fmt.Fprintf(os.Stderr, "succeeded.")
 	},
 }
 

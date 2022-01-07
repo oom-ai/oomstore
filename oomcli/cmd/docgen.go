@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -38,7 +37,7 @@ func genDocTree(sb *strings.Builder, cmd *cobra.Command) {
 	out := new(bytes.Buffer)
 	err := genMarkdown(cmd, out)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	sb.WriteString(out.String())
 
