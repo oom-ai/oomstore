@@ -171,6 +171,10 @@ func prepareTableSchema(dbOpt dbutil.DBOpt, entity types.Entity, tableName strin
 		entityType = "VARCHAR(255)"
 		valueType = "TEXT"
 		qtTableName = qt(tableName)
+	case types.BackendSnowflake:
+		entityType = "TEXT"
+		valueType = "TEXT"
+		qtTableName = fmt.Sprintf("PUBLIC.%s", qt(tableName))
 	default:
 		entityType = "TEXT"
 		valueType = "TEXT"

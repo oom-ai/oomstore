@@ -57,7 +57,11 @@ func createTableDDL(tableName string, columns ColumnList, pkFields []string, bac
 			panic(fmt.Sprintf("unsupported backend type %s", backend))
 		}
 	}
-	return fmt.Sprintf("CREATE TABLE %s (\n%s\n)", qt(tableName), tableDef)
+	tableName = qt(tableName)
+	if backend == types.BackendSnowflake {
+		tableName = fmt.Sprintf("PUBLIC.%s", tableName)
+	}
+	return fmt.Sprintf("CREATE TABLE %s (\n%s\n)", tableName, tableDef)
 }
 
 func BuildIndexDDL(tableName string, indexName string, fields []string, backend types.BackendType) string {
