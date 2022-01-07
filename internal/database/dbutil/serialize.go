@@ -19,6 +19,8 @@ func DeserializeByValueType(i interface{}, valueType types.ValueType, backend ty
 	switch backend {
 	case types.BackendCassandra:
 		deserializer = cassandraDeserializer
+	case types.BackendDynamoDB:
+		deserializer = dynamoDeserializer
 	case types.BackendSnowflake:
 		deserializer = snowflakeDeserializer
 	default:
@@ -57,6 +59,25 @@ func cassandraDeserializer(i interface{}, valueType types.ValueType) (interface{
 		}
 	}
 	return i, nil
+}
+
+func dynamoDeserializer(i interface{}, valueType types.ValueType) (interface{}, error) {
+	switch valueType {
+	case types.Int64:
+		v, ok := i.(float64)
+		if !ok {
+			return "", errors.Errorf("not float64 %v", i)
+		}
+		return int64(v), nil
+	case types.Time:
+		v, ok := i.(float64)
+		if !ok {
+			return "", errors.Errorf("not float64 %v", i)
+		}
+		return time.UnixMilli(int64(v)), nil
+	default:
+		return i, nil
+	}
 }
 
 func snowflakeDeserializer(i interface{}, valueType types.ValueType) (interface{}, error) {

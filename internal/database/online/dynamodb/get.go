@@ -124,7 +124,7 @@ func deserializeFeatureValues(features oomTypes.FeatureList, item map[string]typ
 		if err := attributevalue.Unmarshal(attributeValue, &value); err != nil {
 			return nil, errors.WithStack(err)
 		}
-		typedValue, err := deserializeByTag(value, feature.ValueType)
+		typedValue, err := dbutil.DeserializeByValueType(value, feature.ValueType, oomTypes.BackendDynamoDB)
 		if err != nil {
 			return nil, err
 		}

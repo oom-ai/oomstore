@@ -22,26 +22,3 @@ func serializeByTag(i interface{}, valueType types.ValueType) (out interface{}, 
 		return i, nil
 	}
 }
-
-func deserializeByTag(i interface{}, valueType types.ValueType) (interface{}, error) {
-	if i == nil {
-		return nil, nil
-	}
-
-	switch valueType {
-	case types.Int64:
-		v, ok := i.(float64)
-		if !ok {
-			return "", errors.Errorf("not float64 %v", i)
-		}
-		return int64(v), nil
-	case types.Time:
-		v, ok := i.(float64)
-		if !ok {
-			return "", errors.Errorf("not float64 %v", i)
-		}
-		return time.UnixMilli(int64(v)), nil
-	default:
-		return i, nil
-	}
-}
