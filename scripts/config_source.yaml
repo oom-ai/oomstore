@@ -24,8 +24,13 @@ tidb:
   password: oomplay
   database: oomplay
 
+tikv:
+  pd-addrs:
+    - 127.0.0.1:22379
+
 cassandra:
-  hosts: ['127.0.0.1:29042']
+  hosts:
+    - 127.0.0.1:29042
   user: oomplay
   password: oomplay
   keyspace: oomplay
