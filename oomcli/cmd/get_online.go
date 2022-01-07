@@ -13,7 +13,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-var onlineGetOpt types.OnlineGetOpt
+var onlineGetOpt types.OnlineMultiGetOpt
 
 var getOnlineCmd = &cobra.Command{
 	Use:   "online",
@@ -23,7 +23,7 @@ var getOnlineCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		featureValues, err := oomStore.OnlineGet(ctx, onlineGetOpt)
+		featureValues, err := oomStore.OnlineMultiGet(ctx, onlineGetOpt)
 		if err != nil {
 			exitf("failed getting online features: %+v", err)
 		}
@@ -39,14 +39,14 @@ func init() {
 
 	flags := getOnlineCmd.Flags()
 
-	flags.StringVarP(&onlineGetOpt.EntityKey, "entity-key", "k", "", "entity key")
+	flags.StringSliceVarP(&onlineGetOpt.EntityKeys, "entity-key", "k", nil, "entity keys")
 	_ = getOnlineCmd.MarkFlagRequired("entity-key")
 
 	flags.StringSliceVar(&onlineGetOpt.FeatureFullNames, "feature", nil, "feature full names")
 	_ = getOnlineCmd.MarkFlagRequired("feature")
 }
 
-func printOnlineFeatures(featureValues *types.FeatureValues, output string) error {
+func printOnlineFeatures(featureValues map[string]*types.FeatureValues, output string) error {
 	switch output {
 	case CSV:
 		return printOnlineFeaturesInCSV(featureValues)
@@ -57,29 +57,43 @@ func printOnlineFeatures(featureValues *types.FeatureValues, output string) erro
 	}
 }
 
-func printOnlineFeaturesInCSV(featureValues *types.FeatureValues) error {
-	header := append([]string{featureValues.EntityName}, featureValues.FeatureFullNames...)
-	record := append([]string{featureValues.EntityKey}, cast.ToStringSlice(featureValues.FeatureValueSlice())...)
+func printOnlineFeaturesInCSV(featureValues map[string]*types.FeatureValues) error {
+	header := getHeader(featureValues)
+	records := getRecord(featureValues)
 
 	w := csv.NewWriter(os.Stdout)
 	if err := w.Write(header); err != nil {
 		return err
 	}
-	if err := w.Write(record); err != nil {
+	if err := w.WriteAll(records); err != nil {
 		return err
 	}
 	w.Flush()
 	return nil
 }
 
-func printOnlineFeaturesInASCIITable(featureValues *types.FeatureValues) error {
-	header := append([]string{featureValues.EntityName}, featureValues.FeatureFullNames...)
-	record := append([]string{featureValues.EntityKey}, cast.ToStringSlice(featureValues.FeatureValueSlice())...)
+func printOnlineFeaturesInASCIITable(featureValues map[string]*types.FeatureValues) error {
+	header := getHeader(featureValues)
+	records := getRecord(featureValues)
 
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetAutoFormatHeaders(false)
 	table.SetHeader(header)
-	table.Append(record)
+	table.AppendBulk(records)
 	table.Render()
 	return nil
+}
+
+func getHeader(featureValues map[string]*types.FeatureValues) []string {
+	for _, v := range featureValues {
+		return append([]string{v.EntityName}, v.FeatureFullNames...)
+	}
+	return nil
+}
+
+func getRecord(featureValues map[string]*types.FeatureValues) (rs [][]string) {
+	for _, v := range featureValues {
+		rs = append(rs, append([]string{v.EntityKey}, cast.ToStringSlice(v.FeatureValueSlice())...))
+	}
+	return
 }
