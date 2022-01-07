@@ -7,7 +7,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	"github.com/spf13/cast"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -87,40 +86,11 @@ func getFeatureValueMapFromRows(rows *sqlx.Rows, features types.FeatureList, bac
 func deserializeIntoRowMap(values []interface{}, features types.FeatureList, backend types.BackendType) (dbutil.RowMap, error) {
 	rs := map[string]interface{}{}
 	for i, v := range values {
-		typedValue, err := deserializeByTag(v, features[i].ValueType, backend)
+		typedValue, err := dbutil.DeserializeByValueType(v, features[i].ValueType, backend)
 		if err != nil {
 			return nil, err
 		}
 		rs[features[i].FullName] = typedValue
 	}
 	return rs, nil
-}
-
-func deserializeByTag(i interface{}, valueType types.ValueType, backend types.BackendType) (interface{}, error) {
-	if i == nil {
-		return nil, nil
-	}
-
-	// TODO: merge with DeserializeByValueType in internal/database/offline/sqlutil/serialize.go
-	switch valueType {
-	case types.String:
-		if backend == types.BackendMySQL {
-			return string(i.([]byte)), nil
-		}
-		return i, nil
-	case types.Bool:
-		if backend == types.BackendMySQL || backend == types.BackendSQLite {
-			s := cast.ToString(i)
-			if s == "1" || s == "true" {
-				return true, nil
-			} else if s == "0" || s == "false" {
-				return false, nil
-			} else {
-				return nil, errors.Errorf("invalid bool value: %s", i)
-			}
-		}
-		return i, nil
-	default:
-		return i, nil
-	}
 }

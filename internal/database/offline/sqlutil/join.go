@@ -287,7 +287,7 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 			}
 			serializedRecord := make([]interface{}, 0, len(record))
 			for i, r := range record {
-				deserializedValue, err := DeserializeByValueType(r, header[i].ValueType, backendType)
+				deserializedValue, err := dbutil.DeserializeByValueType(r, header[i].ValueType, backendType)
 				if err != nil {
 					scanErr = err
 					continue
