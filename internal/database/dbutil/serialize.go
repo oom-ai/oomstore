@@ -17,6 +17,8 @@ func DeserializeByValueType(i interface{}, valueType types.ValueType, backend ty
 	}
 	var deserializer func(i interface{}, valueType types.ValueType) (interface{}, error)
 	switch backend {
+	case types.BackendCassandra:
+		deserializer = cassandraDeserializer
 	case types.BackendSnowflake:
 		deserializer = snowflakeDeserializer
 	default:
@@ -45,6 +47,16 @@ func defaultDeserializer(i interface{}, valueType types.ValueType) (interface{},
 	default:
 		return i, nil
 	}
+}
+
+func cassandraDeserializer(i interface{}, valueType types.ValueType) (interface{}, error) {
+	switch i.(type) {
+	case string:
+		if i == "" {
+			return nil, nil
+		}
+	}
+	return i, nil
 }
 
 func snowflakeDeserializer(i interface{}, valueType types.ValueType) (interface{}, error) {

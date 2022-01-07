@@ -38,7 +38,8 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 
 	rs := make(map[string]interface{}, len(scan))
 	for _, feature := range opt.Features {
-		rs[feature.FullName] = deserializeString(scan[feature.Name])
+		value, _ := dbutil.DeserializeByValueType(scan[feature.Name], feature.ValueType, types.BackendCassandra)
+		rs[feature.FullName] = value
 	}
 	return rs, nil
 }
@@ -78,19 +79,8 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	for _, s := range scan {
 		entityKey, value := deserializeIntoRowMap(s, opt.Entity.Name, opt.Features)
 		rs[entityKey] = value
-
 	}
 	return rs, nil
-}
-
-func deserializeString(i interface{}) interface{} {
-	switch i.(type) {
-	case string:
-		if i == "" {
-			return nil
-		}
-	}
-	return i
 }
 
 func deserializeIntoRowMap(values map[string]interface{}, entityName string, features types.FeatureList) (string, dbutil.RowMap) {
@@ -98,7 +88,8 @@ func deserializeIntoRowMap(values map[string]interface{}, entityName string, fea
 
 	rs := make(dbutil.RowMap)
 	for _, feature := range features {
-		rs[feature.FullName] = deserializeString(values[feature.Name])
+		value, _ := dbutil.DeserializeByValueType(values[feature.Name], feature.ValueType, types.BackendCassandra)
+		rs[feature.FullName] = value
 	}
 	return entityKey, rs
 }
