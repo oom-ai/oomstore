@@ -3,10 +3,12 @@ package sqlite
 import (
 	"context"
 
-	"github.com/mattn/go-sqlite3"
+	"github.com/pkg/errors"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/pkg/errors"
 )
 
 func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateRevisionOpt) (int, string, error) {
@@ -21,8 +23,8 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 	insertQuery := "INSERT INTO feature_group_revision(group_id, revision, snapshot_table, cdc_table, anchored, description) VALUES (?, ?, ?, ?, ?, ?)"
 	res, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(insertQuery), opt.GroupID, opt.Revision, snapshotTable, cdcTable, opt.Anchored, opt.Description)
 	if err != nil {
-		if sqliteErr, ok := err.(sqlite3.Error); ok {
-			if sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+		if sqliteErr, ok := err.(*sqlite.Error); ok {
+			if sqliteErr.Code() == sqlite3.SQLITE_CONSTRAINT_UNIQUE {
 				return 0, "", errors.Errorf("revision already exists: groupID=%d, revision=%d", opt.GroupID, opt.Revision)
 			}
 		}
