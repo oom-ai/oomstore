@@ -20,12 +20,12 @@ var syncCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		fmt.Fprintf(os.Stderr, "syncing features ...")
+		fmt.Fprintln(os.Stderr, "syncing features ...")
 		if err := oomStore.Sync(ctx, syncOpt); err != nil {
 			exitf("failed sync features: %+v\n", err)
 		}
 
-		fmt.Fprintf(os.Stderr, "succeeded.")
+		fmt.Fprintln(os.Stderr, "succeeded.")
 	},
 }
 

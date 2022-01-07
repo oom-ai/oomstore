@@ -34,7 +34,7 @@ var applyCmd = &cobra.Command{
 			exitf("apply failed: %+v", err)
 		}
 
-		fmt.Fprintf(os.Stderr, "applied")
+		fmt.Fprintln(os.Stderr, "applied")
 	},
 }
 
