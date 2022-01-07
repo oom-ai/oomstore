@@ -7,15 +7,16 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"github.com/mattn/go-sqlite3"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/pkg/errors"
 	"github.com/snowflakedb/gosnowflake"
 	"google.golang.org/api/googleapi"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 )
 
 func OpenSQLite(dbFile string) (*sqlx.DB, error) {
-	db, err := sqlx.Open("sqlite3", dbFile)
+	db, err := sqlx.Open("sqlite", dbFile)
 	return db, errors.WithStack(err)
 }
 
@@ -59,10 +60,9 @@ func DeserializeString(i interface{}, backend types.BackendType) string {
 func IsTableNotFoundError(err error, backend types.BackendType) bool {
 	err = errors.Cause(err)
 	switch backend {
-	// https://github.com/mattn/go-sqlite3/issues/244
 	case types.BackendSQLite:
-		if sqliteErr, ok := err.(sqlite3.Error); ok {
-			return sqliteErr.Code == sqlite3.ErrError
+		if sqliteErr, ok := err.(*sqlite.Error); ok {
+			return sqliteErr.Code() == sqlite3.SQLITE_CORE
 		}
 
 	// https://dev.mysql.com/doc/mysql-errors/5.7/en/server-error-reference.html#error_er_no_such_table
