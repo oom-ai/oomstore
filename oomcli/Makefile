@@ -19,7 +19,7 @@ build:
 
 .PHONY: test
 test:
-	@go test -race -coverprofile=coverage.out -covermode=atomic ./...
+	@gotestsum -f testname  -- -coverprofile=cover.out -race -covermode=atomic ./...
 
 .PHONY: integration-test
 integration-test: build

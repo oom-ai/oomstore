@@ -71,6 +71,11 @@ jobs:
         pkg=oomplay-musl_${v}_amd64.deb
         wget https://github.com/oom-ai/oomplay/releases/download/v${v}/${pkg} &&
         sudo dpkg -i ${pkg}
+    - name: Install gotestsum
+      run: |
+        cd ~/bin
+        wget https://github.com/gotestyourself/gotestsum/releases/download/v1.7.0/gotestsum_1.7.0_linux_amd64.tar.gz
+        tar xvf gotestsum_1.7.0_linux_amd64.tar.gz && chmod +x gotestsum
     - name: Run unit tests
       run: make test
       env:
