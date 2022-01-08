@@ -1,6 +1,6 @@
 <h1 align="center">OomStore</h1>
 <p align="center">
-    <em>A Fast Feature Store Powered by Go.</em>
+    <em>Lightweight and Fast Feature Store Powered by Go</em>
 </p>
 
 <p align="center">
@@ -30,11 +30,20 @@
 
 oomstore allows you to:
 
-- Define features with YAML
-- Store features in databases of choice (see [supported databases](https://oom.ai/docs/supported-databases))
-- Retrieve features for both online and offline use, fast (see [benchmark](https://oom.ai/docs/benchmark))
+- Define features with YAML.
+- Store features in databases of choice.
+- Retrieve features for both online serving and offline training, **fast**.
 
 Please see our [docs](https://oom.ai/docs) for more details.
+
+## Features
+
+oomstore's edges:
+
+- 🍼 Simple. Being serverless and CLI-friendly, users can be productive in hours, not months.
+- 🔌 Composable. We support your preferred [databases of choice](https://oom.ai/docs/supported-databases).
+- ⚡ Fast. [Benchmark](https://oom.ai/docs/benchmark) shows oomstore performs QPS > 50k and latency < 0.3 ms with Redis.
+- 🌊 Streaming. We support streaming features to ensure your predictions are up-to-date.
 
 ## Architecture
 
@@ -43,17 +52,6 @@ Please see our [docs](https://oom.ai/docs) for more details.
 </p>
 
 You can interact with oomstore with CLI, Go API or Python API. See [Architecture](https://oom.ai/docs/architecture) for more details.
-
-## Features
-
-Compared to other feature store implementations, oomstore has its edges:
-
-- Fast. Benchmark shows oomstore performs QPS > 50k and latency < 0.3 ms using Redis as the Online Store. For more details, see [benchmark](https://oom.ai/docs/benchmark).
-- Pluggable. We support a wide range of databases already (see below), and there are more to come.
-  - Online Store: DynamoDB, Redis, TiKV, Cassandra, TiDB, PostgreSQL, MySQL, SQLite.
-  - Offline Store: Snowflake, Redshift, BigQuery, TiDB, PostgreSQL, MySQL, SQLite.
-  - Metadata Store: TiDB, PostgreSQL, MySQL, SQLite.
-- Simple. In the minimal, oomstore can run aganist a single MySQL/PostgreSQL database. This helps get started quickly, and you can always switch to a different database later without having to rewrite your code.
 
 ## Quickstart
 
@@ -80,7 +78,6 @@ metadata-store:
 ```yaml
 kind: Entity
 name: user
-length: 8
 description: 'user ID'
 groups:
 - name: account
@@ -167,10 +164,36 @@ oomcli join \
 
 See [Quickstart](https://oom.ai/docs/quickstart) for more complete details.
 
-## Roadmap
+## Supported Databases
 
-See [Roadmap](https://oom.ai/docs/roadmap) for more details.
+### Online Store
+
+- Amazon DynamoDB
+- Redis
+- TiKV
+- Cassandra
+- PostgreSQL
+- MySQL
+- TiDB
+- SQLite
+
+### Offline Store
+
+- Snowflake
+- Amazon Redshift
+- Google BigQuery
+- PostgreSQL
+- MySQL
+- TiDB
+- SQLite
+
+### Metadata Store
+
+- PostgreSQL
+- MySQL
+- TiDB
+- SQLite
 
 ## Community
 
-Feel free to [join the community](https://oom.ai/slack) for questions and suggestions!
+Feel free to [join the community](https://oom.ai/slack) for questions and requests!
