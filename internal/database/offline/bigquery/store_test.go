@@ -77,7 +77,6 @@ func TestImport(t *testing.T) {
 }
 
 func TestExport(t *testing.T) {
-	t.Skip("skip export test for bigquery until we support exporting stream features")
 	test_impl.TestExport(t, prepareStore, destroyStore(DATASET_ID))
 }
 
