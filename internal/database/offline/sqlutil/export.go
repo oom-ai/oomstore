@@ -5,11 +5,12 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/spf13/cast"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/spf13/cast"
 )
 
 func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend types.BackendType) (<-chan types.ExportRecord, <-chan error) {
@@ -22,7 +23,7 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend typ
 	if err != nil {
 		defer close(stream)
 		defer close(errs)
-		errs <- errors.WithStack(err)
+		errs <- errdefs.WithStack(err)
 		return stream, errs
 	}
 
@@ -97,7 +98,7 @@ func buildExportStreamQuery(opt offline.ExportOpt, backend types.BackendType) (s
 		Backend:               backend,
 	})
 	if err != nil {
-		return "", nil, errors.WithStack(err)
+		return "", nil, errdefs.WithStack(err)
 	}
 	if opt.Limit != nil {
 		query += fmt.Sprintf(" LIMIT %d", *opt.Limit)
