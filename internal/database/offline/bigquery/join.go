@@ -58,7 +58,7 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 			record := make([]interface{}, 0, len(recordMap))
 			for i := range header {
 				column := strings.Split(header[i].Name, ".")
-				deserializedValue, err := sqlutil.DeserializeByValueType(recordMap[column[len(column)-1]], header[i].ValueType, backendType)
+				deserializedValue, err := dbutil.DeserializeByValueType(recordMap[column[len(column)-1]], header[i].ValueType, backendType)
 				if err != nil {
 					scanErr = err
 					continue
