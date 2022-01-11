@@ -1,6 +1,7 @@
 package dbutil
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -25,8 +26,11 @@ func DeserializeByValueType(i interface{}, valueType types.ValueType, backend ty
 		deserializer = snowflakeDeserializer
 	case types.BackendRedis, types.BackendTiKV:
 		deserializer = kvDeserializer
+	case types.BackendMySQL, types.BackendPostgres, types.BackendSQLite,
+		types.BackendBigQuery, types.BackendRedshift:
+		deserializer = rdbDeserializer
 	default:
-		deserializer = defaultDeserializer
+		panic(fmt.Sprintf("unsupported backend type %s", backend))
 	}
 
 	value, err := deserializer(i, valueType)
@@ -36,7 +40,7 @@ func DeserializeByValueType(i interface{}, valueType types.ValueType, backend ty
 	return value, nil
 }
 
-func defaultDeserializer(i interface{}, valueType types.ValueType) (interface{}, error) {
+func rdbDeserializer(i interface{}, valueType types.ValueType) (interface{}, error) {
 	switch valueType {
 	case types.Bool:
 		s := strings.ToLower(cast.ToString(i))

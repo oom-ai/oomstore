@@ -15,7 +15,7 @@ const (
 
 func SerializeByValueType(i interface{}, valueType types.ValueType, backend types.BackendType) (interface{}, error) {
 	if i == nil {
-		return "", nil
+		return nil, nil
 	}
 	var serializer func(i interface{}, valueType types.ValueType) (interface{}, error)
 	switch backend {
@@ -24,12 +24,12 @@ func SerializeByValueType(i interface{}, valueType types.ValueType, backend type
 	case types.BackendDynamoDB:
 		serializer = dynamoSerializerByValueType
 	default:
-		return "", fmt.Errorf("unsupported backend type %s", backend)
+		panic(fmt.Sprintf("unsupported backend type %s", backend))
 	}
 
 	value, err := serializer(i, valueType)
 	if err != nil {
-		return "", errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 	return value, nil
 }
@@ -88,7 +88,7 @@ func SerializeByValue(i interface{}, backend types.BackendType) (string, error) 
 	case types.BackendRedis, types.BackendTiKV:
 		serializer = kvSerializerByValue
 	default:
-		return "", fmt.Errorf("unsupported backend type %s", backend)
+		panic(fmt.Sprintf("unsupported backend type %s", backend))
 	}
 
 	value, err := serializer(i)
