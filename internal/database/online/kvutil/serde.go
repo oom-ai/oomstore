@@ -16,36 +16,6 @@ const (
 	KeyPrefixForStreamFeature = "s"
 )
 
-func SerializeByValueType(i interface{}, valueType types.ValueType) (s string, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = errors.Errorf("failed to serailize by tag: %v", r)
-		}
-	}()
-
-	switch valueType {
-	case types.String:
-		return i.(string), nil
-	case types.Int64:
-		return strconv.FormatInt(int64(i.(int64)), serializeIntBase), nil
-	case types.Float64:
-		return strconv.FormatFloat(i.(float64), 'f', -1, 64), nil
-	case types.Bool:
-		if i.(bool) {
-			return "1", nil
-		} else {
-			return "0", nil
-		}
-	case types.Time:
-		return strconv.FormatInt(i.(time.Time).UnixMilli(), serializeIntBase), nil
-
-	case types.Bytes:
-		return string(i.([]byte)), nil
-	default:
-		return "", errors.Errorf("unable to serialize %#v of type %T to string", i, i)
-	}
-}
-
 func SerializeByValue(i interface{}) (string, error) {
 	switch s := i.(type) {
 	case string:
