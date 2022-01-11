@@ -6,7 +6,7 @@ before:
     - go generate ./...
 builds:
   - main: ./oomcli
-    id: "oomcli"
+    id: oomcli
     binary: oomcli
     env:
       - CGO_ENABLED=0
@@ -22,7 +22,7 @@ builds:
         -X github.com/oom-ai/oomstore/version.Commit={{.Commit}}
         -X github.com/oom-ai/oomstore/version.Built={{.CommitDate}}
   - main: ./oomagent
-    id: "oomagent"
+    id: oomagent
     binary: oomagent
     env:
       - CGO_ENABLED=0
@@ -38,6 +38,9 @@ builds:
         -X github.com/oom-ai/oomstore/version.Commit={{.Commit}}
         -X github.com/oom-ai/oomstore/version.Built={{.CommitDate}}
 
+archives:
+  - name_template: "{{ .ProjectName }}-v{{ .Version }}-{{ .Arch }}-{{ .Os }}"
+    wrap_in_directory: "true"
 checksum:
   name_template: "checksums.txt"
 snapshot:
