@@ -23,6 +23,8 @@ func DeserializeByValueType(i interface{}, valueType types.ValueType, backend ty
 		deserializer = dynamoDeserializer
 	case types.BackendSnowflake:
 		deserializer = snowflakeDeserializer
+	case types.BackendRedis, types.BackendTiKV:
+		deserializer = kvDeserializer
 	default:
 		deserializer = defaultDeserializer
 	}
@@ -115,6 +117,47 @@ func snowflakeDeserializer(i interface{}, valueType types.ValueType) (interface{
 		}
 	case types.Time:
 		x, err := strconv.ParseInt(s, 10, 64)
+		return time.UnixMilli(x), err
+
+	case types.Bytes:
+		return []byte(s), nil
+	default:
+		return "", errors.Errorf("unsupported value type: %s", valueType)
+	}
+}
+
+func kvDeserializer(i interface{}, valueType types.ValueType) (interface{}, error) {
+	if i == nil {
+		return nil, nil
+	}
+
+	s, ok := i.(string)
+	if !ok {
+		return nil, errors.Errorf("not a string or nil: %v", i)
+	}
+
+	switch valueType {
+	case types.String:
+		return s, nil
+
+	case types.Int64:
+		x, err := strconv.ParseInt(s, serializeIntBase, 64)
+		return x, err
+
+	case types.Float64:
+		x, err := strconv.ParseFloat(s, 64)
+		return x, err
+
+	case types.Bool:
+		if s == "1" {
+			return true, nil
+		} else if s == "0" {
+			return false, nil
+		} else {
+			return nil, errors.Errorf("invalid bool value: %s", s)
+		}
+	case types.Time:
+		x, err := strconv.ParseInt(s, serializeIntBase, 64)
 		return time.UnixMilli(x), err
 
 	case types.Bytes:

@@ -45,7 +45,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		if v == nil {
 			continue
 		}
-		typedValue, err := kvutil.DeserializeByValueType(v, opt.Features[i].ValueType)
+		typedValue, err := dbutil.DeserializeByValueType(v, opt.Features[i].ValueType, types.BackendRedis)
 		if err != nil {
 			return nil, err
 		}

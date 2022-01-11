@@ -102,7 +102,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		if v == nil {
 			continue
 		}
-		typedValue, err := kvutil.DeserializeByValueType(string(v), inputs[i].feature.ValueType)
+		typedValue, err := dbutil.DeserializeByValueType(string(v), inputs[i].feature.ValueType, types.BackendTiKV)
 		if err != nil {
 			return nil, err
 		}

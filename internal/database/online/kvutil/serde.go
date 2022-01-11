@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 const (
@@ -61,46 +59,5 @@ func SerializeByValue(i interface{}) (string, error) {
 
 	default:
 		return "", errors.Errorf("unable to serialize %#v of type %T to string", i, i)
-	}
-}
-
-func DeserializeByValueType(i interface{}, valueType types.ValueType) (interface{}, error) {
-	if i == nil {
-		return nil, nil
-	}
-
-	s, ok := i.(string)
-	if !ok {
-		return nil, errors.Errorf("not a string or nil: %v", i)
-	}
-
-	switch valueType {
-	case types.String:
-		return s, nil
-
-	case types.Int64:
-		x, err := strconv.ParseInt(s, serializeIntBase, 64)
-		return x, err
-
-	case types.Float64:
-		x, err := strconv.ParseFloat(s, 64)
-		return x, err
-
-	case types.Bool:
-		if s == "1" {
-			return true, nil
-		} else if s == "0" {
-			return false, nil
-		} else {
-			return nil, errors.Errorf("invalid bool value: %s", s)
-		}
-	case types.Time:
-		x, err := strconv.ParseInt(s, serializeIntBase, 64)
-		return time.UnixMilli(x), err
-
-	case types.Bytes:
-		return []byte(s), nil
-	default:
-		return "", errors.Errorf("unsupported value type: %s", valueType)
 	}
 }
