@@ -8,13 +8,13 @@ on:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
-    env:
-        RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Set env
+        run: echo "REF_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -28,5 +28,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: force sync pkg.go.dev
-        run: |
-            curl https://sum.golang.org/lookup/github.com/oom-ai/oomstore@$RELEASE_VERSION
+        run: curl https://sum.golang.org/lookup/github.com/oom-ai/oomstore@${{ env.REF_TAG }}
+      - name: Bump Homebrew formula
+        uses: mislav/bump-homebrew-formula-action@v1
+        with:
+          formula-name: oomcli
+          homebrew-tap: oom-ai/homebrew-oom-ai
+          download-url: https://github.com/oom-ai/oomstore/releases/download/${{ env.REF_TAG }}/oomstore-${{ env.REF_TAG }}-amd64-darwin.tar.gz
+        env:
+          COMMITTER_TOKEN: ${{ secrets.HOMEBREW_COMMITTER_TOKEN }}
