@@ -1,6 +1,7 @@
 package types
 
 import (
+	"sort"
 	"time"
 )
 
@@ -60,6 +61,25 @@ func (l RevisionList) Filter(filter func(*Revision) bool) (rs RevisionList) {
 		}
 	}
 	return
+}
+
+func (l RevisionList) Before(unixMilli int64) *Revision {
+	if len(l) == 0 {
+		return nil
+	}
+	sort.Slice(l, func(i, j int) bool {
+		return l[i].Revision < l[j].Revision
+	})
+	if l[0].Revision > unixMilli {
+		return nil
+	}
+	var i int
+	for i = range l {
+		if l[i].Revision > unixMilli {
+			break
+		}
+	}
+	return l[i-1]
 }
 
 func (l RevisionList) GroupIDs() []int {
