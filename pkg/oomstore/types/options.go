@@ -36,6 +36,12 @@ type ChannelExportOpt struct {
 	Limit        *uint64
 }
 
+type ChannelExportStreamOpt struct {
+	UnixMilli        int64
+	FeatureFullNames []string
+	Limit            *uint64
+}
+
 type ExportOpt struct {
 	RevisionID     int
 	FeatureNames   []string
