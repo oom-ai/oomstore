@@ -66,7 +66,7 @@ endif
 .PHONY: test
 test: codegen
 	@oomplay init $(TEST_PLAYGROUNDS) -j 16
-	@go test -race -coverprofile=coverage.out -covermode=atomic ./...
+	@gotestsum -f testname  -- -coverprofile=cover.out -race -covermode=atomic ./...
 
 .PHONY: integration-test
 integration-test: codegen
