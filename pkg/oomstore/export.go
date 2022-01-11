@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 
@@ -14,7 +16,7 @@ import (
 )
 
 /*
-Export feature values of a particular revision.
+ChannelExport exports batch feature values of a particular revision.
 Usage Example:
 	exportResult, err := store.Export(ctx, opt)
 	if err != nil {
@@ -92,4 +94,49 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
 		}
 	}
 	return exportResult.CheckStreamError()
+}
+
+// ChannelExportStream exports the latest streaming feature values up to the given timestamp.
+// Currently, this API can only export features in one feature group.
+func (s *OomStore) ChannelExportStream(ctx context.Context, opt types.ChannelExportStreamOpt) (*types.ExportResult, error) {
+	if err := validateFeatureFullNames(opt.FeatureFullNames); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
+		FeatureFullNames: &opt.FeatureFullNames,
+	})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	if len(features.GroupIDs()) != 1 {
+		return nil, fmt.Errorf("expected 1 group, got %d groups", len(features.GroupIDs()))
+	}
+	group := features[0].Group
+	revisions, err := s.ListRevision(ctx, &group.ID)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	revision := revisions.Before(opt.UnixMilli)
+	if revision == nil {
+		return nil, fmt.Errorf("no feature values up to %d, use a later timestamp", opt.UnixMilli)
+	}
+	if revision.SnapshotTable == "" {
+		if err = s.Snapshot(ctx, group.Name); err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
+	snapshotTable := dbutil.OfflineStreamSnapshotTableName(group.ID, revision.Revision)
+	cdcTable := dbutil.OfflineStreamCdcTableName(group.ID, revision.Revision)
+	stream, exportErr := s.offline.Export(ctx, offline.ExportOpt{
+		SnapshotTable: snapshotTable,
+		CdcTable:      &cdcTable,
+		UnixMilli:     &opt.UnixMilli,
+		EntityName:    group.Entity.Name,
+		Features:      features,
+		Limit:         opt.Limit,
+	})
+
+	header := append([]string{group.Entity.Name}, features.Names()...)
+	return types.NewExportResult(header, stream, exportErr), nil
 }
