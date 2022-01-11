@@ -3,10 +3,10 @@ package tikv
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
 
 const BatchSize = 100
@@ -14,14 +14,14 @@ const BatchSize = 100
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	var seq int64
 
-	serializedRevisionID, err := kvutil.SerializeByValue(opt.Revision.ID)
+	serializedRevisionID, err := dbutil.SerializeByValue(opt.Revision.ID, Backend)
 	if err != nil {
 		return err
 	}
 
 	var serializedFeatureIDs []string
 	for _, feature := range opt.Features {
-		serializedFeatureID, err := kvutil.SerializeByValue(feature.ID)
+		serializedFeatureID, err := dbutil.SerializeByValue(feature.ID, Backend)
 		if err != nil {
 			return err
 		}
@@ -39,7 +39,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 		entityKey, featureValues := record[0], record[1:]
 
-		serializedEntityKey, err := kvutil.SerializeByValue(entityKey)
+		serializedEntityKey, err := dbutil.SerializeByValue(entityKey, Backend)
 		if err != nil {
 			return err
 		}
@@ -50,13 +50,13 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 				continue
 			}
 
-			serializedFeatureValue, err := kvutil.SerializeByValueType(featureValues[i], opt.Features[i].ValueType)
+			serializedFeatureValue, err := dbutil.SerializeByValueType(featureValues[i], opt.Features[i].ValueType, Backend)
 			if err != nil {
 				return err
 			}
 
 			putKeys = append(putKeys, getKeyOfBatchFeature(serializedRevisionID, serializedEntityKey, serializedFeatureIDs[i]))
-			putVals = append(putVals, []byte(serializedFeatureValue))
+			putVals = append(putVals, []byte(serializedFeatureValue.(string)))
 		}
 
 		seq++

@@ -3,13 +3,13 @@ package redis
 import (
 	"context"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 
-	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
+	"github.com/pkg/errors"
 )
 
 func (db *DB) Purge(ctx context.Context, revisionID int) error {
-	prefix, err := kvutil.SerializeByValue(revisionID)
+	prefix, err := dbutil.SerializeByValue(revisionID, Backend)
 	if err != nil {
 		return nil
 	}

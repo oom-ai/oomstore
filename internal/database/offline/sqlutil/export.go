@@ -50,12 +50,12 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backendType
 				if record[i+1] == nil {
 					continue
 				}
-				v, err := dbutil.DeserializeByValueType(record[i+1], f.ValueType, backendType)
+				deserializedValue, err := dbutil.DeserializeByValueType(record[i+1], f.ValueType, backendType)
 				if err != nil {
 					errs <- err
 					return
 				}
-				record[i+1] = v
+				record[i+1] = deserializedValue
 			}
 			stream <- record
 		}

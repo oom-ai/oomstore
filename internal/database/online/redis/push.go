@@ -3,8 +3,8 @@ package redis
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
@@ -20,16 +20,16 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 			continue
 		}
 
-		featureValue, err := kvutil.SerializeByValueType(value, opt.Features[i].ValueType)
+		featureValue, err := dbutil.SerializeByValueType(value, opt.Features[i].ValueType, Backend)
 		if err != nil {
 			return err
 		}
 
-		featureID, err := kvutil.SerializeByValue(opt.Features[i].ID)
+		featureID, err := dbutil.SerializeByValue(opt.Features[i].ID, Backend)
 		if err != nil {
 			return err
 		}
-		featureValues[featureID] = featureValue
+		featureValues[featureID] = featureValue.(string)
 	}
 
 	db.HSet(ctx, key, featureValues)

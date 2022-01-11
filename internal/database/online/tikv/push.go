@@ -3,17 +3,17 @@ package tikv
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 	"github.com/pkg/errors"
 )
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	serializedEntityKey, err := kvutil.SerializeByValue(opt.EntityKey)
+	serializedEntityKey, err := dbutil.SerializeByValue(opt.EntityKey, Backend)
 	if err != nil {
 		return err
 	}
-	serializedGroupID, err := kvutil.SerializeByValue(opt.GroupID)
+	serializedGroupID, err := dbutil.SerializeByValue(opt.GroupID, Backend)
 	if err != nil {
 		return err
 	}
@@ -28,18 +28,18 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 			continue
 		}
 
-		serializedFeatureID, err := kvutil.SerializeByValue(opt.Features[i].ID)
+		serializedFeatureID, err := dbutil.SerializeByValue(opt.Features[i].ID, Backend)
 		if err != nil {
 			return err
 		}
 
-		serializedFeatureValue, err := kvutil.SerializeByValueType(value, opt.Features[i].ValueType)
+		serializedFeatureValue, err := dbutil.SerializeByValueType(value, opt.Features[i].ValueType, Backend)
 		if err != nil {
 			return err
 		}
 
 		putKeys = append(putKeys, getKeyOfStreamFeature(serializedGroupID, serializedEntityKey, serializedFeatureID))
-		putVals = append(putVals, []byte(serializedFeatureValue))
+		putVals = append(putVals, []byte(serializedFeatureValue.(string)))
 	}
 
 	// We don't expire keys using TTL
