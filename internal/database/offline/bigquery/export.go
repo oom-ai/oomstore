@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"google.golang.org/api/iterator"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
@@ -41,7 +41,7 @@ func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.E
 				break
 			}
 			if err != nil {
-				errs <- errors.Errorf("failed at rows.Next, err=%v", err)
+				errs <- errdefs.Errorf("failed at rows.Next, err=%v", err)
 				return
 			}
 			record := make([]interface{}, 0, len(recordMap))

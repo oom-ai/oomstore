@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/spf13/cast"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
@@ -30,7 +30,7 @@ type DB struct {
 func Open(ctx context.Context, opt *types.BigQueryOpt) (*DB, error) {
 	client, err := bigquery.NewClient(ctx, opt.ProjectID, option.WithCredentialsJSON([]byte(opt.Credentials)))
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	return &DB{
 		Client:    client,
@@ -41,14 +41,14 @@ func Open(ctx context.Context, opt *types.BigQueryOpt) (*DB, error) {
 func (db *DB) Ping(ctx context.Context) error {
 	q := db.Client.Query("SELECT 1")
 	_, err := q.Read(ctx)
-	return errors.WithStack(err)
+	return errdefs.WithStack(err)
 }
 
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
 	q := fmt.Sprintf(`SELECT column_name, data_type FROM %s.INFORMATION_SCHEMA.COLUMNS WHERE table_name = "%s"`, db.datasetID, tableName)
 	rows, err := db.Query(q).Read(ctx)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	var schema types.DataTableSchema
 	for {
@@ -58,7 +58,7 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 			break
 		}
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errdefs.WithStack(err)
 		}
 		valueType, err := dbutil.ValueType(Backend, cast.ToString(recordMap["data_type"]))
 		if err != nil {
@@ -79,13 +79,13 @@ func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
 		BigQueryDB: db.Client,
 		DatasetID:  &db.datasetID,
 	}
-	return errors.WithStack(sqlutil.Snapshot(ctx, dbOpt, opt))
+	return errdefs.WithStack(sqlutil.Snapshot(ctx, dbOpt, opt))
 }
 
 func (db *DB) CreateTable(ctx context.Context, opt offline.CreateTableOpt) error {
 	schema := dbutil.BuildTableSchema(opt.TableName, opt.Entity, opt.IsCDC, opt.Features, nil, Backend)
 	if _, err := db.Client.Query(schema).Run(ctx); err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 	return nil
 }

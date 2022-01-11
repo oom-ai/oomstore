@@ -3,7 +3,7 @@ package types
 import (
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 )
 
 type BackendType string
@@ -154,7 +154,7 @@ func (cfg *MetadataStoreConfig) Validate() error {
 		n++
 	}
 	if n != 1 {
-		return errors.Errorf("require exactly one metadata store backend")
+		return errdefs.Errorf("require exactly one metadata store backend")
 	}
 	return nil
 }
@@ -194,7 +194,7 @@ func (cfg *OnlineStoreConfig) Validate() error {
 		n++
 	}
 	if n != 1 {
-		return errors.Errorf("require exactly one online store backend")
+		return errdefs.Errorf("require exactly one online store backend")
 	}
 	return nil
 }
@@ -230,7 +230,7 @@ func (cfg *OfflineStoreConfig) Validate() error {
 		n++
 	}
 	if n != 1 {
-		return errors.Errorf("require exactly one offline store backend")
+		return errdefs.Errorf("require exactly one offline store backend")
 	}
 	return nil
 }

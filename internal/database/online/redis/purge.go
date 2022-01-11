@@ -5,7 +5,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 )
 
 func (db *DB) Purge(ctx context.Context, revisionID int) error {
@@ -20,12 +20,12 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 	for {
 		keys, cursor, err = db.Scan(ctx, cursor, pattern, PipelineBatchSize).Result()
 		if err != nil {
-			return errors.WithStack(err)
+			return errdefs.WithStack(err)
 		}
 
 		if len(keys) > 0 {
 			if _, err = db.Del(ctx, keys...).Result(); err != nil {
-				return errors.WithStack(err)
+				return errdefs.WithStack(err)
 			}
 		}
 

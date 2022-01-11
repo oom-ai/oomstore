@@ -7,8 +7,8 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 	"github.com/snowflakedb/gosnowflake"
 )
 
@@ -25,7 +25,7 @@ type DB struct {
 
 func (db *DB) Ping(ctx context.Context) error {
 	err := db.PingContext(ctx)
-	return errors.WithStack(err)
+	return errdefs.WithStack(err)
 }
 
 func Open(opt *types.SnowflakeOpt) (*DB, error) {
@@ -36,12 +36,12 @@ func Open(opt *types.SnowflakeOpt) (*DB, error) {
 		Database: opt.Database,
 	})
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 
 	db, err := sqlx.Open("snowflake", dsn)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 
 	return &DB{DB: db}, nil
@@ -62,7 +62,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
 	rows, err := db.QueryxContext(ctx, "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = ?", tableName)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	return sqlutil.SqlxTableSchema(ctx, db, types.BackendSnowflake, rows)
 }

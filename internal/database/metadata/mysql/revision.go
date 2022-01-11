@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
@@ -24,14 +24,14 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 	if err != nil {
 		if er, ok := err.(*mysql.MySQLError); ok {
 			if er.Number == ER_DUP_ENTRY {
-				return 0, "", errors.Errorf("revision already exists: groupID=%d, revision=%d", opt.GroupID, opt.Revision)
+				return 0, "", errdefs.Errorf("revision already exists: groupID=%d, revision=%d", opt.GroupID, opt.Revision)
 			}
 		}
-		return 0, "", errors.WithStack(err)
+		return 0, "", errdefs.WithStack(err)
 	}
 	revisionID, err := res.LastInsertId()
 	if err != nil {
-		return 0, "", errors.WithStack(err)
+		return 0, "", errdefs.WithStack(err)
 	}
 
 	if opt.SnapshotTable == nil {
@@ -39,14 +39,14 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 		snapshotTable = dbutil.OfflineBatchTableName(opt.GroupID, revisionID)
 		result, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(updateQuery), snapshotTable, revisionID)
 		if err != nil {
-			return 0, "", errors.WithStack(err)
+			return 0, "", errdefs.WithStack(err)
 		}
 		rowsAffected, err := result.RowsAffected()
 		if err != nil {
-			return 0, "", errors.WithStack(err)
+			return 0, "", errdefs.WithStack(err)
 		}
 		if rowsAffected != 1 {
-			return 0, "", errors.Errorf("failed to update revision %d: revision not found", revisionID)
+			return 0, "", errdefs.Errorf("failed to update revision %d: revision not found", revisionID)
 		}
 	}
 	return int(revisionID), snapshotTable, nil

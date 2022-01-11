@@ -3,8 +3,8 @@ package tikv
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/pingcap/log"
-	"github.com/pkg/errors"
 	"github.com/tikv/client-go/v2/config"
 	"github.com/tikv/client-go/v2/rawkv"
 	"go.uber.org/zap/zapcore"
@@ -29,7 +29,7 @@ type DB struct {
 func Open(opt *types.TiKVOpt) (*DB, error) {
 	db, err := rawkv.NewClient(context.Background(), opt.PdAddrs, config.DefaultConfig().Security)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	return &DB{db}, nil
 }
@@ -40,7 +40,7 @@ func (db *DB) Close() error {
 
 func (db *DB) Ping(ctx context.Context) error {
 	_, err := db.Client.Get(ctx, []byte(""))
-	return errors.WithStack(err)
+	return errdefs.WithStack(err)
 }
 
 func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {

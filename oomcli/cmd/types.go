@@ -3,8 +3,8 @@ package cmd
 import (
 	"time"
 
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 )
 
 type FlattenEntity struct {
@@ -131,7 +131,7 @@ func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenL
 			dataTokens = append(dataTokens, tokens)
 		}
 	default:
-		return nil, nil, errors.Errorf("unsupported type %T", i)
+		return nil, nil, errdefs.Errorf("unsupported type %T", i)
 	}
 	headerTokens, err = parseTokens(element)
 	if err != nil {

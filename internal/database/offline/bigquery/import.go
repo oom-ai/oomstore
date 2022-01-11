@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -28,7 +28,7 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 				return f.Name == h
 			})
 			if feature == nil {
-				return 0, errors.Errorf("missing feature %s", h)
+				return 0, errdefs.Errorf("missing feature %s", h)
 			}
 			fieldType, err := convertValueTypeToBigQueryType(feature.ValueType)
 			if err != nil {
@@ -49,7 +49,7 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 	}
 	tableRef := db.Dataset(db.datasetID).Table(tableID)
 	if err := tableRef.Create(ctx, metaData); err != nil {
-		return 0, errors.WithStack(err)
+		return 0, errdefs.WithStack(err)
 	}
 
 	// Step 3: load data from source
@@ -58,14 +58,14 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 	loader := db.Dataset(db.datasetID).Table(tableID).LoaderFrom(source)
 	job, err := loader.Run(ctx)
 	if err != nil {
-		return 0, errors.WithStack(err)
+		return 0, errdefs.WithStack(err)
 	}
 	status, err := job.Wait(ctx)
 	if err != nil {
-		return 0, errors.WithStack(err)
+		return 0, errdefs.WithStack(err)
 	}
 	if err := status.Err(); err != nil {
-		return 0, errors.WithStack(err)
+		return 0, errdefs.WithStack(err)
 	}
 	return time.Now().UnixMilli(), nil
 }
@@ -85,6 +85,6 @@ func convertValueTypeToBigQueryType(t types.ValueType) (bigquery.FieldType, erro
 	case types.Time:
 		return bigquery.TimeFieldType, nil
 	default:
-		return "", errors.Errorf("unsupported value type %s", t)
+		return "", errdefs.Errorf("unsupported value type %s", t)
 	}
 }

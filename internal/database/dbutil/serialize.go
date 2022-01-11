@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -29,7 +29,7 @@ func SerializeByValueType(i interface{}, valueType types.ValueType, backend type
 
 	value, err := serializer(i, valueType)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	return value, nil
 }
@@ -37,7 +37,7 @@ func SerializeByValueType(i interface{}, valueType types.ValueType, backend type
 func kvSerializerByValueType(i interface{}, valueType types.ValueType) (s interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.Errorf("failed to serailize by tag: %v", r)
+			err = errdefs.Errorf("failed to serailize by tag: %v", r)
 		}
 	}()
 
@@ -60,14 +60,14 @@ func kvSerializerByValueType(i interface{}, valueType types.ValueType) (s interf
 	case types.Bytes:
 		return string(i.([]byte)), nil
 	default:
-		return "", errors.Errorf("unable to serialize %#v of type %T to string", i, i)
+		return "", errdefs.Errorf("unable to serialize %#v of type %T to string", i, i)
 	}
 }
 
 func dynamoSerializerByValueType(i interface{}, valueType types.ValueType) (out interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.Errorf("failed to serailize by value type: %v", r)
+			err = errdefs.Errorf("failed to serailize by value type: %v", r)
 		}
 	}()
 
@@ -93,7 +93,7 @@ func SerializeByValue(i interface{}, backend types.BackendType) (string, error) 
 
 	value, err := serializer(i)
 	if err != nil {
-		return "", errors.WithStack(err)
+		return "", errdefs.WithStack(err)
 	}
 	return value, nil
 }
@@ -142,6 +142,6 @@ func kvSerializerByValue(i interface{}) (string, error) {
 		}
 
 	default:
-		return "", errors.Errorf("unable to serialize %#v of type %T to string", i, i)
+		return "", errdefs.Errorf("unable to serialize %#v of type %T to string", i, i)
 	}
 }

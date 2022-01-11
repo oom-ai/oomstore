@@ -5,7 +5,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 )
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
@@ -44,5 +44,5 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 
 	// We don't expire keys using TTL
 	err = db.BatchPut(ctx, putKeys, putVals, []uint64{})
-	return errors.WithStack(err)
+	return errdefs.WithStack(err)
 }

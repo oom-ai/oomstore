@@ -3,8 +3,8 @@ package database
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	metadataMySQL "github.com/oom-ai/oomstore/internal/database/metadata/mysql"
@@ -48,7 +48,7 @@ func OpenOnlineStore(opt types.OnlineStoreConfig) (online.Store, error) {
 	case types.BackendTiKV:
 		return onlineTiKV.Open(opt.TiKV)
 	default:
-		return nil, errors.Errorf("unsupported backend: %s", opt.Backend)
+		return nil, errdefs.Errorf("unsupported backend: %s", opt.Backend)
 	}
 }
 
@@ -63,7 +63,7 @@ func OpenMetadataStore(opt types.MetadataStoreConfig) (metadata.Store, error) {
 	case types.BackendSQLite:
 		return metadataSQLite.Open(context.Background(), opt.SQLite)
 	default:
-		return nil, errors.Errorf("unsupported backend: %s", opt.Backend)
+		return nil, errdefs.Errorf("unsupported backend: %s", opt.Backend)
 	}
 }
 
@@ -78,7 +78,7 @@ func CreateMetadataDatabase(ctx context.Context, opt types.MetadataStoreConfig) 
 	case types.BackendSQLite:
 		return metadataSQLite.CreateDatabase(ctx, opt.SQLite)
 	default:
-		return errors.Errorf("unsupported backend: %s", opt.Backend)
+		return errdefs.Errorf("unsupported backend: %s", opt.Backend)
 	}
 }
 
@@ -99,6 +99,6 @@ func OpenOfflineStore(ctx context.Context, opt types.OfflineStoreConfig) (offlin
 	case types.BackendSQLite:
 		return offlineSQLite.Open(opt.SQLite)
 	default:
-		return nil, errors.Errorf("unsupported backend: %s", opt.Backend)
+		return nil, errdefs.Errorf("unsupported backend: %s", opt.Backend)
 	}
 }

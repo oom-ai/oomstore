@@ -11,8 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	oomTypes "github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -42,7 +42,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		},
 	})
 	if err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 
 	// Step 2: import items to the table
@@ -90,7 +90,7 @@ func buildItem(record oomTypes.ExportRecord, opt online.ImportOpt) (map[string]t
 	item := make(map[string]types.AttributeValue)
 	entityKeyValue, err := attributevalue.Marshal(record.EntityKey())
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	item[opt.Entity.Name] = entityKeyValue
 
@@ -101,7 +101,7 @@ func buildItem(record oomTypes.ExportRecord, opt online.ImportOpt) (map[string]t
 		}
 		attributeValue, err := attributevalue.Marshal(value)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errdefs.WithStack(err)
 		}
 		item[feature.Name] = attributeValue
 	}

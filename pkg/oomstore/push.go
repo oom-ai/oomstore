@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -21,7 +21,7 @@ func (s *OomStore) Push(ctx context.Context, opt types.PushOpt) error {
 	entity := features[0].Entity()
 	group := features[0].Group
 	if !stringSliceEqual(features.Names(), opt.FeatureNames) {
-		return errors.Errorf("FeatureNames %v does not match with group's features %v", opt.FeatureNames, features.Names())
+		return errdefs.Errorf("FeatureNames %v does not match with group's features %v", opt.FeatureNames, features.Names())
 	}
 	values := make([]interface{}, 0, len(features))
 	for _, f := range features {

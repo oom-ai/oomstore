@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -266,7 +266,7 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 	defer stmt.Close()
 	rows, err := stmt.Queryx()
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 
 	data := make(chan []interface{})
@@ -282,7 +282,7 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 		for rows.Next() {
 			record, err := rows.SliceScan()
 			if err != nil {
-				scanErr = errors.WithStack(err)
+				scanErr = errdefs.WithStack(err)
 				continue
 			}
 			deserializedRecord := make([]interface{}, 0, len(record))

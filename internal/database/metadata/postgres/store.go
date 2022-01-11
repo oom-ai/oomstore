@@ -8,7 +8,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
@@ -56,7 +56,7 @@ func (db *DB) Close() error {
 		return err
 	}
 	if err := db.DB.Close(); err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 	return nil
 }

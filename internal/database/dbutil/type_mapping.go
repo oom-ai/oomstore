@@ -3,8 +3,6 @@ package dbutil
 import (
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -29,12 +27,12 @@ func DBValueType(backend types.BackendType, valueType types.ValueType) (string, 
 	case types.BackendBigQuery:
 		mp = valueTypeToBigQueryType
 	default:
-		return "", errdefs.InvalidAttribute(errors.Errorf("unsupported backend: %s", backend))
+		return "", errdefs.InvalidAttribute(errdefs.Errorf("unsupported backend: %s", backend))
 	}
 
 	t, ok := mp[valueType]
 	if !ok {
-		return "", errdefs.InvalidAttribute(errors.Errorf("unsupported value type: %s", valueType))
+		return "", errdefs.InvalidAttribute(errdefs.Errorf("unsupported value type: %s", valueType))
 	}
 	return t, nil
 }
@@ -56,7 +54,7 @@ func ValueType(backend types.BackendType, dbValueType string) (types.ValueType, 
 	case types.BackendRedshift:
 		mp = redshiftTypeToValueType
 	default:
-		return 0, errdefs.InvalidAttribute(errors.Errorf("unsupported backend: %s", backend))
+		return 0, errdefs.InvalidAttribute(errdefs.Errorf("unsupported backend: %s", backend))
 	}
 	dbValueType = strings.ToLower(dbValueType)
 	i := strings.Index(dbValueType, "(")
@@ -65,7 +63,7 @@ func ValueType(backend types.BackendType, dbValueType string) (types.ValueType, 
 	}
 	t, ok := mp[dbValueType]
 	if !ok {
-		return 0, errdefs.InvalidAttribute(errors.Errorf("unsupported db value type: %s", dbValueType))
+		return 0, errdefs.InvalidAttribute(errdefs.Errorf("unsupported db value type: %s", dbValueType))
 	}
 
 	return t, nil

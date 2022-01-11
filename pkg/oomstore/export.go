@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
-
-	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -54,7 +53,7 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 
 	entity := revision.Group.Entity
 	if entity == nil {
-		return nil, errors.Errorf("failed to get entity id=%d", revision.GroupID)
+		return nil, errdefs.Errorf("failed to get entity id=%d", revision.GroupID)
 	}
 
 	stream, exportErr := s.offline.Export(ctx, offline.ExportOpt{
@@ -100,13 +99,13 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
 // Currently, this API can only export features in one feature group.
 func (s *OomStore) ChannelExportStream(ctx context.Context, opt types.ChannelExportStreamOpt) (*types.ExportResult, error) {
 	if err := validateFeatureFullNames(opt.FeatureFullNames); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
 		FeatureFullNames: &opt.FeatureFullNames,
 	})
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	if len(features.GroupIDs()) != 1 {
 		return nil, fmt.Errorf("expected 1 group, got %d groups", len(features.GroupIDs()))
@@ -114,7 +113,7 @@ func (s *OomStore) ChannelExportStream(ctx context.Context, opt types.ChannelExp
 	group := features[0].Group
 	revisions, err := s.ListRevision(ctx, &group.ID)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	revision := revisions.Before(opt.UnixMilli)
 	if revision == nil {
@@ -122,7 +121,7 @@ func (s *OomStore) ChannelExportStream(ctx context.Context, opt types.ChannelExp
 	}
 	if revision.SnapshotTable == "" {
 		if err = s.Snapshot(ctx, group.Name); err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errdefs.WithStack(err)
 		}
 	}
 

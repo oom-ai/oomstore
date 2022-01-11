@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -23,7 +23,7 @@ func CreateDatabase(ctx context.Context, opt *types.PostgresOpt) (err error) {
 
 	if _, err = defaultDB.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", opt.Database)); err != nil {
 		if e2, ok := err.(*pq.Error); ok && e2.Code != pgerrcode.DuplicateDatabase {
-			return errors.WithStack(err)
+			return errdefs.WithStack(err)
 		}
 	}
 
@@ -42,28 +42,28 @@ func createMetaSchemas(ctx context.Context, db *sqlx.DB) (err error) {
 		// create database functions
 		for _, fn := range DB_FUNCTIONS {
 			if _, err = tx.ExecContext(ctx, fn); err != nil {
-				return errors.WithStack(err)
+				return errdefs.WithStack(err)
 			}
 		}
 
 		// create meta tables
 		for _, schema := range META_TABLE_SCHEMAS {
 			if _, err = tx.ExecContext(ctx, schema); err != nil {
-				return errors.WithStack(err)
+				return errdefs.WithStack(err)
 			}
 		}
 
 		// create foreign keys
 		for _, stmt := range META_TABLE_FOREIGN_KEYS {
 			if _, err = tx.ExecContext(ctx, stmt); err != nil {
-				return errors.WithStack(err)
+				return errdefs.WithStack(err)
 			}
 		}
 
 		// create meta views
 		for _, schema := range META_VIEW_SCHEMAS {
 			if _, err = tx.ExecContext(ctx, schema); err != nil {
-				return errors.WithStack(err)
+				return errdefs.WithStack(err)
 			}
 		}
 
@@ -71,7 +71,7 @@ func createMetaSchemas(ctx context.Context, db *sqlx.DB) (err error) {
 		for table := range META_TABLE_SCHEMAS {
 			trigger := strings.ReplaceAll(TRIGGER_TEMPLATE, `{{TABLE_NAME}}`, table)
 			if _, err = tx.ExecContext(ctx, trigger); err != nil {
-				return errors.WithStack(err)
+				return errdefs.WithStack(err)
 			}
 		}
 

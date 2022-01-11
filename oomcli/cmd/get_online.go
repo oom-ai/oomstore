@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 
@@ -53,7 +53,7 @@ func printOnlineFeatures(featureValues *types.FeatureValues, output string) erro
 	case ASCIITable:
 		return printOnlineFeaturesInASCIITable(featureValues)
 	default:
-		return errors.Errorf("unsupported output format %s", output)
+		return errdefs.Errorf("unsupported output format %s", output)
 	}
 }
 

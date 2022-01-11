@@ -6,9 +6,9 @@ import (
 	"io"
 	"os"
 
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -67,7 +67,7 @@ func queryGroups(ctx context.Context, oomStore *oomstore.OomStore, entityName, g
 		}
 
 		if entityName != nil && group.Entity.Name != *entityName {
-			return nil, errors.Errorf("group '%s' entityName is '%s' not '%s'", *groupName, group.Entity.Name, *entityName)
+			return nil, errdefs.Errorf("group '%s' entityName is '%s' not '%s'", *groupName, group.Entity.Name, *entityName)
 		}
 		return types.GroupList{group}, err
 	}

@@ -6,7 +6,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -30,7 +30,7 @@ func Open(opt *types.MySQLOpt) (*DB, error) {
 }
 
 func (db *DB) Ping(ctx context.Context) error {
-	return errors.WithStack(db.PingContext(ctx))
+	return errdefs.WithStack(db.PingContext(ctx))
 }
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
@@ -62,7 +62,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	)
 
 	_, err := db.ExecContext(ctx, db.Rebind(query), append(cond.InsertValues, cond.UpdateValues...)...)
-	return errors.WithStack(err)
+	return errdefs.WithStack(err)
 }
 
 func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {

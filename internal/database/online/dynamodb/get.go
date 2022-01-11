@@ -2,16 +2,17 @@ package dynamodb
 
 import (
 	"context"
+	"errors"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	oomTypes "github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -29,7 +30,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 
 	entityKeyValue, err := attributevalue.Marshal(opt.EntityKey)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	result, err := db.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(tableName),
@@ -41,7 +42,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		if apiErr := new(types.ResourceNotFoundException); errors.As(err, &apiErr) {
 			return make(dbutil.RowMap), nil
 		}
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	return deserializeFeatureValues(opt.Features, result.Item)
 }
@@ -60,7 +61,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	for _, entityKey := range opt.EntityKeys {
 		entityKeyValue, err := attributevalue.Marshal(entityKey)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errdefs.WithStack(err)
 		}
 		keys = append(keys, map[string]types.AttributeValue{
 			opt.Entity.Name: entityKeyValue,
@@ -88,18 +89,18 @@ func batchGetItem(ctx context.Context, db *DB, keys []map[string]types.Attribute
 	})
 	if err != nil {
 		if apiErr := new(types.ResourceNotFoundException); !errors.As(err, &apiErr) {
-			return errors.WithStack(err)
+			return errdefs.WithStack(err)
 		}
 	}
 
 	for _, item := range result.Responses[tableName] {
 		entityKeyValue, ok := item[entityName]
 		if !ok {
-			return errors.Errorf("could not find entity key column %s in table %s", entityName, tableName)
+			return errdefs.Errorf("could not find entity key column %s in table %s", entityName, tableName)
 		}
 		var entityKey string
 		if err = attributevalue.Unmarshal(entityKeyValue, &entityKey); err != nil {
-			return errors.WithStack(err)
+			return errdefs.WithStack(err)
 		}
 		rowMap, err := deserializeFeatureValues(features, item)
 		if err != nil {
@@ -119,10 +120,10 @@ func deserializeFeatureValues(features oomTypes.FeatureList, item map[string]typ
 	for _, feature := range features {
 		attributeValue, ok := item[feature.Name]
 		if !ok {
-			return nil, errors.Errorf("could not find feature %s", feature.Name)
+			return nil, errdefs.Errorf("could not find feature %s", feature.Name)
 		}
 		if err := attributevalue.Unmarshal(attributeValue, &value); err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errdefs.WithStack(err)
 		}
 		deserializedValue, err := dbutil.DeserializeByValueType(value, feature.ValueType, oomTypes.BackendDynamoDB)
 		if err != nil {
