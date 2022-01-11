@@ -7,7 +7,6 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -45,9 +44,9 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	allBatch = (opt.Group.Category == types.CategoryBatch)
 
 	if allBatch {
-		serializedPrefixKey, err = kvutil.SerializeByValue(*opt.RevisionID)
+		serializedPrefixKey, err = dbutil.SerializeByValue(*opt.RevisionID, Backend)
 	} else {
-		serializedPrefixKey, err = kvutil.SerializeByValue(opt.Group.ID)
+		serializedPrefixKey, err = dbutil.SerializeByValue(opt.Group.ID, Backend)
 	}
 	if err != nil {
 		return nil, err
@@ -55,7 +54,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 
 	var serializedEntityKeys []string
 	for _, entityKey := range opt.EntityKeys {
-		serializedEntityKey, err := kvutil.SerializeByValue(entityKey)
+		serializedEntityKey, err := dbutil.SerializeByValue(entityKey, Backend)
 		if err != nil {
 			return nil, err
 		}
@@ -64,7 +63,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 
 	var serializedFeatureIDs []string
 	for _, feature := range opt.Features {
-		serializedFeatureID, err := kvutil.SerializeByValue(feature.ID)
+		serializedFeatureID, err := dbutil.SerializeByValue(feature.ID, Backend)
 		if err != nil {
 			return nil, err
 		}
@@ -102,7 +101,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		if v == nil {
 			continue
 		}
-		typedValue, err := dbutil.DeserializeByValueType(string(v), inputs[i].feature.ValueType, types.BackendTiKV)
+		typedValue, err := dbutil.DeserializeByValueType(string(v), inputs[i].feature.ValueType, Backend)
 		if err != nil {
 			return nil, err
 		}

@@ -5,12 +5,9 @@ import (
 	"fmt"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-
 	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
@@ -35,12 +32,12 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			if values[i] == nil {
 				continue
 			}
-			featureValue, err := dbutil.SerializeByValueType(values[i], opt.Features[i].ValueType, types.BackendRedis)
+			featureValue, err := dbutil.SerializeByValueType(values[i], opt.Features[i].ValueType, Backend)
 			if err != nil {
 				return err
 			}
 
-			featureID, err := kvutil.SerializeByValue(opt.Features[i].ID)
+			featureID, err := dbutil.SerializeByValue(opt.Features[i].ID, Backend)
 			if err != nil {
 				return err
 			}

@@ -7,7 +7,6 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -28,7 +27,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 
 	featureIDs := []string{}
 	for _, f := range opt.Features {
-		id, err := kvutil.SerializeByValue(f.ID)
+		id, err := dbutil.SerializeByValue(f.ID, Backend)
 		if err != nil {
 			return nil, err
 		}
@@ -45,7 +44,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		if v == nil {
 			continue
 		}
-		typedValue, err := dbutil.DeserializeByValueType(v, opt.Features[i].ValueType, types.BackendRedis)
+		typedValue, err := dbutil.DeserializeByValueType(v, opt.Features[i].ValueType, Backend)
 		if err != nil {
 			return nil, err
 		}

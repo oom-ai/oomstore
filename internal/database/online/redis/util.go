@@ -3,7 +3,7 @@ package redis
 import (
 	"fmt"
 
-	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 )
 
 func serializeRedisKeyForBatchFeature(revisionID int, entityKey interface{}) (string, error) {
@@ -17,12 +17,12 @@ func serializeRedisKeyForStreamFeature(groupID int, entityKey interface{}) (stri
 }
 
 func serializeRediskey(prefixID int, entityKey interface{}) (string, error) {
-	prefix, err := kvutil.SerializeByValue(prefixID)
+	prefix, err := dbutil.SerializeByValue(prefixID, Backend)
 	if err != nil {
 		return "", err
 	}
 
-	suffix, err := kvutil.SerializeByValue(entityKey)
+	suffix, err := dbutil.SerializeByValue(entityKey, Backend)
 	if err != nil {
 		return "", err
 	}

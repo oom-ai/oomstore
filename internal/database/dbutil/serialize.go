@@ -20,7 +20,7 @@ func SerializeByValueType(i interface{}, valueType types.ValueType, backend type
 	var serializer func(i interface{}, valueType types.ValueType) (string, error)
 	switch backend {
 	case types.BackendRedis, types.BackendTiKV:
-		serializer = kvSerializer
+		serializer = kvSerializerByValueType
 	default:
 		return "", fmt.Errorf("unsupported backend type %s", backend)
 	}
@@ -32,7 +32,7 @@ func SerializeByValueType(i interface{}, valueType types.ValueType, backend type
 	return value, nil
 }
 
-func kvSerializer(i interface{}, valueType types.ValueType) (s string, err error) {
+func kvSerializerByValueType(i interface{}, valueType types.ValueType) (s string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = errors.Errorf("failed to serailize by tag: %v", r)
@@ -57,6 +57,73 @@ func kvSerializer(i interface{}, valueType types.ValueType) (s string, err error
 
 	case types.Bytes:
 		return string(i.([]byte)), nil
+	default:
+		return "", errors.Errorf("unable to serialize %#v of type %T to string", i, i)
+	}
+}
+
+func SerializeByValue(i interface{}, backend types.BackendType) (string, error) {
+	if i == nil {
+		return "", nil
+	}
+	var serializer func(i interface{}) (string, error)
+	switch backend {
+	case types.BackendRedis, types.BackendTiKV:
+		serializer = kvSerializerByValue
+	default:
+		return "", fmt.Errorf("unsupported backend type %s", backend)
+	}
+
+	value, err := serializer(i)
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+	return value, nil
+}
+
+func kvSerializerByValue(i interface{}) (string, error) {
+	switch s := i.(type) {
+	case string:
+		return s, nil
+	case []byte:
+		return string(s), nil
+
+	case int:
+		return strconv.FormatInt(int64(s), serializeIntBase), nil
+	case int64:
+		return strconv.FormatInt(int64(s), serializeIntBase), nil
+	case int32:
+		return strconv.FormatInt(int64(s), serializeIntBase), nil
+	case int16:
+		return strconv.FormatInt(int64(s), serializeIntBase), nil
+	case int8:
+		return strconv.FormatInt(int64(s), serializeIntBase), nil
+
+	case float64:
+		return strconv.FormatFloat(s, 'f', -1, 64), nil
+	case float32:
+		return strconv.FormatFloat(float64(s), 'f', -1, 32), nil
+
+	case uint:
+		return strconv.FormatUint(uint64(s), serializeIntBase), nil
+	case uint64:
+		return strconv.FormatUint(uint64(s), serializeIntBase), nil
+	case uint32:
+		return strconv.FormatUint(uint64(s), serializeIntBase), nil
+	case uint16:
+		return strconv.FormatUint(uint64(s), serializeIntBase), nil
+	case uint8:
+		return strconv.FormatUint(uint64(s), serializeIntBase), nil
+
+	case time.Time:
+		return kvSerializerByValue(s.UnixMilli())
+	case bool:
+		if s {
+			return "1", nil
+		} else {
+			return "0", nil
+		}
+
 	default:
 		return "", errors.Errorf("unable to serialize %#v of type %T to string", i, i)
 	}

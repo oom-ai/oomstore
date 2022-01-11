@@ -3,13 +3,15 @@ package tikv
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+
 	"github.com/pkg/errors"
 
 	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
 
 func (db *DB) Purge(ctx context.Context, revisionID int) error {
-	serializedRevisionID, err := kvutil.SerializeByValue(revisionID)
+	serializedRevisionID, err := dbutil.SerializeByValue(revisionID, Backend)
 	if err != nil {
 		return err
 	}
