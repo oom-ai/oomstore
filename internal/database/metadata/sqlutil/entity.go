@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -15,22 +13,22 @@ import (
 
 func UpdateEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateEntityOpt) error {
 	if opt.NewDescription == nil {
-		return errors.Errorf("invalid option: nothing to update")
+		return errdefs.Errorf("invalid option: nothing to update")
 	}
 
 	query := "UPDATE entity SET description = ? WHERE id = ?"
 	result, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(query), opt.NewDescription, opt.EntityID)
 	if err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 
 	if rowsAffected != 1 {
-		return errors.Errorf("failed to update entity %d: entity not found", opt.EntityID)
+		return errdefs.Errorf("failed to update entity %d: entity not found", opt.EntityID)
 	}
 	return nil
 }
@@ -40,9 +38,9 @@ func GetEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*type
 	query := "SELECT * FROM entity WHERE id = ?"
 	if err := sqlxCtx.GetContext(ctx, &entity, sqlxCtx.Rebind(query), id); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errdefs.NotFound(errors.Errorf("feature entity %d not found", id))
+			return nil, errdefs.NotFound(errdefs.Errorf("feature entity %d not found", id))
 		}
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 
 	return &entity, nil
@@ -53,9 +51,9 @@ func GetEntityByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name str
 	query := "SELECT * FROM entity WHERE name = ?"
 	if err := sqlxCtx.GetContext(ctx, &entity, sqlxCtx.Rebind(query), name); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errdefs.NotFound(errors.Errorf("feature entity %s not found", name))
+			return nil, errdefs.NotFound(errdefs.Errorf("feature entity %s not found", name))
 		}
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 
 	return &entity, nil
@@ -71,12 +69,12 @@ func ListEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, entityIDs *[]
 		}
 		query, args, err = sqlx.In(fmt.Sprintf("%s WHERE id IN (?)", query), *entityIDs)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errdefs.WithStack(err)
 		}
 	}
 	entities := types.EntityList{}
 	if err := sqlxCtx.SelectContext(ctx, &entities, sqlxCtx.Rebind(query), args...); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	return entities, nil
 }

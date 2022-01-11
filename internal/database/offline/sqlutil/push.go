@@ -3,8 +3,6 @@ package sqlutil
 import (
 	"context"
 
-	"github.com/pkg/errors"
-
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -24,7 +22,7 @@ func Push(ctx context.Context, dbOpt dbutil.DBOpt, pushOpt offline.PushOpt) erro
 
 	err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, rows, columns)
 	if err != nil && dbutil.IsTableNotFoundError(err, dbOpt.Backend) {
-		return errdefs.NotFound(errors.WithStack(err))
+		return errdefs.NotFound(errdefs.WithStack(err))
 	}
-	return errors.WithStack(err)
+	return errdefs.WithStack(err)
 }

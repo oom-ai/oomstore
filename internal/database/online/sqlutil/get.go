@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -30,7 +30,7 @@ func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.Back
 		if err == sql.ErrNoRows || dbutil.IsTableNotFoundError(err, backend) {
 			return make(dbutil.RowMap), nil
 		}
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 
 	rs, err := deserializeIntoRowMap(record, opt.Features, backend)
@@ -54,12 +54,12 @@ func MultiGet(ctx context.Context, db *sqlx.DB, opt online.MultiGetOpt, backend 
 	query := fmt.Sprintf(`SELECT %s, %s FROM %s WHERE %s in (?);`, qt(opt.Entity.Name), qt(featureNames...), qt(tableName), qt(opt.Entity.Name))
 	sql, args, err := sqlx.In(query, opt.EntityKeys)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 
 	rows, err := db.QueryxContext(ctx, db.Rebind(sql), args...)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	defer rows.Close()
 
@@ -71,11 +71,11 @@ func getFeatureValueMapFromRows(rows *sqlx.Rows, features types.FeatureList, bac
 	for rows.Next() {
 		record, err := rows.SliceScan()
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errdefs.WithStack(err)
 		}
 		entityKey, err := dbutil.DeserializeByValueType(record[0], types.String, backend)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errdefs.WithStack(err)
 		}
 		values := record[1:]
 		rowMap, err := deserializeIntoRowMap(values, features, backend)

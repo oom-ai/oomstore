@@ -5,7 +5,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
@@ -19,5 +19,5 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 	endKey := append([]byte(kvutil.KeyPrefixForBatchFeature+serializedRevisionID), byte(keyDelimiter+1))
 
 	err = db.DeleteRange(ctx, startKey, endKey)
-	return errors.WithStack(err)
+	return errdefs.WithStack(err)
 }

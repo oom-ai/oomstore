@@ -10,8 +10,8 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
 	"github.com/oom-ai/oomstore/internal/database/metadata/sqlutil"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 )
 
 var _ metadata.Store = &DB{}
@@ -32,10 +32,10 @@ func (db *DB) Ping(ctx context.Context) error {
 
 func (db *DB) Close() error {
 	if err := db.Informer.Close(); err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 	if err := db.DB.Close(); err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 	return nil
 }
@@ -63,17 +63,17 @@ func Open(ctx context.Context, option *types.MySQLOpt) (*DB, error) {
 func CreateDatabase(ctx context.Context, opt *types.MySQLOpt) error {
 	defaultDB, err := dbutil.OpenMysqlDB(opt.Host, opt.Port, opt.User, opt.Password, "")
 	if err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 	defer defaultDB.Close()
 
 	if _, err = defaultDB.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", opt.Database)); err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 
 	db, err := dbutil.OpenMysqlDB(opt.Host, opt.Port, opt.User, opt.Password, opt.Database)
 	if err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 	defer db.Close()
 	return createMetaSchemas(ctx, db)
@@ -86,21 +86,21 @@ func createMetaSchemas(ctx context.Context, db *sqlx.DB) (err error) {
 		// create meta tables
 		for _, schema := range META_TABLE_SCHEMAS {
 			if _, err = tx.ExecContext(ctx, schema); err != nil {
-				return errors.Errorf("failed to create table, err=%+v", err)
+				return errdefs.Errorf("failed to create table, err=%+v", err)
 			}
 		}
 
 		// create foreign keys
 		for _, stmt := range META_TABLE_FOREIGN_KEYS {
 			if _, err = tx.ExecContext(ctx, stmt); err != nil {
-				return errors.Errorf("failed to add foreign key, err=%+v", err)
+				return errdefs.Errorf("failed to add foreign key, err=%+v", err)
 			}
 		}
 
 		// create meta views
 		for _, schema := range META_VIEW_SCHEMAS {
 			if _, err = tx.ExecContext(ctx, schema); err != nil {
-				return errors.WithStack(err)
+				return errdefs.WithStack(err)
 			}
 		}
 

@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/spf13/cast"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
@@ -39,7 +39,7 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 	case types.TABLE_LINK:
 		return s.tableLinkImport(ctx, importOpt, opt.TableLinkDataSource)
 	default:
-		return 0, errors.Errorf("unsupported data source: %v", opt.DataSourceType)
+		return 0, errdefs.Errorf("unsupported data source: %v", opt.DataSourceType)
 	}
 }
 
@@ -52,11 +52,11 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 		return 0, err
 	}
 	if hasDup(cast.ToStringSlice(header)) {
-		return 0, errors.Errorf("csv data source has duplicated columns: %v", header)
+		return 0, errdefs.Errorf("csv data source has duplicated columns: %v", header)
 	}
 	columnNames := append([]string{opt.entity.Name}, opt.features.Names()...)
 	if !stringSliceEqual(cast.ToStringSlice(header), columnNames) {
-		return 0, errors.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
+		return 0, errdefs.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
 	newRevisionID, snapshotTableName, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
@@ -110,12 +110,12 @@ func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt, dataSour
 		for _, field := range tableSchema.Fields {
 			if field.Name == f.Name {
 				if field.ValueType != f.ValueType {
-					return errors.Errorf("expect value type '%s', got '%s'", f.ValueType, field.ValueType)
+					return errdefs.Errorf("expect value type '%s', got '%s'", f.ValueType, field.ValueType)
 				}
 				return nil
 			}
 		}
-		return errors.Errorf("field '%s' found in target table", f.Name)
+		return errdefs.Errorf("field '%s' found in target table", f.Name)
 	}
 	for _, feature := range opt.features {
 		if err := validate(feature); err != nil {
@@ -187,13 +187,13 @@ func (s *OomStore) parseImportOpt(ctx context.Context, opt types.ImportOpt) (*im
 		return nil, err
 	}
 	if features == nil {
-		err = errors.Errorf("no features under group: %s", opt.GroupName)
+		err = errdefs.Errorf("no features under group: %s", opt.GroupName)
 		return nil, err
 	}
 
 	entity := group.Entity
 	if entity == nil {
-		return nil, errors.Errorf("no entity found by group: %s", opt.GroupName)
+		return nil, errdefs.Errorf("no entity found by group: %s", opt.GroupName)
 	}
 
 	return &importOpt{

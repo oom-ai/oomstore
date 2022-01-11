@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/spf13/cobra"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -62,7 +62,7 @@ func queryFeatures(ctx context.Context, oomStore *oomstore.OomStore, opt types.L
 	}
 
 	if opt.FeatureFullNames != nil && len(features) == 0 {
-		return nil, errors.Errorf("feature '%s' not found", (*opt.FeatureFullNames)[0])
+		return nil, errdefs.Errorf("feature '%s' not found", (*opt.FeatureFullNames)[0])
 	}
 
 	return features, nil

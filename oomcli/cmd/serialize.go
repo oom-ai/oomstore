@@ -9,7 +9,7 @@ import (
 
 	"github.com/fatih/structtag"
 	"github.com/olekukonko/tablewriter"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/spf13/cast"
 	"gopkg.in/yaml.v3"
 )
@@ -109,7 +109,7 @@ func serializeMetadata(w io.Writer, i interface{}, format string, wide bool) err
 	case Column:
 		return serializeInASCIITable(w, header, records, false)
 	default:
-		return errors.Errorf("unsupported output format %s", format)
+		return errdefs.Errorf("unsupported output format %s", format)
 	}
 }
 

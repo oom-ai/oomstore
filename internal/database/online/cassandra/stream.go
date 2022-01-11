@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pingcap/errors"
-
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 )
 
 func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
@@ -31,7 +30,7 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 	sql := fmt.Sprintf("ALTER TABLE %s ADD %s %s", tableName, opt.Feature.Name, dbValueType)
 
 	err = db.Query(sql).WithContext(ctx).Exec()
-	return errors.WithStack(err)
+	return errdefs.WithStack(err)
 }
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
@@ -47,5 +46,5 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	)
 
 	err := db.Query(query, cond.InsertValues...).WithContext(ctx).Exec()
-	return errors.WithStack(err)
+	return errdefs.WithStack(err)
 }

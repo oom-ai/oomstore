@@ -3,7 +3,7 @@ package redis
 import (
 	"context"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -36,7 +36,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 
 	values, err := db.HMGet(ctx, key, featureIDs...).Result()
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 
 	rowMap := make(dbutil.RowMap)
@@ -65,7 +65,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 			Features:   opt.Features,
 		})
 		if err != nil {
-			return res, errors.WithStack(err)
+			return res, errdefs.WithStack(err)
 		}
 		if len(rowMap) > 0 {
 			res[entityKey] = rowMap

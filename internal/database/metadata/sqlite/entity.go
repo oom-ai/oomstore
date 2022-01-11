@@ -3,7 +3,7 @@ package sqlite
 import (
 	"context"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 
@@ -16,7 +16,7 @@ func createEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadat
 	if err != nil {
 		if er, ok := err.(*sqlite.Error); ok {
 			if er.Code() == sqlite3.SQLITE_CONSTRAINT_UNIQUE {
-				return 0, errors.Errorf("entity %s already exists", opt.EntityName)
+				return 0, errdefs.Errorf("entity %s already exists", opt.EntityName)
 			}
 		}
 
@@ -25,7 +25,7 @@ func createEntity(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadat
 
 	entityID, err := res.LastInsertId()
 	if err != nil {
-		return 0, errors.WithStack(err)
+		return 0, errdefs.WithStack(err)
 	}
 	return int(entityID), nil
 }

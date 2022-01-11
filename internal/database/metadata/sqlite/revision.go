@@ -3,7 +3,7 @@ package sqlite
 import (
 	"context"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 
@@ -25,14 +25,14 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 	if err != nil {
 		if sqliteErr, ok := err.(*sqlite.Error); ok {
 			if sqliteErr.Code() == sqlite3.SQLITE_CONSTRAINT_UNIQUE {
-				return 0, "", errors.Errorf("revision already exists: groupID=%d, revision=%d", opt.GroupID, opt.Revision)
+				return 0, "", errdefs.Errorf("revision already exists: groupID=%d, revision=%d", opt.GroupID, opt.Revision)
 			}
 		}
-		return 0, "", errors.WithStack(err)
+		return 0, "", errdefs.WithStack(err)
 	}
 	revisionID, err := res.LastInsertId()
 	if err != nil {
-		return 0, "", errors.WithStack(err)
+		return 0, "", errdefs.WithStack(err)
 	}
 
 	if opt.SnapshotTable == nil {
@@ -40,14 +40,14 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 		snapshotTable = dbutil.OfflineBatchTableName(opt.GroupID, revisionID)
 		result, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(updateQuery), snapshotTable, revisionID)
 		if err != nil {
-			return 0, "", errors.WithStack(err)
+			return 0, "", errdefs.WithStack(err)
 		}
 		rowsAffected, err := result.RowsAffected()
 		if err != nil {
-			return 0, "", errors.WithStack(err)
+			return 0, "", errdefs.WithStack(err)
 		}
 		if rowsAffected != 1 {
-			return 0, "", errors.Errorf("failed to update revision %d: revision not found", revisionID)
+			return 0, "", errdefs.Errorf("failed to update revision %d: revision not found", revisionID)
 		}
 	}
 	return int(revisionID), snapshotTable, nil

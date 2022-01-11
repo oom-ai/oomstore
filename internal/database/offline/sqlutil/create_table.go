@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -16,19 +16,19 @@ func CreateTable(ctx context.Context, db *sqlx.DB, opt offline.CreateTableOpt, b
 		// Create index (entity_key, unix_milli) on cdc table
 		schema := dbutil.BuildTableSchema(opt.TableName, opt.Entity, true, opt.Features, nil, backend)
 		if _, err := db.ExecContext(ctx, schema); err != nil {
-			return errors.WithStack(err)
+			return errdefs.WithStack(err)
 		}
 		indexFields := []string{opt.Entity.Name, "unix_milli"}
 		indexDDL := dbutil.BuildIndexDDL(opt.TableName, "idx", indexFields, backend)
 		if _, err := db.ExecContext(ctx, indexDDL); err != nil {
-			return errors.WithStack(err)
+			return errdefs.WithStack(err)
 		}
 	} else {
 		// Create primary key (entity_key) on snapshot table
 		pkFields := []string{opt.Entity.Name}
 		schema := dbutil.BuildTableSchema(opt.TableName, opt.Entity, false, opt.Features, pkFields, backend)
 		if _, err := db.ExecContext(ctx, schema); err != nil {
-			return errors.WithStack(err)
+			return errdefs.WithStack(err)
 		}
 	}
 	return nil

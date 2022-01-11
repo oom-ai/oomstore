@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
 	"os"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/spf13/cast"
 
 	"github.com/olekukonko/tablewriter"
@@ -47,7 +47,7 @@ func printJoinResult(joinResult *types.JoinResult, output string) error {
 	case ASCIITable:
 		return printJoinResultInASCIITable(joinResult)
 	default:
-		return errors.Errorf("unsupported output format %s", output)
+		return errdefs.Errorf("unsupported output format %s", output)
 	}
 }
 

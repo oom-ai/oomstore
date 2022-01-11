@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/spf13/cobra"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -44,7 +44,7 @@ func checkCommandExist(cmd string) bool {
 
 func editFileByExternalEditor(ctx context.Context, fileName string) error {
 	if !checkCommandExist(editor) {
-		return errors.Errorf("%s not found", editor)
+		return errdefs.Errorf("%s not found", editor)
 	}
 
 	cmd := exec.CommandContext(ctx, editor, fileName)

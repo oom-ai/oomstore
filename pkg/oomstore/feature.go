@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -107,7 +107,7 @@ func validateFeatureFullNames(names []string) error {
 	for _, name := range names {
 		nameSlice := strings.Split(name, FeatureFullNameSeparator)
 		if len(nameSlice) != 2 {
-			return errors.Errorf("invalid feature full name %s", name)
+			return errdefs.Errorf("invalid feature full name %s", name)
 		}
 	}
 	return nil

@@ -8,8 +8,8 @@ import (
 
 	"github.com/spf13/cast"
 
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 )
 
 func DeserializeByValueType(i interface{}, valueType types.ValueType, backend types.BackendType) (interface{}, error) {
@@ -35,7 +35,7 @@ func DeserializeByValueType(i interface{}, valueType types.ValueType, backend ty
 
 	value, err := deserializer(i, valueType)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	return value, nil
 }
@@ -49,7 +49,7 @@ func rdbDeserializer(i interface{}, valueType types.ValueType) (interface{}, err
 		} else if s == "0" || s == "false" {
 			return false, nil
 		}
-		return nil, errors.Errorf("invalid bool value %v", i)
+		return nil, errdefs.Errorf("invalid bool value %v", i)
 	case types.String:
 		return cast.ToString(i), nil
 	default:
@@ -72,13 +72,13 @@ func dynamoDeserializer(i interface{}, valueType types.ValueType) (interface{}, 
 	case types.Int64:
 		v, ok := i.(float64)
 		if !ok {
-			return "", errors.Errorf("not float64 %v", i)
+			return "", errdefs.Errorf("not float64 %v", i)
 		}
 		return int64(v), nil
 	case types.Time:
 		v, ok := i.(float64)
 		if !ok {
-			return "", errors.Errorf("not float64 %v", i)
+			return "", errdefs.Errorf("not float64 %v", i)
 		}
 		return time.UnixMilli(int64(v)), nil
 	default:
@@ -96,7 +96,7 @@ func snowflakeDeserializer(i interface{}, valueType types.ValueType) (interface{
 
 	s, ok := i.(string)
 	if !ok {
-		return nil, errors.Errorf("not a string or nil: %v", i)
+		return nil, errdefs.Errorf("not a string or nil: %v", i)
 	}
 
 	switch valueType {
@@ -105,11 +105,11 @@ func snowflakeDeserializer(i interface{}, valueType types.ValueType) (interface{
 
 	case types.Int64:
 		x, err := strconv.ParseInt(s, 10, 64)
-		return x, errors.WithStack(err)
+		return x, errdefs.WithStack(err)
 
 	case types.Float64:
 		x, err := strconv.ParseFloat(s, 64)
-		return x, errors.WithStack(err)
+		return x, errdefs.WithStack(err)
 
 	case types.Bool:
 		if s == "1" {
@@ -117,7 +117,7 @@ func snowflakeDeserializer(i interface{}, valueType types.ValueType) (interface{
 		} else if s == "0" {
 			return false, nil
 		} else {
-			return nil, errors.Errorf("invalid bool value: %s", s)
+			return nil, errdefs.Errorf("invalid bool value: %s", s)
 		}
 	case types.Time:
 		x, err := strconv.ParseInt(s, 10, 64)
@@ -126,7 +126,7 @@ func snowflakeDeserializer(i interface{}, valueType types.ValueType) (interface{
 	case types.Bytes:
 		return []byte(s), nil
 	default:
-		return "", errors.Errorf("unsupported value type: %s", valueType)
+		return "", errdefs.Errorf("unsupported value type: %s", valueType)
 	}
 }
 
@@ -137,7 +137,7 @@ func kvDeserializer(i interface{}, valueType types.ValueType) (interface{}, erro
 
 	s, ok := i.(string)
 	if !ok {
-		return nil, errors.Errorf("not a string or nil: %v", i)
+		return nil, errdefs.Errorf("not a string or nil: %v", i)
 	}
 
 	switch valueType {
@@ -158,7 +158,7 @@ func kvDeserializer(i interface{}, valueType types.ValueType) (interface{}, erro
 		} else if s == "0" {
 			return false, nil
 		} else {
-			return nil, errors.Errorf("invalid bool value: %s", s)
+			return nil, errdefs.Errorf("invalid bool value: %s", s)
 		}
 	case types.Time:
 		x, err := strconv.ParseInt(s, serializeIntBase, 64)
@@ -167,6 +167,6 @@ func kvDeserializer(i interface{}, valueType types.ValueType) (interface{}, erro
 	case types.Bytes:
 		return []byte(s), nil
 	default:
-		return "", errors.Errorf("unsupported value type: %s", valueType)
+		return "", errdefs.Errorf("unsupported value type: %s", valueType)
 	}
 }

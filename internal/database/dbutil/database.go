@@ -7,8 +7,8 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 	"github.com/snowflakedb/gosnowflake"
 	"google.golang.org/api/googleapi"
 	"modernc.org/sqlite"
@@ -17,7 +17,7 @@ import (
 
 func OpenSQLite(dbFile string) (*sqlx.DB, error) {
 	db, err := sqlx.Open("sqlite", dbFile)
-	return db, errors.WithStack(err)
+	return db, errdefs.WithStack(err)
 }
 
 func OpenMysqlDB(host, port, user, password, database string) (*sqlx.DB, error) {
@@ -29,7 +29,7 @@ func OpenMysqlDB(host, port, user, password, database string) (*sqlx.DB, error) 
 	cfg.ParseTime = true
 
 	db, err := sqlx.Open("mysql", cfg.FormatDSN())
-	return db, errors.WithStack(err)
+	return db, errdefs.WithStack(err)
 }
 
 func OpenPostgresDB(host, port, user, password, database string) (*sqlx.DB, error) {
@@ -42,14 +42,14 @@ func OpenPostgresDB(host, port, user, password, database string) (*sqlx.DB, erro
 			port,
 			database),
 	)
-	return db, errors.WithStack(err)
+	return db, errdefs.WithStack(err)
 }
 
 var OpenRedshiftDB = OpenPostgresDB
 
 // TODO: Should return an error when bakcend is not supported ?
 func IsTableNotFoundError(err error, backend types.BackendType) bool {
-	err = errors.Cause(err)
+	err = errdefs.Cause(err)
 	switch backend {
 	case types.BackendSQLite:
 		if sqliteErr, ok := err.(*sqlite.Error); ok {

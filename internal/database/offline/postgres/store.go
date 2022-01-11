@@ -7,8 +7,8 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -45,7 +45,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
 	rows, err := db.QueryxContext(ctx, "select column_name, data_type from information_schema.columns where table_name = $1", tableName)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	return sqlutil.SqlxTableSchema(ctx, db, Backend, rows)
 }

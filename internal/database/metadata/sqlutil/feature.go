@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -16,20 +14,20 @@ import (
 
 func UpdateFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.UpdateFeatureOpt) error {
 	if opt.NewDescription == nil {
-		return errors.Errorf("invalid option: nothing to update")
+		return errdefs.Errorf("invalid option: nothing to update")
 	}
 
 	query := "UPDATE feature SET description = ? WHERE id = ?"
 	result, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(query), opt.NewDescription, opt.FeatureID)
 	if err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return errors.WithStack(err)
+		return errdefs.WithStack(err)
 	}
 	if rowsAffected != 1 {
-		return errors.Errorf("failed to update feature %d: feature not found", opt.FeatureID)
+		return errdefs.Errorf("failed to update feature %d: feature not found", opt.FeatureID)
 	}
 	return nil
 }
@@ -44,13 +42,13 @@ func GetFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*typ
 	query := `SELECT * FROM feature WHERE id = ?`
 	if err := sqlxCtx.GetContext(ctx, &feature, sqlxCtx.Rebind(query), id); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errdefs.NotFound(errors.Errorf("feature %d not found", id))
+			return nil, errdefs.NotFound(errdefs.Errorf("feature %d not found", id))
 		}
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 
 	if group, err = GetGroup(ctx, sqlxCtx, feature.GroupID); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	feature.Group = group
 
@@ -67,13 +65,13 @@ func GetFeatureByName(ctx context.Context, sqlxCtx metadata.SqlxContext, fullNam
 	query := `SELECT * FROM feature WHERE full_name = ?`
 	if err := sqlxCtx.GetContext(ctx, &feature, sqlxCtx.Rebind(query), fullName); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errdefs.NotFound(errors.Errorf("feature %s not found", fullName))
+			return nil, errdefs.NotFound(errdefs.Errorf("feature %s not found", fullName))
 		}
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 
 	if group, err = GetGroup(ctx, sqlxCtx, feature.GroupID); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 	feature.Group = group
 
@@ -96,7 +94,7 @@ func ListFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 	}
 	query = fmt.Sprintf("%s ORDER BY id ASC", query)
 	if err := sqlxCtx.SelectContext(ctx, &features, sqlxCtx.Rebind(query), args...); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errdefs.WithStack(err)
 	}
 
 	// enrich group
@@ -108,7 +106,7 @@ func ListFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 	for _, f := range features {
 		group := groups.Find(func(g *types.Group) bool { return g.ID == f.GroupID })
 		if group == nil {
-			return nil, errdefs.InvalidAttribute(errors.Errorf("no group found for feature %s", f.Name))
+			return nil, errdefs.InvalidAttribute(errdefs.Errorf("no group found for feature %s", f.Name))
 		}
 		f.Group = group
 	}

@@ -11,8 +11,8 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 )
 
@@ -46,7 +46,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 		return nil, err
 	}
 	if entity == nil {
-		return nil, errors.Errorf("failed to get shared entity")
+		return nil, errdefs.Errorf("failed to get shared entity")
 	}
 
 	featureMap := buildGroupToFeaturesMap(features)
@@ -164,7 +164,7 @@ func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, [
 				return
 			}
 			if len(line) < 2 {
-				readErr = errors.Errorf("at least 2 values per row, got %d value(s) at row %d", len(line), i)
+				readErr = errdefs.Errorf("at least 2 values per row, got %d value(s) at row %d", len(line), i)
 				return
 			}
 			unixMilli, err := strconv.Atoi(line[1])

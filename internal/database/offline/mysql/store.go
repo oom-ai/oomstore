@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
@@ -25,7 +25,7 @@ type DB struct {
 
 func (db *DB) Ping(ctx context.Context) error {
 	err := db.PingContext(ctx)
-	return errors.WithStack(err)
+	return errdefs.WithStack(err)
 }
 
 func Open(option *types.MySQLOpt) (*DB, error) {

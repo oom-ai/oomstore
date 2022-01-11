@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/pkg/errors"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
 )
@@ -49,14 +49,14 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		seq++
 		if seq%PipelineBatchSize == 0 {
 			if _, err := pipe.Exec(ctx); err != nil {
-				return errors.WithStack(err)
+				return errdefs.WithStack(err)
 			}
 		}
 	}
 
 	if seq%PipelineBatchSize != 0 {
 		if _, err := pipe.Exec(ctx); err != nil {
-			return errors.WithStack(err)
+			return errdefs.WithStack(err)
 		}
 	}
 	if opt.ExportError != nil {
