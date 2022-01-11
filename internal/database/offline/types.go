@@ -8,6 +8,8 @@ import (
 
 type ExportOpt struct {
 	SnapshotTable string
+	CdcTable      *string
+	UnixMilli     *int64
 	EntityName    string
 	Features      types.FeatureList
 	Limit         *uint64
