@@ -124,11 +124,11 @@ func deserializeFeatureValues(features oomTypes.FeatureList, item map[string]typ
 		if err := attributevalue.Unmarshal(attributeValue, &value); err != nil {
 			return nil, errors.WithStack(err)
 		}
-		typedValue, err := dbutil.DeserializeByValueType(value, feature.ValueType, oomTypes.BackendDynamoDB)
+		deserializedValue, err := dbutil.DeserializeByValueType(value, feature.ValueType, oomTypes.BackendDynamoDB)
 		if err != nil {
 			return nil, err
 		}
-		rowMap[feature.FullName] = typedValue
+		rowMap[feature.FullName] = deserializedValue
 	}
 	return rowMap, nil
 }

@@ -90,11 +90,11 @@ func getFeatureValueMapFromRows(rows *sqlx.Rows, features types.FeatureList, bac
 func deserializeIntoRowMap(values []interface{}, features types.FeatureList, backend types.BackendType) (dbutil.RowMap, error) {
 	rs := map[string]interface{}{}
 	for i, v := range values {
-		typedValue, err := dbutil.DeserializeByValueType(v, features[i].ValueType, backend)
+		deserializedValue, err := dbutil.DeserializeByValueType(v, features[i].ValueType, backend)
 		if err != nil {
 			return nil, err
 		}
-		rs[features[i].FullName] = typedValue
+		rs[features[i].FullName] = deserializedValue
 	}
 	return rs, nil
 }

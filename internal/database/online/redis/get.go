@@ -44,11 +44,11 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		if v == nil {
 			continue
 		}
-		typedValue, err := dbutil.DeserializeByValueType(v, opt.Features[i].ValueType, Backend)
+		deserializedValue, err := dbutil.DeserializeByValueType(v, opt.Features[i].ValueType, Backend)
 		if err != nil {
 			return nil, err
 		}
-		rowMap[opt.Features[i].FullName] = typedValue
+		rowMap[opt.Features[i].FullName] = deserializedValue
 	}
 	return rowMap, nil
 }

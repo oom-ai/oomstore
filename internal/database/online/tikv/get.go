@@ -101,7 +101,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		if v == nil {
 			continue
 		}
-		typedValue, err := dbutil.DeserializeByValueType(string(v), inputs[i].feature.ValueType, Backend)
+		deserializedValue, err := dbutil.DeserializeByValueType(string(v), inputs[i].feature.ValueType, Backend)
 		if err != nil {
 			return nil, err
 		}
@@ -109,7 +109,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		if _, ok := res[entityKey]; !ok {
 			res[entityKey] = make(dbutil.RowMap)
 		}
-		res[entityKey][inputs[i].feature.FullName] = typedValue
+		res[entityKey][inputs[i].feature.FullName] = deserializedValue
 	}
 	return res, nil
 }

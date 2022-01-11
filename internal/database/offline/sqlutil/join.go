@@ -285,15 +285,15 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 				scanErr = errors.WithStack(err)
 				continue
 			}
-			serializedRecord := make([]interface{}, 0, len(record))
+			deserializedRecord := make([]interface{}, 0, len(record))
 			for i, r := range record {
 				deserializedValue, err := dbutil.DeserializeByValueType(r, header[i].ValueType, backendType)
 				if err != nil {
 					scanErr = err
 				}
-				serializedRecord = append(serializedRecord, deserializedValue)
+				deserializedRecord = append(deserializedRecord, deserializedValue)
 			}
-			data <- serializedRecord
+			data <- deserializedRecord
 		}
 	}()
 
