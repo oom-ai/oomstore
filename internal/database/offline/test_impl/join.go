@@ -186,7 +186,7 @@ func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.Feature
 func prepareRevisionRanges(oneGroup bool, stream bool) map[string][]*offline.RevisionRange {
 	basic := []*offline.RevisionRange{
 		{
-			MinRevision:   1,
+			MinRevision:   5,
 			MaxRevision:   15,
 			SnapshotTable: "offline_snapshot_1_1",
 		},
@@ -198,7 +198,7 @@ func prepareRevisionRanges(oneGroup bool, stream bool) map[string][]*offline.Rev
 	}
 	advanced := []*offline.RevisionRange{
 		{
-			MinRevision:   5,
+			MinRevision:   1,
 			MaxRevision:   math.MaxInt64,
 			SnapshotTable: "offline_snapshot_2_1",
 		},
@@ -222,6 +222,11 @@ func prepareRevisionRanges(oneGroup bool, stream bool) map[string][]*offline.Rev
 func prepareEntityRows(isEmpty bool, withValue bool) <-chan types.EntityRow {
 	entityRows := make(chan types.EntityRow)
 	rows := []types.EntityRow{
+		{
+			EntityKey: "1234",
+			UnixMilli: 2,
+			Values:    []string{"1", "2"},
+		},
 		{
 			EntityKey: "1234",
 			UnixMilli: 10,
@@ -301,6 +306,15 @@ func prepareStreamingResultValues() []map[string]interface{} {
 	return []map[string]interface{}{
 		{
 			"entity_key":                "1234",
+			"unix_milli":                int64(2),
+			"value_1":                   "1",
+			"value_2":                   "2",
+			"device_basic.model":        nil,
+			"device_basic.price":        nil,
+			"device_advanced.is_active": true,
+		},
+		{
+			"entity_key":                "1234",
 			"unix_milli":                int64(10),
 			"value_1":                   "1",
 			"value_2":                   "2",
@@ -340,6 +354,15 @@ func prepareStreamingResultValues() []map[string]interface{} {
 
 func prepareBatchResultValues() []map[string]interface{} {
 	return []map[string]interface{}{
+		{
+			"entity_key":                "1234",
+			"unix_milli":                int64(2),
+			"value_1":                   "1",
+			"value_2":                   "2",
+			"device_basic.model":        nil,
+			"device_basic.price":        nil,
+			"device_advanced.is_active": true,
+		},
 		{
 			"entity_key":                "1234",
 			"unix_milli":                int64(10),
