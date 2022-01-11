@@ -18,7 +18,7 @@ repos:
       - id: check-added-large-files
       - id: mixed-line-ending
         exclude: \.pvt\.
-  - repo: git://github.com/dnephin/pre-commit-golang
+  - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.4.0
     hooks:
       - id: go-fmt
