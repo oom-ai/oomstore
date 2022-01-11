@@ -3,6 +3,9 @@ package tikv
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 	"github.com/pkg/errors"
@@ -33,7 +36,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 			return err
 		}
 
-		serializedFeatureValue, err := kvutil.SerializeByValueType(value, opt.Features[i].ValueType)
+		serializedFeatureValue, err := dbutil.SerializeByValueType(value, opt.Features[i].ValueType, types.BackendTiKV)
 		if err != nil {
 			return err
 		}

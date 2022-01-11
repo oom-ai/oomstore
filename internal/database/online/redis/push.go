@@ -3,6 +3,9 @@ package redis
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/kvutil"
 )
@@ -20,7 +23,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 			continue
 		}
 
-		featureValue, err := kvutil.SerializeByValueType(value, opt.Features[i].ValueType)
+		featureValue, err := dbutil.SerializeByValueType(value, opt.Features[i].ValueType, types.BackendRedis)
 		if err != nil {
 			return err
 		}
