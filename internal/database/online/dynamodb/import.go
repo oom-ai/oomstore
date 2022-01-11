@@ -3,6 +3,8 @@ package dynamodb
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -93,7 +95,7 @@ func buildItem(record oomTypes.ExportRecord, opt online.ImportOpt) (map[string]t
 	item[opt.Entity.Name] = entityKeyValue
 
 	for i, feature := range opt.Features {
-		value, err := serializeByTag(record.ValueAt(i), feature.ValueType)
+		value, err := dbutil.SerializeByValueType(record.ValueAt(i), feature.ValueType, Backend)
 		if err != nil {
 			return nil, err
 		}

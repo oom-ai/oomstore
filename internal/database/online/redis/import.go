@@ -41,7 +41,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			if err != nil {
 				return err
 			}
-			featureValues[featureID] = featureValue
+			featureValues[featureID] = featureValue.(string)
 		}
 
 		pipe.HSet(ctx, key, featureValues)

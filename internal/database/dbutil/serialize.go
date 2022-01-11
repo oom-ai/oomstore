@@ -13,14 +13,16 @@ const (
 	serializeIntBase = 36
 )
 
-func SerializeByValueType(i interface{}, valueType types.ValueType, backend types.BackendType) (string, error) {
+func SerializeByValueType(i interface{}, valueType types.ValueType, backend types.BackendType) (interface{}, error) {
 	if i == nil {
 		return "", nil
 	}
-	var serializer func(i interface{}, valueType types.ValueType) (string, error)
+	var serializer func(i interface{}, valueType types.ValueType) (interface{}, error)
 	switch backend {
 	case types.BackendRedis, types.BackendTiKV:
 		serializer = kvSerializerByValueType
+	case types.BackendDynamoDB:
+		serializer = dynamoSerializerByValueType
 	default:
 		return "", fmt.Errorf("unsupported backend type %s", backend)
 	}
@@ -32,7 +34,7 @@ func SerializeByValueType(i interface{}, valueType types.ValueType, backend type
 	return value, nil
 }
 
-func kvSerializerByValueType(i interface{}, valueType types.ValueType) (s string, err error) {
+func kvSerializerByValueType(i interface{}, valueType types.ValueType) (s interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = errors.Errorf("failed to serailize by tag: %v", r)
@@ -59,6 +61,21 @@ func kvSerializerByValueType(i interface{}, valueType types.ValueType) (s string
 		return string(i.([]byte)), nil
 	default:
 		return "", errors.Errorf("unable to serialize %#v of type %T to string", i, i)
+	}
+}
+
+func dynamoSerializerByValueType(i interface{}, valueType types.ValueType) (out interface{}, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.Errorf("failed to serailize by value type: %v", r)
+		}
+	}()
+
+	switch valueType {
+	case types.Time:
+		return i.(time.Time).UnixMilli(), nil
+	default:
+		return i, nil
 	}
 }
 

@@ -39,7 +39,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 		}
 
 		putKeys = append(putKeys, getKeyOfStreamFeature(serializedGroupID, serializedEntityKey, serializedFeatureID))
-		putVals = append(putVals, []byte(serializedFeatureValue))
+		putVals = append(putVals, []byte(serializedFeatureValue.(string)))
 	}
 
 	// We don't expire keys using TTL

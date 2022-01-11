@@ -29,7 +29,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 		if err != nil {
 			return err
 		}
-		featureValues[featureID] = featureValue
+		featureValues[featureID] = featureValue.(string)
 	}
 
 	db.HSet(ctx, key, featureValues)
