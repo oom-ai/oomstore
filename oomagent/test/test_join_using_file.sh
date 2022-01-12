@@ -30,11 +30,7 @@ arg=$(cat <<-EOF
 }
 EOF
 )
-expected='
-{
-  "status": {}
-}
-'
+expected='{}'
 actual=$(testgrpc Join <<<"$arg")
 assert_json_eq "$case" "$expected" "$actual"
 

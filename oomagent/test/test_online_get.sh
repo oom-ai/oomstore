@@ -14,9 +14,6 @@ arg='
 '
 expected='
 {
-  "status": {
-
-  },
   "result": {
     "map": {
       "account.state": {
@@ -38,7 +35,6 @@ arg='
 '
 expected='
 {
-  "status": {},
   "result": {
     "map": {
       "account.credit_score": {

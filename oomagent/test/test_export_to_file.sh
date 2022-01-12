@@ -19,9 +19,7 @@ group_test() {
     local arg="$2"
     local expected="$3"
 
-    case="$group: api returns ok"
     actual=$(testgrpc Export <<<"$arg")
-    assert_json_eq "$case" '{"status":{}}' "$actual"
 
     case="$group: result is correct"
     # sort result ignoring header
