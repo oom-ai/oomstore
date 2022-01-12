@@ -13,7 +13,7 @@ ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION,ONLINE-REVISION-ID
 2,model,phone,device,batch,string,model,<NULL>
 3,age,student,user,batch,int64,age,<NULL>
 4,last_5_click_posts,user-click,user,stream,string,user last 5 click posts,<NULL>
-5,number_of_user_started_posts,user-click,user,stream,int64,number of posts that users stared today,<NULL>
+5,number_of_user_starred_posts,user-click,user,stream,int64,number of posts that users starred today,<NULL>
 '
 actual=$(oomcli get meta feature -o csv --wide)
 ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }
@@ -25,7 +25,7 @@ expected='ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
 2,model,phone,device,batch,string,model
 3,age,student,user,batch,int64,age
 4,last_5_click_posts,user-click,user,stream,string,user last 5 click posts
-5,number_of_user_started_posts,user-click,user,stream,int64,number of posts that users stared today
+5,number_of_user_starred_posts,user-click,user,stream,int64,number of posts that users starred today
 '
 actual=$(oomcli get meta feature -o csv)
 assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"
@@ -76,10 +76,10 @@ items:
       value-type: string
       description: user last 5 click posts
     - kind: Feature
-      name: number_of_user_started_posts
+      name: number_of_user_starred_posts
       group-name: user-click
       value-type: int64
-      description: number of posts that users stared today
+      description: number of posts that users starred today
 '
 
 actual=$(oomcli get meta feature -o yaml)
