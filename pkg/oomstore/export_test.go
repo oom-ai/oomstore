@@ -38,7 +38,7 @@ func TestChannelExport(t *testing.T) {
 
 	testCases := []struct {
 		description  string
-		opt          types.ChannelExportOpt
+		opt          types.ChannelExportBatchOpt
 		features     types.FeatureList
 		exportStream <-chan types.ExportRecord
 		exportError  <-chan error
@@ -46,7 +46,7 @@ func TestChannelExport(t *testing.T) {
 	}{
 		{
 			description: "provide no features, should return all feature values",
-			opt: types.ChannelExportOpt{
+			opt: types.ChannelExportBatchOpt{
 				FeatureNames: []string{},
 				RevisionID:   revisionID,
 			},
@@ -56,7 +56,7 @@ func TestChannelExport(t *testing.T) {
 		},
 		{
 			description: "provide one feature, should return one feature values",
-			opt: types.ChannelExportOpt{
+			opt: types.ChannelExportBatchOpt{
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
@@ -66,7 +66,7 @@ func TestChannelExport(t *testing.T) {
 		},
 		{
 			description: "provide revision and one feature name, should return one feature values",
-			opt: types.ChannelExportOpt{
+			opt: types.ChannelExportBatchOpt{
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
@@ -76,7 +76,7 @@ func TestChannelExport(t *testing.T) {
 		},
 		{
 			description: "empty stream",
-			opt: types.ChannelExportOpt{
+			opt: types.ChannelExportBatchOpt{
 				FeatureNames: []string{"price"},
 				RevisionID:   revisionID,
 			},
@@ -118,7 +118,7 @@ func TestChannelExport(t *testing.T) {
 			}).Return(tc.exportStream, tc.exportError)
 
 			// execute and compare results
-			actual, err := store.ChannelExport(context.Background(), tc.opt)
+			actual, err := store.ChannelExportBatch(context.Background(), tc.opt)
 			assert.NoError(t, err)
 			values := make([][]interface{}, 0)
 			for row := range actual.Data {

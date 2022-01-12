@@ -294,7 +294,7 @@ func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.J
 
 func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen.OomAgent_ChannelExportServer) error {
 	ctx := context.Background()
-	exportResult, err := s.oomstore.ChannelExport(ctx, types.ChannelExportOpt{
+	exportResult, err := s.oomstore.ChannelExportBatch(ctx, types.ChannelExportBatchOpt{
 		FeatureNames: req.FeatureNames,
 		RevisionID:   int(req.RevisionId),
 		Limit:        req.Limit,
@@ -331,7 +331,7 @@ func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen
 }
 
 func (s *server) Export(ctx context.Context, req *codegen.ExportRequest) (*codegen.ExportResponse, error) {
-	err := s.oomstore.Export(ctx, types.ExportOpt{
+	err := s.oomstore.ExportBatch(ctx, types.ExportBatchOpt{
 		FeatureNames:   req.FeatureNames,
 		RevisionID:     int(req.RevisionId),
 		Limit:          req.Limit,
