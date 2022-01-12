@@ -30,7 +30,7 @@ type CreateGroupOpt struct {
 	Description string
 }
 
-type ChannelExportOpt struct {
+type ChannelExportBatchOpt struct {
 	RevisionID   int
 	FeatureNames []string
 	Limit        *uint64
@@ -42,7 +42,7 @@ type ChannelExportStreamOpt struct {
 	Limit            *uint64
 }
 
-type ExportOpt struct {
+type ExportBatchOpt struct {
 	RevisionID     int
 	FeatureNames   []string
 	Limit          *uint64

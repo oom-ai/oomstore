@@ -8,11 +8,11 @@ import (
 )
 
 var exportOutput *string
-var exportOpt types.ChannelExportOpt
+var exportOpt types.ChannelExportBatchOpt
 
 var exportCmd = &cobra.Command{
 	Use:   "export",
-	Short: "Export historical features in a group",
+	Short: "ExportBatch historical features in a group",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("limit") {
 			exportOpt.Limit = nil

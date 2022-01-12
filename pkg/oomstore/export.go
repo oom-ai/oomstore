@@ -15,9 +15,9 @@ import (
 )
 
 /*
-ChannelExport exports batch feature values of a particular revision.
+ChannelExportBatch exports batch feature values of a particular revision.
 Usage Example:
-	exportResult, err := store.Export(ctx, opt)
+	exportResult, err := store.ExportBatch(ctx, opt)
 	if err != nil {
 		return err
 	}
@@ -27,7 +27,7 @@ Usage Example:
 	// Attention: call CheckStreamError after consuming exportResult.Data channel
 	return exportResult.CheckStreamError()
 */
-func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt) (*types.ExportResult, error) {
+func (s *OomStore) ChannelExportBatch(ctx context.Context, opt types.ChannelExportBatchOpt) (*types.ExportResult, error) {
 	revision, err := s.GetRevision(ctx, opt.RevisionID)
 	if err != nil {
 		return nil, err
@@ -66,8 +66,8 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 	return types.NewExportResult(header, stream, exportErr), nil
 }
 
-func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
-	exportResult, err := s.ChannelExport(ctx, types.ChannelExportOpt{
+func (s *OomStore) ExportBatch(ctx context.Context, opt types.ExportBatchOpt) error {
+	exportResult, err := s.ChannelExportBatch(ctx, types.ChannelExportBatchOpt{
 		RevisionID:   opt.RevisionID,
 		FeatureNames: opt.FeatureNames,
 		Limit:        opt.Limit,
