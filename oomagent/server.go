@@ -165,6 +165,27 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 	})
 }
 
+func (s *server) Push(ctx context.Context, req *codegen.PushRequest) (*codegen.PushResponse, error) {
+	if err := s.oomstore.Push(ctx, types.PushOpt{
+		EntityKey:     req.EntityKey,
+		GroupName:     req.GroupName,
+		FeatureNames:  req.FeatureNames,
+		FeatureValues: convertToInterfaceSlice(req.FeatureValues),
+	}); err != nil {
+		return &codegen.PushResponse{
+			Status: &status.Status{
+				Code:    int32(code.Code_INTERNAL),
+				Message: err.Error(),
+			},
+		}, err
+	}
+	return &codegen.PushResponse{
+		Status: &status.Status{
+			Code: int32(code.Code_OK),
+		},
+	}, nil
+}
+
 func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codegen.ImportResponse, error) {
 	revisionID, err := s.oomstore.Import(ctx, types.ImportOpt{
 		GroupName:      req.GroupName,
@@ -437,4 +458,33 @@ func convertJoinedRow(row []interface{}) ([]*codegen.Value, error) {
 		res = append(res, v)
 	}
 	return res, nil
+}
+
+func convertValueToInterface(i *codegen.Value) interface{} {
+	kind := i.GetKind()
+	switch kind.(type) {
+	case *codegen.Value_NullValue:
+		return nil
+	case *codegen.Value_Int64Value:
+		return i.GetInt64Value()
+	case *codegen.Value_DoubleValue:
+		return i.GetDoubleValue()
+	case *codegen.Value_StringValue:
+		return i.GetStringValue()
+	case *codegen.Value_BoolValue:
+		return i.GetBoolValue()
+	case *codegen.Value_UnixMilliValue:
+		return i.GetUnixMilliValue()
+	case *codegen.Value_BytesValue:
+		return i.GetBytesValue()
+	}
+	return nil
+}
+
+func convertToInterfaceSlice(values []*codegen.Value) []interface{} {
+	res := make([]interface{}, 0, len(values))
+	for _, value := range values {
+		res = append(res, convertValueToInterface(value))
+	}
+	return res
 }
