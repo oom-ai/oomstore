@@ -15,6 +15,15 @@ type ExportOneGroupOpt struct {
 	Limit         *uint64
 }
 
+type ExportOpt struct {
+	SnapshotTables map[int]string
+	CdcTables      map[int]string
+	Features       map[int]types.FeatureList
+	UnixMilli      int64
+	EntityName     string
+	Limit          *uint64
+}
+
 type RevisionRange struct {
 	MinRevision   int64
 	MaxRevision   int64
