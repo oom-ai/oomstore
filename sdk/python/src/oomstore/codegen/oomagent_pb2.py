@@ -11,8 +11,8 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
-from . import status_pb2 as status__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -21,9 +21,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z\010/codegen',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0eoomagent.proto\x12\x08oomagent\x1a\x1cgoogle/protobuf/struct.proto\x1a\x0cstatus.proto\"\xd1\x01\n\x05Value\x12\x30\n\nnull_value\x18\x01 \x01(\x0e\x32\x1a.google.protobuf.NullValueH\x00\x12\x15\n\x0bint64_value\x18\x02 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x03 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x04 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x05 \x01(\x08H\x00\x12\x1a\n\x10unix_milli_value\x18\x06 \x01(\x03H\x00\x12\x15\n\x0b\x62ytes_value\x18\x07 \x01(\x0cH\x00\x42\x06\n\x04kind\"B\n\x10OnlineGetRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x02 \x03(\t\"\x7f\n\x0f\x46\x65\x61tureValueMap\x12/\n\x03map\x18\x01 \x03(\x0b\x32\".oomagent.FeatureValueMap.MapEntry\x1a;\n\x08MapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1e\n\x05value\x18\x02 \x01(\x0b\x32\x0f.oomagent.Value:\x02\x38\x01\"b\n\x11OnlineGetResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12)\n\x06result\x18\x02 \x01(\x0b\x32\x19.oomagent.FeatureValueMap\"H\n\x15OnlineMultiGetRequest\x12\x13\n\x0b\x65ntity_keys\x18\x01 \x03(\t\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x02 \x03(\t\"\xc4\x01\n\x16OnlineMultiGetResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12<\n\x06result\x18\x02 \x03(\x0b\x32,.oomagent.OnlineMultiGetResponse.ResultEntry\x1aH\n\x0bResultEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12(\n\x05value\x18\x02 \x01(\x0b\x32\x19.oomagent.FeatureValueMap:\x02\x38\x01\"7\n\x0bSyncRequest\x12\x13\n\x0brevision_id\x18\x01 \x01(\x05\x12\x13\n\x0bpurge_delay\x18\x02 \x01(\x05\"2\n\x0cSyncResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\"p\n\x14\x43hannelImportRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x0b\n\x03row\x18\x04 \x01(\x0c\x42\x0b\n\t_revision\"I\n\x0eImportResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x13\n\x0brevision_id\x18\x02 \x01(\x03\"\x88\x01\n\rImportRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x17\n\x0finput_file_path\x18\x04 \x01(\t\x12\x11\n\tdelimiter\x18\x05 \x01(\tB\x0b\n\t_revision\"2\n\x0cPushResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\"u\n\x0bPushRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x12\n\ngroup_name\x18\x02 \x01(\t\x12\x15\n\rfeature_names\x18\x03 \x03(\t\x12\'\n\x0e\x66\x65\x61ture_values\x18\x04 \x03(\x0b\x32\x0f.oomagent.Value\"C\n\tEntityRow\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x12\n\nunix_milli\x18\x02 \x01(\x03\x12\x0e\n\x06values\x18\x03 \x03(\t\"n\n\x12\x43hannelJoinRequest\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x01 \x03(\t\x12\'\n\nentity_row\x18\x02 \x01(\x0b\x32\x13.oomagent.EntityRow\x12\x13\n\x0bvalue_names\x18\x03 \x03(\t\"n\n\x13\x43hannelJoinResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x0e\n\x06header\x18\x02 \x03(\t\x12#\n\njoined_row\x18\x03 \x03(\x0b\x32\x0f.oomagent.Value\"\\\n\x0bJoinRequest\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x01 \x03(\t\x12\x17\n\x0finput_file_path\x18\x02 \x01(\t\x12\x18\n\x10output_file_path\x18\x03 \x01(\t\"2\n\x0cJoinResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\"`\n\x14\x43hannelExportRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x13\n\x0brevision_id\x18\x02 \x01(\x05\x12\x12\n\x05limit\x18\x03 \x01(\x04H\x00\x88\x01\x01\x42\x08\n\x06_limit\"i\n\x15\x43hannelExportResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\x12\x0e\n\x06header\x18\x02 \x03(\t\x12\x1c\n\x03row\x18\x03 \x03(\x0b\x32\x0f.oomagent.Value\"s\n\rExportRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x13\n\x0brevision_id\x18\x02 \x01(\x05\x12\x12\n\x05limit\x18\x03 \x01(\x04H\x00\x88\x01\x01\x12\x18\n\x10output_file_path\x18\x04 \x01(\tB\x08\n\x06_limit\"4\n\x0e\x45xportResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status\"\x14\n\x12HealthCheckRequest\"9\n\x13HealthCheckResponse\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.Status2\x97\x06\n\x08OomAgent\x12\x46\n\tOnlineGet\x12\x1a.oomagent.OnlineGetRequest\x1a\x1b.oomagent.OnlineGetResponse\"\x00\x12U\n\x0eOnlineMultiGet\x12\x1f.oomagent.OnlineMultiGetRequest\x1a .oomagent.OnlineMultiGetResponse\"\x00\x12\x37\n\x04Sync\x12\x15.oomagent.SyncRequest\x1a\x16.oomagent.SyncResponse\"\x00\x12M\n\rChannelImport\x12\x1e.oomagent.ChannelImportRequest\x1a\x18.oomagent.ImportResponse\"\x00(\x01\x12=\n\x06Import\x12\x17.oomagent.ImportRequest\x1a\x18.oomagent.ImportResponse\"\x00\x12\x37\n\x04Push\x12\x15.oomagent.PushRequest\x1a\x16.oomagent.PushResponse\"\x00\x12P\n\x0b\x43hannelJoin\x12\x1c.oomagent.ChannelJoinRequest\x1a\x1d.oomagent.ChannelJoinResponse\"\x00(\x01\x30\x01\x12\x37\n\x04Join\x12\x15.oomagent.JoinRequest\x1a\x16.oomagent.JoinResponse\"\x00\x12T\n\rChannelExport\x12\x1e.oomagent.ChannelExportRequest\x1a\x1f.oomagent.ChannelExportResponse\"\x00\x30\x01\x12=\n\x06\x45xport\x12\x17.oomagent.ExportRequest\x1a\x18.oomagent.ExportResponse\"\x00\x12L\n\x0bHealthCheck\x12\x1c.oomagent.HealthCheckRequest\x1a\x1d.oomagent.HealthCheckResponse\"\x00\x42\nZ\x08/codegenb\x06proto3'
+  serialized_pb=b'\n\x0eoomagent.proto\x12\x08oomagent\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xd1\x01\n\x05Value\x12\x30\n\nnull_value\x18\x01 \x01(\x0e\x32\x1a.google.protobuf.NullValueH\x00\x12\x15\n\x0bint64_value\x18\x02 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x03 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x04 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x05 \x01(\x08H\x00\x12\x1a\n\x10unix_milli_value\x18\x06 \x01(\x03H\x00\x12\x15\n\x0b\x62ytes_value\x18\x07 \x01(\x0cH\x00\x42\x06\n\x04kind\"B\n\x10OnlineGetRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x02 \x03(\t\"\x7f\n\x0f\x46\x65\x61tureValueMap\x12/\n\x03map\x18\x01 \x03(\x0b\x32\".oomagent.FeatureValueMap.MapEntry\x1a;\n\x08MapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1e\n\x05value\x18\x02 \x01(\x0b\x32\x0f.oomagent.Value:\x02\x38\x01\">\n\x11OnlineGetResponse\x12)\n\x06result\x18\x02 \x01(\x0b\x32\x19.oomagent.FeatureValueMap\"H\n\x15OnlineMultiGetRequest\x12\x13\n\x0b\x65ntity_keys\x18\x01 \x03(\t\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x02 \x03(\t\"\xa0\x01\n\x16OnlineMultiGetResponse\x12<\n\x06result\x18\x02 \x03(\x0b\x32,.oomagent.OnlineMultiGetResponse.ResultEntry\x1aH\n\x0bResultEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12(\n\x05value\x18\x02 \x01(\x0b\x32\x19.oomagent.FeatureValueMap:\x02\x38\x01\"7\n\x0bSyncRequest\x12\x13\n\x0brevision_id\x18\x01 \x01(\x05\x12\x13\n\x0bpurge_delay\x18\x02 \x01(\x05\"\x0e\n\x0cSyncResponse\"p\n\x14\x43hannelImportRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x0b\n\x03row\x18\x04 \x01(\x0c\x42\x0b\n\t_revision\"%\n\x0eImportResponse\x12\x13\n\x0brevision_id\x18\x02 \x01(\x03\"\x88\x01\n\rImportRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x17\n\x0finput_file_path\x18\x04 \x01(\t\x12\x11\n\tdelimiter\x18\x05 \x01(\tB\x0b\n\t_revision\"\x0e\n\x0cPushResponse\"u\n\x0bPushRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x12\n\ngroup_name\x18\x02 \x01(\t\x12\x15\n\rfeature_names\x18\x03 \x03(\t\x12\'\n\x0e\x66\x65\x61ture_values\x18\x04 \x03(\x0b\x32\x0f.oomagent.Value\"C\n\tEntityRow\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x12\n\nunix_milli\x18\x02 \x01(\x03\x12\x0e\n\x06values\x18\x03 \x03(\t\"n\n\x12\x43hannelJoinRequest\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x01 \x03(\t\x12\'\n\nentity_row\x18\x02 \x01(\x0b\x32\x13.oomagent.EntityRow\x12\x13\n\x0bvalue_names\x18\x03 \x03(\t\"J\n\x13\x43hannelJoinResponse\x12\x0e\n\x06header\x18\x02 \x03(\t\x12#\n\njoined_row\x18\x03 \x03(\x0b\x32\x0f.oomagent.Value\"\\\n\x0bJoinRequest\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x01 \x03(\t\x12\x17\n\x0finput_file_path\x18\x02 \x01(\t\x12\x18\n\x10output_file_path\x18\x03 \x01(\t\"\x0e\n\x0cJoinResponse\"`\n\x14\x43hannelExportRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x13\n\x0brevision_id\x18\x02 \x01(\x05\x12\x12\n\x05limit\x18\x03 \x01(\x04H\x00\x88\x01\x01\x42\x08\n\x06_limit\"E\n\x15\x43hannelExportResponse\x12\x0e\n\x06header\x18\x02 \x03(\t\x12\x1c\n\x03row\x18\x03 \x03(\x0b\x32\x0f.oomagent.Value\"s\n\rExportRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x13\n\x0brevision_id\x18\x02 \x01(\x05\x12\x12\n\x05limit\x18\x03 \x01(\x04H\x00\x88\x01\x01\x12\x18\n\x10output_file_path\x18\x04 \x01(\tB\x08\n\x06_limit\"\x10\n\x0e\x45xportResponse2\x8a\x06\n\x08OomAgent\x12\x46\n\tOnlineGet\x12\x1a.oomagent.OnlineGetRequest\x1a\x1b.oomagent.OnlineGetResponse\"\x00\x12U\n\x0eOnlineMultiGet\x12\x1f.oomagent.OnlineMultiGetRequest\x1a .oomagent.OnlineMultiGetResponse\"\x00\x12\x37\n\x04Sync\x12\x15.oomagent.SyncRequest\x1a\x16.oomagent.SyncResponse\"\x00\x12M\n\rChannelImport\x12\x1e.oomagent.ChannelImportRequest\x1a\x18.oomagent.ImportResponse\"\x00(\x01\x12=\n\x06Import\x12\x17.oomagent.ImportRequest\x1a\x18.oomagent.ImportResponse\"\x00\x12\x37\n\x04Push\x12\x15.oomagent.PushRequest\x1a\x16.oomagent.PushResponse\"\x00\x12P\n\x0b\x43hannelJoin\x12\x1c.oomagent.ChannelJoinRequest\x1a\x1d.oomagent.ChannelJoinResponse\"\x00(\x01\x30\x01\x12\x37\n\x04Join\x12\x15.oomagent.JoinRequest\x1a\x16.oomagent.JoinResponse\"\x00\x12T\n\rChannelExport\x12\x1e.oomagent.ChannelExportRequest\x1a\x1f.oomagent.ChannelExportResponse\"\x00\x30\x01\x12=\n\x06\x45xport\x12\x17.oomagent.ExportRequest\x1a\x18.oomagent.ExportResponse\"\x00\x12?\n\x0bHealthCheck\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\"\x00\x42\nZ\x08/codegenb\x06proto3'
   ,
-  dependencies=[google_dot_protobuf_dot_struct__pb2.DESCRIPTOR,status__pb2.DESCRIPTOR,])
+  dependencies=[google_dot_protobuf_dot_empty__pb2.DESCRIPTOR,google_dot_protobuf_dot_struct__pb2.DESCRIPTOR,])
 
 
 
@@ -102,8 +102,8 @@ _VALUE = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=73,
-  serialized_end=282,
+  serialized_start=88,
+  serialized_end=297,
 )
 
 
@@ -141,8 +141,8 @@ _ONLINEGETREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=284,
-  serialized_end=350,
+  serialized_start=299,
+  serialized_end=365,
 )
 
 
@@ -180,8 +180,8 @@ _FEATUREVALUEMAP_MAPENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=420,
-  serialized_end=479,
+  serialized_start=435,
+  serialized_end=494,
 )
 
 _FEATUREVALUEMAP = _descriptor.Descriptor(
@@ -211,8 +211,8 @@ _FEATUREVALUEMAP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=352,
-  serialized_end=479,
+  serialized_start=367,
+  serialized_end=494,
 )
 
 
@@ -225,14 +225,7 @@ _ONLINEGETRESPONSE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='status', full_name='oomagent.OnlineGetResponse.status', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='result', full_name='oomagent.OnlineGetResponse.result', index=1,
+      name='result', full_name='oomagent.OnlineGetResponse.result', index=0,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -250,8 +243,8 @@ _ONLINEGETRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=481,
-  serialized_end=579,
+  serialized_start=496,
+  serialized_end=558,
 )
 
 
@@ -289,8 +282,8 @@ _ONLINEMULTIGETREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=581,
-  serialized_end=653,
+  serialized_start=560,
+  serialized_end=632,
 )
 
 
@@ -328,8 +321,8 @@ _ONLINEMULTIGETRESPONSE_RESULTENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=780,
-  serialized_end=852,
+  serialized_start=723,
+  serialized_end=795,
 )
 
 _ONLINEMULTIGETRESPONSE = _descriptor.Descriptor(
@@ -341,14 +334,7 @@ _ONLINEMULTIGETRESPONSE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='status', full_name='oomagent.OnlineMultiGetResponse.status', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='result', full_name='oomagent.OnlineMultiGetResponse.result', index=1,
+      name='result', full_name='oomagent.OnlineMultiGetResponse.result', index=0,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -366,8 +352,8 @@ _ONLINEMULTIGETRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=656,
-  serialized_end=852,
+  serialized_start=635,
+  serialized_end=795,
 )
 
 
@@ -405,8 +391,8 @@ _SYNCREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=854,
-  serialized_end=909,
+  serialized_start=797,
+  serialized_end=852,
 )
 
 
@@ -418,13 +404,6 @@ _SYNCRESPONSE = _descriptor.Descriptor(
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
-    _descriptor.FieldDescriptor(
-      name='status', full_name='oomagent.SyncResponse.status', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -437,8 +416,8 @@ _SYNCRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=911,
-  serialized_end=961,
+  serialized_start=854,
+  serialized_end=868,
 )
 
 
@@ -495,8 +474,8 @@ _CHANNELIMPORTREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=963,
-  serialized_end=1075,
+  serialized_start=870,
+  serialized_end=982,
 )
 
 
@@ -509,14 +488,7 @@ _IMPORTRESPONSE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='status', full_name='oomagent.ImportResponse.status', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='revision_id', full_name='oomagent.ImportResponse.revision_id', index=1,
+      name='revision_id', full_name='oomagent.ImportResponse.revision_id', index=0,
       number=2, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -534,8 +506,8 @@ _IMPORTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1077,
-  serialized_end=1150,
+  serialized_start=984,
+  serialized_end=1021,
 )
 
 
@@ -599,8 +571,8 @@ _IMPORTREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1153,
-  serialized_end=1289,
+  serialized_start=1024,
+  serialized_end=1160,
 )
 
 
@@ -612,13 +584,6 @@ _PUSHRESPONSE = _descriptor.Descriptor(
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
-    _descriptor.FieldDescriptor(
-      name='status', full_name='oomagent.PushResponse.status', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -631,8 +596,8 @@ _PUSHRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1291,
-  serialized_end=1341,
+  serialized_start=1162,
+  serialized_end=1176,
 )
 
 
@@ -684,8 +649,8 @@ _PUSHREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1343,
-  serialized_end=1460,
+  serialized_start=1178,
+  serialized_end=1295,
 )
 
 
@@ -730,8 +695,8 @@ _ENTITYROW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1462,
-  serialized_end=1529,
+  serialized_start=1297,
+  serialized_end=1364,
 )
 
 
@@ -776,8 +741,8 @@ _CHANNELJOINREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1531,
-  serialized_end=1641,
+  serialized_start=1366,
+  serialized_end=1476,
 )
 
 
@@ -790,21 +755,14 @@ _CHANNELJOINRESPONSE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='status', full_name='oomagent.ChannelJoinResponse.status', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='header', full_name='oomagent.ChannelJoinResponse.header', index=1,
+      name='header', full_name='oomagent.ChannelJoinResponse.header', index=0,
       number=2, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='joined_row', full_name='oomagent.ChannelJoinResponse.joined_row', index=2,
+      name='joined_row', full_name='oomagent.ChannelJoinResponse.joined_row', index=1,
       number=3, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -822,8 +780,8 @@ _CHANNELJOINRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1643,
-  serialized_end=1753,
+  serialized_start=1478,
+  serialized_end=1552,
 )
 
 
@@ -868,8 +826,8 @@ _JOINREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1755,
-  serialized_end=1847,
+  serialized_start=1554,
+  serialized_end=1646,
 )
 
 
@@ -881,13 +839,6 @@ _JOINRESPONSE = _descriptor.Descriptor(
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
-    _descriptor.FieldDescriptor(
-      name='status', full_name='oomagent.JoinResponse.status', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -900,8 +851,8 @@ _JOINRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1849,
-  serialized_end=1899,
+  serialized_start=1648,
+  serialized_end=1662,
 )
 
 
@@ -951,8 +902,8 @@ _CHANNELEXPORTREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1901,
-  serialized_end=1997,
+  serialized_start=1664,
+  serialized_end=1760,
 )
 
 
@@ -965,21 +916,14 @@ _CHANNELEXPORTRESPONSE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='status', full_name='oomagent.ChannelExportResponse.status', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='header', full_name='oomagent.ChannelExportResponse.header', index=1,
+      name='header', full_name='oomagent.ChannelExportResponse.header', index=0,
       number=2, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='row', full_name='oomagent.ChannelExportResponse.row', index=2,
+      name='row', full_name='oomagent.ChannelExportResponse.row', index=1,
       number=3, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -997,8 +941,8 @@ _CHANNELEXPORTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1999,
-  serialized_end=2104,
+  serialized_start=1762,
+  serialized_end=1831,
 )
 
 
@@ -1055,8 +999,8 @@ _EXPORTREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=2106,
-  serialized_end=2221,
+  serialized_start=1833,
+  serialized_end=1948,
 )
 
 
@@ -1068,13 +1012,6 @@ _EXPORTRESPONSE = _descriptor.Descriptor(
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
-    _descriptor.FieldDescriptor(
-      name='status', full_name='oomagent.ExportResponse.status', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -1087,65 +1024,8 @@ _EXPORTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2223,
-  serialized_end=2275,
-)
-
-
-_HEALTHCHECKREQUEST = _descriptor.Descriptor(
-  name='HealthCheckRequest',
-  full_name='oomagent.HealthCheckRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=2277,
-  serialized_end=2297,
-)
-
-
-_HEALTHCHECKRESPONSE = _descriptor.Descriptor(
-  name='HealthCheckResponse',
-  full_name='oomagent.HealthCheckResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='status', full_name='oomagent.HealthCheckResponse.status', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=2299,
-  serialized_end=2356,
+  serialized_start=1950,
+  serialized_end=1966,
 )
 
 _VALUE.fields_by_name['null_value'].enum_type = google_dot_protobuf_dot_struct__pb2._NULLVALUE
@@ -1173,36 +1053,26 @@ _VALUE.fields_by_name['bytes_value'].containing_oneof = _VALUE.oneofs_by_name['k
 _FEATUREVALUEMAP_MAPENTRY.fields_by_name['value'].message_type = _VALUE
 _FEATUREVALUEMAP_MAPENTRY.containing_type = _FEATUREVALUEMAP
 _FEATUREVALUEMAP.fields_by_name['map'].message_type = _FEATUREVALUEMAP_MAPENTRY
-_ONLINEGETRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
 _ONLINEGETRESPONSE.fields_by_name['result'].message_type = _FEATUREVALUEMAP
 _ONLINEMULTIGETRESPONSE_RESULTENTRY.fields_by_name['value'].message_type = _FEATUREVALUEMAP
 _ONLINEMULTIGETRESPONSE_RESULTENTRY.containing_type = _ONLINEMULTIGETRESPONSE
-_ONLINEMULTIGETRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
 _ONLINEMULTIGETRESPONSE.fields_by_name['result'].message_type = _ONLINEMULTIGETRESPONSE_RESULTENTRY
-_SYNCRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
 _CHANNELIMPORTREQUEST.oneofs_by_name['_revision'].fields.append(
   _CHANNELIMPORTREQUEST.fields_by_name['revision'])
 _CHANNELIMPORTREQUEST.fields_by_name['revision'].containing_oneof = _CHANNELIMPORTREQUEST.oneofs_by_name['_revision']
-_IMPORTRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
 _IMPORTREQUEST.oneofs_by_name['_revision'].fields.append(
   _IMPORTREQUEST.fields_by_name['revision'])
 _IMPORTREQUEST.fields_by_name['revision'].containing_oneof = _IMPORTREQUEST.oneofs_by_name['_revision']
-_PUSHRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
 _PUSHREQUEST.fields_by_name['feature_values'].message_type = _VALUE
 _CHANNELJOINREQUEST.fields_by_name['entity_row'].message_type = _ENTITYROW
-_CHANNELJOINRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
 _CHANNELJOINRESPONSE.fields_by_name['joined_row'].message_type = _VALUE
-_JOINRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
 _CHANNELEXPORTREQUEST.oneofs_by_name['_limit'].fields.append(
   _CHANNELEXPORTREQUEST.fields_by_name['limit'])
 _CHANNELEXPORTREQUEST.fields_by_name['limit'].containing_oneof = _CHANNELEXPORTREQUEST.oneofs_by_name['_limit']
-_CHANNELEXPORTRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
 _CHANNELEXPORTRESPONSE.fields_by_name['row'].message_type = _VALUE
 _EXPORTREQUEST.oneofs_by_name['_limit'].fields.append(
   _EXPORTREQUEST.fields_by_name['limit'])
 _EXPORTREQUEST.fields_by_name['limit'].containing_oneof = _EXPORTREQUEST.oneofs_by_name['_limit']
-_EXPORTRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
-_HEALTHCHECKRESPONSE.fields_by_name['status'].message_type = status__pb2._STATUS
 DESCRIPTOR.message_types_by_name['Value'] = _VALUE
 DESCRIPTOR.message_types_by_name['OnlineGetRequest'] = _ONLINEGETREQUEST
 DESCRIPTOR.message_types_by_name['FeatureValueMap'] = _FEATUREVALUEMAP
@@ -1225,8 +1095,6 @@ DESCRIPTOR.message_types_by_name['ChannelExportRequest'] = _CHANNELEXPORTREQUEST
 DESCRIPTOR.message_types_by_name['ChannelExportResponse'] = _CHANNELEXPORTRESPONSE
 DESCRIPTOR.message_types_by_name['ExportRequest'] = _EXPORTREQUEST
 DESCRIPTOR.message_types_by_name['ExportResponse'] = _EXPORTRESPONSE
-DESCRIPTOR.message_types_by_name['HealthCheckRequest'] = _HEALTHCHECKREQUEST
-DESCRIPTOR.message_types_by_name['HealthCheckResponse'] = _HEALTHCHECKRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Value = _reflection.GeneratedProtocolMessageType('Value', (_message.Message,), {
@@ -1399,20 +1267,6 @@ ExportResponse = _reflection.GeneratedProtocolMessageType('ExportResponse', (_me
   })
 _sym_db.RegisterMessage(ExportResponse)
 
-HealthCheckRequest = _reflection.GeneratedProtocolMessageType('HealthCheckRequest', (_message.Message,), {
-  'DESCRIPTOR' : _HEALTHCHECKREQUEST,
-  '__module__' : 'oomagent_pb2'
-  # @@protoc_insertion_point(class_scope:oomagent.HealthCheckRequest)
-  })
-_sym_db.RegisterMessage(HealthCheckRequest)
-
-HealthCheckResponse = _reflection.GeneratedProtocolMessageType('HealthCheckResponse', (_message.Message,), {
-  'DESCRIPTOR' : _HEALTHCHECKRESPONSE,
-  '__module__' : 'oomagent_pb2'
-  # @@protoc_insertion_point(class_scope:oomagent.HealthCheckResponse)
-  })
-_sym_db.RegisterMessage(HealthCheckResponse)
-
 
 DESCRIPTOR._options = None
 _FEATUREVALUEMAP_MAPENTRY._options = None
@@ -1425,8 +1279,8 @@ _OOMAGENT = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=2359,
-  serialized_end=3150,
+  serialized_start=1969,
+  serialized_end=2747,
   methods=[
   _descriptor.MethodDescriptor(
     name='OnlineGet',
@@ -1533,8 +1387,8 @@ _OOMAGENT = _descriptor.ServiceDescriptor(
     full_name='oomagent.OomAgent.HealthCheck',
     index=10,
     containing_service=None,
-    input_type=_HEALTHCHECKREQUEST,
-    output_type=_HEALTHCHECKRESPONSE,
+    input_type=google_dot_protobuf_dot_empty__pb2._EMPTY,
+    output_type=google_dot_protobuf_dot_empty__pb2._EMPTY,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

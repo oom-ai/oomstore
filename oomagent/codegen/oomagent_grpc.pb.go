@@ -7,6 +7,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -28,7 +29,7 @@ type OomAgentClient interface {
 	Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error)
 	ChannelExport(ctx context.Context, in *ChannelExportRequest, opts ...grpc.CallOption) (OomAgent_ChannelExportClient, error)
 	Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (*ExportResponse, error)
-	HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
+	HealthCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type oomAgentClient struct {
@@ -199,8 +200,8 @@ func (c *oomAgentClient) Export(ctx context.Context, in *ExportRequest, opts ...
 	return out, nil
 }
 
-func (c *oomAgentClient) HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
-	out := new(HealthCheckResponse)
+func (c *oomAgentClient) HealthCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/oomagent.OomAgent/HealthCheck", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -222,7 +223,7 @@ type OomAgentServer interface {
 	Join(context.Context, *JoinRequest) (*JoinResponse, error)
 	ChannelExport(*ChannelExportRequest, OomAgent_ChannelExportServer) error
 	Export(context.Context, *ExportRequest) (*ExportResponse, error)
-	HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
+	HealthCheck(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedOomAgentServer()
 }
 
@@ -260,7 +261,7 @@ func (UnimplementedOomAgentServer) ChannelExport(*ChannelExportRequest, OomAgent
 func (UnimplementedOomAgentServer) Export(context.Context, *ExportRequest) (*ExportResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Export not implemented")
 }
-func (UnimplementedOomAgentServer) HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error) {
+func (UnimplementedOomAgentServer) HealthCheck(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HealthCheck not implemented")
 }
 func (UnimplementedOomAgentServer) mustEmbedUnimplementedOomAgentServer() {}
@@ -476,7 +477,7 @@ func _OomAgent_Export_Handler(srv interface{}, ctx context.Context, dec func(int
 }
 
 func _OomAgent_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HealthCheckRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -488,7 +489,7 @@ func _OomAgent_HealthCheck_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/oomagent.OomAgent/HealthCheck",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OomAgentServer).HealthCheck(ctx, req.(*HealthCheckRequest))
+		return srv.(OomAgentServer).HealthCheck(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
