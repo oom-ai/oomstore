@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use error::OomError;
 use google::protobuf::Empty;
-use oomagent::{oom_agent_client::OomAgentClient, OnlineGetRequest};
+use oomagent::{oom_agent_client::OomAgentClient, value, OnlineGetRequest};
 use tonic::{codegen::StdError, transport};
 
 type Result<T> = std::result::Result<T, OomError>;
@@ -50,5 +50,17 @@ impl Client {
             Some(res) => res.map,
             None => HashMap::default(),
         })
+    }
+
+    pub async fn online_get(
+        &mut self,
+        key: impl Into<String>,
+        features: Vec<String>,
+    ) -> Result<HashMap<String, value::Kind>> {
+        let rs = self.online_get_raw(key, features).await?;
+        Ok(rs
+            .into_iter()
+            .map(|(k, v)| (k, v.kind.expect("`oneof` should not be none")))
+            .collect())
     }
 }
