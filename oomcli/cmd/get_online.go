@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/csv"
 	"os"
+	"sort"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -13,7 +14,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-var onlineGetOpt types.OnlineGetOpt
+var multiGetOpt types.OnlineMultiGetOpt
 
 var getOnlineCmd = &cobra.Command{
 	Use:   "online",
@@ -23,7 +24,7 @@ var getOnlineCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		featureValues, err := oomStore.OnlineGet(ctx, onlineGetOpt)
+		featureValues, err := oomStore.OnlineMultiGet(ctx, multiGetOpt)
 		if err != nil {
 			exitf("failed getting online features: %+v", err)
 		}
@@ -39,14 +40,14 @@ func init() {
 
 	flags := getOnlineCmd.Flags()
 
-	flags.StringVarP(&onlineGetOpt.EntityKey, "entity-key", "k", "", "entity key")
-	_ = getOnlineCmd.MarkFlagRequired("entity-key")
+	flags.StringSliceVarP(&multiGetOpt.EntityKeys, "entity-keys", "k", nil, "entity keys")
+	_ = getOnlineCmd.MarkFlagRequired("entity-keys")
 
-	flags.StringSliceVar(&onlineGetOpt.FeatureFullNames, "feature", nil, "feature full names")
+	flags.StringSliceVar(&multiGetOpt.FeatureFullNames, "feature", nil, "feature full names")
 	_ = getOnlineCmd.MarkFlagRequired("feature")
 }
 
-func printOnlineFeatures(featureValues *types.FeatureValues, output string) error {
+func printOnlineFeatures(featureValues map[string]*types.FeatureValues, output string) error {
 	switch output {
 	case CSV:
 		return printOnlineFeaturesInCSV(featureValues)
@@ -57,29 +58,63 @@ func printOnlineFeatures(featureValues *types.FeatureValues, output string) erro
 	}
 }
 
-func printOnlineFeaturesInCSV(featureValues *types.FeatureValues) error {
-	header := append([]string{featureValues.EntityName}, featureValues.FeatureFullNames...)
-	record := append([]string{featureValues.EntityKey}, cast.ToStringSlice(featureValues.FeatureValueSlice())...)
+func printOnlineFeaturesInCSV(featureValues map[string]*types.FeatureValues) error {
+	if len(featureValues) == 0 {
+		return nil
+	}
 
-	w := csv.NewWriter(os.Stdout)
+	var (
+		w = csv.NewWriter(os.Stdout)
+
+		keys   = entityKeys(featureValues)
+		header = append([]string{featureValues[keys[0]].EntityName}, featureValues[keys[0]].FeatureFullNames...)
+	)
+
 	if err := w.Write(header); err != nil {
 		return err
 	}
-	if err := w.Write(record); err != nil {
-		return err
+	for _, key := range keys {
+		value := featureValues[key]
+		record := append([]string{value.EntityKey}, cast.ToStringSlice(value.FeatureValueSlice())...)
+		if err := w.Write(record); err != nil {
+			return err
+		}
 	}
+
 	w.Flush()
 	return nil
 }
 
-func printOnlineFeaturesInASCIITable(featureValues *types.FeatureValues) error {
-	header := append([]string{featureValues.EntityName}, featureValues.FeatureFullNames...)
-	record := append([]string{featureValues.EntityKey}, cast.ToStringSlice(featureValues.FeatureValueSlice())...)
+func printOnlineFeaturesInASCIITable(featureValues map[string]*types.FeatureValues) error {
+	if len(featureValues) == 0 {
+		return nil
+	}
 
-	table := tablewriter.NewWriter(os.Stdout)
+	var (
+		table = tablewriter.NewWriter(os.Stdout)
+
+		keys   = entityKeys(featureValues)
+		header = append([]string{featureValues[keys[0]].EntityName}, featureValues[keys[0]].FeatureFullNames...)
+	)
 	table.SetAutoFormatHeaders(false)
 	table.SetHeader(header)
-	table.Append(record)
+
+	for _, key := range keys {
+		value := featureValues[key]
+		record := append([]string{value.EntityKey}, cast.ToStringSlice(value.FeatureValueSlice())...)
+		table.Append(record)
+	}
+
 	table.Render()
 	return nil
+}
+
+func entityKeys(featureValues map[string]*types.FeatureValues) []string {
+	keys := make([]string, 0, len(featureValues))
+	for key := range featureValues {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	return keys
 }

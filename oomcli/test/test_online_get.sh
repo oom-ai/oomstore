@@ -31,3 +31,12 @@ device,phone.price,phone.model
 '
 actual=$(oomcli get online --feature phone.price,phone.model -k 6 -o csv)
 assert_eq "$case" "$expected" "$actual"
+
+case="query multiple entity and features"
+expected='
+device,phone.price,phone.model
+1,3999,xiaomi-mix3
+6,4999,apple-iphone11
+'
+actual=$(oomcli get online --feature phone.price,phone.model -k 1,6 -o csv)
+assert_eq "$case" "$expected" "$actual"
