@@ -52,7 +52,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 		_, err := store.Import(ctx, opt)
 		assert.NoError(t, err)
 
-		stream, errch := store.Export(ctx, offline.ExportOpt{
+		stream, errch := store.ExportOneGroup(ctx, offline.ExportOneGroupOpt{
 			SnapshotTable: snapshotTable,
 			EntityName:    entity.Name,
 			Features: []*types.Feature{

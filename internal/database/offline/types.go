@@ -6,7 +6,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-type ExportOpt struct {
+type ExportOneGroupOpt struct {
 	SnapshotTable string
 	CdcTable      *string
 	UnixMilli     *int64

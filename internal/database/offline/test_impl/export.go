@@ -53,13 +53,13 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 
 	testCases := []struct {
 		description   string
-		opt           offline.ExportOpt
+		opt           offline.ExportOneGroupOpt
 		expected      [][]interface{}
 		expectedError error
 	}{
 		{
 			description: "no features",
-			opt: offline.ExportOpt{
+			opt: offline.ExportOneGroupOpt{
 				SnapshotTable: snapshotTable,
 				EntityName:    "device",
 				Features:      types.FeatureList{},
@@ -68,13 +68,13 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 		},
 		{
 			description: "invalid option",
-			opt: offline.ExportOpt{
+			opt: offline.ExportOneGroupOpt{
 				SnapshotTable: snapshotTable,
 				CdcTable:      &cdcTable,
 				EntityName:    "device",
 				Features:      features,
 			},
-			expectedError: fmt.Errorf("invalid option %+v", offline.ExportOpt{
+			expectedError: fmt.Errorf("invalid option %+v", offline.ExportOneGroupOpt{
 				SnapshotTable: snapshotTable,
 				CdcTable:      &cdcTable,
 				EntityName:    "device",
@@ -83,7 +83,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 		},
 		{
 			description: "batch features",
-			opt: offline.ExportOpt{
+			opt: offline.ExportOneGroupOpt{
 				SnapshotTable: snapshotTable,
 				EntityName:    "device",
 				Features:      features,
@@ -92,7 +92,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 		},
 		{
 			description: "streaming features",
-			opt: offline.ExportOpt{
+			opt: offline.ExportOneGroupOpt{
 				SnapshotTable: snapshotTable,
 				CdcTable:      &cdcTable,
 				UnixMilli:     int64Ptr(11),
@@ -105,7 +105,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			actual, errs := store.Export(ctx, tc.opt)
+			actual, errs := store.ExportOneGroup(ctx, tc.opt)
 			values := make([][]interface{}, 0)
 			for row := range actual {
 				values = append(values, row)

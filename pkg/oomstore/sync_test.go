@@ -74,7 +74,7 @@ func TestSync(t *testing.T) {
 				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features, nil)
 
 				stream := make(chan types.ExportRecord)
-				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
+				offlineStore.EXPECT().ExportOneGroup(ctx, offline.ExportOneGroupOpt{
 					SnapshotTable: "snapshot-table-name",
 					EntityName:    "device",
 					Features:      features,
@@ -109,7 +109,7 @@ func TestSync(t *testing.T) {
 				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features, nil)
 
 				stream := make(chan types.ExportRecord)
-				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
+				offlineStore.EXPECT().ExportOneGroup(ctx, offline.ExportOneGroupOpt{
 					SnapshotTable: "snapshot-table-name",
 					EntityName:    "device",
 					Features:      features,

@@ -13,26 +13,26 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-type QueryExportResults func(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error)
+type QueryExportResults func(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error)
 
-type DoExportOpt struct {
-	offline.ExportOpt
+type DoExportOneGroupOpt struct {
+	offline.ExportOneGroupOpt
 	QueryResults QueryExportResults
 }
 
-func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend types.BackendType) (<-chan types.ExportRecord, <-chan error) {
+func ExportOneGroup(ctx context.Context, db *sqlx.DB, opt offline.ExportOneGroupOpt, backend types.BackendType) (<-chan types.ExportRecord, <-chan error) {
 	dbOpt := dbutil.DBOpt{
 		Backend: backend,
 		SqlxDB:  db,
 	}
-	doJoinOpt := DoExportOpt{
-		ExportOpt:    opt,
-		QueryResults: sqlxQueryExportResults,
+	doJoinOpt := DoExportOneGroupOpt{
+		ExportOneGroupOpt: opt,
+		QueryResults:      sqlxQueryExportResults,
 	}
-	return DoExport(ctx, dbOpt, doJoinOpt)
+	return DoExportOneGroup(ctx, dbOpt, doJoinOpt)
 }
 
-func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (<-chan types.ExportRecord, <-chan error) {
+func DoExportOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOneGroupOpt) (<-chan types.ExportRecord, <-chan error) {
 	var (
 		emptyStream = make(chan types.ExportRecord)
 		errs        = make(chan error, 1) // at most 1 error
@@ -40,16 +40,16 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (<-chan 
 	defer close(emptyStream)
 	defer close(errs)
 
-	query, args, err := buildExportQuery(dbOpt, opt.ExportOpt)
+	query, args, err := buildExportQuery(dbOpt, opt.ExportOneGroupOpt)
 	if err != nil {
 		errs <- errdefs.WithStack(err)
 		return emptyStream, errs
 	}
 
-	return opt.QueryResults(ctx, dbOpt, opt.ExportOpt, query, args)
+	return opt.QueryResults(ctx, dbOpt, opt.ExportOneGroupOpt, query, args)
 }
 
-func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error) {
+func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error) {
 	stream := make(chan types.ExportRecord)
 	errs := make(chan error, 1) // at most 1 error
 
@@ -93,7 +93,7 @@ func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline
 	return stream, errs
 }
 
-func buildExportQuery(dbOpt dbutil.DBOpt, opt offline.ExportOpt) (string, []interface{}, error) {
+func buildExportQuery(dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt) (string, []interface{}, error) {
 	if opt.CdcTable == nil && opt.UnixMilli == nil {
 		return buildExportBatchQuery(dbOpt, opt), nil, nil
 	}
@@ -103,7 +103,7 @@ func buildExportQuery(dbOpt dbutil.DBOpt, opt offline.ExportOpt) (string, []inte
 	return "", nil, fmt.Errorf("invalid option %+v", opt)
 }
 
-func buildExportBatchQuery(dbOpt dbutil.DBOpt, opt offline.ExportOpt) string {
+func buildExportBatchQuery(dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt) string {
 	fields := append([]string{opt.EntityName}, opt.Features.Names()...)
 	qt := dbutil.QuoteFn(dbOpt.Backend)
 
@@ -118,7 +118,7 @@ func buildExportBatchQuery(dbOpt dbutil.DBOpt, opt offline.ExportOpt) string {
 	return query
 }
 
-func buildExportStreamQuery(dbOpt dbutil.DBOpt, opt offline.ExportOpt) (string, []interface{}, error) {
+func buildExportStreamQuery(dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt) (string, []interface{}, error) {
 	query, err := buildAggregateQuery(aggregateQueryParams{
 		EntityName:            opt.EntityName,
 		UnixMilli:             "unix_milli",
