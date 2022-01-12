@@ -1,8 +1,10 @@
 pub mod error;
 
+use std::collections::HashMap;
+
 use error::OomError;
 use google::protobuf::Empty;
-use oomagent::oom_agent_client::OomAgentClient;
+use oomagent::{oom_agent_client::OomAgentClient, OnlineGetRequest};
 use tonic::{codegen::StdError, transport};
 
 type Result<T> = std::result::Result<T, OomError>;
@@ -31,9 +33,22 @@ impl Client {
     }
 
     pub async fn health_check(&mut self) -> Result<()> {
-        match self.inner.health_check(Empty {}).await {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e.into()),
-        }
+        Ok(self.inner.health_check(Empty {}).await.map(|_| ())?)
+    }
+
+    pub async fn online_get_raw(
+        &mut self,
+        key: impl Into<String>,
+        features: Vec<String>,
+    ) -> Result<HashMap<String, oomagent::Value>> {
+        let res = self
+            .inner
+            .online_get(OnlineGetRequest { entity_key: key.into(), feature_full_names: features })
+            .await?
+            .into_inner();
+        Ok(match res.result {
+            Some(res) => res.map,
+            None => HashMap::default(),
+        })
     }
 }
