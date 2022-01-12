@@ -2,7 +2,11 @@ package bigquery
 
 import (
 	"context"
-	"fmt"
+	"strings"
+
+	"github.com/spf13/cast"
+
+	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
 
 	"cloud.google.com/go/bigquery"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -14,22 +18,29 @@ import (
 )
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
-	qt := dbutil.QuoteFn(Backend)
-	fieldStr := qt(append([]string{opt.EntityName}, opt.Features.Names()...)...)
-	tableName := qt(opt.SnapshotTable)
-
-	q := fmt.Sprintf(`SELECT %s FROM %s.%s`, fieldStr, db.datasetID, tableName)
-	if opt.Limit != nil {
-		q += fmt.Sprintf(" LIMIT %d", *opt.Limit)
+	dbOpt := dbutil.DBOpt{
+		Backend:    types.BackendBigQuery,
+		BigQueryDB: db.Client,
+		DatasetID:  &db.datasetID,
 	}
-	query := db.Query(q)
+	doExportOpt := sqlutil.DoExportOpt{
+		ExportOpt:    opt,
+		QueryResults: bigqueryQueryExportResults,
+	}
+	return sqlutil.DoExport(ctx, dbOpt, doExportOpt)
+}
 
+func bigqueryQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error) {
 	stream := make(chan types.ExportRecord)
 	errs := make(chan error, 1) // at most 1 error
+	for _, arg := range args {
+		query = strings.Replace(query, "?", cast.ToString(arg), 1)
+	}
+
 	go func() {
 		defer close(stream)
 		defer close(errs)
-		rows, err := query.Read(ctx)
+		rows, err := dbOpt.BigQueryDB.Query(query).Read(ctx)
 		if err != nil {
 			errs <- err
 			return
@@ -54,5 +65,4 @@ func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.E
 	}()
 
 	return stream, errs
-
 }

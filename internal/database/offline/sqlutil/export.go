@@ -13,24 +13,50 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend types.BackendType) (<-chan types.ExportRecord, <-chan error) {
-	var (
-		stream = make(chan types.ExportRecord)
-		errs   = make(chan error, 1) // at most 1 error
-	)
+type QueryExportResults func(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error)
 
-	query, args, err := buildExportQuery(opt, backend)
-	if err != nil {
-		defer close(stream)
-		defer close(errs)
-		errs <- errdefs.WithStack(err)
-		return stream, errs
+type DoExportOpt struct {
+	offline.ExportOpt
+	QueryResults QueryExportResults
+}
+
+func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend types.BackendType) (<-chan types.ExportRecord, <-chan error) {
+	dbOpt := dbutil.DBOpt{
+		Backend: backend,
+		SqlxDB:  db,
 	}
+	doJoinOpt := DoExportOpt{
+		ExportOpt:    opt,
+		QueryResults: sqlxQueryExportResults,
+	}
+	return DoExport(ctx, dbOpt, doJoinOpt)
+}
+
+func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (<-chan types.ExportRecord, <-chan error) {
+	var (
+		emptyStream = make(chan types.ExportRecord)
+		errs        = make(chan error, 1) // at most 1 error
+	)
+	defer close(emptyStream)
+	defer close(errs)
+
+	query, args, err := buildExportQuery(dbOpt, opt.ExportOpt)
+	if err != nil {
+		errs <- errdefs.WithStack(err)
+		return emptyStream, errs
+	}
+
+	return opt.QueryResults(ctx, dbOpt, opt.ExportOpt, query, args)
+}
+
+func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error) {
+	stream := make(chan types.ExportRecord)
+	errs := make(chan error, 1) // at most 1 error
 
 	go func() {
 		defer close(stream)
 		defer close(errs)
-		stmt, err := db.Preparex(db.Rebind(query))
+		stmt, err := dbOpt.SqlxDB.Preparex(dbOpt.SqlxDB.Rebind(query))
 		if err != nil {
 			errs <- errdefs.WithStack(err)
 			return
@@ -53,7 +79,7 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend typ
 				if record[i+1] == nil {
 					continue
 				}
-				deserializedValue, err := dbutil.DeserializeByValueType(record[i+1], f.ValueType, backend)
+				deserializedValue, err := dbutil.DeserializeByValueType(record[i+1], f.ValueType, dbOpt.Backend)
 				if err != nil {
 					errs <- err
 					return
@@ -67,35 +93,40 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend typ
 	return stream, errs
 }
 
-func buildExportQuery(opt offline.ExportOpt, backend types.BackendType) (string, []interface{}, error) {
+func buildExportQuery(dbOpt dbutil.DBOpt, opt offline.ExportOpt) (string, []interface{}, error) {
 	if opt.CdcTable == nil && opt.UnixMilli == nil {
-		return buildExportBatchQuery(opt, backend), nil, nil
+		return buildExportBatchQuery(dbOpt, opt), nil, nil
 	}
 	if opt.CdcTable != nil && opt.UnixMilli != nil {
-		return buildExportStreamQuery(opt, backend)
+		return buildExportStreamQuery(dbOpt, opt)
 	}
 	return "", nil, fmt.Errorf("invalid option %+v", opt)
 }
 
-func buildExportBatchQuery(opt offline.ExportOpt, backend types.BackendType) string {
+func buildExportBatchQuery(dbOpt dbutil.DBOpt, opt offline.ExportOpt) string {
 	fields := append([]string{opt.EntityName}, opt.Features.Names()...)
-	qt := dbutil.QuoteFn(backend)
+	qt := dbutil.QuoteFn(dbOpt.Backend)
 
-	query := fmt.Sprintf("SELECT %s FROM %s", qt(fields...), qt(opt.SnapshotTable))
+	tableName := qt(opt.SnapshotTable)
+	if dbOpt.Backend == types.BackendBigQuery {
+		tableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, tableName)
+	}
+	query := fmt.Sprintf("SELECT %s FROM %s", qt(fields...), tableName)
 	if opt.Limit != nil {
 		query += fmt.Sprintf(" LIMIT %d", *opt.Limit)
 	}
 	return query
 }
 
-func buildExportStreamQuery(opt offline.ExportOpt, backend types.BackendType) (string, []interface{}, error) {
+func buildExportStreamQuery(dbOpt dbutil.DBOpt, opt offline.ExportOpt) (string, []interface{}, error) {
 	query, err := buildAggregateQuery(aggregateQueryParams{
 		EntityName:            opt.EntityName,
 		UnixMilli:             "unix_milli",
 		FeatureNames:          opt.Features.Names(),
 		PrevSnapshotTableName: opt.SnapshotTable,
 		CurrCdcTableName:      *opt.CdcTable,
-		Backend:               backend,
+		Backend:               dbOpt.Backend,
+		DatasetID:             dbOpt.DatasetID,
 	})
 	if err != nil {
 		return "", nil, errdefs.WithStack(err)

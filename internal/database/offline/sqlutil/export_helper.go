@@ -72,6 +72,8 @@ type aggregateQueryParams struct {
 func buildAggregateQuery(params aggregateQueryParams) (string, error) {
 	if params.Backend == types.BackendBigQuery {
 		params.Union = "UNION DISTINCT"
+		params.PrevSnapshotTableName = fmt.Sprintf("%s.%s", *params.DatasetID, params.PrevSnapshotTableName)
+		params.CurrCdcTableName = fmt.Sprintf("%s.%s", *params.DatasetID, params.CurrCdcTableName)
 	} else {
 		params.Union = "UNION"
 	}
