@@ -12,6 +12,7 @@ service OomAgent {
 
   rpc ChannelImport(stream ChannelImportRequest) returns (ImportResponse) {}
   rpc Import(ImportRequest) returns (ImportResponse) {}
+  rpc Push(PushRequest) returns (PushResponse) {}
 
   rpc ChannelJoin(stream ChannelJoinRequest) returns (stream ChannelJoinResponse) {}
   rpc Join(JoinRequest) returns (JoinResponse) {}
@@ -91,6 +92,17 @@ message ImportRequest {
   optional int64 revision = 3;
   string input_file_path = 4;
   string delimiter = 5;
+}
+
+message PushResponse {
+    google.rpc.Status status = 1;
+}
+
+message PushRequest {
+  string entity_key = 1;
+  string group_name = 2;
+  repeated string feature_names = 3;
+  repeated Value feature_values = 4;
 }
 
 message EntityRow {

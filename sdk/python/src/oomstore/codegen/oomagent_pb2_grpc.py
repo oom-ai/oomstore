@@ -39,6 +39,11 @@ class OomAgentStub(object):
                 request_serializer=oomagent__pb2.ImportRequest.SerializeToString,
                 response_deserializer=oomagent__pb2.ImportResponse.FromString,
                 )
+        self.Push = channel.unary_unary(
+                '/oomagent.OomAgent/Push',
+                request_serializer=oomagent__pb2.PushRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.PushResponse.FromString,
+                )
         self.ChannelJoin = channel.stream_stream(
                 '/oomagent.OomAgent/ChannelJoin',
                 request_serializer=oomagent__pb2.ChannelJoinRequest.SerializeToString,
@@ -94,6 +99,12 @@ class OomAgentServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def Import(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Push(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -156,6 +167,11 @@ def add_OomAgentServicer_to_server(servicer, server):
                     servicer.Import,
                     request_deserializer=oomagent__pb2.ImportRequest.FromString,
                     response_serializer=oomagent__pb2.ImportResponse.SerializeToString,
+            ),
+            'Push': grpc.unary_unary_rpc_method_handler(
+                    servicer.Push,
+                    request_deserializer=oomagent__pb2.PushRequest.FromString,
+                    response_serializer=oomagent__pb2.PushResponse.SerializeToString,
             ),
             'ChannelJoin': grpc.stream_stream_rpc_method_handler(
                     servicer.ChannelJoin,
@@ -274,6 +290,23 @@ class OomAgent(object):
         return grpc.experimental.unary_unary(request, target, '/oomagent.OomAgent/Import',
             oomagent__pb2.ImportRequest.SerializeToString,
             oomagent__pb2.ImportResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Push(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/oomagent.OomAgent/Push',
+            oomagent__pb2.PushRequest.SerializeToString,
+            oomagent__pb2.PushResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
