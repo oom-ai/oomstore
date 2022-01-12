@@ -80,6 +80,13 @@ items:
       entity-name: user
       category: stream
       description: user click post feature
+      features:
+        - name: last_5_click_posts
+          value-type: string
+          description: user last 5 click posts
+        - name: number_of_user_started_posts
+          value-type: int64
+          description: number of posts that users stared today
 '
 actual=$(oomcli get meta group -o yaml)
 assert_eq "$case" "$expected" "$actual"
