@@ -23,11 +23,7 @@ arg='
 ]
 }
 '
-expected='
-{
-  "status": {}
-}
-'
+expected='{}'
 
 # wait informer refresh
 sleep 1
@@ -43,9 +39,6 @@ arg='
 '
 expected='
 {
-  "status": {
-
-  },
   "result": {
     "map": {
       "user-click.last_5_click_posts": {

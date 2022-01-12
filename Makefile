@@ -42,7 +42,6 @@ grpc-python:
 		--python_out=sdk/python/src/oomstore/codegen \
 		--grpc-python_out=sdk/python/src/oomstore/codegen \
 		proto/oomagent.proto
-	@perl -pi -e s,"import status_pb2","from . import status_pb2",g sdk/python/src/oomstore/codegen/oomagent_pb2.py
 	@perl -pi -e s,"import oomagent_pb2","from . import oomagent_pb2",g sdk/python/src/oomstore/codegen/oomagent_pb2_grpc.py
 
 .PHONY: build

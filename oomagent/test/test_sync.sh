@@ -11,11 +11,7 @@ arg='
     "revision_id": "3"
 }
 '
-expected='
-{
-  "status": {}
-}
-'
+expected='{}'
 import_sample account ./data/account_10.csv
 actual=$(testgrpc Sync <<<"$arg")
 assert_json_eq "$case" "$expected" "$actual"

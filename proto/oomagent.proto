@@ -2,8 +2,8 @@ syntax = "proto3";
 package oomagent;
 option go_package = "/codegen";
 
+import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
-import "status.proto";
 
 service OomAgent {
   rpc OnlineGet(OnlineGetRequest) returns (OnlineGetResponse) {}
@@ -19,7 +19,7 @@ service OomAgent {
 
   rpc ChannelExport(ChannelExportRequest) returns (stream ChannelExportResponse) {}
   rpc Export(ExportRequest) returns (ExportResponse) {}
-  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {}
+  rpc HealthCheck(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
 message Value {
@@ -52,7 +52,6 @@ message FeatureValueMap {
 }
 
 message OnlineGetResponse {
-  google.rpc.Status status = 1;
   FeatureValueMap result = 2;
 }
 
@@ -62,7 +61,6 @@ message OnlineMultiGetRequest {
 }
 
 message OnlineMultiGetResponse {
-  google.rpc.Status status = 1;
   map<string, FeatureValueMap> result = 2;
 }
 
@@ -71,7 +69,6 @@ message SyncRequest {
   int32 purge_delay = 2;
 }
 message SyncResponse {
-  google.rpc.Status status = 1;
 }
 
 message ChannelImportRequest {
@@ -82,7 +79,6 @@ message ChannelImportRequest {
 }
 
 message ImportResponse {
-  google.rpc.Status status = 1;
   int64 revision_id = 2;
 }
 
@@ -95,7 +91,6 @@ message ImportRequest {
 }
 
 message PushResponse {
-    google.rpc.Status status = 1;
 }
 
 message PushRequest {
@@ -118,7 +113,6 @@ message ChannelJoinRequest {
 }
 
 message ChannelJoinResponse {
-  google.rpc.Status status = 1;
   repeated string header = 2;
   repeated Value joined_row = 3;
 }
@@ -130,7 +124,6 @@ message JoinRequest {
 }
 
 message JoinResponse {
-  google.rpc.Status status = 1;
 }
 
 message ChannelExportRequest {
@@ -140,7 +133,6 @@ message ChannelExportRequest {
 }
 
 message ChannelExportResponse {
-  google.rpc.Status status = 1;
   repeated string header = 2;
   repeated Value row = 3;
 }
@@ -153,12 +145,4 @@ message ExportRequest {
 }
 
 message ExportResponse {
-  google.rpc.Status status = 1;
-}
-
-message HealthCheckRequest {
-}
-
-message HealthCheckResponse {
-  google.rpc.Status status = 1;
 }

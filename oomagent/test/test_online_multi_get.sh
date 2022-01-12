@@ -14,7 +14,6 @@ arg='
 '
 expected='
 {
-  "status": {},
   "result": {
     "19": {
       "map": {
@@ -52,7 +51,6 @@ arg='
 '
 expected='
 {
-  "status": {},
   "result": {
     "48": {
       "map": {

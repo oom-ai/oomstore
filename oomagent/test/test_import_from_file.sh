@@ -16,7 +16,6 @@ EOF
 )
 expected='
 {
-  "status": {},
   "revisionId": "3"
 }
 '

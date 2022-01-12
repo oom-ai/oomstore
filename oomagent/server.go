@@ -6,8 +6,9 @@ import (
 	"log"
 	"time"
 
-	code "google.golang.org/genproto/googleapis/rpc/code"
-	status "google.golang.org/genproto/googleapis/rpc/status"
+	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/oom-ai/oomstore/oomagent/codegen"
@@ -22,15 +23,11 @@ type server struct {
 	oomstore *oomstore.OomStore
 }
 
-func (s *server) HealthCheck(ctx context.Context, req *codegen.HealthCheckRequest) (*codegen.HealthCheckResponse, error) {
+func (s *server) HealthCheck(ctx context.Context, req *empty.Empty) (*empty.Empty, error) {
 	if err := s.oomstore.Ping(ctx); err != nil {
-		return &codegen.HealthCheckResponse{
-			Status: buildStatus(code.Code_UNAVAILABLE, "oomstore is currently unavailable"),
-		}, err
+		return nil, status.Errorf(codes.Unavailable, "oomstore is currently unavailable")
 	}
-	return &codegen.HealthCheckResponse{
-		Status: buildStatus(code.Code_OK, ""),
-	}, nil
+	return &empty.Empty{}, nil
 }
 
 func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (*codegen.OnlineGetResponse, error) {
@@ -39,19 +36,14 @@ func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (
 		EntityKey:        req.EntityKey,
 	})
 	if err != nil {
-		return &codegen.OnlineGetResponse{
-			Status: buildStatus(code.Code_INTERNAL, err.Error()),
-		}, err
+		return nil, internalError(err.Error())
 	}
 
 	valueMap, err := convertToValueMap(result.FeatureValueMap)
 	if err != nil {
-		return &codegen.OnlineGetResponse{
-			Status: buildStatus(code.Code_INTERNAL, err.Error()),
-		}, err
+		return nil, internalError(err.Error())
 	}
 	return &codegen.OnlineGetResponse{
-		Status: buildStatus(code.Code_OK, ""),
 		Result: &codegen.FeatureValueMap{
 			Map: valueMap,
 		},
@@ -64,25 +56,20 @@ func (s *server) OnlineMultiGet(ctx context.Context, req *codegen.OnlineMultiGet
 		EntityKeys:       req.EntityKeys,
 	})
 	if err != nil {
-		return &codegen.OnlineMultiGetResponse{
-			Status: buildStatus(code.Code_INTERNAL, err.Error()),
-		}, err
+		return nil, internalError(err.Error())
 	}
 
 	resultMap := make(map[string]*codegen.FeatureValueMap)
 	for entityKey, featureValues := range result {
 		valueMap, err := convertToValueMap(featureValues.FeatureValueMap)
 		if err != nil {
-			return &codegen.OnlineMultiGetResponse{
-				Status: buildStatus(code.Code_INTERNAL, err.Error()),
-			}, err
+			return nil, internalError(err.Error())
 		}
 		resultMap[entityKey] = &codegen.FeatureValueMap{
 			Map: valueMap,
 		}
 	}
 	return &codegen.OnlineMultiGetResponse{
-		Status: buildStatus(code.Code_OK, ""),
 		Result: resultMap,
 	}, nil
 }
@@ -92,25 +79,16 @@ func (s *server) Sync(ctx context.Context, req *codegen.SyncRequest) (*codegen.S
 		RevisionID: int(req.RevisionId),
 		PurgeDelay: int(req.PurgeDelay),
 	}); err != nil {
-		return &codegen.SyncResponse{
-			Status: &status.Status{
-				Code:    int32(code.Code_INTERNAL),
-				Message: err.Error(),
-			},
-		}, err
+		return nil, internalError(err.Error())
 	}
 
-	return &codegen.SyncResponse{
-		Status: &status.Status{
-			Code: int32(code.Code_OK),
-		},
-	}, nil
+	return &codegen.SyncResponse{}, nil
 }
 
 func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) error {
 	firstReq, err := stream.Recv()
 	if err != nil {
-		return err
+		return internalError(err.Error())
 	}
 
 	reader, writer := io.Pipe()
@@ -150,17 +128,9 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 		},
 	})
 	if err != nil {
-		return stream.SendAndClose(&codegen.ImportResponse{
-			Status: &status.Status{
-				Code:    int32(code.Code_INTERNAL),
-				Message: err.Error(),
-			},
-		})
+		return internalError(err.Error())
 	}
 	return stream.SendAndClose(&codegen.ImportResponse{
-		Status: &status.Status{
-			Code: int32(code.Code_OK),
-		},
 		RevisionId: int64(revisionID),
 	})
 }
@@ -172,18 +142,9 @@ func (s *server) Push(ctx context.Context, req *codegen.PushRequest) (*codegen.P
 		FeatureNames:  req.FeatureNames,
 		FeatureValues: convertToInterfaceSlice(req.FeatureValues),
 	}); err != nil {
-		return &codegen.PushResponse{
-			Status: &status.Status{
-				Code:    int32(code.Code_INTERNAL),
-				Message: err.Error(),
-			},
-		}, err
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
-	return &codegen.PushResponse{
-		Status: &status.Status{
-			Code: int32(code.Code_OK),
-		},
-	}, nil
+	return &codegen.PushResponse{}, nil
 }
 
 func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codegen.ImportResponse, error) {
@@ -198,14 +159,10 @@ func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codeg
 		},
 	})
 	if err != nil {
-		return &codegen.ImportResponse{
-			Status:     buildStatus(code.Code_INTERNAL, err.Error()),
-			RevisionId: int64(revisionID),
-		}, err
+		return nil, internalError(err.Error())
 	}
 
 	return &codegen.ImportResponse{
-		Status:     buildStatus(code.Code_OK, ""),
 		RevisionId: int64(revisionID),
 	}, nil
 }
@@ -214,7 +171,7 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 	// We need to read the first request to get the feature names and value names
 	firstReq, err := stream.Recv()
 	if err != nil {
-		return err
+		return internalError(err.Error())
 	}
 
 	// A global error
@@ -244,7 +201,6 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 				}
 				resp := &codegen.ChannelJoinResponse{
 					Header:    header,
-					Status:    buildStatus(code.Code_OK, ""),
 					JoinedRow: joinedRow,
 				}
 				if err = stream.Send(resp); err != nil {
@@ -303,14 +259,10 @@ func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.J
 		OutputFilePath:   req.OutputFilePath,
 	})
 	if err != nil {
-		return &codegen.JoinResponse{
-			Status: buildStatus(code.Code_INTERNAL, err.Error()),
-		}, err
+		return nil, internalError(err.Error())
 	}
 
-	return &codegen.JoinResponse{
-		Status: buildStatus(code.Code_OK, ""),
-	}, nil
+	return &codegen.JoinResponse{}, nil
 }
 
 func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen.OomAgent_ChannelExportServer) error {
@@ -321,17 +273,16 @@ func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen
 		Limit:        req.Limit,
 	})
 	if err != nil {
-		return err
+		return internalError(err.Error())
 	}
 
 	header := exportResult.Header
 	for row := range exportResult.Data {
 		valueRow, err := convertToValueSlice(row)
 		if err != nil {
-			return err
+			return internalError(err.Error())
 		}
 		if err := stream.Send(&codegen.ChannelExportResponse{
-			Status: buildStatus(code.Code_OK, ""),
 			Header: header,
 			Row:    valueRow,
 		}); err != nil {
@@ -340,13 +291,8 @@ func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen
 		// Only need to send header upon the first response
 		header = nil
 	}
-	exportErr := exportResult.CheckStreamError()
-	if exportErr != nil {
-		if err := stream.Send(&codegen.ChannelExportResponse{
-			Status: buildStatus(code.Code_INTERNAL, exportErr.Error()),
-		}); err != nil {
-			return err
-		}
+	if err := exportResult.CheckStreamError(); err != nil {
+		return internalError(err.Error())
 	}
 	return nil
 }
@@ -359,13 +305,9 @@ func (s *server) Export(ctx context.Context, req *codegen.ExportRequest) (*codeg
 		OutputFilePath: req.OutputFilePath,
 	})
 	if err != nil {
-		return &codegen.ExportResponse{
-			Status: buildStatus(code.Code_INTERNAL, err.Error()),
-		}, err
+		return nil, internalError(err.Error())
 	}
-	return &codegen.ExportResponse{
-		Status: buildStatus(code.Code_OK, ""),
-	}, nil
+	return &codegen.ExportResponse{}, nil
 }
 
 func convertToValueMap(m map[string]interface{}) (map[string]*codegen.Value, error) {
@@ -390,13 +332,6 @@ func convertToValueSlice(s []interface{}) ([]*codegen.Value, error) {
 		valueSlice = append(valueSlice, value)
 	}
 	return valueSlice, nil
-}
-
-func buildStatus(code code.Code, message string) *status.Status {
-	return &status.Status{
-		Code:    int32(code),
-		Message: message,
-	}
 }
 
 func convertInterfaceToValue(i interface{}) (*codegen.Value, error) {
@@ -487,4 +422,8 @@ func convertToInterfaceSlice(values []*codegen.Value) []interface{} {
 		res = append(res, convertValueToInterface(value))
 	}
 	return res
+}
+
+func internalError(msg string) error {
+	return status.Errorf(codes.Internal, msg)
 }
