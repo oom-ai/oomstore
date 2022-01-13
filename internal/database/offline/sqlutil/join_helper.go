@@ -105,9 +105,10 @@ func PrepareJoinedTable(
 		return "", err
 	}
 
+	qt := dbutil.QuoteFn(dbOpt.Backend)
 	// Step 2: create index on table joined_
 	if supportIndex(dbOpt.Backend) {
-		index := fmt.Sprintf(`CREATE INDEX idx_%s ON %s (unix_milli, entity_key)`, tableName, tableName)
+		index := fmt.Sprintf(`CREATE INDEX %s ON %s (unix_milli, entity_key)`, qt("idx_"+tableName), qtTableName)
 		if err = dbOpt.ExecContext(ctx, index, nil); err != nil {
 			return "", err
 		}

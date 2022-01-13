@@ -9,11 +9,12 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/spf13/cast"
+
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/spf13/cast"
 )
 
 // ChannelJoin gets point-in-time correct feature values for each entity row.
@@ -24,11 +25,19 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 	}
 	data := make(chan []interface{})
 	defer close(data)
+
+	emptyResult := &types.JoinResult{
+		Data: data,
+	}
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureFullNames: &opt.FeatureFullNames,
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if len(features) == 0 {
+		return emptyResult, nil
 	}
 
 	entity, err := getSharedEntity(features)
