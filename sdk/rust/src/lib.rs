@@ -8,12 +8,13 @@ use google::protobuf::Empty;
 use oomagent::{
     oom_agent_client::OomAgentClient,
     value,
+    ChannelImportRequest,
     FeatureValueMap,
     OnlineGetRequest,
     OnlineMultiGetRequest,
     SyncRequest,
 };
-use tonic::{codegen::StdError, transport};
+use tonic::{codegen::StdError, transport, Request};
 use util::parse_raw_feature_values;
 
 type Result<T> = std::result::Result<T, OomError>;
@@ -96,5 +97,24 @@ impl Client {
             })
             .await?;
         Ok(())
+    }
+
+    pub async fn channel_import(
+        &mut self,
+        group_name: impl Into<Option<String>>,
+        description: impl Into<Option<String>>,
+        revision: impl Into<Option<i64>>,
+        rows: impl Iterator<Item = Vec<u8>> + Send + 'static,
+    ) -> Result<u32> {
+        let mut group_name = group_name.into();
+        let mut description = description.into();
+        let mut revision = revision.into();
+        let outbound = async_stream::stream! {
+            for row in rows {
+                yield ChannelImportRequest{group_name: group_name.take(), description: description.take(), revision: revision.take(), row};
+            }
+        };
+        let res = self.inner.channel_import(Request::new(outbound)).await?.into_inner();
+        Ok(res.revision_id as u32)
     }
 }

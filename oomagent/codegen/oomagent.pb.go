@@ -530,11 +530,11 @@ type ChannelImportRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// only take effect and required at first request
+	// only takes effect (and required) on the first request
 	GroupName *string `protobuf:"bytes,1,opt,name=group_name,json=groupName,proto3,oneof" json:"group_name,omitempty"`
-	// only take effect at first request
+	// only takes effect on the first request
 	Description *string `protobuf:"bytes,2,opt,name=description,proto3,oneof" json:"description,omitempty"`
-	// only take effect at first request
+	// only takes effect on the first request
 	Revision *int64 `protobuf:"varint,3,opt,name=revision,proto3,oneof" json:"revision,omitempty"`
 	Row      []byte `protobuf:"bytes,4,opt,name=row,proto3" json:"row,omitempty"`
 }
