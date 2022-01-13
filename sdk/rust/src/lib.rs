@@ -1,7 +1,7 @@
 pub mod error;
 mod util;
 
-use std::collections::HashMap;
+use std::{collections::HashMap, path::Path};
 
 use error::OomError;
 use google::protobuf::Empty;
@@ -10,6 +10,7 @@ use oomagent::{
     value,
     ChannelImportRequest,
     FeatureValueMap,
+    ImportRequest,
     OnlineGetRequest,
     OnlineMultiGetRequest,
     SyncRequest,
@@ -115,6 +116,28 @@ impl Client {
             }
         };
         let res = self.inner.channel_import(Request::new(outbound)).await?.into_inner();
+        Ok(res.revision_id as u32)
+    }
+
+    pub async fn import(
+        &mut self,
+        group_name: impl Into<String>,
+        description: impl Into<Option<String>>,
+        revision: impl Into<Option<i64>>,
+        input_file: impl AsRef<Path>,
+        delimiter: impl Into<Option<char>>,
+    ) -> Result<u32> {
+        let res = self
+            .inner
+            .import(ImportRequest {
+                group_name:      group_name.into(),
+                description:     description.into(),
+                revision:        revision.into(),
+                input_file_path: input_file.as_ref().display().to_string(),
+                delimiter:       delimiter.into().map(String::from),
+            })
+            .await?
+            .into_inner();
         Ok(res.revision_id as u32)
     }
 }
