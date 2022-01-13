@@ -13,10 +13,13 @@ use oomagent::{
     ImportRequest,
     OnlineGetRequest,
     OnlineMultiGetRequest,
+    PushRequest,
     SyncRequest,
 };
 use tonic::{codegen::StdError, transport, Request};
 use util::parse_raw_feature_values;
+
+pub type FValue = value::Kind;
 
 type Result<T> = std::result::Result<T, OomError>;
 
@@ -139,5 +142,29 @@ impl Client {
             .await?
             .into_inner();
         Ok(res.revision_id as u32)
+    }
+
+    pub async fn push(
+        &mut self,
+        entity_key: impl Into<String>,
+        group_name: impl Into<String>,
+        kv_pairs: Vec<(impl Into<String>, impl Into<value::Kind>)>,
+    ) -> Result<()> {
+        let mut keys = Vec::with_capacity(kv_pairs.len());
+        let mut vals = Vec::with_capacity(kv_pairs.len());
+        kv_pairs.into_iter().for_each(|(k, v)| {
+            keys.push(k.into());
+            vals.push(oomagent::Value { kind: Some(v.into()) });
+        });
+        self.inner
+            .push(PushRequest {
+                entity_key:     entity_key.into(),
+                group_name:     group_name.into(),
+                feature_names:  keys,
+                feature_values: vals,
+            })
+            .await?
+            .into_inner();
+        Ok(())
     }
 }
