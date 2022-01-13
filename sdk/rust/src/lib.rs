@@ -5,7 +5,14 @@ use std::collections::HashMap;
 
 use error::OomError;
 use google::protobuf::Empty;
-use oomagent::{oom_agent_client::OomAgentClient, value, FeatureValueMap, OnlineGetRequest, OnlineMultiGetRequest};
+use oomagent::{
+    oom_agent_client::OomAgentClient,
+    value,
+    FeatureValueMap,
+    OnlineGetRequest,
+    OnlineMultiGetRequest,
+    SyncRequest,
+};
 use tonic::{codegen::StdError, transport};
 use util::parse_raw_feature_values;
 
@@ -79,5 +86,15 @@ impl Client {
     ) -> Result<HashMap<String, HashMap<String, value::Kind>>> {
         let rs = self.online_multi_get_raw(keys, features).await?;
         Ok(rs.into_iter().map(|(k, v)| (k, parse_raw_feature_values(v))).collect())
+    }
+
+    pub async fn sync(&mut self, revision_id: u32, purge_delay: u32) -> Result<()> {
+        self.inner
+            .sync(SyncRequest {
+                revision_id: i32::try_from(revision_id)?,
+                purge_delay: i32::try_from(purge_delay)?,
+            })
+            .await?;
+        Ok(())
     }
 }
