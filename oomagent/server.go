@@ -155,9 +155,13 @@ func (s *server) Push(ctx context.Context, req *codegen.PushRequest) (*codegen.P
 }
 
 func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codegen.ImportResponse, error) {
+	var description string
+	if req.Description == nil {
+		description = ""
+	}
 	revisionID, err := s.oomstore.Import(ctx, types.ImportOpt{
 		GroupName:      req.GroupName,
-		Description:    req.Description,
+		Description:    description,
 		Revision:       req.Revision,
 		DataSourceType: types.CSV_FILE,
 		CsvFileDataSource: &types.CsvFileDataSource{
