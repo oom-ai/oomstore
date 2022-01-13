@@ -29,6 +29,12 @@ func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 			return err
 		}
 	}
+
+	// re-fetch revision
+	revisions, err = s.metadata.ListRevision(ctx, &group.ID)
+	if err != nil {
+		return err
+	}
 	for i, revision := range revisions {
 		if revision.SnapshotTable != "" {
 			continue
