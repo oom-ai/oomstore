@@ -28,9 +28,10 @@ type GroupBuffer struct {
 }
 
 type StreamPushProcessor struct {
-	capacity  int
-	minPeriod time.Duration
-	quit      chan bool
+	capacity   int
+	minPeriod  time.Duration
+	notifyQuit chan struct{}
+	waitQuit   chan struct{}
 
 	ticker *time.Ticker
 	ch     chan types.StreamRecord
@@ -40,9 +41,10 @@ type StreamPushProcessor struct {
 func (s *OomStore) InitStreamPushProcessor(ctx context.Context) {
 	processor := &StreamPushProcessor{
 		// TODO: make Capacity, Period, MinPeriod configurable
-		capacity:  Capacity,
-		minPeriod: MinPeriod,
-		quit:      make(chan bool),
+		capacity:   Capacity,
+		minPeriod:  MinPeriod,
+		notifyQuit: make(chan struct{}),
+		waitQuit:   make(chan struct{}),
 
 		ch:     make(chan types.StreamRecord),
 		ticker: time.NewTicker(Period),
@@ -50,9 +52,13 @@ func (s *OomStore) InitStreamPushProcessor(ctx context.Context) {
 	s.streamPushProcessor = processor
 
 	go func() {
+		defer func() {
+			processor.waitQuit <- struct{}{}
+		}()
+
 		for {
 			select {
-			case <-processor.quit:
+			case <-processor.notifyQuit:
 				processor.buffer.Range(func(key, value interface{}) bool {
 					groupID := key.(int)
 					b := value.(GroupBuffer)
@@ -95,7 +101,9 @@ func (s *OomStore) InitStreamPushProcessor(ctx context.Context) {
 
 func (p *StreamPushProcessor) Close() error {
 	p.ticker.Stop()
-	p.quit <- true
+	p.notifyQuit <- struct{}{}
+
+	<-p.waitQuit
 	return nil
 }
 

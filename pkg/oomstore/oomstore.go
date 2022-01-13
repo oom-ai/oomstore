@@ -80,7 +80,7 @@ func (s *OomStore) Ping(ctx context.Context) error {
 func (s *OomStore) Close() error {
 	errs := make([]error, 0)
 
-	for _, closer := range []io.Closer{s.online, s.offline, s.metadata, s.streamPushProcessor} {
+	for _, closer := range []io.Closer{s.streamPushProcessor, s.online, s.offline, s.metadata} {
 		if err := closer.Close(); err != nil {
 			errs = append(errs, err)
 		}
