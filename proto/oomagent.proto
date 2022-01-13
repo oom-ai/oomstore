@@ -72,14 +72,18 @@ message SyncResponse {
 }
 
 message ChannelImportRequest {
-  string group_name = 1;
-  string description = 2;
+  // only takes effect (and required) on the first request
+  optional string group_name = 1;
+  // only takes effect on the first request
+  optional string description = 2;
+  // only takes effect on the first request
   optional int64 revision = 3;
+
   bytes row = 4;
 }
 
 message ImportResponse {
-  int64 revision_id = 2;
+  int32 revision_id = 2;
 }
 
 message ImportRequest {
