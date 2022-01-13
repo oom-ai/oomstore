@@ -69,10 +69,12 @@ func Import() {
 	defer file.Close()
 	fileScanner := bufio.NewScanner(file)
 
+	groupName := "please input your group name"
+	description := "please input you description"
 	for fileScanner.Scan() {
 		if err := importClient.Send(&codegen.ChannelImportRequest{
-			GroupName:   "please input your group name",
-			Description: "please input you description",
+			GroupName:   &groupName,
+			Description: &description,
 			Row:         fileScanner.Bytes(),
 		}); err != nil {
 			log.Fatal(err)

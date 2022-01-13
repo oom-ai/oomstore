@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z\010/codegen',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0eoomagent.proto\x12\x08oomagent\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xd1\x01\n\x05Value\x12\x30\n\nnull_value\x18\x01 \x01(\x0e\x32\x1a.google.protobuf.NullValueH\x00\x12\x15\n\x0bint64_value\x18\x02 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x03 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x04 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x05 \x01(\x08H\x00\x12\x1a\n\x10unix_milli_value\x18\x06 \x01(\x03H\x00\x12\x15\n\x0b\x62ytes_value\x18\x07 \x01(\x0cH\x00\x42\x06\n\x04kind\"B\n\x10OnlineGetRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x02 \x03(\t\"\x7f\n\x0f\x46\x65\x61tureValueMap\x12/\n\x03map\x18\x01 \x03(\x0b\x32\".oomagent.FeatureValueMap.MapEntry\x1a;\n\x08MapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1e\n\x05value\x18\x02 \x01(\x0b\x32\x0f.oomagent.Value:\x02\x38\x01\">\n\x11OnlineGetResponse\x12)\n\x06result\x18\x02 \x01(\x0b\x32\x19.oomagent.FeatureValueMap\"H\n\x15OnlineMultiGetRequest\x12\x13\n\x0b\x65ntity_keys\x18\x01 \x03(\t\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x02 \x03(\t\"\xa0\x01\n\x16OnlineMultiGetResponse\x12<\n\x06result\x18\x02 \x03(\x0b\x32,.oomagent.OnlineMultiGetResponse.ResultEntry\x1aH\n\x0bResultEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12(\n\x05value\x18\x02 \x01(\x0b\x32\x19.oomagent.FeatureValueMap:\x02\x38\x01\"7\n\x0bSyncRequest\x12\x13\n\x0brevision_id\x18\x01 \x01(\x05\x12\x13\n\x0bpurge_delay\x18\x02 \x01(\x05\"\x0e\n\x0cSyncResponse\"p\n\x14\x43hannelImportRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x0b\n\x03row\x18\x04 \x01(\x0c\x42\x0b\n\t_revision\"%\n\x0eImportResponse\x12\x13\n\x0brevision_id\x18\x02 \x01(\x03\"\x88\x01\n\rImportRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x17\n\x0finput_file_path\x18\x04 \x01(\t\x12\x11\n\tdelimiter\x18\x05 \x01(\tB\x0b\n\t_revision\"\x0e\n\x0cPushResponse\"u\n\x0bPushRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x12\n\ngroup_name\x18\x02 \x01(\t\x12\x15\n\rfeature_names\x18\x03 \x03(\t\x12\'\n\x0e\x66\x65\x61ture_values\x18\x04 \x03(\x0b\x32\x0f.oomagent.Value\"C\n\tEntityRow\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x12\n\nunix_milli\x18\x02 \x01(\x03\x12\x0e\n\x06values\x18\x03 \x03(\t\"n\n\x12\x43hannelJoinRequest\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x01 \x03(\t\x12\'\n\nentity_row\x18\x02 \x01(\x0b\x32\x13.oomagent.EntityRow\x12\x13\n\x0bvalue_names\x18\x03 \x03(\t\"J\n\x13\x43hannelJoinResponse\x12\x0e\n\x06header\x18\x02 \x03(\t\x12#\n\njoined_row\x18\x03 \x03(\x0b\x32\x0f.oomagent.Value\"\\\n\x0bJoinRequest\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x01 \x03(\t\x12\x17\n\x0finput_file_path\x18\x02 \x01(\t\x12\x18\n\x10output_file_path\x18\x03 \x01(\t\"\x0e\n\x0cJoinResponse\"`\n\x14\x43hannelExportRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x13\n\x0brevision_id\x18\x02 \x01(\x05\x12\x12\n\x05limit\x18\x03 \x01(\x04H\x00\x88\x01\x01\x42\x08\n\x06_limit\"E\n\x15\x43hannelExportResponse\x12\x0e\n\x06header\x18\x02 \x03(\t\x12\x1c\n\x03row\x18\x03 \x03(\x0b\x32\x0f.oomagent.Value\"s\n\rExportRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x13\n\x0brevision_id\x18\x02 \x01(\x05\x12\x12\n\x05limit\x18\x03 \x01(\x04H\x00\x88\x01\x01\x12\x18\n\x10output_file_path\x18\x04 \x01(\tB\x08\n\x06_limit\"\x10\n\x0e\x45xportResponse2\x8a\x06\n\x08OomAgent\x12\x46\n\tOnlineGet\x12\x1a.oomagent.OnlineGetRequest\x1a\x1b.oomagent.OnlineGetResponse\"\x00\x12U\n\x0eOnlineMultiGet\x12\x1f.oomagent.OnlineMultiGetRequest\x1a .oomagent.OnlineMultiGetResponse\"\x00\x12\x37\n\x04Sync\x12\x15.oomagent.SyncRequest\x1a\x16.oomagent.SyncResponse\"\x00\x12M\n\rChannelImport\x12\x1e.oomagent.ChannelImportRequest\x1a\x18.oomagent.ImportResponse\"\x00(\x01\x12=\n\x06Import\x12\x17.oomagent.ImportRequest\x1a\x18.oomagent.ImportResponse\"\x00\x12\x37\n\x04Push\x12\x15.oomagent.PushRequest\x1a\x16.oomagent.PushResponse\"\x00\x12P\n\x0b\x43hannelJoin\x12\x1c.oomagent.ChannelJoinRequest\x1a\x1d.oomagent.ChannelJoinResponse\"\x00(\x01\x30\x01\x12\x37\n\x04Join\x12\x15.oomagent.JoinRequest\x1a\x16.oomagent.JoinResponse\"\x00\x12T\n\rChannelExport\x12\x1e.oomagent.ChannelExportRequest\x1a\x1f.oomagent.ChannelExportResponse\"\x00\x30\x01\x12=\n\x06\x45xport\x12\x17.oomagent.ExportRequest\x1a\x18.oomagent.ExportResponse\"\x00\x12?\n\x0bHealthCheck\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\"\x00\x42\nZ\x08/codegenb\x06proto3'
+  serialized_pb=b'\n\x0eoomagent.proto\x12\x08oomagent\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xd1\x01\n\x05Value\x12\x30\n\nnull_value\x18\x01 \x01(\x0e\x32\x1a.google.protobuf.NullValueH\x00\x12\x15\n\x0bint64_value\x18\x02 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x03 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x04 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x05 \x01(\x08H\x00\x12\x1a\n\x10unix_milli_value\x18\x06 \x01(\x03H\x00\x12\x15\n\x0b\x62ytes_value\x18\x07 \x01(\x0cH\x00\x42\x06\n\x04kind\"B\n\x10OnlineGetRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x02 \x03(\t\"\x7f\n\x0f\x46\x65\x61tureValueMap\x12/\n\x03map\x18\x01 \x03(\x0b\x32\".oomagent.FeatureValueMap.MapEntry\x1a;\n\x08MapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1e\n\x05value\x18\x02 \x01(\x0b\x32\x0f.oomagent.Value:\x02\x38\x01\">\n\x11OnlineGetResponse\x12)\n\x06result\x18\x02 \x01(\x0b\x32\x19.oomagent.FeatureValueMap\"H\n\x15OnlineMultiGetRequest\x12\x13\n\x0b\x65ntity_keys\x18\x01 \x03(\t\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x02 \x03(\t\"\xa0\x01\n\x16OnlineMultiGetResponse\x12<\n\x06result\x18\x02 \x03(\x0b\x32,.oomagent.OnlineMultiGetResponse.ResultEntry\x1aH\n\x0bResultEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12(\n\x05value\x18\x02 \x01(\x0b\x32\x19.oomagent.FeatureValueMap:\x02\x38\x01\"7\n\x0bSyncRequest\x12\x13\n\x0brevision_id\x18\x01 \x01(\x05\x12\x13\n\x0bpurge_delay\x18\x02 \x01(\x05\"\x0e\n\x0cSyncResponse\"\x99\x01\n\x14\x43hannelImportRequest\x12\x17\n\ngroup_name\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x18\n\x0b\x64\x65scription\x18\x02 \x01(\tH\x01\x88\x01\x01\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x02\x88\x01\x01\x12\x0b\n\x03row\x18\x04 \x01(\x0c\x42\r\n\x0b_group_nameB\x0e\n\x0c_descriptionB\x0b\n\t_revision\"%\n\x0eImportResponse\x12\x13\n\x0brevision_id\x18\x02 \x01(\x05\"\x88\x01\n\rImportRequest\x12\x12\n\ngroup_name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\x08revision\x18\x03 \x01(\x03H\x00\x88\x01\x01\x12\x17\n\x0finput_file_path\x18\x04 \x01(\t\x12\x11\n\tdelimiter\x18\x05 \x01(\tB\x0b\n\t_revision\"\x0e\n\x0cPushResponse\"u\n\x0bPushRequest\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x12\n\ngroup_name\x18\x02 \x01(\t\x12\x15\n\rfeature_names\x18\x03 \x03(\t\x12\'\n\x0e\x66\x65\x61ture_values\x18\x04 \x03(\x0b\x32\x0f.oomagent.Value\"C\n\tEntityRow\x12\x12\n\nentity_key\x18\x01 \x01(\t\x12\x12\n\nunix_milli\x18\x02 \x01(\x03\x12\x0e\n\x06values\x18\x03 \x03(\t\"n\n\x12\x43hannelJoinRequest\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x01 \x03(\t\x12\'\n\nentity_row\x18\x02 \x01(\x0b\x32\x13.oomagent.EntityRow\x12\x13\n\x0bvalue_names\x18\x03 \x03(\t\"J\n\x13\x43hannelJoinResponse\x12\x0e\n\x06header\x18\x02 \x03(\t\x12#\n\njoined_row\x18\x03 \x03(\x0b\x32\x0f.oomagent.Value\"\\\n\x0bJoinRequest\x12\x1a\n\x12\x66\x65\x61ture_full_names\x18\x01 \x03(\t\x12\x17\n\x0finput_file_path\x18\x02 \x01(\t\x12\x18\n\x10output_file_path\x18\x03 \x01(\t\"\x0e\n\x0cJoinResponse\"`\n\x14\x43hannelExportRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x13\n\x0brevision_id\x18\x02 \x01(\x05\x12\x12\n\x05limit\x18\x03 \x01(\x04H\x00\x88\x01\x01\x42\x08\n\x06_limit\"E\n\x15\x43hannelExportResponse\x12\x0e\n\x06header\x18\x02 \x03(\t\x12\x1c\n\x03row\x18\x03 \x03(\x0b\x32\x0f.oomagent.Value\"s\n\rExportRequest\x12\x15\n\rfeature_names\x18\x01 \x03(\t\x12\x13\n\x0brevision_id\x18\x02 \x01(\x05\x12\x12\n\x05limit\x18\x03 \x01(\x04H\x00\x88\x01\x01\x12\x18\n\x10output_file_path\x18\x04 \x01(\tB\x08\n\x06_limit\"\x10\n\x0e\x45xportResponse2\x8a\x06\n\x08OomAgent\x12\x46\n\tOnlineGet\x12\x1a.oomagent.OnlineGetRequest\x1a\x1b.oomagent.OnlineGetResponse\"\x00\x12U\n\x0eOnlineMultiGet\x12\x1f.oomagent.OnlineMultiGetRequest\x1a .oomagent.OnlineMultiGetResponse\"\x00\x12\x37\n\x04Sync\x12\x15.oomagent.SyncRequest\x1a\x16.oomagent.SyncResponse\"\x00\x12M\n\rChannelImport\x12\x1e.oomagent.ChannelImportRequest\x1a\x18.oomagent.ImportResponse\"\x00(\x01\x12=\n\x06Import\x12\x17.oomagent.ImportRequest\x1a\x18.oomagent.ImportResponse\"\x00\x12\x37\n\x04Push\x12\x15.oomagent.PushRequest\x1a\x16.oomagent.PushResponse\"\x00\x12P\n\x0b\x43hannelJoin\x12\x1c.oomagent.ChannelJoinRequest\x1a\x1d.oomagent.ChannelJoinResponse\"\x00(\x01\x30\x01\x12\x37\n\x04Join\x12\x15.oomagent.JoinRequest\x1a\x16.oomagent.JoinResponse\"\x00\x12T\n\rChannelExport\x12\x1e.oomagent.ChannelExportRequest\x1a\x1f.oomagent.ChannelExportResponse\"\x00\x30\x01\x12=\n\x06\x45xport\x12\x17.oomagent.ExportRequest\x1a\x18.oomagent.ExportResponse\"\x00\x12?\n\x0bHealthCheck\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\"\x00\x42\nZ\x08/codegenb\x06proto3'
   ,
   dependencies=[google_dot_protobuf_dot_empty__pb2.DESCRIPTOR,google_dot_protobuf_dot_struct__pb2.DESCRIPTOR,])
 
@@ -469,13 +469,23 @@ _CHANNELIMPORTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='_revision', full_name='oomagent.ChannelImportRequest._revision',
+      name='_group_name', full_name='oomagent.ChannelImportRequest._group_name',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
+    _descriptor.OneofDescriptor(
+      name='_description', full_name='oomagent.ChannelImportRequest._description',
+      index=1, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
+    _descriptor.OneofDescriptor(
+      name='_revision', full_name='oomagent.ChannelImportRequest._revision',
+      index=2, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
   ],
-  serialized_start=870,
-  serialized_end=982,
+  serialized_start=871,
+  serialized_end=1024,
 )
 
 
@@ -489,7 +499,7 @@ _IMPORTRESPONSE = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='revision_id', full_name='oomagent.ImportResponse.revision_id', index=0,
-      number=2, type=3, cpp_type=2, label=1,
+      number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -506,8 +516,8 @@ _IMPORTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=984,
-  serialized_end=1021,
+  serialized_start=1026,
+  serialized_end=1063,
 )
 
 
@@ -571,8 +581,8 @@ _IMPORTREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1024,
-  serialized_end=1160,
+  serialized_start=1066,
+  serialized_end=1202,
 )
 
 
@@ -596,8 +606,8 @@ _PUSHRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1162,
-  serialized_end=1176,
+  serialized_start=1204,
+  serialized_end=1218,
 )
 
 
@@ -649,8 +659,8 @@ _PUSHREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1178,
-  serialized_end=1295,
+  serialized_start=1220,
+  serialized_end=1337,
 )
 
 
@@ -695,8 +705,8 @@ _ENTITYROW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1297,
-  serialized_end=1364,
+  serialized_start=1339,
+  serialized_end=1406,
 )
 
 
@@ -741,8 +751,8 @@ _CHANNELJOINREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1366,
-  serialized_end=1476,
+  serialized_start=1408,
+  serialized_end=1518,
 )
 
 
@@ -780,8 +790,8 @@ _CHANNELJOINRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1478,
-  serialized_end=1552,
+  serialized_start=1520,
+  serialized_end=1594,
 )
 
 
@@ -826,8 +836,8 @@ _JOINREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1554,
-  serialized_end=1646,
+  serialized_start=1596,
+  serialized_end=1688,
 )
 
 
@@ -851,8 +861,8 @@ _JOINRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1648,
-  serialized_end=1662,
+  serialized_start=1690,
+  serialized_end=1704,
 )
 
 
@@ -902,8 +912,8 @@ _CHANNELEXPORTREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1664,
-  serialized_end=1760,
+  serialized_start=1706,
+  serialized_end=1802,
 )
 
 
@@ -941,8 +951,8 @@ _CHANNELEXPORTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1762,
-  serialized_end=1831,
+  serialized_start=1804,
+  serialized_end=1873,
 )
 
 
@@ -999,8 +1009,8 @@ _EXPORTREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1833,
-  serialized_end=1948,
+  serialized_start=1875,
+  serialized_end=1990,
 )
 
 
@@ -1024,8 +1034,8 @@ _EXPORTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1950,
-  serialized_end=1966,
+  serialized_start=1992,
+  serialized_end=2008,
 )
 
 _VALUE.fields_by_name['null_value'].enum_type = google_dot_protobuf_dot_struct__pb2._NULLVALUE
@@ -1057,6 +1067,12 @@ _ONLINEGETRESPONSE.fields_by_name['result'].message_type = _FEATUREVALUEMAP
 _ONLINEMULTIGETRESPONSE_RESULTENTRY.fields_by_name['value'].message_type = _FEATUREVALUEMAP
 _ONLINEMULTIGETRESPONSE_RESULTENTRY.containing_type = _ONLINEMULTIGETRESPONSE
 _ONLINEMULTIGETRESPONSE.fields_by_name['result'].message_type = _ONLINEMULTIGETRESPONSE_RESULTENTRY
+_CHANNELIMPORTREQUEST.oneofs_by_name['_group_name'].fields.append(
+  _CHANNELIMPORTREQUEST.fields_by_name['group_name'])
+_CHANNELIMPORTREQUEST.fields_by_name['group_name'].containing_oneof = _CHANNELIMPORTREQUEST.oneofs_by_name['_group_name']
+_CHANNELIMPORTREQUEST.oneofs_by_name['_description'].fields.append(
+  _CHANNELIMPORTREQUEST.fields_by_name['description'])
+_CHANNELIMPORTREQUEST.fields_by_name['description'].containing_oneof = _CHANNELIMPORTREQUEST.oneofs_by_name['_description']
 _CHANNELIMPORTREQUEST.oneofs_by_name['_revision'].fields.append(
   _CHANNELIMPORTREQUEST.fields_by_name['revision'])
 _CHANNELIMPORTREQUEST.fields_by_name['revision'].containing_oneof = _CHANNELIMPORTREQUEST.oneofs_by_name['_revision']
@@ -1279,8 +1295,8 @@ _OOMAGENT = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1969,
-  serialized_end=2747,
+  serialized_start=2011,
+  serialized_end=2789,
   methods=[
   _descriptor.MethodDescriptor(
     name='OnlineGet',

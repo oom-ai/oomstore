@@ -90,6 +90,13 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 	if err != nil {
 		return internalError(err.Error())
 	}
+	if firstReq.GroupName == nil {
+		return status.Errorf(codes.InvalidArgument, "group_name is required in first request")
+	}
+	if firstReq.Description == nil {
+		empty := ""
+		firstReq.Description = &empty
+	}
 
 	reader, writer := io.Pipe()
 
@@ -118,9 +125,9 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 	}()
 
 	revisionID, err := s.oomstore.Import(context.Background(), types.ImportOpt{
-		GroupName:      firstReq.GroupName,
+		GroupName:      *firstReq.GroupName,
 		Revision:       firstReq.Revision,
-		Description:    firstReq.Description,
+		Description:    *firstReq.Description,
 		DataSourceType: types.CSV_READER,
 		CsvReaderDataSource: &types.CsvReaderDataSource{
 			Reader:    reader,
@@ -131,7 +138,7 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 		return internalError(err.Error())
 	}
 	return stream.SendAndClose(&codegen.ImportResponse{
-		RevisionId: int64(revisionID),
+		RevisionId: int32(revisionID),
 	})
 }
 
@@ -163,7 +170,7 @@ func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codeg
 	}
 
 	return &codegen.ImportResponse{
-		RevisionId: int64(revisionID),
+		RevisionId: int32(revisionID),
 	}, nil
 }
 

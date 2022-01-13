@@ -15,7 +15,7 @@ EOF
 )
 expected='
 {
-  "revisionId": "3"
+  "revisionId": 3
 }
 '
 actual=$(testgrpc ChannelImport <<<"$arg")
