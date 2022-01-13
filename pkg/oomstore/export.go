@@ -56,7 +56,7 @@ func (s *OomStore) ChannelExportBatch(ctx context.Context, opt types.ChannelExpo
 		return nil, errdefs.Errorf("failed to get entity id=%d", revision.GroupID)
 	}
 
-	stream, exportErr := s.offline.Export(ctx, offline.ExportOpt{
+	stream, exportErr := s.offline.ExportOneGroup(ctx, offline.ExportOneGroupOpt{
 		SnapshotTable: revision.SnapshotTable,
 		EntityName:    entity.Name,
 		Features:      features,
@@ -127,7 +127,7 @@ func (s *OomStore) ChannelExportStream(ctx context.Context, opt types.ChannelExp
 
 	snapshotTable := dbutil.OfflineStreamSnapshotTableName(group.ID, revision.Revision)
 	cdcTable := dbutil.OfflineStreamCdcTableName(group.ID, revision.Revision)
-	stream, exportErr := s.offline.Export(ctx, offline.ExportOpt{
+	stream, exportErr := s.offline.ExportOneGroup(ctx, offline.ExportOneGroupOpt{
 		SnapshotTable: snapshotTable,
 		CdcTable:      &cdcTable,
 		UnixMilli:     &opt.UnixMilli,

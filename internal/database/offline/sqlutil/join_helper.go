@@ -79,7 +79,12 @@ func PrepareJoinedTable(
 ) (string, error) {
 	// Step 1: create table joined_
 	tableName := dbutil.TempTable(fmt.Sprintf("joined_%s", groupName))
-	qtTableName, columnDefs, err := prepareTableSchema(dbOpt, entity, tableName, valueNames)
+	qtTableName, columnDefs, err := prepareTableSchema(dbOpt, prepareTableSchemaParams{
+		tableName:    tableName,
+		entityName:   "entity_key",
+		valueNames:   valueNames,
+		hasUnixMilli: true,
+	})
 	if err != nil {
 		return "", err
 	}
@@ -124,7 +129,12 @@ func PrepareEntityRowsTable(ctx context.Context,
 ) (string, error) {
 	// Step 1: create table entity_rows
 	tableName := dbutil.TempTable("entity_rows")
-	qtTableName, columnDefs, err := prepareTableSchema(dbOpt, entity, tableName, valueNames)
+	qtTableName, columnDefs, err := prepareTableSchema(dbOpt, prepareTableSchemaParams{
+		tableName:    tableName,
+		entityName:   "entity_key",
+		valueNames:   valueNames,
+		hasUnixMilli: true,
+	})
 	if err != nil {
 		return "", err
 	}
@@ -154,7 +164,14 @@ func PrepareEntityRowsTable(ctx context.Context,
 	return tableName, nil
 }
 
-func prepareTableSchema(dbOpt dbutil.DBOpt, entity types.Entity, tableName string, valueNames []string) (string, []string, error) {
+type prepareTableSchemaParams struct {
+	tableName    string
+	entityName   string
+	valueNames   []string
+	hasUnixMilli bool
+}
+
+func prepareTableSchema(dbOpt dbutil.DBOpt, params prepareTableSchemaParams) (string, []string, error) {
 	columnFormat, err := dbutil.GetColumnFormat(dbOpt.Backend)
 	if err != nil {
 		return "", nil, err
@@ -167,26 +184,28 @@ func prepareTableSchema(dbOpt dbutil.DBOpt, entity types.Entity, tableName strin
 	case types.BackendBigQuery:
 		entityType = "STRING"
 		valueType = "STRING"
-		qtTableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, qt(tableName))
+		qtTableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, qt(params.tableName))
 	case types.BackendMySQL:
 		entityType = "VARCHAR(255)"
 		valueType = "TEXT"
-		qtTableName = qt(tableName)
+		qtTableName = qt(params.tableName)
 	case types.BackendSnowflake:
 		entityType = "TEXT"
 		valueType = "TEXT"
-		qtTableName = fmt.Sprintf("PUBLIC.%s", qt(tableName))
+		qtTableName = fmt.Sprintf("PUBLIC.%s", qt(params.tableName))
 	default:
 		entityType = "TEXT"
 		valueType = "TEXT"
-		qtTableName = qt(tableName)
+		qtTableName = qt(params.tableName)
 	}
 
 	columnDefs := []string{
-		fmt.Sprintf(`%s %s NOT NULL`, qt("entity_key"), entityType),
-		fmt.Sprintf(`%s BIGINT NOT NULL`, qt("unix_milli")),
+		fmt.Sprintf(`%s %s NOT NULL`, qt(params.entityName), entityType),
 	}
-	for _, name := range valueNames {
+	if params.hasUnixMilli {
+		columnDefs = append(columnDefs, fmt.Sprintf(`%s BIGINT NOT NULL`, qt("unix_milli")))
+	}
+	for _, name := range params.valueNames {
 		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, valueType))
 	}
 

@@ -56,7 +56,7 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 	})
 	assert.NoError(t, err)
 
-	actual, errs := store.Export(ctx, offline.ExportOpt{
+	actual, errs := store.ExportOneGroup(ctx, offline.ExportOneGroupOpt{
 		SnapshotTable: "offline_stream_snapshot_1_2",
 		EntityName:    "device",
 		Features:      features,

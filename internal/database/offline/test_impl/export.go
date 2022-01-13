@@ -13,27 +13,18 @@ import (
 
 func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
 	t.Cleanup(destroyStore)
-
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	snapshotTable := "offline_snapshot_1_1"
-	cdcTable := "offline_cdc_1_1"
+	batchSnapshotTable := "offline_batch_snapshot_1_1"
+	streamSnapshotTable := "offline_stream_snapshot_2_1"
+	streamCdcTable := "offline_stream_cdc_2_1"
 	unixMilli := &types.Feature{
 		Name:      "unix_milli",
 		ValueType: types.Int64,
 	}
-	features := []*types.Feature{
-		{
-			Name:      "model",
-			ValueType: types.String,
-		},
-		{
-			Name:      "price",
-			ValueType: types.Int64,
-		},
-	}
-	buildTestSnapshotTable(ctx, t, store, features, 1, snapshotTable, &offline.CSVSource{
+	batchFeatures, streamFeatures := prepareFeaturesForExport()
+	buildTestSnapshotTable(ctx, t, store, batchFeatures, 1, batchSnapshotTable, &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100
 1235,apple,200
 1236,huawei,300
@@ -41,12 +32,20 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 `)),
 		Delimiter: ",",
 	})
-	buildTestSnapshotTable(ctx, t, store, append(features, unixMilli), 1, cdcTable, &offline.CSVSource{
-		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi-1,120,2
-1235,apple-2,115,5
-1234,xiaomi-1,130,10
-1238,galaxy,100,11
-1239,galaxy,90,12
+	buildTestSnapshotTable(ctx, t, store, streamFeatures, 1, streamSnapshotTable, &offline.CSVSource{
+		Reader: bufio.NewReader(strings.NewReader(`1234,1000,true
+1235,2040,false
+1236,1560,true
+1237,4000,false
+`)),
+		Delimiter: ",",
+	})
+	buildTestSnapshotTable(ctx, t, store, append(streamFeatures, unixMilli), 1, streamCdcTable, &offline.CSVSource{
+		Reader: bufio.NewReader(strings.NewReader(`1234,1200,true,2
+1235,2050,false,5
+1234,1300,false,10
+1238,1500,true,11
+1239,2700,false,12
 `)),
 		Delimiter: ",",
 	})
@@ -58,48 +57,36 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 		expectedError error
 	}{
 		{
-			description: "no features",
+			description: "one group, batch features",
 			opt: offline.ExportOpt{
-				SnapshotTable: snapshotTable,
-				EntityName:    "device",
-				Features:      types.FeatureList{},
-			},
-			expected: [][]interface{}{{"1234"}, {"1235"}, {"1236"}, {"1237"}},
-		},
-		{
-			description: "invalid option",
-			opt: offline.ExportOpt{
-				SnapshotTable: snapshotTable,
-				CdcTable:      &cdcTable,
-				EntityName:    "device",
-				Features:      features,
-			},
-			expectedError: fmt.Errorf("invalid option %+v", offline.ExportOpt{
-				SnapshotTable: snapshotTable,
-				CdcTable:      &cdcTable,
-				EntityName:    "device",
-				Features:      features,
-			}),
-		},
-		{
-			description: "batch features",
-			opt: offline.ExportOpt{
-				SnapshotTable: snapshotTable,
-				EntityName:    "device",
-				Features:      features,
+				SnapshotTables: map[int]string{1: batchSnapshotTable},
+				Features:       map[int]types.FeatureList{1: batchFeatures},
+				EntityName:     "device",
+				UnixMilli:      10,
 			},
 			expected: [][]interface{}{{"1234", "xiaomi", int64(100)}, {"1235", "apple", int64(200)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}},
 		},
 		{
-			description: "streaming features",
+			description: "one group, streaming features",
 			opt: offline.ExportOpt{
-				SnapshotTable: snapshotTable,
-				CdcTable:      &cdcTable,
-				UnixMilli:     int64Ptr(11),
-				EntityName:    "device",
-				Features:      features,
+				SnapshotTables: map[int]string{2: streamSnapshotTable},
+				CdcTables:      map[int]string{2: streamCdcTable},
+				Features:       map[int]types.FeatureList{2: streamFeatures},
+				UnixMilli:      11,
+				EntityName:     "device",
 			},
-			expected: [][]interface{}{{"1234", "xiaomi-1", int64(130)}, {"1235", "apple-2", int64(115)}, {"1236", "huawei", int64(300)}, {"1237", "oneplus", int64(240)}, {"1238", "galaxy", int64(100)}},
+			expected: [][]interface{}{{"1234", int64(1300), false}, {"1235", int64(2050), false}, {"1236", int64(1560), true}, {"1237", int64(4000), false}, {"1238", int64(1500), true}},
+		},
+		{
+			description: "multiple groups, batch and stream features",
+			opt: offline.ExportOpt{
+				SnapshotTables: map[int]string{1: batchSnapshotTable, 2: streamSnapshotTable},
+				CdcTables:      map[int]string{2: streamCdcTable},
+				Features:       map[int]types.FeatureList{1: batchFeatures, 2: streamFeatures},
+				EntityName:     "device",
+				UnixMilli:      11,
+			},
+			expected: [][]interface{}{{"1234", "xiaomi", int64(100), int64(1300), false}, {"1235", "apple", int64(200), int64(2050), false}, {"1236", "huawei", int64(300), int64(1560), true}, {"1237", "oneplus", int64(240), int64(4000), false}, {"1238", nil, nil, int64(1500), true}},
 		},
 	}
 
@@ -113,6 +100,9 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 			if tc.expectedError != nil {
 				assert.EqualError(t, <-errs, tc.expectedError.Error())
 			} else {
+				fmt.Println("expected: ", tc.expected)
+				fmt.Println("actual: ", values)
+
 				assert.ElementsMatch(t, tc.expected, values)
 				assert.NoError(t, <-errs)
 			}
@@ -120,6 +110,45 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 	}
 }
 
-func int64Ptr(i int64) *int64 {
-	return &i
+func prepareFeaturesForExport() (batchFeatures types.FeatureList, streamFeatures types.FeatureList) {
+	batchGroup := &types.Group{
+		ID:       1,
+		Name:     "device",
+		Category: types.CategoryBatch,
+	}
+	streamGroup := &types.Group{
+		ID:       2,
+		Name:     "account",
+		Category: types.CategoryStream,
+	}
+
+	batchFeatures = []*types.Feature{
+		{
+			Name:      "model",
+			FullName:  "device.model",
+			ValueType: types.String,
+			Group:     batchGroup,
+		},
+		{
+			Name:      "price",
+			FullName:  "device.price",
+			ValueType: types.Int64,
+			Group:     batchGroup,
+		},
+	}
+	streamFeatures = []*types.Feature{
+		{
+			Name:      "last_txn_amount",
+			FullName:  "account.last_txn_amount",
+			ValueType: types.Int64,
+			Group:     streamGroup,
+		},
+		{
+			Name:      "is_vip",
+			FullName:  "account.is_vip",
+			ValueType: types.Bool,
+			Group:     streamGroup,
+		},
+	}
+	return batchFeatures, streamFeatures
 }

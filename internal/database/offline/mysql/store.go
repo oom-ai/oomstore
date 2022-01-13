@@ -37,6 +37,10 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(Backend, MySQLBatchSize), Backend)
 }
 
+func (db *DB) ExportOneGroup(ctx context.Context, opt offline.ExportOneGroupOpt) (<-chan types.ExportRecord, <-chan error) {
+	return sqlutil.ExportOneGroup(ctx, db.DB, opt, Backend)
+}
+
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
 	return sqlutil.Export(ctx, db.DB, opt, Backend)
 }

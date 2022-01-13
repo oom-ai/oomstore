@@ -17,20 +17,20 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
+func (db *DB) ExportOneGroup(ctx context.Context, opt offline.ExportOneGroupOpt) (<-chan types.ExportRecord, <-chan error) {
 	dbOpt := dbutil.DBOpt{
 		Backend:    types.BackendBigQuery,
 		BigQueryDB: db.Client,
 		DatasetID:  &db.datasetID,
 	}
-	doExportOpt := sqlutil.DoExportOpt{
-		ExportOpt:    opt,
-		QueryResults: bigqueryQueryExportResults,
+	doExportOpt := sqlutil.DoExportOneGroupOpt{
+		ExportOneGroupOpt: opt,
+		QueryResults:      bigqueryQueryExportResults,
 	}
-	return sqlutil.DoExport(ctx, dbOpt, doExportOpt)
+	return sqlutil.DoExportOneGroup(ctx, dbOpt, doExportOpt)
 }
 
-func bigqueryQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error) {
+func bigqueryQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error) {
 	stream := make(chan types.ExportRecord)
 	errs := make(chan error, 1) // at most 1 error
 	for _, arg := range args {
@@ -65,4 +65,9 @@ func bigqueryQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt off
 	}()
 
 	return stream, errs
+}
+
+func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
+	//TODO implement me
+	panic("implement me")
 }

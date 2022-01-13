@@ -9,6 +9,7 @@ import (
 
 type Store interface {
 	Join(ctx context.Context, opt JoinOpt) (*types.JoinResult, error)
+	ExportOneGroup(ctx context.Context, opt ExportOneGroupOpt) (<-chan types.ExportRecord, <-chan error)
 	Export(ctx context.Context, opt ExportOpt) (<-chan types.ExportRecord, <-chan error)
 	Import(ctx context.Context, opt ImportOpt) (int64, error)
 	Push(ctx context.Context, opt PushOpt) error

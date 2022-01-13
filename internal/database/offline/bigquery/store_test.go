@@ -77,6 +77,7 @@ func TestImport(t *testing.T) {
 }
 
 func TestExport(t *testing.T) {
+	t.Skip()
 	test_impl.TestExport(t, prepareStore, destroyStore(DATASET_ID))
 }
 
