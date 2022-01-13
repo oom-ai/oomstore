@@ -42,8 +42,7 @@ func (db *DB) ExportOneGroup(ctx context.Context, opt offline.ExportOneGroupOpt)
 }
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
-	//TODO implement me
-	panic("implement me")
+	return sqlutil.Export(ctx, db.DB, opt, Backend)
 }
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
