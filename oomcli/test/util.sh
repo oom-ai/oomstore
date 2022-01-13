@@ -64,7 +64,7 @@ register_features() {
     oomcli register feature age   --group student --value-type "int64"  --description "age"
 
     oomcli register feature last_5_click_posts           --group user-click --value-type "string" --description "user last 5 click posts"
-    oomcli register feature number_of_user_started_posts --group user-click --value-type "int64"  --description "number of posts that users stared today"
+    oomcli register feature number_of_user_starred_posts --group user-click --value-type "int64"  --description "number of posts that users starred today"
 }
 
 # import sample data

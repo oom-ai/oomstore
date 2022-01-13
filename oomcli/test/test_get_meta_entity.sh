@@ -80,9 +80,9 @@ items:
             - name: last_5_click_posts
               value-type: string
               description: user last 5 click posts
-            - name: number_of_user_started_posts
+            - name: number_of_user_starred_posts
               value-type: int64
-              description: number of posts that users stared today
+              description: number of posts that users starred today
 '
 
 actual=$(oomcli get meta entity -o yaml)

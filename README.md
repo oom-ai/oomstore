@@ -126,7 +126,7 @@ oomcli sync --revision-id 2
 
 ```bash
 oomcli get online \
-  --entity-key 1006 \
+  --entity-keys 1006 \
   --feature account.state,account.credit_score,account.account_age_days,account.has_2fa_installed,transaction_stats.transaction_count_7d,transaction_stats.transaction_count_30d
 ```
 
