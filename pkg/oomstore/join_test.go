@@ -21,7 +21,6 @@ func TestChannelJoin(t *testing.T) {
 	metadataStore := mock_metadata.NewMockStore(ctrl)
 	store := oomstore.TEST__New(nil, offlineStore, metadataStore)
 
-	streamFeatures := prepareFeatures(true, false)
 	inconsistentFeatures := prepareFeatures(false, true)
 	consistentFeatures := prepareFeatures(true, true)
 
@@ -55,10 +54,10 @@ func TestChannelJoin(t *testing.T) {
 		{
 			description: "no valid features, return nil",
 			opt: types.ChannelJoinOpt{
-				FeatureFullNames: streamFeatures.FullNames(),
+				FeatureFullNames: []string{},
 				EntityRows:       entityRows,
 			},
-			features:      streamFeatures,
+			features:      nil,
 			expectedError: nil,
 			expected:      prepareEmptyResult(),
 		},
