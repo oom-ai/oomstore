@@ -22,7 +22,8 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		return err
 	}
 
-	return s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
+	callbacks := make([]func() error, 0)
+	if err := s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
 		// apply entity
 		for _, entity := range stage.NewEntities {
 			if err := s.applyEntity(c, tx, entity); err != nil {
@@ -32,19 +33,36 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 
 		// apply group
 		for _, group := range stage.NewGroups {
-			if err := s.applyGroup(c, tx, group); err != nil {
+			callback, err := s.applyGroup(c, tx, group)
+			if err != nil {
 				return err
+			}
+			if callback != nil {
+				callbacks = append(callbacks, callback)
 			}
 		}
 
 		// apply feature
 		for _, feature := range stage.NewFeatures {
-			if err := s.applyFeature(c, tx, feature); err != nil {
+			callback, err := s.applyFeature(c, tx, feature)
+			if err != nil {
 				return err
+			}
+			if callback != nil {
+				callbacks = append(callbacks, callback)
 			}
 		}
 		return nil
-	})
+	}); err != nil {
+		return err
+	}
+
+	for _, callback := range callbacks {
+		if err = callback(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *OomStore) applyEntity(ctx context.Context, tx metadata.DBStore, newEntity apply.Entity) error {
@@ -75,20 +93,20 @@ func (s *OomStore) applyEntity(ctx context.Context, tx metadata.DBStore, newEnti
 	return nil
 }
 
-func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup apply.Group) error {
+func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup apply.Group) (func() error, error) {
 	if err := newGroup.Validate(); err != nil {
-		return err
+		return nil, err
 	}
 
 	entity, err := tx.GetEntityByName(ctx, newGroup.EntityName)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	group, err := tx.GetGroupByName(ctx, newGroup.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
-			return err
+			return nil, err
 		}
 
 		id, err := tx.CreateGroup(ctx, metadata.CreateGroupOpt{
@@ -98,47 +116,49 @@ func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup
 			Description: newGroup.Description,
 		})
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if newGroup.Category == types.CategoryStream {
-			return s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-				Entity:  entity,
-				GroupID: id,
-			})
+			return func() error {
+				return s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+					Entity:  entity,
+					GroupID: id,
+				})
+			}, nil
 		}
-		return nil
+		return nil, nil
 	}
 
 	if newGroup.Description != group.Description {
-		return tx.UpdateGroup(ctx, metadata.UpdateGroupOpt{
+		return nil, tx.UpdateGroup(ctx, metadata.UpdateGroupOpt{
 			GroupID:        group.ID,
 			NewDescription: &newGroup.Description,
 		})
 
 	}
-	return nil
+	return nil, nil
 }
 
-func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFeature apply.Feature) error {
+func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFeature apply.Feature) (func() error, error) {
 	if err := newFeature.Validate(); err != nil {
-		return err
+		return nil, err
 	}
 
 	group, err := tx.GetGroupByName(ctx, newFeature.GroupName)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	featureFullName := fmt.Sprintf("%s.%s", newFeature.GroupName, newFeature.Name)
 	feature, err := tx.GetFeatureByName(ctx, featureFullName)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
-			return err
+			return nil, err
 		}
 		valueType, err := types.ParseValueType(newFeature.ValueType)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		id, err := tx.CreateFeature(ctx, metadata.CreateFeatureOpt{
 			FeatureName: newFeature.Name,
@@ -148,30 +168,32 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 			ValueType:   valueType,
 		})
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if group.Category == types.CategoryStream {
 			feature, err := tx.GetFeature(ctx, id)
 			if err != nil {
-				return err
+				return nil, err
 			}
-			return s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-				Entity:  group.Entity,
-				GroupID: group.ID,
-				Feature: feature,
-			})
+			return func() error {
+				return s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+					Entity:  group.Entity,
+					GroupID: group.ID,
+					Feature: feature,
+				})
+			}, nil
 		}
-		return nil
+		return nil, nil
 	}
 
 	if newFeature.Description != feature.Description {
-		return tx.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
+		return nil, tx.UpdateFeature(ctx, metadata.UpdateFeatureOpt{
 			FeatureID:      feature.ID,
 			NewDescription: &newFeature.Description,
 		})
 	}
-	return nil
+	return nil, nil
 }
 
 func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage, error) {
