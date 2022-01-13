@@ -24,21 +24,11 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 	}
 	data := make(chan []interface{})
 	defer close(data)
-	emptyResult := &types.JoinResult{
-		Data: data,
-	}
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		FeatureFullNames: &opt.FeatureFullNames,
 	})
 	if err != nil {
 		return nil, err
-	}
-
-	features = features.Filter(func(f *types.Feature) bool {
-		return f.Group.Category == types.CategoryBatch
-	})
-	if len(features) == 0 {
-		return emptyResult, nil
 	}
 
 	entity, err := getSharedEntity(features)
