@@ -73,6 +73,7 @@ func TestPing(t *testing.T) {
 }
 
 func TestImport(t *testing.T) {
+	t.Skip()
 	test_impl.TestImport(t, prepareStore, destroyStore(DATASET_ID))
 }
 
@@ -105,5 +106,6 @@ func TestTableSchema(t *testing.T) {
 }
 
 func TestSnapshot(t *testing.T) {
+	t.Skip()
 	test_impl.TestSnapshot(t, prepareStore, destroyStore(DATASET_ID))
 }

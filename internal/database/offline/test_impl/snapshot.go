@@ -56,13 +56,13 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 	})
 	assert.NoError(t, err)
 
-	actual, errs := store.ExportOneGroup(ctx, offline.ExportOneGroupOpt{
-		SnapshotTable: "offline_stream_snapshot_1_2",
-		EntityName:    "device",
-		Features:      features,
+	result, err := store.Export(ctx, offline.ExportOpt{
+		SnapshotTables: map[int]string{1: "offline_stream_snapshot_1_2"},
+		EntityName:     "device",
+		Features:       map[int]types.FeatureList{1: features},
 	})
 	values := make([][]interface{}, 0)
-	for row := range actual {
+	for row := range result.Data {
 		values = append(values, row)
 	}
 	sort.Slice(values, func(i, j int) bool {
@@ -75,6 +75,6 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 		{"1237", "pixel", int64(200)},
 	}
 	assert.Equal(t, expected, values)
-	assert.NoError(t, <-errs)
-
+	assert.NoError(t, result.CheckStreamError())
+	assert.NoError(t, err)
 }

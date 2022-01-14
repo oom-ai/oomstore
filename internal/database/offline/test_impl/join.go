@@ -144,23 +144,36 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 }
 
 func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.FeatureList) {
+	groupBasic := &types.Group{
+		ID:       1,
+		Name:     "device_basic",
+		Category: types.CategoryBatch,
+	}
+	groupAdvanced := &types.Group{
+		ID:       2,
+		Name:     "device_advanced",
+		Category: types.CategoryBatch,
+	}
 	price := &types.Feature{
 		Name:      "price",
 		FullName:  "device_basic.price",
 		ValueType: types.Int64,
 		GroupID:   1,
+		Group:     groupBasic,
 	}
 	model := &types.Feature{
 		Name:      "model",
 		FullName:  "device_basic.model",
 		ValueType: types.String,
 		GroupID:   1,
+		Group:     groupBasic,
 	}
 	isActive := &types.Feature{
 		Name:      "is_active",
 		FullName:  "device_advanced.is_active",
 		ValueType: types.Bool,
 		GroupID:   2,
+		Group:     groupAdvanced,
 	}
 
 	if oneGroup {
