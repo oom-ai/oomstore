@@ -92,19 +92,20 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			actual, errs := store.Export(ctx, tc.opt)
+			result, err := store.Export(ctx, tc.opt)
 			values := make([][]interface{}, 0)
-			for row := range actual {
+			for row := range result.Data {
 				values = append(values, row)
 			}
 			if tc.expectedError != nil {
-				assert.EqualError(t, <-errs, tc.expectedError.Error())
+				assert.EqualError(t, err, tc.expectedError.Error())
 			} else {
 				fmt.Println("expected: ", tc.expected)
 				fmt.Println("actual: ", values)
 
 				assert.ElementsMatch(t, tc.expected, values)
-				assert.NoError(t, <-errs)
+				assert.NoError(t, err)
+				assert.NoError(t, result.CheckStreamError())
 			}
 		})
 	}
