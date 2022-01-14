@@ -22,7 +22,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		return err
 	}
 
-	callbacks := make([]func() error, 0)
+	onlineJobs := make([]func() error, 0)
 	if err := s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
 		// apply entity
 		for _, entity := range stage.NewEntities {
@@ -33,23 +33,23 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 
 		// apply group
 		for _, group := range stage.NewGroups {
-			callback, err := s.applyGroup(c, tx, group)
+			onlineJob, err := s.applyGroup(c, tx, group)
 			if err != nil {
 				return err
 			}
-			if callback != nil {
-				callbacks = append(callbacks, callback)
+			if onlineJob != nil {
+				onlineJobs = append(onlineJobs, onlineJob)
 			}
 		}
 
 		// apply feature
 		for _, feature := range stage.NewFeatures {
-			callback, err := s.applyFeature(c, tx, feature)
+			onlineJob, err := s.applyFeature(c, tx, feature)
 			if err != nil {
 				return err
 			}
-			if callback != nil {
-				callbacks = append(callbacks, callback)
+			if onlineJob != nil {
+				onlineJobs = append(onlineJobs, onlineJob)
 			}
 		}
 		return nil
@@ -57,8 +57,8 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 		return err
 	}
 
-	for _, callback := range callbacks {
-		if err = callback(); err != nil {
+	for _, job := range onlineJobs {
+		if err = job(); err != nil {
 			return err
 		}
 	}
