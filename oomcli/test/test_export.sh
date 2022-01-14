@@ -7,7 +7,7 @@ register_features
 import_sample >> /dev/null
 
 case='get all'
-expected='device,price
+expected='device,phone.price
 1,3999
 2,5299
 3,3999
@@ -18,5 +18,6 @@ expected='device,price
 8,6500
 9,4500
 '
-actual=$(oomcli export --feature price --revision-id 1 -o csv)
+timestamp=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
+actual=$(oomcli export --feature phone.price --unix-milli $timestamp -o csv)
 assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"

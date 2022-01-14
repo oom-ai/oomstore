@@ -242,9 +242,10 @@ func prepareEntityTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.Exp
 
 	// Step 3: create index on table entity_rows
 	if supportIndex(dbOpt.Backend) {
-		index := fmt.Sprintf(`CREATE UNIQUE INDEX idx_%s ON %s (%s)`, tableName, tableName, opt.EntityName)
+		qt := dbutil.QuoteFn(dbOpt.Backend)
+		index := fmt.Sprintf(`CREATE UNIQUE INDEX idx_%s ON %s (%s)`, tableName, tableName, qt(opt.EntityName))
 		if err = dbOpt.ExecContext(ctx, index, nil); err != nil {
-			return "", err
+			return "", errdefs.WithStack(err)
 		}
 	}
 	return tableName, nil

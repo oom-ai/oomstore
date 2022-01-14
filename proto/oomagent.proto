@@ -131,7 +131,7 @@ message JoinResponse {}
 
 message ChannelExportRequest {
   repeated string feature_names = 1;
-  int32 revision_id = 2;
+  int64 unix_milli = 2;
   optional uint64 limit = 3;
 }
 
@@ -142,7 +142,7 @@ message ChannelExportResponse {
 
 message ExportRequest {
   repeated string feature_names = 1;
-  int32 revision_id = 2;
+  int64 unix_milli = 2;
   optional uint64 limit = 3;
   string output_file_path = 4;
 }

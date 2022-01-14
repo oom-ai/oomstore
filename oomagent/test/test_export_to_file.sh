@@ -31,16 +31,17 @@ group_test() {
 #  test group 1  #
 ##################
 group="export some features"
+unix_milli=${3:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
 arg=$(cat <<-EOF
 {
-    "feature_names": ["state"],
-    "output_file_path": "$output",
-    "revision_id": "3"
+    "feature_names": ["account.state"],
+    "unix_milli": $unix_milli,
+    "output_file_path": "$output"
 }
 EOF
 )
 expected='
-user,state
+user,account.state
 1,Nevada
 2,South Carolina
 3,New Jersey
@@ -60,11 +61,24 @@ group_test "$group" "$arg" "$expected"
 group="export all features"
 arg=$(cat <<-EOF
 {
+    "feature_names": ["account.state","account.credit_score","account.account_age_days","account.has_2fa_installed"],
     "output_file_path": "$output",
-    "revision_id": "3"
+    "unix_milli": $unix_milli
 }
 EOF
 )
-expected=$(cat ./data/account_10.csv)
+expected='
+user,account.state,account.credit_score,account.account_age_days,account.has_2fa_installed
+1,Nevada,530,242,true
+2,South Carolina,520,268,false
+3,New Jersey,655,84,false
+4,Ohio,677,119,true
+5,California,566,289,false
+6,North Carolina,533,155,true
+7,North Dakota,605,334,true
+8,West Virginia,664,282,false
+9,Alabama,577,150,true
+10,Idaho,693,212,true
+'
 group_test "$group" "$arg" "$expected"
 )

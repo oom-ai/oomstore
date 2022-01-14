@@ -74,10 +74,13 @@ func (l RevisionList) Before(unixMilli int64) *Revision {
 		return nil
 	}
 	var i int
-	for i = range l {
+	for i = 1; i < len(l); i++ {
 		if l[i].Revision > unixMilli {
 			break
 		}
+	}
+	if i == 0 {
+		return l[0]
 	}
 	return l[i-1]
 }

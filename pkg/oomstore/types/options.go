@@ -36,23 +36,11 @@ type ChannelExportOpt struct {
 	Limit            *uint64
 }
 
-type ChannelExportBatchOpt struct {
-	RevisionID   int
-	FeatureNames []string
-	Limit        *uint64
-}
-
-type ChannelExportStreamOpt struct {
-	UnixMilli        int64
+type ExportOpt struct {
 	FeatureFullNames []string
+	UnixMilli        int64
 	Limit            *uint64
-}
-
-type ExportBatchOpt struct {
-	RevisionID     int
-	FeatureNames   []string
-	Limit          *uint64
-	OutputFilePath string
+	OutputFilePath   string
 }
 
 type OnlineGetOpt struct {
