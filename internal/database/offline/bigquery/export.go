@@ -67,7 +67,7 @@ func bigqueryQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt off
 	return stream, errs
 }
 
-func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
+func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (*types.ExportResult, error) {
 	//TODO implement me
 	panic("implement me")
 }

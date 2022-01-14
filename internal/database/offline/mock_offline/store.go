@@ -65,11 +65,11 @@ func (mr *MockStoreMockRecorder) CreateTable(ctx, opt interface{}) *gomock.Call 
 }
 
 // Export mocks base method.
-func (m *MockStore) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
+func (m *MockStore) Export(ctx context.Context, opt offline.ExportOpt) (*types.ExportResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Export", ctx, opt)
-	ret0, _ := ret[0].(<-chan types.ExportRecord)
-	ret1, _ := ret[1].(<-chan error)
+	ret0, _ := ret[0].(*types.ExportResult)
+	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 

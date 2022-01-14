@@ -55,7 +55,7 @@ func DoExportOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOneGr
 	return opt.QueryResults(ctx, dbOpt, opt.ExportOneGroupOpt, query, args)
 }
 
-func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend types.BackendType) (<-chan types.ExportRecord, <-chan error) {
+func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend types.BackendType) (*types.ExportResult, error) {
 	dbOpt := dbutil.DBOpt{
 		Backend: backend,
 		SqlxDB:  db,
@@ -67,7 +67,7 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend typ
 	return DoExport(ctx, dbOpt, doJoinOpt)
 }
 
-func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (<-chan types.ExportRecord, <-chan error) {
+func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.ExportResult, error) {
 	var (
 		emptyStream = make(chan types.ExportRecord)
 		errs        = make(chan error, 1) // at most 1 error
@@ -97,8 +97,7 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (<-chan 
 	// Step 1: prepare export_entity table, which contains all entity keys from source tables
 	tableName, err := prepareEntityTable(ctx, dbOpt, opt.ExportOpt, snapshotTables, cdcTables)
 	if err != nil {
-		errs <- errdefs.WithStack(err)
-		return emptyStream, errs
+		return nil, err
 	}
 
 	// Step 2: join export_entity table, snapshot tables and cdc tables
@@ -133,17 +132,16 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (<-chan 
 		Backend:         dbOpt.Backend,
 	})
 	if err != nil {
-		errs <- errdefs.WithStack(err)
-		return emptyStream, errs
+		return nil, err
 	}
 	args := make([]interface{}, 0, len(opt.CdcTables)*2)
 	for i := 0; i < len(opt.CdcTables)*2; i++ {
 		args = append(args, opt.UnixMilli)
 	}
-	return queryExportResults(ctx, dbOpt, query, args, featureList)
+	return queryExportResults(ctx, dbOpt, opt.ExportOpt, query, args, featureList)
 }
 
-func queryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, args []interface{}, featureList types.FeatureList) (<-chan types.ExportRecord, <-chan error) {
+func queryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList) (*types.ExportResult, error) {
 	stream := make(chan types.ExportRecord)
 	errs := make(chan error, 1) // at most 1 error
 
@@ -169,7 +167,7 @@ func queryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, a
 				return
 			}
 			record[0] = cast.ToString(record[0])
-			for i, f := range featureList {
+			for i, f := range features {
 				if record[i+1] == nil {
 					continue
 				}
@@ -183,8 +181,8 @@ func queryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, a
 			stream <- record
 		}
 	}()
-
-	return stream, errs
+	header := append([]string{opt.EntityName}, features.FullNames()...)
+	return types.NewExportResult(header, stream, errs), nil
 }
 
 func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error) {
