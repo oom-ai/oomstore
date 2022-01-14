@@ -79,21 +79,6 @@ func (mr *MockStoreMockRecorder) Export(ctx, opt interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Export", reflect.TypeOf((*MockStore)(nil).Export), ctx, opt)
 }
 
-// ExportOneGroup mocks base method.
-func (m *MockStore) ExportOneGroup(ctx context.Context, opt offline.ExportOneGroupOpt) (<-chan types.ExportRecord, <-chan error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ExportOneGroup", ctx, opt)
-	ret0, _ := ret[0].(<-chan types.ExportRecord)
-	ret1, _ := ret[1].(<-chan error)
-	return ret0, ret1
-}
-
-// ExportOneGroup indicates an expected call of ExportOneGroup.
-func (mr *MockStoreMockRecorder) ExportOneGroup(ctx, opt interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExportOneGroup", reflect.TypeOf((*MockStore)(nil).ExportOneGroup), ctx, opt)
-}
-
 // Import mocks base method.
 func (m *MockStore) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) {
 	m.ctrl.T.Helper()
