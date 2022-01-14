@@ -8,7 +8,7 @@ import (
 )
 
 var exportOutput *string
-var exportOpt types.ChannelExportBatchOpt
+var exportOpt types.ChannelExportOpt
 
 var exportCmd = &cobra.Command{
 	Use:   "export",
@@ -35,9 +35,9 @@ func init() {
 	flags := exportCmd.Flags()
 	exportOutput = flags.StringP("output", "o", ASCIITable, "output format [csv,ascii_table]")
 
-	flags.StringSliceVar(&exportOpt.FeatureNames, "feature", nil, "select feature names")
+	flags.StringSliceVar(&exportOpt.FeatureFullNames, "feature", nil, "select feature names")
 
-	flags.IntVarP(&exportOpt.RevisionID, "revision-id", "r", 0, "group revision id")
+	flags.Int64VarP(&exportOpt.UnixMilli, "unix-milli", "u", 0, "max unix timestamp")
 	_ = exportCmd.MarkFlagRequired("revision-id")
 
 	exportOpt.Limit = flags.Uint64P("limit", "l", 0, "max records to export")
