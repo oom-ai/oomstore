@@ -25,6 +25,7 @@ type OomAgentClient interface {
 	ChannelImport(ctx context.Context, opts ...grpc.CallOption) (OomAgent_ChannelImportClient, error)
 	Import(ctx context.Context, in *ImportRequest, opts ...grpc.CallOption) (*ImportResponse, error)
 	Push(ctx context.Context, in *PushRequest, opts ...grpc.CallOption) (*PushResponse, error)
+	Snapshot(ctx context.Context, in *SnapshotRequest, opts ...grpc.CallOption) (*SnapshotResponse, error)
 	ChannelJoin(ctx context.Context, opts ...grpc.CallOption) (OomAgent_ChannelJoinClient, error)
 	Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error)
 	ChannelExport(ctx context.Context, in *ChannelExportRequest, opts ...grpc.CallOption) (OomAgent_ChannelExportClient, error)
@@ -113,6 +114,15 @@ func (c *oomAgentClient) Import(ctx context.Context, in *ImportRequest, opts ...
 func (c *oomAgentClient) Push(ctx context.Context, in *PushRequest, opts ...grpc.CallOption) (*PushResponse, error) {
 	out := new(PushResponse)
 	err := c.cc.Invoke(ctx, "/oomagent.OomAgent/Push", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *oomAgentClient) Snapshot(ctx context.Context, in *SnapshotRequest, opts ...grpc.CallOption) (*SnapshotResponse, error) {
+	out := new(SnapshotResponse)
+	err := c.cc.Invoke(ctx, "/oomagent.OomAgent/Snapshot", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -219,6 +229,7 @@ type OomAgentServer interface {
 	ChannelImport(OomAgent_ChannelImportServer) error
 	Import(context.Context, *ImportRequest) (*ImportResponse, error)
 	Push(context.Context, *PushRequest) (*PushResponse, error)
+	Snapshot(context.Context, *SnapshotRequest) (*SnapshotResponse, error)
 	ChannelJoin(OomAgent_ChannelJoinServer) error
 	Join(context.Context, *JoinRequest) (*JoinResponse, error)
 	ChannelExport(*ChannelExportRequest, OomAgent_ChannelExportServer) error
@@ -248,6 +259,9 @@ func (UnimplementedOomAgentServer) Import(context.Context, *ImportRequest) (*Imp
 }
 func (UnimplementedOomAgentServer) Push(context.Context, *PushRequest) (*PushResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Push not implemented")
+}
+func (UnimplementedOomAgentServer) Snapshot(context.Context, *SnapshotRequest) (*SnapshotResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Snapshot not implemented")
 }
 func (UnimplementedOomAgentServer) ChannelJoin(OomAgent_ChannelJoinServer) error {
 	return status.Errorf(codes.Unimplemented, "method ChannelJoin not implemented")
@@ -393,6 +407,24 @@ func _OomAgent_Push_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OomAgent_Snapshot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SnapshotRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OomAgentServer).Snapshot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/oomagent.OomAgent/Snapshot",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OomAgentServer).Snapshot(ctx, req.(*SnapshotRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _OomAgent_ChannelJoin_Handler(srv interface{}, stream grpc.ServerStream) error {
 	return srv.(OomAgentServer).ChannelJoin(&oomAgentChannelJoinServer{stream})
 }
@@ -520,6 +552,10 @@ var OomAgent_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Push",
 			Handler:    _OomAgent_Push_Handler,
+		},
+		{
+			MethodName: "Snapshot",
+			Handler:    _OomAgent_Snapshot_Handler,
 		},
 		{
 			MethodName: "Join",
