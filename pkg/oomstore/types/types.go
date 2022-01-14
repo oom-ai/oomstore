@@ -54,6 +54,10 @@ func (e *ExportResult) CheckStreamError() error {
 	return nil
 }
 
+func (e *ExportResult) GetErrorChannel() <-chan error {
+	return e.error
+}
+
 type DataTableSchema struct {
 	Fields []DataTableFieldSchema
 }

@@ -88,11 +88,11 @@ func TestChannelExport(t *testing.T) {
 			}
 			metadataStore.EXPECT().ListFeature(gomock.Any(), gomock.Any()).Return(features, nil)
 
-			offlineStore.EXPECT().ExportOneGroup(gomock.Any(), offline.ExportOneGroupOpt{
-				SnapshotTable: "device_info_10",
-				EntityName:    "device",
-				Features:      features,
-				Limit:         tc.opt.Limit,
+			offlineStore.EXPECT().Export(gomock.Any(), offline.ExportOpt{
+				SnapshotTables: map[int]string{1: "device_info_10"},
+				Features:       map[int]types.FeatureList{1: features},
+				EntityName:     "device",
+				Limit:          tc.opt.Limit,
 			}).Return(tc.exportStream, tc.exportError)
 
 			// execute and compare results
