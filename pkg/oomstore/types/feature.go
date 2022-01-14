@@ -96,8 +96,13 @@ func (l FeatureList) Find(find func(*Feature) bool) *Feature {
 }
 
 func (l FeatureList) GroupIDs() (ids []int) {
-	for _, f := range l {
-		ids = append(ids, f.GroupID)
+	groupIDMap := make(map[int]struct{})
+	for _, r := range l {
+		groupIDMap[r.GroupID] = struct{}{}
 	}
-	return ids
+	groupIDs := make([]int, 0, len(groupIDMap))
+	for id := range groupIDMap {
+		groupIDs = append(groupIDs, id)
+	}
+	return groupIDs
 }
