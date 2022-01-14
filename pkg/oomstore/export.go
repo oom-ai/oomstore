@@ -181,7 +181,7 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 		}
 	}
 
-	stream, exportErr := s.offline.Export(ctx, offline.ExportOpt{
+	result, err := s.offline.Export(ctx, offline.ExportOpt{
 		SnapshotTables: snapshotTables,
 		CdcTables:      cdcTables,
 		Features:       featureMap,
@@ -189,9 +189,10 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 		EntityName:     features[0].Group.Entity.Name,
 		Limit:          opt.Limit,
 	})
-
-	header := append([]string{features[0].Group.Entity.Name}, features.Names()...)
-	return types.NewExportResult(header, stream, exportErr), nil
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // key: group_Id, value: slice of features
