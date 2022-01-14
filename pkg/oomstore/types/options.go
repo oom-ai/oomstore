@@ -30,6 +30,12 @@ type CreateGroupOpt struct {
 	Description string
 }
 
+type ChannelExportOpt struct {
+	FeatureFullNames []string
+	UnixMilli        int64
+	Limit            *uint64
+}
+
 type ChannelExportBatchOpt struct {
 	RevisionID   int
 	FeatureNames []string
