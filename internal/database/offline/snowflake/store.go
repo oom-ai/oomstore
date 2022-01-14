@@ -55,7 +55,7 @@ func (db *DB) ExportOneGroup(ctx context.Context, opt offline.ExportOneGroupOpt)
 	return sqlutil.ExportOneGroup(ctx, db.DB, opt, Backend)
 }
 
-func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (<-chan types.ExportRecord, <-chan error) {
+func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (*types.ExportResult, error) {
 	return sqlutil.Export(ctx, db.DB, opt, Backend)
 }
 
