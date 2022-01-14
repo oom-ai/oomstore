@@ -50,7 +50,7 @@ func TestPurgeNotRemovesOtherRevisions(t *testing.T, prepareStore PrepareStoreFn
 		})
 		require.NoError(t, err)
 		for i, f := range SampleSmall.Features {
-			compareFeatureValue(t, record.ValueAt(i), rs[f.FullName], f.ValueType)
+			compareFeatureValue(t, record.ValueAt(i), rs[f.FullName()], f.ValueType)
 		}
 	}
 }

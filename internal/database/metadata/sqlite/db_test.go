@@ -138,7 +138,7 @@ func TestListFeature(t *testing.T) {
 }
 
 func TestCacheListFeature(t *testing.T) {
-	test_impl.TestCacheListFeature(t, prepareStore, destroyStore)
+	test_impl.TestListCachedFeature(t, prepareStore, destroyStore)
 }
 
 func TestCreateRevision(t *testing.T) {

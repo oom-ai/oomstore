@@ -7,7 +7,6 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
 	"github.com/oom-ai/oomstore/internal/database/online/mock_online"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
@@ -81,7 +80,7 @@ func TestOnlineGet(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().CacheListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureFullNames: &tc.opt.FeatureFullNames}).Return(tc.features)
+			metadataStore.EXPECT().ListCachedFeature(gomock.Any(), &tc.opt.FeatureFullNames).Return(tc.features)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().Get(gomock.Any(), gomock.Any()).Return(dbutil.RowMap{
 					"price": int64(100),
@@ -175,7 +174,7 @@ func TestOnlineMultiGet(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().CacheListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureFullNames: &tc.opt.FeatureFullNames}).Return(tc.features)
+			metadataStore.EXPECT().ListCachedFeature(gomock.Any(), &tc.opt.FeatureFullNames).Return(tc.features)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().MultiGet(gomock.Any(), gomock.Any()).Return(map[string]dbutil.RowMap{
 					"1234": {
@@ -219,7 +218,6 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 	features := types.FeatureList{
 		{
 			Name:      "model",
-			FullName:  "device.model",
 			ValueType: types.String,
 			GroupID:   1,
 			Group: &types.Group{
@@ -232,7 +230,6 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 		},
 		{
 			Name:      "price",
-			FullName:  "device.price",
 			ValueType: types.Int64,
 			GroupID:   2,
 			Group: &types.Group{
@@ -245,7 +242,6 @@ func prepareFeatures(isConsistent bool, isAvailable bool) types.FeatureList {
 		},
 		{
 			Name:      "age",
-			FullName:  "user.age",
 			ValueType: types.Int64,
 			GroupID:   3,
 			Group: &types.Group{

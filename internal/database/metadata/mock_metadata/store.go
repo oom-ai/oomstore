@@ -37,20 +37,6 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 	return m.recorder
 }
 
-// CacheListFeature mocks base method.
-func (m *MockStore) CacheListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheListFeature", ctx, opt)
-	ret0, _ := ret[0].(types.FeatureList)
-	return ret0
-}
-
-// CacheListFeature indicates an expected call of CacheListFeature.
-func (mr *MockStoreMockRecorder) CacheListFeature(ctx, opt interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheListFeature", reflect.TypeOf((*MockStore)(nil).CacheListFeature), ctx, opt)
-}
-
 // Close mocks base method.
 func (m *MockStore) Close() error {
 	m.ctrl.T.Helper()
@@ -172,18 +158,18 @@ func (mr *MockStoreMockRecorder) GetFeature(ctx, id interface{}) *gomock.Call {
 }
 
 // GetFeatureByName mocks base method.
-func (m *MockStore) GetFeatureByName(ctx context.Context, fullName string) (*types.Feature, error) {
+func (m *MockStore) GetFeatureByName(ctx context.Context, groupName, featureName string) (*types.Feature, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFeatureByName", ctx, fullName)
+	ret := m.ctrl.Call(m, "GetFeatureByName", ctx, groupName, featureName)
 	ret0, _ := ret[0].(*types.Feature)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFeatureByName indicates an expected call of GetFeatureByName.
-func (mr *MockStoreMockRecorder) GetFeatureByName(ctx, fullName interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) GetFeatureByName(ctx, groupName, featureName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockStore)(nil).GetFeatureByName), ctx, fullName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockStore)(nil).GetFeatureByName), ctx, groupName, featureName)
 }
 
 // GetGroup mocks base method.
@@ -244,6 +230,20 @@ func (m *MockStore) GetRevisionBy(ctx context.Context, groupID int, revision int
 func (mr *MockStoreMockRecorder) GetRevisionBy(ctx, groupID, revision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRevisionBy", reflect.TypeOf((*MockStore)(nil).GetRevisionBy), ctx, groupID, revision)
+}
+
+// ListCachedFeature mocks base method.
+func (m *MockStore) ListCachedFeature(ctx context.Context, fullNames *[]string) types.FeatureList {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListCachedFeature", ctx, fullNames)
+	ret0, _ := ret[0].(types.FeatureList)
+	return ret0
+}
+
+// ListCachedFeature indicates an expected call of ListCachedFeature.
+func (mr *MockStoreMockRecorder) ListCachedFeature(ctx, fullNames interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCachedFeature", reflect.TypeOf((*MockStore)(nil).ListCachedFeature), ctx, fullNames)
 }
 
 // ListEntity mocks base method.
@@ -534,18 +534,18 @@ func (mr *MockDBStoreMockRecorder) GetFeature(ctx, id interface{}) *gomock.Call 
 }
 
 // GetFeatureByName mocks base method.
-func (m *MockDBStore) GetFeatureByName(ctx context.Context, fullName string) (*types.Feature, error) {
+func (m *MockDBStore) GetFeatureByName(ctx context.Context, groupName, featureName string) (*types.Feature, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFeatureByName", ctx, fullName)
+	ret := m.ctrl.Call(m, "GetFeatureByName", ctx, groupName, featureName)
 	ret0, _ := ret[0].(*types.Feature)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFeatureByName indicates an expected call of GetFeatureByName.
-func (mr *MockDBStoreMockRecorder) GetFeatureByName(ctx, fullName interface{}) *gomock.Call {
+func (mr *MockDBStoreMockRecorder) GetFeatureByName(ctx, groupName, featureName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockDBStore)(nil).GetFeatureByName), ctx, fullName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeatureByName", reflect.TypeOf((*MockDBStore)(nil).GetFeatureByName), ctx, groupName, featureName)
 }
 
 // GetGroup mocks base method.
@@ -761,18 +761,18 @@ func (m *MockCacheStore) EXPECT() *MockCacheStoreMockRecorder {
 	return m.recorder
 }
 
-// CacheListFeature mocks base method.
-func (m *MockCacheStore) CacheListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
+// ListCachedFeature mocks base method.
+func (m *MockCacheStore) ListCachedFeature(ctx context.Context, fullNames *[]string) types.FeatureList {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CacheListFeature", ctx, opt)
+	ret := m.ctrl.Call(m, "ListCachedFeature", ctx, fullNames)
 	ret0, _ := ret[0].(types.FeatureList)
 	return ret0
 }
 
-// CacheListFeature indicates an expected call of CacheListFeature.
-func (mr *MockCacheStoreMockRecorder) CacheListFeature(ctx, opt interface{}) *gomock.Call {
+// ListCachedFeature indicates an expected call of ListCachedFeature.
+func (mr *MockCacheStoreMockRecorder) ListCachedFeature(ctx, fullNames interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheListFeature", reflect.TypeOf((*MockCacheStore)(nil).CacheListFeature), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCachedFeature", reflect.TypeOf((*MockCacheStore)(nil).ListCachedFeature), ctx, fullNames)
 }
 
 // Refresh mocks base method.

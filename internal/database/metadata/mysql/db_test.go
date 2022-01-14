@@ -134,7 +134,7 @@ func TestListFeature(t *testing.T) {
 }
 
 func TestCacheListFeature(t *testing.T) {
-	test_impl.TestCacheListFeature(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
+	test_impl.TestListCachedFeature(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestUpdateFeature(t *testing.T) {

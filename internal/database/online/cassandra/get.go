@@ -39,7 +39,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	rs := make(map[string]interface{}, len(scan))
 	for _, feature := range opt.Features {
 		deserializedValue, _ := dbutil.DeserializeByValueType(scan[feature.Name], feature.ValueType, types.BackendCassandra)
-		rs[feature.FullName] = deserializedValue
+		rs[feature.FullName()] = deserializedValue
 	}
 	return rs, nil
 }
@@ -89,7 +89,7 @@ func deserializeIntoRowMap(values map[string]interface{}, entityName string, fea
 	rs := make(dbutil.RowMap)
 	for _, feature := range features {
 		deserializedValue, _ := dbutil.DeserializeByValueType(values[feature.Name], feature.ValueType, types.BackendCassandra)
-		rs[feature.FullName] = deserializedValue
+		rs[feature.FullName()] = deserializedValue
 	}
 	return entityKey, rs
 }

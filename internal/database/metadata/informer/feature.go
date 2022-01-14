@@ -1,7 +1,6 @@
 package informer
 
 import (
-	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -17,28 +16,15 @@ func (c *FeatureCache) Enrich(groupCache *GroupCache) {
 	}
 }
 
-func (c *FeatureCache) List(opt metadata.ListFeatureOpt) types.FeatureList {
+func (c *FeatureCache) List(fullNames *[]string) types.FeatureList {
 	features := c.FeatureList
 
-	// filter ids
-	if opt.FeatureIDs != nil {
-		var tmp types.FeatureList
-		for _, id := range *opt.FeatureIDs {
-			if f := c.Find(func(f *types.Feature) bool {
-				return f.ID == id
-			}); f != nil {
-				tmp = append(tmp, f)
-			}
-		}
-		features = tmp
-	}
-
 	// filter names
-	if opt.FeatureFullNames != nil {
+	if fullNames != nil {
 		var tmp types.FeatureList
-		for _, fullName := range *opt.FeatureFullNames {
+		for _, fullName := range *fullNames {
 			if f := features.Find(func(f *types.Feature) bool {
-				return f.FullName == fullName
+				return f.FullName() == fullName
 			}); f != nil {
 				tmp = append(tmp, f)
 			}
@@ -46,18 +32,5 @@ func (c *FeatureCache) List(opt metadata.ListFeatureOpt) types.FeatureList {
 		features = tmp
 	}
 
-	// filter entity
-	if opt.EntityID != nil {
-		features = features.Filter(func(f *types.Feature) bool {
-			return f.Entity().ID == *opt.EntityID
-		})
-	}
-
-	// filter group
-	if opt.GroupID != nil {
-		features = features.Filter(func(f *types.Feature) bool {
-			return f.Group.ID == *opt.GroupID
-		})
-	}
 	return features
 }

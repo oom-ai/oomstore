@@ -9,7 +9,6 @@ type CreateEntityOpt struct {
 
 type CreateFeatureOpt struct {
 	FeatureName string
-	FullName    string
 	GroupID     int
 	Description string
 	ValueType   types.ValueType
@@ -56,8 +55,7 @@ type UpdateRevisionOpt struct {
 }
 
 type ListFeatureOpt struct {
-	EntityID         *int
-	GroupID          *int
-	FeatureIDs       *[]int
-	FeatureFullNames *[]string
+	EntityID   *int
+	GroupID    *int
+	FeatureIDs *[]int
 }

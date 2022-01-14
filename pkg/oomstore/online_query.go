@@ -6,14 +6,13 @@ import (
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 // OnlineGet gets online features of a particular entity instance.
 func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*types.FeatureValues, error) {
-	if err := validateFeatureFullNames(opt.FeatureFullNames); err != nil {
+	if err := validateFullFeatureNames(opt.FeatureFullNames...); err != nil {
 		return nil, err
 	}
 	rs := types.FeatureValues{
@@ -21,9 +20,7 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 		FeatureFullNames: opt.FeatureFullNames,
 		FeatureValueMap:  make(map[string]interface{}),
 	}
-	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
-		FeatureFullNames: &opt.FeatureFullNames,
-	})
+	features := s.metadata.ListCachedFeature(ctx, &opt.FeatureFullNames)
 	if len(features) == 0 {
 		return &rs, nil
 	}
@@ -61,13 +58,11 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 
 // OnlineMultiGet gets online features of multiple entity instances.
 func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetOpt) (map[string]*types.FeatureValues, error) {
-	if err := validateFeatureFullNames(opt.FeatureFullNames); err != nil {
+	if err := validateFullFeatureNames(opt.FeatureFullNames...); err != nil {
 		return nil, err
 	}
 	result := make(map[string]*types.FeatureValues)
-	features := s.metadata.CacheListFeature(ctx, metadata.ListFeatureOpt{
-		FeatureFullNames: &opt.FeatureFullNames,
-	})
+	features := s.metadata.ListCachedFeature(ctx, &opt.FeatureFullNames)
 	if len(features) == 0 {
 		return result, nil
 	}

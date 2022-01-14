@@ -3,7 +3,6 @@ package oomstore
 import (
 	"context"
 	"encoding/csv"
-	"fmt"
 	"os"
 
 	"github.com/spf13/cast"
@@ -12,6 +11,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
 
 /*
@@ -41,7 +41,7 @@ func (s *OomStore) ChannelExportBatch(ctx context.Context, opt types.ChannelExpo
 	} else {
 		fullNames := make([]string, 0, len(opt.FeatureNames))
 		for _, name := range opt.FeatureNames {
-			fullNames = append(fullNames, fmt.Sprintf("%s.%s", revision.Group.Name, name))
+			fullNames = append(fullNames, util.ComposeFullFeatureName(revision.Group.Name, name))
 		}
 		features, err = s.ListFeature(ctx, types.ListFeatureOpt{
 			FeatureFullNames: &fullNames,
@@ -98,7 +98,7 @@ func (s *OomStore) ExportBatch(ctx context.Context, opt types.ExportBatchOpt) er
 // ChannelExportStream exports the latest streaming feature values up to the given timestamp.
 // Currently, this API can only export features in one feature group.
 func (s *OomStore) ChannelExportStream(ctx context.Context, opt types.ChannelExportStreamOpt) (*types.ExportResult, error) {
-	if err := validateFeatureFullNames(opt.FeatureFullNames); err != nil {
+	if err := validateFullFeatureNames(opt.FeatureFullNames...); err != nil {
 		return nil, errdefs.WithStack(err)
 	}
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
@@ -143,7 +143,7 @@ func (s *OomStore) ChannelExportStream(ctx context.Context, opt types.ChannelExp
 // ChannelExport exports the latest streaming feature values up to the given timestamp.
 // Currently, this API can only export features in one feature group.
 func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt) (*types.ExportResult, error) {
-	if err := validateFeatureFullNames(opt.FeatureFullNames); err != nil {
+	if err := validateFullFeatureNames(opt.FeatureFullNames...); err != nil {
 		return nil, err
 	}
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{

@@ -111,14 +111,14 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (<-chan 
 		features := opt.Features[groupID]
 		if features[0].Group.Category == types.CategoryBatch {
 			for _, f := range features {
-				fields = append(fields, fmt.Sprintf("%s.%s AS %s", qt(opt.SnapshotTables[groupID]), qt(f.Name), qt(f.FullName)))
+				fields = append(fields, fmt.Sprintf("%s.%s AS %s", qt(opt.SnapshotTables[groupID]), qt(f.Name), qt(f.FullName())))
 				featureList = append(featureList, f)
 			}
 		} else {
 			for _, f := range features {
 				cdc := fmt.Sprintf("%s.%s", opt.CdcTables[groupID]+"_0", qt(f.Name))
 				snapshot := fmt.Sprintf("%s.%s", qt(opt.SnapshotTables[groupID]), qt(f.Name))
-				fields = append(fields, fmt.Sprintf("(CASE WHEN %s IS NULL THEN %s ELSE %s END) AS %s", cdc, snapshot, cdc, qt(f.FullName)))
+				fields = append(fields, fmt.Sprintf("(CASE WHEN %s IS NULL THEN %s ELSE %s END) AS %s", cdc, snapshot, cdc, qt(f.FullName())))
 				featureList = append(featureList, f)
 			}
 		}

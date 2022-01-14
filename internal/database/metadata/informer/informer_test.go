@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -49,10 +49,8 @@ func TestInformer(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	entityID := 1
-	features := informer.CacheListFeature(ctx, metadata.ListFeatureOpt{
-		EntityID: &entityID,
-	})
+	name := util.ComposeFullFeatureName("group", "price")
+	features := informer.ListCachedFeature(ctx, &[]string{name})
 	require.Equal(t, 1, len(features))
 	feature := features[0]
 
@@ -70,17 +68,12 @@ func TestInformerDeepCopy(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	entityID := 1
-	features := informer.CacheListFeature(ctx, metadata.ListFeatureOpt{
-		EntityID: &entityID,
-	})
+	features := informer.ListCachedFeature(ctx, nil)
 	require.Equal(t, 1, len(features))
 	// changing this entity should not change the internal state of the informer
 	features[0].Name = "new_price"
 
-	features = informer.CacheListFeature(ctx, metadata.ListFeatureOpt{
-		EntityID: &entityID,
-	})
+	features = informer.ListCachedFeature(ctx, nil)
 	require.Equal(t, 1, len(features))
 	assert.Equal(t, 1, features[0].ID)
 	assert.Equal(t, 100, features[0].GroupID)

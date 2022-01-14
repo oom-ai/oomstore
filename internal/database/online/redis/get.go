@@ -48,7 +48,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		if err != nil {
 			return nil, err
 		}
-		rowMap[opt.Features[i].FullName] = deserializedValue
+		rowMap[opt.Features[i].FullName()] = deserializedValue
 	}
 	return rowMap, nil
 }

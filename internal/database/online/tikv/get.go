@@ -109,7 +109,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		if _, ok := res[entityKey]; !ok {
 			res[entityKey] = make(dbutil.RowMap)
 		}
-		res[entityKey][inputs[i].feature.FullName] = deserializedValue
+		res[entityKey][inputs[i].feature.FullName()] = deserializedValue
 	}
 	return res, nil
 }
