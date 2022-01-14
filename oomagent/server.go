@@ -154,6 +154,13 @@ func (s *server) Push(ctx context.Context, req *codegen.PushRequest) (*codegen.P
 	return &codegen.PushResponse{}, nil
 }
 
+func (s *server) Snapshot(ctx context.Context, re *codegen.SnapshotRequest) (*codegen.SnapshotResponse, error) {
+	if err := s.oomstore.Snapshot(ctx, re.GroupName); err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &codegen.SnapshotResponse{}, nil
+}
+
 func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codegen.ImportResponse, error) {
 	var description string
 	if req.Description == nil {
