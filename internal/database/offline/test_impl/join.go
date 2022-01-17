@@ -147,11 +147,13 @@ func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.Feature
 	groupBasic := &types.Group{
 		ID:       1,
 		Name:     "device_basic",
+		Entity:   &types.Entity{Name: "device"},
 		Category: types.CategoryBatch,
 	}
 	groupAdvanced := &types.Group{
 		ID:       2,
 		Name:     "device_advanced",
+		Entity:   &types.Entity{Name: "device"},
 		Category: types.CategoryBatch,
 	}
 	price := &types.Feature{
