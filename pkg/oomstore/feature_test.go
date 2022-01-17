@@ -2,7 +2,6 @@ package oomstore_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -70,7 +69,6 @@ func TestCreateFeature(t *testing.T) {
 
 			metadataOpt := metadata.CreateFeatureOpt{
 				FeatureName: tc.opt.FeatureName,
-				FullName:    fmt.Sprintf("%s.%s", tc.opt.GroupName, tc.opt.FeatureName),
 				GroupID:     tc.group.ID,
 				ValueType:   tc.valueType,
 				Description: tc.opt.Description,

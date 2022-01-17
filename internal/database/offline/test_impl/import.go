@@ -62,8 +62,8 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 			EntityName:     entity.Name,
 			Features: map[int]types.FeatureList{
 				1: []*types.Feature{
-					{Name: "model", FullName: "device.model", ValueType: types.String, Group: group},
-					{Name: "price", FullName: "device.price", ValueType: types.Int64, Group: group},
+					{Name: "model", ValueType: types.String, Group: group},
+					{Name: "price", ValueType: types.Int64, Group: group},
 				}},
 		})
 		records := make([][]interface{}, 0)

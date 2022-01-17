@@ -37,7 +37,6 @@ func init() {
 				&types.Feature{
 					ID:        1,
 					Name:      "age",
-					FullName:  "user.age",
 					GroupID:   1,
 					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
 					ValueType: types.Int64,
@@ -45,7 +44,6 @@ func init() {
 				&types.Feature{
 					ID:        2,
 					Name:      "gender",
-					FullName:  "user.gender",
 					GroupID:   1,
 					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
 					ValueType: types.String,
@@ -53,7 +51,6 @@ func init() {
 				&types.Feature{
 					ID:        3,
 					Name:      "account",
-					FullName:  "user.account",
 					GroupID:   1,
 					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
 					ValueType: types.Float64,
@@ -61,7 +58,6 @@ func init() {
 				&types.Feature{
 					ID:        4,
 					Name:      "is_active",
-					FullName:  "user.is_active",
 					GroupID:   1,
 					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
 					ValueType: types.Bool,
@@ -69,7 +65,6 @@ func init() {
 				&types.Feature{
 					ID:        5,
 					Name:      "register_time",
-					FullName:  "user.register_time",
 					GroupID:   1,
 					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
 					ValueType: types.Time,
@@ -98,7 +93,6 @@ func init() {
 			&types.Feature{
 				ID:        2,
 				Name:      "charge",
-				FullName:  "user.charge",
 				GroupID:   2,
 				Group:     &types.Group{ID: 2, Category: types.CategoryBatch},
 				ValueType: types.Float64,

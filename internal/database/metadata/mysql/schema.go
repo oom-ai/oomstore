@@ -5,14 +5,12 @@ var META_TABLE_SCHEMAS = map[string]string{
 		CREATE TABLE feature (
 			id				INT 			NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			name          	VARCHAR(32) 	NOT	NULL,
-			full_name   	VARCHAR(65)		NOT NULL COMMENT "<group_name>:<feature_name>",
 			group_id      	INT         	NOT	NULL,
 			value_type    	INT         	NOT	NULL COMMENT "data type of feature value",
 			description   	VARCHAR(128)	DEFAULT '',
 			create_time   	TIMESTAMP    	NOT	NULL DEFAULT CURRENT_TIMESTAMP,
 			modify_time   	TIMESTAMP    	NOT	NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			UNIQUE (group_id, name),
-			UNIQUE (full_name)
+			UNIQUE (group_id, name)
 		);
 		`,
 	"feature_group": `

@@ -89,8 +89,8 @@ func (db *DB) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) (typ
 	return sqlutil.ListFeature(ctx, db, opt)
 }
 
-func (db *DB) GetFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
-	return sqlutil.GetFeatureByName(ctx, db, name)
+func (db *DB) GetFeatureByName(ctx context.Context, groupName string, featureName string) (*types.Feature, error) {
+	return sqlutil.GetFeatureByName(ctx, db, groupName, featureName)
 }
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {

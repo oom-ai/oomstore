@@ -14,8 +14,8 @@ func createFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metada
 		return 0, err
 	}
 	var featureID int
-	query := "INSERT INTO feature(name, full_name, group_id, value_type, description) VALUES ($1, $2, $3, $4, $5) RETURNING id"
-	err := sqlxCtx.GetContext(ctx, &featureID, query, opt.FeatureName, opt.FullName, opt.GroupID, opt.ValueType, opt.Description)
+	query := "INSERT INTO feature(name, group_id, value_type, description) VALUES ($1, $2, $3, $4) RETURNING id"
+	err := sqlxCtx.GetContext(ctx, &featureID, query, opt.FeatureName, opt.GroupID, opt.ValueType, opt.Description)
 	if err != nil {
 		if e2, ok := err.(*pq.Error); ok {
 			if e2.Code == pgerrcode.UniqueViolation {

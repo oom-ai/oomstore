@@ -126,13 +126,11 @@ func prepareFeaturesForExport() (batchFeatures types.FeatureList, streamFeatures
 	batchFeatures = []*types.Feature{
 		{
 			Name:      "model",
-			FullName:  "device.model",
 			ValueType: types.String,
 			Group:     batchGroup,
 		},
 		{
 			Name:      "price",
-			FullName:  "device.price",
 			ValueType: types.Int64,
 			Group:     batchGroup,
 		},
@@ -140,13 +138,11 @@ func prepareFeaturesForExport() (batchFeatures types.FeatureList, streamFeatures
 	streamFeatures = []*types.Feature{
 		{
 			Name:      "last_txn_amount",
-			FullName:  "account.last_txn_amount",
 			ValueType: types.Int64,
 			Group:     streamGroup,
 		},
 		{
 			Name:      "is_vip",
-			FullName:  "account.is_vip",
 			ValueType: types.Bool,
 			Group:     streamGroup,
 		},

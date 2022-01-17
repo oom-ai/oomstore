@@ -88,6 +88,6 @@ func (f *Informer) Cache() *Cache {
 	return f.cache.Load().(*Cache)
 }
 
-func (f *Informer) CacheListFeature(ctx context.Context, opt metadata.ListFeatureOpt) types.FeatureList {
-	return f.Cache().Features.List(opt).Copy()
+func (f *Informer) ListCachedFeature(ctx context.Context, fullNames *[]string) types.FeatureList {
+	return f.Cache().Features.List(fullNames).Copy()
 }

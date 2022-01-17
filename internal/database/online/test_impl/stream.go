@@ -46,7 +46,6 @@ func init() {
 			&types.Feature{
 				ID:        1,
 				Name:      "last_5_click_post",
-				FullName:  "user_clicks.last_5_click_post",
 				ValueType: types.String,
 				GroupID:   1,
 				Group:     group1,
@@ -54,7 +53,6 @@ func init() {
 			&types.Feature{
 				ID:        2,
 				Name:      "last_10_click_post",
-				FullName:  "user_clicks.last_10_click_post",
 				ValueType: types.String,
 				GroupID:   1,
 				Group:     group1,
@@ -62,7 +60,6 @@ func init() {
 			&types.Feature{
 				ID:        3,
 				Name:      "recent_5_read_post",
-				FullName:  "user_reads.recent_5_read_post",
 				ValueType: types.String,
 				GroupID:   2,
 				Group:     group2,
@@ -139,7 +136,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{
-		feature1.FullName: "post1",
+		feature1.FullName(): "post1",
 	}, rs)
 
 	assert.NoError(t, store.Push(ctx, online.PushOpt{
@@ -158,7 +155,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{
-		feature1.FullName: "post2",
+		feature1.FullName(): "post2",
 	}, rs)
 
 	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
@@ -183,7 +180,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{
-		feature1.FullName: "post1",
-		feature2.FullName: "post2",
+		feature1.FullName(): "post1",
+		feature2.FullName(): "post2",
 	}, rs)
 }

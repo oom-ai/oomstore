@@ -129,7 +129,7 @@ func deserializeFeatureValues(features oomTypes.FeatureList, item map[string]typ
 		if err != nil {
 			return nil, err
 		}
-		rowMap[feature.FullName] = deserializedValue
+		rowMap[feature.FullName()] = deserializedValue
 	}
 	return rowMap, nil
 }

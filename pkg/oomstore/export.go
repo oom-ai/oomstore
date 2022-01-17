@@ -26,7 +26,7 @@ Usage Example:
 	return exportResult.CheckStreamError()
 */
 func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt) (*types.ExportResult, error) {
-	if err := validateFeatureFullNames(opt.FeatureFullNames); err != nil {
+	if err := validateFullFeatureNames(opt.FeatureFullNames...); err != nil {
 		return nil, err
 	}
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{

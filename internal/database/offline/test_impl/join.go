@@ -156,21 +156,18 @@ func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.Feature
 	}
 	price := &types.Feature{
 		Name:      "price",
-		FullName:  "device_basic.price",
 		ValueType: types.Int64,
 		GroupID:   1,
 		Group:     groupBasic,
 	}
 	model := &types.Feature{
 		Name:      "model",
-		FullName:  "device_basic.model",
 		ValueType: types.String,
 		GroupID:   1,
 		Group:     groupBasic,
 	}
 	isActive := &types.Feature{
 		Name:      "is_active",
-		FullName:  "device_advanced.is_active",
 		ValueType: types.Bool,
 		GroupID:   2,
 		Group:     groupAdvanced,
@@ -179,18 +176,14 @@ func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.Feature
 	if oneGroup {
 		features := types.FeatureList{model, price}
 		featureMap := map[string]types.FeatureList{
-			"device_basic": {
-				model, price,
-			},
+			groupBasic.Name: {model, price},
 		}
 		return features, featureMap
 	} else {
 		features := types.FeatureList{model, price, isActive}
 		featureMap := map[string]types.FeatureList{
-			"device_basic": {
-				model, price,
-			},
-			"device_advanced": {isActive},
+			groupBasic.Name:     {model, price},
+			isActive.Group.Name: {isActive},
 		}
 		return features, featureMap
 	}

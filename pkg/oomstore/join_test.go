@@ -108,7 +108,7 @@ func TestChannelJoin(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
-			metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{FeatureFullNames: &tc.opt.FeatureFullNames}).Return(tc.features, nil)
+			metadataStore.EXPECT().ListFeature(gomock.Any(), metadata.ListFeatureOpt{}).Return(tc.features, nil)
 			if tc.entity != nil {
 				for _, featureList := range tc.featureMap {
 					metadataStore.EXPECT().ListRevision(gomock.Any(), &featureList[0].GroupID).Return(revisions, nil).AnyTimes()

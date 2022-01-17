@@ -55,25 +55,25 @@ func GetFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*typ
 	return &feature, nil
 }
 
-func GetFeatureByName(ctx context.Context, sqlxCtx metadata.SqlxContext, fullName string) (*types.Feature, error) {
+func GetFeatureByName(ctx context.Context, sqlxCtx metadata.SqlxContext, groupName string, featureName string) (*types.Feature, error) {
 	var (
 		feature types.Feature
 		group   *types.Group
 		err     error
 	)
 
-	query := `SELECT * FROM feature WHERE full_name = ?`
-	if err := sqlxCtx.GetContext(ctx, &feature, sqlxCtx.Rebind(query), fullName); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errdefs.NotFound(errdefs.Errorf("feature %s not found", fullName))
-		}
-		return nil, errdefs.WithStack(err)
-	}
-
-	if group, err = GetGroup(ctx, sqlxCtx, feature.GroupID); err != nil {
+	if group, err = GetGroupByName(ctx, sqlxCtx, groupName); err != nil {
 		return nil, errdefs.WithStack(err)
 	}
 	feature.Group = group
+
+	query := `SELECT * FROM feature WHERE name = ? AND group_id = ?`
+	if err := sqlxCtx.GetContext(ctx, &feature, sqlxCtx.Rebind(query), featureName, group.ID); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.NotFound(errdefs.Errorf("feature %s not found in group %s", featureName, groupName))
+		}
+		return nil, errdefs.WithStack(err)
+	}
 
 	return &feature, nil
 }
@@ -135,11 +135,5 @@ func buildListFeatureCond(opt metadata.ListFeatureOpt) ([]string, []interface{},
 		in["id"] = *opt.FeatureIDs
 	}
 
-	if opt.FeatureFullNames != nil {
-		if len(*opt.FeatureFullNames) == 0 {
-			return []string{"false"}, nil, nil
-		}
-		in["full_name"] = *opt.FeatureFullNames
-	}
 	return dbutil.BuildConditions(and, in)
 }

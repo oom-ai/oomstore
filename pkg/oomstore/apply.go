@@ -2,7 +2,6 @@ package oomstore
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	"github.com/mitchellh/mapstructure"
@@ -150,8 +149,7 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 		return nil, err
 	}
 
-	featureFullName := fmt.Sprintf("%s.%s", newFeature.GroupName, newFeature.Name)
-	feature, err := tx.GetFeatureByName(ctx, featureFullName)
+	feature, err := tx.GetFeatureByName(ctx, newFeature.GroupName, newFeature.Name)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
 			return nil, err
@@ -162,7 +160,6 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 		}
 		id, err := tx.CreateFeature(ctx, metadata.CreateFeatureOpt{
 			FeatureName: newFeature.Name,
-			FullName:    featureFullName,
 			GroupID:     group.ID,
 			Description: newFeature.Description,
 			ValueType:   valueType,

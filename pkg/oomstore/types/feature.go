@@ -2,12 +2,13 @@ package types
 
 import (
 	"time"
+
+	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
 
 type Feature struct {
 	ID        int       `db:"id"`
 	Name      string    `db:"name"`
-	FullName  string    `db:"full_name"`
 	ValueType ValueType `db:"value_type"`
 
 	Description string    `db:"description"`
@@ -16,6 +17,13 @@ type Feature struct {
 
 	GroupID int `db:"group_id"`
 	Group   *Group
+}
+
+func (f *Feature) FullName() string {
+	if f.Group == nil {
+		panic("expected group to be not nil")
+	}
+	return util.ComposeFullFeatureName(f.Group.Name, f.Name)
 }
 
 func (f *Feature) Copy() *Feature {
@@ -65,7 +73,7 @@ func (l *FeatureList) Names() (names []string) {
 
 func (l *FeatureList) FullNames() (fullNames []string) {
 	for _, f := range *l {
-		fullNames = append(fullNames, f.FullName)
+		fullNames = append(fullNames, f.FullName())
 	}
 	return
 }
@@ -84,6 +92,17 @@ func (l FeatureList) Filter(filter func(*Feature) bool) (rs FeatureList) {
 		}
 	}
 	return
+}
+
+func (l FeatureList) FilterFullnames(fullnames []string) (rs FeatureList) {
+	return l.Filter(func(f *Feature) bool {
+		for _, fullname := range fullnames {
+			if f.FullName() == fullname {
+				return true
+			}
+		}
+		return false
+	})
 }
 
 func (l FeatureList) Find(find func(*Feature) bool) *Feature {
