@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/util"
@@ -47,6 +48,13 @@ func (f *Feature) OnlineRevisionID() *int {
 		return nil
 	}
 	return f.Group.OnlineRevisionID
+}
+
+func (f *Feature) DBFullName(backend BackendType) string {
+	if backend != BackendBigQuery {
+		return f.FullName()
+	}
+	return fmt.Sprintf("%s_%s", f.Group.Name, f.Name)
 }
 
 type FeatureList []*Feature

@@ -73,12 +73,10 @@ func TestPing(t *testing.T) {
 }
 
 func TestImport(t *testing.T) {
-	t.Skip()
 	test_impl.TestImport(t, prepareStore, destroyStore(DATASET_ID))
 }
 
 func TestExport(t *testing.T) {
-	t.Skip()
 	test_impl.TestExport(t, prepareStore, destroyStore(DATASET_ID))
 }
 

@@ -28,7 +28,7 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend typ
 	}
 	doJoinOpt := DoExportOpt{
 		ExportOpt:    opt,
-		QueryResults: queryExportResults,
+		QueryResults: sqlxQueryExportResults,
 	}
 	return DoExport(ctx, dbOpt, doJoinOpt)
 }
@@ -54,9 +54,17 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.
 		return groupIDs[i] < groupIDs[j]
 	})
 	for _, groupID := range groupIDs {
-		snapshotTables = append(snapshotTables, opt.SnapshotTables[groupID])
+		snapshotTable := opt.SnapshotTables[groupID]
+		if dbOpt.Backend == types.BackendBigQuery {
+			snapshotTable = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, snapshotTable)
+		}
+		snapshotTables = append(snapshotTables, snapshotTable)
 		if _, ok := opt.CdcTables[groupID]; ok {
-			cdcTables = append(cdcTables, opt.CdcTables[groupID])
+			table := opt.CdcTables[groupID]
+			if dbOpt.Backend == types.BackendBigQuery {
+				table = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, table)
+			}
+			cdcTables = append(cdcTables, table)
 		}
 	}
 
@@ -69,21 +77,24 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.
 	// Step 2: join export_entity table, snapshot tables and cdc tables
 	qt := dbutil.QuoteFn(dbOpt.Backend)
 	var (
+		j           int
 		fields      []string
 		featureList types.FeatureList
 	)
-	for _, groupID := range groupIDs {
+	for i, groupID := range groupIDs {
 		features := opt.Features[groupID]
 		if features[0].Group.Category == types.CategoryBatch {
 			for _, f := range features {
-				fields = append(fields, fmt.Sprintf("%s.%s AS %s", qt(opt.SnapshotTables[groupID]), qt(f.Name), qt(f.FullName())))
+				snapshot := snapshotTables[i]
+				fields = append(fields, fmt.Sprintf("%s.%s AS %s", qt(snapshot), qt(f.Name), qt(f.DBFullName(dbOpt.Backend))))
 				featureList = append(featureList, f)
 			}
 		} else {
+			cdc := cdcTables[j] + "_0"
+			snapshot := snapshotTables[i]
+			j++
 			for _, f := range features {
-				cdc := fmt.Sprintf("%s.%s", opt.CdcTables[groupID]+"_0", qt(f.Name))
-				snapshot := fmt.Sprintf("%s.%s", qt(opt.SnapshotTables[groupID]), qt(f.Name))
-				fields = append(fields, fmt.Sprintf("(CASE WHEN %s IS NULL THEN %s ELSE %s END) AS %s", cdc, snapshot, cdc, qt(f.FullName())))
+				fields = append(fields, fmt.Sprintf("(CASE WHEN %s.%s IS NULL THEN %s.%s ELSE %s.%s END) AS %s", qt(cdc), qt(f.Name), qt(snapshot), qt(f.Name), qt(cdc), qt(f.Name), qt(f.DBFullName(dbOpt.Backend))))
 				featureList = append(featureList, f)
 			}
 		}
@@ -96,6 +107,7 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.
 		CdcTables:       cdcTables,
 		Fields:          fields,
 		Backend:         dbOpt.Backend,
+		DatasetID:       dbOpt.DatasetID,
 	})
 	if err != nil {
 		return nil, err
@@ -104,10 +116,10 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.
 	for i := 0; i < len(opt.CdcTables)*2; i++ {
 		args = append(args, opt.UnixMilli)
 	}
-	return queryExportResults(ctx, dbOpt, opt.ExportOpt, query, args, featureList)
+	return opt.QueryResults(ctx, dbOpt, opt.ExportOpt, query, args, featureList)
 }
 
-func queryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList) (*types.ExportResult, error) {
+func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList) (*types.ExportResult, error) {
 	stream := make(chan types.ExportRecord)
 	errs := make(chan error, 1) // at most 1 error
 
