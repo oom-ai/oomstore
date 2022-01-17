@@ -71,7 +71,7 @@ func Snapshot(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.SnapshotOpt) 
 
 	schema := dbutil.BuildTableSchema(currSnapshotTableName, opt.Group.Entity, false, opt.Features, []string{opt.Group.Entity.Name}, dbOpt.Backend)
 	if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
-		return errdefs.WithStack(err)
+		return err
 	}
 	query, err := buildSnapshotQuery(snapshotQueryParams{
 		EntityName:            opt.Group.Entity.Name,
@@ -86,7 +86,7 @@ func Snapshot(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.SnapshotOpt) 
 		return err
 	}
 	if err = dbOpt.ExecContext(ctx, query, nil); err != nil {
-		return errdefs.WithStack(err)
+		return err
 	}
 
 	return nil
