@@ -8,7 +8,7 @@ prepare_oomagent
 case="api returns ok"
 arg=$(cat <<-EOF
 {
-    "group_name": "account",
+    "group": "account",
     "input_file_path": "./data/account_10.csv",
     "delimiter": ","
 }

@@ -20,7 +20,7 @@ output="$TEMP/result.csv"
 case="api returns ok"
 arg=$(cat <<-EOF
 {
-  "feature_names": [
+  "features": [
     "driver_stats.conv_rate",
     "driver_stats.acc_rate",
     "driver_stats.avg_daily_trips"

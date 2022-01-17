@@ -20,7 +20,7 @@ import (
 // ChannelJoin gets point-in-time correct feature values for each entity row.
 // Currently, this API only supports batch features.
 func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*types.JoinResult, error) {
-	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
+	if err := util.ValidateFullFeatureNames(opt.JoinFeatureNames...); err != nil {
 		return nil, err
 	}
 	data := make(chan []interface{})
@@ -30,7 +30,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 		Data: data,
 	}
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
-		FeatureNames: &opt.FeatureNames,
+		FeatureNames: &opt.JoinFeatureNames,
 	})
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 		EntityRows:       opt.EntityRows,
 		FeatureMap:       featureMap,
 		RevisionRangeMap: revisionRangeMap,
-		ValueNames:       opt.ValueNames,
+		ValueNames:       opt.ExistedFeatureNames,
 	})
 }
 
@@ -84,9 +84,9 @@ func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) error {
 	}
 
 	joinResult, err := s.ChannelJoin(ctx, types.ChannelJoinOpt{
-		FeatureNames: opt.FeatureNames,
-		EntityRows:   entityRows,
-		ValueNames:   header[2:],
+		JoinFeatureNames:    opt.FeatureNames,
+		EntityRows:          entityRows,
+		ExistedFeatureNames: header[2:],
 	})
 	if err != nil {
 		return err

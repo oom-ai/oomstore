@@ -32,7 +32,7 @@ func (s *server) HealthCheck(ctx context.Context, req *empty.Empty) (*empty.Empt
 
 func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (*codegen.OnlineGetResponse, error) {
 	result, err := s.oomstore.OnlineGet(ctx, types.OnlineGetOpt{
-		FeatureNames: req.FeatureNames,
+		FeatureNames: req.Features,
 		EntityKey:    req.EntityKey,
 	})
 	if err != nil {
@@ -52,7 +52,7 @@ func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (
 
 func (s *server) OnlineMultiGet(ctx context.Context, req *codegen.OnlineMultiGetRequest) (*codegen.OnlineMultiGetResponse, error) {
 	result, err := s.oomstore.OnlineMultiGet(ctx, types.OnlineMultiGetOpt{
-		FeatureNames: req.FeatureNames,
+		FeatureNames: req.Features,
 		EntityKeys:   req.EntityKeys,
 	})
 	if err != nil {
@@ -90,8 +90,8 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 	if err != nil {
 		return internalError(err.Error())
 	}
-	if firstReq.GroupName == nil {
-		return status.Errorf(codes.InvalidArgument, "group_name is required in first request")
+	if firstReq.Group == nil {
+		return status.Errorf(codes.InvalidArgument, "group is required in first request")
 	}
 	if firstReq.Description == nil {
 		empty := ""
@@ -125,7 +125,7 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 	}()
 
 	revisionID, err := s.oomstore.Import(context.Background(), types.ImportOpt{
-		GroupName:      *firstReq.GroupName,
+		GroupName:      *firstReq.Group,
 		Revision:       firstReq.Revision,
 		Description:    *firstReq.Description,
 		DataSourceType: types.CSV_READER,
@@ -145,8 +145,8 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 func (s *server) Push(ctx context.Context, req *codegen.PushRequest) (*codegen.PushResponse, error) {
 	if err := s.oomstore.Push(ctx, types.PushOpt{
 		EntityKey:     req.EntityKey,
-		GroupName:     req.GroupName,
-		FeatureNames:  req.FeatureNames,
+		GroupName:     req.Group,
+		FeatureNames:  req.Features,
 		FeatureValues: convertToInterfaceSlice(req.FeatureValues),
 	}); err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
@@ -155,7 +155,7 @@ func (s *server) Push(ctx context.Context, req *codegen.PushRequest) (*codegen.P
 }
 
 func (s *server) Snapshot(ctx context.Context, re *codegen.SnapshotRequest) (*codegen.SnapshotResponse, error) {
-	if err := s.oomstore.Snapshot(ctx, re.GroupName); err != nil {
+	if err := s.oomstore.Snapshot(ctx, re.Group); err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 	return &codegen.SnapshotResponse{}, nil
@@ -167,7 +167,7 @@ func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codeg
 		description = ""
 	}
 	revisionID, err := s.oomstore.Import(ctx, types.ImportOpt{
-		GroupName:      req.GroupName,
+		GroupName:      req.Group,
 		Description:    description,
 		Revision:       req.Revision,
 		DataSourceType: types.CSV_FILE,
@@ -203,9 +203,9 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 	// This goroutine runs the join operation, and send whatever joined as the response
 	go func() {
 		joinResult, err := s.oomstore.ChannelJoin(context.Background(), types.ChannelJoinOpt{
-			FeatureNames: firstReq.FeatureNames,
-			EntityRows:   entityRows,
-			ValueNames:   firstReq.ValueNames,
+			JoinFeatureNames:    firstReq.JoinFeatures,
+			EntityRows:          entityRows,
+			ExistedFeatureNames: firstReq.ExistedFeatures,
 		})
 		if err != nil {
 			globalErr = err
@@ -272,7 +272,7 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 
 func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.JoinResponse, error) {
 	err := s.oomstore.Join(ctx, types.JoinOpt{
-		FeatureNames:   req.FeatureNames,
+		FeatureNames:   req.Features,
 		InputFilePath:  req.InputFilePath,
 		OutputFilePath: req.OutputFilePath,
 	})
@@ -286,7 +286,7 @@ func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.J
 func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen.OomAgent_ChannelExportServer) error {
 	ctx := context.Background()
 	exportResult, err := s.oomstore.ChannelExport(ctx, types.ChannelExportOpt{
-		FeatureNames: req.FeatureNames,
+		FeatureNames: req.Features,
 		UnixMilli:    req.UnixMilli,
 		Limit:        req.Limit,
 	})
@@ -317,7 +317,7 @@ func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen
 
 func (s *server) Export(ctx context.Context, req *codegen.ExportRequest) (*codegen.ExportResponse, error) {
 	err := s.oomstore.Export(ctx, types.ExportOpt{
-		FeatureNames:   req.FeatureNames,
+		FeatureNames:   req.Features,
 		UnixMilli:      req.UnixMilli,
 		Limit:          req.Limit,
 		OutputFilePath: req.OutputFilePath,

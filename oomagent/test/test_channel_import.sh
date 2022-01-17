@@ -8,7 +8,7 @@ prepare_oomagent
 case="api returns ok"
 arg=$(cat <<-EOF
 {
-    "group_name": "account",
+    "group": "account",
     "row": "$(base64 <./data/account_10.csv | tr -d '\n\r')"
 }
 EOF

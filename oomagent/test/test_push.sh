@@ -11,8 +11,8 @@ case="push stream feature"
 arg='
 {
     "entity_key": "1",
-    "group_name": "user-click",
-    "feature_names": ["last_5_click_posts", "number_of_user_starred_posts"],
+    "group": "user-click",
+    "features": ["last_5_click_posts", "number_of_user_starred_posts"],
     "feature_values": [
     {
         "stringValue": "1,2,3"
@@ -34,7 +34,7 @@ case="query stream feature"
 arg='
 {
     "entity_key": "1",
-    "feature_names": ["user-click.last_5_click_posts", "user-click.number_of_user_starred_posts"]
+    "features": ["user-click.last_5_click_posts", "user-click.number_of_user_starred_posts"]
 }
 '
 expected='

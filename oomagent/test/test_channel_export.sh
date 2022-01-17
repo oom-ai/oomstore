@@ -12,7 +12,7 @@ case1() {
     prefix="export some features"
     arg=$(cat <<-EOF
     {
-       "feature_names": ["account.state"],
+       "features": ["account.state"],
        "unix_milli": $unix_milli
     }
 EOF
@@ -45,7 +45,7 @@ case2() {
     prefix="export some features"
     arg=$(cat <<-EOF
     {
-       "feature_names": ["account.state","account.credit_score","account.account_age_days","account.has_2fa_installed"],
+       "features": ["account.state","account.credit_score","account.account_age_days","account.has_2fa_installed"],
        "unix_milli": $unix_milli
     }
 EOF
