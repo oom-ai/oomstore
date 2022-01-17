@@ -20,15 +20,13 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	group := &types.Group{
-		ID:     1,
-		Entity: &types.Entity{Name: "device"},
-	}
+	features, _ := prepareFeatures(true)
+	group := features[0].Group
 	unixMilli := &types.Feature{
 		Name:      "unix_milli",
 		ValueType: types.Int64,
+		Group:     group,
 	}
-	features, _ := prepareFeatures(true)
 
 	buildTestSnapshotTable(ctx, t, store, append(features, unixMilli), 1, "offline_stream_snapshot_1_1", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100,1
@@ -59,7 +57,7 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 	result, err := store.Export(ctx, offline.ExportOpt{
 		SnapshotTables: map[int]string{1: "offline_stream_snapshot_1_2"},
 		EntityName:     "device",
-		Features:       map[int]types.FeatureList{1: features},
+		Features:       map[int]types.FeatureList{1: append(features, unixMilli)},
 	})
 	values := make([][]interface{}, 0)
 	for row := range result.Data {
@@ -69,10 +67,10 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 		return cast.ToInt64(values[i][0]) < cast.ToInt64(values[j][0])
 	})
 	expected := [][]interface{}{
-		{"1234", "xiaomi-1", int64(130)},
-		{"1235", "apple-1", int64(113)},
-		{"1236", "oneplus", int64(155)},
-		{"1237", "pixel", int64(200)},
+		{"1234", "xiaomi-1", int64(130), int64(10)},
+		{"1235", "apple-1", int64(113), int64(15)},
+		{"1236", "oneplus", int64(155), int64(8)},
+		{"1237", "pixel", int64(200), int64(11)},
 	}
 	assert.Equal(t, expected, values)
 	assert.NoError(t, result.CheckStreamError())
