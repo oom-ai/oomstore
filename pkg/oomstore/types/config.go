@@ -31,10 +31,9 @@ type OomStoreConfig struct {
 }
 
 type PushProcessorConfig struct {
-	RevisionInterval time.Duration `yaml:"revision-interval"`
-	Period           time.Duration `yaml:"period"`
-	MinPeriod        time.Duration `yaml:"min-period"`
 	BufferSize       int           `yaml:"buffer-size"`
+	FlushInterval    time.Duration `yaml:"flush-interval"`
+	RevisionInterval time.Duration `yaml:"revision-interval"`
 }
 
 type OnlineStoreConfig struct {

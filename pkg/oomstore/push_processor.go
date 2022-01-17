@@ -16,8 +16,7 @@ import (
 
 var defaultPushProcessorCfg = types.PushProcessorConfig{
 	RevisionInterval: 24 * time.Hour,
-	Period:           5 * time.Minute,
-	MinPeriod:        2 * time.Minute,
+	FlushInterval:    2 * time.Minute,
 	BufferSize:       1000,
 }
 
@@ -29,7 +28,7 @@ type GroupBuffer struct {
 
 type PushProcessor struct {
 	bufferSize      int
-	minPeriod       time.Duration
+	flushInterval   time.Duration
 	revisionInteval time.Duration
 	notifyQuit      chan struct{}
 	waitQuit        chan struct{}
@@ -43,15 +42,23 @@ func (s *OomStore) InitPushProcessor(ctx context.Context, cfg *types.PushProcess
 	if cfg == nil {
 		cfg = &defaultPushProcessorCfg
 	}
+
+	// tick at least once every 10 seconds
+	maxTickInterval := 10 * time.Second
+	tickInterval := cfg.FlushInterval
+	if cfg.FlushInterval > maxTickInterval {
+		tickInterval = maxTickInterval
+	}
+
 	processor := &PushProcessor{
 		bufferSize:      cfg.BufferSize,
-		minPeriod:       cfg.MinPeriod,
+		flushInterval:   cfg.FlushInterval,
 		revisionInteval: cfg.RevisionInterval,
 		notifyQuit:      make(chan struct{}),
 		waitQuit:        make(chan struct{}),
 
 		ch:     make(chan types.StreamRecord),
-		ticker: time.NewTicker(cfg.Period),
+		ticker: time.NewTicker(tickInterval),
 	}
 	s.pushProcessor = processor
 
@@ -78,7 +85,7 @@ func (s *OomStore) InitPushProcessor(ctx context.Context, cfg *types.PushProcess
 				processor.buffer.Range(func(key, value interface{}) bool {
 					groupID := key.(int)
 					b := value.(GroupBuffer)
-					if len(b.records) > 0 && time.Since(b.lastPush) > processor.minPeriod {
+					if len(b.records) > 0 && time.Since(b.lastPush) >= processor.flushInterval {
 						if err := processor.pushToOffline(ctx, s, groupID); err != nil {
 							fmt.Fprintf(os.Stderr, "Error pushing to offline store: %+v", err)
 						}
