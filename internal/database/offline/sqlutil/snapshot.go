@@ -15,9 +15,10 @@ import (
 )
 
 const SNAPSHOT_QUERY = `
-INSERT INTO {{ qt .CurrSnapshotTableName }} ({{ qt .EntityName }}, {{ columnJoin .FeatureNames }})
+INSERT INTO {{ qt .CurrSnapshotTableName }} ({{ qt .EntityName }}, {{ qt .UnixMilli }}, {{ columnJoin .FeatureNames }})
 SELECT
 	l.{{ qt .EntityName }},
+	{{ unixMilli .UnixMilli }},
 	{{ featureValue .FeatureNames }}
 FROM {{ qt .PrevSnapshotTableName }} AS l
 LEFT JOIN
@@ -38,6 +39,7 @@ ON l.{{ qt .EntityName }} = r.{{ qt .EntityName }}
 {{ .Union }}
 SELECT
 	r.{{ qt .EntityName }},
+	{{ unixMilli .UnixMilli }},
 	{{ featureValue .FeatureNames }}
 FROM
 (
@@ -69,7 +71,7 @@ func Snapshot(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.SnapshotOpt) 
 		currCdcTableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, currCdcTableName)
 	}
 
-	schema := dbutil.BuildTableSchema(currSnapshotTableName, opt.Group.Entity, false, opt.Features, []string{opt.Group.Entity.Name}, dbOpt.Backend)
+	schema := dbutil.BuildTableSchema(currSnapshotTableName, opt.Group.Entity, true, opt.Features, []string{opt.Group.Entity.Name}, dbOpt.Backend)
 	if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
 		return err
 	}
@@ -115,6 +117,9 @@ func buildSnapshotQuery(params snapshotQueryParams) (string, error) {
 		"qt": qt,
 		"columnJoin": func(columns []string) string {
 			return qt(columns...)
+		},
+		"unixMilli": func(unixMilli string) string {
+			return fmt.Sprintf("(CASE WHEN r.%s IS NULL THEN l.%s ELSE r.%s END) AS %s", qt(params.FeatureNames[0]), qt(unixMilli), qt(unixMilli), unixMilli)
 		},
 		"featureValue": func(features []string) string {
 			values := make([]string, 0, len(features))

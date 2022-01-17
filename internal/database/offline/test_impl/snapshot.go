@@ -30,10 +30,10 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 	}
 	features, _ := prepareFeatures(true)
 
-	buildTestSnapshotTable(ctx, t, store, features, 1, "offline_stream_snapshot_1_1", &offline.CSVSource{
-		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100
-1235,apple,200
-1236,oneplus,155
+	buildTestSnapshotTable(ctx, t, store, append(features, unixMilli), 1, "offline_stream_snapshot_1_1", &offline.CSVSource{
+		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100,1
+1235,apple,200,5
+1236,oneplus,155,8
 `)),
 		Delimiter: ",",
 	})
