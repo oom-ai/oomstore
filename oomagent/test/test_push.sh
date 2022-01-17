@@ -34,7 +34,7 @@ case="query stream feature"
 arg='
 {
     "entity_key": "1",
-    "feature_full_names": ["user-click.last_5_click_posts", "user-click.number_of_user_starred_posts"]
+    "feature_names": ["user-click.last_5_click_posts", "user-click.number_of_user_starred_posts"]
 }
 '
 expected='
