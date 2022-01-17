@@ -32,8 +32,8 @@ func (s *server) HealthCheck(ctx context.Context, req *empty.Empty) (*empty.Empt
 
 func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (*codegen.OnlineGetResponse, error) {
 	result, err := s.oomstore.OnlineGet(ctx, types.OnlineGetOpt{
-		FeatureFullNames: req.FeatureNames,
-		EntityKey:        req.EntityKey,
+		FeatureNames: req.FeatureNames,
+		EntityKey:    req.EntityKey,
 	})
 	if err != nil {
 		return nil, internalError(err.Error())
@@ -52,8 +52,8 @@ func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (
 
 func (s *server) OnlineMultiGet(ctx context.Context, req *codegen.OnlineMultiGetRequest) (*codegen.OnlineMultiGetResponse, error) {
 	result, err := s.oomstore.OnlineMultiGet(ctx, types.OnlineMultiGetOpt{
-		FeatureFullNames: req.FeatureNames,
-		EntityKeys:       req.EntityKeys,
+		FeatureNames: req.FeatureNames,
+		EntityKeys:   req.EntityKeys,
 	})
 	if err != nil {
 		return nil, internalError(err.Error())
@@ -203,9 +203,9 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 	// This goroutine runs the join operation, and send whatever joined as the response
 	go func() {
 		joinResult, err := s.oomstore.ChannelJoin(context.Background(), types.ChannelJoinOpt{
-			FeatureFullNames: firstReq.FeatureNames,
-			EntityRows:       entityRows,
-			ValueNames:       firstReq.ValueNames,
+			FeatureNames: firstReq.FeatureNames,
+			EntityRows:   entityRows,
+			ValueNames:   firstReq.ValueNames,
 		})
 		if err != nil {
 			globalErr = err
@@ -272,9 +272,9 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 
 func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.JoinResponse, error) {
 	err := s.oomstore.Join(ctx, types.JoinOpt{
-		FeatureFullNames: req.FeatureNames,
-		InputFilePath:    req.InputFilePath,
-		OutputFilePath:   req.OutputFilePath,
+		FeatureNames:   req.FeatureNames,
+		InputFilePath:  req.InputFilePath,
+		OutputFilePath: req.OutputFilePath,
 	})
 	if err != nil {
 		return nil, internalError(err.Error())
@@ -286,9 +286,9 @@ func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.J
 func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen.OomAgent_ChannelExportServer) error {
 	ctx := context.Background()
 	exportResult, err := s.oomstore.ChannelExport(ctx, types.ChannelExportOpt{
-		FeatureFullNames: req.FeatureNames,
-		UnixMilli:        req.UnixMilli,
-		Limit:            req.Limit,
+		FeatureNames: req.FeatureNames,
+		UnixMilli:    req.UnixMilli,
+		Limit:        req.Limit,
 	})
 	if err != nil {
 		return internalError(err.Error())
@@ -317,10 +317,10 @@ func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen
 
 func (s *server) Export(ctx context.Context, req *codegen.ExportRequest) (*codegen.ExportResponse, error) {
 	err := s.oomstore.Export(ctx, types.ExportOpt{
-		FeatureFullNames: req.FeatureNames,
-		UnixMilli:        req.UnixMilli,
-		Limit:            req.Limit,
-		OutputFilePath:   req.OutputFilePath,
+		FeatureNames:   req.FeatureNames,
+		UnixMilli:      req.UnixMilli,
+		Limit:          req.Limit,
+		OutputFilePath: req.OutputFilePath,
 	})
 	if err != nil {
 		return nil, internalError(err.Error())

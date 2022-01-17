@@ -26,11 +26,11 @@ Usage Example:
 	return exportResult.CheckStreamError()
 */
 func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt) (*types.ExportResult, error) {
-	if err := validateFullFeatureNames(opt.FeatureFullNames...); err != nil {
+	if err := validateFullFeatureNames(opt.FeatureNames...); err != nil {
 		return nil, err
 	}
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
-		FeatureFullNames: &opt.FeatureFullNames,
+		FeatureNames: &opt.FeatureNames,
 	})
 	if err != nil {
 		return nil, err
@@ -82,9 +82,9 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 // feature values to the given file path.
 func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
 	exportResult, err := s.ChannelExport(ctx, types.ChannelExportOpt{
-		FeatureFullNames: opt.FeatureFullNames,
-		UnixMilli:        opt.UnixMilli,
-		Limit:            opt.Limit,
+		FeatureNames: opt.FeatureNames,
+		UnixMilli:    opt.UnixMilli,
+		Limit:        opt.Limit,
 	})
 	if err != nil {
 		return err

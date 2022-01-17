@@ -54,8 +54,8 @@ func TestChannelJoin(t *testing.T) {
 		{
 			description: "no valid features, return nil",
 			opt: types.ChannelJoinOpt{
-				FeatureFullNames: []string{},
-				EntityRows:       entityRows,
+				FeatureNames: []string{},
+				EntityRows:   entityRows,
 			},
 			features:      nil,
 			expectedError: nil,
@@ -64,8 +64,8 @@ func TestChannelJoin(t *testing.T) {
 		{
 			description: "inconsistent features, return nil",
 			opt: types.ChannelJoinOpt{
-				FeatureFullNames: inconsistentFeatures.FullNames(),
-				EntityRows:       entityRows,
+				FeatureNames: inconsistentFeatures.FullNames(),
+				EntityRows:   entityRows,
 			},
 			features:      inconsistentFeatures,
 			expectedError: fmt.Errorf("inconsistent entity type: %v", map[string]string{"device": "price", "user": "age"}),
@@ -74,8 +74,8 @@ func TestChannelJoin(t *testing.T) {
 		{
 			description: "nil joined, return nil",
 			opt: types.ChannelJoinOpt{
-				FeatureFullNames: consistentFeatures.FullNames(),
-				EntityRows:       entityRows,
+				FeatureNames: consistentFeatures.FullNames(),
+				EntityRows:   entityRows,
 			},
 			entity:   &entity,
 			features: consistentFeatures,
@@ -90,8 +90,8 @@ func TestChannelJoin(t *testing.T) {
 		{
 			description: "consistent entity type, succeed",
 			opt: types.ChannelJoinOpt{
-				FeatureFullNames: consistentFeatures.FullNames(),
-				EntityRows:       entityRows,
+				FeatureNames: consistentFeatures.FullNames(),
+				EntityRows:   entityRows,
 			},
 			entity:   &entity,
 			features: consistentFeatures,

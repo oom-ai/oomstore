@@ -52,18 +52,18 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 	if err != nil {
 		return nil, err
 	}
-	if opt.FeatureFullNames != nil {
-		features = features.FilterFullnames(*opt.FeatureFullNames)
+	if opt.FeatureNames != nil {
+		features = features.FilterFullnames(*opt.FeatureNames)
 	}
 	return features, nil
 }
 
 // Update metadata of a feature.
 func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
-	if err := validateFullFeatureNames(opt.FeatureFullName); err != nil {
+	if err := validateFullFeatureNames(opt.FeatureName); err != nil {
 		return err
 	}
-	feature, err := s.GetFeatureByFullName(ctx, opt.FeatureFullName)
+	feature, err := s.GetFeatureByFullName(ctx, opt.FeatureName)
 	if err != nil {
 		return err
 	}
