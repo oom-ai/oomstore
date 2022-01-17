@@ -35,19 +35,28 @@ func TestCreateTable(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 		{
 			describtion: "cdc table (with unix_milli)",
 			opt: offline.CreateTableOpt{
-				TableName: tableName,
+				TableName: tableName + "_0",
 				Entity:    &entity,
 				Features:  features,
-				IsCDC:     true,
+				TableType: types.TableStreamCdc,
 			},
 		},
 		{
-			describtion: "snapshot table (without_milli)",
+			describtion: "stream snapshot table (with unix_milli)",
 			opt: offline.CreateTableOpt{
-				TableName: tableName,
+				TableName: tableName + "_1",
 				Entity:    &entity,
 				Features:  features,
-				IsCDC:     false,
+				TableType: types.TableStreamSnapshot,
+			},
+		},
+		{
+			describtion: "batch snapshot table (without unix_milli)",
+			opt: offline.CreateTableOpt{
+				TableName: tableName + "_2",
+				Entity:    &entity,
+				Features:  features,
+				TableType: types.TableBatchSnapshot,
 			},
 		},
 	}

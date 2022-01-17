@@ -2,7 +2,6 @@ package test_impl
 
 import (
 	"bufio"
-	"fmt"
 	"strings"
 	"testing"
 
@@ -100,9 +99,6 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 			if tc.expectedError != nil {
 				assert.EqualError(t, err, tc.expectedError.Error())
 			} else {
-				fmt.Println("expected: ", tc.expected)
-				fmt.Println("actual: ", values)
-
 				assert.ElementsMatch(t, tc.expected, values)
 				assert.NoError(t, err)
 				assert.NoError(t, result.CheckStreamError())

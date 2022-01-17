@@ -58,3 +58,7 @@ func TestTableSchema(t *testing.T) {
 		}
 	})
 }
+
+func TestCreateTable(t *testing.T) {
+	test_impl.TestCreateTable(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
+}

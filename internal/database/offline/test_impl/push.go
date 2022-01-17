@@ -75,7 +75,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 			TableName: dbutil.OfflineStreamCdcTableName(group.ID, revision),
 			Entity:    &entity,
 			Features:  features,
-			IsCDC:     true,
+			TableType: types.TableStreamCdc,
 		})
 		require.NoError(t, err)
 
