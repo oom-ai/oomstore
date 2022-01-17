@@ -4,11 +4,14 @@ mod util;
 use std::{collections::HashMap, path::Path};
 
 use error::OomError;
+use futures_core::stream::Stream;
 use google::protobuf::Empty;
 use oomagent::{
     oom_agent_client::OomAgentClient,
     value,
     ChannelImportRequest,
+    ChannelJoinRequest,
+    ChannelJoinResponse,
     FeatureValueMap,
     ImportRequest,
     OnlineGetRequest,
@@ -18,6 +21,8 @@ use oomagent::{
 };
 use tonic::{codegen::StdError, transport, Request};
 use util::parse_raw_feature_values;
+
+use crate::{oomagent::EntityRow, util::parse_raw_values};
 
 pub type FValue = value::Kind;
 
@@ -117,12 +122,12 @@ impl Client {
         let mut group = group.into();
         let mut description = description.into();
         let mut revision = revision.into();
-        let outbound = async_stream::stream! {
+        let inbound = async_stream::stream! {
             for row in rows {
                 yield ChannelImportRequest{group: group.take(), description: description.take(), revision: revision.take(), row};
             }
         };
-        let res = self.inner.channel_import(Request::new(outbound)).await?.into_inner();
+        let res = self.inner.channel_import(Request::new(inbound)).await?.into_inner();
         Ok(res.revision_id as u32)
     }
 
@@ -170,5 +175,43 @@ impl Client {
             .await?
             .into_inner();
         Ok(())
+    }
+
+    pub async fn channel_join(
+        &mut self,
+        join_features: Vec<String>,
+        existed_features: Vec<String>,
+        entity_rows: impl Iterator<Item = EntityRow> + Send + 'static,
+    ) -> Result<(Vec<String>, impl Stream<Item = Result<Vec<value::Kind>>>)> {
+        let inbound = async_stream::stream! {
+            for (i, row) in entity_rows.enumerate() {
+                let (join_features, existed_features) = match i {
+                    0 => (join_features.clone(), existed_features.clone()),
+                    _ => (Vec::new(), Vec::new()),
+                };
+                yield ChannelJoinRequest {
+                    join_features,
+                    existed_features,
+                    entity_row: Some(row),
+                };
+            }
+        };
+
+        let mut outbound = self.inner.channel_join(Request::new(inbound)).await?.into_inner();
+
+        let ChannelJoinResponse { header, joined_row } = outbound
+            .message()
+            .await?
+            .ok_or_else(|| OomError::Unknown(String::from("stream finished with no response")))?;
+
+        let row = parse_raw_values(joined_row);
+
+        let outbound = async_stream::try_stream! {
+            yield row;
+            while let Some(ChannelJoinResponse { joined_row, .. }) = outbound.message().await? {
+                yield parse_raw_values(joined_row)
+            }
+        };
+        Ok((header, outbound))
     }
 }
