@@ -14,12 +14,12 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-const (
-	Day       = 24 * time.Hour
-	Capacity  = 1000
-	Period    = 5 * time.Minute
-	MinPeriod = 2 * time.Minute
-)
+var defaultStreamPushProcessorCfg = types.StreamPushProcessorConfig{
+	RevisionInterval: 24 * time.Hour,
+	Period:           5 * time.Minute,
+	MinPeriod:        2 * time.Minute,
+	BufferSize:       1000,
+}
 
 type GroupBuffer struct {
 	groupID  int
@@ -28,26 +28,30 @@ type GroupBuffer struct {
 }
 
 type StreamPushProcessor struct {
-	capacity   int
-	minPeriod  time.Duration
-	notifyQuit chan struct{}
-	waitQuit   chan struct{}
+	bufferSize      int
+	minPeriod       time.Duration
+	revisionInteval time.Duration
+	notifyQuit      chan struct{}
+	waitQuit        chan struct{}
 
 	ticker *time.Ticker
 	ch     chan types.StreamRecord
 	buffer sync.Map // GroupID -> GroupBuffer
 }
 
-func (s *OomStore) InitStreamPushProcessor(ctx context.Context) {
+func (s *OomStore) InitStreamPushProcessor(ctx context.Context, cfg *types.StreamPushProcessorConfig) {
+	if cfg == nil {
+		cfg = &defaultStreamPushProcessorCfg
+	}
 	processor := &StreamPushProcessor{
-		// TODO: make Capacity, Period, MinPeriod configurable
-		capacity:   Capacity,
-		minPeriod:  MinPeriod,
-		notifyQuit: make(chan struct{}),
-		waitQuit:   make(chan struct{}),
+		bufferSize:      cfg.BufferSize,
+		minPeriod:       cfg.MinPeriod,
+		revisionInteval: cfg.RevisionInterval,
+		notifyQuit:      make(chan struct{}),
+		waitQuit:        make(chan struct{}),
 
 		ch:     make(chan types.StreamRecord),
-		ticker: time.NewTicker(Period),
+		ticker: time.NewTicker(cfg.Period),
 	}
 	s.streamPushProcessor = processor
 
@@ -89,7 +93,7 @@ func (s *OomStore) InitStreamPushProcessor(ctx context.Context) {
 				b.records = append(b.records, record)
 				processor.buffer.Store(groupID, b)
 
-				if len(b.records) >= processor.capacity {
+				if len(b.records) >= processor.bufferSize {
 					if err := processor.pushToOffline(ctx, s, groupID); err != nil {
 						fmt.Fprintf(os.Stderr, "Error pushing to offline store: %+v", err)
 					}
@@ -111,7 +115,7 @@ func (p *StreamPushProcessor) Push(record types.StreamRecord) {
 	if _, ok := p.buffer.Load(record.GroupID); !ok {
 		p.buffer.Store(record.GroupID, GroupBuffer{
 			groupID: record.GroupID,
-			records: make([]types.StreamRecord, 0, p.capacity),
+			records: make([]types.StreamRecord, 0, p.bufferSize),
 		})
 	}
 	p.ch <- record
@@ -131,7 +135,7 @@ func (p *StreamPushProcessor) pushToOffline(ctx context.Context, s *OomStore, gr
 
 	buckets := make(map[int64][]types.StreamRecord)
 	for _, record := range b.records {
-		revision := latestRevision(record.UnixMilli)
+		revision := p.lastRevision(record.UnixMilli)
 		if _, ok := buckets[revision]; !ok {
 			buckets[revision] = make([]types.StreamRecord, 0)
 		}
@@ -161,7 +165,7 @@ func (p *StreamPushProcessor) pushToOffline(ctx context.Context, s *OomStore, gr
 		}
 	}
 
-	b.records = make([]types.StreamRecord, 0, p.capacity)
+	b.records = make([]types.StreamRecord, 0, p.bufferSize)
 	b.lastPush = time.Now()
 	p.buffer.Store(groupID, b)
 	return err
@@ -198,6 +202,6 @@ func (p *StreamPushProcessor) newRevision(ctx context.Context, s *OomStore, grou
 	return nil
 }
 
-func latestRevision(unixMilli int64) int64 {
-	return (unixMilli / Day.Milliseconds()) * Day.Milliseconds()
+func (p *StreamPushProcessor) lastRevision(unixMill int64) int64 {
+	return (unixMill / p.revisionInteval.Milliseconds()) * p.revisionInteval.Milliseconds()
 }

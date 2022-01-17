@@ -46,7 +46,7 @@ func Open(ctx context.Context, opt types.OomStoreConfig) (*OomStore, error) {
 		offline:  offlineStore,
 		metadata: metadataStore,
 	}
-	store.InitStreamPushProcessor(ctx)
+	store.InitStreamPushProcessor(ctx, opt.StreamPushProcessor)
 
 	return store, nil
 }
