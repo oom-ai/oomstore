@@ -203,9 +203,9 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 	// This goroutine runs the join operation, and send whatever joined as the response
 	go func() {
 		joinResult, err := s.oomstore.ChannelJoin(context.Background(), types.ChannelJoinOpt{
-			FeatureNames: firstReq.JoinFeatures,
-			EntityRows:   entityRows,
-			ValueNames:   firstReq.ExistedFeatures,
+			JoinFeatureNames:    firstReq.JoinFeatures,
+			EntityRows:          entityRows,
+			ExistedFeatureNames: firstReq.ExistedFeatures,
 		})
 		if err != nil {
 			globalErr = err

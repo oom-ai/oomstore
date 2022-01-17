@@ -54,9 +54,9 @@ type OnlineMultiGetOpt struct {
 }
 
 type ChannelJoinOpt struct {
-	FeatureNames []string
-	EntityRows   <-chan EntityRow
-	ValueNames   []string
+	JoinFeatureNames    []string
+	ExistedFeatureNames []string
+	EntityRows          <-chan EntityRow
 }
 
 type JoinOpt struct {
