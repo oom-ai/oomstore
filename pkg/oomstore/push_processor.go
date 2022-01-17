@@ -14,10 +14,9 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-var defaultStreamPushProcessorCfg = types.StreamPushProcessorConfig{
+var defaultPushProcessorCfg = types.PushProcessorConfig{
 	RevisionInterval: 24 * time.Hour,
-	Period:           5 * time.Minute,
-	MinPeriod:        2 * time.Minute,
+	FlushInterval:    2 * time.Minute,
 	BufferSize:       1000,
 }
 
@@ -27,9 +26,9 @@ type GroupBuffer struct {
 	lastPush time.Time
 }
 
-type StreamPushProcessor struct {
+type PushProcessor struct {
 	bufferSize      int
-	minPeriod       time.Duration
+	flushInterval   time.Duration
 	revisionInteval time.Duration
 	notifyQuit      chan struct{}
 	waitQuit        chan struct{}
@@ -39,21 +38,29 @@ type StreamPushProcessor struct {
 	buffer sync.Map // GroupID -> GroupBuffer
 }
 
-func (s *OomStore) InitStreamPushProcessor(ctx context.Context, cfg *types.StreamPushProcessorConfig) {
+func (s *OomStore) InitPushProcessor(ctx context.Context, cfg *types.PushProcessorConfig) {
 	if cfg == nil {
-		cfg = &defaultStreamPushProcessorCfg
+		cfg = &defaultPushProcessorCfg
 	}
-	processor := &StreamPushProcessor{
+
+	// tick at least once every 10 seconds
+	maxTickInterval := 10 * time.Second
+	tickInterval := cfg.FlushInterval
+	if cfg.FlushInterval > maxTickInterval {
+		tickInterval = maxTickInterval
+	}
+
+	processor := &PushProcessor{
 		bufferSize:      cfg.BufferSize,
-		minPeriod:       cfg.MinPeriod,
+		flushInterval:   cfg.FlushInterval,
 		revisionInteval: cfg.RevisionInterval,
 		notifyQuit:      make(chan struct{}),
 		waitQuit:        make(chan struct{}),
 
 		ch:     make(chan types.StreamRecord),
-		ticker: time.NewTicker(cfg.Period),
+		ticker: time.NewTicker(tickInterval),
 	}
-	s.streamPushProcessor = processor
+	s.pushProcessor = processor
 
 	go func() {
 		defer func() {
@@ -78,7 +85,7 @@ func (s *OomStore) InitStreamPushProcessor(ctx context.Context, cfg *types.Strea
 				processor.buffer.Range(func(key, value interface{}) bool {
 					groupID := key.(int)
 					b := value.(GroupBuffer)
-					if len(b.records) > 0 && time.Since(b.lastPush) > processor.minPeriod {
+					if len(b.records) > 0 && time.Since(b.lastPush) >= processor.flushInterval {
 						if err := processor.pushToOffline(ctx, s, groupID); err != nil {
 							fmt.Fprintf(os.Stderr, "Error pushing to offline store: %+v", err)
 						}
@@ -103,7 +110,7 @@ func (s *OomStore) InitStreamPushProcessor(ctx context.Context, cfg *types.Strea
 	}()
 }
 
-func (p *StreamPushProcessor) Close() error {
+func (p *PushProcessor) Close() error {
 	p.ticker.Stop()
 	p.notifyQuit <- struct{}{}
 
@@ -111,7 +118,7 @@ func (p *StreamPushProcessor) Close() error {
 	return nil
 }
 
-func (p *StreamPushProcessor) Push(record types.StreamRecord) {
+func (p *PushProcessor) Push(record types.StreamRecord) {
 	if _, ok := p.buffer.Load(record.GroupID); !ok {
 		p.buffer.Store(record.GroupID, GroupBuffer{
 			groupID: record.GroupID,
@@ -121,7 +128,7 @@ func (p *StreamPushProcessor) Push(record types.StreamRecord) {
 	p.ch <- record
 }
 
-func (p *StreamPushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID int) error {
+func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID int) error {
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		GroupID: &groupID,
 	})
@@ -171,7 +178,7 @@ func (p *StreamPushProcessor) pushToOffline(ctx context.Context, s *OomStore, gr
 	return err
 }
 
-func (p *StreamPushProcessor) newRevision(ctx context.Context, s *OomStore, groupID int, revision int64) error {
+func (p *PushProcessor) newRevision(ctx context.Context, s *OomStore, groupID int, revision int64) error {
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		GroupID: &groupID,
 	})
@@ -202,6 +209,6 @@ func (p *StreamPushProcessor) newRevision(ctx context.Context, s *OomStore, grou
 	return nil
 }
 
-func (p *StreamPushProcessor) lastRevision(unixMill int64) int64 {
+func (p *PushProcessor) lastRevision(unixMill int64) int64 {
 	return (unixMill / p.revisionInteval.Milliseconds()) * p.revisionInteval.Milliseconds()
 }

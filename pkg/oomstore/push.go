@@ -43,7 +43,7 @@ func (s *OomStore) Push(ctx context.Context, opt types.PushOpt) error {
 		return err
 	}
 
-	s.streamPushProcessor.Push(types.StreamRecord{
+	s.pushProcessor.Push(types.StreamRecord{
 		GroupID:   group.ID,
 		EntityKey: opt.EntityKey,
 		UnixMilli: time.Now().UnixMilli(),

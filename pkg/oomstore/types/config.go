@@ -27,14 +27,13 @@ type OomStoreConfig struct {
 	OfflineStore  OfflineStoreConfig  `yaml:"offline-store"`
 	OnlineStore   OnlineStoreConfig   `yaml:"online-store"`
 
-	StreamPushProcessor *StreamPushProcessorConfig `yaml:"stream-push-processor"`
+	PushProcessor *PushProcessorConfig `yaml:"push-processor"`
 }
 
-type StreamPushProcessorConfig struct {
-	RevisionInterval time.Duration `yaml:"revision-interval"`
-	Period           time.Duration `yaml:"period"`
-	MinPeriod        time.Duration `yaml:"min-period"`
+type PushProcessorConfig struct {
 	BufferSize       int           `yaml:"buffer-size"`
+	FlushInterval    time.Duration `yaml:"flush-interval"`
+	RevisionInterval time.Duration `yaml:"revision-interval"`
 }
 
 type OnlineStoreConfig struct {
