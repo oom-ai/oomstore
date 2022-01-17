@@ -47,6 +47,7 @@ func (s *OomStore) createFirstSnapshotTable(ctx context.Context, revision *types
 		TableName: snapshotTable,
 		Entity:    revision.Group.Entity,
 		Features:  features,
+		IsCDC:     true, // In order to add `unix_milli` column, set IsCDC as true temporarily
 	}); err != nil {
 		return err
 	}
