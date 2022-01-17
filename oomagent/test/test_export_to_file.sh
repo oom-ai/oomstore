@@ -34,7 +34,7 @@ group="export some features"
 unix_milli=${3:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
 arg=$(cat <<-EOF
 {
-    "feature_names": ["account.state"],
+    "features": ["account.state"],
     "unix_milli": $unix_milli,
     "output_file_path": "$output"
 }
@@ -61,7 +61,7 @@ group_test "$group" "$arg" "$expected"
 group="export all features"
 arg=$(cat <<-EOF
 {
-    "feature_names": ["account.state","account.credit_score","account.account_age_days","account.has_2fa_installed"],
+    "features": ["account.state","account.credit_score","account.account_age_days","account.has_2fa_installed"],
     "output_file_path": "$output",
     "unix_milli": $unix_milli
 }

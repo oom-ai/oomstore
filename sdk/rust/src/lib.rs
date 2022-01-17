@@ -53,11 +53,11 @@ impl Client {
     pub async fn online_get_raw(
         &mut self,
         entity_key: impl Into<String>,
-        feature_names: Vec<String>,
+        features: Vec<String>,
     ) -> Result<FeatureValueMap> {
         let res = self
             .inner
-            .online_get(OnlineGetRequest { entity_key: entity_key.into(), feature_names })
+            .online_get(OnlineGetRequest { entity_key: entity_key.into(), features })
             .await?
             .into_inner();
         Ok(match res.result {
@@ -78,11 +78,11 @@ impl Client {
     pub async fn online_multi_get_raw(
         &mut self,
         entity_keys: Vec<String>,
-        feature_names: Vec<String>,
+        features: Vec<String>,
     ) -> Result<HashMap<String, FeatureValueMap>> {
         let res = self
             .inner
-            .online_multi_get(OnlineMultiGetRequest { entity_keys, feature_names })
+            .online_multi_get(OnlineMultiGetRequest { entity_keys, features })
             .await?
             .into_inner();
         Ok(res.result)
@@ -109,17 +109,17 @@ impl Client {
 
     pub async fn channel_import(
         &mut self,
-        group_name: impl Into<Option<String>>,
+        group: impl Into<Option<String>>,
         description: impl Into<Option<String>>,
         revision: impl Into<Option<i64>>,
         rows: impl Iterator<Item = Vec<u8>> + Send + 'static,
     ) -> Result<u32> {
-        let mut group_name = group_name.into();
+        let mut group = group.into();
         let mut description = description.into();
         let mut revision = revision.into();
         let outbound = async_stream::stream! {
             for row in rows {
-                yield ChannelImportRequest{group_name: group_name.take(), description: description.take(), revision: revision.take(), row};
+                yield ChannelImportRequest{group: group.take(), description: description.take(), revision: revision.take(), row};
             }
         };
         let res = self.inner.channel_import(Request::new(outbound)).await?.into_inner();
@@ -128,7 +128,7 @@ impl Client {
 
     pub async fn import(
         &mut self,
-        group_name: impl Into<String>,
+        group: impl Into<String>,
         description: impl Into<Option<String>>,
         revision: impl Into<Option<i64>>,
         input_file: impl AsRef<Path>,
@@ -137,7 +137,7 @@ impl Client {
         let res = self
             .inner
             .import(ImportRequest {
-                group_name:      group_name.into(),
+                group:           group.into(),
                 description:     description.into(),
                 revision:        revision.into(),
                 input_file_path: input_file.as_ref().display().to_string(),
@@ -151,7 +151,7 @@ impl Client {
     pub async fn push(
         &mut self,
         entity_key: impl Into<String>,
-        group_name: impl Into<String>,
+        group: impl Into<String>,
         kv_pairs: Vec<(impl Into<String>, impl Into<value::Kind>)>,
     ) -> Result<()> {
         let mut keys = Vec::with_capacity(kv_pairs.len());
@@ -163,8 +163,8 @@ impl Client {
         self.inner
             .push(PushRequest {
                 entity_key:     entity_key.into(),
-                group_name:     group_name.into(),
-                feature_names:  keys,
+                group:          group.into(),
+                features:       keys,
                 feature_values: vals,
             })
             .await?

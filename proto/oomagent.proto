@@ -45,7 +45,7 @@ message Value {
 
 message OnlineGetRequest {
   string entity_key = 1;
-  repeated string feature_names = 2;
+  repeated string features = 2;
 }
 
 message FeatureValueMap {
@@ -58,7 +58,7 @@ message OnlineGetResponse {
 
 message OnlineMultiGetRequest {
   repeated string entity_keys = 1;
-  repeated string feature_names = 2;
+  repeated string features = 2;
 }
 
 message OnlineMultiGetResponse {
@@ -74,7 +74,7 @@ message SyncResponse {}
 
 message ChannelImportRequest {
   // only takes effect (and required) on the first request
-  optional string group_name = 1;
+  optional string group = 1;
   // only takes effect on the first request
   optional string description = 2;
   // only takes effect on the first request
@@ -88,7 +88,7 @@ message ImportResponse {
 }
 
 message ImportRequest {
-  string group_name = 1;
+  string group = 1;
   optional int64 revision = 2;
   optional string description = 3;
 
@@ -100,15 +100,15 @@ message PushResponse {}
 
 message PushRequest {
   string entity_key = 1;
-  string group_name = 2;
-  repeated string feature_names = 3;
+  string group = 2;
+  repeated string features = 3;
   repeated Value feature_values = 4;
 }
 
 message SnapshotResponse {}
 
 message SnapshotRequest {
-  string group_name = 1;
+  string group = 1;
 }
 
 message EntityRow {
@@ -118,9 +118,9 @@ message EntityRow {
 }
 
 message ChannelJoinRequest {
-  repeated string feature_names = 1;
+  repeated string join_features = 1;
+  repeated string existed_features = 3;
   EntityRow entity_row = 2;
-  repeated string value_names = 3;
 }
 
 message ChannelJoinResponse {
@@ -129,7 +129,7 @@ message ChannelJoinResponse {
 }
 
 message JoinRequest {
-  repeated string feature_names = 1;
+  repeated string features = 1;
   string input_file_path = 2;
   string output_file_path = 3;
 }
@@ -137,7 +137,7 @@ message JoinRequest {
 message JoinResponse {}
 
 message ChannelExportRequest {
-  repeated string feature_names = 1;
+  repeated string features = 1;
   int64 unix_milli = 2;
   optional uint64 limit = 3;
 }
@@ -148,7 +148,7 @@ message ChannelExportResponse {
 }
 
 message ExportRequest {
-  repeated string feature_names = 1;
+  repeated string features = 1;
   int64 unix_milli = 2;
   optional uint64 limit = 3;
   string output_file_path = 4;

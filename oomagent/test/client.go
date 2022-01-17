@@ -42,7 +42,7 @@ func OnlineGet() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	r, err := c.OnlineGet(ctx, &codegen.OnlineGetRequest{EntityKey: "1", FeatureNames: []string{"model"}})
+	r, err := c.OnlineGet(ctx, &codegen.OnlineGetRequest{EntityKey: "1", Features: []string{"model"}})
 	if err != nil {
 		log.Fatalf("could not get: %v", err)
 	}
@@ -73,7 +73,7 @@ func Import() {
 	description := "please input you description"
 	for fileScanner.Scan() {
 		if err := importClient.Send(&codegen.ChannelImportRequest{
-			GroupName:   &groupName,
+			Group:       &groupName,
 			Description: &description,
 			Row:         fileScanner.Bytes(),
 		}); err != nil {
