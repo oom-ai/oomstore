@@ -50,10 +50,14 @@ impl Client {
         Ok(self.inner.health_check(Empty {}).await.map(|_| ())?)
     }
 
-    pub async fn online_get_raw(&mut self, key: impl Into<String>, features: Vec<String>) -> Result<FeatureValueMap> {
+    pub async fn online_get_raw(
+        &mut self,
+        entity_key: impl Into<String>,
+        feature_names: Vec<String>,
+    ) -> Result<FeatureValueMap> {
         let res = self
             .inner
-            .online_get(OnlineGetRequest { entity_key: key.into(), feature_full_names: features })
+            .online_get(OnlineGetRequest { entity_key: entity_key.into(), feature_names })
             .await?
             .into_inner();
         Ok(match res.result {
@@ -73,12 +77,12 @@ impl Client {
 
     pub async fn online_multi_get_raw(
         &mut self,
-        keys: Vec<String>,
-        features: Vec<String>,
+        entity_keys: Vec<String>,
+        feature_names: Vec<String>,
     ) -> Result<HashMap<String, FeatureValueMap>> {
         let res = self
             .inner
-            .online_multi_get(OnlineMultiGetRequest { entity_keys: keys, feature_full_names: features })
+            .online_multi_get(OnlineMultiGetRequest { entity_keys, feature_names })
             .await?
             .into_inner();
         Ok(res.result)

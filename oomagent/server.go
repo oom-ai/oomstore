@@ -32,7 +32,7 @@ func (s *server) HealthCheck(ctx context.Context, req *empty.Empty) (*empty.Empt
 
 func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (*codegen.OnlineGetResponse, error) {
 	result, err := s.oomstore.OnlineGet(ctx, types.OnlineGetOpt{
-		FeatureFullNames: req.FeatureFullNames,
+		FeatureFullNames: req.FeatureNames,
 		EntityKey:        req.EntityKey,
 	})
 	if err != nil {
@@ -52,7 +52,7 @@ func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (
 
 func (s *server) OnlineMultiGet(ctx context.Context, req *codegen.OnlineMultiGetRequest) (*codegen.OnlineMultiGetResponse, error) {
 	result, err := s.oomstore.OnlineMultiGet(ctx, types.OnlineMultiGetOpt{
-		FeatureFullNames: req.FeatureFullNames,
+		FeatureFullNames: req.FeatureNames,
 		EntityKeys:       req.EntityKeys,
 	})
 	if err != nil {
@@ -203,7 +203,7 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 	// This goroutine runs the join operation, and send whatever joined as the response
 	go func() {
 		joinResult, err := s.oomstore.ChannelJoin(context.Background(), types.ChannelJoinOpt{
-			FeatureFullNames: firstReq.FeatureFullNames,
+			FeatureFullNames: firstReq.FeatureNames,
 			EntityRows:       entityRows,
 			ValueNames:       firstReq.ValueNames,
 		})
@@ -272,7 +272,7 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 
 func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.JoinResponse, error) {
 	err := s.oomstore.Join(ctx, types.JoinOpt{
-		FeatureFullNames: req.FeatureFullNames,
+		FeatureFullNames: req.FeatureNames,
 		InputFilePath:    req.InputFilePath,
 		OutputFilePath:   req.OutputFilePath,
 	})
