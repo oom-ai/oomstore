@@ -59,6 +59,6 @@ func init() {
 	flags.StringVarP(&pushOpt.GroupName, "group", "g", "", "feature group")
 	_ = pushCmd.MarkFlagRequired("group")
 
-	flags.StringToStringVarP(&pushOpt.FeaturePair, "features", "f", nil, "features")
+	flags.StringToStringVarP(&pushOpt.FeaturePair, "features", "f", nil, "feature name-value pairs")
 	_ = pushCmd.MarkFlagRequired("features")
 }
