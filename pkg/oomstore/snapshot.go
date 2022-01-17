@@ -14,6 +14,14 @@ func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 	if err != nil {
 		return err
 	}
+
+	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+		GroupID: &group.ID,
+	})
+	if err != nil {
+		return err
+	}
+
 	revisions, err := s.metadata.ListRevision(ctx, &group.ID)
 	if err != nil {
 		return err
@@ -21,6 +29,7 @@ func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 	if len(revisions) == 0 {
 		return nil
 	}
+
 	sort.Slice(revisions, func(i, j int) bool {
 		return revisions[i].Revision < revisions[j].Revision
 	})
@@ -42,6 +51,7 @@ func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 		tableName := dbutil.OfflineStreamSnapshotTableName(group.ID, revision.Revision)
 		if err = s.offline.Snapshot(ctx, offline.SnapshotOpt{
 			Group:        group,
+			Features:     features,
 			Revision:     revisions[i].Revision,
 			PrevRevision: revisions[i-1].Revision,
 		}); err != nil {
