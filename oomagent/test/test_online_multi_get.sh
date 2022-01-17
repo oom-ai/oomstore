@@ -9,7 +9,7 @@ case="query single feature"
 arg='
 {
     "entity_keys": ["19", "50", "78"],
-    "feature_full_names": ["account.state"]
+    "feature_names": ["account.state"]
 }
 '
 expected='
@@ -46,7 +46,7 @@ case="query multiple features"
 arg='
 {
     "entity_keys": ["48", "74"],
-    "feature_full_names": ["account.state", "account.credit_score", "transaction_stats.transaction_count_7d", "transaction_stats.transaction_count_30d"]
+    "feature_names": ["account.state", "account.credit_score", "transaction_stats.transaction_count_7d", "transaction_stats.transaction_count_30d"]
 }
 '
 expected='

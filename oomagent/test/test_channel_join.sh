@@ -13,7 +13,7 @@ done
 
 arg='
 {
-  "feature_full_names": [
+  "feature_names": [
     "driver_stats.conv_rate",
     "driver_stats.acc_rate",
     "driver_stats.avg_daily_trips"
