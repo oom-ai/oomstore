@@ -32,11 +32,14 @@ LEFT JOIN {{ qt $table }}
 ON e.{{ qt $.EntityName }} = {{ qt $table }}.{{ qt $.EntityName }}
 {{end}}
 {{ range $table := .CdcTables }}
+	{{- $t0 := suffix0 $table -}}
+	{{- $t1 := suffix1 $table -}}
+	{{- $t2 := suffix2 $table -}}
 LEFT JOIN
 (
 	SELECT
-		{{ $table }}_1.*
-	FROM {{ qt $table }} AS {{ $table }}_1
+		{{ qt $t1 }}.*
+	FROM {{ qt $table }} AS {{ qt $t1 }}
 	JOIN
 	(SELECT
 		{{ qt $.EntityName }},
@@ -44,11 +47,11 @@ LEFT JOIN
 	FROM {{ qt $table }}
 	WHERE {{ qt $table }}.{{ qt $.UnixMilli }} <= ?
 	GROUP BY {{ qt $.EntityName }}
-	) AS {{ $table }}_2
-	ON {{ $table }}_1.{{ qt $.EntityName }} = {{ $table }}_2.{{ qt $.EntityName }} AND {{ $table }}_1.{{ qt $.UnixMilli }} = {{ $table }}_2.{{ qt $.UnixMilli }}
-	WHERE {{ $table }}_1.{{ qt $.UnixMilli }} <= ?
-) AS {{ $table }}_0
-ON e.{{ qt $.EntityName }} = {{ $table }}_0.{{ qt $.EntityName }}
+	) AS {{ qt $t2 }}
+	ON {{ qt $t1 }}.{{ qt $.EntityName }} = {{ qt $t2 }}.{{ qt $.EntityName }} AND {{ qt $t1 }}.{{ qt $.UnixMilli }} = {{ qt $t2 }}.{{ qt $.UnixMilli }}
+	WHERE {{ qt $t1 }}.{{ qt $.UnixMilli }} <= ?
+) AS {{ qt $t0 }}
+ON e.{{ qt $.EntityName }} = {{ qt $t0 }}.{{ qt $.EntityName }}
 {{end}}
 
 `
@@ -60,10 +63,17 @@ type unionEntityQueryParams struct {
 	CdcTables      []string
 	UnixMilli      int64
 	Backend        types.BackendType
+	DatasetID      *string
 }
 
 func buildUnionEntityQuery(params unionEntityQueryParams) (string, []interface{}, error) {
 	qt := dbutil.QuoteFn(params.Backend)
+	union := "UNION"
+	if params.Backend == types.BackendBigQuery {
+		union = "UNION DISTINCT"
+		params.TableName = fmt.Sprintf("%s.%s", *params.DatasetID, params.TableName)
+	}
+	sep := fmt.Sprintf("%s \n\t", union)
 	var args []interface{}
 	t := template.Must(template.New("union_entity").Funcs(template.FuncMap{
 		"qt": qt,
@@ -72,7 +82,7 @@ func buildUnionEntityQuery(params unionEntityQueryParams) (string, []interface{}
 			for _, t := range tables {
 				query = append(query, fmt.Sprintf("SELECT %s FROM %s", qt(params.EntityName), qt(t)))
 			}
-			return strings.Join(query, "UNION \n\t")
+			return strings.Join(query, sep)
 		},
 		"cdc": func(tables []string) string {
 			if len(tables) == 0 {
@@ -83,7 +93,7 @@ func buildUnionEntityQuery(params unionEntityQueryParams) (string, []interface{}
 				query = append(query, fmt.Sprintf("SELECT %s FROM %s WHERE %s <= ?", qt(params.EntityName), qt(t), qt("unix_milli")))
 				args = append(args, params.UnixMilli)
 			}
-			return fmt.Sprintf("%s%s", "UNION \n\t", strings.Join(query, "UNION \n\t"))
+			return fmt.Sprintf("%s%s", sep, strings.Join(query, sep))
 		},
 	}).Parse(UNION_ENTITY_QUERY))
 
@@ -102,11 +112,24 @@ type exportQueryParams struct {
 	CdcTables       []string
 	Fields          []string
 	Backend         types.BackendType
+	DatasetID       *string
 }
 
 func buildExportQuery(params exportQueryParams) (string, error) {
+	if params.Backend == types.BackendBigQuery {
+		params.EntityTableName = fmt.Sprintf("%s.%s", *params.DatasetID, params.EntityTableName)
+	}
 	t := template.Must(template.New("export").Funcs(template.FuncMap{
 		"qt": dbutil.QuoteFn(params.Backend),
+		"suffix0": func(table string) string {
+			return table + "_0"
+		},
+		"suffix1": func(table string) string {
+			return table + "_1"
+		},
+		"suffix2": func(table string) string {
+			return table + "_2"
+		},
 		"fieldJoin": func(fields []string) string {
 			return strings.Join(fields, ",\n\t")
 		},
@@ -147,6 +170,7 @@ func prepareEntityTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.Exp
 		CdcTables:      cdcTables,
 		UnixMilli:      opt.UnixMilli,
 		Backend:        dbOpt.Backend,
+		DatasetID:      dbOpt.DatasetID,
 	})
 	if err != nil {
 		return "", errdefs.WithStack(err)
