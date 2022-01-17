@@ -73,12 +73,14 @@ func TestSync(t *testing.T) {
 				}, nil)
 				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features, nil)
 
-				stream := make(chan types.ExportRecord)
-				offlineStore.EXPECT().ExportOneGroup(ctx, offline.ExportOneGroupOpt{
-					SnapshotTable: "snapshot-table-name",
-					EntityName:    "device",
-					Features:      features,
-				}).Return(stream, nil)
+				result := &types.ExportResult{
+					Data: make(chan types.ExportRecord),
+				}
+				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
+					SnapshotTables: map[int]string{1: "snapshot-table-name"},
+					Features:       map[int]types.FeatureList{1: features},
+					EntityName:     "device",
+				}).Return(result, nil)
 
 				onlineStore.EXPECT().Import(ctx, online.ImportOpt{
 					Features: features,
@@ -86,7 +88,7 @@ func TestSync(t *testing.T) {
 					Entity: &types.Entity{
 						Name: "device",
 					},
-					ExportStream: stream,
+					ExportStream: result.Data,
 				}).Return(nil)
 
 				metadataStore.EXPECT().WithTransaction(ctx, gomock.Any()).Return(nil)
@@ -108,12 +110,14 @@ func TestSync(t *testing.T) {
 				}, nil)
 				metadataStore.EXPECT().ListFeature(ctx, metadata.ListFeatureOpt{GroupID: &revision.Group.ID}).Return(features, nil)
 
-				stream := make(chan types.ExportRecord)
-				offlineStore.EXPECT().ExportOneGroup(ctx, offline.ExportOneGroupOpt{
-					SnapshotTable: "snapshot-table-name",
-					EntityName:    "device",
-					Features:      features,
-				}).Return(stream, nil)
+				result := &types.ExportResult{
+					Data: make(chan types.ExportRecord),
+				}
+				offlineStore.EXPECT().Export(ctx, offline.ExportOpt{
+					SnapshotTables: map[int]string{1: "snapshot-table-name"},
+					Features:       map[int]types.FeatureList{1: features},
+					EntityName:     "device",
+				}).Return(result, nil)
 
 				onlineStore.EXPECT().Import(ctx, online.ImportOpt{
 					Features: features,
@@ -121,7 +125,7 @@ func TestSync(t *testing.T) {
 					Entity: &types.Entity{
 						Name: "device",
 					},
-					ExportStream: stream,
+					ExportStream: result.Data,
 				}).Return(nil)
 
 				metadataStore.EXPECT().WithTransaction(ctx, gomock.Any()).Return(nil)

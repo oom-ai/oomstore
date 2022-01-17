@@ -40,18 +40,21 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	}
 
 	// Move data from offline to online store
-	exportStream, exportError := s.offline.ExportOneGroup(ctx, offline.ExportOneGroupOpt{
-		SnapshotTable: revision.SnapshotTable,
-		EntityName:    group.Entity.Name,
-		Features:      features,
+	exportResult, err := s.offline.Export(ctx, offline.ExportOpt{
+		SnapshotTables: map[int]string{group.ID: revision.SnapshotTable},
+		Features:       map[int]types.FeatureList{group.ID: features},
+		EntityName:     group.Entity.Name,
 	})
+	if err != nil {
+		return err
+	}
 
 	if err = s.online.Import(ctx, online.ImportOpt{
 		Features:     features,
 		Revision:     revision,
 		Entity:       group.Entity,
-		ExportStream: exportStream,
-		ExportError:  exportError,
+		ExportStream: exportResult.Data,
+		ExportError:  exportResult.GetErrorChannel(),
 	}); err != nil {
 		return err
 	}

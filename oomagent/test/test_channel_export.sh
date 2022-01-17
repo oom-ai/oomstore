@@ -6,20 +6,22 @@ prepare_store
 prepare_oomagent
 
 import_sample account "./data/account_10.csv"
+unix_milli=${3:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
 
 case1() {
     prefix="export some features"
-    arg='
+    arg=$(cat <<-EOF
     {
-        "feature_names": ["state"],
-        "revision_id": 3
+       "feature_names": ["account.state"],
+       "unix_milli": $unix_milli
     }
-    '
+EOF
+    )
     actual=$(testgrpc ChannelExport <<<"$arg")
 
     case="$prefix - first response returns header"
     actual_header=$(jq -s '.[0].header' <<< "$actual")
-    expected_header='["user","state"]'
+    expected_header='["user","account.state"]'
     assert_json_eq "$case" "$expected_header" "$actual_header"
 
     case="$prefix - returns correct rows"
@@ -41,12 +43,18 @@ case1() {
 
 case2() {
     prefix="export some features"
-    arg='{"revision_id":3}'
+    arg=$(cat <<-EOF
+    {
+       "feature_names": ["account.state","account.credit_score","account.account_age_days","account.has_2fa_installed"],
+       "unix_milli": $unix_milli
+    }
+EOF
+)
     actual=$(testgrpc ChannelExport <<<"$arg")
 
     case="$prefix - first response returns header"
     actual_header=$(jq -s '.[0].header' <<< "$actual")
-    expected_header='["user","state","credit_score","account_age_days","has_2fa_installed"]'
+    expected_header='["user","account.state","account.credit_score","account.account_age_days","account.has_2fa_installed"]'
     assert_json_eq "$case" "$expected_header" "$actual_header"
 
     case="$prefix - returns correct rows"

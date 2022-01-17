@@ -14,8 +14,8 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func export(ctx context.Context, store *oomstore.OomStore, opt types.ChannelExportBatchOpt, output string) error {
-	exportResult, err := store.ChannelExportBatch(ctx, opt)
+func export(ctx context.Context, store *oomstore.OomStore, opt types.ChannelExportOpt, output string) error {
+	exportResult, err := store.ChannelExport(ctx, opt)
 	if err != nil {
 		return err
 	}

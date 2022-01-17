@@ -20,6 +20,11 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 	defer store.Close()
 
 	entity := types.Entity{Name: "device"}
+	group := &types.Group{
+		ID:       1,
+		Name:     "device",
+		Category: types.CategoryBatch,
+	}
 	snapshotTable := "offline_1_1"
 
 	opt := offline.ImportOpt{
@@ -52,19 +57,21 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 		_, err := store.Import(ctx, opt)
 		assert.NoError(t, err)
 
-		stream, errch := store.ExportOneGroup(ctx, offline.ExportOneGroupOpt{
-			SnapshotTable: snapshotTable,
-			EntityName:    entity.Name,
-			Features: []*types.Feature{
-				{Name: "model", ValueType: types.String},
-				{Name: "price", ValueType: types.Int64},
-			},
+		result, err := store.Export(ctx, offline.ExportOpt{
+			SnapshotTables: map[int]string{1: snapshotTable},
+			EntityName:     entity.Name,
+			Features: map[int]types.FeatureList{
+				1: []*types.Feature{
+					{Name: "model", ValueType: types.String, Group: group},
+					{Name: "price", ValueType: types.Int64, Group: group},
+				}},
 		})
 		records := make([][]interface{}, 0)
-		for row := range stream {
+		for row := range result.Data {
 			records = append(records, row)
 		}
-		assert.NoError(t, <-errch)
+		assert.NoError(t, err)
+		assert.NoError(t, result.CheckStreamError())
 		sort.Slice(records, func(i, j int) bool {
 			return cast.ToString(records[i][0]) < cast.ToString(records[j][0])
 		})

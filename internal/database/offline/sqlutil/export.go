@@ -14,60 +14,26 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-type QueryExportResults func(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error)
-
-type DoExportOneGroupOpt struct {
-	offline.ExportOneGroupOpt
-	QueryResults QueryExportResults
-}
+type QueryExportResults func(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList) (*types.ExportResult, error)
 
 type DoExportOpt struct {
 	offline.ExportOpt
 	QueryResults QueryExportResults
 }
 
-func ExportOneGroup(ctx context.Context, db *sqlx.DB, opt offline.ExportOneGroupOpt, backend types.BackendType) (<-chan types.ExportRecord, <-chan error) {
-	dbOpt := dbutil.DBOpt{
-		Backend: backend,
-		SqlxDB:  db,
-	}
-	doJoinOpt := DoExportOneGroupOpt{
-		ExportOneGroupOpt: opt,
-		QueryResults:      sqlxQueryExportResults,
-	}
-	return DoExportOneGroup(ctx, dbOpt, doJoinOpt)
-}
-
-func DoExportOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOneGroupOpt) (<-chan types.ExportRecord, <-chan error) {
-	var (
-		emptyStream = make(chan types.ExportRecord)
-		errs        = make(chan error, 1) // at most 1 error
-	)
-	defer close(emptyStream)
-	defer close(errs)
-
-	query, args, err := buildExportOneGroupQuery(dbOpt, opt.ExportOneGroupOpt)
-	if err != nil {
-		errs <- errdefs.WithStack(err)
-		return emptyStream, errs
-	}
-
-	return opt.QueryResults(ctx, dbOpt, opt.ExportOneGroupOpt, query, args)
-}
-
-func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend types.BackendType) (<-chan types.ExportRecord, <-chan error) {
+func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend types.BackendType) (*types.ExportResult, error) {
 	dbOpt := dbutil.DBOpt{
 		Backend: backend,
 		SqlxDB:  db,
 	}
 	doJoinOpt := DoExportOpt{
 		ExportOpt:    opt,
-		QueryResults: sqlxQueryExportResults,
+		QueryResults: queryExportResults,
 	}
 	return DoExport(ctx, dbOpt, doJoinOpt)
 }
 
-func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (<-chan types.ExportRecord, <-chan error) {
+func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.ExportResult, error) {
 	var (
 		emptyStream = make(chan types.ExportRecord)
 		errs        = make(chan error, 1) // at most 1 error
@@ -97,8 +63,7 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (<-chan 
 	// Step 1: prepare export_entity table, which contains all entity keys from source tables
 	tableName, err := prepareEntityTable(ctx, dbOpt, opt.ExportOpt, snapshotTables, cdcTables)
 	if err != nil {
-		errs <- errdefs.WithStack(err)
-		return emptyStream, errs
+		return nil, err
 	}
 
 	// Step 2: join export_entity table, snapshot tables and cdc tables
@@ -133,17 +98,16 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (<-chan 
 		Backend:         dbOpt.Backend,
 	})
 	if err != nil {
-		errs <- errdefs.WithStack(err)
-		return emptyStream, errs
+		return nil, err
 	}
 	args := make([]interface{}, 0, len(opt.CdcTables)*2)
 	for i := 0; i < len(opt.CdcTables)*2; i++ {
 		args = append(args, opt.UnixMilli)
 	}
-	return queryExportResults(ctx, dbOpt, query, args, featureList)
+	return queryExportResults(ctx, dbOpt, opt.ExportOpt, query, args, featureList)
 }
 
-func queryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, args []interface{}, featureList types.FeatureList) (<-chan types.ExportRecord, <-chan error) {
+func queryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList) (*types.ExportResult, error) {
 	stream := make(chan types.ExportRecord)
 	errs := make(chan error, 1) // at most 1 error
 
@@ -169,7 +133,7 @@ func queryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, a
 				return
 			}
 			record[0] = cast.ToString(record[0])
-			for i, f := range featureList {
+			for i, f := range features {
 				if record[i+1] == nil {
 					continue
 				}
@@ -183,94 +147,6 @@ func queryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, a
 			stream <- record
 		}
 	}()
-
-	return stream, errs
-}
-
-func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt, query string, args []interface{}) (<-chan types.ExportRecord, <-chan error) {
-	stream := make(chan types.ExportRecord)
-	errs := make(chan error, 1) // at most 1 error
-
-	go func() {
-		defer close(stream)
-		defer close(errs)
-		stmt, err := dbOpt.SqlxDB.Preparex(dbOpt.SqlxDB.Rebind(query))
-		if err != nil {
-			errs <- errdefs.WithStack(err)
-			return
-		}
-		defer stmt.Close()
-		rows, err := stmt.Queryx(args...)
-		if err != nil {
-			errs <- errdefs.WithStack(err)
-			return
-		}
-		defer rows.Close()
-		for rows.Next() {
-			record, err := rows.SliceScan()
-			if err != nil {
-				errs <- errdefs.Errorf("failed at rows.SliceScan, err=%v", err)
-				return
-			}
-			record[0] = cast.ToString(record[0])
-			for i, f := range opt.Features {
-				if record[i+1] == nil {
-					continue
-				}
-				deserializedValue, err := dbutil.DeserializeByValueType(record[i+1], f.ValueType, dbOpt.Backend)
-				if err != nil {
-					errs <- err
-					return
-				}
-				record[i+1] = deserializedValue
-			}
-			stream <- record
-		}
-	}()
-
-	return stream, errs
-}
-
-func buildExportOneGroupQuery(dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt) (string, []interface{}, error) {
-	if opt.CdcTable == nil && opt.UnixMilli == nil {
-		return buildExportBatchQuery(dbOpt, opt), nil, nil
-	}
-	if opt.CdcTable != nil && opt.UnixMilli != nil {
-		return buildExportStreamQuery(dbOpt, opt)
-	}
-	return "", nil, fmt.Errorf("invalid option %+v", opt)
-}
-
-func buildExportBatchQuery(dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt) string {
-	fields := append([]string{opt.EntityName}, opt.Features.Names()...)
-	qt := dbutil.QuoteFn(dbOpt.Backend)
-
-	tableName := qt(opt.SnapshotTable)
-	if dbOpt.Backend == types.BackendBigQuery {
-		tableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, tableName)
-	}
-	query := fmt.Sprintf("SELECT %s FROM %s", qt(fields...), tableName)
-	if opt.Limit != nil {
-		query += fmt.Sprintf(" LIMIT %d", *opt.Limit)
-	}
-	return query
-}
-
-func buildExportStreamQuery(dbOpt dbutil.DBOpt, opt offline.ExportOneGroupOpt) (string, []interface{}, error) {
-	query, err := buildAggregateQuery(aggregateQueryParams{
-		EntityName:            opt.EntityName,
-		UnixMilli:             "unix_milli",
-		FeatureNames:          opt.Features.Names(),
-		PrevSnapshotTableName: opt.SnapshotTable,
-		CurrCdcTableName:      *opt.CdcTable,
-		Backend:               dbOpt.Backend,
-		DatasetID:             dbOpt.DatasetID,
-	})
-	if err != nil {
-		return "", nil, errdefs.WithStack(err)
-	}
-	if opt.Limit != nil {
-		query += fmt.Sprintf(" LIMIT %d", *opt.Limit)
-	}
-	return query, []interface{}{*opt.UnixMilli, *opt.UnixMilli, *opt.UnixMilli, *opt.UnixMilli}, nil
+	header := append([]string{opt.EntityName}, features.FullNames()...)
+	return types.NewExportResult(header, stream, errs), nil
 }

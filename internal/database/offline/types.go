@@ -6,15 +6,6 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-type ExportOneGroupOpt struct {
-	SnapshotTable string
-	CdcTable      *string
-	UnixMilli     *int64
-	EntityName    string
-	Features      types.FeatureList
-	Limit         *uint64
-}
-
 type ExportOpt struct {
 	SnapshotTables map[int]string
 	CdcTables      map[int]string

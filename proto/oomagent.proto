@@ -13,6 +13,7 @@ service OomAgent {
   rpc ChannelImport(stream ChannelImportRequest) returns (ImportResponse) {}
   rpc Import(ImportRequest) returns (ImportResponse) {}
   rpc Push(PushRequest) returns (PushResponse) {}
+  rpc Snapshot(SnapshotRequest) returns (SnapshotResponse) {}
 
   rpc ChannelJoin(stream ChannelJoinRequest) returns (stream ChannelJoinResponse) {}
   rpc Join(JoinRequest) returns (JoinResponse) {}
@@ -104,6 +105,12 @@ message PushRequest {
   repeated Value feature_values = 4;
 }
 
+message SnapshotResponse {}
+
+message SnapshotRequest {
+  string group_name = 1;
+}
+
 message EntityRow {
   string entity_key = 1;
   int64 unix_milli = 2;
@@ -131,7 +138,7 @@ message JoinResponse {}
 
 message ChannelExportRequest {
   repeated string feature_names = 1;
-  int32 revision_id = 2;
+  int64 unix_milli = 2;
   optional uint64 limit = 3;
 }
 
@@ -142,7 +149,7 @@ message ChannelExportResponse {
 
 message ExportRequest {
   repeated string feature_names = 1;
-  int32 revision_id = 2;
+  int64 unix_milli = 2;
   optional uint64 limit = 3;
   string output_file_path = 4;
 }

@@ -154,6 +154,13 @@ func (s *server) Push(ctx context.Context, req *codegen.PushRequest) (*codegen.P
 	return &codegen.PushResponse{}, nil
 }
 
+func (s *server) Snapshot(ctx context.Context, re *codegen.SnapshotRequest) (*codegen.SnapshotResponse, error) {
+	if err := s.oomstore.Snapshot(ctx, re.GroupName); err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &codegen.SnapshotResponse{}, nil
+}
+
 func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codegen.ImportResponse, error) {
 	var description string
 	if req.Description == nil {
@@ -278,10 +285,10 @@ func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.J
 
 func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen.OomAgent_ChannelExportServer) error {
 	ctx := context.Background()
-	exportResult, err := s.oomstore.ChannelExportBatch(ctx, types.ChannelExportBatchOpt{
-		FeatureNames: req.FeatureNames,
-		RevisionID:   int(req.RevisionId),
-		Limit:        req.Limit,
+	exportResult, err := s.oomstore.ChannelExport(ctx, types.ChannelExportOpt{
+		FeatureFullNames: req.FeatureNames,
+		UnixMilli:        req.UnixMilli,
+		Limit:            req.Limit,
 	})
 	if err != nil {
 		return internalError(err.Error())
@@ -309,11 +316,11 @@ func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen
 }
 
 func (s *server) Export(ctx context.Context, req *codegen.ExportRequest) (*codegen.ExportResponse, error) {
-	err := s.oomstore.ExportBatch(ctx, types.ExportBatchOpt{
-		FeatureNames:   req.FeatureNames,
-		RevisionID:     int(req.RevisionId),
-		Limit:          req.Limit,
-		OutputFilePath: req.OutputFilePath,
+	err := s.oomstore.Export(ctx, types.ExportOpt{
+		FeatureFullNames: req.FeatureNames,
+		UnixMilli:        req.UnixMilli,
+		Limit:            req.Limit,
+		OutputFilePath:   req.OutputFilePath,
 	})
 	if err != nil {
 		return nil, internalError(err.Error())
