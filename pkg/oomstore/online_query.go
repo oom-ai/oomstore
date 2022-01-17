@@ -8,19 +8,20 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
 
 // OnlineGet gets online features of a particular entity instance.
 func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*types.FeatureValues, error) {
-	if err := validateFullFeatureNames(opt.FeatureFullNames...); err != nil {
+	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
 		return nil, err
 	}
 	rs := types.FeatureValues{
-		EntityKey:        opt.EntityKey,
-		FeatureFullNames: opt.FeatureFullNames,
-		FeatureValueMap:  make(map[string]interface{}),
+		EntityKey:       opt.EntityKey,
+		FeatureNames:    opt.FeatureNames,
+		FeatureValueMap: make(map[string]interface{}),
 	}
-	features := s.metadata.ListCachedFeature(ctx, &opt.FeatureFullNames)
+	features := s.metadata.ListCachedFeature(ctx, &opt.FeatureNames)
 	if len(features) == 0 {
 		return &rs, nil
 	}
@@ -58,11 +59,11 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 
 // OnlineMultiGet gets online features of multiple entity instances.
 func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetOpt) (map[string]*types.FeatureValues, error) {
-	if err := validateFullFeatureNames(opt.FeatureFullNames...); err != nil {
+	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
 		return nil, err
 	}
 	result := make(map[string]*types.FeatureValues)
-	features := s.metadata.ListCachedFeature(ctx, &opt.FeatureFullNames)
+	features := s.metadata.ListCachedFeature(ctx, &opt.FeatureNames)
 	if len(features) == 0 {
 		return result, nil
 	}
@@ -84,10 +85,10 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 
 	for _, entityKey := range opt.EntityKeys {
 		result[entityKey] = &types.FeatureValues{
-			EntityName:       entity.Name,
-			EntityKey:        entityKey,
-			FeatureFullNames: opt.FeatureFullNames,
-			FeatureValueMap:  make(map[string]interface{}),
+			EntityName:      entity.Name,
+			EntityKey:       entityKey,
+			FeatureNames:    opt.FeatureNames,
+			FeatureValueMap: make(map[string]interface{}),
 		}
 		for featureName, featureValue := range featureValueMap[entityKey] {
 			result[entityKey].FeatureValueMap[featureName] = featureValue

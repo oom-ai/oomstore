@@ -46,8 +46,8 @@ func TestChannelExport(t *testing.T) {
 		{
 			description: "provide multiple features, should return multiple feature values",
 			opt: types.ChannelExportOpt{
-				FeatureFullNames: []string{"model", "price"},
-				UnixMilli:        100,
+				FeatureNames: []string{"model", "price"},
+				UnixMilli:    100,
 			},
 			features:     features,
 			exportStream: prepareTwoFeatureStream(),
@@ -56,8 +56,8 @@ func TestChannelExport(t *testing.T) {
 		{
 			description: "provide no features, should return empty values",
 			opt: types.ChannelExportOpt{
-				FeatureFullNames: []string{},
-				UnixMilli:        100,
+				FeatureNames: []string{},
+				UnixMilli:    100,
 			},
 			features:     features,
 			exportStream: prepareEmptyStream(),
@@ -67,8 +67,8 @@ func TestChannelExport(t *testing.T) {
 		{
 			description: "provide one feature, should return one feature values",
 			opt: types.ChannelExportOpt{
-				FeatureFullNames: []string{"price"},
-				UnixMilli:        100,
+				FeatureNames: []string{"price"},
+				UnixMilli:    100,
 			},
 			features:     features[1:],
 			exportStream: prepareOneFeatureStream(),
@@ -80,7 +80,7 @@ func TestChannelExport(t *testing.T) {
 			t.Skip()
 			metadataStore.EXPECT().Refresh().Return(nil).AnyTimes()
 
-			if len(tc.opt.FeatureFullNames) == 0 {
+			if len(tc.opt.FeatureNames) == 0 {
 				metadataStore.EXPECT().GetGroupByName(ctx, "device_info").Return(&types.Group{
 					Name: "device_info",
 					ID:   1,

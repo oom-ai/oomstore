@@ -192,7 +192,7 @@ func TestListCachedFeature(t *testing.T, prepareStore PrepareStoreFn, destroySto
 	features = store.ListCachedFeature(ctx, nil)
 	assert.Equal(t, 1, features.Len())
 
-	// case 8: list features by FeatureFullNames
+	// case 8: list features by FeatureNames
 	features = store.ListCachedFeature(ctx, &[]string{"device_info.phone"})
 	assert.Equal(t, 1, len(features))
 }

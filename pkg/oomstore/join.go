@@ -14,12 +14,13 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
 
 // ChannelJoin gets point-in-time correct feature values for each entity row.
 // Currently, this API only supports batch features.
 func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*types.JoinResult, error) {
-	if err := validateFullFeatureNames(opt.FeatureFullNames...); err != nil {
+	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
 		return nil, err
 	}
 	data := make(chan []interface{})
@@ -29,7 +30,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 		Data: data,
 	}
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
-		FeatureFullNames: &opt.FeatureFullNames,
+		FeatureNames: &opt.FeatureNames,
 	})
 	if err != nil {
 		return nil, err
@@ -74,7 +75,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 // Input File should contain header, the first two columns of Input File should be
 // entity_key, unix_milli, then followed by other real-time feature values.
 func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) error {
-	if err := validateFullFeatureNames(opt.FeatureFullNames...); err != nil {
+	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
 		return err
 	}
 	entityRows, header, err := GetEntityRowsFromInputFile(opt.InputFilePath)
@@ -83,9 +84,9 @@ func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) error {
 	}
 
 	joinResult, err := s.ChannelJoin(ctx, types.ChannelJoinOpt{
-		FeatureFullNames: opt.FeatureFullNames,
-		EntityRows:       entityRows,
-		ValueNames:       header[2:],
+		FeatureNames: opt.FeatureNames,
+		EntityRows:   entityRows,
+		ValueNames:   header[2:],
 	})
 	if err != nil {
 		return err

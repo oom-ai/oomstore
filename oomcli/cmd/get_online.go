@@ -43,7 +43,7 @@ func init() {
 	flags.StringSliceVarP(&multiGetOpt.EntityKeys, "entity-keys", "k", nil, "entity keys")
 	_ = getOnlineCmd.MarkFlagRequired("entity-keys")
 
-	flags.StringSliceVar(&multiGetOpt.FeatureFullNames, "feature", nil, "feature full names")
+	flags.StringSliceVar(&multiGetOpt.FeatureNames, "feature", nil, "feature full names")
 	_ = getOnlineCmd.MarkFlagRequired("feature")
 }
 
@@ -67,7 +67,7 @@ func printOnlineFeaturesInCSV(featureValues map[string]*types.FeatureValues) err
 		w = csv.NewWriter(os.Stdout)
 
 		keys   = entityKeys(featureValues)
-		header = append([]string{featureValues[keys[0]].EntityName}, featureValues[keys[0]].FeatureFullNames...)
+		header = append([]string{featureValues[keys[0]].EntityName}, featureValues[keys[0]].FeatureNames...)
 	)
 
 	if err := w.Write(header); err != nil {
@@ -94,7 +94,7 @@ func printOnlineFeaturesInASCIITable(featureValues map[string]*types.FeatureValu
 		table = tablewriter.NewWriter(os.Stdout)
 
 		keys   = entityKeys(featureValues)
-		header = append([]string{featureValues[keys[0]].EntityName}, featureValues[keys[0]].FeatureFullNames...)
+		header = append([]string{featureValues[keys[0]].EntityName}, featureValues[keys[0]].FeatureNames...)
 	)
 	table.SetAutoFormatHeaders(false)
 	table.SetHeader(header)

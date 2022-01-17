@@ -8,14 +8,14 @@ type CreateFeatureOpt struct {
 }
 
 type ListFeatureOpt struct {
-	EntityName       *string
-	GroupName        *string
-	FeatureFullNames *[]string
+	EntityName   *string
+	GroupName    *string
+	FeatureNames *[]string
 }
 
 type UpdateFeatureOpt struct {
-	FeatureFullName string
-	NewDescription  *string
+	FeatureName    string
+	NewDescription *string
 }
 
 type CreateEntityOpt struct {
@@ -31,38 +31,38 @@ type CreateGroupOpt struct {
 }
 
 type ChannelExportOpt struct {
-	FeatureFullNames []string
-	UnixMilli        int64
-	Limit            *uint64
+	FeatureNames []string
+	UnixMilli    int64
+	Limit        *uint64
 }
 
 type ExportOpt struct {
-	FeatureFullNames []string
-	UnixMilli        int64
-	Limit            *uint64
-	OutputFilePath   string
+	FeatureNames   []string
+	UnixMilli      int64
+	Limit          *uint64
+	OutputFilePath string
 }
 
 type OnlineGetOpt struct {
-	FeatureFullNames []string
-	EntityKey        string
+	FeatureNames []string
+	EntityKey    string
 }
 
 type OnlineMultiGetOpt struct {
-	FeatureFullNames []string
-	EntityKeys       []string
+	FeatureNames []string
+	EntityKeys   []string
 }
 
 type ChannelJoinOpt struct {
-	FeatureFullNames []string
-	EntityRows       <-chan EntityRow
-	ValueNames       []string
+	FeatureNames []string
+	EntityRows   <-chan EntityRow
+	ValueNames   []string
 }
 
 type JoinOpt struct {
-	FeatureFullNames []string
-	InputFilePath    string
-	OutputFilePath   string
+	FeatureNames   []string
+	InputFilePath  string
+	OutputFilePath string
 }
 
 type UpdateEntityOpt struct {
@@ -82,8 +82,10 @@ type SyncOpt struct {
 }
 
 type PushOpt struct {
-	EntityKey     string
-	GroupName     string
+	EntityKey string
+	GroupName string
+
+	// feature names without group prefix
 	FeatureNames  []string
 	FeatureValues []interface{}
 }
