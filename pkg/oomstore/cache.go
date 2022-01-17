@@ -138,14 +138,15 @@ func (p *StreamPushProcessor) pushToOffline(ctx context.Context, s *OomStore, gr
 		buckets[revision] = append(buckets[revision], record)
 	}
 	for revision, records := range buckets {
-		err = s.offline.Push(ctx, offline.PushOpt{
+		pushOpt := offline.PushOpt{
 			GroupID:      groupID,
 			Revision:     revision,
 			EntityName:   entity.Name,
 			FeatureNames: features.Names(),
 			Records:      records,
-		})
-		if err != nil {
+		}
+
+		if err = s.offline.Push(ctx, pushOpt); err != nil {
 			if !errdefs.IsNotFound(err) {
 				return err
 			}
@@ -154,13 +155,7 @@ func (p *StreamPushProcessor) pushToOffline(ctx context.Context, s *OomStore, gr
 				return err
 			}
 			// push data to new offline stream cdc table
-			if err = s.offline.Push(ctx, offline.PushOpt{
-				GroupID:      groupID,
-				Revision:     revision,
-				EntityName:   entity.Name,
-				FeatureNames: features.Names(),
-				Records:      records,
-			}); err != nil {
+			if err = s.offline.Push(ctx, pushOpt); err != nil {
 				return err
 			}
 		}
