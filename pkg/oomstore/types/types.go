@@ -7,6 +7,14 @@ const (
 	CategoryStream Category = "stream"
 )
 
+type TableType = string
+
+const (
+	TableBatchSnapshot  TableType = "batch_snapshot"
+	TableStreamSnapshot TableType = "stream_snapshot"
+	TableStreamCdc      TableType = "stream_cdc"
+)
+
 type ExportRecord []interface{}
 
 func (r ExportRecord) EntityKey() string {

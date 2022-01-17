@@ -74,5 +74,5 @@ type CreateTableOpt struct {
 	TableName string
 	Entity    *types.Entity
 	Features  types.FeatureList
-	IsCDC     bool
+	TableType types.TableType
 }

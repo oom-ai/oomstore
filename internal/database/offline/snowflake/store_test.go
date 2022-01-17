@@ -105,3 +105,7 @@ func TestTableSchema(t *testing.T) {
 	}
 	require.ElementsMatch(t, expected.Fields, actual.Fields)
 }
+
+func TestCreateTable(t *testing.T) {
+	test_impl.TestCreateTable(t, prepareStore, destroyStore(DATABASE))
+}

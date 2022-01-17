@@ -26,12 +26,12 @@ func (c ColumnList) Names() []string {
 func BuildTableSchema(
 	tableName string,
 	entity *types.Entity,
-	isCDC bool,
+	hasUnixMilli bool,
 	features types.FeatureList,
 	pkFields []string,
 	backend types.BackendType,
 ) string {
-	columns := parseColumns(entity, isCDC, features, backend)
+	columns := parseColumns(entity, hasUnixMilli, features, backend)
 	return createTableDDL(tableName, columns, pkFields, backend)
 }
 
@@ -82,7 +82,7 @@ func BuildIndexDDL(tableName string, indexName string, fields []string, backend 
 	}
 }
 
-func parseColumns(entity *types.Entity, isCDC bool, features types.FeatureList, backend types.BackendType) (rs []Column) {
+func parseColumns(entity *types.Entity, hasUnixMilli bool, features types.FeatureList, backend types.BackendType) (rs []Column) {
 	// entity column
 	{
 		c := Column{Name: entity.Name, ValueType: types.String}
@@ -101,7 +101,7 @@ func parseColumns(entity *types.Entity, isCDC bool, features types.FeatureList, 
 
 	// unix_milli column
 	{
-		if isCDC {
+		if hasUnixMilli {
 			valueType := types.Int64
 			dbType, err := DBValueType(backend, valueType)
 			if err != nil {

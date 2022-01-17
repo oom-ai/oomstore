@@ -107,3 +107,7 @@ func TestSnapshot(t *testing.T) {
 	t.Skip()
 	test_impl.TestSnapshot(t, prepareStore, destroyStore(DATASET_ID))
 }
+
+func TestCreateTable(t *testing.T) {
+	test_impl.TestCreateTable(t, prepareStore, destroyStore(DATASET_ID))
+}

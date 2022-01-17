@@ -2,6 +2,7 @@ package redshift
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -59,7 +60,21 @@ func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
 }
 
 func (db *DB) CreateTable(ctx context.Context, opt offline.CreateTableOpt) error {
-	return sqlutil.CreateTable(ctx, db.DB, opt, Backend)
+	var hasUnixMilli bool
+	switch opt.TableType {
+	case types.TableBatchSnapshot:
+		hasUnixMilli = false
+	case types.TableStreamSnapshot, types.TableStreamCdc:
+		hasUnixMilli = true
+	default:
+		panic(fmt.Sprintf("unsupported table type %s", opt.TableType))
+	}
+
+	schema := dbutil.BuildTableSchema(opt.TableName, opt.Entity, hasUnixMilli, opt.Features, nil, Backend)
+	if _, err := db.ExecContext(ctx, schema); err != nil {
+		return errdefs.WithStack(err)
+	}
+	return nil
 }
 
 func (db *DB) Push(ctx context.Context, opt offline.PushOpt) error {

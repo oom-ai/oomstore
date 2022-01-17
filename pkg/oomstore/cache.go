@@ -184,7 +184,7 @@ func (p *StreamPushProcessor) newRevision(ctx context.Context, s *OomStore, grou
 		TableName: dbutil.OfflineStreamCdcTableName(groupID, revision),
 		Entity:    entity,
 		Features:  features,
-		IsCDC:     true,
+		TableType: types.TableStreamCdc,
 	}); err != nil {
 		return err
 	}
