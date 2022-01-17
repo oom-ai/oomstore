@@ -2,9 +2,6 @@ package oomstore
 
 import (
 	"context"
-	"strings"
-
-	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -60,7 +57,7 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 
 // Update metadata of a feature.
 func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
-	if err := validateFullFeatureNames(opt.FeatureName); err != nil {
+	if err := util.ValidateFullFeatureNames(opt.FeatureName); err != nil {
 		return err
 	}
 	feature, err := s.GetFeatureByFullName(ctx, opt.FeatureName)
@@ -105,14 +102,4 @@ func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt
 	}
 
 	return id, nil
-}
-
-func validateFullFeatureNames(fullnames ...string) error {
-	for _, fullname := range fullnames {
-		nameSlice := strings.Split(fullname, util.SepFullFeatureName)
-		if len(nameSlice) != 2 {
-			return errdefs.Errorf("invalid full feature name: '%s'", fullname)
-		}
-	}
-	return nil
 }

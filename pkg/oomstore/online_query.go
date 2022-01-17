@@ -8,11 +8,12 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
 
 // OnlineGet gets online features of a particular entity instance.
 func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*types.FeatureValues, error) {
-	if err := validateFullFeatureNames(opt.FeatureNames...); err != nil {
+	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
 		return nil, err
 	}
 	rs := types.FeatureValues{
@@ -58,7 +59,7 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 
 // OnlineMultiGet gets online features of multiple entity instances.
 func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetOpt) (map[string]*types.FeatureValues, error) {
-	if err := validateFullFeatureNames(opt.FeatureNames...); err != nil {
+	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
 		return nil, err
 	}
 	result := make(map[string]*types.FeatureValues)

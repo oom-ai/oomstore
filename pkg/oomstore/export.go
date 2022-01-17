@@ -10,6 +10,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
 
 /*
@@ -26,7 +27,7 @@ Usage Example:
 	return exportResult.CheckStreamError()
 */
 func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt) (*types.ExportResult, error) {
-	if err := validateFullFeatureNames(opt.FeatureNames...); err != nil {
+	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
 		return nil, err
 	}
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
