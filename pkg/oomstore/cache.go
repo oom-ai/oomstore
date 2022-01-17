@@ -149,7 +149,18 @@ func (p *StreamPushProcessor) pushToOffline(ctx context.Context, s *OomStore, gr
 			if !errdefs.IsNotFound(err) {
 				return err
 			}
+
 			if err = p.newRevision(ctx, s, groupID, revision); err != nil {
+				return err
+			}
+			// push data to new offline stream cdc table
+			if err = s.offline.Push(ctx, offline.PushOpt{
+				GroupID:      groupID,
+				Revision:     revision,
+				EntityName:   entity.Name,
+				FeatureNames: features.Names(),
+				Records:      records,
+			}); err != nil {
 				return err
 			}
 		}
