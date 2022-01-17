@@ -13,5 +13,5 @@ pub enum OomError {
     IntConversionError(#[from] num::TryFromIntError),
 
     #[error("unknown error")]
-    Unknown,
+    Unknown(String),
 }
