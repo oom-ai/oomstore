@@ -68,10 +68,13 @@ func BuildIndexDDL(tableName string, indexName string, fields []string, backend 
 	qt := QuoteFn(backend)
 	switch backend {
 	case types.BackendCassandra,
-		types.BackendPostgres,
 		types.BackendMySQL,
 		types.BackendSQLite:
 		return fmt.Sprintf("CREATE INDEX %s ON %s (%s)", qt(indexName), qt(tableName), qt(fields...))
+	case types.BackendPostgres:
+		// omit the name when creating the index, and PG will assign a unique name automatically.
+		// see: https://stackoverflow.com/a/27307016/16428442
+		return fmt.Sprintf("CREATE INDEX ON %s (%s)", qt(tableName), qt(fields...))
 	case types.BackendSnowflake:
 		return fmt.Sprintf("ALTER TABLE %s CLUSTER BY (%s)", qt(tableName), qt(fields...))
 	default:
