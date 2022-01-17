@@ -14,7 +14,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-var defaultStreamPushProcessorCfg = types.StreamPushProcessorConfig{
+var defaultPushProcessorCfg = types.PushProcessorConfig{
 	RevisionInterval: 24 * time.Hour,
 	Period:           5 * time.Minute,
 	MinPeriod:        2 * time.Minute,
@@ -27,7 +27,7 @@ type GroupBuffer struct {
 	lastPush time.Time
 }
 
-type StreamPushProcessor struct {
+type PushProcessor struct {
 	bufferSize      int
 	minPeriod       time.Duration
 	revisionInteval time.Duration
@@ -39,11 +39,11 @@ type StreamPushProcessor struct {
 	buffer sync.Map // GroupID -> GroupBuffer
 }
 
-func (s *OomStore) InitStreamPushProcessor(ctx context.Context, cfg *types.StreamPushProcessorConfig) {
+func (s *OomStore) InitPushProcessor(ctx context.Context, cfg *types.PushProcessorConfig) {
 	if cfg == nil {
-		cfg = &defaultStreamPushProcessorCfg
+		cfg = &defaultPushProcessorCfg
 	}
-	processor := &StreamPushProcessor{
+	processor := &PushProcessor{
 		bufferSize:      cfg.BufferSize,
 		minPeriod:       cfg.MinPeriod,
 		revisionInteval: cfg.RevisionInterval,
@@ -53,7 +53,7 @@ func (s *OomStore) InitStreamPushProcessor(ctx context.Context, cfg *types.Strea
 		ch:     make(chan types.StreamRecord),
 		ticker: time.NewTicker(cfg.Period),
 	}
-	s.streamPushProcessor = processor
+	s.pushProcessor = processor
 
 	go func() {
 		defer func() {
@@ -103,7 +103,7 @@ func (s *OomStore) InitStreamPushProcessor(ctx context.Context, cfg *types.Strea
 	}()
 }
 
-func (p *StreamPushProcessor) Close() error {
+func (p *PushProcessor) Close() error {
 	p.ticker.Stop()
 	p.notifyQuit <- struct{}{}
 
@@ -111,7 +111,7 @@ func (p *StreamPushProcessor) Close() error {
 	return nil
 }
 
-func (p *StreamPushProcessor) Push(record types.StreamRecord) {
+func (p *PushProcessor) Push(record types.StreamRecord) {
 	if _, ok := p.buffer.Load(record.GroupID); !ok {
 		p.buffer.Store(record.GroupID, GroupBuffer{
 			groupID: record.GroupID,
@@ -121,7 +121,7 @@ func (p *StreamPushProcessor) Push(record types.StreamRecord) {
 	p.ch <- record
 }
 
-func (p *StreamPushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID int) error {
+func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID int) error {
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		GroupID: &groupID,
 	})
@@ -171,7 +171,7 @@ func (p *StreamPushProcessor) pushToOffline(ctx context.Context, s *OomStore, gr
 	return err
 }
 
-func (p *StreamPushProcessor) newRevision(ctx context.Context, s *OomStore, groupID int, revision int64) error {
+func (p *PushProcessor) newRevision(ctx context.Context, s *OomStore, groupID int, revision int64) error {
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		GroupID: &groupID,
 	})
@@ -202,6 +202,6 @@ func (p *StreamPushProcessor) newRevision(ctx context.Context, s *OomStore, grou
 	return nil
 }
 
-func (p *StreamPushProcessor) lastRevision(unixMill int64) int64 {
+func (p *PushProcessor) lastRevision(unixMill int64) int64 {
 	return (unixMill / p.revisionInteval.Milliseconds()) * p.revisionInteval.Milliseconds()
 }
