@@ -109,10 +109,11 @@ func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup
 		}
 
 		id, err := tx.CreateGroup(ctx, metadata.CreateGroupOpt{
-			GroupName:   newGroup.Name,
-			EntityID:    entity.ID,
-			Category:    newGroup.Category,
-			Description: newGroup.Description,
+			GroupName:        newGroup.Name,
+			EntityID:         entity.ID,
+			Category:         newGroup.Category,
+			SnapshotInterval: int(newGroup.SnapshotInterval.Seconds()),
+			Description:      newGroup.Description,
 		})
 		if err != nil {
 			return nil, err
@@ -129,13 +130,26 @@ func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup
 		return nil, nil
 	}
 
+	opt := metadata.UpdateGroupOpt{
+		GroupID: group.ID,
+	}
 	if newGroup.Description != group.Description {
+		opt.NewDescription = &newGroup.Description
+	}
+	if newGroup.Category == types.CategoryStream && newGroup.SnapshotInterval != 0 {
+		second := int(newGroup.SnapshotInterval.Seconds())
+		opt.NewSnapshotInterval = &second
+	}
+
+	if opt.NewDescription != nil || opt.NewSnapshotInterval != nil {
 		return nil, tx.UpdateGroup(ctx, metadata.UpdateGroupOpt{
-			GroupID:        group.ID,
-			NewDescription: &newGroup.Description,
+			GroupID:             group.ID,
+			NewSnapshotInterval: opt.NewSnapshotInterval,
+			NewDescription:      &newGroup.Description,
 		})
 
 	}
+
 	return nil, nil
 }
 
@@ -217,8 +231,8 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 		switch kind {
 		case "Entity":
 			var entity apply.Entity
-			if err := mapstructure.Decode(data, &entity); err != nil {
-				return nil, err
+			if err := mapstructureDecode(data, &entity); err != nil {
+				return nil, errdefs.WithStack(err)
 			}
 
 			stage.NewEntities = append(stage.NewEntities, buildApplyEntity(entity))
@@ -232,8 +246,8 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 			}
 		case "Group":
 			var group apply.Group
-			if err := mapstructure.Decode(data, &group); err != nil {
-				return nil, err
+			if err := mapstructureDecode(data, &group); err != nil {
+				return nil, errdefs.WithStack(err)
 			}
 
 			stage.NewGroups = append(stage.NewGroups, buildApplyGroup(group, group.EntityName))
@@ -244,8 +258,8 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 
 		case "Feature":
 			var feature apply.Feature
-			if err := mapstructure.Decode(data, &feature); err != nil {
-				return nil, err
+			if err := mapstructureDecode(data, &feature); err != nil {
+				return nil, errdefs.WithStack(err)
 			}
 			stage.NewFeatures = append(stage.NewFeatures, feature)
 
@@ -257,7 +271,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 			switch itemsKind {
 			case "Feature":
 				featureItems := apply.FeatureItems{}
-				if err := mapstructure.Decode(data, &featureItems); err != nil {
+				if err := mapstructureDecode(data, &featureItems); err != nil {
 					return nil, err
 				}
 				for _, item := range featureItems.Items {
@@ -265,7 +279,7 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 				}
 			case "Group":
 				groupItems := apply.GroupItems{}
-				if err := mapstructure.Decode(data, &groupItems); err != nil {
+				if err := mapstructureDecode(data, &groupItems); err != nil {
 					return nil, err
 				}
 				for _, group := range groupItems.Items {
@@ -277,9 +291,10 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 				}
 			case "Entity":
 				entityItems := apply.EntityItems{}
-				if err := mapstructure.Decode(data, &entityItems); err != nil {
+				if err := mapstructureDecode(data, &entityItems); err != nil {
 					return nil, err
 				}
+
 				for _, entity := range entityItems.Items {
 					stage.NewEntities = append(stage.NewEntities, buildApplyEntity(entity))
 
@@ -299,6 +314,20 @@ func buildApplyStage(ctx context.Context, opt apply.ApplyOpt) (*apply.ApplyStage
 	return stage, nil
 }
 
+func mapstructureDecode(data map[string]interface{}, result interface{}) error {
+	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		DecodeHook: mapstructure.StringToTimeDurationHookFunc(),
+		Result:     result,
+	})
+	if err != nil {
+		return errdefs.WithStack(err)
+	}
+	if err := dec.Decode(data); err != nil {
+		return errdefs.WithStack(err)
+	}
+	return nil
+}
+
 func parseKind(data map[string]interface{}) (string, error) {
 	if k, ok := data["kind"]; ok {
 		return cast.ToString(k), nil
@@ -311,7 +340,7 @@ func parseKind(data map[string]interface{}) (string, error) {
 
 func parseItemsKind(data map[string]interface{}) (string, error) {
 	items := apply.Items{}
-	if err := mapstructure.Decode(data, &items); err != nil {
+	if err := mapstructureDecode(data, &items); err != nil {
 		return "", err
 	}
 	return items.Kind(), nil
@@ -331,11 +360,12 @@ func buildApplyGroup(group apply.Group, entityName string) apply.Group {
 	// We don't want group.Features to have values.
 	// The whole stage should be a flat structure, not a nested structure.
 	return apply.Group{
-		Kind:        "Group",
-		Name:        group.Name,
-		EntityName:  entityName,
-		Category:    group.Category,
-		Description: group.Description,
+		Kind:             "Group",
+		Name:             group.Name,
+		EntityName:       entityName,
+		Category:         group.Category,
+		SnapshotInterval: group.SnapshotInterval,
+		Description:      group.Description,
 	}
 }
 
