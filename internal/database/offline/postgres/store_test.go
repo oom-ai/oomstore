@@ -37,6 +37,10 @@ func TestImport(t *testing.T) {
 	test_impl.TestImport(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
+func TestImportStream(t *testing.T) {
+	test_impl.TestImportStream(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
+}
+
 func TestExport(t *testing.T) {
 	test_impl.TestExport(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }

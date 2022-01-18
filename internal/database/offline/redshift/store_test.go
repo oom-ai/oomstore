@@ -86,6 +86,10 @@ func TestImport(t *testing.T) {
 	test_impl.TestImport(t, prepareStore, destroyStore(DATABASE))
 }
 
+func TestImportStream(t *testing.T) {
+	test_impl.TestImportStream(t, prepareStore, destroyStore(DATABASE))
+}
+
 func TestJoin(t *testing.T) {
 	test_impl.TestJoin(t, prepareStore, destroyStore(DATABASE))
 }

@@ -49,8 +49,8 @@ func TestSnapshot(t *testing.T) {
 	test_impl.TestSnapshot(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
-func TestPush(t *testing.T) {
-	test_impl.TestPush(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
+func TestImportStream(t *testing.T) {
+	test_impl.TestImportStream(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
 func TestTableSchema(t *testing.T) {
