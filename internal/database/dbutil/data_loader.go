@@ -1,7 +1,6 @@
 package dbutil
 
 import (
-	"bufio"
 	"context"
 	"io"
 	"strings"
@@ -13,53 +12,81 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
+type LoadDataFromSourceOpt struct {
+	Source    *offline.CSVSource
+	Entity    *types.Entity
+	TableName string
+	Header    []string
+	Features  types.FeatureList
+	Backend   types.BackendType
+}
+
 // Currying
-func LoadDataFromSource(backendType types.BackendType, batchSize int) func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, features types.FeatureList) error {
-	return func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, features types.FeatureList) error {
-		return loadDataFromSource(tx, ctx, source, tableName, header, features, backendType, batchSize)
+func LoadDataFromSource(backend types.BackendType, batchSize int) func(tx *sqlx.Tx, ctx context.Context, opt LoadDataFromSourceOpt) error {
+	return func(tx *sqlx.Tx, ctx context.Context, opt LoadDataFromSourceOpt) error {
+		return loadDataFromSource(tx, ctx, opt, batchSize)
 	}
 }
 
-func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, features types.FeatureList, backendType types.BackendType, batchSize int) error {
+func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, opt LoadDataFromSourceOpt, batchSize int) error {
 	records := make([]interface{}, 0, batchSize)
 	for {
-		record, err := ReadLine(source.Reader, source.Delimiter, features, backendType)
+		record, err := ReadLine(ReadLineOpt{
+			Source:   opt.Source,
+			Entity:   opt.Entity,
+			Header:   opt.Header,
+			Features: opt.Features,
+			Backend:  opt.Backend,
+		})
 		if errdefs.Cause(err) == io.EOF {
 			break
 		}
 		if err != nil {
 			return err
 		}
-		if len(record) != len(header) {
+		if len(record) != len(opt.Header) {
 			continue
 		}
 		records = append(records, record)
 		if len(records) == batchSize {
-			if err := InsertRecordsToTableTx(tx, ctx, tableName, records, header, backendType); err != nil {
+			if err := InsertRecordsToTableTx(tx, ctx, opt.TableName, records, opt.Header, opt.Backend); err != nil {
 				return err
 			}
 			records = make([]interface{}, 0, batchSize)
 		}
 	}
-	if err := InsertRecordsToTableTx(tx, ctx, tableName, records, header, backendType); err != nil {
+	if err := InsertRecordsToTableTx(tx, ctx, opt.TableName, records, opt.Header, opt.Backend); err != nil {
 		return err
 	}
 	return nil
 }
 
-func ReadLine(reader *bufio.Reader, delimiter string, features types.FeatureList, backend types.BackendType) ([]interface{}, error) {
-	row, err := reader.ReadString('\n')
+type ReadLineOpt struct {
+	Source   *offline.CSVSource
+	Entity   *types.Entity
+	Header   []string
+	Features types.FeatureList
+	Backend  types.BackendType
+}
+
+func ReadLine(opt ReadLineOpt) ([]interface{}, error) {
+	row, err := opt.Source.Reader.ReadString('\n')
 	if err != nil {
 		return nil, errdefs.WithStack(err)
 	}
-	rowSlice := strings.Split(strings.Trim(row, "\n"), delimiter)
+	rowSlice := strings.Split(strings.Trim(row, "\n"), opt.Source.Delimiter)
 	line := make([]interface{}, 0, len(rowSlice))
 	for i, ele := range rowSlice {
-		if i == 0 || len(features) == 0 {
+		if len(opt.Header) == 0 || len(opt.Features) == 0 || opt.Header[i] == opt.Entity.Name {
 			// entity_key doesn't need to change type
 			line = append(line, ele)
+		} else if opt.Header[i] == "unix_milli" {
+			line = append(line, castElement(ele, types.Int64, opt.Backend))
 		} else {
-			line = append(line, castElement(ele, features[i-1].ValueType, backend))
+			feature := opt.Features.Find(func(f *types.Feature) bool {
+				return f.Name == opt.Header[i]
+			})
+			line = append(line, castElement(ele, feature.ValueType, opt.Backend))
 		}
 	}
 	return line, nil

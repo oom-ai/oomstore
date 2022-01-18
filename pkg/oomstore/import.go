@@ -46,8 +46,14 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) (int, error) {
 	//make sure csv data source has all defined columns
 	reader := bufio.NewReader(dataSource.Reader)
+	source := &offline.CSVSource{
+		Reader:    reader,
+		Delimiter: dataSource.Delimiter,
+	}
 	// read header does not need pass down features
-	header, err := dbutil.ReadLine(reader, dataSource.Delimiter, nil, "")
+	header, err := dbutil.ReadLine(dbutil.ReadLineOpt{
+		Source: source,
+	})
 	if err != nil {
 		return 0, err
 	}
@@ -76,10 +82,7 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 		Header:            cast.ToStringSlice(header),
 		Revision:          opt.Revision,
 		SnapshotTableName: snapshotTableName,
-		Source: &offline.CSVSource{
-			Reader:    reader,
-			Delimiter: dataSource.Delimiter,
-		},
+		Source:            source,
 	})
 	if err != nil {
 		return 0, err

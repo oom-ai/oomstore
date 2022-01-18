@@ -12,9 +12,9 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-type LoadData func(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, features types.FeatureList) error
+type LoadData func(tx *sqlx.Tx, ctx context.Context, opt dbutil.LoadDataFromSourceOpt) error
 
-func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData LoadData, backendType types.BackendType) (int64, error) {
+func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData LoadData, backend types.BackendType) (int64, error) {
 	var revision int64
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
@@ -22,14 +22,21 @@ func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData Lo
 		if opt.NoPK {
 			pkFields = nil
 		}
-		schema := dbutil.BuildTableSchema(opt.SnapshotTableName, opt.Entity, false, opt.Features, pkFields, backendType)
+		schema := dbutil.BuildTableSchema(opt.SnapshotTableName, opt.Entity, false, opt.Features, pkFields, backend)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return errdefs.WithStack(err)
 		}
 
 		// populate the data table
-		err = loadData(tx, ctx, opt.Source, opt.SnapshotTableName, opt.Header, opt.Features)
+		err = loadData(tx, ctx, dbutil.LoadDataFromSourceOpt{
+			Source:    opt.Source,
+			Entity:    opt.Entity,
+			TableName: opt.SnapshotTableName,
+			Header:    opt.Header,
+			Features:  opt.Features,
+			Backend:   backend,
+		})
 		if err != nil {
 			return err
 		}
