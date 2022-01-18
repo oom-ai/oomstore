@@ -15,9 +15,8 @@ import (
 )
 
 var defaultPushProcessorCfg = types.PushProcessorConfig{
-	RevisionInterval: 24 * time.Hour,
-	FlushInterval:    2 * time.Minute,
-	BufferSize:       1000,
+	FlushInterval: 2 * time.Minute,
+	BufferSize:    1000,
 }
 
 type GroupBuffer struct {
@@ -27,11 +26,10 @@ type GroupBuffer struct {
 }
 
 type PushProcessor struct {
-	bufferSize      int
-	flushInterval   time.Duration
-	revisionInteval time.Duration
-	notifyQuit      chan struct{}
-	waitQuit        chan struct{}
+	bufferSize    int
+	flushInterval time.Duration
+	notifyQuit    chan struct{}
+	waitQuit      chan struct{}
 
 	ticker *time.Ticker
 	ch     chan types.StreamRecord
@@ -51,11 +49,10 @@ func (s *OomStore) InitPushProcessor(ctx context.Context, cfg *types.PushProcess
 	}
 
 	processor := &PushProcessor{
-		bufferSize:      cfg.BufferSize,
-		flushInterval:   cfg.FlushInterval,
-		revisionInteval: cfg.RevisionInterval,
-		notifyQuit:      make(chan struct{}),
-		waitQuit:        make(chan struct{}),
+		bufferSize:    cfg.BufferSize,
+		flushInterval: cfg.FlushInterval,
+		notifyQuit:    make(chan struct{}),
+		waitQuit:      make(chan struct{}),
 
 		ch:     make(chan types.StreamRecord),
 		ticker: time.NewTicker(tickInterval),
@@ -139,10 +136,14 @@ func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID 
 
 	value, _ := p.buffer.Load(groupID)
 	b := value.(GroupBuffer)
+	group, err := s.metadata.GetGroup(ctx, groupID)
+	if err != nil {
+		return err
+	}
 
 	buckets := make(map[int64][]types.StreamRecord)
 	for _, record := range b.records {
-		revision := p.lastRevision(record.UnixMilli)
+		revision := p.lastRevision(int64(group.SnapshotInterval), record.UnixMilli)
 		if _, ok := buckets[revision]; !ok {
 			buckets[revision] = make([]types.StreamRecord, 0)
 		}
@@ -209,6 +210,6 @@ func (p *PushProcessor) newRevision(ctx context.Context, s *OomStore, groupID in
 	return nil
 }
 
-func (p *PushProcessor) lastRevision(unixMill int64) int64 {
-	return (unixMill / p.revisionInteval.Milliseconds()) * p.revisionInteval.Milliseconds()
+func (p *PushProcessor) lastRevision(snapshotInterval int64, unixMill int64) int64 {
+	return (unixMill / snapshotInterval) * snapshotInterval
 }

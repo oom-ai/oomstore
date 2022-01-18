@@ -31,9 +31,8 @@ type OomStoreConfig struct {
 }
 
 type PushProcessorConfig struct {
-	BufferSize       int           `yaml:"buffer-size"`
-	FlushInterval    time.Duration `yaml:"flush-interval"`
-	RevisionInterval time.Duration `yaml:"revision-interval"`
+	BufferSize    int           `yaml:"buffer-size"`
+	FlushInterval time.Duration `yaml:"flush-interval"`
 }
 
 type OnlineStoreConfig struct {
