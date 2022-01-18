@@ -1,27 +1,27 @@
 pub mod error;
 mod util;
 
-use crate::oomagent::{ChannelExportResponse, JoinRequest};
-use std::{collections::HashMap, path::Path};
-
 use error::OomError;
 use futures_core::stream::Stream;
-use google::protobuf::Empty;
 use oomagent::{
     oom_agent_client::OomAgentClient,
     ChannelExportRequest,
+    ChannelExportResponse,
     ChannelImportRequest,
     ChannelJoinRequest,
     ChannelJoinResponse,
     ExportRequest,
     FeatureValueMap,
+    HealthCheckRequest,
     ImportRequest,
+    JoinRequest,
     OnlineGetRequest,
     OnlineMultiGetRequest,
     PushRequest,
     SnapshotRequest,
     SyncRequest,
 };
+use std::{collections::HashMap, path::Path};
 use tonic::{codegen::StdError, transport, Request};
 use util::parse_raw_feature_values;
 
@@ -55,7 +55,7 @@ impl Client {
     }
 
     pub async fn health_check(&mut self) -> Result<()> {
-        Ok(self.inner.health_check(Empty {}).await.map(|_| ())?)
+        Ok(self.inner.health_check(HealthCheckRequest {}).await.map(|_| ())?)
     }
 
     pub async fn online_get_raw(

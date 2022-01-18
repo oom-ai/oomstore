@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -22,11 +21,11 @@ type server struct {
 	oomstore *oomstore.OomStore
 }
 
-func (s *server) HealthCheck(ctx context.Context, req *empty.Empty) (*empty.Empty, error) {
+func (s *server) HealthCheck(ctx context.Context, req *codegen.HealthCheckRequest) (*codegen.HealthCheckResponse, error) {
 	if err := s.oomstore.Ping(ctx); err != nil {
 		return nil, status.Errorf(codes.Unavailable, "oomstore is currently unavailable")
 	}
-	return &empty.Empty{}, nil
+	return &codegen.HealthCheckResponse{}, nil
 }
 
 func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (*codegen.OnlineGetResponse, error) {

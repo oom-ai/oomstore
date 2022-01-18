@@ -2,8 +2,6 @@ syntax = "proto3";
 package oomagent;
 option go_package = "/codegen";
 
-import "google/protobuf/empty.proto";
-
 service OomAgent {
   rpc OnlineGet(OnlineGetRequest) returns (OnlineGetResponse) {}
   rpc OnlineMultiGet(OnlineMultiGetRequest) returns (OnlineMultiGetResponse) {}
@@ -19,7 +17,7 @@ service OomAgent {
 
   rpc ChannelExport(ChannelExportRequest) returns (stream ChannelExportResponse) {}
   rpc Export(ExportRequest) returns (ExportResponse) {}
-  rpc HealthCheck(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {}
 }
 
 message Value {
@@ -156,3 +154,7 @@ message ExportRequest {
 }
 
 message ExportResponse {}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {}
