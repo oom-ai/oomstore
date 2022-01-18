@@ -112,6 +112,9 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.
 	if err != nil {
 		return nil, err
 	}
+	if opt.Limit != nil {
+		query = fmt.Sprintf("%s LIMIT %d", query, *opt.Limit)
+	}
 	args := make([]interface{}, 0, len(opt.CdcTables)*2)
 	for i := 0; i < len(opt.CdcTables)*2; i++ {
 		args = append(args, opt.UnixMilli)

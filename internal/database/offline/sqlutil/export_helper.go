@@ -53,7 +53,6 @@ LEFT JOIN
 ) AS {{ qt $t0 }}
 ON e.{{ qt $.EntityName }} = {{ qt $t0 }}.{{ qt $.EntityName }}
 {{end}}
-
 `
 
 type unionEntityQueryParams struct {
