@@ -50,6 +50,18 @@ type ImportOpt struct {
 	NoPK              bool // TODO: to import cdc data temporarily for testing
 }
 
+type ImportStreamOpt struct {
+	Entity   *types.Entity
+	Features types.FeatureList
+	Header   []string
+	Source   *CSVSource
+}
+
+type TimeRange struct {
+	MinUnixMilli int64 `db:"min_unix_milli"`
+	MaxUnixMilli int64 `db:"max_unix_milli"`
+}
+
 type PushOpt struct {
 	GroupID      int
 	Revision     int64

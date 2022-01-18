@@ -94,6 +94,21 @@ func (mr *MockStoreMockRecorder) Import(ctx, opt interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Import", reflect.TypeOf((*MockStore)(nil).Import), ctx, opt)
 }
 
+// ImportStream mocks base method.
+func (m *MockStore) ImportStream(ctx context.Context, opt offline.ImportStreamOpt) (*offline.TimeRange, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ImportStream", ctx, opt)
+	ret0, _ := ret[0].(*offline.TimeRange)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ImportStream indicates an expected call of ImportStream.
+func (mr *MockStoreMockRecorder) ImportStream(ctx, opt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportStream", reflect.TypeOf((*MockStore)(nil).ImportStream), ctx, opt)
+}
+
 // Join mocks base method.
 func (m *MockStore) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {
 	m.ctrl.T.Helper()

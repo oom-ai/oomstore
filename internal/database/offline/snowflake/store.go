@@ -51,6 +51,11 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 	return sqlutil.Import(ctx, db.DB, opt, dbutil.LoadDataFromSource(Backend, SnowflakeBatchSize), Backend)
 }
 
+func (db *DB) ImportStream(ctx context.Context, opt offline.ImportStreamOpt) (*offline.TimeRange, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (*types.ExportResult, error) {
 	return sqlutil.Export(ctx, db.DB, opt, Backend)
 }

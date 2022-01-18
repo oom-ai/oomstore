@@ -70,6 +70,11 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 	return time.Now().UnixMilli(), nil
 }
 
+func (db *DB) ImportStream(ctx context.Context, opt offline.ImportStreamOpt) (*offline.TimeRange, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func convertValueTypeToBigQueryType(t types.ValueType) (bigquery.FieldType, error) {
 	switch t {
 	case types.String:
