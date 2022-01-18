@@ -9,7 +9,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/oom-ai/oomstore/oomagent/codegen"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -355,11 +354,7 @@ func convertToValueSlice(s []interface{}) ([]*codegen.Value, error) {
 func convertInterfaceToValue(i interface{}) (*codegen.Value, error) {
 	switch s := i.(type) {
 	case nil:
-		return &codegen.Value{
-			Value: &codegen.Value_Null{
-				Null: structpb.NullValue_NULL_VALUE,
-			},
-		}, nil
+		return nil, nil
 	case int64:
 		return &codegen.Value{
 			Value: &codegen.Value_Int64{
@@ -416,8 +411,6 @@ func convertJoinedRow(row []interface{}) ([]*codegen.Value, error) {
 func convertValueToInterface(i *codegen.Value) interface{} {
 	kind := i.GetValue()
 	switch kind.(type) {
-	case *codegen.Value_Null:
-		return nil
 	case *codegen.Value_Int64:
 		return i.GetInt64()
 	case *codegen.Value_Double:

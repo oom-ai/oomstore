@@ -10,7 +10,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -28,7 +27,6 @@ type Value struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Value:
-	//	*Value_Null
 	//	*Value_Int64
 	//	*Value_Double
 	//	*Value_String_
@@ -77,13 +75,6 @@ func (m *Value) GetValue() isValue_Value {
 	return nil
 }
 
-func (x *Value) GetNull() structpb.NullValue {
-	if x, ok := x.GetValue().(*Value_Null); ok {
-		return x.Null
-	}
-	return structpb.NullValue_NULL_VALUE
-}
-
 func (x *Value) GetInt64() int64 {
 	if x, ok := x.GetValue().(*Value_Int64); ok {
 		return x.Int64
@@ -130,42 +121,35 @@ type isValue_Value interface {
 	isValue_Value()
 }
 
-type Value_Null struct {
-	// Represents a null value.
-	Null structpb.NullValue `protobuf:"varint,1,opt,name=null,proto3,enum=google.protobuf.NullValue,oneof"`
-}
-
 type Value_Int64 struct {
 	// Represents a int64 value.
-	Int64 int64 `protobuf:"varint,2,opt,name=int64,proto3,oneof"`
+	Int64 int64 `protobuf:"varint,1,opt,name=int64,proto3,oneof"`
 }
 
 type Value_Double struct {
 	// Represents a double value.
-	Double float64 `protobuf:"fixed64,3,opt,name=double,proto3,oneof"`
+	Double float64 `protobuf:"fixed64,2,opt,name=double,proto3,oneof"`
 }
 
 type Value_String_ struct {
 	// Represents a string value.
-	String_ string `protobuf:"bytes,4,opt,name=string,proto3,oneof"`
+	String_ string `protobuf:"bytes,3,opt,name=string,proto3,oneof"`
 }
 
 type Value_Bool struct {
 	// Represents a boolean value.
-	Bool bool `protobuf:"varint,5,opt,name=bool,proto3,oneof"`
+	Bool bool `protobuf:"varint,4,opt,name=bool,proto3,oneof"`
 }
 
 type Value_UnixMilli struct {
 	// Represents a unix milliseconds value.
-	UnixMilli int64 `protobuf:"varint,6,opt,name=unix_milli,json=unixMilli,proto3,oneof"`
+	UnixMilli int64 `protobuf:"varint,5,opt,name=unix_milli,json=unixMilli,proto3,oneof"`
 }
 
 type Value_Bytes struct {
 	// Represents a bytes value.
-	Bytes []byte `protobuf:"bytes,7,opt,name=bytes,proto3,oneof"`
+	Bytes []byte `protobuf:"bytes,6,opt,name=bytes,proto3,oneof"`
 }
-
-func (*Value_Null) isValue_Value() {}
 
 func (*Value_Int64) isValue_Value() {}
 
@@ -1436,21 +1420,16 @@ var file_oomagent_proto_rawDesc = []byte{
 	0x0a, 0x0e, 0x6f, 0x6f, 0x6d, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x12, 0x08, 0x6f, 0x6f, 0x6d, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x1a, 0x1b, 0x67, 0x6f, 0x6f, 0x67,
 	0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x65, 0x6d, 0x70, 0x74,
-	0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1c, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xdd, 0x01, 0x0a, 0x05, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12,
-	0x30, 0x0a, 0x04, 0x6e, 0x75, 0x6c, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1a, 0x2e,
-	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e,
-	0x4e, 0x75, 0x6c, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x48, 0x00, 0x52, 0x04, 0x6e, 0x75, 0x6c,
-	0x6c, 0x12, 0x16, 0x0a, 0x05, 0x69, 0x6e, 0x74, 0x36, 0x34, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03,
+	0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xab, 0x01, 0x0a, 0x05, 0x56, 0x61, 0x6c, 0x75,
+	0x65, 0x12, 0x16, 0x0a, 0x05, 0x69, 0x6e, 0x74, 0x36, 0x34, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03,
 	0x48, 0x00, 0x52, 0x05, 0x69, 0x6e, 0x74, 0x36, 0x34, 0x12, 0x18, 0x0a, 0x06, 0x64, 0x6f, 0x75,
-	0x62, 0x6c, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x01, 0x48, 0x00, 0x52, 0x06, 0x64, 0x6f, 0x75,
-	0x62, 0x6c, 0x65, 0x12, 0x18, 0x0a, 0x06, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x18, 0x04, 0x20,
+	0x62, 0x6c, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x48, 0x00, 0x52, 0x06, 0x64, 0x6f, 0x75,
+	0x62, 0x6c, 0x65, 0x12, 0x18, 0x0a, 0x06, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x18, 0x03, 0x20,
 	0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x06, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x12, 0x14, 0x0a,
-	0x04, 0x62, 0x6f, 0x6f, 0x6c, 0x18, 0x05, 0x20, 0x01, 0x28, 0x08, 0x48, 0x00, 0x52, 0x04, 0x62,
+	0x04, 0x62, 0x6f, 0x6f, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x48, 0x00, 0x52, 0x04, 0x62,
 	0x6f, 0x6f, 0x6c, 0x12, 0x1f, 0x0a, 0x0a, 0x75, 0x6e, 0x69, 0x78, 0x5f, 0x6d, 0x69, 0x6c, 0x6c,
-	0x69, 0x18, 0x06, 0x20, 0x01, 0x28, 0x03, 0x48, 0x00, 0x52, 0x09, 0x75, 0x6e, 0x69, 0x78, 0x4d,
-	0x69, 0x6c, 0x6c, 0x69, 0x12, 0x16, 0x0a, 0x05, 0x62, 0x79, 0x74, 0x65, 0x73, 0x18, 0x07, 0x20,
+	0x69, 0x18, 0x05, 0x20, 0x01, 0x28, 0x03, 0x48, 0x00, 0x52, 0x09, 0x75, 0x6e, 0x69, 0x78, 0x4d,
+	0x69, 0x6c, 0x6c, 0x69, 0x12, 0x16, 0x0a, 0x05, 0x62, 0x79, 0x74, 0x65, 0x73, 0x18, 0x06, 0x20,
 	0x01, 0x28, 0x0c, 0x48, 0x00, 0x52, 0x05, 0x62, 0x79, 0x74, 0x65, 0x73, 0x42, 0x07, 0x0a, 0x05,
 	0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x4d, 0x0a, 0x10, 0x4f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x47,
 	0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x65, 0x6e, 0x74,
@@ -1686,49 +1665,47 @@ var file_oomagent_proto_goTypes = []interface{}{
 	(*ExportResponse)(nil),         // 23: oomagent.ExportResponse
 	nil,                            // 24: oomagent.FeatureValueMap.MapEntry
 	nil,                            // 25: oomagent.OnlineMultiGetResponse.ResultEntry
-	(structpb.NullValue)(0),        // 26: google.protobuf.NullValue
-	(*emptypb.Empty)(nil),          // 27: google.protobuf.Empty
+	(*emptypb.Empty)(nil),          // 26: google.protobuf.Empty
 }
 var file_oomagent_proto_depIdxs = []int32{
-	26, // 0: oomagent.Value.null:type_name -> google.protobuf.NullValue
-	24, // 1: oomagent.FeatureValueMap.map:type_name -> oomagent.FeatureValueMap.MapEntry
-	2,  // 2: oomagent.OnlineGetResponse.result:type_name -> oomagent.FeatureValueMap
-	25, // 3: oomagent.OnlineMultiGetResponse.result:type_name -> oomagent.OnlineMultiGetResponse.ResultEntry
-	0,  // 4: oomagent.PushRequest.feature_values:type_name -> oomagent.Value
-	15, // 5: oomagent.ChannelJoinRequest.entity_row:type_name -> oomagent.EntityRow
-	0,  // 6: oomagent.ChannelJoinResponse.joined_row:type_name -> oomagent.Value
-	0,  // 7: oomagent.ChannelExportResponse.row:type_name -> oomagent.Value
-	0,  // 8: oomagent.FeatureValueMap.MapEntry.value:type_name -> oomagent.Value
-	2,  // 9: oomagent.OnlineMultiGetResponse.ResultEntry.value:type_name -> oomagent.FeatureValueMap
-	1,  // 10: oomagent.OomAgent.OnlineGet:input_type -> oomagent.OnlineGetRequest
-	4,  // 11: oomagent.OomAgent.OnlineMultiGet:input_type -> oomagent.OnlineMultiGetRequest
-	6,  // 12: oomagent.OomAgent.Sync:input_type -> oomagent.SyncRequest
-	8,  // 13: oomagent.OomAgent.ChannelImport:input_type -> oomagent.ChannelImportRequest
-	10, // 14: oomagent.OomAgent.Import:input_type -> oomagent.ImportRequest
-	12, // 15: oomagent.OomAgent.Push:input_type -> oomagent.PushRequest
-	14, // 16: oomagent.OomAgent.Snapshot:input_type -> oomagent.SnapshotRequest
-	16, // 17: oomagent.OomAgent.ChannelJoin:input_type -> oomagent.ChannelJoinRequest
-	18, // 18: oomagent.OomAgent.Join:input_type -> oomagent.JoinRequest
-	20, // 19: oomagent.OomAgent.ChannelExport:input_type -> oomagent.ChannelExportRequest
-	22, // 20: oomagent.OomAgent.Export:input_type -> oomagent.ExportRequest
-	27, // 21: oomagent.OomAgent.HealthCheck:input_type -> google.protobuf.Empty
-	3,  // 22: oomagent.OomAgent.OnlineGet:output_type -> oomagent.OnlineGetResponse
-	5,  // 23: oomagent.OomAgent.OnlineMultiGet:output_type -> oomagent.OnlineMultiGetResponse
-	7,  // 24: oomagent.OomAgent.Sync:output_type -> oomagent.SyncResponse
-	9,  // 25: oomagent.OomAgent.ChannelImport:output_type -> oomagent.ImportResponse
-	9,  // 26: oomagent.OomAgent.Import:output_type -> oomagent.ImportResponse
-	11, // 27: oomagent.OomAgent.Push:output_type -> oomagent.PushResponse
-	13, // 28: oomagent.OomAgent.Snapshot:output_type -> oomagent.SnapshotResponse
-	17, // 29: oomagent.OomAgent.ChannelJoin:output_type -> oomagent.ChannelJoinResponse
-	19, // 30: oomagent.OomAgent.Join:output_type -> oomagent.JoinResponse
-	21, // 31: oomagent.OomAgent.ChannelExport:output_type -> oomagent.ChannelExportResponse
-	23, // 32: oomagent.OomAgent.Export:output_type -> oomagent.ExportResponse
-	27, // 33: oomagent.OomAgent.HealthCheck:output_type -> google.protobuf.Empty
-	22, // [22:34] is the sub-list for method output_type
-	10, // [10:22] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	24, // 0: oomagent.FeatureValueMap.map:type_name -> oomagent.FeatureValueMap.MapEntry
+	2,  // 1: oomagent.OnlineGetResponse.result:type_name -> oomagent.FeatureValueMap
+	25, // 2: oomagent.OnlineMultiGetResponse.result:type_name -> oomagent.OnlineMultiGetResponse.ResultEntry
+	0,  // 3: oomagent.PushRequest.feature_values:type_name -> oomagent.Value
+	15, // 4: oomagent.ChannelJoinRequest.entity_row:type_name -> oomagent.EntityRow
+	0,  // 5: oomagent.ChannelJoinResponse.joined_row:type_name -> oomagent.Value
+	0,  // 6: oomagent.ChannelExportResponse.row:type_name -> oomagent.Value
+	0,  // 7: oomagent.FeatureValueMap.MapEntry.value:type_name -> oomagent.Value
+	2,  // 8: oomagent.OnlineMultiGetResponse.ResultEntry.value:type_name -> oomagent.FeatureValueMap
+	1,  // 9: oomagent.OomAgent.OnlineGet:input_type -> oomagent.OnlineGetRequest
+	4,  // 10: oomagent.OomAgent.OnlineMultiGet:input_type -> oomagent.OnlineMultiGetRequest
+	6,  // 11: oomagent.OomAgent.Sync:input_type -> oomagent.SyncRequest
+	8,  // 12: oomagent.OomAgent.ChannelImport:input_type -> oomagent.ChannelImportRequest
+	10, // 13: oomagent.OomAgent.Import:input_type -> oomagent.ImportRequest
+	12, // 14: oomagent.OomAgent.Push:input_type -> oomagent.PushRequest
+	14, // 15: oomagent.OomAgent.Snapshot:input_type -> oomagent.SnapshotRequest
+	16, // 16: oomagent.OomAgent.ChannelJoin:input_type -> oomagent.ChannelJoinRequest
+	18, // 17: oomagent.OomAgent.Join:input_type -> oomagent.JoinRequest
+	20, // 18: oomagent.OomAgent.ChannelExport:input_type -> oomagent.ChannelExportRequest
+	22, // 19: oomagent.OomAgent.Export:input_type -> oomagent.ExportRequest
+	26, // 20: oomagent.OomAgent.HealthCheck:input_type -> google.protobuf.Empty
+	3,  // 21: oomagent.OomAgent.OnlineGet:output_type -> oomagent.OnlineGetResponse
+	5,  // 22: oomagent.OomAgent.OnlineMultiGet:output_type -> oomagent.OnlineMultiGetResponse
+	7,  // 23: oomagent.OomAgent.Sync:output_type -> oomagent.SyncResponse
+	9,  // 24: oomagent.OomAgent.ChannelImport:output_type -> oomagent.ImportResponse
+	9,  // 25: oomagent.OomAgent.Import:output_type -> oomagent.ImportResponse
+	11, // 26: oomagent.OomAgent.Push:output_type -> oomagent.PushResponse
+	13, // 27: oomagent.OomAgent.Snapshot:output_type -> oomagent.SnapshotResponse
+	17, // 28: oomagent.OomAgent.ChannelJoin:output_type -> oomagent.ChannelJoinResponse
+	19, // 29: oomagent.OomAgent.Join:output_type -> oomagent.JoinResponse
+	21, // 30: oomagent.OomAgent.ChannelExport:output_type -> oomagent.ChannelExportResponse
+	23, // 31: oomagent.OomAgent.Export:output_type -> oomagent.ExportResponse
+	26, // 32: oomagent.OomAgent.HealthCheck:output_type -> google.protobuf.Empty
+	21, // [21:33] is the sub-list for method output_type
+	9,  // [9:21] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_oomagent_proto_init() }
@@ -2027,7 +2004,6 @@ func file_oomagent_proto_init() {
 		}
 	}
 	file_oomagent_proto_msgTypes[0].OneofWrappers = []interface{}{
-		(*Value_Null)(nil),
 		(*Value_Int64)(nil),
 		(*Value_Double)(nil),
 		(*Value_String_)(nil),

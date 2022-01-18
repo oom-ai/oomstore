@@ -57,6 +57,6 @@ actual_rows=$(jq -c ".joinedRow" <<< "$actual" | sort)
 expected_rows='
 [{"string":"1"},{"int64":"3"},{"double":0.556},{"double":0.465},{"int64":"464"}]
 [{"string":"7"},{"int64":"1"},{"double":0.758},{"double":0.02},{"int64":"389"}]
-[{"string":"7"},{"int64":"0"},{"null":"NULL_VALUE"},{"null":"NULL_VALUE"},{"null":"NULL_VALUE"}]
+[{"string":"7"},{"int64":"0"},{},{},{}]
 '
 assert_json_eq "$case" "$(sort <<<"$expected_rows")" "$actual_rows"
