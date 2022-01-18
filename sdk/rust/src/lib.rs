@@ -14,6 +14,7 @@ use oomagent::{
     ChannelImportRequest,
     ChannelJoinRequest,
     ChannelJoinResponse,
+    ExportRequest,
     FeatureValueMap,
     ImportRequest,
     OnlineGetRequest,
@@ -260,5 +261,21 @@ impl Client {
             }
         };
         Ok((header, outbound))
+    }
+
+    pub async fn export(
+        &mut self,
+        features: Vec<String>,
+        unix_milli: u64,
+        output_file: impl AsRef<Path>,
+        limit: impl Into<Option<usize>>,
+    ) -> Result<()> {
+        let unix_milli = unix_milli.try_into()?;
+        let limit = limit.into().map(|n| n.try_into()).transpose()?;
+        let output_file = output_file.as_ref().display().to_string();
+        self.inner
+            .export(ExportRequest { features, unix_milli, output_file, limit })
+            .await?;
+        Ok(())
     }
 }
