@@ -134,6 +134,10 @@ func TestCreateGroup(t *testing.T) {
 	test_impl.TestCreateGroup(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
+func TestCreateStreamGroup(t *testing.T) {
+	test_impl.TestCreateStreamGroup(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
+}
+
 func TestUpdateGroup(t *testing.T) {
 	test_impl.TestUpdateGroup(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }

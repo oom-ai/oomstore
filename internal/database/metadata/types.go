@@ -1,6 +1,8 @@
 package metadata
 
-import "github.com/oom-ai/oomstore/pkg/oomstore/types"
+import (
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+)
 
 // Create
 type CreateEntityOpt struct {
@@ -19,6 +21,8 @@ type CreateGroupOpt struct {
 	EntityID    int
 	Description string
 	Category    types.Category
+
+	SnapshotInterval int
 }
 
 type CreateRevisionOpt struct {
@@ -43,6 +47,7 @@ type UpdateFeatureOpt struct {
 
 type UpdateGroupOpt struct {
 	GroupID             int
+	NewSnapshotInterval *int
 	NewDescription      *string
 	NewOnlineRevisionID *int
 }
