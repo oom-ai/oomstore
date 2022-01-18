@@ -9,7 +9,7 @@ case="api returns ok"
 arg=$(cat <<-EOF
 {
     "group": "account",
-    "input_file_path": "./data/account_10.csv",
+    "input_file": "./data/account_10.csv",
     "delimiter": ","
 }
 EOF

@@ -62,7 +62,7 @@ func Import() {
 		log.Fatal(err)
 	}
 
-	file, err := os.Open("input_file_path")
+	file, err := os.Open("input_file")
 	if err != nil {
 		log.Fatal(err)
 	}

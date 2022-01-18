@@ -142,11 +142,11 @@ impl Client {
         let res = self
             .inner
             .import(ImportRequest {
-                group:           group.into(),
-                description:     description.into(),
-                revision:        revision.into(),
-                input_file_path: input_file.as_ref().display().to_string(),
-                delimiter:       delimiter.into().map(String::from),
+                group:       group.into(),
+                description: description.into(),
+                revision:    revision.into(),
+                input_file:  input_file.as_ref().display().to_string(),
+                delimiter:   delimiter.into().map(String::from),
             })
             .await?
             .into_inner();

@@ -25,8 +25,8 @@ arg=$(cat <<-EOF
     "driver_stats.acc_rate",
     "driver_stats.avg_daily_trips"
   ],
-  "input_file_path": "./data/driver_stats_label.csv",
-  "output_file_path": "$output"
+  "input_file": "./data/driver_stats_label.csv",
+  "output_file": "$output"
 }
 EOF
 )
