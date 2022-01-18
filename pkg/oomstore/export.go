@@ -36,6 +36,18 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 	if err != nil {
 		return nil, err
 	}
+	if len(features) != len(opt.FeatureNames) {
+		invalid := make([]string, 0)
+		for _, name := range opt.FeatureNames {
+			f := features.Find(func(feature *types.Feature) bool {
+				return feature.FullName() == name
+			})
+			if f == nil {
+				invalid = append(invalid, name)
+			}
+		}
+		return nil, errdefs.Errorf("invalid feature names %s", invalid)
+	}
 
 	featureMap := buildGroupIDToFeaturesMap(features)
 	snapshotTables := make(map[int]string)
