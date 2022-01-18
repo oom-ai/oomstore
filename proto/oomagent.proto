@@ -24,22 +24,21 @@ service OomAgent {
 }
 
 message Value {
-  // The kind of value.
-  oneof kind {
+  oneof value {
     // Represents a null value.
-    google.protobuf.NullValue null_value = 1;
+    google.protobuf.NullValue null = 1;
     // Represents a int64 value.
-    int64 int64_value = 2;
+    int64 int64 = 2;
     // Represents a double value.
-    double double_value = 3;
+    double double = 3;
     // Represents a string value.
-    string string_value = 4;
+    string string = 4;
     // Represents a boolean value.
-    bool bool_value = 5;
+    bool bool = 5;
     // Represents a unix milliseconds value.
-    int64 unix_milli_value = 6;
+    int64 unix_milli = 6;
     // Represents a bytes value.
-    bytes bytes_value = 7;
+    bytes bytes = 7;
   }
 }
 

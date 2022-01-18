@@ -18,21 +18,21 @@ expected='
     "19": {
       "map": {
         "account.state": {
-          "stringValue": "Illinois"
+          "string": "Illinois"
         }
       }
     },
     "50": {
       "map": {
         "account.state": {
-          "stringValue": "Hawaii"
+          "string": "Hawaii"
         }
       }
     },
     "78": {
       "map": {
         "account.state": {
-          "stringValue": "Tennessee"
+          "string": "Tennessee"
         }
       }
     }
@@ -55,32 +55,32 @@ expected='
     "48": {
       "map": {
         "account.credit_score": {
-          "int64Value": "708"
+          "int64": "708"
         },
         "account.state": {
-          "stringValue": "Indiana"
+          "string": "Indiana"
         },
         "transaction_stats.transaction_count_30d": {
-          "int64Value": "45"
+          "int64": "45"
         },
         "transaction_stats.transaction_count_7d": {
-          "int64Value": "5"
+          "int64": "5"
         }
       }
     },
     "74": {
       "map": {
         "account.credit_score": {
-          "int64Value": "703"
+          "int64": "703"
         },
         "account.state": {
-          "stringValue": "Ohio"
+          "string": "Ohio"
         },
         "transaction_stats.transaction_count_30d": {
-          "int64Value": "25"
+          "int64": "25"
         },
         "transaction_stats.transaction_count_7d": {
-          "int64Value": "8"
+          "int64": "8"
         }
       }
     }

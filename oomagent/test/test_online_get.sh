@@ -17,7 +17,7 @@ expected='
   "result": {
     "map": {
       "account.state": {
-        "stringValue": "Illinois"
+        "string": "Illinois"
       }
     }
   }
@@ -38,16 +38,16 @@ expected='
   "result": {
     "map": {
       "account.credit_score": {
-        "int64Value": "708"
+        "int64": "708"
       },
       "account.state": {
-        "stringValue": "Indiana"
+        "string": "Indiana"
       },
       "transaction_stats.transaction_count_30d": {
-        "int64Value": "45"
+        "int64": "45"
       },
       "transaction_stats.transaction_count_7d": {
-        "int64Value": "5"
+        "int64": "5"
       }
     }
   }

@@ -55,8 +55,8 @@ assert_json_eq "$case" "$expected_header" "$actual_header"
 case="api returns correct joined rows"
 actual_rows=$(jq -c ".joinedRow" <<< "$actual" | sort)
 expected_rows='
-[{"stringValue":"1"},{"int64Value":"3"},{"doubleValue":0.556},{"doubleValue":0.465},{"int64Value":"464"}]
-[{"stringValue":"7"},{"int64Value":"1"},{"doubleValue":0.758},{"doubleValue":0.02},{"int64Value":"389"}]
-[{"stringValue":"7"},{"int64Value":"0"},{"nullValue":"NULL_VALUE"},{"nullValue":"NULL_VALUE"},{"nullValue":"NULL_VALUE"}]
+[{"string":"1"},{"int64":"3"},{"double":0.556},{"double":0.465},{"int64":"464"}]
+[{"string":"7"},{"int64":"1"},{"double":0.758},{"double":0.02},{"int64":"389"}]
+[{"string":"7"},{"int64":"0"},{"null":"NULL_VALUE"},{"null":"NULL_VALUE"},{"null":"NULL_VALUE"}]
 '
 assert_json_eq "$case" "$(sort <<<"$expected_rows")" "$actual_rows"

@@ -9,7 +9,6 @@ use futures_core::stream::Stream;
 use google::protobuf::Empty;
 use oomagent::{
     oom_agent_client::OomAgentClient,
-    value,
     ChannelExportRequest,
     ChannelImportRequest,
     ChannelJoinRequest,
@@ -28,7 +27,7 @@ use util::parse_raw_feature_values;
 
 use crate::{oomagent::EntityRow, util::parse_raw_values};
 
-pub type FValue = value::Kind;
+pub use oomagent::value::Value;
 
 type Result<T> = std::result::Result<T, OomError>;
 
@@ -79,7 +78,7 @@ impl Client {
         &mut self,
         key: impl Into<String>,
         features: Vec<String>,
-    ) -> Result<HashMap<String, value::Kind>> {
+    ) -> Result<HashMap<String, Value>> {
         let rs = self.online_get_raw(key, features).await?;
         Ok(parse_raw_feature_values(rs))
     }
@@ -101,7 +100,7 @@ impl Client {
         &mut self,
         keys: Vec<String>,
         features: Vec<String>,
-    ) -> Result<HashMap<String, HashMap<String, value::Kind>>> {
+    ) -> Result<HashMap<String, HashMap<String, Value>>> {
         let rs = self.online_multi_get_raw(keys, features).await?;
         Ok(rs.into_iter().map(|(k, v)| (k, parse_raw_feature_values(v))).collect())
     }
@@ -161,13 +160,13 @@ impl Client {
         &mut self,
         entity_key: impl Into<String>,
         group: impl Into<String>,
-        kv_pairs: Vec<(impl Into<String>, impl Into<value::Kind>)>,
+        kv_pairs: Vec<(impl Into<String>, impl Into<Value>)>,
     ) -> Result<()> {
         let mut keys = Vec::with_capacity(kv_pairs.len());
         let mut vals = Vec::with_capacity(kv_pairs.len());
         kv_pairs.into_iter().for_each(|(k, v)| {
             keys.push(k.into());
-            vals.push(oomagent::Value { kind: Some(v.into()) });
+            vals.push(oomagent::Value { value: Some(v.into()) });
         });
         self.inner
             .push(PushRequest {
@@ -186,7 +185,7 @@ impl Client {
         join_features: Vec<String>,
         existed_features: Vec<String>,
         entity_rows: impl Iterator<Item = EntityRow> + Send + 'static,
-    ) -> Result<(Vec<String>, impl Stream<Item = Result<Vec<value::Kind>>>)> {
+    ) -> Result<(Vec<String>, impl Stream<Item = Result<Vec<Value>>>)> {
         let inbound = async_stream::stream! {
             for (i, row) in entity_rows.enumerate() {
                 let (join_features, existed_features) = match i {
@@ -240,7 +239,7 @@ impl Client {
         features: Vec<String>,
         unix_milli: u64,
         limit: impl Into<Option<usize>>,
-    ) -> Result<(Vec<String>, impl Stream<Item = Result<Vec<value::Kind>>>)> {
+    ) -> Result<(Vec<String>, impl Stream<Item = Result<Vec<Value>>>)> {
         let unix_milli = unix_milli.try_into()?;
         let limit = limit.into().map(|n| n.try_into()).transpose()?;
         let mut outbound = self
