@@ -1,7 +1,7 @@
 pub mod error;
 mod util;
 
-use crate::oomagent::JoinRequest;
+use crate::oomagent::{ChannelExportResponse, JoinRequest};
 use std::{collections::HashMap, path::Path};
 
 use error::OomError;
@@ -10,6 +10,7 @@ use google::protobuf::Empty;
 use oomagent::{
     oom_agent_client::OomAgentClient,
     value,
+    ChannelExportRequest,
     ChannelImportRequest,
     ChannelJoinRequest,
     ChannelJoinResponse,
@@ -230,5 +231,34 @@ impl Client {
             })
             .await?;
         Ok(())
+    }
+
+    pub async fn channel_export(
+        &mut self,
+        features: Vec<String>,
+        unix_milli: u64,
+        limit: impl Into<Option<usize>>,
+    ) -> Result<(Vec<String>, impl Stream<Item = Result<Vec<value::Kind>>>)> {
+        let unix_milli = unix_milli.try_into()?;
+        let limit = limit.into().map(|n| n.try_into()).transpose()?;
+        let mut outbound = self
+            .inner
+            .channel_export(ChannelExportRequest { features, unix_milli, limit })
+            .await?
+            .into_inner();
+
+        let ChannelExportResponse { header, row } = outbound
+            .message()
+            .await?
+            .ok_or_else(|| OomError::Unknown(String::from("stream finished with no response")))?;
+
+        let row = parse_raw_values(row);
+        let outbound = async_stream::try_stream! {
+            yield row;
+            while let Some(ChannelExportResponse{row, ..}) = outbound.message().await? {
+                yield parse_raw_values(row)
+            }
+        };
+        Ok((header, outbound))
     }
 }
