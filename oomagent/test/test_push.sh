@@ -15,10 +15,10 @@ arg='
     "features": ["last_5_click_posts", "number_of_user_starred_posts"],
     "feature_values": [
     {
-        "stringValue": "1,2,3"
+        "string": "1,2,3"
     },
     {
-        "int64Value": 10
+        "int64": 10
     }
 ]
 }
@@ -42,10 +42,10 @@ expected='
   "result": {
     "map": {
       "user-click.last_5_click_posts": {
-        "stringValue": "1,2,3"
+        "string": "1,2,3"
       },
       "user-click.number_of_user_starred_posts": {
-        "int64Value": "10"
+        "int64": "10"
       }
     }
   }

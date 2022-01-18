@@ -6,10 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/oom-ai/oomstore/oomagent/codegen"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -23,11 +21,11 @@ type server struct {
 	oomstore *oomstore.OomStore
 }
 
-func (s *server) HealthCheck(ctx context.Context, req *empty.Empty) (*empty.Empty, error) {
+func (s *server) HealthCheck(ctx context.Context, req *codegen.HealthCheckRequest) (*codegen.HealthCheckResponse, error) {
 	if err := s.oomstore.Ping(ctx); err != nil {
 		return nil, status.Errorf(codes.Unavailable, "oomstore is currently unavailable")
 	}
-	return &empty.Empty{}, nil
+	return &codegen.HealthCheckResponse{}, nil
 }
 
 func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (*codegen.OnlineGetResponse, error) {
@@ -355,45 +353,41 @@ func convertToValueSlice(s []interface{}) ([]*codegen.Value, error) {
 func convertInterfaceToValue(i interface{}) (*codegen.Value, error) {
 	switch s := i.(type) {
 	case nil:
-		return &codegen.Value{
-			Kind: &codegen.Value_NullValue{
-				NullValue: structpb.NullValue_NULL_VALUE,
-			},
-		}, nil
+		return nil, nil
 	case int64:
 		return &codegen.Value{
-			Kind: &codegen.Value_Int64Value{
-				Int64Value: s,
+			Value: &codegen.Value_Int64{
+				Int64: s,
 			},
 		}, nil
 	case float64:
 		return &codegen.Value{
-			Kind: &codegen.Value_DoubleValue{
-				DoubleValue: s,
+			Value: &codegen.Value_Double{
+				Double: s,
 			},
 		}, nil
 	case string:
 		return &codegen.Value{
-			Kind: &codegen.Value_StringValue{
-				StringValue: s,
+			Value: &codegen.Value_String_{
+				String_: s,
 			},
 		}, nil
 	case bool:
 		return &codegen.Value{
-			Kind: &codegen.Value_BoolValue{
-				BoolValue: s,
+			Value: &codegen.Value_Bool{
+				Bool: s,
 			},
 		}, nil
 	case time.Time:
 		return &codegen.Value{
-			Kind: &codegen.Value_UnixMilliValue{
-				UnixMilliValue: s.UnixMilli(),
+			Value: &codegen.Value_UnixMilli{
+				UnixMilli: s.UnixMilli(),
 			},
 		}, nil
 	case []byte:
 		return &codegen.Value{
-			Kind: &codegen.Value_BytesValue{
-				BytesValue: s,
+			Value: &codegen.Value_Bytes{
+				Bytes: s,
 			},
 		}, nil
 	default:
@@ -414,22 +408,20 @@ func convertJoinedRow(row []interface{}) ([]*codegen.Value, error) {
 }
 
 func convertValueToInterface(i *codegen.Value) interface{} {
-	kind := i.GetKind()
+	kind := i.GetValue()
 	switch kind.(type) {
-	case *codegen.Value_NullValue:
-		return nil
-	case *codegen.Value_Int64Value:
-		return i.GetInt64Value()
-	case *codegen.Value_DoubleValue:
-		return i.GetDoubleValue()
-	case *codegen.Value_StringValue:
-		return i.GetStringValue()
-	case *codegen.Value_BoolValue:
-		return i.GetBoolValue()
-	case *codegen.Value_UnixMilliValue:
-		return i.GetUnixMilliValue()
-	case *codegen.Value_BytesValue:
-		return i.GetBytesValue()
+	case *codegen.Value_Int64:
+		return i.GetInt64()
+	case *codegen.Value_Double:
+		return i.GetDouble()
+	case *codegen.Value_String_:
+		return i.GetString_()
+	case *codegen.Value_Bool:
+		return i.GetBool()
+	case *codegen.Value_UnixMilli:
+		return i.GetUnixMilli()
+	case *codegen.Value_Bytes:
+		return i.GetBytes()
 	}
 	return nil
 }

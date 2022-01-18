@@ -27,16 +27,16 @@ EOF
     case="$prefix - returns correct rows"
     actual_rows=$(jq -c ".row" <<< "$actual" | sort)
     expected_rows='
-    [{"stringValue":"1"},{"stringValue":"Nevada"}]
-    [{"stringValue":"2"},{"stringValue":"South Carolina"}]
-    [{"stringValue":"3"},{"stringValue":"New Jersey"}]
-    [{"stringValue":"4"},{"stringValue":"Ohio"}]
-    [{"stringValue":"5"},{"stringValue":"California"}]
-    [{"stringValue":"6"},{"stringValue":"North Carolina"}]
-    [{"stringValue":"7"},{"stringValue":"North Dakota"}]
-    [{"stringValue":"8"},{"stringValue":"West Virginia"}]
-    [{"stringValue":"9"},{"stringValue":"Alabama"}]
-    [{"stringValue":"10"},{"stringValue":"Idaho"}]
+    [{"string":"1"},{"string":"Nevada"}]
+    [{"string":"2"},{"string":"South Carolina"}]
+    [{"string":"3"},{"string":"New Jersey"}]
+    [{"string":"4"},{"string":"Ohio"}]
+    [{"string":"5"},{"string":"California"}]
+    [{"string":"6"},{"string":"North Carolina"}]
+    [{"string":"7"},{"string":"North Dakota"}]
+    [{"string":"8"},{"string":"West Virginia"}]
+    [{"string":"9"},{"string":"Alabama"}]
+    [{"string":"10"},{"string":"Idaho"}]
     '
     assert_json_eq "$case" "$(sort <<<"$expected_rows")" "$actual_rows"
 }
@@ -60,16 +60,16 @@ EOF
     case="$prefix - returns correct rows"
     actual_rows=$(jq -c ".row" <<< "$actual" | sort)
     expected_rows='
-    [{"stringValue":"1"},{"stringValue":"Nevada"},{"int64Value":"530"},{"int64Value":"242"},{"boolValue":true}]
-    [{"stringValue":"2"},{"stringValue":"South Carolina"},{"int64Value":"520"},{"int64Value":"268"},{"boolValue":false}]
-    [{"stringValue":"3"},{"stringValue":"New Jersey"},{"int64Value":"655"},{"int64Value":"84"},{"boolValue":false}]
-    [{"stringValue":"4"},{"stringValue":"Ohio"},{"int64Value":"677"},{"int64Value":"119"},{"boolValue":true}]
-    [{"stringValue":"5"},{"stringValue":"California"},{"int64Value":"566"},{"int64Value":"289"},{"boolValue":false}]
-    [{"stringValue":"6"},{"stringValue":"North Carolina"},{"int64Value":"533"},{"int64Value":"155"},{"boolValue":true}]
-    [{"stringValue":"7"},{"stringValue":"North Dakota"},{"int64Value":"605"},{"int64Value":"334"},{"boolValue":true}]
-    [{"stringValue":"8"},{"stringValue":"West Virginia"},{"int64Value":"664"},{"int64Value":"282"},{"boolValue":false}]
-    [{"stringValue":"9"},{"stringValue":"Alabama"},{"int64Value":"577"},{"int64Value":"150"},{"boolValue":true}]
-    [{"stringValue":"10"},{"stringValue":"Idaho"},{"int64Value":"693"},{"int64Value":"212"},{"boolValue":true}]
+    [{"string":"1"},{"string":"Nevada"},{"int64":"530"},{"int64":"242"},{"bool":true}]
+    [{"string":"2"},{"string":"South Carolina"},{"int64":"520"},{"int64":"268"},{"bool":false}]
+    [{"string":"3"},{"string":"New Jersey"},{"int64":"655"},{"int64":"84"},{"bool":false}]
+    [{"string":"4"},{"string":"Ohio"},{"int64":"677"},{"int64":"119"},{"bool":true}]
+    [{"string":"5"},{"string":"California"},{"int64":"566"},{"int64":"289"},{"bool":false}]
+    [{"string":"6"},{"string":"North Carolina"},{"int64":"533"},{"int64":"155"},{"bool":true}]
+    [{"string":"7"},{"string":"North Dakota"},{"int64":"605"},{"int64":"334"},{"bool":true}]
+    [{"string":"8"},{"string":"West Virginia"},{"int64":"664"},{"int64":"282"},{"bool":false}]
+    [{"string":"9"},{"string":"Alabama"},{"int64":"577"},{"int64":"150"},{"bool":true}]
+    [{"string":"10"},{"string":"Idaho"},{"int64":"693"},{"int64":"212"},{"bool":true}]
     '
     assert_json_eq "$case" "$(sort <<<"$expected_rows")" "$actual_rows"
 }

@@ -2,7 +2,6 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 from . import oomagent_pb2 as oomagent__pb2
 
 
@@ -72,8 +71,8 @@ class OomAgentStub(object):
                 )
         self.HealthCheck = channel.unary_unary(
                 '/oomagent.OomAgent/HealthCheck',
-                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                request_serializer=oomagent__pb2.HealthCheckRequest.SerializeToString,
+                response_deserializer=oomagent__pb2.HealthCheckResponse.FromString,
                 )
 
 
@@ -212,8 +211,8 @@ def add_OomAgentServicer_to_server(servicer, server):
             ),
             'HealthCheck': grpc.unary_unary_rpc_method_handler(
                     servicer.HealthCheck,
-                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                    request_deserializer=oomagent__pb2.HealthCheckRequest.FromString,
+                    response_serializer=oomagent__pb2.HealthCheckResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -424,7 +423,7 @@ class OomAgent(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/oomagent.OomAgent/HealthCheck',
-            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+            oomagent__pb2.HealthCheckRequest.SerializeToString,
+            oomagent__pb2.HealthCheckResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
