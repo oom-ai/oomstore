@@ -16,7 +16,7 @@ oomcli push --entity-key 2 --group user-click --features last_5_click_posts=2,3,
 oomcli push --entity-key 3 --group user-click --features last_5_click_posts=3,4,5,6,7 --features number_of_user_starred_posts=12 >> /dev/null 2>&1
 oomcli snapshot user-click
 
-t1=$(date +%s%3N)
+t1=$(perl -MTime::HiRes -e 'printf("%.0f\n",Time::HiRes::time()*1000)')
 cat <<-EOF > entity_rows.csv
 entity_key,unix_milli
 1,$t1
