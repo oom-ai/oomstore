@@ -147,6 +147,7 @@ message ChannelExportRequest {
 }
 
 message ChannelExportResponse {
+  // only appears in the first request
   repeated string header = 1;
   repeated Value row = 2;
 }
@@ -154,8 +155,8 @@ message ChannelExportResponse {
 message ExportRequest {
   repeated string features = 1;
   int64 unix_milli = 2;
-  optional uint64 limit = 3;
-  string output_file = 4;
+  string output_file = 3;
+  optional uint64 limit = 4;
 }
 
 message ExportResponse {}
