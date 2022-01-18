@@ -78,6 +78,13 @@ entity-name: user
 category: batch
 description: 'description'
 ---
+kind: Group
+name: user-click
+entity-name: user
+category: stream
+snapshot-interval: 86400
+description: 'description'
+---
 kind: Feature
 name: model
 group-name: device
@@ -113,6 +120,14 @@ description: 'description'
 						EntityName:  "user",
 						Category:    "batch",
 						Description: "description",
+					},
+					{
+						Kind:             "Group",
+						Name:             "user-click",
+						EntityName:       "user",
+						Category:         "stream",
+						SnapshotInterval: 86400,
+						Description:      "description",
 					},
 				},
 				NewFeatures: []apply.Feature{
@@ -208,6 +223,17 @@ groups:
   - name: gender
     value-type: int64
     description: 'description'
+- name: user-click
+  category: stream
+  snapshot-interval: 86400
+  description: description
+  features:
+  - name: last_5_click_posts
+    value-type: string
+    description: 'description'
+  - name: number_of_user_started_posts
+    value-type: int64
+    description: 'description'
 `)},
 			wantStage: &apply.ApplyStage{
 				NewEntities: []apply.Entity{
@@ -231,6 +257,14 @@ groups:
 						Category:    types.CategoryBatch,
 						EntityName:  "user",
 						Description: "description",
+					},
+					{
+						Kind:             "Group",
+						Name:             "user-click",
+						EntityName:       "user",
+						Category:         "stream",
+						SnapshotInterval: 86400,
+						Description:      "description",
 					},
 				},
 				NewFeatures: []apply.Feature{
@@ -260,6 +294,20 @@ groups:
 						Kind:        "Feature",
 						Name:        "gender",
 						GroupName:   "user",
+						ValueType:   "int64",
+						Description: "description",
+					},
+					{
+						Kind:        "Feature",
+						Name:        "last_5_click_posts",
+						GroupName:   "user-click",
+						ValueType:   "string",
+						Description: "description",
+					},
+					{
+						Kind:        "Feature",
+						Name:        "number_of_user_started_posts",
+						GroupName:   "user-click",
 						ValueType:   "int64",
 						Description: "description",
 					},

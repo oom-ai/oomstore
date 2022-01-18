@@ -2,7 +2,9 @@ package test_impl
 
 import (
 	"context"
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -151,6 +153,43 @@ func TestCreateGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 	opt.Category = "invalid-category"
 	_, err = store.CreateGroup(ctx, opt)
 	require.NotNil(t, err)
+}
+
+func TestCreateStreamGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	entityID := prepareEntity(t, ctx, store, "user")
+
+	opt := metadata.CreateGroupOpt{
+		GroupName:        "user-click",
+		EntityID:         entityID,
+		Description:      "description",
+		Category:         types.CategoryStream,
+		SnapshotInterval: 24 * int(time.Hour.Seconds()),
+	}
+
+	// create successfully
+	groupID, err := store.CreateGroup(ctx, opt)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, groupID)
+
+	// cannot create feature group with same name
+	_, err = store.CreateGroup(ctx, opt)
+	require.Equal(t, "feature group user-click already exists", err.Error())
+
+	// cannot create feature group with invalid category
+	opt.Category = "invalid-category"
+	_, err = store.CreateGroup(ctx, opt)
+	require.NotNil(t, err)
+
+	// cannot create stream group with snapshot_interval is zero
+	opt.Category = types.CategoryStream
+	opt.SnapshotInterval = 0
+	_, err = store.CreateGroup(ctx, opt)
+	require.Equal(t, fmt.Sprintf("the field SnapshotInterval of the stream group %s cannot be zero", opt.GroupName), err.Error())
 }
 
 func TestUpdateGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {

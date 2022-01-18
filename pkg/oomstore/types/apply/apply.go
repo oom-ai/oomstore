@@ -2,6 +2,7 @@ package apply
 
 import (
 	"io"
+	"time"
 
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -72,12 +73,13 @@ func FromFeatureList(features types.FeatureList) FeatureItems {
 }
 
 type Group struct {
-	Kind        string         `mapstructure:"kind" yaml:"kind,omitempty"`
-	Name        string         `mapstructure:"name" yaml:"name,omitempty"`
-	EntityName  string         `mapstructure:"entity-name" yaml:"entity-name,omitempty"`
-	Category    types.Category `mapstructure:"category" yaml:"category,omitempty"`
-	Description string         `mapstructure:"description" yaml:"description"`
-	Features    []Feature      `mapstructure:"features" yaml:"features,omitempty"`
+	Kind             string         `mapstructure:"kind" yaml:"kind,omitempty"`
+	Name             string         `mapstructure:"name" yaml:"name,omitempty"`
+	EntityName       string         `mapstructure:"entity-name" yaml:"entity-name,omitempty"`
+	Category         types.Category `mapstructure:"category" yaml:"category,omitempty"`
+	SnapshotInterval time.Duration  `mapstructure:"snapshot-interval" yaml:"snapshot-interval,omitempty"`
+	Description      string         `mapstructure:"description" yaml:"description"`
+	Features         []Feature      `mapstructure:"features" yaml:"features,omitempty"`
 }
 
 type GroupItems struct {
@@ -107,11 +109,12 @@ func FromGroupList(groups types.GroupList, features types.FeatureList) *GroupIte
 
 	for _, group := range groups {
 		items.Items = append(items.Items, Group{
-			Kind:        "Group",
-			Name:        group.Name,
-			EntityName:  group.Entity.Name,
-			Category:    group.Category,
-			Description: group.Description,
+			Kind:             "Group",
+			Name:             group.Name,
+			EntityName:       group.Entity.Name,
+			Category:         group.Category,
+			SnapshotInterval: time.Duration(group.SnapshotInterval) * time.Second,
+			Description:      group.Description,
 			Features: FromFeatureList(features.Filter(func(f *types.Feature) bool {
 				return f.Group.Name == group.Name
 			})).Walk(func(f Feature) Feature {

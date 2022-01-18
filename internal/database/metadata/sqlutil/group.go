@@ -18,6 +18,9 @@ func UpdateGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 	if opt.NewDescription != nil {
 		and["description"] = *opt.NewDescription
 	}
+	if opt.NewSnapshotInterval != nil {
+		and["snapshot_interval"] = *opt.NewSnapshotInterval
+	}
 	if opt.NewOnlineRevisionID != nil {
 		and["online_revision_id"] = *opt.NewOnlineRevisionID
 	}

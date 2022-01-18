@@ -19,6 +19,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 			name               	VARCHAR(32) 	NOT	NULL,
 			category           	VARCHAR(16) 	NOT	NULL COMMENT "group category: batch, stream",
 			entity_id          	INT         	NOT	NULL,
+			snapshot_interval  	INT		        DEFAULT 0,
 			online_revision_id 	INT         	DEFAULT NULL,
 			description        	VARCHAR(64) 	DEFAULT '',
 			create_time        	TIMESTAMP   	NOT	NULL DEFAULT CURRENT_TIMESTAMP,

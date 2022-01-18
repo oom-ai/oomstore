@@ -30,8 +30,8 @@ features:
 EOF
 
     group_expected='
-ID,NAME,ENTITY,CATEGORY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,device,user,batch,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+ID,NAME,ENTITY,CATEGORY,SNAPSHOT-INTERVAL,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,device,user,batch,0s,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
     group_actual=$(oomcli get meta group -o csv --wide)
     filter() { cut -d ',' -f 1-5 <<<"$1"; }
@@ -66,12 +66,20 @@ name: account
 entity-name: user
 category: batch
 description: 'description'
+---
+kind: Group
+name: user-click
+entity-name: user
+category: stream
+snapshot-interval: 24h
+description: user click post feature
 EOF
 
     group_expected='
-ID,NAME,ENTITY,CATEGORY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,device,user,batch,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
-2,account,user,batch,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+ID,NAME,ENTITY,CATEGORY,SNAPSHOT-INTERVAL,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,device,user,batch,0s,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+2,account,user,batch,0s,description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+3,user-click,user,stream,24h0m0s,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
     group_actual=$(oomcli get meta group -o csv --wide)
     filter() { cut -d ',' -f 1-5 <<<"$1"; }
@@ -136,10 +144,10 @@ items:
 EOF
 
     group_expected='
-ID,NAME,ENTITY,CATEGORY,DESCRIPTION
-1,account,user,batch,user account info
-2,transaction_stats,user,batch,user transaction statistics
-3,phone,device,batch,phone info
+ID,NAME,ENTITY,CATEGORY,SNAPSHOT-INTERVAL,DESCRIPTION
+1,account,user,batch,0s,user account info
+2,transaction_stats,user,batch,0s,user transaction statistics
+3,phone,device,batch,0s,phone info
 '
     group_actual=$(oomcli get meta group -o csv --wide)
     filter() { cut -d ',' -f 1-5 <<<"$1"; }
