@@ -5,30 +5,34 @@ import (
 	"io"
 
 	"github.com/oom-ai/oomstore/pkg/errdefs"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/offline"
 )
 
-func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, source *offline.CSVSource, tableName string, header []string, features types.FeatureList) error {
-	stmt, err := tx.PreparexContext(ctx, pq.CopyIn(tableName, header...))
+func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, opt dbutil.LoadDataFromSourceOpt) error {
+	stmt, err := tx.PreparexContext(ctx, pq.CopyIn(opt.TableName, opt.Header...))
 	if err != nil {
 		return errdefs.WithStack(err)
 	}
 	defer stmt.Close()
 
 	for {
-		record, err := dbutil.ReadLine(source.Reader, source.Delimiter, features, Backend)
+		record, err := dbutil.ReadLine(dbutil.ReadLineOpt{
+			Source:   opt.Source,
+			Entity:   opt.Entity,
+			Header:   opt.Header,
+			Features: opt.Features,
+			Backend:  opt.Backend,
+		})
 		if errdefs.Cause(err) == io.EOF {
 			break
 		}
 		if err != nil {
 			return err
 		}
-		if len(record) != len(header) {
+		if len(record) != len(opt.Header) {
 			continue
 		}
 		if _, err := stmt.ExecContext(ctx, record...); err != nil {
