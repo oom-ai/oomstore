@@ -172,7 +172,7 @@ func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codeg
 		Revision:       req.Revision,
 		DataSourceType: types.CSV_FILE,
 		CsvFileDataSource: &types.CsvFileDataSource{
-			InputFilePath: req.InputFilePath,
+			InputFilePath: req.InputFile,
 			Delimiter:     ",",
 		},
 	})
@@ -273,8 +273,8 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.JoinResponse, error) {
 	err := s.oomstore.Join(ctx, types.JoinOpt{
 		FeatureNames:   req.Features,
-		InputFilePath:  req.InputFilePath,
-		OutputFilePath: req.OutputFilePath,
+		InputFilePath:  req.InputFile,
+		OutputFilePath: req.OutputFile,
 	})
 	if err != nil {
 		return nil, internalError(err.Error())
@@ -320,7 +320,7 @@ func (s *server) Export(ctx context.Context, req *codegen.ExportRequest) (*codeg
 		FeatureNames:   req.Features,
 		UnixMilli:      req.UnixMilli,
 		Limit:          req.Limit,
-		OutputFilePath: req.OutputFilePath,
+		OutputFilePath: req.OutputFile,
 	})
 	if err != nil {
 		return nil, internalError(err.Error())

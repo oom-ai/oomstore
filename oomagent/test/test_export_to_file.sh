@@ -36,7 +36,7 @@ arg=$(cat <<-EOF
 {
     "features": ["account.state"],
     "unix_milli": $unix_milli,
-    "output_file_path": "$output"
+    "output_file": "$output"
 }
 EOF
 )
@@ -62,7 +62,7 @@ group="export all features"
 arg=$(cat <<-EOF
 {
     "features": ["account.state","account.credit_score","account.account_age_days","account.has_2fa_installed"],
-    "output_file_path": "$output",
+    "output_file": "$output",
     "unix_milli": $unix_milli
 }
 EOF

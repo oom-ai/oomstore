@@ -1,6 +1,7 @@
 pub mod error;
 mod util;
 
+use crate::oomagent::JoinRequest;
 use std::{collections::HashMap, path::Path};
 
 use error::OomError;
@@ -142,11 +143,11 @@ impl Client {
         let res = self
             .inner
             .import(ImportRequest {
-                group:           group.into(),
-                description:     description.into(),
-                revision:        revision.into(),
-                input_file_path: input_file.as_ref().display().to_string(),
-                delimiter:       delimiter.into().map(String::from),
+                group:       group.into(),
+                description: description.into(),
+                revision:    revision.into(),
+                input_file:  input_file.as_ref().display().to_string(),
+                delimiter:   delimiter.into().map(String::from),
             })
             .await?
             .into_inner();
@@ -213,5 +214,21 @@ impl Client {
             }
         };
         Ok((header, outbound))
+    }
+
+    pub async fn join(
+        &mut self,
+        features: Vec<String>,
+        input_file: impl AsRef<Path>,
+        output_file: impl AsRef<Path>,
+    ) -> Result<()> {
+        self.inner
+            .join(JoinRequest {
+                features,
+                input_file: input_file.as_ref().display().to_string(),
+                output_file: output_file.as_ref().display().to_string(),
+            })
+            .await?;
+        Ok(())
     }
 }
