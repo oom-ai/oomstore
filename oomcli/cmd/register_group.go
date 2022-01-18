@@ -9,7 +9,13 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-var registerGroupOpt types.CreateGroupOpt
+type RegisterGroupOption struct {
+	types.CreateGroupOpt
+
+	snapshotInterval string
+}
+
+var registerGroupOpt RegisterGroupOption
 var registerGroupCmd = &cobra.Command{
 	Use:   "group <group_name>",
 	Short: "Register a new feature group",
@@ -19,8 +25,12 @@ var registerGroupCmd = &cobra.Command{
 			exitf("illegal category '%s', should be either 'stream' or 'batch'", registerGroupOpt.Category)
 		}
 
-		if registerGroupOpt.Category == types.CategoryBatch {
-			registerGroupOpt.SnapshotInterval = 0
+		if registerGroupOpt.Category == types.CategoryStream {
+			t, err := time.ParseDuration(registerGroupOpt.snapshotInterval)
+			if err != nil {
+				exitf("invalid snapshot_interval %s: %v", registerGroupOpt.snapshotInterval, err)
+			}
+			registerGroupOpt.CreateGroupOpt.SnapshotInterval = int(t.Seconds())
 		}
 
 		registerGroupOpt.GroupName = args[0]
@@ -30,7 +40,7 @@ var registerGroupCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		if _, err := oomStore.CreateGroup(ctx, registerGroupOpt); err != nil {
+		if _, err := oomStore.CreateGroup(ctx, registerGroupOpt.CreateGroupOpt); err != nil {
 			exitf("failed registering new group: %+v\n", err)
 		}
 	},
@@ -46,7 +56,8 @@ func init() {
 
 	flags.StringVarP(&registerGroupOpt.Category, "category", "c", "batch", "group category")
 
-	flags.IntVarP(&registerGroupOpt.SnapshotInterval, "snapshot_interval", "s", 24*int(time.Hour.Seconds()), "stream group snapshot interval")
+	flags.StringVarP(&registerGroupOpt.snapshotInterval, "snapshot_interval", "s", "24h", "stream group snapshot interval")
 
 	flags.StringVarP(&registerGroupOpt.Description, "description", "d", "", "group description")
+
 }
