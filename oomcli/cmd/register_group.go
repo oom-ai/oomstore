@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -16,6 +17,10 @@ var registerGroupCmd = &cobra.Command{
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if registerGroupOpt.Category != types.CategoryBatch && registerGroupOpt.Category != types.CategoryStream {
 			exitf("illegal category '%s', should be either 'stream' or 'batch'", registerGroupOpt.Category)
+		}
+
+		if registerGroupOpt.Category == types.CategoryBatch {
+			registerGroupOpt.SnapshotInterval = 0
 		}
 
 		registerGroupOpt.GroupName = args[0]
@@ -40,6 +45,8 @@ func init() {
 	_ = registerGroupCmd.MarkFlagRequired("entity")
 
 	flags.StringVarP(&registerGroupOpt.Category, "category", "c", "batch", "group category")
+
+	flags.IntVarP(&registerGroupOpt.SnapshotInterval, "snapshot_interval", "s", 24*int(time.Hour.Seconds()), "stream group snapshot interval")
 
 	flags.StringVarP(&registerGroupOpt.Description, "description", "d", "", "group description")
 }

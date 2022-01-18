@@ -24,10 +24,11 @@ type CreateEntityOpt struct {
 }
 
 type CreateGroupOpt struct {
-	GroupName   string
-	EntityName  string
-	Category    Category
-	Description string
+	GroupName        string
+	EntityName       string
+	Category         Category
+	SnapshotInterval int
+	Description      string
 }
 
 type ChannelExportOpt struct {

@@ -13,6 +13,8 @@ type Group struct {
 	CreateTime  time.Time `db:"create_time"`
 	ModifyTime  time.Time `db:"modify_time"`
 
+	SnapshotInterval int `db:"snapshot_interval"`
+
 	EntityID         int  `db:"entity_id"`
 	OnlineRevisionID *int `db:"online_revision_id"`
 

@@ -16,10 +16,11 @@ func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (i
 	}
 
 	id, err := s.metadata.CreateGroup(ctx, metadata.CreateGroupOpt{
-		GroupName:   opt.GroupName,
-		EntityID:    entity.ID,
-		Description: opt.Description,
-		Category:    opt.Category,
+		GroupName:        opt.GroupName,
+		EntityID:         entity.ID,
+		Description:      opt.Description,
+		Category:         opt.Category,
+		SnapshotInterval: opt.SnapshotInterval,
 	})
 	if err != nil {
 		return 0, err
