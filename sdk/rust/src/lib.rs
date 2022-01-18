@@ -20,6 +20,7 @@ use oomagent::{
     OnlineGetRequest,
     OnlineMultiGetRequest,
     PushRequest,
+    SnapshotRequest,
     SyncRequest,
 };
 use tonic::{codegen::StdError, transport, Request};
@@ -276,6 +277,11 @@ impl Client {
         self.inner
             .export(ExportRequest { features, unix_milli, output_file, limit })
             .await?;
+        Ok(())
+    }
+
+    pub async fn snapshot(&mut self, group: impl Into<String>) -> Result<()> {
+        self.inner.snapshot(SnapshotRequest { group: group.into() }).await?;
         Ok(())
     }
 }
