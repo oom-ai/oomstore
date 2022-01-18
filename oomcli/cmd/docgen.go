@@ -25,6 +25,7 @@ func init() {
 
 func genDoc() {
 	var sb strings.Builder
+	sb.WriteString("# CLI\n\n")
 	genDocTree(&sb, rootCmd)
 	fmt.Println(sb.String())
 }
