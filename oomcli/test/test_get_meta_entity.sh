@@ -75,6 +75,7 @@ items:
               description: age
         - name: user-click
           category: stream
+          snapshot-interval: 24h0m0s
           description: user click post feature
           features:
             - name: last_5_click_posts

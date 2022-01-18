@@ -1,9 +1,10 @@
 kind: Entity
 name: user
-description: 'user id'
+description: "user id"
 groups:
   - name: user-click
     category: stream
+    snapshot-interval: 24h
     description: user click post feature
     features:
       - name: last_5_click_posts

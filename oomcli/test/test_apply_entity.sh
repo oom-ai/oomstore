@@ -30,6 +30,10 @@ groups:
   - name: gender
     value-type: int64
     description: 'description'
+- name: user-click
+  category: stream
+  snapshot-interval: 24h
+  description: user click post feature
 EOF
 
     entity_expected='
@@ -40,12 +44,13 @@ ID,NAME,DESCRIPTION
     assert_eq "apply_single_complex_entity: check entity" "$(sort <<< "$entity_expected")" "$(sort <<< "$entity_actual")"
 
     group_expected='
-ID,NAME,ENTITY,CATEGORY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,device,user,batch,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
-2,user,user,batch,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+ID,NAME,ENTITY,CATEGORY,SNAPSHOT-INTERVAL,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,device,user,batch,0s,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+2,user,user,batch,0s,a description,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+3,user-click,user,stream,24h0m0s,user click post feature
 '
     group_actual=$(oomcli get meta group -o csv --wide)
-    filter() { cut -d ',' -f 1-5 <<<"$1"; }
+    filter() { cut -d ',' -f 1-6 <<<"$1"; }
     assert_eq "apply_single_complex_entity: check group" "$(filter "$group_expected" | sort)" "$(filter "$group_actual" | sort)"
 
     feature_expected='
@@ -91,11 +96,11 @@ ID,NAME,DESCRIPTION
     assert_eq "apply_multiple_files_of_entity: oomcli get meta entity" "$entity_expected" "$entity_actual"
 
     group_expected='
-ID,NAME,ENTITY,CATEGORY,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
-1,student,user,batch,student feature group,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
+ID,NAME,ENTITY,CATEGORY,SNAPSHOT-INTERVAL,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
+1,student,user,batch,0s,student feature group,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 '
     group_actual=$(oomcli get meta group -o csv --wide)
-    filter() { cut -d ',' -f 1-5 <<<"$1"; }
+    filter() { cut -d ',' -f 1-6 <<<"$1"; }
     assert_eq "oapply_multiple_files_of_entity: check group" "$(filter "$group_expected"| sort)" "$(filter "$group_actual" | sort)"
 }
 
@@ -156,10 +161,10 @@ ID,NAME,DESCRIPTION
       assert_eq "apply_entity_items: oomcli apply mutiple entity: check entity" "$(sort <<< "$entity_expected")" "$(sort <<< "$entity_actual")"
 
     group_expected='
-ID,NAME,ENTITY,CATEGORY,DESCRIPTION
-1,account,user,batch,user account info
-2,transaction_stats,user,batch,user transaction statistics
-3,phone,device,batch,phone info
+ID,NAME,ENTITY,CATEGORY,SNAPSHOT-INTERVAL,DESCRIPTION
+1,account,user,batch,0s,user account info
+2,transaction_stats,user,batch,0s,user transaction statistics
+3,phone,device,batch,0s,phone info
 '
       group_actual=$(oomcli get meta group -o csv)
       assert_eq "apply_entity_items: oomcli apply multiple entity: check group" "$group_expected" "$group_actual"
