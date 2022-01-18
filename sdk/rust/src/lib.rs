@@ -1,6 +1,7 @@
 pub mod error;
 mod util;
 
+use crate::oomagent::JoinRequest;
 use std::{collections::HashMap, path::Path};
 
 use error::OomError;
@@ -213,5 +214,21 @@ impl Client {
             }
         };
         Ok((header, outbound))
+    }
+
+    pub async fn join(
+        &mut self,
+        features: Vec<String>,
+        input_file: impl AsRef<Path>,
+        output_file: impl AsRef<Path>,
+    ) -> Result<()> {
+        self.inner
+            .join(JoinRequest {
+                features,
+                input_file: input_file.as_ref().display().to_string(),
+                output_file: output_file.as_ref().display().to_string(),
+            })
+            .await?;
+        Ok(())
     }
 }
