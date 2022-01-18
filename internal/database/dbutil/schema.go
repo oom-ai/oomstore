@@ -69,7 +69,8 @@ func BuildIndexDDL(tableName string, indexName string, fields []string, backend 
 	switch backend {
 	case types.BackendCassandra,
 		types.BackendMySQL,
-		types.BackendSQLite:
+		types.BackendSQLite,
+		types.BackendRedshift:
 		return fmt.Sprintf("CREATE INDEX %s ON %s (%s)", qt(indexName), qt(tableName), qt(fields...))
 	case types.BackendPostgres:
 		// omit the name when creating the index, and PG will assign a unique name automatically.
