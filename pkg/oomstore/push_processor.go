@@ -143,7 +143,7 @@ func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID 
 
 	buckets := make(map[int64][]types.StreamRecord)
 	for _, record := range b.records {
-		revision := p.lastRevision(int64(group.SnapshotInterval), record.UnixMilli)
+		revision := lastRevisionForStream(int64(group.SnapshotInterval), record.UnixMilli)
 		if _, ok := buckets[revision]; !ok {
 			buckets[revision] = make([]types.StreamRecord, 0)
 		}
@@ -163,7 +163,7 @@ func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID 
 				return err
 			}
 
-			if err = p.newRevision(ctx, s, groupID, revision); err != nil {
+			if err = s.newRevisionForStream(ctx, groupID, revision); err != nil {
 				return err
 			}
 			// push data to new offline stream cdc table
@@ -179,7 +179,7 @@ func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID 
 	return err
 }
 
-func (p *PushProcessor) newRevision(ctx context.Context, s *OomStore, groupID int, revision int64) error {
+func (s *OomStore) newRevisionForStream(ctx context.Context, groupID int, revision int64) error {
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		GroupID: &groupID,
 	})
@@ -210,6 +210,6 @@ func (p *PushProcessor) newRevision(ctx context.Context, s *OomStore, groupID in
 	return nil
 }
 
-func (p *PushProcessor) lastRevision(snapshotInterval int64, unixMill int64) int64 {
+func lastRevisionForStream(snapshotInterval int64, unixMill int64) int64 {
 	return (unixMill / snapshotInterval) * snapshotInterval
 }
