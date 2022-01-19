@@ -1,4 +1,4 @@
-use oomstore::Client;
+use oomrpc::Client;
 
 macro_rules! svec { ($($part:expr),* $(,)?) => {{ vec![$($part.to_string(),)*] }} }
 

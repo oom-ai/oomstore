@@ -1,5 +1,8 @@
 pub mod error;
 mod util;
+mod oomagent {
+    tonic::include_proto!("oomagent");
+}
 
 use error::OomError;
 use futures_core::stream::Stream;
@@ -23,23 +26,11 @@ use oomagent::{
 };
 use std::{collections::HashMap, path::Path};
 use tonic::{codegen::StdError, transport, Request};
-use util::parse_raw_feature_values;
+use util::{parse_raw_feature_values, parse_raw_values};
 
-use crate::{oomagent::EntityRow, util::parse_raw_values};
-
-pub use oomagent::value::Value;
+pub use oomagent::{value::Value, EntityRow};
 
 type Result<T> = std::result::Result<T, OomError>;
-
-pub mod google {
-    pub mod protobuf {
-        tonic::include_proto!("google.protobuf");
-    }
-}
-
-pub mod oomagent {
-    tonic::include_proto!("oomagent");
-}
 
 pub struct Client {
     inner: OomAgentClient<transport::Channel>,
@@ -78,7 +69,7 @@ impl Client {
         &mut self,
         key: impl Into<String>,
         features: Vec<String>,
-    ) -> Result<HashMap<String, Value>> {
+    ) -> Result<HashMap<String, Option<Value>>> {
         let rs = self.online_get_raw(key, features).await?;
         Ok(parse_raw_feature_values(rs))
     }
@@ -100,7 +91,7 @@ impl Client {
         &mut self,
         keys: Vec<String>,
         features: Vec<String>,
-    ) -> Result<HashMap<String, HashMap<String, Value>>> {
+    ) -> Result<HashMap<String, HashMap<String, Option<Value>>>> {
         let rs = self.online_multi_get_raw(keys, features).await?;
         Ok(rs.into_iter().map(|(k, v)| (k, parse_raw_feature_values(v))).collect())
     }
@@ -185,7 +176,7 @@ impl Client {
         join_features: Vec<String>,
         existed_features: Vec<String>,
         entity_rows: impl Iterator<Item = EntityRow> + Send + 'static,
-    ) -> Result<(Vec<String>, impl Stream<Item = Result<Vec<Value>>>)> {
+    ) -> Result<(Vec<String>, impl Stream<Item = Result<Vec<Option<Value>>>>)> {
         let inbound = async_stream::stream! {
             for (i, row) in entity_rows.enumerate() {
                 let (join_features, existed_features) = match i {
@@ -239,7 +230,7 @@ impl Client {
         features: Vec<String>,
         unix_milli: u64,
         limit: impl Into<Option<usize>>,
-    ) -> Result<(Vec<String>, impl Stream<Item = Result<Vec<Value>>>)> {
+    ) -> Result<(Vec<String>, impl Stream<Item = Result<Vec<Option<Value>>>>)> {
         let unix_milli = unix_milli.try_into()?;
         let limit = limit.into().map(|n| n.try_into()).transpose()?;
         let mut outbound = self

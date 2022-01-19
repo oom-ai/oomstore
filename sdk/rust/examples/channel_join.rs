@@ -1,5 +1,5 @@
 use futures_util::{pin_mut, StreamExt};
-use oomstore::{oomagent::EntityRow, Client};
+use oomrpc::{Client, EntityRow};
 
 macro_rules! svec { ($($part:expr),* $(,)?) => {{ vec![$($part.to_string(),)*] }} }
 
@@ -41,7 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     pin_mut!(rows); // needed for iteration
 
     while let Some(row) = rows.next().await {
-        println!("RESPONSE ROWS={:?}", row);
+        println!("RESPONSE ROWS={:?}", row?);
     }
 
     Ok(())
