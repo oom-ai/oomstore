@@ -4,6 +4,7 @@ mod oomagent {
     tonic::include_proto!("oomagent");
 }
 
+use async_stream::stream;
 use error::OomError;
 use futures_core::stream::Stream;
 use oomagent::{
@@ -111,13 +112,13 @@ impl Client {
         group: impl Into<Option<String>>,
         description: impl Into<Option<String>>,
         revision: impl Into<Option<i64>>,
-        rows: impl Iterator<Item = Vec<u8>> + Send + 'static,
+        rows: impl Stream<Item = Vec<u8>> + Send + 'static,
     ) -> Result<u32> {
         let mut group = group.into();
         let mut description = description.into();
         let mut revision = revision.into();
-        let inbound = async_stream::stream! {
-            for row in rows {
+        let inbound = stream! {
+            for await row in rows {
                 yield ChannelImportRequest{group: group.take(), description: description.take(), revision: revision.take(), row};
             }
         };
@@ -175,12 +176,14 @@ impl Client {
         &mut self,
         join_features: Vec<String>,
         existed_features: Vec<String>,
-        entity_rows: impl Iterator<Item = EntityRow> + Send + 'static,
+        entity_rows: impl Stream<Item = EntityRow> + Send + 'static,
     ) -> Result<(Vec<String>, impl Stream<Item = Result<Vec<Option<Value>>>>)> {
-        let inbound = async_stream::stream! {
-            for (i, row) in entity_rows.enumerate() {
-                let (join_features, existed_features) = match i {
-                    0 => (join_features.clone(), existed_features.clone()),
+        let mut join_features = Some(join_features);
+        let mut existed_features = Some(existed_features);
+        let inbound = stream! {
+            for await row in entity_rows {
+                let (join_features, existed_features) = match (join_features.take(), existed_features.take()) {
+                    (Some(join_features), Some(existed_features)) => (join_features, existed_features),
                     _ => (Vec::new(), Vec::new()),
                 };
                 yield ChannelJoinRequest {

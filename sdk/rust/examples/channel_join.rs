@@ -12,7 +12,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ];
     let existed_features = vec![];
 
-    let entity_rows = vec![
+    let entity_rows = tokio_stream::iter([
         EntityRow {
             entity_key: "1".into(),
             unix_milli: 3,
@@ -28,10 +28,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             unix_milli: 0,
             values:     Vec::new(),
         },
-    ];
+    ]);
 
     let (header, rows) = client
-        .channel_join(join_features, existed_features, entity_rows.into_iter())
+        .channel_join(join_features, existed_features, entity_rows)
         .await?;
 
     println!("RESPONSE HEADER={:?}", header);

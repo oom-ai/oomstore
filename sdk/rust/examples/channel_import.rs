@@ -17,11 +17,13 @@ user,state,credit_score,account_age_days,has_2fa_installed
 9,Alabama,577,150,true
 10,Idaho,693,212,true
 "#
-    .trim()
+    .trim_start()
     .split_inclusive('\n')
     .map(|line| line.as_bytes().to_vec());
 
-    client.channel_import("account".to_owned(), None, None, rows).await?;
+    client
+        .channel_import("account".to_owned(), None, None, tokio_stream::iter(rows))
+        .await?;
 
     Ok(())
 }
