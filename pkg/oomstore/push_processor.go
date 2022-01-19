@@ -10,7 +10,6 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -140,37 +139,8 @@ func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID 
 	if err != nil {
 		return err
 	}
-
-	buckets := make(map[int64][]types.StreamRecord)
-	for _, record := range b.records {
-		revision := p.lastRevision(int64(group.SnapshotInterval), record.UnixMilli)
-		if _, ok := buckets[revision]; !ok {
-			buckets[revision] = make([]types.StreamRecord, 0)
-		}
-		buckets[revision] = append(buckets[revision], record)
-	}
-	for revision, records := range buckets {
-		pushOpt := offline.PushOpt{
-			GroupID:      groupID,
-			Revision:     revision,
-			EntityName:   entity.Name,
-			FeatureNames: features.Names(),
-			Records:      records,
-		}
-
-		if err = s.offline.Push(ctx, pushOpt); err != nil {
-			if !errdefs.IsNotFound(err) {
-				return err
-			}
-
-			if err = p.newRevision(ctx, s, groupID, revision); err != nil {
-				return err
-			}
-			// push data to new offline stream cdc table
-			if err = s.offline.Push(ctx, pushOpt); err != nil {
-				return err
-			}
-		}
+	if err = s.pushStreamingRecords(ctx, b.records, entity.Name, group, features); err != nil {
+		return err
 	}
 
 	b.records = make([]types.StreamRecord, 0, p.bufferSize)
@@ -179,7 +149,7 @@ func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID 
 	return err
 }
 
-func (p *PushProcessor) newRevision(ctx context.Context, s *OomStore, groupID int, revision int64) error {
+func (s *OomStore) newRevisionForStream(ctx context.Context, groupID int, revision int64) error {
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
 		GroupID: &groupID,
 	})
@@ -210,6 +180,6 @@ func (p *PushProcessor) newRevision(ctx context.Context, s *OomStore, groupID in
 	return nil
 }
 
-func (p *PushProcessor) lastRevision(snapshotInterval int64, unixMill int64) int64 {
+func lastRevisionForStream(snapshotInterval int64, unixMill int64) int64 {
 	return (unixMill / snapshotInterval) * snapshotInterval
 }
