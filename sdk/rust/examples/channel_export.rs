@@ -2,16 +2,14 @@ use futures_util::{pin_mut, StreamExt};
 use oomrpc::Client;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-macro_rules! svec { ($($part:expr),* $(,)?) => {{ vec![$($part.to_string(),)*] }} }
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = Client::connect("http://127.0.0.1:50051").await?;
 
-    let features = svec![
-        "account.state",
-        "account.has_2fa_installed",
-        "transaction_stats.transaction_count_7d"
+    let features = vec![
+        "account.state".into(),
+        "account.has_2fa_installed".into(),
+        "transaction_stats.transaction_count_7d".into(),
     ];
 
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_millis().try_into()?;

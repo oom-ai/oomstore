@@ -1,18 +1,16 @@
 use futures_util::{pin_mut, StreamExt};
 use oomrpc::{Client, EntityRow};
 
-macro_rules! svec { ($($part:expr),* $(,)?) => {{ vec![$($part.to_string(),)*] }} }
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = Client::connect("http://127.0.0.1:50051").await?;
 
-    let join_features = svec![
-        "driver_stats.conv_rate",
-        "driver_stats.acc_rate",
-        "driver_stats.avg_daily_trips"
+    let join_features = vec![
+        "driver_stats.conv_rate".into(),
+        "driver_stats.acc_rate".into(),
+        "driver_stats.avg_daily_trips".into(),
     ];
-    let existed_features = svec![];
+    let existed_features = vec![];
 
     let entity_rows = vec![
         EntityRow {
