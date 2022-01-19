@@ -36,7 +36,6 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, opt LoadDataFromSource
 			Entity:   opt.Entity,
 			Header:   opt.Header,
 			Features: opt.Features,
-			Backend:  opt.Backend,
 		})
 		if errdefs.Cause(err) == io.EOF {
 			break
@@ -66,7 +65,6 @@ type ReadLineOpt struct {
 	Entity   *types.Entity
 	Header   []string
 	Features types.FeatureList
-	Backend  types.BackendType
 }
 
 func ReadLine(opt ReadLineOpt) ([]interface{}, error) {
@@ -81,21 +79,18 @@ func ReadLine(opt ReadLineOpt) ([]interface{}, error) {
 			// entity_key doesn't need to change type
 			line = append(line, ele)
 		} else if opt.Header[i] == "unix_milli" {
-			line = append(line, castElement(ele, types.Int64, opt.Backend))
+			line = append(line, castElement(ele, types.Int64))
 		} else {
 			feature := opt.Features.Find(func(f *types.Feature) bool {
 				return f.Name == opt.Header[i]
 			})
-			line = append(line, castElement(ele, feature.ValueType, opt.Backend))
+			line = append(line, castElement(ele, feature.ValueType))
 		}
 	}
 	return line, nil
 }
 
-func castElement(s string, valueType types.ValueType, backend types.BackendType) interface{} {
-	if backend != types.BackendMySQL {
-		return s
-	}
+func castElement(s string, valueType types.ValueType) interface{} {
 	if valueType != types.Bool {
 		return s
 	}
