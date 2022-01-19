@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"io"
+	"os"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 
@@ -21,16 +22,36 @@ const (
 )
 
 func (s *OomStore) ImportStream(ctx context.Context, opt types.ImportStreamOpt) error {
+	switch opt.DataSourceType {
+	case types.CSV_FILE:
+		src := opt.CsvFileDataSource
+		file, err := os.Open(src.InputFilePath)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		return s.csvReaderImportStream(ctx, opt, &types.CsvReaderDataSource{
+			Reader:    file,
+			Delimiter: src.Delimiter,
+		})
+	case types.CSV_READER:
+		return s.csvReaderImportStream(ctx, opt, opt.CsvReaderDataSource)
+	default:
+		return errdefs.Errorf("unsupported data source: %v", opt.DataSourceType)
+	}
+}
+
+func (s *OomStore) csvReaderImportStream(ctx context.Context, opt types.ImportStreamOpt, dataSource *types.CsvReaderDataSource) error {
 	// get group information
 	entity, group, features, err := s.getGroupInfo(ctx, opt.GroupName)
 	if err != nil {
 		return err
 	}
 	// read header
-	reader := bufio.NewReader(opt.CsvReaderDataSource.Reader)
+	reader := bufio.NewReader(dataSource.Reader)
 	source := &offline.CSVSource{
 		Reader:    reader,
-		Delimiter: opt.CsvReaderDataSource.Delimiter,
+		Delimiter: dataSource.Delimiter,
 	}
 	columnNames := append([]string{entity.Name, "unix_milli"}, features.Names()...)
 	header, err := readHeader(source, columnNames)

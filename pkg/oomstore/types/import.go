@@ -39,5 +39,7 @@ type ImportStreamOpt struct {
 	GroupName   string
 	Description string
 
-	CsvReaderDataSource CsvReaderDataSource
+	DataSourceType      DataSourceType
+	CsvFileDataSource   *CsvFileDataSource
+	CsvReaderDataSource *CsvReaderDataSource
 }
