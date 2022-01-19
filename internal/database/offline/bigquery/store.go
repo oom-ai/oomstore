@@ -83,21 +83,8 @@ func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
 }
 
 func (db *DB) CreateTable(ctx context.Context, opt offline.CreateTableOpt) error {
-	var hasUnixMilli bool
-	switch opt.TableType {
-	case types.TableBatchSnapshot:
-		hasUnixMilli = false
-	case types.TableStreamSnapshot, types.TableStreamCdc:
-		hasUnixMilli = true
-	default:
-		panic(fmt.Sprintf("unsupported table type %s", opt.TableType))
-	}
-
-	schema := dbutil.BuildTableSchema(opt.TableName, opt.Entity, hasUnixMilli, opt.Features, nil, Backend)
-	if _, err := db.Client.Query(schema).Run(ctx); err != nil {
-		return errdefs.WithStack(err)
-	}
-	return nil
+	dbOpt := dbutil.DBOpt{Backend: Backend, BigQueryDB: db.Client, DatasetID: &db.datasetID}
+	return sqlutil.CreateTable(ctx, dbOpt, opt)
 }
 
 func (db *DB) Push(ctx context.Context, opt offline.PushOpt) error {
