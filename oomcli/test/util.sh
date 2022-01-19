@@ -57,14 +57,25 @@ register_features() {
 
     oomcli register group phone      --entity device --category "batch"  --description "phone"
     oomcli register group student    --entity user   --category "batch"  --description "student"
-    oomcli register group user-click --entity user   --category "stream" --description "user click post feature"
+    oomcli register group user-click \
+      --entity user \
+      --category "stream" \
+      --snapshot_interval "1s" \
+      --description "user click post feature"
 
     oomcli register feature price --group phone   --value-type "int64"  --description "price"
     oomcli register feature model --group phone   --value-type "string" --description "model"
     oomcli register feature age   --group student --value-type "int64"  --description "age"
 
-    oomcli register feature last_5_click_posts           --group user-click --value-type "string" --description "user last 5 click posts"
-    oomcli register feature number_of_user_starred_posts --group user-click --value-type "int64"  --description "number of posts that users starred today"
+    oomcli register feature last_5_click_posts \
+      --group user-click \
+      --value-type "string" \
+      --description "user last 5 click posts"
+
+    oomcli register feature number_of_user_starred_posts \
+      --group user-click \
+      --value-type "int64"  \
+      --description "number of posts that users starred today"
 }
 
 # import sample data

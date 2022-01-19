@@ -10,7 +10,7 @@ case='oomcli get meta group works'
 expected='ID,NAME,ENTITY,CATEGORY,SNAPSHOT-INTERVAL,DESCRIPTION,ONLINE-REVISION-ID,CREATE-TIME,MODIFY-TIME
 1,phone,device,batch,0s,phone,<NULL>,2021-11-30T07:51:03Z,2021-11-30T08:19:13Z
 2,student,user,batch,0s,student
-3,user-click,user,stream,24h0m0s,user click post feature
+3,user-click,user,stream,1s,user click post feature
 '
 actual=$(oomcli get meta group -o csv --wide)
 ignore_time() { cut -d ',' -f 1-5 <<<"$1"; }
@@ -20,7 +20,7 @@ case='oomcli get simplified group works'
 expected='ID,NAME,ENTITY,CATEGORY,SNAPSHOT-INTERVAL,DESCRIPTION
 1,phone,device,batch,0s,phone
 2,student,user,batch,0s,student
-3,user-click,user,stream,24h0m0s,user click post feature
+3,user-click,user,stream,1s,user click post feature
 '
 actual=$(oomcli get meta group -o csv)
 assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"
@@ -79,7 +79,7 @@ items:
       name: user-click
       entity-name: user
       category: stream
-      snapshot-interval: 24h0m0s
+      snapshot-interval: 1s
       description: user click post feature
       features:
         - name: last_5_click_posts

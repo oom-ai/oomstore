@@ -66,20 +66,11 @@ func createTableDDL(tableName string, columns ColumnList, pkFields []string, bac
 
 func BuildIndexDDL(tableName string, indexName string, fields []string, backend types.BackendType) string {
 	qt := QuoteFn(backend)
-	switch backend {
-	case types.BackendCassandra,
-		types.BackendMySQL,
-		types.BackendSQLite:
-		return fmt.Sprintf("CREATE INDEX %s ON %s (%s)", qt(indexName), qt(tableName), qt(fields...))
-	case types.BackendPostgres:
-		// omit the name when creating the index, and PG will assign a unique name automatically.
-		// see: https://stackoverflow.com/a/27307016/16428442
-		return fmt.Sprintf("CREATE INDEX ON %s (%s)", qt(tableName), qt(fields...))
-	case types.BackendSnowflake:
-		return fmt.Sprintf("ALTER TABLE %s CLUSTER BY (%s)", qt(tableName), qt(fields...))
-	default:
-		panic(fmt.Sprintf("unsupported backend type %s", backend))
-	}
+
+	// Some db like postgres, sqlite index must be database unique,
+	// so here we use index + table to build a database unique index.
+	index := tableName + indexName
+	return fmt.Sprintf("CREATE INDEX %s ON %s (%s)", qt(index), qt(tableName), qt(fields...))
 }
 
 func parseColumns(entity *types.Entity, hasUnixMilli bool, features types.FeatureList, backend types.BackendType) (rs []Column) {
