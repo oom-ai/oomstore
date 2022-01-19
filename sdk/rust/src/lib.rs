@@ -33,6 +33,7 @@ pub use oomagent::{value::Value, EntityRow};
 
 type Result<T> = std::result::Result<T, OomError>;
 
+#[derive(Debug, Clone)]
 pub struct Client {
     inner: OomAgentClient<transport::Channel>,
 }
