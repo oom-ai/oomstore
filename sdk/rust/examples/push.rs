@@ -1,4 +1,4 @@
-use oomrpc::{Client, Value};
+use oomclient::{Client, Value};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

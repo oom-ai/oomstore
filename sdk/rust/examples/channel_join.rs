@@ -1,5 +1,5 @@
 use futures_util::{pin_mut, StreamExt};
-use oomrpc::{Client, EntityRow};
+use oomclient::{Client, EntityRow};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

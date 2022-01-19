@@ -1,4 +1,4 @@
-use oomrpc::Client;
+use oomclient::Client;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 #[tokio::main]

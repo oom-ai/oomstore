@@ -1,6 +1,6 @@
 use std::fs;
 
-use oomrpc::Client;
+use oomclient::Client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

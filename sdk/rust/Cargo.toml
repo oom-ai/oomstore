@@ -1,6 +1,6 @@
 [package]
-name = "oomrpc"
-version = "0.1.0"
+name = "oomclient"
+version = "0.1.0-rc"
 edition = "2021"
 
 [dependencies]
