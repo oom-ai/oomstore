@@ -73,7 +73,8 @@ func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
 }
 
 func (db *DB) CreateTable(ctx context.Context, opt offline.CreateTableOpt) error {
-	return sqlutil.CreateTable(ctx, db.DB, opt, Backend)
+	dbOpt := dbutil.DBOpt{Backend: Backend, SqlxDB: db.DB}
+	return sqlutil.CreateTable(ctx, dbOpt, opt)
 }
 
 func (db *DB) Push(ctx context.Context, opt offline.PushOpt) error {
