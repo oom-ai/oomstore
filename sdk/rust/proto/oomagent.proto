@@ -1,0 +1,160 @@
+syntax = "proto3";
+package oomagent;
+option go_package = "/codegen";
+
+service OomAgent {
+  rpc OnlineGet(OnlineGetRequest) returns (OnlineGetResponse) {}
+  rpc OnlineMultiGet(OnlineMultiGetRequest) returns (OnlineMultiGetResponse) {}
+  rpc Sync(SyncRequest) returns (SyncResponse) {}
+
+  rpc ChannelImport(stream ChannelImportRequest) returns (ImportResponse) {}
+  rpc Import(ImportRequest) returns (ImportResponse) {}
+  rpc Push(PushRequest) returns (PushResponse) {}
+  rpc Snapshot(SnapshotRequest) returns (SnapshotResponse) {}
+
+  rpc ChannelJoin(stream ChannelJoinRequest) returns (stream ChannelJoinResponse) {}
+  rpc Join(JoinRequest) returns (JoinResponse) {}
+
+  rpc ChannelExport(ChannelExportRequest) returns (stream ChannelExportResponse) {}
+  rpc Export(ExportRequest) returns (ExportResponse) {}
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {}
+}
+
+message Value {
+  oneof value {
+    // Represents a int64 value.
+    int64 int64 = 1;
+    // Represents a double value.
+    double double = 2;
+    // Represents a string value.
+    string string = 3;
+    // Represents a boolean value.
+    bool bool = 4;
+    // Represents a unix milliseconds value.
+    int64 unix_milli = 5;
+    // Represents a bytes value.
+    bytes bytes = 6;
+  }
+}
+
+message OnlineGetRequest {
+  string entity_key = 1;
+  repeated string features = 2;
+}
+
+message FeatureValueMap {
+  map<string, Value> map = 1;
+}
+
+message OnlineGetResponse {
+  FeatureValueMap result = 1;
+}
+
+message OnlineMultiGetRequest {
+  repeated string entity_keys = 1;
+  repeated string features = 2;
+}
+
+message OnlineMultiGetResponse {
+  map<string, FeatureValueMap> result = 1;
+}
+
+message SyncRequest {
+  int32 revision_id = 1;
+  int32 purge_delay = 2;
+}
+
+message SyncResponse {}
+
+message ChannelImportRequest {
+  // only takes effect (and required) on the first request
+  optional string group = 1;
+  // only takes effect on the first request
+  optional string description = 2;
+  // only takes effect on the first request
+  optional int64 revision = 3;
+
+  bytes row = 4;
+}
+
+message ImportResponse {
+  int32 revision_id = 1;
+}
+
+message ImportRequest {
+  string group = 1;
+  optional int64 revision = 2;
+  optional string description = 3;
+
+  string input_file = 4;
+  optional string delimiter = 5;
+}
+
+message PushResponse {}
+
+message PushRequest {
+  string entity_key = 1;
+  string group = 2;
+  repeated string features = 3;
+  repeated Value feature_values = 4;
+}
+
+message SnapshotResponse {}
+
+message SnapshotRequest {
+  string group = 1;
+}
+
+message EntityRow {
+  string entity_key = 1;
+  int64 unix_milli = 2;
+  repeated string values = 3;
+}
+
+message ChannelJoinRequest {
+  // only takes effect (and required) on the first request
+  repeated string join_features = 1;
+  // only takes effect (and required) on the first request
+  repeated string existed_features = 2;
+
+  EntityRow entity_row = 3;
+}
+
+message ChannelJoinResponse {
+  // only appears in the first request
+  repeated string header = 1;
+  repeated Value joined_row = 2;
+}
+
+message JoinRequest {
+  repeated string features = 1;
+  string input_file = 2;
+  string output_file = 3;
+}
+
+message JoinResponse {}
+
+message ChannelExportRequest {
+  repeated string features = 1;
+  int64 unix_milli = 2;
+  optional uint64 limit = 3;
+}
+
+message ChannelExportResponse {
+  // only appears in the first request
+  repeated string header = 1;
+  repeated Value row = 2;
+}
+
+message ExportRequest {
+  repeated string features = 1;
+  int64 unix_milli = 2;
+  string output_file = 3;
+  optional uint64 limit = 4;
+}
+
+message ExportResponse {}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {}
