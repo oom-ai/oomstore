@@ -90,6 +90,13 @@ jobs:
 
   integration-test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        backends:
+          - { online: sqlite,   offline: sqlite,   metadata: sqlite   }
+          - { online: mysql,    offline: mysql,    metadata: mysql    }
+          - { online: postgres, offline: postgres, metadata: postgres }
     env:
       oomplay-version: '0.6.8'
     steps:
@@ -110,4 +117,6 @@ jobs:
         wget https://github.com/oom-ai/oomplay/releases/download/v${v}/${pkg} &&
         sudo dpkg -i ${pkg}
     - name: Run integration tests
-      run: make integration-test
+      run: |
+        export BACKENDS='${{ matrix.backends.online }},${{ matrix.backends.offline }},${{ matrix.backends.metadata }}'
+        make integration-test
