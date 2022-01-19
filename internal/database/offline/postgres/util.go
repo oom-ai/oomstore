@@ -24,7 +24,6 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, opt dbutil.LoadDataFro
 			Entity:   opt.Entity,
 			Header:   opt.Header,
 			Features: opt.Features,
-			Backend:  opt.Backend,
 		})
 		if errdefs.Cause(err) == io.EOF {
 			break
