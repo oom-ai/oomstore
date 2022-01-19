@@ -50,19 +50,11 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 		Reader:    reader,
 		Delimiter: dataSource.Delimiter,
 	}
-	// read header does not need pass down features
-	header, err := dbutil.ReadLine(dbutil.ReadLineOpt{
-		Source: source,
-	})
+	// read header
+	columnNames := append([]string{opt.entity.Name}, opt.features.Names()...)
+	header, err := readHeader(source, columnNames)
 	if err != nil {
 		return 0, err
-	}
-	if hasDup(cast.ToStringSlice(header)) {
-		return 0, errdefs.Errorf("csv data source has duplicated columns: %v", header)
-	}
-	columnNames := append([]string{opt.entity.Name}, opt.features.Names()...)
-	if !stringSliceEqual(cast.ToStringSlice(header), columnNames) {
-		return 0, errdefs.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, columnNames)
 	}
 
 	newRevisionID, snapshotTableName, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
@@ -157,6 +149,23 @@ func hasDup(a []string) bool {
 	return false
 }
 
+func readHeader(source *offline.CSVSource, expectedColumns []string) ([]string, error) {
+	// read header does not need pass down features
+	header, err := dbutil.ReadLine(dbutil.ReadLineOpt{
+		Source: source,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if hasDup(cast.ToStringSlice(header)) {
+		return nil, errdefs.Errorf("csv data source has duplicated columns: %v", header)
+	}
+	if !stringSliceEqual(cast.ToStringSlice(header), expectedColumns) {
+		return nil, errdefs.Errorf("csv header of the data source %v doesn't match the feature group schema %v", header, expectedColumns)
+	}
+	return cast.ToStringSlice(header), nil
+}
+
 func stringSliceEqual(a, b []string) bool {
 	ma := make(map[string]bool)
 	mb := make(map[string]bool)
@@ -178,33 +187,40 @@ func stringSliceEqual(a, b []string) bool {
 }
 
 func (s *OomStore) parseImportOpt(ctx context.Context, opt types.ImportOpt) (*importOpt, error) {
-	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
+	entity, group, features, err := s.getGroupInfo(ctx, opt.GroupName)
 	if err != nil {
 		return nil, err
 	}
-
-	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
-		GroupID: &group.ID,
-	})
-	if err != nil {
-		return nil, err
-	}
-	if features == nil {
-		err = errdefs.Errorf("no features under group: %s", opt.GroupName)
-		return nil, err
-	}
-
-	entity := group.Entity
-	if entity == nil {
-		return nil, errdefs.Errorf("no entity found by group: %s", opt.GroupName)
-	}
-
 	return &importOpt{
 		ImportOpt: &opt,
 		entity:    entity,
 		group:     group,
 		features:  features,
 	}, nil
+}
+
+func (s *OomStore) getGroupInfo(ctx context.Context, groupName string) (*types.Entity, *types.Group, types.FeatureList, error) {
+	group, err := s.metadata.GetGroupByName(ctx, groupName)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+		GroupID: &group.ID,
+	})
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if features == nil {
+		err = errdefs.Errorf("no features under group: %s", groupName)
+		return nil, nil, nil, err
+	}
+
+	entity := group.Entity
+	if entity == nil {
+		return nil, nil, nil, errdefs.Errorf("no entity found by group: %s", groupName)
+	}
+	return entity, group, features, nil
 }
 
 type importOpt struct {
