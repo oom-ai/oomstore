@@ -1,12 +1,10 @@
 use std::fs;
 
-use oomstore::Client;
-
-macro_rules! svec { ($($part:expr),* $(,)?) => {{ vec![$($part.to_string(),)*] }} }
+use oomclient::Client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = Client::connect("http://127.0.0.1:50051").await?;
+    let mut client = Client::connect("http://localhost:50051").await?;
 
     let contents = r#"
 entity_key,unix_milli,age
@@ -37,10 +35,10 @@ entity_key,unix_milli,age
     let output = "/tmp/joined.csv";
     fs::write(input, contents)?;
 
-    let features = svec![
-        "driver_stats.conv_rate",
-        "driver_stats.acc_rate",
-        "driver_stats.avg_daily_trips"
+    let features = vec![
+        "driver_stats.conv_rate".into(),
+        "driver_stats.acc_rate".into(),
+        "driver_stats.avg_daily_trips".into(),
     ];
 
     client.join(features, input, output).await?;

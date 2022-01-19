@@ -1,0 +1,5 @@
+[tasks.pre-build]
+script_runner = "@shell"
+script = '''
+cp ../../proto/* proto
+'''

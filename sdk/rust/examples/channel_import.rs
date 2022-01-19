@@ -1,8 +1,8 @@
-use oomstore::Client;
+use oomclient::Client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = Client::connect("http://127.0.0.1:50051").await?;
+    let mut client = Client::connect("http://localhost:50051").await?;
 
     let rows = r#"
 user,state,credit_score,account_age_days,has_2fa_installed
@@ -17,11 +17,13 @@ user,state,credit_score,account_age_days,has_2fa_installed
 9,Alabama,577,150,true
 10,Idaho,693,212,true
 "#
-    .trim()
+    .trim_start()
     .split_inclusive('\n')
     .map(|line| line.as_bytes().to_vec());
 
-    client.channel_import("account".to_owned(), None, None, rows).await?;
+    client
+        .channel_import("account".to_owned(), None, None, tokio_stream::iter(rows))
+        .await?;
 
     Ok(())
 }

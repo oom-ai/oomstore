@@ -1,7 +1,12 @@
 [package]
-name = "oomstore"
-version = "0.1.0"
+name = "oomclient"
+version = "0.1.0-rc"
 edition = "2021"
+authors = ["Wenxuan Zhang <wenxuangm@gmail.com>"]
+description = "oomstore client for rust"
+homepage = "https://github.com/oom-ai/oomstore/tree/main/sdk/rust"
+repository = "https://github.com/oom-ai/oomstore/tree/main/sdk/rust"
+license = "Apache-2.0"
 
 [dependencies]
 async-stream = "0.3"
@@ -11,6 +16,7 @@ thiserror = "1.0"
 tokio = { version = "1.15", features = ["macros", "rt-multi-thread"] }
 tonic = "0.6"
 futures-core = "0.3"
+tokio-stream = "0.1"
 
 [build-dependencies]
 tonic-build = "0.6"
