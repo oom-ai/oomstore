@@ -22,7 +22,7 @@ user,state,credit_score,account_age_days,has_2fa_installed
     .map(|line| line.as_bytes().to_vec());
 
     client
-        .channel_import("account".to_owned(), None, None, tokio_stream::iter(rows))
+        .channel_import("account", None, None, tokio_stream::iter(rows))
         .await?;
 
     Ok(())
