@@ -110,12 +110,12 @@ impl Client {
 
     pub async fn channel_import(
         &mut self,
-        group: impl Into<Option<String>>,
+        group: impl Into<String>,
         description: impl Into<Option<String>>,
         revision: impl Into<Option<i64>>,
         rows: impl Stream<Item = Vec<u8>> + Send + 'static,
     ) -> Result<u32> {
-        let mut group = group.into();
+        let mut group = Some(group.into());
         let mut description = description.into();
         let mut revision = revision.into();
         let inbound = stream! {
