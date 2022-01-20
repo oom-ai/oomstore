@@ -28,8 +28,8 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 		Name:      "unix_milli",
 		ValueType: types.Int64,
 	}
-	oneGroupFeatures, oneGroupFeatureMap := prepareFeatures(true)
-	twoGroupFeatures, twoGroupFeatureMap := prepareFeatures(false)
+	oneGroupFeatures, oneGroupFeatureMap, oneGroupGroupNames := prepareFeatures(true)
+	twoGroupFeatures, twoGroupFeatureMap, twoGroupGroupNames := prepareFeatures(false)
 
 	buildTestSnapshotTable(ctx, t, store, oneGroupFeatures, 1, "offline_snapshot_1_1", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100
@@ -71,6 +71,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 		{
 			description: "no features",
 			opt: offline.JoinOpt{
+
 				FeatureMap: make(map[string]types.FeatureList),
 			},
 			expected: prepareEmptyResult(),
@@ -79,6 +80,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 			description: "no entity rows",
 			opt: offline.JoinOpt{
 				Entity:     *entity,
+				GroupNames: oneGroupGroupNames,
 				FeatureMap: oneGroupFeatureMap,
 				EntityRows: prepareEntityRows(true, false),
 			},
@@ -89,6 +91,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 			opt: offline.JoinOpt{
 				Entity:           *entity,
 				EntityRows:       prepareEntityRows(false, false),
+				GroupNames:       oneGroupGroupNames,
 				FeatureMap:       oneGroupFeatureMap,
 				RevisionRangeMap: prepareRevisionRanges(true, false),
 			},
@@ -99,6 +102,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 			opt: offline.JoinOpt{
 				Entity:           *entity,
 				EntityRows:       prepareEntityRows(false, false),
+				GroupNames:       twoGroupGroupNames,
 				FeatureMap:       twoGroupFeatureMap,
 				RevisionRangeMap: prepareRevisionRanges(false, false),
 			},
@@ -109,6 +113,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 			opt: offline.JoinOpt{
 				Entity:           *entity,
 				EntityRows:       prepareEntityRows(false, true),
+				GroupNames:       twoGroupGroupNames,
 				FeatureMap:       twoGroupFeatureMap,
 				RevisionRangeMap: prepareRevisionRanges(false, false),
 				ValueNames:       []string{"value_1", "value_2"},
@@ -120,6 +125,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 			opt: offline.JoinOpt{
 				Entity:           *entity,
 				EntityRows:       prepareEntityRows(false, true),
+				GroupNames:       twoGroupGroupNames,
 				FeatureMap:       twoGroupFeatureMap,
 				RevisionRangeMap: prepareRevisionRanges(false, true),
 				ValueNames:       []string{"value_1", "value_2"},
@@ -143,7 +149,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 	}
 }
 
-func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.FeatureList) {
+func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.FeatureList, []string) {
 	groupBasic := &types.Group{
 		ID:       1,
 		Name:     "device_basic",
@@ -180,14 +186,14 @@ func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.Feature
 		featureMap := map[string]types.FeatureList{
 			groupBasic.Name: {model, price},
 		}
-		return features, featureMap
+		return features, featureMap, []string{groupBasic.Name}
 	} else {
 		features := types.FeatureList{model, price, isActive}
 		featureMap := map[string]types.FeatureList{
 			groupBasic.Name:     {model, price},
 			isActive.Group.Name: {isActive},
 		}
-		return features, featureMap
+		return features, featureMap, []string{groupBasic.Name, groupAdvanced.Name}
 	}
 }
 
@@ -310,6 +316,7 @@ func prepareEmptyResult() *types.JoinResult {
 		Data: data,
 	}
 }
+
 func prepareStreamingResultValues() []map[string]interface{} {
 	return []map[string]interface{}{
 		{

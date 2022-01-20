@@ -20,7 +20,7 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	features, _ := prepareFeatures(true)
+	features, _, _ := prepareFeatures(true)
 	group := features[0].Group
 	unixMilli := &types.Feature{
 		Name:      "unix_milli",

@@ -48,7 +48,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 		return nil, errdefs.Errorf("failed to get shared entity")
 	}
 
-	featureMap := buildGroupToFeaturesMap(features)
+	groupNames, featureMap := buildGroupToFeaturesMap(features)
 	revisionRangeMap := make(map[string][]*offline.RevisionRange)
 	for groupName, featureList := range featureMap {
 		if len(featureList) == 0 {
@@ -64,6 +64,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 	return s.offline.Join(ctx, offline.JoinOpt{
 		Entity:           *entity,
 		EntityRows:       opt.EntityRows,
+		GroupNames:       groupNames,
 		FeatureMap:       featureMap,
 		RevisionRangeMap: revisionRangeMap,
 		ValueNames:       opt.ExistedFeatureNames,
@@ -95,15 +96,18 @@ func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) error {
 }
 
 // key: group_name, value: slice of features
-func buildGroupToFeaturesMap(features types.FeatureList) map[string]types.FeatureList {
-	groups := make(map[string]types.FeatureList)
+func buildGroupToFeaturesMap(features types.FeatureList) ([]string, map[string]types.FeatureList) {
+	groupNames := make([]string, 0, features.Len())
+	featureMap := make(map[string]types.FeatureList)
+
 	for _, f := range features {
-		if _, ok := groups[f.Group.Name]; !ok {
-			groups[f.Group.Name] = types.FeatureList{}
+		if _, ok := featureMap[f.Group.Name]; !ok {
+			groupNames = append(groupNames, f.Group.Name)
+			featureMap[f.Group.Name] = types.FeatureList{}
 		}
-		groups[f.Group.Name] = append(groups[f.Group.Name], f)
+		featureMap[f.Group.Name] = append(featureMap[f.Group.Name], f)
 	}
-	return groups
+	return groupNames, featureMap
 }
 
 func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) ([]*offline.RevisionRange, error) {
