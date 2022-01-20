@@ -4,7 +4,7 @@ source ./util.sh
 
 init_store
 register_features
-import_sample
+import_device_sample
 
 case='oomcli import using table link'
 oomcli import \

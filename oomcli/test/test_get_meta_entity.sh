@@ -4,7 +4,7 @@ source ./util.sh
 
 init_store
 register_features
-import_sample > /dev/null
+import_device_sample > /dev/null
 
 case='oomcli get meta entity works'
 expected='ID,NAME,DESCRIPTION,CREATE-TIME,MODIFY-TIME
@@ -70,6 +70,12 @@ items:
           category: batch
           description: student
           features:
+            - name: name
+              value-type: string
+              description: name
+            - name: gender
+              value-type: string
+              description: gender
             - name: age
               value-type: int64
               description: age

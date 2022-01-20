@@ -4,7 +4,7 @@ source ./util.sh
 
 init_store
 register_features
-import_sample > /dev/null
+import_device_sample > /dev/null
 
 case='oomcli update feature works'
 oomcli update feature phone.price --description "new description"

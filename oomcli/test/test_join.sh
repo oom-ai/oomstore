@@ -9,7 +9,7 @@ register_features
 trap 'command rm -rf entity_rows.csv entity_rows_with_values.csv' EXIT INT TERM HUP
 
 # import sample data to offline store
-import_sample 80
+import_device_sample 80
 
 t1=50
 t2=100
