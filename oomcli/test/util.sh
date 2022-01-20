@@ -63,9 +63,12 @@ register_features() {
       --snapshot_interval "1s" \
       --description "user click post feature"
 
-    oomcli register feature price --group phone   --value-type "int64"  --description "price"
-    oomcli register feature model --group phone   --value-type "string" --description "model"
-    oomcli register feature age   --group student --value-type "int64"  --description "age"
+    oomcli register feature price  --group phone   --value-type "int64"  --description "price"
+    oomcli register feature model  --group phone   --value-type "string" --description "model"
+
+    oomcli register feature name   --group student --value-type "string" --description "name"
+    oomcli register feature gender --group student --value-type "string" --description "gender"
+    oomcli register feature age    --group student --value-type "int64"  --description "age"
 
     oomcli register feature last_5_click_posts \
       --group user-click \
@@ -79,7 +82,7 @@ register_features() {
 }
 
 # import sample data
-import_sample() {
+import_device_sample() {
     info "import sample data to offline store..."
     local revision=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
     oomcli import \
@@ -87,6 +90,17 @@ import_sample() {
     --revision "$revision" \
     --delimiter "," \
     --input-file device.csv \
+    --description 'test data' | grep -o '[0-9]\+'
+}
+
+import_student_sample() {
+    info "import sample data to offline store..."
+    local revision=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
+    oomcli import \
+    --group student \
+    --revision "$revision" \
+    --delimiter "," \
+    --input-file student.csv \
     --description 'test data' | grep -o '[0-9]\+'
 }
 
