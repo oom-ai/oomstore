@@ -72,6 +72,12 @@ items:
       category: batch
       description: student
       features:
+        - name: name
+          value-type: string
+          description: name
+        - name: gender
+          value-type: string
+          description: gender
         - name: age
           value-type: int64
           description: age

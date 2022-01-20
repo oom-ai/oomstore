@@ -4,7 +4,7 @@ source ./util.sh
 
 init_store
 register_features
-revisionID=$(import_sample)
+revisionID=$(import_device_sample)
 sync $revisionID
 
 case="query single feature"

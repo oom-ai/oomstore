@@ -4,16 +4,18 @@ source ./util.sh
 
 init_store
 register_features
-import_sample > /dev/null
+import_device_sample > /dev/null
 
 case='oomcli get meta features works'
 expected='
 ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION,ONLINE-REVISION-ID
 1,price,phone,device,batch,int64,price,<NULL>
 2,model,phone,device,batch,string,model,<NULL>
-3,age,student,user,batch,int64,age,<NULL>
-4,last_5_click_posts,user-click,user,stream,string,user last 5 click posts,<NULL>
-5,number_of_user_starred_posts,user-click,user,stream,int64,number of posts that users starred today,<NULL>
+3,name,student,user,batch,string,name,<NULL>
+4,gender,student,user,batch,string,gender,<NULL>
+5,age,student,user,batch,int64,age,<NULL>
+6,last_5_click_posts,user-click,user,stream,string,user last 5 click posts,<NULL>
+7,number_of_user_starred_posts,user-click,user,stream,int64,number of posts that users starred today,<NULL>
 '
 actual=$(oomcli get meta feature -o csv --wide)
 ignore_time() { cut -d ',' -f 1-8 <<<"$1"; }
@@ -23,9 +25,11 @@ case='oomcli get simplified meta features works'
 expected='ID,NAME,GROUP,ENTITY,CATEGORY,VALUE-TYPE,DESCRIPTION
 1,price,phone,device,batch,int64,price
 2,model,phone,device,batch,string,model
-3,age,student,user,batch,int64,age
-4,last_5_click_posts,user-click,user,stream,string,user last 5 click posts
-5,number_of_user_starred_posts,user-click,user,stream,int64,number of posts that users starred today
+3,name,student,user,batch,string,name
+4,gender,student,user,batch,string,gender
+5,age,student,user,batch,int64,age
+6,last_5_click_posts,user-click,user,stream,string,user last 5 click posts
+7,number_of_user_starred_posts,user-click,user,stream,int64,number of posts that users starred today
 '
 actual=$(oomcli get meta feature -o csv)
 assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"
@@ -65,6 +69,16 @@ items:
       group-name: phone
       value-type: string
       description: model
+    - kind: Feature
+      name: name
+      group-name: student
+      value-type: string
+      description: name
+    - kind: Feature
+      name: gender
+      group-name: student
+      value-type: string
+      description: gender
     - kind: Feature
       name: age
       group-name: student
