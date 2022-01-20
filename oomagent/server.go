@@ -282,6 +282,10 @@ func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.J
 }
 
 func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen.OomAgent_ChannelExportServer) error {
+	if len(req.Features) == 0 {
+		return nil
+	}
+
 	ctx := context.Background()
 	exportResult, err := s.oomstore.ChannelExport(ctx, types.ChannelExportOpt{
 		FeatureNames: req.Features,
