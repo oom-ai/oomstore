@@ -9,4 +9,7 @@ name = "oomclient"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.15.1", features = ["extension-module"] }
+oomclient = "0.1.0-rc.1"
+pyo3-asyncio = { version = "0.15", features = ["tokio-runtime"] }
+pyo3 = { version = "0.15", features = ["extension-module"] }
+tokio = { version = "1.15", features = ["macros", "rt-multi-thread"] }

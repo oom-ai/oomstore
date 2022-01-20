@@ -1,14 +1,41 @@
-use pyo3::prelude::*;
+use oomclient::Client as OomClient;
+use pyo3::{exceptions::PyException, prelude::*, types::PyType};
+use pyo3_asyncio::tokio::future_into_py;
 
-/// Formats the sum of two numbers as string.
-#[pyfunction]
-fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
-    Ok((a + b).to_string())
+#[pyclass]
+pub struct Client {
+    inner: OomClient,
 }
 
-/// A Python module implemented in Rust.
+#[pymethods]
+impl Client {
+    #[classmethod]
+    pub fn connect<'p>(_cls: &PyType, py: Python<'p>, endpoint: String) -> PyResult<&'p PyAny> {
+        future_into_py(py, async {
+            let inner = OomClient::connect(endpoint).await.map_err(to_py_execption)?;
+            let client = Client { inner };
+            Python::with_gil(|py| PyCell::new(py, client).map(|py_cell| py_cell.to_object(py)))
+        })
+    }
+
+    pub fn health_check<'p>(&self, py: Python<'p>) -> PyResult<&'p PyAny> {
+        // Don't panic, it's cheap:
+        // https://github.com/hyperium/tonic/issues/285#issuecomment-595880400
+        let mut inner = OomClient::clone(&self.inner);
+        future_into_py(py, async move { inner.health_check().await.map_err(to_py_execption) })
+    }
+}
+
+pub fn to_py_execption(err: impl std::fmt::Display) -> PyErr {
+    PyException::new_err(format!("{}", err))
+}
+
+/// OomClient python module implemented in Rust.
 #[pymodule]
 fn oomclient(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
+    unsafe {
+        pyo3::ffi::PyEval_InitThreads();
+    }
+    m.add_class::<Client>()?;
     Ok(())
 }
