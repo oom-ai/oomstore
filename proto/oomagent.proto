@@ -70,9 +70,9 @@ message ChannelImportRequest {
   // only takes effect (and required) on the first request
   optional string group = 1;
   // only takes effect on the first request
-  optional string description = 2;
+  optional int64 revision = 2;
   // only takes effect on the first request
-  optional int64 revision = 3;
+  optional string description = 3;
 
   bytes row = 4;
 }
