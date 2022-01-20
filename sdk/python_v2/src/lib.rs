@@ -1,6 +1,10 @@
+mod convert;
+
+use crate::convert::{err_to_py, value_to_py};
 use oomclient::Client as OomClient;
-use pyo3::{exceptions::PyException, prelude::*, types::PyType};
+use pyo3::{prelude::*, types::PyType};
 use pyo3_asyncio::tokio::future_into_py;
+use std::collections::HashMap;
 
 #[pyclass]
 pub struct Client {
@@ -12,7 +16,7 @@ impl Client {
     #[classmethod]
     pub fn connect<'p>(_cls: &PyType, py: Python<'p>, endpoint: String) -> PyResult<&'p PyAny> {
         future_into_py(py, async {
-            let inner = OomClient::connect(endpoint).await.map_err(to_py_execption)?;
+            let inner = OomClient::connect(endpoint).await.map_err(err_to_py)?;
             let client = Client { inner };
             Python::with_gil(|py| PyCell::new(py, client).map(|py_cell| py_cell.to_object(py)))
         })
@@ -22,12 +26,25 @@ impl Client {
         // Don't panic, it's cheap:
         // https://github.com/hyperium/tonic/issues/285#issuecomment-595880400
         let mut inner = OomClient::clone(&self.inner);
-        future_into_py(py, async move { inner.health_check().await.map_err(to_py_execption) })
+        future_into_py(py, async move { inner.health_check().await.map_err(err_to_py) })
     }
-}
 
-pub fn to_py_execption(err: impl std::fmt::Display) -> PyErr {
-    PyException::new_err(format!("{}", err))
+    pub fn online_get<'p>(&self, py: Python<'p>, entity_key: String, features: Vec<String>) -> PyResult<&'p PyAny> {
+        let mut inner = OomClient::clone(&self.inner);
+        future_into_py(py, async move {
+            inner
+                .online_get(entity_key, features)
+                .await
+                .map_err(err_to_py)
+                .map(|r| {
+                    Python::with_gil(|py| {
+                        r.into_iter()
+                            .map(|(k, v)| (k, value_to_py(v, py)))
+                            .collect::<HashMap<_, _>>()
+                    })
+                })
+        })
+    }
 }
 
 /// OomClient python module implemented in Rust.

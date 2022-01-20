@@ -1,0 +1,15 @@
+[tasks.pyshell]
+
+[tasks.post-build]
+script_runner = "@shell"
+script = '''
+source .env/bin/activate
+maturin develop
+'''
+
+[tasks.ipython]
+script_runner = "@shell"
+script = '''
+source .env/bin/activate
+ipython
+'''
