@@ -9,6 +9,20 @@ import_sample account "./data/account_10.csv"
 unix_milli=${3:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
 
 case1() {
+    case="export and no features"
+    arg=$(cat <<-EOF
+    {
+       "features": [],
+       "unix_milli": $unix_milli
+    }
+EOF
+    )
+    actual=$(testgrpc ChannelExport <<<"$arg")
+    expected=''
+    assert_json_eq "$case" "$expected" "$actual"
+}
+
+case2() {
     prefix="export some features"
     arg=$(cat <<-EOF
     {
@@ -41,7 +55,7 @@ EOF
     assert_json_eq "$case" "$(sort <<<"$expected_rows")" "$actual_rows"
 }
 
-case2() {
+case3() {
     prefix="export some features"
     arg=$(cat <<-EOF
     {
@@ -76,3 +90,4 @@ EOF
 
 case1
 case2
+case3
