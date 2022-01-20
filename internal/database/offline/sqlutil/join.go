@@ -45,19 +45,23 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType typ
 }
 
 func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.JoinResult, error) {
-	data := make(chan []interface{})
-	defer close(data)
-	emptyResult := &types.JoinResult{
-		Data: data,
+	{
+		empty := true
+		for _, features := range opt.FeatureMap {
+			if len(features) > 0 {
+				empty = false
+				break
+			}
+		}
+		if empty {
+			data := make(chan []interface{})
+			defer close(data)
+			return &types.JoinResult{Data: data}, nil
+		}
+
 	}
+
 	// Step 1: prepare temporary table entity_rows
-	features := types.FeatureList{}
-	for _, featureList := range opt.FeatureMap {
-		features = append(features, featureList...)
-	}
-	if len(features) == 0 {
-		return emptyResult, nil
-	}
 	entityRowsTableName, err := PrepareEntityRowsTable(ctx, dbOpt, opt.Entity, opt.EntityRows, opt.ValueNames)
 	if err != nil {
 		return nil, err
@@ -68,7 +72,8 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 	allTableNames := make([]string, 0)
 	tableToFeatureMap := make(map[string]types.FeatureList)
 	var category types.Category
-	for groupName, featureList := range opt.FeatureMap {
+	for _, groupName := range opt.GroupNames {
+		featureList := opt.FeatureMap[groupName]
 		revisionRanges, ok := opt.RevisionRangeMap[groupName]
 		if !ok {
 			continue
