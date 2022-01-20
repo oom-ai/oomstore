@@ -94,7 +94,7 @@ import_device_sample() {
 }
 
 import_student_sample() {
-    info "import sample data to offline store..."
+    info "import student sample data to offline store..."
     local revision=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
     oomcli import \
     --group student \
