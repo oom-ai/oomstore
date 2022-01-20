@@ -1,6 +1,10 @@
+mod convert;
+
+use crate::convert::value_to_py;
 use oomclient::Client as OomClient;
 use pyo3::{exceptions::PyException, prelude::*, types::PyType};
 use pyo3_asyncio::tokio::future_into_py;
+use std::collections::HashMap;
 
 #[pyclass]
 pub struct Client {
@@ -23,6 +27,23 @@ impl Client {
         // https://github.com/hyperium/tonic/issues/285#issuecomment-595880400
         let mut inner = OomClient::clone(&self.inner);
         future_into_py(py, async move { inner.health_check().await.map_err(to_py_execption) })
+    }
+
+    pub fn online_get<'p>(&self, py: Python<'p>, entity_key: String, features: Vec<String>) -> PyResult<&'p PyAny> {
+        let mut inner = OomClient::clone(&self.inner);
+        future_into_py(py, async move {
+            inner
+                .online_get(entity_key, features)
+                .await
+                .map_err(to_py_execption)
+                .map(|r| {
+                    Python::with_gil(|py| {
+                        r.into_iter()
+                            .map(|(k, v)| (k, value_to_py(v, py)))
+                            .collect::<HashMap<_, _>>()
+                    })
+                })
+        })
     }
 }
 
