@@ -64,7 +64,12 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 		}
 		revision := revisions.Before(opt.UnixMilli)
 		if revision == nil {
-			return nil, errdefs.Errorf("no feature values up to %d, use a later timestamp", opt.UnixMilli)
+			empty := make(chan types.ExportRecord)
+			close(empty)
+			return &types.ExportResult{
+				Header: append([]string{features[0].Entity().Name}, features.FullNames()...),
+				Data:   empty,
+			}, nil
 		}
 		if revision.SnapshotTable == "" {
 			if err = s.Snapshot(ctx, group.Name); err != nil {
