@@ -1,5 +1,5 @@
 use oomclient::Value;
-use pyo3::prelude::*;
+use pyo3::{exceptions::PyException, prelude::*};
 
 pub fn value_to_py(value: Option<Value>, py: Python) -> PyObject {
     value
@@ -12,4 +12,8 @@ pub fn value_to_py(value: Option<Value>, py: Python) -> PyObject {
             Value::Bytes(v) => v.to_object(py),
         })
         .to_object(py)
+}
+
+pub fn err_to_py(err: impl std::fmt::Display) -> PyErr {
+    PyException::new_err(format!("{}", err))
 }
