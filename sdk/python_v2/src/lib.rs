@@ -1,6 +1,6 @@
 mod convert;
 
-use crate::convert::{err_to_py, value_to_py};
+use convert::{err_to_py, value_map_to_py};
 use oomclient::Client as OomClient;
 use pyo3::{prelude::*, types::PyType};
 use pyo3_asyncio::tokio::future_into_py;
@@ -36,10 +36,26 @@ impl Client {
                 .online_get(entity_key, features)
                 .await
                 .map_err(err_to_py)
+                .map(|m| Python::with_gil(|py| value_map_to_py(m, py)))
+        })
+    }
+
+    pub fn online_multi_get<'p>(
+        &self,
+        py: Python<'p>,
+        entity_keys: Vec<String>,
+        features: Vec<String>,
+    ) -> PyResult<&'p PyAny> {
+        let mut inner = OomClient::clone(&self.inner);
+        future_into_py(py, async move {
+            inner
+                .online_multi_get(entity_keys, features)
+                .await
+                .map_err(err_to_py)
                 .map(|r| {
                     Python::with_gil(|py| {
                         r.into_iter()
-                            .map(|(k, v)| (k, value_to_py(v, py)))
+                            .map(|(k, m)| (k, value_map_to_py(m, py)))
                             .collect::<HashMap<_, _>>()
                     })
                 })
