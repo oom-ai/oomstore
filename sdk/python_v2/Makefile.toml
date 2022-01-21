@@ -1,6 +1,4 @@
-[tasks.pyshell]
-
-[tasks.post-build]
+[tasks.maturin]
 script = '''
 source .env/bin/activate
 maturin develop
