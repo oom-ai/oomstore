@@ -152,6 +152,11 @@ impl Client {
                 .map_err(err_to_py)
         })
     }
+
+    pub fn snapshot<'p>(&mut self, py: Python<'p>, group: String) -> PyResult<&'p PyAny> {
+        let mut inner = OomClient::clone(&self.inner);
+        future_into_py(py, async move { inner.snapshot(group).await.map_err(err_to_py) })
+    }
 }
 
 /// OomClient python module implemented in Rust.
