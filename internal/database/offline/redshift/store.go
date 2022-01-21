@@ -45,12 +45,12 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	return sqlutil.Join(ctx, db.DB, opt, Backend)
 }
 
-func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
-	rows, err := db.QueryxContext(ctx, "select column_name, data_type from information_schema.columns where table_name = $1", tableName)
+func (db *DB) TableSchema(ctx context.Context, opt offline.TableSchemaOpt) (*types.DataTableSchema, error) {
+	rows, err := db.QueryxContext(ctx, "select column_name, data_type from information_schema.columns where table_name = $1", opt.TableName)
 	if err != nil {
 		return nil, errdefs.WithStack(err)
 	}
-	return sqlutil.SqlxTableSchema(ctx, db, Backend, rows)
+	return sqlutil.SqlxTableSchema(ctx, db.DB, Backend, rows, opt)
 }
 
 func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {
