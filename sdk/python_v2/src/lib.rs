@@ -1,10 +1,13 @@
 mod convert;
 mod error;
 
-use convert::{err_to_py, value_map_to_py};
+use convert::{err_to_py, py_to_value, value_map_to_py};
 use error::Error;
 use oomclient::Client as OomClient;
-use pyo3::{prelude::*, types::PyType};
+use pyo3::{
+    prelude::*,
+    types::{PyDict, PyType},
+};
 use pyo3_asyncio::tokio::future_into_py;
 use std::collections::HashMap;
 
@@ -97,6 +100,26 @@ impl Client {
                 .import(group, revision, description, input_file, delimiter)
                 .await
                 .map_err(err_to_py)
+        })
+    }
+
+    pub fn push<'p>(
+        &mut self,
+        py: Python<'p>,
+        group: String,
+        entity_key: String,
+        kv_pairs: &PyDict,
+    ) -> PyResult<&'p PyAny> {
+        let mut kvs = Vec::with_capacity(kv_pairs.len());
+        for (k, v) in kv_pairs {
+            let name = k.extract::<String>()?;
+            let value = py_to_value(v)?;
+            kvs.push((name, value));
+        }
+
+        let mut inner = OomClient::clone(&self.inner);
+        future_into_py(py, async move {
+            inner.push(entity_key, group, kvs).await.map_err(err_to_py)
         })
     }
 }
