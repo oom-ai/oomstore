@@ -98,7 +98,10 @@ func (s *OomStore) tableLinkImportStream(ctx context.Context, opt types.ImportSt
 		return err
 	}
 	// get linked table schema
-	tableSchema, err := s.offline.TableSchema(ctx, dataSource.TableName)
+	tableSchema, err := s.offline.TableSchema(ctx, offline.TableSchemaOpt{
+		TableName:      dataSource.TableName,
+		CheckTimeRange: true,
+	})
 	if err != nil {
 		return err
 	}
@@ -198,7 +201,10 @@ func (s *OomStore) validateRevisions(ctx context.Context, groupID int, schema *t
 		return errdefs.Errorf("data table crosses with another offline table %s", revisionBeforeMax.CdcTable)
 	}
 	if revisionBeforeMin != nil {
-		beforeTableSchema, err := s.offline.TableSchema(ctx, revisionBeforeMin.CdcTable)
+		beforeTableSchema, err := s.offline.TableSchema(ctx, offline.TableSchemaOpt{
+			TableName:      revisionBeforeMin.CdcTable,
+			CheckTimeRange: true,
+		})
 		if err != nil {
 			return err
 		}

@@ -97,7 +97,9 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 
 func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt, dataSource *types.TableLinkDataSource) (int, error) {
 	// Make sure all features existing with correct value type
-	tableSchema, err := s.offline.TableSchema(ctx, dataSource.TableName)
+	tableSchema, err := s.offline.TableSchema(ctx, offline.TableSchemaOpt{
+		TableName: dataSource.TableName,
+	})
 	if err != nil {
 		return 0, err
 	}
