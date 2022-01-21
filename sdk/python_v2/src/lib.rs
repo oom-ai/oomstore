@@ -1,6 +1,8 @@
 mod convert;
+mod error;
 
 use convert::{err_to_py, value_map_to_py};
+use error::Error;
 use oomclient::Client as OomClient;
 use pyo3::{prelude::*, types::PyType};
 use pyo3_asyncio::tokio::future_into_py;
@@ -66,6 +68,35 @@ impl Client {
         let mut inner = OomClient::clone(&self.inner);
         future_into_py(py, async move {
             inner.sync(revision_id, purge_delay).await.map_err(err_to_py)
+        })
+    }
+
+    #[pyo3(name = "import_")]
+    pub fn import<'p>(
+        &mut self,
+        py: Python<'p>,
+        group: String,
+        revision: Option<i64>,
+        description: Option<String>,
+        input_file: String,
+        delimiter: Option<String>,
+    ) -> PyResult<&'p PyAny> {
+        let delimiter = delimiter
+            .map(|s| {
+                let mut chars = s.chars();
+                match (chars.next(), chars.next()) {
+                    (Some(c), None) => Ok(c),
+                    _ => err!("delimiter must be exactly one character"),
+                }
+            })
+            .transpose()
+            .map_err(err_to_py)?;
+        let mut inner = OomClient::clone(&self.inner);
+        future_into_py(py, async move {
+            inner
+                .import(group, revision, description, input_file, delimiter)
+                .await
+                .map_err(err_to_py)
         })
     }
 }
