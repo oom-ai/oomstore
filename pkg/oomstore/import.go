@@ -101,23 +101,9 @@ func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt, dataSour
 	if err != nil {
 		return 0, err
 	}
-	validate := func(f *types.Feature) error {
-		for _, field := range tableSchema.Fields {
-			if field.Name == f.Name {
-				if field.ValueType != f.ValueType {
-					return errdefs.Errorf("expect value type '%s', got '%s'", f.ValueType, field.ValueType)
-				}
-				return nil
-			}
-		}
-		return errdefs.Errorf("field '%s' found in target table", f.Name)
+	if err = validateTableSchema(tableSchema, opt.features); err != nil {
+		return 0, err
 	}
-	for _, feature := range opt.features {
-		if err := validate(feature); err != nil {
-			return 0, err
-		}
-	}
-
 	var revision int64
 	if opt.Revision == nil {
 		revision = time.Now().UnixMilli()
@@ -138,6 +124,25 @@ func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt, dataSour
 	return newRevisionID, nil
 }
 
+func validateTableSchema(schema *types.DataTableSchema, features types.FeatureList) error {
+	validate := func(f *types.Feature) error {
+		for _, field := range schema.Fields {
+			if field.Name == f.Name {
+				if field.ValueType != f.ValueType {
+					return errdefs.Errorf("expect value type '%s', got '%s'", f.ValueType, field.ValueType)
+				}
+				return nil
+			}
+		}
+		return errdefs.Errorf("field '%s' found in target table", f.Name)
+	}
+	for _, feature := range features {
+		if err := validate(feature); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 func hasDup(a []string) bool {
 	s := make(map[string]bool)
 	for _, e := range a {
