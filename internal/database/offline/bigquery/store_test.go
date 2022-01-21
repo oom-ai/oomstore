@@ -96,8 +96,11 @@ func TestTableSchema(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		query := fmt.Sprintf("CREATE TABLE %s.offline_batch_1_1(`user` STRING, `age` BIGINT)", DATASET_ID)
+		query := fmt.Sprintf("CREATE TABLE %s.offline_batch_1_1(`user` STRING, `age` BIGINT, `unix_milli` BIGINT)", DATASET_ID)
 		if _, err = db.Query(query).Read(ctx); err != nil {
+			t.Fatal(err)
+		}
+		if _, err = db.Query(fmt.Sprintf("insert into %s.offline_batch_1_1 VALUES ('1', 1, 1), ('2', 2, 100)", DATASET_ID)).Read(ctx); err != nil {
 			t.Fatal(err)
 		}
 	})
