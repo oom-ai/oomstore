@@ -135,6 +135,23 @@ impl Client {
             inner.join(features, input_file, output_file).await.map_err(err_to_py)
         })
     }
+
+    pub fn export<'p>(
+        &mut self,
+        py: Python<'p>,
+        features: Vec<String>,
+        unix_milli: u64,
+        output_file: String,
+        limit: Option<usize>,
+    ) -> PyResult<&'p PyAny> {
+        let mut inner = OomClient::clone(&self.inner);
+        future_into_py(py, async move {
+            inner
+                .export(features, unix_milli, output_file, limit)
+                .await
+                .map_err(err_to_py)
+        })
+    }
 }
 
 /// OomClient python module implemented in Rust.
