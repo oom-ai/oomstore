@@ -1,4 +1,3 @@
-use oomclient::error::OomError;
 use std::collections::HashMap;
 
 use oomclient::Value;
@@ -24,6 +23,6 @@ pub fn value_map_to_py(m: HashMap<String, Option<Value>>, py: Python) -> PyObjec
         .into_py(py)
 }
 
-pub fn oom_err_to_py(err: OomError) -> PyErr {
+pub fn err_to_py(err: impl std::error::Error) -> PyErr {
     PyException::new_err(format!("{:?}", err))
 }
