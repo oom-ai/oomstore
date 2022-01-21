@@ -42,4 +42,5 @@ type ImportStreamOpt struct {
 	DataSourceType      DataSourceType
 	CsvFileDataSource   *CsvFileDataSource
 	CsvReaderDataSource *CsvReaderDataSource
+	TableLinkDataSource *TableLinkDataSource
 }

@@ -66,8 +66,14 @@ func (e *ExportResult) GetErrorChannel() <-chan error {
 	return e.error
 }
 
+type DataTableTimeRange struct {
+	MinUnixMilli int64
+	MaxUnixMilli int64
+}
+
 type DataTableSchema struct {
-	Fields []DataTableFieldSchema
+	Fields    []DataTableFieldSchema
+	TimeRange DataTableTimeRange
 }
 
 type DataTableFieldSchema struct {
