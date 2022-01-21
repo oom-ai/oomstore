@@ -44,8 +44,8 @@ func (db *DB) Ping(ctx context.Context) error {
 	return errdefs.WithStack(err)
 }
 
-func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
-	q := fmt.Sprintf(`SELECT column_name, data_type FROM %s.INFORMATION_SCHEMA.COLUMNS WHERE table_name = "%s"`, db.datasetID, tableName)
+func (db *DB) TableSchema(ctx context.Context, opt offline.TableSchemaOpt) (*types.DataTableSchema, error) {
+	q := fmt.Sprintf(`SELECT column_name, data_type FROM %s.INFORMATION_SCHEMA.COLUMNS WHERE table_name = "%s"`, db.datasetID, opt.TableName)
 	rows, err := db.Query(q).Read(ctx)
 	if err != nil {
 		return nil, errdefs.WithStack(err)
@@ -69,7 +69,26 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 			ValueType: valueType,
 		})
 	}
-
+	if opt.CheckTimeRange {
+		q = fmt.Sprintf(`
+		SELECT
+			MIN(%s) AS %s,
+			MAX(%s) AS %s
+		FROM %s.%s`, "unix_milli", "min_unix_milli", "unix_milli", "max_unix_milli", db.datasetID, opt.TableName)
+		rows, err = db.Query(q).Read(ctx)
+		if err != nil {
+			return nil, errdefs.WithStack(err)
+		}
+		recordMap := make(map[string]bigquery.Value)
+		err = rows.Next(&recordMap)
+		if err != nil {
+			return nil, errdefs.WithStack(err)
+		}
+		schema.TimeRange = types.DataTableTimeRange{
+			MinUnixMilli: cast.ToInt64(recordMap["min_unix_milli"]),
+			MaxUnixMilli: cast.ToInt64(recordMap["max_unix_milli"]),
+		}
+	}
 	return &schema, nil
 }
 
