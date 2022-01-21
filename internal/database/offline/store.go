@@ -14,7 +14,7 @@ type Store interface {
 	Push(ctx context.Context, opt PushOpt) error
 
 	CreateTable(ctx context.Context, opt CreateTableOpt) error
-	TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error)
+	TableSchema(ctx context.Context, opt TableSchemaOpt) (*types.DataTableSchema, error)
 	Snapshot(ctx context.Context, opt SnapshotOpt) error
 
 	Ping(ctx context.Context) error
