@@ -13,7 +13,6 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/pkg/errors"
 )
 
 const UNION_ENTITY_QUERY = `
@@ -98,7 +97,7 @@ func buildUnionEntityQuery(params unionEntityQueryParams) (string, []interface{}
 
 	buf := bytes.NewBuffer(nil)
 	if err := t.Execute(buf, params); err != nil {
-		return "", nil, errors.WithStack(err)
+		return "", nil, errdefs.WithStack(err)
 	}
 	return buf.String(), args, nil
 }
@@ -136,7 +135,7 @@ func buildExportQuery(params exportQueryParams) (string, error) {
 
 	buf := bytes.NewBuffer(nil)
 	if err := t.Execute(buf, params); err != nil {
-		return "", errors.WithStack(err)
+		return "", errdefs.WithStack(err)
 	}
 	return buf.String(), nil
 }
