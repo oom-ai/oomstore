@@ -8,6 +8,7 @@ import (
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/spf13/cast"
 
@@ -36,6 +37,8 @@ func (s *OomStore) ImportStream(ctx context.Context, opt types.ImportStreamOpt) 
 		})
 	case types.CSV_READER:
 		return s.csvReaderImportStream(ctx, opt, opt.CsvReaderDataSource)
+	case types.TABLE_LINK:
+		return s.tableLinkImportStream(ctx, opt, opt.TableLinkDataSource)
 	default:
 		return errdefs.Errorf("unsupported data source: %v", opt.DataSourceType)
 	}
@@ -88,6 +91,38 @@ func (s *OomStore) csvReaderImportStream(ctx context.Context, opt types.ImportSt
 	return s.pushStreamingRecords(ctx, records, entity.Name, group, features)
 }
 
+func (s *OomStore) tableLinkImportStream(ctx context.Context, opt types.ImportStreamOpt, dataSource *types.TableLinkDataSource) error {
+	// get group information
+	_, group, features, err := s.getGroupInfo(ctx, opt.GroupName)
+	if err != nil {
+		return err
+	}
+	// get linked table schema
+	tableSchema, err := s.offline.TableSchema(ctx, dataSource.TableName)
+	if err != nil {
+		return err
+	}
+	// validation
+	if err = validateTableSchema(tableSchema, features); err != nil {
+		return err
+	}
+	if err = s.validateRevisions(ctx, group.ID, tableSchema); err != nil {
+		return err
+	}
+
+	_, _, err = s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
+		Revision:    tableSchema.TimeRange.MinUnixMilli,
+		GroupID:     group.ID,
+		CdcTable:    &dataSource.TableName,
+		Description: opt.Description,
+		Anchored:    true,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *OomStore) pushStreamingRecords(ctx context.Context, records []types.StreamRecord, entityName string, group *types.Group, features types.FeatureList) error {
 	buckets := make(map[int64][]types.StreamRecord)
 	for _, record := range records {
@@ -122,6 +157,7 @@ func (s *OomStore) pushStreamingRecords(ctx context.Context, records []types.Str
 	}
 	return nil
 }
+
 func generateStreamRecord(line []interface{}, header []string, group *types.Group, features types.FeatureList) types.StreamRecord {
 	var (
 		entityKey string
@@ -148,4 +184,27 @@ func generateStreamRecord(line []interface{}, header []string, group *types.Grou
 		UnixMilli: unixMilli,
 		Values:    values,
 	}
+}
+
+func (s *OomStore) validateRevisions(ctx context.Context, groupID int, schema *types.DataTableSchema) error {
+	revisions, err := s.ListRevision(ctx, &groupID)
+	if err != nil {
+		return err
+	}
+
+	revisionBeforeMin := revisions.Before(schema.TimeRange.MinUnixMilli)
+	revisionBeforeMax := revisions.Before(schema.TimeRange.MaxUnixMilli)
+	if revisionBeforeMax != revisionBeforeMin {
+		return errdefs.Errorf("data table crosses with another offline table %s", revisionBeforeMax.CdcTable)
+	}
+	if revisionBeforeMin != nil {
+		beforeTableSchema, err := s.offline.TableSchema(ctx, revisionBeforeMin.CdcTable)
+		if err != nil {
+			return err
+		}
+		if beforeTableSchema.TimeRange.MaxUnixMilli >= schema.TimeRange.MinUnixMilli {
+			return errdefs.Errorf("data table crosses with another offline table %s", revisionBeforeMin.CdcTable)
+		}
+	}
+	return nil
 }
