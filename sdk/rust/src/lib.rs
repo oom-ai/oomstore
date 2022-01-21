@@ -130,8 +130,8 @@ impl Client {
     pub async fn import(
         &mut self,
         group: impl Into<String>,
-        description: impl Into<Option<String>>,
         revision: impl Into<Option<i64>>,
+        description: impl Into<Option<String>>,
         input_file: impl AsRef<Path>,
         delimiter: impl Into<Option<char>>,
     ) -> Result<u32> {
