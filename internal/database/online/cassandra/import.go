@@ -6,34 +6,41 @@ import (
 	"strings"
 
 	"github.com/gocql/gocql"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
+	// Step 0: drop existing table for streaming feature
+	var tableName string
+	if opt.Group.Category == types.CategoryBatch {
+		tableName = sqlutil.OnlineBatchTableName(opt.Revision.ID)
+	} else {
+		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
+		if err := db.Query(fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)).Exec(); err != nil {
+			return errdefs.WithStack(err)
+		}
+	}
+
+	// Step 1: create online table
 	entity := opt.Group.Entity
 	columns := append([]string{entity.Name}, opt.Features.Names()...)
-	tableName := sqlutil.OnlineBatchTableName(opt.Revision.ID)
-
-	table := dbutil.BuildTableSchema(tableName, entity, false, opt.Features, []string{entity.Name}, Backend)
-
-	// create table
-	if err := db.Query(table).Exec(); err != nil {
+	schema := dbutil.BuildTableSchema(tableName, entity, false, opt.Features, []string{entity.Name}, Backend)
+	if err := db.Query(schema).Exec(); err != nil {
 		return errdefs.WithStack(err)
 	}
 
-	var (
-		insertStmt = buildInsertStatement(tableName, columns)
-		batch      = db.NewBatch(gocql.LoggedBatch)
-	)
+	// Step 2: insert records to the online table
+	insertStmt := buildInsertStatement(tableName, columns)
+	batch := db.NewBatch(gocql.LoggedBatch)
 	for record := range opt.ExportStream {
 		if len(record) != len(opt.Features)+1 {
 			return errdefs.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
 		}
-
 		if batch.Size() != BatchSize {
 			batch.Query(insertStmt, record...)
 		} else {
