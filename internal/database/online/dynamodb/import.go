@@ -20,19 +20,32 @@ const (
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
+	// Step 0: clean up existing table for streaming feature
+	var tableName string
+	if opt.Group.Category == oomTypes.CategoryBatch {
+		tableName = sqlutil.OnlineBatchTableName(opt.Revision.ID)
+	} else {
+		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
+		_, err := db.DeleteTable(ctx, &dynamodb.DeleteTableInput{
+			TableName: aws.String(tableName),
+		})
+		if err != nil {
+			return errdefs.WithStack(err)
+		}
+	}
 	// Step 1: create table
-	tableName := sqlutil.OnlineBatchTableName(opt.Revision.ID)
+	entity := opt.Group.Entity
 	_, err := db.CreateTable(ctx, &dynamodb.CreateTableInput{
 		TableName: aws.String(tableName),
 		KeySchema: []types.KeySchemaElement{
 			{
-				AttributeName: aws.String(opt.Entity.Name),
+				AttributeName: aws.String(entity.Name),
 				KeyType:       types.KeyTypeHash,
 			},
 		},
 		AttributeDefinitions: []types.AttributeDefinition{
 			{
-				AttributeName: aws.String(opt.Entity.Name),
+				AttributeName: aws.String(entity.Name),
 				AttributeType: types.ScalarAttributeTypeS,
 			},
 		},
@@ -92,7 +105,7 @@ func buildItem(record oomTypes.ExportRecord, opt online.ImportOpt) (map[string]t
 	if err != nil {
 		return nil, errdefs.WithStack(err)
 	}
-	item[opt.Entity.Name] = entityKeyValue
+	item[opt.Group.Entity.Name] = entityKeyValue
 
 	for i, feature := range opt.Features {
 		value, err := dbutil.SerializeByValueType(record.ValueAt(i), feature.ValueType, Backend)

@@ -17,3 +17,10 @@ func Purge(ctx context.Context, db *sqlx.DB, revisionID int, backend types.Backe
 	_, err := db.ExecContext(ctx, query)
 	return errdefs.WithStack(err)
 }
+
+func PurgeTx(ctx context.Context, tx *sqlx.Tx, tableName string, backend types.BackendType) error {
+	qt := dbutil.QuoteFn(backend)
+	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, qt(tableName))
+	_, err := tx.ExecContext(ctx, query)
+	return errdefs.WithStack(err)
+}

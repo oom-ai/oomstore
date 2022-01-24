@@ -45,9 +45,9 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	}
 
 	if err = s.online.Import(ctx, online.ImportOpt{
+		Group:        *group,
 		Features:     features,
 		Revision:     revision,
-		Entity:       group.Entity,
 		ExportStream: exportResult.Data,
 		ExportError:  exportResult.GetErrorChannel(),
 	}); err != nil {

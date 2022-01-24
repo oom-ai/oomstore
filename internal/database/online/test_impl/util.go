@@ -19,9 +19,10 @@ type PrepareStoreFn func(*testing.T) (context.Context, online.Store)
 type DestroyStoreFn func()
 
 type Sample struct {
+	Entity   types.Entity
+	Group    types.Group
 	Features types.FeatureList
-	Revision *types.Revision
-	Entity   *types.Entity
+	Revision types.Revision
 	Data     []types.ExportRecord
 }
 
@@ -30,55 +31,54 @@ var SampleMedium Sample
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-
+	entity := types.Entity{ID: 5, Name: "user"}
+	group := types.Group{ID: 1, Category: types.CategoryBatch, Entity: &entity}
 	{
 		SampleSmall = Sample{
+			Entity: entity,
+			Group:  group,
 			Features: types.FeatureList{
 				&types.Feature{
 					ID:        1,
 					Name:      "age",
 					GroupID:   1,
-					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
+					Group:     &group,
 					ValueType: types.Int64,
 				},
 				&types.Feature{
 					ID:        2,
 					Name:      "gender",
 					GroupID:   1,
-					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
+					Group:     &group,
 					ValueType: types.String,
 				},
 				&types.Feature{
 					ID:        3,
 					Name:      "account",
 					GroupID:   1,
-					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
+					Group:     &group,
 					ValueType: types.Float64,
 				},
 				&types.Feature{
 					ID:        4,
 					Name:      "is_active",
 					GroupID:   1,
-					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
+					Group:     &group,
 					ValueType: types.Bool,
 				},
 				&types.Feature{
 					ID:        5,
 					Name:      "register_time",
 					GroupID:   1,
-					Group:     &types.Group{ID: 1, Category: types.CategoryBatch},
+					Group:     &group,
 					ValueType: types.Time,
 				},
 			},
-			Revision: &types.Revision{
+			Revision: types.Revision{
 				ID:      3,
 				GroupID: 1,
-				Group: &types.Group{
-					ID:       1,
-					Category: types.CategoryBatch,
-				},
+				Group:   &group,
 			},
-			Entity: &types.Entity{ID: 5, Name: "user"},
 			Data: []types.ExportRecord{
 				[]interface{}{"3215", int64(18), "F", 1.1, true, time.Now()},
 				[]interface{}{"3216", int64(29), nil, 2.0, false, time.Now()},
@@ -99,15 +99,14 @@ func init() {
 			},
 		}
 
-		revision := &types.Revision{ID: 9, GroupID: 2, Group: &types.Group{ID: 2, Category: types.CategoryBatch}}
-		entity := &types.Entity{ID: 5, Name: "user"}
+		revision := types.Revision{ID: 9, GroupID: 2, Group: &types.Group{ID: 2, Category: types.CategoryBatch}}
 		var data []types.ExportRecord
 
 		for i := 0; i < 100; i++ {
 			record := []interface{}{dbutil.RandString(10), rand.Float64()}
 			data = append(data, record)
 		}
-		SampleMedium = Sample{features, revision, entity, data}
+		SampleMedium = Sample{entity, group, features, revision, data}
 	}
 }
 
@@ -122,9 +121,9 @@ func importSample(t *testing.T, ctx context.Context, store online.Store, samples
 		}(sample)
 
 		err := store.Import(ctx, online.ImportOpt{
+			Group:        sample.Group,
 			Features:     sample.Features,
-			Revision:     sample.Revision,
-			Entity:       sample.Entity,
+			Revision:     &sample.Revision,
 			ExportStream: stream,
 		})
 		require.NoError(t, err)

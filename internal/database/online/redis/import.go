@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
-
 	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
@@ -21,7 +21,13 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		}
 
 		entityKey, values := record[0], record[1:]
-		key, err := serializeRedisKeyForBatchFeature(opt.Revision.ID, entityKey)
+		var key string
+		var err error
+		if opt.Group.Category == types.CategoryBatch {
+			key, err = serializeRedisKeyForBatchFeature(opt.Revision.ID, entityKey)
+		} else {
+			key, err = serializeRedisKeyForStreamFeature(opt.Group.ID, entityKey)
+		}
 		if err != nil {
 			return err
 		}
@@ -48,7 +54,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 		seq++
 		if seq%PipelineBatchSize == 0 {
-			if _, err := pipe.Exec(ctx); err != nil {
+			if _, err = pipe.Exec(ctx); err != nil {
 				return errdefs.WithStack(err)
 			}
 		}

@@ -2,6 +2,7 @@ package sqlutil
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
@@ -13,11 +14,17 @@ import (
 const importBatchSize = 10
 
 func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend types.BackendType) error {
-	columns := append([]string{opt.Entity.Name}, opt.Features.Names()...)
+	var tableName string
+	if opt.Group.Category == types.CategoryStream {
+		tableName = dbutil.TempTable("online_stream")
+	} else {
+		tableName = OnlineBatchTableName(opt.Revision.ID)
+	}
+	entity := opt.Group.Entity
+	columns := append([]string{entity.Name}, opt.Features.Names()...)
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		tableName := OnlineBatchTableName(opt.Revision.ID)
-		schema := dbutil.BuildTableSchema(tableName, opt.Entity, false, opt.Features, []string{opt.Entity.Name}, backend)
+		schema := dbutil.BuildTableSchema(tableName, entity, false, opt.Features, []string{entity.Name}, backend)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return errdefs.WithStack(err)
@@ -32,18 +39,27 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 			records = append(records, record)
 
 			if len(records) == importBatchSize {
-				if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, backend); err != nil {
+				if err = dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, backend); err != nil {
 					return err
 				}
 				records = make([]interface{}, 0, importBatchSize)
 			}
 		}
-
-		if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, backend); err != nil {
+		if err = dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, backend); err != nil {
 			return err
 		}
 		if opt.ExportError != nil {
 			return <-opt.ExportError
+		}
+		if opt.Group.Category == types.CategoryStream {
+			streamTableName := OnlineStreamTableName(opt.Group.ID)
+			if err = PurgeTx(ctx, tx, streamTableName, backend); err != nil {
+				return err
+			}
+			query := fmt.Sprintf(`ALTER TABLE %s RENAME TO %s;`, tableName, streamTableName)
+			if _, err = tx.ExecContext(ctx, query); err != nil {
+				return errdefs.WithStack(err)
+			}
 		}
 		return nil
 	})
