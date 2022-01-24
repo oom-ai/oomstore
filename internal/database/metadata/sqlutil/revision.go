@@ -25,6 +25,9 @@ func UpdateRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 	if opt.NewSnapshotTable != nil {
 		and["snapshot_table"] = *opt.NewSnapshotTable
 	}
+	if opt.NewCdcTable != nil {
+		and["cdc_table"] = *opt.NewCdcTable
+	}
 	cond, args, err := dbutil.BuildConditions(and, nil)
 	if err != nil {
 		return err

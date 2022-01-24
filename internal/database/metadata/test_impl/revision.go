@@ -107,7 +107,8 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 	revisionID, _, err := store.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:      1000,
 		GroupID:       groupID,
-		SnapshotTable: stringPtr("device_info_1000"),
+		SnapshotTable: stringPtr("offline_stream_snapshot_device_info_1000"),
+		CdcTable:      stringPtr("offline_stream_cdc_device_info_1000"),
 		Anchored:      false,
 	})
 	require.NoError(t, err)
@@ -129,7 +130,8 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 				ID:            revisionID,
 				GroupID:       groupID,
 				Revision:      1000,
-				SnapshotTable: "device_info_1000",
+				SnapshotTable: "offline_stream_snapshot_device_info_1000",
+				CdcTable:      "offline_stream_cdc_device_info_1000",
 				Anchored:      true,
 				Group:         group,
 			},
@@ -146,6 +148,24 @@ func TestUpdateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore 
 				GroupID:       groupID,
 				Revision:      1000,
 				SnapshotTable: "new_table",
+				CdcTable:      "offline_stream_cdc_device_info_1000",
+				Anchored:      true,
+				Group:         group,
+			},
+		},
+		{
+			description: "update revision cdc_table successfully",
+			opt: metadata.UpdateRevisionOpt{
+				RevisionID:  revisionID,
+				NewCdcTable: stringPtr("new_table"),
+			},
+			expected: nil,
+			expectedRevision: &types.Revision{
+				ID:            revisionID,
+				GroupID:       groupID,
+				Revision:      1000,
+				SnapshotTable: "new_table",
+				CdcTable:      "new_table",
 				Anchored:      true,
 				Group:         group,
 			},
