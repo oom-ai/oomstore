@@ -57,8 +57,8 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 		return 0, err
 	}
 
-	newRevisionID, snapshotTableName, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:      0,
+	newRevisionID, snapshotTableName, err := s.CreateRevision(ctx, metadata.CreateRevisionOpt{
+		Revision:      time.Now().UnixMilli(),
 		GroupID:       opt.group.ID,
 		SnapshotTable: nil,
 		Description:   opt.Description,
@@ -112,7 +112,7 @@ func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt, dataSour
 	} else {
 		revision = *opt.Revision
 	}
-	newRevisionID, _, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	newRevisionID, _, err := s.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:      revision,
 		GroupID:       opt.group.ID,
 		SnapshotTable: &dataSource.TableName,

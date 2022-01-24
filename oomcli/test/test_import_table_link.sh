@@ -9,12 +9,13 @@ import_device_sample
 case='oomcli import using table link'
 oomcli import \
     --group phone \
-    --table-link "offline_batch_1_1" \
+    --table-link "offline_batch_1_2" \
     --description 'linked table' > /dev/null
 expected='
 ID,REVISION,GROUP,SNAPSHOT-TABLE,CDC-TABLE,DESCRIPTION
-1,1639047117470,phone,offline_batch_1_1,,test data
-2,1639047117552,phone,offline_batch_1_1,,linked table
+1,0,phone,offline_stream_snapshot_1_0,
+2,1639047117470,phone,offline_batch_1_2,,test data
+3,1639047117552,phone,offline_batch_1_2,,linked table
 '
 filter() { cut -d, -f 1,3,4,5; }
 actual=$(oomcli get meta revision -o csv)
