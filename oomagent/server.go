@@ -78,7 +78,7 @@ func (s *server) Sync(ctx context.Context, req *codegen.SyncRequest) (*codegen.S
 		revisionID = int(*req.RevisionId)
 	}
 	if err := s.oomstore.Sync(ctx, types.SyncOpt{
-		GroupName:  req.GroupName,
+		GroupName:  req.Group,
 		RevisionID: &revisionID,
 		PurgeDelay: int(req.PurgeDelay),
 	}); err != nil {
