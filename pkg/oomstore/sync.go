@@ -2,7 +2,7 @@ package oomstore
 
 import (
 	"context"
-	"fmt"
+	"sort"
 	"time"
 
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -18,17 +18,12 @@ import (
 // This helps get rid of unwanted out-of-memory errors,
 // where size of the particular revision outgrows memory limit of your machine.
 func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
-	if err := s.metadata.Refresh(); err != nil {
-		return fmt.Errorf("failed to refresh informer, err=%v", err)
-	}
-	revision, err := s.GetRevision(ctx, opt.RevisionID)
+	group, revision, err := s.validateSyncOpt(ctx, opt)
 	if err != nil {
 		return err
 	}
-
-	group := revision.Group
 	prevOnlineRevisionID := group.OnlineRevisionID
-	if prevOnlineRevisionID != nil && *prevOnlineRevisionID == opt.RevisionID {
+	if prevOnlineRevisionID != nil && *prevOnlineRevisionID == revision.ID {
 		return errdefs.Errorf("the specific revision was synced to the online store, won't do it again this time")
 	}
 
@@ -93,4 +88,38 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	}
 
 	return nil
+}
+
+func (s *OomStore) validateSyncOpt(ctx context.Context, opt types.SyncOpt) (*types.Group, *types.Revision, error) {
+	group, err := s.GetGroupByName(ctx, opt.GroupName)
+	if err != nil {
+		return nil, nil, err
+	}
+	if group.Category == types.CategoryStream && opt.RevisionID != nil {
+		return nil, nil, errdefs.Errorf("streaming feature group only sync the latest values, cannot designate revisionID")
+	}
+	var revision *types.Revision
+	if opt.RevisionID != nil {
+		r, err := s.GetRevision(ctx, *opt.RevisionID)
+		if err != nil {
+			return nil, nil, err
+		}
+		revision = r
+	} else {
+		revisions, err := s.ListRevision(ctx, &group.ID)
+		if err != nil {
+			return nil, nil, err
+		}
+		if len(revisions) == 0 {
+			return nil, nil, errdefs.Errorf("group %s doesn't have any revision", opt.GroupName)
+		}
+		sort.Slice(revisions, func(i, j int) bool {
+			return revisions[i].Revision > revisions[j].Revision
+		})
+		revision = revisions[0]
+	}
+	if group.ID != revision.GroupID {
+		return nil, nil, errdefs.Errorf("revisionID %d does not belong to group %s", *opt.RevisionID, opt.GroupName)
+	}
+	return group, revision, nil
 }

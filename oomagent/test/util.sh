@@ -110,8 +110,8 @@ prepare_store() {
     import_sample transaction_stats ./data/transaction_stats_100.csv
 
     info "sync sample data to online store"
-    oomcli sync -r 1
-    oomcli sync -r 2
+    oomcli sync --group-name account --revision-id 1
+    oomcli sync --group-name transaction_stats --revision-id 2
 }
 
 testgrpc() {

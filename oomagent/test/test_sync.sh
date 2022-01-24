@@ -8,6 +8,7 @@ prepare_oomagent
 case="it works"
 arg='
 {
+    "group_name": "account",
     "revision_id": "3"
 }
 '

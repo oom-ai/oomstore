@@ -60,8 +60,9 @@ message OnlineMultiGetResponse {
 }
 
 message SyncRequest {
-  int32 revision_id = 1;
-  int32 purge_delay = 2;
+  string group_name = 1;
+  optional int32 revision_id = 2;
+  int32 purge_delay = 3;
 }
 
 message SyncResponse {}

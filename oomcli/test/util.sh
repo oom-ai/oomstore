@@ -107,7 +107,7 @@ import_student_sample() {
 # sync feature values from offline store to online store
 sync() {
     info "sync sample data to online store"
-    oomcli sync -r "$1"
+    oomcli sync --group-name "$1" --revision-id "$2"
 }
 
 init_store() {

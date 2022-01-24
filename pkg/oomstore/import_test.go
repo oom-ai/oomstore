@@ -247,3 +247,11 @@ func TestChannelImport(t *testing.T) {
 		})
 	}
 }
+
+func intPtr(i int) *int {
+	return &i
+}
+
+func int64Ptr(i int64) *int64 {
+	return &i
+}

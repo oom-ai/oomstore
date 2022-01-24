@@ -15,6 +15,11 @@ var syncOpt types.SyncOpt
 var syncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Sync feature values from offline store to online store",
+	PreRun: func(cmd *cobra.Command, args []string) {
+		if !cmd.Flags().Changed("revision-id") {
+			syncOpt.RevisionID = nil
+		}
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
@@ -34,7 +39,9 @@ func init() {
 
 	flags := syncCmd.Flags()
 
-	flags.IntVarP(&syncOpt.RevisionID, "revision-id", "r", 0, "group revision id")
+	flags.StringVarP(&syncOpt.GroupName, "group-name", "g", "", "group name")
+
+	syncOpt.RevisionID = flags.IntP("revision-id", "r", 0, "group revision id")
 	_ = syncCmd.MarkFlagRequired("revision-id")
 
 	flags.IntVarP(&syncOpt.PurgeDelay, "purge-delay", "", 0, "wait time in seconds before purging the old revision")
