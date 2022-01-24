@@ -85,26 +85,26 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *type
 		return err
 	}
 
-	// Update snapshot_table in feature_group_revision table
-	if err := s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
-		RevisionID:       revision.ID,
-		NewSnapshotTable: &snapshotTable,
-	}); err != nil {
-		return err
-	}
-
+	var cdcTable *string
 	if revision.Group.Category == types.CategoryStream {
+		tableName := dbutil.OfflineStreamCdcTableName(revision.GroupID, revision.Revision)
 		if err = s.offline.CreateTable(ctx, offline.CreateTableOpt{
-			TableName: dbutil.OfflineStreamCdcTableName(revision.GroupID, revision.Revision),
+			TableName: tableName,
 			Entity:    revision.Group.Entity,
 			Features:  features,
 			TableType: types.TableStreamCdc,
 		}); err != nil {
 			return err
 		}
+		cdcTable = &tableName
 	}
 
-	return nil
+	// Update snapshot_table in feature_group_revision table
+	return s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
+		RevisionID:       revision.ID,
+		NewSnapshotTable: &snapshotTable,
+		NewCdcTable:      cdcTable,
+	})
 }
 
 func (s *OomStore) createFirstSnapshotTable(ctx context.Context, revision *types.Revision) error {
