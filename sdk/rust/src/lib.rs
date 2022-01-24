@@ -156,20 +156,17 @@ impl Client {
         &mut self,
         entity_key: impl Into<String>,
         group: impl Into<String>,
-        kv_pairs: Vec<(impl Into<String>, impl Into<Value>)>,
+        kv_pairs: HashMap<String, Value>,
     ) -> Result<()> {
-        let mut keys = Vec::with_capacity(kv_pairs.len());
-        let mut vals = Vec::with_capacity(kv_pairs.len());
-        kv_pairs.into_iter().for_each(|(k, v)| {
-            keys.push(k.into());
-            vals.push(oomagent::Value { value: Some(v.into()) });
-        });
+        let kv_pairs = kv_pairs
+            .into_iter()
+            .map(|(k, v)| (k, oomagent::Value { value: Some(v) }))
+            .collect();
         self.inner
             .push(PushRequest {
                 entity_key:     entity_key.into(),
                 group:          group.into(),
-                features:       keys,
-                feature_values: vals,
+                feature_values: kv_pairs,
             })
             .await?
             .into_inner();

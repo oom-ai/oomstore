@@ -96,8 +96,7 @@ message PushResponse {}
 message PushRequest {
   string entity_key = 1;
   string group = 2;
-  repeated string features = 3;
-  repeated Value feature_values = 4;
+  map<string, Value> feature_values = 3;
 }
 
 message SnapshotResponse {}

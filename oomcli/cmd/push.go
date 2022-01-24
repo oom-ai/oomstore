@@ -11,12 +11,9 @@ import (
 )
 
 type PushOption struct {
-	EntityKey   string
-	GroupName   string
-	FeaturePair map[string]string
-
-	featureNames  []string
-	featureValues []interface{}
+	EntityKey     string
+	GroupName     string
+	FeatureValues map[string]string
 }
 
 var pushOpt PushOption
@@ -24,22 +21,20 @@ var pushOpt PushOption
 var pushCmd = &cobra.Command{
 	Use:   "push",
 	Short: "Push stream feature",
-	PreRun: func(cmd *cobra.Command, args []string) {
-		for feature, value := range pushOpt.FeaturePair {
-			pushOpt.featureNames = append(pushOpt.featureNames, feature)
-			pushOpt.featureValues = append(pushOpt.featureValues, value)
-		}
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
+		featureValues := make(map[string]interface{})
+		for k, v := range pushOpt.FeatureValues {
+			featureValues[k] = v
+		}
+
 		if err := oomStore.Push(ctx, types.PushOpt{
 			EntityKey:     pushOpt.EntityKey,
 			GroupName:     pushOpt.GroupName,
-			FeatureNames:  pushOpt.featureNames,
-			FeatureValues: pushOpt.featureValues,
+			FeatureValues: featureValues,
 		}); err != nil {
 			exitf("failed push features: %+v\n", err)
 		}
@@ -59,6 +54,6 @@ func init() {
 	flags.StringVarP(&pushOpt.GroupName, "group", "g", "", "feature group")
 	_ = pushCmd.MarkFlagRequired("group")
 
-	flags.StringToStringVarP(&pushOpt.FeaturePair, "features", "f", nil, "feature name-value pairs")
+	flags.StringToStringVarP(&pushOpt.FeatureValues, "features", "f", nil, "feature name-value pairs")
 	_ = pushCmd.MarkFlagRequired("features")
 }
