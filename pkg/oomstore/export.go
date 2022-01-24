@@ -64,25 +64,21 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 		}
 		revision := revisions.Before(opt.UnixMilli)
 		if revision == nil {
-			empty := make(chan types.ExportRecord)
-			close(empty)
-			return &types.ExportResult{
-				Header: append([]string{features[0].Entity().Name}, features.FullNames()...),
-				Data:   empty,
-			}, nil
-		}
-		if revision.SnapshotTable == "" {
-			if err = s.Snapshot(ctx, group.Name); err != nil {
+			return nil, errdefs.Errorf("group %s no feature values up to %d, use a later timestamp", group.Name, opt.UnixMilli)
+		} else {
+			if revision.SnapshotTable == "" {
+				if err = s.Snapshot(ctx, group.Name); err != nil {
+					return nil, err
+				}
+			}
+
+			if revision, err = s.GetRevision(ctx, revision.ID); err != nil {
 				return nil, err
 			}
-		}
-		revision, err = s.GetRevision(ctx, revision.ID)
-		if err != nil {
-			return nil, err
-		}
-		snapshotTables[group.ID] = revision.SnapshotTable
-		if group.Category == types.CategoryStream {
-			cdcTables[group.ID] = revision.CdcTable
+			snapshotTables[group.ID] = revision.SnapshotTable
+			if group.Category == types.CategoryStream {
+				cdcTables[group.ID] = revision.CdcTable
+			}
 		}
 	}
 
