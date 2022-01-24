@@ -58,6 +58,9 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 		if err != nil {
 			return nil, err
 		}
+		if len(revisionRanges) == 0 {
+			return nil, errdefs.Errorf("group %s no feature values", groupName)
+		}
 		revisionRangeMap[groupName] = revisionRanges
 	}
 
