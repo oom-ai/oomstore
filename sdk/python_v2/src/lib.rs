@@ -67,10 +67,16 @@ impl Client {
         })
     }
 
-    pub fn sync<'p>(&mut self, py: Python<'p>, revision_id: u32, purge_delay: u32) -> PyResult<&'p PyAny> {
+    pub fn sync<'p>(
+        &mut self,
+        py: Python<'p>,
+        group: String,
+        revision_id: Option<u32>,
+        purge_delay: u32,
+    ) -> PyResult<&'p PyAny> {
         let mut inner = OomClient::clone(&self.inner);
         future_into_py(py, async move {
-            inner.sync(revision_id, purge_delay).await.map_err(err_to_py)
+            inner.sync(group, revision_id, purge_delay).await.map_err(err_to_py)
         })
     }
 
