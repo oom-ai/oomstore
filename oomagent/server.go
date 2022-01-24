@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"time"
@@ -424,6 +425,9 @@ func convertJoinedRow(row []interface{}) ([]*codegen.Value, error) {
 }
 
 func convertValueToInterface(i *codegen.Value) interface{} {
+	if i == nil {
+		return nil
+	}
 	kind := i.GetValue()
 	switch kind.(type) {
 	case *codegen.Value_Int64:
@@ -438,8 +442,9 @@ func convertValueToInterface(i *codegen.Value) interface{} {
 		return i.GetUnixMilli()
 	case *codegen.Value_Bytes:
 		return i.GetBytes()
+	default:
+		panic(fmt.Sprintf("unsupported value type: %T, value=%v", i, i))
 	}
-	return nil
 }
 
 func internalError(msg string) error {
