@@ -98,13 +98,16 @@ impl Client {
         Ok(rs.into_iter().map(|(k, v)| (k, parse_raw_feature_values(v))).collect())
     }
 
-    pub async fn sync(&mut self, revision_id: u32, purge_delay: u32) -> Result<()> {
-        self.inner
-            .sync(SyncRequest {
-                revision_id: i32::try_from(revision_id)?,
-                purge_delay: i32::try_from(purge_delay)?,
-            })
-            .await?;
+    pub async fn sync(
+        &mut self,
+        group: impl Into<String>,
+        revision_id: impl Into<Option<u32>>,
+        purge_delay: u32,
+    ) -> Result<()> {
+        let group = group.into();
+        let revision_id = revision_id.into().map(|x| i32::try_from(x)).transpose()?;
+        let purge_delay = i32::try_from(purge_delay)?;
+        self.inner.sync(SyncRequest { revision_id, group, purge_delay }).await?;
         Ok(())
     }
 
