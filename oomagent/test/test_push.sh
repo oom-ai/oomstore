@@ -12,15 +12,14 @@ arg='
 {
     "entity_key": "1",
     "group": "user-click",
-    "features": ["last_5_click_posts", "number_of_user_starred_posts"],
-    "feature_values": [
-    {
-        "string": "1,2,3"
-    },
-    {
-        "int64": 10
+    "feature_values": {
+        "last_5_click_posts": {
+            "string": "1,2,3"
+        },
+        "number_of_user_starred_posts": {
+            "int64": 10
+        }
     }
-]
 }
 '
 expected='{}'
@@ -59,15 +58,14 @@ arg='
 {
     "entity_key": "1",
     "group": "user-click",
-    "features": ["last_5_click_posts", "number_of_user_starred_posts"],
-    "feature_values": [
-    {
-        "string": "2,3,4"
-    },
-    {
-        "int64": 11
+    "feature_values": {
+        "last_5_click_posts": {
+            "string": "2,3,4"
+        },
+        "number_of_user_starred_posts": {
+            "int64": 11
+        }
     }
-]
 }
 '
 expected='{}'

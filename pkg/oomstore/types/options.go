@@ -88,6 +88,5 @@ type PushOpt struct {
 	GroupName string
 
 	// feature names without group prefix
-	FeatureNames  []string
-	FeatureValues []interface{}
+	FeatureValues map[string]interface{}
 }

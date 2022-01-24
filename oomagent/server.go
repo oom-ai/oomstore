@@ -149,8 +149,7 @@ func (s *server) Push(ctx context.Context, req *codegen.PushRequest) (*codegen.P
 	if err := s.oomstore.Push(ctx, types.PushOpt{
 		EntityKey:     req.EntityKey,
 		GroupName:     req.Group,
-		FeatureNames:  req.Features,
-		FeatureValues: convertToInterfaceSlice(req.FeatureValues),
+		FeatureValues: convertToInterfaceMap(req.FeatureValues),
 	}); err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
@@ -336,7 +335,7 @@ func (s *server) Export(ctx context.Context, req *codegen.ExportRequest) (*codeg
 }
 
 func convertToValueMap(m map[string]interface{}) (map[string]*codegen.Value, error) {
-	valueMap := make(map[string]*codegen.Value)
+	valueMap := make(map[string]*codegen.Value, len(m))
 	for key, i := range m {
 		value, err := convertInterfaceToValue(i)
 		if err != nil {
@@ -345,6 +344,14 @@ func convertToValueMap(m map[string]interface{}) (map[string]*codegen.Value, err
 		valueMap[key] = value
 	}
 	return valueMap, nil
+}
+
+func convertToInterfaceMap(m map[string]*codegen.Value) map[string]interface{} {
+	rs := make(map[string]interface{}, len(m))
+	for k, v := range m {
+		rs[k] = convertValueToInterface(v)
+	}
+	return rs
 }
 
 func convertToValueSlice(s []interface{}) ([]*codegen.Value, error) {
@@ -433,14 +440,6 @@ func convertValueToInterface(i *codegen.Value) interface{} {
 		return i.GetBytes()
 	}
 	return nil
-}
-
-func convertToInterfaceSlice(values []*codegen.Value) []interface{} {
-	res := make([]interface{}, 0, len(values))
-	for _, value := range values {
-		res = append(res, convertValueToInterface(value))
-	}
-	return res
 }
 
 func internalError(msg string) error {

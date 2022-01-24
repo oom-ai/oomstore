@@ -18,19 +18,19 @@ func (s *OomStore) Push(ctx context.Context, opt types.PushOpt) error {
 	if err != nil {
 		return err
 	}
+	var featureNames []string
+	for name := range opt.FeatureValues {
+		featureNames = append(featureNames, name)
+	}
+
 	entity := features[0].Entity()
 	group := features[0].Group
-	if !stringSliceEqual(features.Names(), opt.FeatureNames) {
-		return errdefs.Errorf("FeatureNames %v does not match with group's features %v", opt.FeatureNames, features.Names())
+	if !stringSliceEqual(features.Names(), featureNames) {
+		return errdefs.Errorf("FeatureNames %v does not match with group's features %v", featureNames, features.Names())
 	}
 	values := make([]interface{}, 0, len(features))
 	for _, f := range features {
-		for i, name := range opt.FeatureNames {
-			if f.Name == name {
-				values = append(values, opt.FeatureValues[i])
-				break
-			}
-		}
+		values = append(values, opt.FeatureValues[f.Name])
 	}
 
 	if err = s.online.Push(ctx, online.PushOpt{
