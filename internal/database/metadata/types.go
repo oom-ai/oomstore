@@ -57,6 +57,7 @@ type UpdateRevisionOpt struct {
 	NewRevision      *int64
 	NewAnchored      *bool
 	NewSnapshotTable *string
+	NewCdcTable      *string
 }
 
 type ListFeatureOpt struct {
