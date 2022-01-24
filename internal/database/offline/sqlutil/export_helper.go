@@ -172,10 +172,10 @@ func prepareEntityTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.Exp
 		DatasetID:      dbOpt.DatasetID,
 	})
 	if err != nil {
-		return "", errdefs.WithStack(err)
+		return "", err
 	}
 	if err = dbOpt.ExecContext(ctx, query, args); err != nil {
-		return "", errdefs.WithStack(err)
+		return "", err
 	}
 
 	// Step 3: create index on table entity_rows
