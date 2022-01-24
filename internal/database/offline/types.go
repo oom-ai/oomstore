@@ -77,3 +77,8 @@ type CreateTableOpt struct {
 	Features  types.FeatureList
 	TableType types.TableType
 }
+
+type TableSchemaOpt struct {
+	TableName      string
+	CheckTimeRange bool
+}

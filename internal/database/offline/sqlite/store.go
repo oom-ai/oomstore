@@ -45,7 +45,7 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	return sqlutil.Join(ctx, db.DB, opt, Backend)
 }
 
-func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
+func (db *DB) TableSchema(ctx context.Context, opt offline.TableSchemaOpt) (*types.DataTableSchema, error) {
 	query := `
 		SELECT
 			p.name as column_name,
@@ -54,11 +54,11 @@ func (db *DB) TableSchema(ctx context.Context, tableName string) (*types.DataTab
 		LEFT OUTER JOIN pragma_table_info((m.name)) AS p
 		WHERE m.type = 'table' AND m.name = ?
 `
-	rows, err := db.QueryxContext(ctx, query, tableName)
+	rows, err := db.QueryxContext(ctx, query, opt.TableName)
 	if err != nil {
 		return nil, errdefs.WithStack(err)
 	}
-	return sqlutil.SqlxTableSchema(ctx, db, types.BackendSQLite, rows)
+	return sqlutil.SqlxTableSchema(ctx, db.DB, Backend, rows, opt)
 }
 
 func (db *DB) Snapshot(ctx context.Context, opt offline.SnapshotOpt) error {

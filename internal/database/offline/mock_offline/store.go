@@ -152,16 +152,16 @@ func (mr *MockStoreMockRecorder) Snapshot(ctx, opt interface{}) *gomock.Call {
 }
 
 // TableSchema mocks base method.
-func (m *MockStore) TableSchema(ctx context.Context, tableName string) (*types.DataTableSchema, error) {
+func (m *MockStore) TableSchema(ctx context.Context, opt offline.TableSchemaOpt) (*types.DataTableSchema, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TableSchema", ctx, tableName)
+	ret := m.ctrl.Call(m, "TableSchema", ctx, opt)
 	ret0, _ := ret[0].(*types.DataTableSchema)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // TableSchema indicates an expected call of TableSchema.
-func (mr *MockStoreMockRecorder) TableSchema(ctx, tableName interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) TableSchema(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TableSchema", reflect.TypeOf((*MockStore)(nil).TableSchema), ctx, tableName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TableSchema", reflect.TypeOf((*MockStore)(nil).TableSchema), ctx, opt)
 }
