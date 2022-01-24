@@ -4,10 +4,12 @@ use oomclient::{Client, Value};
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = Client::connect("http://localhost:50051").await?;
 
-    let kvs = vec![
-        ("last_5_click_posts", Value::String("hello".into())),
-        ("number_of_user_starred_posts", Value::Int64(28)),
-    ];
+    let kvs = [
+        ("last_5_click_posts".to_string(), Value::String("hello".into())),
+        ("number_of_user_starred_posts".to_string(), Value::Int64(28)),
+    ]
+    .into_iter()
+    .collect();
 
     client.push("1", "user-click", kvs).await?;
 
