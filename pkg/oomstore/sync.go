@@ -22,6 +22,9 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	if err != nil {
 		return err
 	}
+	if group.Category == types.CategoryStream {
+		return s.syncStream(ctx, opt)
+	}
 	prevOnlineRevisionID := group.OnlineRevisionID
 	if prevOnlineRevisionID != nil && *prevOnlineRevisionID == revision.ID {
 		return errdefs.Errorf("the specific revision was synced to the online store, won't do it again this time")
@@ -88,6 +91,30 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	}
 
 	return nil
+}
+
+func (s *OomStore) syncStream(ctx context.Context, opt types.SyncOpt) error {
+	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
+		GroupName: &opt.GroupName,
+	})
+	if err != nil {
+		return err
+	}
+	group := features[0].Group
+	exportResult, err := s.ChannelExport(ctx, types.ChannelExportOpt{
+		FeatureNames: features.Names(),
+		UnixMilli:    time.Now().UnixMilli(),
+	})
+	if err != nil {
+		return err
+	}
+
+	return s.online.Import(ctx, online.ImportOpt{
+		Group:        *group,
+		Features:     features,
+		ExportStream: exportResult.Data,
+		ExportError:  exportResult.GetErrorChannel(),
+	})
 }
 
 func (s *OomStore) validateSyncOpt(ctx context.Context, opt types.SyncOpt) (*types.Group, *types.Revision, error) {
