@@ -13,11 +13,12 @@ import (
 const importBatchSize = 10
 
 func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend types.BackendType) error {
-	columns := append([]string{opt.Entity.Name}, opt.Features.Names()...)
+	entity := opt.Group.Entity
+	columns := append([]string{entity.Name}, opt.Features.Names()...)
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		tableName := OnlineBatchTableName(opt.Revision.ID)
-		schema := dbutil.BuildTableSchema(tableName, opt.Entity, false, opt.Features, []string{opt.Entity.Name}, backend)
+		schema := dbutil.BuildTableSchema(tableName, entity, false, opt.Features, []string{entity.Name}, backend)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return errdefs.WithStack(err)

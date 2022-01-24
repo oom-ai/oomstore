@@ -21,18 +21,19 @@ const (
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	// Step 1: create table
+	entity := opt.Group.Entity
 	tableName := sqlutil.OnlineBatchTableName(opt.Revision.ID)
 	_, err := db.CreateTable(ctx, &dynamodb.CreateTableInput{
 		TableName: aws.String(tableName),
 		KeySchema: []types.KeySchemaElement{
 			{
-				AttributeName: aws.String(opt.Entity.Name),
+				AttributeName: aws.String(entity.Name),
 				KeyType:       types.KeyTypeHash,
 			},
 		},
 		AttributeDefinitions: []types.AttributeDefinition{
 			{
-				AttributeName: aws.String(opt.Entity.Name),
+				AttributeName: aws.String(entity.Name),
 				AttributeType: types.ScalarAttributeTypeS,
 			},
 		},
@@ -92,7 +93,7 @@ func buildItem(record oomTypes.ExportRecord, opt online.ImportOpt) (map[string]t
 	if err != nil {
 		return nil, errdefs.WithStack(err)
 	}
-	item[opt.Entity.Name] = entityKeyValue
+	item[opt.Group.Entity.Name] = entityKeyValue
 
 	for i, feature := range opt.Features {
 		value, err := dbutil.SerializeByValueType(record.ValueAt(i), feature.ValueType, Backend)

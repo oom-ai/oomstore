@@ -21,11 +21,11 @@ type MultiGetOpt struct {
 }
 
 type ImportOpt struct {
+	Group        types.Group
+	Features     types.FeatureList
 	Revision     *types.Revision
-	Entity       *types.Entity
 	ExportStream <-chan types.ExportRecord
 	ExportError  <-chan error
-	Features     types.FeatureList
 }
 
 type PushOpt struct {

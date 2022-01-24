@@ -14,10 +14,11 @@ import (
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
-	columns := append([]string{opt.Entity.Name}, opt.Features.Names()...)
+	entity := opt.Group.Entity
+	columns := append([]string{entity.Name}, opt.Features.Names()...)
 	tableName := sqlutil.OnlineBatchTableName(opt.Revision.ID)
 
-	table := dbutil.BuildTableSchema(tableName, opt.Entity, false, opt.Features, []string{opt.Entity.Name}, Backend)
+	table := dbutil.BuildTableSchema(tableName, entity, false, opt.Features, []string{entity.Name}, Backend)
 
 	// create table
 	if err := db.Query(table).Exec(); err != nil {
