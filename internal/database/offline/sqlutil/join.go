@@ -180,16 +180,15 @@ func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGr
 }
 
 func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTableOpt) (*types.JoinResult, error) {
-	data := make(chan []interface{})
-	defer close(data)
-	emptyResult := &types.JoinResult{
-		Data: data,
-	}
-	tableNames := opt.TableNames
-	dropTableNames := append([]string{opt.EntityRowsTableName}, opt.AllTableNames...)
-	if len(tableNames) == 0 {
+	if len(opt.TableNames) == 0 {
+		data := make(chan []interface{})
+		defer close(data)
+		emptyResult := &types.JoinResult{
+			Data: data,
+		}
 		return emptyResult, nil
 	}
+
 	qt := dbutil.QuoteFn(dbOpt.Backend)
 
 	// Step 1: join temporary tables
@@ -225,7 +224,7 @@ func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTabl
 			ValueType: types.String,
 		})
 	}
-	for _, name := range tableNames {
+	for _, name := range opt.TableNames {
 		for _, f := range opt.FeatureMap[name] {
 			fields = append(fields, fmt.Sprintf("%s.%s", qt(name), qt(f.Name)))
 			header = append(header, dbutil.Column{
@@ -235,7 +234,7 @@ func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTabl
 		}
 	}
 
-	tableNames = append([]string{opt.EntityRowsTableName}, tableNames...)
+	tableNames := append([]string{opt.EntityRowsTableName}, opt.TableNames...)
 	for i := 0; i < len(tableNames)-1; i++ {
 		joinTablePairs = append(joinTablePairs, joinTablePair{
 			LeftTable:  tableNames[0],
@@ -258,6 +257,8 @@ func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTabl
 	if err != nil {
 		return nil, err
 	}
+
+	dropTableNames := append([]string{opt.EntityRowsTableName}, opt.AllTableNames...)
 
 	// Step 2: read joined results
 	return opt.QueryResults(ctx, dbOpt, query, header, dropTableNames, dbOpt.Backend)
