@@ -5,7 +5,7 @@ source ./util.sh
 init_store
 register_features
 revisionID=$(import_device_sample)
-sync $revisionID
+sync "phone" $revisionID
 
 case="query single feature"
 expected='
