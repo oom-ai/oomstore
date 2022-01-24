@@ -20,9 +20,21 @@ const (
 )
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
+	// Step 0: clean up existing table for streaming feature
+	var tableName string
+	if opt.Group.Category == oomTypes.CategoryBatch {
+		tableName = sqlutil.OnlineBatchTableName(opt.Revision.ID)
+	} else {
+		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
+		_, err := db.DeleteTable(ctx, &dynamodb.DeleteTableInput{
+			TableName: aws.String(tableName),
+		})
+		if err != nil {
+			return errdefs.WithStack(err)
+		}
+	}
 	// Step 1: create table
 	entity := opt.Group.Entity
-	tableName := sqlutil.OnlineBatchTableName(opt.Revision.ID)
 	_, err := db.CreateTable(ctx, &dynamodb.CreateTableInput{
 		TableName: aws.String(tableName),
 		KeySchema: []types.KeySchemaElement{
