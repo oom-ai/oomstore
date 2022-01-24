@@ -116,13 +116,10 @@ impl Client {
         entity_key: String,
         kv_pairs: &PyDict,
     ) -> PyResult<&'p PyAny> {
-        let mut kvs = Vec::with_capacity(kv_pairs.len());
-        for (k, v) in kv_pairs {
-            let name = k.extract::<String>()?;
-            let value = py_to_value(v)?;
-            kvs.push((name, value));
-        }
-
+        let kvs = kv_pairs
+            .into_iter()
+            .map(|(k, v)| Ok((k.extract::<String>()?, py_to_value(v)?)))
+            .collect::<PyResult<_>>()?;
         let mut inner = OomClient::clone(&self.inner);
         future_into_py(py, async move {
             inner.push(entity_key, group, kvs).await.map_err(err_to_py)
