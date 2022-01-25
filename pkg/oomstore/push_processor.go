@@ -163,7 +163,7 @@ func (s *OomStore) newRevisionForStream(ctx context.Context, groupID int, revisi
 
 	snapshotTable := ""
 	cdcTable := dbutil.OfflineStreamCdcTableName(groupID, revision)
-	if _, _, err := s.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	if _, _, err := s.createRevision(ctx, metadata.CreateRevisionOpt{
 		GroupID:       groupID,
 		Revision:      revision,
 		SnapshotTable: &snapshotTable,
