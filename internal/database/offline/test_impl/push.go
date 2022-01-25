@@ -72,10 +72,10 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 
 	t.Run("push when cdc table exists", func(t *testing.T) {
 		err := store.CreateTable(ctx, offline.CreateTableOpt{
-			TableName: dbutil.OfflineStreamCdcTableName(group.ID, revision),
-			Entity:    &entity,
-			Features:  features,
-			TableType: types.TableStreamCdc,
+			TableName:  dbutil.OfflineStreamCdcTableName(group.ID, revision),
+			EntityName: entity.Name,
+			Features:   features,
+			TableType:  types.TableStreamCdc,
 		})
 		require.NoError(t, err)
 

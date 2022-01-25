@@ -71,7 +71,6 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 		{
 			description: "no features",
 			opt: offline.JoinOpt{
-
 				FeatureMap: make(map[string]types.FeatureList),
 			},
 			expected: prepareEmptyResult(),
@@ -79,7 +78,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 		{
 			description: "no entity rows",
 			opt: offline.JoinOpt{
-				Entity:     *entity,
+				EntityName: entity.Name,
 				GroupNames: oneGroupGroupNames,
 				FeatureMap: oneGroupFeatureMap,
 				EntityRows: prepareEntityRows(true, false),
@@ -89,7 +88,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 		{
 			description: "one batch feature group",
 			opt: offline.JoinOpt{
-				Entity:           *entity,
+				EntityName:       entity.Name,
 				EntityRows:       prepareEntityRows(false, false),
 				GroupNames:       oneGroupGroupNames,
 				FeatureMap:       oneGroupFeatureMap,
@@ -100,7 +99,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 		{
 			description: "two batch feature groups",
 			opt: offline.JoinOpt{
-				Entity:           *entity,
+				EntityName:       entity.Name,
 				EntityRows:       prepareEntityRows(false, false),
 				GroupNames:       twoGroupGroupNames,
 				FeatureMap:       twoGroupFeatureMap,
@@ -111,7 +110,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 		{
 			description: "two batch feature groups, with extra values",
 			opt: offline.JoinOpt{
-				Entity:           *entity,
+				EntityName:       entity.Name,
 				EntityRows:       prepareEntityRows(false, true),
 				GroupNames:       twoGroupGroupNames,
 				FeatureMap:       twoGroupFeatureMap,
@@ -123,7 +122,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 		{
 			description: "one streaming feature group, one batch group",
 			opt: offline.JoinOpt{
-				Entity:           *entity,
+				EntityName:       entity.Name,
 				EntityRows:       prepareEntityRows(false, true),
 				GroupNames:       twoGroupGroupNames,
 				FeatureMap:       twoGroupFeatureMap,
