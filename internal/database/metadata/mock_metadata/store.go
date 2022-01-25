@@ -233,17 +233,17 @@ func (mr *MockStoreMockRecorder) GetRevisionBy(ctx, groupID, revision interface{
 }
 
 // ListCachedFeature mocks base method.
-func (m *MockStore) ListCachedFeature(ctx context.Context, fullNames *[]string) types.FeatureList {
+func (m *MockStore) ListCachedFeature(ctx context.Context, opt metadata.ListCachedFeatureOpt) types.FeatureList {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListCachedFeature", ctx, fullNames)
+	ret := m.ctrl.Call(m, "ListCachedFeature", ctx, opt)
 	ret0, _ := ret[0].(types.FeatureList)
 	return ret0
 }
 
 // ListCachedFeature indicates an expected call of ListCachedFeature.
-func (mr *MockStoreMockRecorder) ListCachedFeature(ctx, fullNames interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) ListCachedFeature(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCachedFeature", reflect.TypeOf((*MockStore)(nil).ListCachedFeature), ctx, fullNames)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCachedFeature", reflect.TypeOf((*MockStore)(nil).ListCachedFeature), ctx, opt)
 }
 
 // ListEntity mocks base method.
@@ -762,17 +762,17 @@ func (m *MockCacheStore) EXPECT() *MockCacheStoreMockRecorder {
 }
 
 // ListCachedFeature mocks base method.
-func (m *MockCacheStore) ListCachedFeature(ctx context.Context, fullNames *[]string) types.FeatureList {
+func (m *MockCacheStore) ListCachedFeature(ctx context.Context, opt metadata.ListCachedFeatureOpt) types.FeatureList {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListCachedFeature", ctx, fullNames)
+	ret := m.ctrl.Call(m, "ListCachedFeature", ctx, opt)
 	ret0, _ := ret[0].(types.FeatureList)
 	return ret0
 }
 
 // ListCachedFeature indicates an expected call of ListCachedFeature.
-func (mr *MockCacheStoreMockRecorder) ListCachedFeature(ctx, fullNames interface{}) *gomock.Call {
+func (mr *MockCacheStoreMockRecorder) ListCachedFeature(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCachedFeature", reflect.TypeOf((*MockCacheStore)(nil).ListCachedFeature), ctx, fullNames)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCachedFeature", reflect.TypeOf((*MockCacheStore)(nil).ListCachedFeature), ctx, opt)
 }
 
 // Refresh mocks base method.
