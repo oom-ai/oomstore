@@ -43,8 +43,8 @@ func hasStack(err error) bool {
 		return false
 	}
 
-	type causer interface {
-		Cause() error
+	type wrapper interface {
+		Unwrap() error
 	}
 
 	type tracer interface {
@@ -57,12 +57,12 @@ func hasStack(err error) bool {
 			return true
 		}
 
-		cause, ok := e.(causer)
+		wrap, ok := e.(wrapper)
 		if !ok {
 			return false
 		}
 
-		e = cause.Cause()
+		e = wrap.Unwrap()
 		if e == nil {
 			return false
 		}
