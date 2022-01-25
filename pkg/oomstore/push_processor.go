@@ -125,17 +125,14 @@ func (p *PushProcessor) Push(record types.StreamRecord) {
 }
 
 func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID int) error {
-	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+	features := s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
 		GroupID: &groupID,
 	})
-	if err != nil {
-		return err
-	}
 	entity := features[0].Entity()
 
 	value, _ := p.buffer.Load(groupID)
 	b := value.(GroupBuffer)
-	group, err := s.metadata.GetGroup(ctx, groupID)
+	group, err := s.metadata.GetCachedGroup(ctx, groupID)
 	if err != nil {
 		return err
 	}
@@ -150,15 +147,12 @@ func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID 
 }
 
 func (s *OomStore) newRevisionForStream(ctx context.Context, groupID int, revision int64) error {
-	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+	features := s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
 		GroupID: &groupID,
 	})
-	if err != nil {
-		return err
-	}
 	entity := features[0].Entity()
 
-	if err = s.offline.CreateTable(ctx, offline.CreateTableOpt{
+	if err := s.offline.CreateTable(ctx, offline.CreateTableOpt{
 		TableName: dbutil.OfflineStreamCdcTableName(groupID, revision),
 		Entity:    entity,
 		Features:  features,
@@ -169,7 +163,7 @@ func (s *OomStore) newRevisionForStream(ctx context.Context, groupID int, revisi
 
 	snapshotTable := ""
 	cdcTable := dbutil.OfflineStreamCdcTableName(groupID, revision)
-	if _, _, err = s.CreateRevision(ctx, metadata.CreateRevisionOpt{
+	if _, _, err := s.CreateRevision(ctx, metadata.CreateRevisionOpt{
 		GroupID:       groupID,
 		Revision:      revision,
 		SnapshotTable: &snapshotTable,
