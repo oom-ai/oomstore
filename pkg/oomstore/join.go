@@ -23,21 +23,18 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 	if err := util.ValidateFullFeatureNames(opt.JoinFeatureNames...); err != nil {
 		return nil, err
 	}
-	data := make(chan []interface{})
-	defer close(data)
 
-	emptyResult := &types.JoinResult{
-		Data: data,
-	}
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
 		FeatureNames: &opt.JoinFeatureNames,
 	})
 	if err != nil {
 		return nil, err
 	}
-
 	if len(features) == 0 {
-		return emptyResult, nil
+		data := make(chan []interface{})
+		defer close(data)
+
+		return &types.JoinResult{Data: data}, nil
 	}
 
 	entity, err := getSharedEntity(features)
@@ -147,12 +144,12 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) 
 func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, []string, error) {
 	input, err := os.Open(inputFilePath)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errdefs.WithStack(err)
 	}
 	reader := csv.NewReader(input)
 	header, err := reader.Read()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errdefs.WithStack(err)
 	}
 	entityRows := make(chan types.EntityRow)
 	var readErr error
@@ -166,7 +163,7 @@ func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, [
 				break
 			}
 			if err != nil {
-				readErr = err
+				readErr = errdefs.WithStack(err)
 				return
 			}
 			if len(line) < 2 {
@@ -175,7 +172,7 @@ func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, [
 			}
 			unixMilli, err := strconv.Atoi(line[1])
 			if err != nil {
-				readErr = err
+				readErr = errdefs.WithStack(err)
 				return
 			}
 			entityRows <- types.EntityRow{
