@@ -50,7 +50,7 @@ func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 		}
 		tableName := dbutil.OfflineStreamSnapshotTableName(group.ID, revision.Revision)
 		if err = s.offline.Snapshot(ctx, offline.SnapshotOpt{
-			Group:        group,
+			Group:        *group,
 			Features:     features,
 			Revision:     revisions[i].Revision,
 			PrevRevision: revisions[i-1].Revision,

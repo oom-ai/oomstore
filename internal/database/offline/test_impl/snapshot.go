@@ -47,7 +47,7 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 	})
 
 	err := store.Snapshot(ctx, offline.SnapshotOpt{
-		Group:        group,
+		Group:        *group,
 		Features:     features,
 		Revision:     2,
 		PrevRevision: 1,
