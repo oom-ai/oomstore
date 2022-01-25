@@ -32,9 +32,11 @@ var SampleStream Sample
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	entity := types.Entity{ID: 5, Name: "user"}
+	entity := types.Entity{ID: 1, Name: "user"}
 	group1 := types.Group{ID: 1, Category: types.CategoryBatch, Entity: &entity}
 	group2 := types.Group{ID: 2, Category: types.CategoryBatch, Entity: &entity}
+	group3 := types.Group{ID: 3, Name: "user_clicks", Category: types.CategoryStream, Entity: &entity}
+	//group4 := types.Group{ID:4,Name: "user_reads",Category: types.CategoryStream,Entity:&entity}
 
 	SampleSmall = Sample{
 		Entity: entity,
@@ -98,7 +100,7 @@ func init() {
 		Group:  group2,
 		Features: types.FeatureList{
 			&types.Feature{
-				ID:        2,
+				ID:        6,
 				Name:      "charge",
 				GroupID:   2,
 				Group:     &group2,
@@ -113,6 +115,26 @@ func init() {
 		Data: data,
 	}
 
+	SampleStream = Sample{
+		Entity: entity,
+		Group:  group3,
+		Features: types.FeatureList{
+			&types.Feature{
+				ID:        7,
+				Name:      "amount",
+				ValueType: types.Int64,
+				GroupID:   3,
+				Group:     &group3,
+			},
+			&types.Feature{
+				ID:        8,
+				Name:      "last_10_click_post",
+				ValueType: types.String,
+				GroupID:   3,
+				Group:     &group3,
+			},
+		},
+	}
 }
 
 func importSample(t *testing.T, ctx context.Context, store online.Store, samples ...*Sample) {

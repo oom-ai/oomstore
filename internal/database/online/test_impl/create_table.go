@@ -13,17 +13,16 @@ func TestPrepareStreamTable(t *testing.T, prepareStore PrepareStoreFn, destroySt
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	for _, group := range simpleStreamData.groups {
-		t.Run("create stream table", func(t *testing.T) {
-			err := store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-				EntityName: group.Entity.Name,
-				GroupID:    group.ID,
-			})
-			assert.NoError(t, err, "create stream table failed: %v", err)
+	group := SampleStream.Group
+	t.Run("create stream table", func(t *testing.T) {
+		err := store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+			EntityName: group.Entity.Name,
+			GroupID:    group.ID,
 		})
-	}
+		assert.NoError(t, err, "create stream table failed: %v", err)
+	})
 
-	for _, feature := range simpleStreamData.features {
+	for _, feature := range SampleStream.Features {
 		t.Run("stream table add column", func(t *testing.T) {
 			err := store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
 				EntityName: feature.Entity().Name,

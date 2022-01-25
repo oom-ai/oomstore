@@ -14,12 +14,10 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 	ctx, store := prepareStore(t)
 	defer store.Close()
 
-	var (
-		entity   = simpleStreamData.entity
-		group    = simpleStreamData.groups[0]
-		feature1 = simpleStreamData.features[0]
-		feature2 = simpleStreamData.features[1]
-	)
+	entity := SampleStream.Entity
+	group := SampleStream.Group
+	feature1 := SampleStream.Features[0]
+	feature2 := SampleStream.Features[1]
 
 	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
 		EntityName: entity.Name,
@@ -37,17 +35,17 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		EntityKey:     "user1",
 		GroupID:       group.ID,
 		Features:      types.FeatureList{feature1},
-		FeatureValues: []interface{}{"post1"},
+		FeatureValues: []interface{}{1},
 	}))
 	rs, err := store.Get(ctx, online.GetOpt{
 		EntityKey:  "user1",
-		Group:      *group,
+		Group:      group,
 		Features:   types.FeatureList{feature1},
 		RevisionID: nil,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{
-		feature1.FullName(): "post1",
+		feature1.FullName(): int64(1),
 	}, rs)
 
 	assert.NoError(t, store.Push(ctx, online.PushOpt{
@@ -55,17 +53,17 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		EntityKey:     "user1",
 		GroupID:       group.ID,
 		Features:      types.FeatureList{feature1},
-		FeatureValues: []interface{}{"post2"},
+		FeatureValues: []interface{}{2},
 	}))
 	rs, err = store.Get(ctx, online.GetOpt{
 		EntityKey:  "user1",
-		Group:      *group,
+		Group:      group,
 		Features:   types.FeatureList{feature1},
 		RevisionID: nil,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{
-		feature1.FullName(): "post2",
+		feature1.FullName(): int64(2),
 	}, rs)
 
 	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
@@ -79,17 +77,17 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		EntityKey:     "user1",
 		GroupID:       group.ID,
 		Features:      types.FeatureList{feature1, feature2},
-		FeatureValues: []interface{}{"post1", "post2"},
+		FeatureValues: []interface{}{3, "post2"},
 	}))
 	rs, err = store.Get(ctx, online.GetOpt{
 		EntityKey:  "user1",
-		Group:      *group,
+		Group:      group,
 		Features:   types.FeatureList{feature1, feature2},
 		RevisionID: nil,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{
-		feature1.FullName(): "post1",
+		feature1.FullName(): int64(3),
 		feature2.FullName(): "post2",
 	}, rs)
 }
