@@ -5,19 +5,17 @@ import (
 )
 
 type GetOpt struct {
-	Entity     *types.Entity
 	EntityKey  string
-	RevisionID *int
-	Group      *types.Group
+	Group      types.Group
 	Features   types.FeatureList
+	RevisionID *int
 }
 
 type MultiGetOpt struct {
-	Entity     *types.Entity
 	EntityKeys []string
-	RevisionID *int
-	Group      *types.Group
+	Group      types.Group
 	Features   types.FeatureList
+	RevisionID *int
 }
 
 type ImportOpt struct {

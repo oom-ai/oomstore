@@ -25,7 +25,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	query := fmt.Sprintf(`SELECT %s FROM %s WHERE %s = ?`,
 		strings.Join(opt.Features.Names(), ","),
 		tableName,
-		opt.Entity.Name,
+		opt.Group.Entity.Name,
 	)
 
 	scan := make(map[string]interface{})
@@ -56,12 +56,12 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	} else {
 		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
 	}
-
+	entityName := opt.Group.Entity.Name
 	query := fmt.Sprintf(`SELECT %s, %s FROM %s WHERE %s in (%s)`,
-		opt.Entity.Name,
+		entityName,
 		strings.Join(opt.Features.Names(), ","),
 		tableName,
-		opt.Entity.Name,
+		entityName,
 		placeholders,
 	)
 
@@ -77,7 +77,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	}
 
 	for _, s := range scan {
-		entityKey, value := deserializeIntoRowMap(s, opt.Entity.Name, opt.Features)
+		entityKey, value := deserializeIntoRowMap(s, entityName, opt.Features)
 		rs[entityKey] = value
 	}
 	return rs, nil

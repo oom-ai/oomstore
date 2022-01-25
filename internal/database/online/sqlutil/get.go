@@ -21,9 +21,10 @@ func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.Back
 		tableName = OnlineStreamTableName(opt.Group.ID)
 	}
 
+	entityName := opt.Group.Entity.Name
 	featureNames := opt.Features.Names()
 	qt := dbutil.QuoteFn(backend)
-	query := fmt.Sprintf(`SELECT %s FROM %s WHERE %s = ?`, qt(featureNames...), qt(tableName), qt(opt.Entity.Name))
+	query := fmt.Sprintf(`SELECT %s FROM %s WHERE %s = ?`, qt(featureNames...), qt(tableName), qt(entityName))
 
 	record, err := db.QueryRowxContext(ctx, db.Rebind(query), opt.EntityKey).SliceScan()
 	if err != nil {
@@ -49,9 +50,10 @@ func MultiGet(ctx context.Context, db *sqlx.DB, opt online.MultiGetOpt, backend 
 		tableName = OnlineStreamTableName(opt.Group.ID)
 	}
 
+	entityName := opt.Group.Entity.Name
 	featureNames := opt.Features.Names()
 	qt := dbutil.QuoteFn(backend)
-	query := fmt.Sprintf(`SELECT %s, %s FROM %s WHERE %s in (?);`, qt(opt.Entity.Name), qt(featureNames...), qt(tableName), qt(opt.Entity.Name))
+	query := fmt.Sprintf(`SELECT %s, %s FROM %s WHERE %s in (?);`, qt(entityName), qt(featureNames...), qt(tableName), qt(entityName))
 	sql, args, err := sqlx.In(query, opt.EntityKeys)
 	if err != nil {
 		return nil, errdefs.WithStack(err)

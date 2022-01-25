@@ -35,7 +35,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	result, err := db.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(tableName),
 		Key: map[string]types.AttributeValue{
-			opt.Entity.Name: entityKeyValue,
+			opt.Group.Entity.Name: entityKeyValue,
 		},
 	})
 	if err != nil {
@@ -56,6 +56,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
 	}
 
+	entityName := opt.Group.Entity.Name
 	res := make(map[string]dbutil.RowMap)
 	keys := make([]map[string]types.AttributeValue, 0, BatchGetItemCapacity)
 	for _, entityKey := range opt.EntityKeys {
@@ -64,16 +65,16 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 			return nil, errdefs.WithStack(err)
 		}
 		keys = append(keys, map[string]types.AttributeValue{
-			opt.Entity.Name: entityKeyValue,
+			entityName: entityKeyValue,
 		})
 		if len(keys) == BatchGetItemCapacity {
-			if err = batchGetItem(ctx, db, keys, tableName, opt.Entity.Name, opt.Features, res); err != nil {
+			if err = batchGetItem(ctx, db, keys, tableName, entityName, opt.Features, res); err != nil {
 				return nil, err
 			}
 			keys = make([]map[string]types.AttributeValue, 0, BatchGetItemCapacity)
 		}
 	}
-	if err := batchGetItem(ctx, db, keys, tableName, opt.Entity.Name, opt.Features, res); err != nil {
+	if err := batchGetItem(ctx, db, keys, tableName, entityName, opt.Features, res); err != nil {
 		return nil, err
 	}
 	return res, nil

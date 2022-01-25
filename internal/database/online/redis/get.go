@@ -58,11 +58,10 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	res := make(map[string]dbutil.RowMap)
 	for _, entityKey := range opt.EntityKeys {
 		rowMap, err := db.Get(ctx, online.GetOpt{
-			Entity:     opt.Entity,
-			RevisionID: opt.RevisionID,
-			Group:      opt.Group,
 			EntityKey:  entityKey,
+			Group:      opt.Group,
 			Features:   opt.Features,
+			RevisionID: opt.RevisionID,
 		})
 		if err != nil {
 			return res, errdefs.WithStack(err)
