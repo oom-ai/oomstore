@@ -18,7 +18,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	// Step 0: drop existing table for streaming feature
 	var tableName string
 	if opt.Group.Category == types.CategoryBatch {
-		tableName = sqlutil.OnlineBatchTableName(opt.Revision.ID)
+		tableName = sqlutil.OnlineBatchTableName(*opt.RevisionID)
 	} else {
 		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
 		if err := db.Query(fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)).Exec(); err != nil {

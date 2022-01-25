@@ -14,7 +14,7 @@ const BatchSize = 100
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	var seq int64
 
-	serializedRevisionID, err := dbutil.SerializeByValue(opt.Revision.ID, Backend)
+	serializedRevisionID, err := dbutil.SerializeByValue(*opt.RevisionID, Backend)
 	if err != nil {
 		return err
 	}

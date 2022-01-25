@@ -18,7 +18,7 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 	if opt.Group.Category == types.CategoryStream {
 		tableName = dbutil.TempTable("online_stream")
 	} else {
-		tableName = OnlineBatchTableName(opt.Revision.ID)
+		tableName = OnlineBatchTableName(*opt.RevisionID)
 	}
 	entity := opt.Group.Entity
 	columns := append([]string{entity.Name}, opt.Features.Names()...)

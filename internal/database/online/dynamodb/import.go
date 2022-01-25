@@ -23,7 +23,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	// Step 0: clean up existing table for streaming feature
 	var tableName string
 	if opt.Group.Category == oomTypes.CategoryBatch {
-		tableName = sqlutil.OnlineBatchTableName(opt.Revision.ID)
+		tableName = sqlutil.OnlineBatchTableName(*opt.RevisionID)
 	} else {
 		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
 		_, err := db.DeleteTable(ctx, &dynamodb.DeleteTableInput{

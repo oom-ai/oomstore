@@ -21,9 +21,9 @@ type MultiGetOpt struct {
 type ImportOpt struct {
 	Group        types.Group
 	Features     types.FeatureList
-	Revision     *types.Revision
 	ExportStream <-chan types.ExportRecord
 	ExportError  <-chan error
+	RevisionID   *int
 }
 
 type PushOpt struct {
