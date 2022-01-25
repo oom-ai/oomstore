@@ -5,6 +5,7 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
@@ -75,6 +76,14 @@ func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt
 	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return 0, err
+	}
+
+	revisions, err := s.metadata.ListRevision(ctx, &group.ID)
+	if err != nil {
+		return 0, err
+	}
+	if len(revisions) > 0 {
+		return 0, errdefs.Errorf("group %s already has data and cannot add features due to the join and export mechanism", group.Name)
 	}
 
 	id, err := s.metadata.CreateFeature(ctx, metadata.CreateFeatureOpt{
