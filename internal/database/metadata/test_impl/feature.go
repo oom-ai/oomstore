@@ -176,7 +176,7 @@ func TestListCachedFeature(t *testing.T, prepareStore PrepareStoreFn, destroySto
 	_, groupID := prepareEntityAndGroup(t, ctx, store)
 
 	// case 1: no feature to list
-	features := store.ListCachedFeature(ctx, nil)
+	features := store.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{})
 	assert.Equal(t, 0, features.Len())
 
 	_, err := store.CreateFeature(ctx, metadata.CreateFeatureOpt{
@@ -189,11 +189,13 @@ func TestListCachedFeature(t *testing.T, prepareStore PrepareStoreFn, destroySto
 	require.NoError(t, store.Refresh())
 
 	// case 2: no condition, list all features
-	features = store.ListCachedFeature(ctx, nil)
+	features = store.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{})
 	assert.Equal(t, 1, features.Len())
 
 	// case 8: list features by FeatureNames
-	features = store.ListCachedFeature(ctx, &[]string{"device_info.phone"})
+	features = store.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
+		FullNames: &[]string{"device_info.phone"},
+	})
 	assert.Equal(t, 1, len(features))
 }
 

@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -12,12 +14,9 @@ import (
 
 // Push inserts stream feature values to online store and offline store
 func (s *OomStore) Push(ctx context.Context, opt types.PushOpt) error {
-	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
+	features := s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
 		GroupName: &opt.GroupName,
 	})
-	if err != nil {
-		return err
-	}
 	var featureNames []string
 	for name := range opt.FeatureValues {
 		featureNames = append(featureNames, name)
@@ -33,7 +32,7 @@ func (s *OomStore) Push(ctx context.Context, opt types.PushOpt) error {
 		values = append(values, opt.FeatureValues[f.Name])
 	}
 
-	if err = s.online.Push(ctx, online.PushOpt{
+	if err := s.online.Push(ctx, online.PushOpt{
 		Entity:        entity,
 		EntityKey:     opt.EntityKey,
 		GroupID:       group.ID,

@@ -3,6 +3,8 @@ package oomstore
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
@@ -21,7 +23,9 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 		FeatureNames:    opt.FeatureNames,
 		FeatureValueMap: make(map[string]interface{}),
 	}
-	features := s.metadata.ListCachedFeature(ctx, &opt.FeatureNames)
+	features := s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
+		FullNames: &opt.FeatureNames,
+	})
 	if len(features) == 0 {
 		return &rs, nil
 	}
@@ -63,7 +67,9 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 		return nil, err
 	}
 	result := make(map[string]*types.FeatureValues)
-	features := s.metadata.ListCachedFeature(ctx, &opt.FeatureNames)
+	features := s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
+		FullNames: &opt.FeatureNames,
+	})
 	if len(features) == 0 {
 		return result, nil
 	}

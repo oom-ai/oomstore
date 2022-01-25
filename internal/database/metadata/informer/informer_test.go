@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+
 	"github.com/oom-ai/oomstore/internal/database/metadata/informer"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/util"
@@ -50,7 +52,9 @@ func TestInformer(t *testing.T) {
 	defer informer.Close()
 
 	name := util.ComposeFullFeatureName("group", "price")
-	features := informer.ListCachedFeature(ctx, &[]string{name})
+	features := informer.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
+		FullNames: &[]string{name},
+	})
 	require.Equal(t, 1, len(features))
 	feature := features[0]
 
@@ -62,18 +66,25 @@ func TestInformer(t *testing.T) {
 	assert.Equal(t, 100, feature.Group.ID)
 	assert.Equal(t, 1, feature.Group.Entity.ID)
 	assert.Equal(t, "entity", feature.Group.Entity.Name)
+
+	groupName := "group"
+	featuresByGroup := informer.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
+		GroupName: &groupName,
+	})
+	assert.Equal(t, 1, len(featuresByGroup))
+	assert.Equal(t, feature, featuresByGroup[0])
 }
 
 func TestInformerDeepCopy(t *testing.T) {
 	ctx, informer := prepareInformer(t)
 	defer informer.Close()
 
-	features := informer.ListCachedFeature(ctx, nil)
+	features := informer.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{})
 	require.Equal(t, 1, len(features))
 	// changing this entity should not change the internal state of the informer
 	features[0].Name = "new_price"
 
-	features = informer.ListCachedFeature(ctx, nil)
+	features = informer.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{})
 	require.Equal(t, 1, len(features))
 	assert.Equal(t, 1, features[0].ID)
 	assert.Equal(t, 100, features[0].GroupID)

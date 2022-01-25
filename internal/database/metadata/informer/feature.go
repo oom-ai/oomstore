@@ -1,6 +1,7 @@
 package informer
 
 import (
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -16,13 +17,13 @@ func (c *FeatureCache) Enrich(groupCache *GroupCache) {
 	}
 }
 
-func (c *FeatureCache) List(fullNames *[]string) types.FeatureList {
+func (c *FeatureCache) List(opt metadata.ListCachedFeatureOpt) types.FeatureList {
 	features := c.FeatureList
 
-	// filter names
-	if fullNames != nil {
+	// filter featureNames
+	if opt.FullNames != nil {
 		var tmp types.FeatureList
-		for _, fullName := range *fullNames {
+		for _, fullName := range *opt.FullNames {
 			if f := features.Find(func(f *types.Feature) bool {
 				return f.FullName() == fullName
 			}); f != nil {
@@ -31,6 +32,17 @@ func (c *FeatureCache) List(fullNames *[]string) types.FeatureList {
 		}
 		features = tmp
 	}
-
+	// filter groupName
+	if opt.GroupName != nil {
+		features = features.Filter(func(f *types.Feature) bool {
+			return f.Group.Name == *opt.GroupName
+		})
+	}
+	// filter groupID
+	if opt.GroupID != nil {
+		features = features.Filter(func(f *types.Feature) bool {
+			return f.Group.ID == *opt.GroupID
+		})
+	}
 	return features
 }

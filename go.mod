@@ -20,7 +20,6 @@ require (
 	github.com/lib/pq v1.10.4
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/pingcap/errors v0.11.5-0.20201126102027-b0a155152ca3
 	github.com/pingcap/log v0.0.0-20211215031037-e024ba4eb0ee
 	github.com/pkg/errors v0.9.1
 	github.com/snowflakedb/gosnowflake v1.6.5
@@ -30,7 +29,6 @@ require (
 	github.com/tikv/client-go/v2 v2.0.0-rc
 	go.uber.org/zap v1.19.1
 	google.golang.org/api v0.63.0
-	google.golang.org/genproto v0.0.0-20211223182754-3ac035c7e7cb
 	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
@@ -93,6 +91,7 @@ require (
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.12 // indirect
+	github.com/pingcap/errors v0.11.5-0.20201126102027-b0a155152ca3 // indirect
 	github.com/pingcap/failpoint v0.0.0-20210918120811-547c13e3eb00 // indirect
 	github.com/pingcap/kvproto v0.0.0-20211229082925-7a8280c36daf // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
@@ -120,6 +119,7 @@ require (
 	golang.org/x/tools v0.1.5 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/genproto v0.0.0-20211223182754-3ac035c7e7cb // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	lukechampine.com/uint128 v1.1.1 // indirect

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+
 	"github.com/golang/mock/gomock"
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata/mock_metadata"
@@ -80,7 +82,9 @@ func TestOnlineGet(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().ListCachedFeature(gomock.Any(), &tc.opt.FeatureNames).Return(tc.features)
+			metadataStore.EXPECT().ListCachedFeature(gomock.Any(), metadata.ListCachedFeatureOpt{
+				FullNames: &tc.opt.FeatureNames,
+			}).Return(tc.features)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().Get(gomock.Any(), gomock.Any()).Return(dbutil.RowMap{
 					"price": int64(100),
@@ -174,7 +178,9 @@ func TestOnlineMultiGet(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			metadataStore.EXPECT().ListCachedFeature(gomock.Any(), &tc.opt.FeatureNames).Return(tc.features)
+			metadataStore.EXPECT().ListCachedFeature(gomock.Any(), metadata.ListCachedFeatureOpt{
+				FullNames: &tc.opt.FeatureNames,
+			}).Return(tc.features)
 			if tc.entityName != nil {
 				onlineStore.EXPECT().MultiGet(gomock.Any(), gomock.Any()).Return(map[string]dbutil.RowMap{
 					"1234": {
