@@ -26,7 +26,7 @@ func Errorf(format string, args ...interface{}) error {
 }
 
 func WithStack(err error) error {
-	if !debug {
+	if !debug || hasStack(err) {
 		return err
 	}
 
@@ -35,4 +35,36 @@ func WithStack(err error) error {
 
 func Cause(err error) error {
 	return errors.Cause(err)
+}
+
+// not call callers() on every wrap, see https://github.com/pkg/errors/issues/75#issuecomment-574580408
+func hasStack(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	type causer interface {
+		Cause() error
+	}
+
+	type tracer interface {
+		StackTrace() errors.StackTrace
+	}
+
+	e := err
+	for {
+		if _, ok := e.(tracer); ok {
+			return true
+		}
+
+		cause, ok := e.(causer)
+		if !ok {
+			return false
+		}
+
+		e = cause.Cause()
+		if e == nil {
+			return false
+		}
+	}
 }

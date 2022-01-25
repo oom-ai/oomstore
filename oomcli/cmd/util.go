@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -44,11 +43,6 @@ func groupsToApplyGroupItems(ctx context.Context, store *oomstore.OomStore, grou
 }
 
 func exitf(format string, a ...interface{}) {
-	if true {
-		format = strings.ReplaceAll(format, "{err}", "%+v")
-	} else {
-		format = strings.ReplaceAll(format, "{err}", "%v")
-	}
 	msg := fmt.Sprintf(format, a...)
 	fmt.Fprintf(os.Stderr, "Error: %s\n", msg)
 	os.Exit(1)
