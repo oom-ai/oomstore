@@ -16,14 +16,14 @@ pub struct EmbeddedAgent {
 }
 
 impl EmbeddedAgent {
-    pub async fn new<P: AsRef<Path>>(
-        cmd_path: impl Into<Option<P>>,
-        cfg_path: impl Into<Option<P>>,
-        port: impl Into<Option<u16>>,
-    ) -> Result<Self> {
-        let cmd_path = cmd_path.into().map(|p| p.as_ref().to_owned());
-        let cfg_path = cfg_path.into().map(|p| p.as_ref().to_owned());
-        let port = port.into().unwrap_or(0);
+    pub async fn new<P1, P2>(cmd_path: Option<P1>, cfg_path: Option<P2>, port: Option<u16>) -> Result<Self>
+    where
+        P1: AsRef<Path>,
+        P2: AsRef<Path>,
+    {
+        let cmd_path = cmd_path.map(|p| p.as_ref().to_owned());
+        let cfg_path = cfg_path.map(|p| p.as_ref().to_owned());
+        let port = port.unwrap_or(0);
 
         let mut signals = Signals::new(&[SIGHUP, SIGTERM, SIGINT, SIGQUIT])?;
         let handle = signals.handle();
@@ -49,6 +49,10 @@ impl EmbeddedAgent {
 
         let addr = get_agent_address(pid.unwrap()).await?;
         Ok(Self { handle, addr })
+    }
+
+    pub async fn default() -> Result<Self> {
+        Self::new(None::<String>, None::<String>, None).await
     }
 
     pub fn ip(&self) -> IpAddr {
