@@ -23,7 +23,7 @@ type RevisionRange struct {
 }
 
 type JoinOpt struct {
-	Entity           types.Entity
+	EntityName       string
 	EntityRows       <-chan types.EntityRow
 	GroupNames       []string
 	FeatureMap       map[string]types.FeatureList
@@ -36,7 +36,7 @@ type JoinOneGroupOpt struct {
 	Category            types.Category
 	Features            types.FeatureList
 	RevisionRanges      []*RevisionRange
-	Entity              types.Entity
+	EntityName          string
 	EntityRowsTableName string
 	ValueNames          []string
 }
