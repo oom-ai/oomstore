@@ -69,11 +69,10 @@ LEFT JOIN {{ $t2 }}
 ON {{ $t1 }}.{{ qt $.UnixMilli }} = {{ $t2 }}.{{ qt $.UnixMilli }} AND {{ $t1 }}.{{ qt $.EntityKey }} = {{ $t2 }}.{{ qt $.EntityKey }}
 {{end}}`
 
-func PrepareJoinedTable(
+func prepareJoinedTable(
 	ctx context.Context,
 	dbOpt dbutil.DBOpt,
 	features types.FeatureList,
-	entity types.Entity,
 	groupName string,
 	valueNames []string,
 ) (string, error) {
@@ -121,9 +120,8 @@ func PrepareJoinedTable(
 	return tableName, nil
 }
 
-func PrepareEntityRowsTable(ctx context.Context,
+func prepareEntityRowsTable(ctx context.Context,
 	dbOpt dbutil.DBOpt,
-	entity types.Entity,
 	entityRows <-chan types.EntityRow,
 	valueNames []string,
 ) (string, error) {

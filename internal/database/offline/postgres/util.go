@@ -20,10 +20,10 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, opt dbutil.LoadDataFro
 
 	for {
 		record, err := dbutil.ReadLine(dbutil.ReadLineOpt{
-			Source:   opt.Source,
-			Entity:   opt.Entity,
-			Header:   opt.Header,
-			Features: opt.Features,
+			Source:     opt.Source,
+			EntityName: opt.EntityName,
+			Header:     opt.Header,
+			Features:   opt.Features,
 		})
 		if errdefs.Cause(err) == io.EOF {
 			break

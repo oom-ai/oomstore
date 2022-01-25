@@ -18,11 +18,11 @@ func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData Lo
 	var revision int64
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		pkFields := []string{opt.Entity.Name}
+		pkFields := []string{opt.EntityName}
 		if opt.NoPK {
 			pkFields = nil
 		}
-		schema := dbutil.BuildTableSchema(opt.SnapshotTableName, opt.Entity, false, opt.Features, pkFields, backend)
+		schema := dbutil.BuildTableSchema(opt.SnapshotTableName, opt.EntityName, false, opt.Features, pkFields, backend)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return errdefs.WithStack(err)
@@ -30,12 +30,12 @@ func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData Lo
 
 		// populate the data table
 		err = loadData(tx, ctx, dbutil.LoadDataFromSourceOpt{
-			Source:    opt.Source,
-			Entity:    opt.Entity,
-			TableName: opt.SnapshotTableName,
-			Header:    opt.Header,
-			Features:  opt.Features,
-			Backend:   backend,
+			Source:     opt.Source,
+			EntityName: opt.EntityName,
+			TableName:  opt.SnapshotTableName,
+			Header:     opt.Header,
+			Features:   opt.Features,
+			Backend:    backend,
 		})
 		if err != nil {
 			return err

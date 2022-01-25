@@ -28,7 +28,7 @@ func buildTestSnapshotTable(
 		header = append(header, f.Name)
 	}
 	opt := offline.ImportOpt{
-		Entity:            entity,
+		EntityName:        entity.Name,
 		SnapshotTableName: snapshotTable,
 		Features:          features,
 		Header:            header,

@@ -28,7 +28,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 	snapshotTable := "offline_1_1"
 
 	opt := offline.ImportOpt{
-		Entity:            &entity,
+		EntityName:        entity.Name,
 		SnapshotTableName: snapshotTable,
 		Header:            []string{"device", "model", "price"},
 		Source: &offline.CSVSource{

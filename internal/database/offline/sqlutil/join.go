@@ -62,7 +62,7 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 	}
 
 	// Step 1: prepare temporary table entity_rows
-	entityRowsTableName, err := PrepareEntityRowsTable(ctx, dbOpt, opt.Entity, opt.EntityRows, opt.ValueNames)
+	entityRowsTableName, err := prepareEntityRowsTable(ctx, dbOpt, opt.EntityRows, opt.ValueNames)
 	if err != nil {
 		return nil, err
 	}
@@ -83,10 +83,10 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 		} else {
 			category = types.CategoryStream
 		}
-		joinedTables, err := JoinOneGroup(ctx, dbOpt, offline.JoinOneGroupOpt{
+		joinedTables, err := joinOneGroup(ctx, dbOpt, offline.JoinOneGroupOpt{
 			GroupName:           groupName,
 			Category:            category,
-			Entity:              opt.Entity,
+			EntityName:          opt.EntityName,
 			Features:            featureList,
 			RevisionRanges:      revisionRanges,
 			EntityRowsTableName: entityRowsTableName,
@@ -115,13 +115,13 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 	})
 }
 
-func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGroupOpt) ([]string, error) {
+func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGroupOpt) ([]string, error) {
 	if len(opt.Features) == 0 {
 		return nil, nil
 	}
 
 	// Step 1: create temporary joined table
-	snapshotJoinedTableName, err := PrepareJoinedTable(ctx, dbOpt, opt.Features, opt.Entity, opt.GroupName, opt.ValueNames)
+	snapshotJoinedTableName, err := prepareJoinedTable(ctx, dbOpt, opt.Features, opt.GroupName, opt.ValueNames)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGr
 	for _, r := range opt.RevisionRanges {
 		query, err := buildJoinQuery(joinQueryParams{
 			TableName:           snapshotJoinedTableName,
-			EntityName:          opt.Entity.Name,
+			EntityName:          opt.EntityName,
 			EntityKey:           "entity_key",
 			UnixMilli:           "unix_milli",
 			Columns:             columns,
@@ -152,7 +152,7 @@ func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGr
 	}
 
 	// Step 3: for streaming features, keep joining with cdc_table
-	cdcJoinedTableName, err := PrepareJoinedTable(ctx, dbOpt, opt.Features, opt.Entity, opt.GroupName, opt.ValueNames)
+	cdcJoinedTableName, err := prepareJoinedTable(ctx, dbOpt, opt.Features, opt.GroupName, opt.ValueNames)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func JoinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGr
 		query, err := buildCdcJoinQuery(cdcJoinQueryParams{
 			TableName:           cdcJoinedTableName,
 			EntityKey:           "entity_key",
-			EntityName:          opt.Entity.Name,
+			EntityName:          opt.EntityName,
 			UnixMilli:           "unix_milli",
 			ValueNames:          opt.ValueNames,
 			FeatureNames:        opt.Features.Names(),

@@ -17,9 +17,9 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 	// Step 1: define table schema
 	schema := make(bigquery.Schema, 0, len(opt.Features)+1)
 	for _, h := range opt.Header {
-		if h == opt.Entity.Name {
+		if h == opt.EntityName {
 			schema = append(schema, &bigquery.FieldSchema{
-				Name:        opt.Entity.Name,
+				Name:        opt.EntityName,
 				Type:        bigquery.StringFieldType,
 				Description: "entity key",
 			})

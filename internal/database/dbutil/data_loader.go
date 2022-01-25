@@ -13,12 +13,12 @@ import (
 )
 
 type LoadDataFromSourceOpt struct {
-	Source    *offline.CSVSource
-	Entity    *types.Entity
-	TableName string
-	Header    []string
-	Features  types.FeatureList
-	Backend   types.BackendType
+	Source     *offline.CSVSource
+	EntityName string
+	TableName  string
+	Header     []string
+	Features   types.FeatureList
+	Backend    types.BackendType
 }
 
 // Currying
@@ -32,10 +32,10 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, opt LoadDataFromSource
 	records := make([]interface{}, 0, batchSize)
 	for {
 		record, err := ReadLine(ReadLineOpt{
-			Source:   opt.Source,
-			Entity:   opt.Entity,
-			Header:   opt.Header,
-			Features: opt.Features,
+			Source:     opt.Source,
+			EntityName: opt.EntityName,
+			Header:     opt.Header,
+			Features:   opt.Features,
 		})
 		if errdefs.Cause(err) == io.EOF {
 			break
@@ -61,10 +61,10 @@ func loadDataFromSource(tx *sqlx.Tx, ctx context.Context, opt LoadDataFromSource
 }
 
 type ReadLineOpt struct {
-	Source   *offline.CSVSource
-	Entity   *types.Entity
-	Header   []string
-	Features types.FeatureList
+	Source     *offline.CSVSource
+	EntityName string
+	Header     []string
+	Features   types.FeatureList
 }
 
 func ReadLine(opt ReadLineOpt) ([]interface{}, error) {
@@ -75,7 +75,7 @@ func ReadLine(opt ReadLineOpt) ([]interface{}, error) {
 	rowSlice := strings.Split(strings.Trim(row, "\n"), opt.Source.Delimiter)
 	line := make([]interface{}, 0, len(rowSlice))
 	for i, ele := range rowSlice {
-		if len(opt.Header) == 0 || len(opt.Features) == 0 || opt.Header[i] == opt.Entity.Name {
+		if len(opt.Header) == 0 || len(opt.Features) == 0 || opt.Header[i] == opt.EntityName {
 			// entity_key doesn't need to change type
 			line = append(line, ele)
 		} else if opt.Header[i] == "unix_milli" {

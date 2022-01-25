@@ -23,7 +23,7 @@ type RevisionRange struct {
 }
 
 type JoinOpt struct {
-	Entity           types.Entity
+	EntityName       string
 	EntityRows       <-chan types.EntityRow
 	GroupNames       []string
 	FeatureMap       map[string]types.FeatureList
@@ -36,17 +36,17 @@ type JoinOneGroupOpt struct {
 	Category            types.Category
 	Features            types.FeatureList
 	RevisionRanges      []*RevisionRange
-	Entity              types.Entity
+	EntityName          string
 	EntityRowsTableName string
 	ValueNames          []string
 }
 
 type ImportOpt struct {
-	Entity            *types.Entity
-	Features          types.FeatureList
-	Header            []string
-	Revision          *int64
+	EntityName        string
 	SnapshotTableName string
+	Header            []string
+	Features          types.FeatureList
+	Revision          *int64
 	Source            *CSVSource
 	NoPK              bool // TODO: to import cdc data temporarily for testing
 }
@@ -65,17 +65,17 @@ type CSVSource struct {
 }
 
 type SnapshotOpt struct {
-	Group        *types.Group
+	Group        types.Group
 	Features     types.FeatureList
 	Revision     int64
 	PrevRevision int64
 }
 
 type CreateTableOpt struct {
-	TableName string
-	Entity    *types.Entity
-	Features  types.FeatureList
-	TableType types.TableType
+	TableName  string
+	EntityName string
+	Features   types.FeatureList
+	TableType  types.TableType
 }
 
 type TableSchemaOpt struct {
