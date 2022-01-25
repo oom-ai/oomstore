@@ -31,16 +31,6 @@ type JoinOpt struct {
 	ValueNames       []string
 }
 
-type JoinOneGroupOpt struct {
-	GroupName           string
-	Category            types.Category
-	Features            types.FeatureList
-	RevisionRanges      []*RevisionRange
-	EntityName          string
-	EntityRowsTableName string
-	ValueNames          []string
-}
-
 type ImportOpt struct {
 	EntityName        string
 	SnapshotTableName string

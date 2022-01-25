@@ -14,23 +14,6 @@ import (
 
 type QueryResults func(ctx context.Context, dbOpt dbutil.DBOpt, query string, header dbutil.ColumnList, dropTableNames []string, backendType types.BackendType) (*types.JoinResult, error)
 
-type ReadJoinedTableOpt struct {
-	EntityRowsTableName string
-	TableNames          []string
-	AllTableNames       []string
-	FeatureMap          map[string]types.FeatureList
-	ValueNames          []string
-	QueryResults        QueryResults
-	ReadJoinResultQuery string
-	BackendType         types.BackendType
-}
-
-type DoJoinOpt struct {
-	offline.JoinOpt
-	QueryResults        QueryResults
-	ReadJoinResultQuery string
-}
-
 func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType types.BackendType) (*types.JoinResult, error) {
 	dbOpt := dbutil.DBOpt{
 		Backend: backendType,
@@ -42,6 +25,12 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType typ
 		ReadJoinResultQuery: READ_JOIN_RESULT_QUERY,
 	}
 	return DoJoin(ctx, dbOpt, doJoinOpt)
+}
+
+type DoJoinOpt struct {
+	offline.JoinOpt
+	QueryResults        QueryResults
+	ReadJoinResultQuery string
 }
 
 func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.JoinResult, error) {
@@ -83,7 +72,7 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 		} else {
 			category = types.CategoryStream
 		}
-		joinedTables, err := joinOneGroup(ctx, dbOpt, offline.JoinOneGroupOpt{
+		joinedTables, err := joinOneGroup(ctx, dbOpt, joinOneGroupOpt{
 			GroupName:           groupName,
 			Category:            category,
 			EntityName:          opt.EntityName,
@@ -103,7 +92,7 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 	}
 
 	// Step 3: read joined results
-	return ReadJoinedTable(ctx, dbOpt, ReadJoinedTableOpt{
+	return readJoinedTable(ctx, dbOpt, readJoinedTableOpt{
 		EntityRowsTableName: entityRowsTableName,
 		TableNames:          tableNames,
 		AllTableNames:       allTableNames,
@@ -115,7 +104,17 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 	})
 }
 
-func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGroupOpt) ([]string, error) {
+type joinOneGroupOpt struct {
+	GroupName           string
+	Category            types.Category
+	Features            types.FeatureList
+	RevisionRanges      []*offline.RevisionRange
+	EntityName          string
+	EntityRowsTableName string
+	ValueNames          []string
+}
+
+func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt joinOneGroupOpt) ([]string, error) {
 	if len(opt.Features) == 0 {
 		return nil, nil
 	}
@@ -179,7 +178,18 @@ func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.JoinOneGr
 	return []string{snapshotJoinedTableName, cdcJoinedTableName}, nil
 }
 
-func ReadJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt ReadJoinedTableOpt) (*types.JoinResult, error) {
+type readJoinedTableOpt struct {
+	EntityRowsTableName string
+	TableNames          []string
+	AllTableNames       []string
+	FeatureMap          map[string]types.FeatureList
+	ValueNames          []string
+	QueryResults        QueryResults
+	ReadJoinResultQuery string
+	BackendType         types.BackendType
+}
+
+func readJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt readJoinedTableOpt) (*types.JoinResult, error) {
 	if len(opt.TableNames) == 0 {
 		data := make(chan []interface{})
 		defer close(data)
