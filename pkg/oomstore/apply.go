@@ -168,6 +168,15 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 		if !errdefs.IsNotFound(err) {
 			return nil, err
 		}
+
+		revisions, err := tx.ListRevision(ctx, &group.ID)
+		if err != nil {
+			return nil, err
+		}
+		if len(revisions) > 0 {
+			return nil, errdefs.Errorf("group %s already has data and cannot add features due to the join and export mechanism", group.Name)
+		}
+
 		valueType, err := types.ParseValueType(newFeature.ValueType)
 		if err != nil {
 			return nil, err
