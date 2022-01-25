@@ -52,6 +52,15 @@ oomcli_export_batch() {
     assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"
 }
 
+oomcli_export_batch_and_stream_before_import() {
+    case="export batch and stream feature before import"
+    expected='user,student.name,student.gender,student.age,user-click.last_5_click_posts,user-click.number_of_user_starred_posts
+1,,,,"2,3,4,5,6",11
+'
+    actual=$(oomcli export --feature student.name,student.gender,student.age,user-click.last_5_click_posts,user-click.number_of_user_starred_posts --unix-milli $t2 -o csv)
+    assert_eq "$case" "$(sort <<< "$expected")" "$(sort <<< "$actual")"
+}
+
 oomcli_export_batch_and_stream() {
     case="export batch and stream feature"
     expected='user,student.name,student.gender,student.age,user-click.last_5_click_posts,user-click.number_of_user_starred_posts
@@ -71,6 +80,7 @@ main() {
     oomcli_export_push_feature
     oomcli_export_update_feature
     oomcli_export_batch
+    oomcli_export_batch_and_stream_before_import
     oomcli_export_batch_and_stream
 }
 
