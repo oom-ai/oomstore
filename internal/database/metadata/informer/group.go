@@ -24,3 +24,13 @@ func (c *GroupCache) List(entityID *int) types.GroupList {
 		return g.Entity.ID == *entityID
 	})
 }
+
+func (c *GroupCache) Get(groupID int) *types.Group {
+	groups := c.GroupList.Filter(func(g *types.Group) bool {
+		return g.ID == groupID
+	})
+	if len(groups) == 0 {
+		return nil
+	}
+	return groups[0]
+}

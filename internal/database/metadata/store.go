@@ -53,6 +53,7 @@ type DBStore interface {
 // CacheStore defines methods that a memory backend store must implement.
 type CacheStore interface {
 	ListCachedFeature(ctx context.Context, opt ListCachedFeatureOpt) types.FeatureList
+	GetCachedGroup(ctx context.Context, id int) (*types.Group, error)
 
 	// Refresh pulls data from database and update cache.
 	Refresh() error

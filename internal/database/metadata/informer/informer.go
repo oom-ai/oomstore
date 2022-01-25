@@ -6,6 +6,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -90,4 +92,12 @@ func (f *Informer) Cache() *Cache {
 
 func (f *Informer) ListCachedFeature(ctx context.Context, opt metadata.ListCachedFeatureOpt) types.FeatureList {
 	return f.Cache().Features.List(opt).Copy()
+}
+
+func (f *Informer) GetCachedGroup(ctx context.Context, groupID int) (*types.Group, error) {
+	group := f.Cache().Groups.Get(groupID).Copy()
+	if group == nil {
+		return nil, errdefs.NotFound(errdefs.Errorf("group %d not found", groupID))
+	}
+	return group, nil
 }

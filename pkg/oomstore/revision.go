@@ -25,7 +25,7 @@ func (s *OomStore) GetRevisionBy(ctx context.Context, groupID int, revision int6
 	return s.metadata.GetRevisionBy(ctx, groupID, revision)
 }
 
-func (s *OomStore) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
+func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
 	var revisionID int
 	var snapshotTable string
 	var dummyRevision *types.Revision
