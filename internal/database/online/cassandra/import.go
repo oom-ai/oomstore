@@ -29,7 +29,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	// Step 1: create online table
 	entity := opt.Group.Entity
 	columns := append([]string{entity.Name}, opt.Features.Names()...)
-	schema := dbutil.BuildTableSchema(tableName, entity, false, opt.Features, []string{entity.Name}, Backend)
+	schema := dbutil.BuildTableSchema(tableName, entity.Name, false, opt.Features, []string{entity.Name}, Backend)
 	if err := db.Query(schema).Exec(); err != nil {
 		return errdefs.WithStack(err)
 	}

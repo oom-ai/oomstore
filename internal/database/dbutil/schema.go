@@ -25,13 +25,13 @@ func (c ColumnList) Names() []string {
 
 func BuildTableSchema(
 	tableName string,
-	entity *types.Entity,
+	entityName string,
 	hasUnixMilli bool,
 	features types.FeatureList,
 	pkFields []string,
 	backend types.BackendType,
 ) string {
-	columns := parseColumns(entity, hasUnixMilli, features, backend)
+	columns := parseColumns(entityName, hasUnixMilli, features, backend)
 	return createTableDDL(tableName, columns, pkFields, backend)
 }
 
@@ -73,10 +73,10 @@ func BuildIndexDDL(tableName string, indexName string, fields []string, backend 
 	return fmt.Sprintf("CREATE INDEX %s ON %s (%s)", qt(index), qt(tableName), qt(fields...))
 }
 
-func parseColumns(entity *types.Entity, hasUnixMilli bool, features types.FeatureList, backend types.BackendType) (rs []Column) {
+func parseColumns(entityName string, hasUnixMilli bool, features types.FeatureList, backend types.BackendType) (rs []Column) {
 	// entity column
 	{
-		c := Column{Name: entity.Name, ValueType: types.String}
+		c := Column{Name: entityName, ValueType: types.String}
 		switch backend {
 		case types.BackendCassandra, types.BackendSQLite, types.BackendPostgres, types.BackendRedshift, types.BackendSnowflake:
 			c.DbType = "TEXT"

@@ -66,10 +66,10 @@ func (s *OomStore) csvReaderImportStream(ctx context.Context, opt types.ImportSt
 	records := make([]types.StreamRecord, 0, ImportStreamBatchSize)
 	for {
 		line, err := dbutil.ReadLine(dbutil.ReadLineOpt{
-			Source:   source,
-			Entity:   entity,
-			Header:   header,
-			Features: features,
+			Source:     source,
+			EntityName: entity.Name,
+			Header:     header,
+			Features:   features,
 		})
 		if errdefs.Cause(err) == io.EOF {
 			break

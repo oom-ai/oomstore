@@ -42,11 +42,11 @@ type JoinOneGroupOpt struct {
 }
 
 type ImportOpt struct {
-	Entity            *types.Entity
-	Features          types.FeatureList
-	Header            []string
-	Revision          *int64
+	EntityName        string
 	SnapshotTableName string
+	Header            []string
+	Features          types.FeatureList
+	Revision          *int64
 	Source            *CSVSource
 	NoPK              bool // TODO: to import cdc data temporarily for testing
 }
@@ -72,10 +72,10 @@ type SnapshotOpt struct {
 }
 
 type CreateTableOpt struct {
-	TableName string
-	Entity    *types.Entity
-	Features  types.FeatureList
-	TableType types.TableType
+	TableName  string
+	EntityName string
+	Features   types.FeatureList
+	TableType  types.TableType
 }
 
 type TableSchemaOpt struct {

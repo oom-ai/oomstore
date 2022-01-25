@@ -81,7 +81,7 @@ CREATE TABLE "user" (
 
 	for _, c := range cases {
 		t.Run(c.description, func(t *testing.T) {
-			schema := dbutil.BuildTableSchema(c.tableName, c.entity, false, c.features, nil, c.backend)
+			schema := dbutil.BuildTableSchema(c.tableName, c.entity.Name, false, c.features, nil, c.backend)
 			require.Equal(t, strings.TrimSpace(c.want), schema)
 		})
 	}
