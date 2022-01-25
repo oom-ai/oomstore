@@ -4,10 +4,8 @@ use std::{
     env,
     net::{IpAddr, SocketAddr},
     path::Path,
-    process::{Child, Command},
-    sync::{Arc, Mutex},
 };
-use tokio::{fs, time, time::Duration};
+use tokio::{fs, process::Command, time, time::Duration};
 use tokio_stream::StreamExt;
 
 use crate::Result;
@@ -15,7 +13,6 @@ use crate::Result;
 pub struct EmbeddedAgent {
     addr:   SocketAddr,
     handle: Handle,
-    child:  Arc<Mutex<Child>>,
 }
 
 impl EmbeddedAgent {
@@ -36,23 +33,22 @@ impl EmbeddedAgent {
         if let Some(cfg_path) = cfg_path.clone() {
             oomagent.arg("--config").arg(cfg_path);
         }
+        oomagent.kill_on_drop(true);
 
-        let child = oomagent.spawn()?;
-        let child = Arc::new(Mutex::new(child));
+        let mut child = oomagent.spawn()?;
+        let pid = child.id();
 
         tokio::spawn({
-            let child = Arc::clone(&child);
             async move {
-                if let Some(signal) = signals.next().await {
-                    child.lock().unwrap().kill().unwrap();
+                while let Some(signal) = signals.next().await {
+                    child.kill().await.unwrap();
                     emulate_default_handler(signal).unwrap();
                 }
             }
         });
 
-        let pid = child.lock().unwrap().id();
-        let addr = get_agent_address(pid).await?;
-        Ok(Self { handle, child, addr })
+        let addr = get_agent_address(pid.unwrap()).await?;
+        Ok(Self { handle, addr })
     }
 
     pub fn ip(&self) -> IpAddr {
@@ -71,7 +67,6 @@ impl EmbeddedAgent {
 impl Drop for EmbeddedAgent {
     fn drop(&mut self) {
         self.handle.close();
-        self.child.lock().unwrap().kill().unwrap();
     }
 }
 
