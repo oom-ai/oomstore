@@ -19,11 +19,10 @@ func TestPurgeRemovesSpecifiedRevision(t *testing.T, prepareStore PrepareStoreFn
 
 	for _, record := range SampleMedium.Data {
 		rs, err := store.Get(ctx, online.GetOpt{
-			Entity:     &SampleMedium.Entity,
-			RevisionID: &SampleMedium.Revision.ID,
-			Group:      SampleMedium.Revision.Group,
 			EntityKey:  record.EntityKey(),
+			Group:      *SampleMedium.Revision.Group,
 			Features:   SampleMedium.Features,
+			RevisionID: &SampleMedium.Revision.ID,
 		})
 		require.NoError(t, err)
 		require.Equal(t, 0, len(rs))
@@ -42,11 +41,10 @@ func TestPurgeNotRemovesOtherRevisions(t *testing.T, prepareStore PrepareStoreFn
 
 	for _, record := range SampleSmall.Data {
 		rs, err := store.Get(ctx, online.GetOpt{
-			Entity:     &SampleSmall.Entity,
-			RevisionID: &SampleSmall.Revision.ID,
-			Group:      SampleSmall.Revision.Group,
 			EntityKey:  record.EntityKey(),
+			Group:      *SampleSmall.Revision.Group,
 			Features:   SampleSmall.Features,
+			RevisionID: &SampleSmall.Revision.ID,
 		})
 		require.NoError(t, err)
 		for i, f := range SampleSmall.Features {

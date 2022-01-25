@@ -17,11 +17,10 @@ func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn, destroyStore Dest
 
 	for _, target := range s.Data {
 		opt := online.GetOpt{
-			Entity:     &s.Entity,
-			RevisionID: &s.Revision.ID,
-			Group:      s.Revision.Group,
-			Features:   s.Features,
 			EntityKey:  target.EntityKey(),
+			Group:      *s.Revision.Group,
+			Features:   s.Features,
+			RevisionID: &s.Revision.ID,
 		}
 		rs, err := store.Get(ctx, opt)
 		require.NoError(t, err)
@@ -41,11 +40,10 @@ func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreFn, destr
 	importSample(t, ctx, store, s)
 
 	rs, err := store.Get(ctx, online.GetOpt{
-		Entity:     &s.Entity,
-		RevisionID: &s.Revision.ID,
-		Group:      s.Revision.Group,
-		Features:   s.Features,
 		EntityKey:  "not-existed-key",
+		Group:      *s.Revision.Group,
+		Features:   s.Features,
+		RevisionID: &s.Revision.ID,
 	})
 	require.NoError(t, err)
 	require.Equal(t, 0, len(rs), "actual: %+v", rs)
@@ -64,11 +62,10 @@ func TestMultiGet(t *testing.T, prepareStore PrepareStoreFn, destroystore Destro
 		keys = append(keys, r.EntityKey())
 	}
 	rs, err := store.MultiGet(ctx, online.MultiGetOpt{
-		Entity:     &s.Entity,
-		RevisionID: &s.Revision.ID,
-		Group:      s.Revision.Group,
-		Features:   s.Features,
 		EntityKeys: keys,
+		Group:      *s.Revision.Group,
+		Features:   s.Features,
+		RevisionID: &s.Revision.ID,
 	})
 	require.NoError(t, err)
 	for _, record := range s.Data {
