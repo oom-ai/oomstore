@@ -58,7 +58,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 		tableName,
 		cond.Inserts,
 		cond.InsertPlaceholders,
-		opt.Entity.Name,
+		opt.EntityName,
 		cond.UpdatePlaceholders,
 	)
 
@@ -67,5 +67,5 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 }
 
 func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
-	return sqlutil.SqlxPrapareStreamTable(ctx, db.DB, opt, Backend)
+	return sqlutil.SqlxPrepareStreamTable(ctx, db.DB, opt, Backend)
 }

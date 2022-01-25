@@ -28,8 +28,8 @@ func (s *OomStore) CreateGroup(ctx context.Context, opt types.CreateGroupOpt) (i
 
 	if opt.Category == types.CategoryStream {
 		if err = s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-			Entity:  entity,
-			GroupID: id,
+			EntityName: entity.Name,
+			GroupID:    id,
 		}); err != nil {
 			return 0, err
 		}

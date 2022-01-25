@@ -21,7 +21,7 @@ func BuildPushCondition(opt online.PushOpt, backend types.BackendType) *PushCond
 	qt := dbutil.QuoteFn(backend)
 	cond := PushCondition{}
 
-	cond.Inserts = qt(append([]string{opt.Entity.Name}, opt.Features.Names()...)...)
+	cond.Inserts = qt(append([]string{opt.EntityName}, opt.Features.Names()...)...)
 	cond.InsertValues = append([]interface{}{opt.EntityKey}, opt.FeatureValues...)
 	cond.InsertPlaceholders = dbutil.Fill(len(cond.InsertValues), "?", ",")
 

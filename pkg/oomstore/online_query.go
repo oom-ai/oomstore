@@ -38,18 +38,15 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 
 	featureMap := groupFeaturesByGroupID(features)
 
-	for _, features := range featureMap {
-		if len(features) == 0 {
+	for _, featureList := range featureMap {
+		if len(featureList) == 0 {
 			continue
 		}
-		revisionID := features[0].OnlineRevisionID()
-		group := features[0].Group
 		featureValues, err := s.online.Get(ctx, online.GetOpt{
-			Entity:     entity,
-			RevisionID: revisionID,
-			Group:      group,
 			EntityKey:  opt.EntityKey,
-			Features:   features,
+			Group:      *featureList[0].Group,
+			Features:   featureList,
+			RevisionID: featureList[0].OnlineRevisionID(),
 		})
 		if err != nil {
 			return nil, err
@@ -111,14 +108,11 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 		if len(features) == 0 {
 			continue
 		}
-		revisionID := features[0].OnlineRevisionID()
-		group := features[0].Group
 		featureValues, err := s.online.MultiGet(ctx, online.MultiGetOpt{
-			Entity:     entity,
-			RevisionID: revisionID,
-			Group:      group,
 			EntityKeys: entityKeys,
+			Group:      *features[0].Group,
 			Features:   features,
+			RevisionID: features[0].OnlineRevisionID(),
 		})
 		if err != nil {
 			return nil, err

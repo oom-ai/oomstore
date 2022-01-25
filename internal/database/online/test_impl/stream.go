@@ -77,8 +77,8 @@ func TestPrepareStreamTable(t *testing.T, prepareStore PrepareStoreFn, destroySt
 	for _, group := range simpleStreamData.groups {
 		t.Run("create stream table", func(t *testing.T) {
 			err := store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-				Entity:  group.Entity,
-				GroupID: group.ID,
+				EntityName: group.Entity.Name,
+				GroupID:    group.ID,
 			})
 			assert.NoError(t, err, "create stream table failed: %v", err)
 		})
@@ -87,9 +87,9 @@ func TestPrepareStreamTable(t *testing.T, prepareStore PrepareStoreFn, destroySt
 	for _, feature := range simpleStreamData.features {
 		t.Run("stream table add column", func(t *testing.T) {
 			err := store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-				Entity:  feature.Entity(),
-				GroupID: feature.GroupID,
-				Feature: feature,
+				EntityName: feature.Entity().Name,
+				GroupID:    feature.GroupID,
+				Feature:    feature,
 			})
 			assert.NoError(t, err, "stream table add column failed: %v", err)
 		})
@@ -110,29 +110,28 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 	)
 
 	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-		Entity:  &entity,
-		GroupID: group.ID,
+		EntityName: entity.Name,
+		GroupID:    group.ID,
 	}))
 
 	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-		Entity:  &entity,
-		GroupID: group.ID,
-		Feature: feature1,
+		EntityName: entity.Name,
+		GroupID:    group.ID,
+		Feature:    feature1,
 	}))
 
 	assert.NoError(t, store.Push(ctx, online.PushOpt{
-		Entity:        &entity,
+		EntityName:    entity.Name,
 		EntityKey:     "user1",
 		GroupID:       group.ID,
 		Features:      types.FeatureList{feature1},
 		FeatureValues: []interface{}{"post1"},
 	}))
 	rs, err := store.Get(ctx, online.GetOpt{
-		Entity:     &entity,
 		EntityKey:  "user1",
-		RevisionID: nil,
-		Group:      group,
+		Group:      *group,
 		Features:   types.FeatureList{feature1},
+		RevisionID: nil,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{
@@ -140,18 +139,17 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 	}, rs)
 
 	assert.NoError(t, store.Push(ctx, online.PushOpt{
-		Entity:        &entity,
+		EntityName:    entity.Name,
 		EntityKey:     "user1",
 		GroupID:       group.ID,
 		Features:      types.FeatureList{feature1},
 		FeatureValues: []interface{}{"post2"},
 	}))
 	rs, err = store.Get(ctx, online.GetOpt{
-		Entity:     &entity,
 		EntityKey:  "user1",
-		RevisionID: nil,
-		Group:      group,
+		Group:      *group,
 		Features:   types.FeatureList{feature1},
+		RevisionID: nil,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{
@@ -159,24 +157,23 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 	}, rs)
 
 	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-		Entity:  &entity,
-		GroupID: group.ID,
-		Feature: feature2,
+		EntityName: entity.Name,
+		GroupID:    group.ID,
+		Feature:    feature2,
 	}))
 
 	assert.NoError(t, store.Push(ctx, online.PushOpt{
-		Entity:        &entity,
+		EntityName:    entity.Name,
 		EntityKey:     "user1",
 		GroupID:       group.ID,
 		Features:      types.FeatureList{feature1, feature2},
 		FeatureValues: []interface{}{"post1", "post2"},
 	}))
 	rs, err = store.Get(ctx, online.GetOpt{
-		Entity:     &entity,
 		EntityKey:  "user1",
-		RevisionID: nil,
-		Group:      group,
+		Group:      *group,
 		Features:   types.FeatureList{feature1, feature2},
+		RevisionID: nil,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{

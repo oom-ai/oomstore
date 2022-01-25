@@ -101,10 +101,10 @@ func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt
 		if err != nil {
 			return 0, err
 		}
-		if err := s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-			Entity:  group.Entity,
-			GroupID: group.ID,
-			Feature: feature,
+		if err = s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+			EntityName: group.Entity.Name,
+			GroupID:    group.ID,
+			Feature:    feature,
 		}); err != nil {
 			return 0, err
 		}

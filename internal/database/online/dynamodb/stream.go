@@ -27,13 +27,13 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 		TableName: aws.String(tableName),
 		KeySchema: []types.KeySchemaElement{
 			{
-				AttributeName: aws.String(opt.Entity.Name),
+				AttributeName: aws.String(opt.EntityName),
 				KeyType:       types.KeyTypeHash,
 			},
 		},
 		AttributeDefinitions: []types.AttributeDefinition{
 			{
-				AttributeName: aws.String(opt.Entity.Name),
+				AttributeName: aws.String(opt.EntityName),
 				AttributeType: types.ScalarAttributeTypeS,
 			},
 		},
@@ -55,7 +55,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	if err != nil {
 		return errdefs.WithStack(err)
 	}
-	item[opt.Entity.Name] = entityKeyValue
+	item[opt.EntityName] = entityKeyValue
 
 	for i, feature := range opt.Features {
 		value, err := dbutil.SerializeByValueType(opt.FeatureValues[i], feature.ValueType, Backend)

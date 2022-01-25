@@ -20,15 +20,15 @@ func OnlineStreamTableName(groupID int) string {
 	return fmt.Sprintf("online_stream_%d", groupID)
 }
 
-func CreateStreamTableSchema(ctx context.Context, tableName string, entity *types.Entity, backend types.BackendType) (string, error) {
+func CreateStreamTableSchema(ctx context.Context, tableName, entityName string, backend types.BackendType) (string, error) {
 	var (
 		entityFormat string
 	)
 	switch backend {
 	case types.BackendMySQL:
-		entityFormat = fmt.Sprintf("`%s` VARCHAR(255) PRIMARY KEY", entity.Name)
+		entityFormat = fmt.Sprintf("`%s` VARCHAR(255) PRIMARY KEY", entityName)
 	case types.BackendPostgres, types.BackendCassandra, types.BackendSQLite:
-		entityFormat = fmt.Sprintf(`"%s" TEXT PRIMARY KEY`, entity.Name)
+		entityFormat = fmt.Sprintf(`"%s" TEXT PRIMARY KEY`, entityName)
 	default:
 		return "", errdefs.InvalidAttribute(errdefs.Errorf("backend %s not support", backend))
 	}
@@ -37,11 +37,11 @@ func CreateStreamTableSchema(ctx context.Context, tableName string, entity *type
 	return schema, nil
 }
 
-func SqlxPrapareStreamTable(ctx context.Context, db *sqlx.DB, opt online.PrepareStreamTableOpt, backend types.BackendType) error {
+func SqlxPrepareStreamTable(ctx context.Context, db *sqlx.DB, opt online.PrepareStreamTableOpt, backend types.BackendType) error {
 	tableName := OnlineStreamTableName(opt.GroupID)
 
 	if opt.Feature == nil {
-		schema, err := CreateStreamTableSchema(ctx, tableName, opt.Entity, backend)
+		schema, err := CreateStreamTableSchema(ctx, tableName, opt.EntityName, backend)
 		if err != nil {
 			return err
 		}

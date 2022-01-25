@@ -24,7 +24,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		var key string
 		var err error
 		if opt.Group.Category == types.CategoryBatch {
-			key, err = serializeRedisKeyForBatchFeature(opt.Revision.ID, entityKey)
+			key, err = serializeRedisKeyForBatchFeature(*opt.RevisionID, entityKey)
 		} else {
 			key, err = serializeRedisKeyForStreamFeature(opt.Group.ID, entityKey)
 		}

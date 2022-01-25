@@ -5,31 +5,29 @@ import (
 )
 
 type GetOpt struct {
-	Entity     *types.Entity
 	EntityKey  string
-	RevisionID *int
-	Group      *types.Group
+	Group      types.Group
 	Features   types.FeatureList
+	RevisionID *int
 }
 
 type MultiGetOpt struct {
-	Entity     *types.Entity
 	EntityKeys []string
-	RevisionID *int
-	Group      *types.Group
+	Group      types.Group
 	Features   types.FeatureList
+	RevisionID *int
 }
 
 type ImportOpt struct {
 	Group        types.Group
 	Features     types.FeatureList
-	Revision     *types.Revision
 	ExportStream <-chan types.ExportRecord
 	ExportError  <-chan error
+	RevisionID   *int
 }
 
 type PushOpt struct {
-	Entity        *types.Entity
+	EntityName    string
 	EntityKey     string
 	GroupID       int
 	Features      types.FeatureList
@@ -37,9 +35,8 @@ type PushOpt struct {
 }
 
 type PrepareStreamTableOpt struct {
-	Entity *types.Entity
-
-	GroupID int
+	EntityName string
+	GroupID    int
 
 	// Feature is not nil to add a new row to the stream table;
 	// otherwise it means the stream table will be created.

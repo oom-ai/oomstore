@@ -122,8 +122,8 @@ func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup
 		if newGroup.Category == types.CategoryStream {
 			return func() error {
 				return s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-					Entity:  entity,
-					GroupID: id,
+					EntityName: entity.Name,
+					GroupID:    id,
 				})
 			}, nil
 		}
@@ -198,9 +198,9 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 			}
 			return func() error {
 				return s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-					Entity:  group.Entity,
-					GroupID: group.ID,
-					Feature: feature,
+					EntityName: group.Entity.Name,
+					GroupID:    group.ID,
+					Feature:    feature,
 				})
 			}, nil
 		}

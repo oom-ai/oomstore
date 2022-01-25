@@ -14,7 +14,7 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
 
 	if opt.Feature == nil {
-		schema, err := sqlutil.CreateStreamTableSchema(ctx, tableName, opt.Entity, Backend)
+		schema, err := sqlutil.CreateStreamTableSchema(ctx, tableName, opt.EntityName, Backend)
 		if err != nil {
 			return err
 		}
