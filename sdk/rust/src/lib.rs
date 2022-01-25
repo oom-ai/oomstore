@@ -1,5 +1,7 @@
+mod agent;
 pub mod error;
 mod util;
+
 mod oomagent {
     tonic::include_proto!("oomagent");
 }
@@ -29,9 +31,10 @@ use std::{collections::HashMap, path::Path};
 use tonic::{codegen::StdError, transport, Request};
 use util::{parse_raw_feature_values, parse_raw_values};
 
+pub use agent::EmbeddedAgent;
 pub use oomagent::{value::Value, EntityRow};
 
-type Result<T> = std::result::Result<T, OomError>;
+pub type Result<T> = std::result::Result<T, OomError>;
 
 #[derive(Debug, Clone)]
 pub struct Client {
@@ -105,7 +108,7 @@ impl Client {
         purge_delay: u32,
     ) -> Result<()> {
         let group = group.into();
-        let revision_id = revision_id.into().map(|x| i32::try_from(x)).transpose()?;
+        let revision_id = revision_id.into().map(i32::try_from).transpose()?;
         let purge_delay = i32::try_from(purge_delay)?;
         self.inner.sync(SyncRequest { revision_id, group, purge_delay }).await?;
         Ok(())
