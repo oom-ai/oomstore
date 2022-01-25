@@ -51,7 +51,7 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 		Delimiter: dataSource.Delimiter,
 	}
 	// read header
-	columnNames := append([]string{opt.entity.Name}, opt.features.Names()...)
+	columnNames := append([]string{opt.entityName}, opt.features.Names()...)
 	header, err := readHeader(source, columnNames)
 	if err != nil {
 		return 0, err
@@ -69,7 +69,7 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 	}
 
 	revision, err := s.offline.Import(ctx, offline.ImportOpt{
-		Entity:            opt.entity,
+		EntityName:        opt.entityName,
 		Features:          opt.features,
 		Header:            cast.ToStringSlice(header),
 		Revision:          opt.Revision,
@@ -199,10 +199,10 @@ func (s *OomStore) parseImportOpt(ctx context.Context, opt types.ImportOpt) (*im
 		return nil, err
 	}
 	return &importOpt{
-		ImportOpt: &opt,
-		entity:    entity,
-		group:     group,
-		features:  features,
+		ImportOpt:  &opt,
+		entityName: entity.Name,
+		group:      group,
+		features:   features,
 	}, nil
 }
 
@@ -232,7 +232,7 @@ func (s *OomStore) getGroupInfo(ctx context.Context, groupName string) (*types.E
 
 type importOpt struct {
 	*types.ImportOpt
-	entity   *types.Entity
-	group    *types.Group
-	features types.FeatureList
+	entityName string
+	group      *types.Group
+	features   types.FeatureList
 }

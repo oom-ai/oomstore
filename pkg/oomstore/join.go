@@ -62,7 +62,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 	}
 
 	return s.offline.Join(ctx, offline.JoinOpt{
-		Entity:           *entity,
+		EntityName:       entity.Name,
 		EntityRows:       opt.EntityRows,
 		GroupNames:       groupNames,
 		FeatureMap:       featureMap,

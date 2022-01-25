@@ -77,10 +77,10 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *type
 	}
 
 	if err = s.offline.CreateTable(ctx, offline.CreateTableOpt{
-		TableName: snapshotTable,
-		Entity:    revision.Group.Entity,
-		Features:  features,
-		TableType: types.TableStreamSnapshot,
+		TableName:  snapshotTable,
+		EntityName: revision.Group.Entity.Name,
+		Features:   features,
+		TableType:  types.TableStreamSnapshot,
 	}); err != nil {
 		return err
 	}
@@ -89,10 +89,10 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *type
 	if revision.Group.Category == types.CategoryStream {
 		tableName := dbutil.OfflineStreamCdcTableName(revision.GroupID, revision.Revision)
 		if err = s.offline.CreateTable(ctx, offline.CreateTableOpt{
-			TableName: tableName,
-			Entity:    revision.Group.Entity,
-			Features:  features,
-			TableType: types.TableStreamCdc,
+			TableName:  tableName,
+			EntityName: revision.Group.Entity.Name,
+			Features:   features,
+			TableType:  types.TableStreamCdc,
 		}); err != nil {
 			return err
 		}
@@ -127,10 +127,10 @@ func (s *OomStore) createFirstSnapshotTable(ctx context.Context, revision *types
 		return err
 	}
 	if err = s.offline.CreateTable(ctx, offline.CreateTableOpt{
-		TableName: snapshotTable,
-		Entity:    revision.Group.Entity,
-		Features:  features,
-		TableType: types.TableStreamSnapshot,
+		TableName:  snapshotTable,
+		EntityName: revision.Group.Entity.Name,
+		Features:   features,
+		TableType:  types.TableStreamSnapshot,
 	}); err != nil {
 		return err
 	}

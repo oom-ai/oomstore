@@ -153,10 +153,10 @@ func (s *OomStore) newRevisionForStream(ctx context.Context, groupID int, revisi
 	entity := features[0].Entity()
 
 	if err := s.offline.CreateTable(ctx, offline.CreateTableOpt{
-		TableName: dbutil.OfflineStreamCdcTableName(groupID, revision),
-		Entity:    entity,
-		Features:  features,
-		TableType: types.TableStreamCdc,
+		TableName:  dbutil.OfflineStreamCdcTableName(groupID, revision),
+		EntityName: entity.Name,
+		Features:   features,
+		TableType:  types.TableStreamCdc,
 	}); err != nil {
 		return err
 	}
