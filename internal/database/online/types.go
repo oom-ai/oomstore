@@ -27,7 +27,7 @@ type ImportOpt struct {
 }
 
 type PushOpt struct {
-	Entity        *types.Entity
+	EntityName    string
 	EntityKey     string
 	GroupID       int
 	Features      types.FeatureList
@@ -35,9 +35,8 @@ type PushOpt struct {
 }
 
 type PrepareStreamTableOpt struct {
-	Entity *types.Entity
-
-	GroupID int
+	EntityName string
+	GroupID    int
 
 	// Feature is not nil to add a new row to the stream table;
 	// otherwise it means the stream table will be created.
