@@ -28,69 +28,75 @@ type Sample struct {
 
 var SampleSmall Sample
 var SampleMedium Sample
+var SampleStream Sample
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 	entity := types.Entity{ID: 5, Name: "user"}
 	group1 := types.Group{ID: 1, Category: types.CategoryBatch, Entity: &entity}
 	group2 := types.Group{ID: 2, Category: types.CategoryBatch, Entity: &entity}
-	{
-		SampleSmall = Sample{
-			Entity: entity,
-			Group:  group1,
-			Features: types.FeatureList{
-				&types.Feature{
-					ID:        1,
-					Name:      "age",
-					GroupID:   1,
-					Group:     &group1,
-					ValueType: types.Int64,
-				},
-				&types.Feature{
-					ID:        2,
-					Name:      "gender",
-					GroupID:   1,
-					Group:     &group1,
-					ValueType: types.String,
-				},
-				&types.Feature{
-					ID:        3,
-					Name:      "account",
-					GroupID:   1,
-					Group:     &group1,
-					ValueType: types.Float64,
-				},
-				&types.Feature{
-					ID:        4,
-					Name:      "is_active",
-					GroupID:   1,
-					Group:     &group1,
-					ValueType: types.Bool,
-				},
-				&types.Feature{
-					ID:        5,
-					Name:      "register_time",
-					GroupID:   1,
-					Group:     &group1,
-					ValueType: types.Time,
-				},
-			},
-			Revision: types.Revision{
-				ID:      3,
-				GroupID: 1,
-				Group:   &group1,
-			},
-			Data: []types.ExportRecord{
-				[]interface{}{"3215", int64(18), "F", 1.1, true, time.Now()},
-				[]interface{}{"3216", int64(29), nil, 2.0, false, time.Now()},
-				[]interface{}{"3217", int64(44), "M", 3.1, true, time.Now()},
-			},
-		}
 
+	SampleSmall = Sample{
+		Entity: entity,
+		Group:  group1,
+		Features: types.FeatureList{
+			&types.Feature{
+				ID:        1,
+				Name:      "age",
+				GroupID:   1,
+				Group:     &group1,
+				ValueType: types.Int64,
+			},
+			&types.Feature{
+				ID:        2,
+				Name:      "gender",
+				GroupID:   1,
+				Group:     &group1,
+				ValueType: types.String,
+			},
+			&types.Feature{
+				ID:        3,
+				Name:      "account",
+				GroupID:   1,
+				Group:     &group1,
+				ValueType: types.Float64,
+			},
+			&types.Feature{
+				ID:        4,
+				Name:      "is_active",
+				GroupID:   1,
+				Group:     &group1,
+				ValueType: types.Bool,
+			},
+			&types.Feature{
+				ID:        5,
+				Name:      "register_time",
+				GroupID:   1,
+				Group:     &group1,
+				ValueType: types.Time,
+			},
+		},
+		Revision: types.Revision{
+			ID:      3,
+			GroupID: 1,
+			Group:   &group1,
+		},
+		Data: []types.ExportRecord{
+			[]interface{}{"3215", int64(18), "F", 1.1, true, time.Now()},
+			[]interface{}{"3216", int64(29), nil, 2.0, false, time.Now()},
+			[]interface{}{"3217", int64(44), "M", 3.1, true, time.Now()},
+		},
 	}
 
-	{
-		features := types.FeatureList{
+	var data []types.ExportRecord
+	for i := 0; i < 100; i++ {
+		record := []interface{}{dbutil.RandString(10), rand.Float64()}
+		data = append(data, record)
+	}
+	SampleMedium = Sample{
+		Entity: entity,
+		Group:  group2,
+		Features: types.FeatureList{
 			&types.Feature{
 				ID:        2,
 				Name:      "charge",
@@ -98,17 +104,15 @@ func init() {
 				Group:     &group2,
 				ValueType: types.Float64,
 			},
-		}
-
-		revision := types.Revision{ID: 9, GroupID: 2, Group: &group2}
-		var data []types.ExportRecord
-
-		for i := 0; i < 100; i++ {
-			record := []interface{}{dbutil.RandString(10), rand.Float64()}
-			data = append(data, record)
-		}
-		SampleMedium = Sample{entity, group1, features, revision, data}
+		},
+		Revision: types.Revision{
+			ID:      9,
+			GroupID: 2,
+			Group:   &group2,
+		},
+		Data: data,
 	}
+
 }
 
 func importSample(t *testing.T, ctx context.Context, store online.Store, samples ...*Sample) {
