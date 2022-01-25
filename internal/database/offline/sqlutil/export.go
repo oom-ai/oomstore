@@ -16,11 +16,6 @@ import (
 
 type QueryExportResults func(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList) (*types.ExportResult, error)
 
-type DoExportOpt struct {
-	offline.ExportOpt
-	QueryResults QueryExportResults
-}
-
 func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend types.BackendType) (*types.ExportResult, error) {
 	dbOpt := dbutil.DBOpt{
 		Backend: backend,
@@ -31,6 +26,11 @@ func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend typ
 		QueryResults: sqlxQueryExportResults,
 	}
 	return DoExport(ctx, dbOpt, doJoinOpt)
+}
+
+type DoExportOpt struct {
+	offline.ExportOpt
+	QueryResults QueryExportResults
 }
 
 func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.ExportResult, error) {
