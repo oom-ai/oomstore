@@ -33,7 +33,7 @@ func (s *OomStore) Push(ctx context.Context, opt types.PushOpt) error {
 	}
 
 	if err := s.online.Push(ctx, online.PushOpt{
-		Entity:        entity,
+		EntityName:    entity.Name,
 		EntityKey:     opt.EntityKey,
 		GroupID:       group.ID,
 		Features:      features,
