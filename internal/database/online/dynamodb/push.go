@@ -31,11 +31,11 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 		if err != nil {
 			return err
 		}
-		attributevalue, err := attributevalue.Marshal(value)
+		attributeValue, err := attributevalue.Marshal(value)
 		if err != nil {
 			return errdefs.WithStack(err)
 		}
-		item[feature.Name] = attributevalue
+		item[feature.Name] = attributeValue
 	}
 
 	_, err = db.Client.PutItem(ctx, &dynamodb.PutItemInput{
