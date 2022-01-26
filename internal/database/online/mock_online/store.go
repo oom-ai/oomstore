@@ -50,6 +50,20 @@ func (mr *MockStoreMockRecorder) Close() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockStore)(nil).Close))
 }
 
+// CreateTable mocks base method.
+func (m *MockStore) CreateTable(ctx context.Context, opt online.CreateTableOpt) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateTable", ctx, opt)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateTable indicates an expected call of CreateTable.
+func (mr *MockStoreMockRecorder) CreateTable(ctx, opt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTable", reflect.TypeOf((*MockStore)(nil).CreateTable), ctx, opt)
+}
+
 // Get mocks base method.
 func (m *MockStore) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
 	m.ctrl.T.Helper()

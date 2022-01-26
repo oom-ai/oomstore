@@ -37,3 +37,7 @@ func Open(opt *types.RedisOpt) *DB {
 func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
 	return nil
 }
+
+func (db *DB) CreateTable(ctx context.Context, opt online.CreateTableOpt) error {
+	return nil
+}

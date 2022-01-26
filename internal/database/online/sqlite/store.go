@@ -66,3 +66,7 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
 	return sqlutil.SqlxPrepareStreamTable(ctx, db.DB, opt, Backend)
 }
+
+func (db *DB) CreateTable(ctx context.Context, opt online.CreateTableOpt) error {
+	return sqlutil.CreateTable(ctx, db.DB, opt, Backend)
+}

@@ -23,7 +23,7 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 
 	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
 
-	_, err := db.CreateTable(ctx, &dynamodb.CreateTableInput{
+	_, err := db.Client.CreateTable(ctx, &dynamodb.CreateTableInput{
 		TableName: aws.String(tableName),
 		KeySchema: []types.KeySchemaElement{
 			{

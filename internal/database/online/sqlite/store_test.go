@@ -63,3 +63,7 @@ func TestPush(t *testing.T) {
 func TestPing(t *testing.T) {
 	test_impl.TestPing(t, prepareStore, destroyStore)
 }
+
+func TestCreateTable(t *testing.T) {
+	test_impl.TestCreateTable(t, prepareStore, destroyStore)
+}

@@ -42,3 +42,9 @@ type PrepareStreamTableOpt struct {
 	// otherwise it means the stream table will be created.
 	Feature *types.Feature
 }
+
+type CreateTableOpt struct {
+	EntityName string
+	TableName  string
+	Features   types.FeatureList
+}

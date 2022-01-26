@@ -89,3 +89,9 @@ func QuoteFn(backendType types.BackendType) func(...string) string {
 		return strings.Join(rs, ",")
 	}
 }
+
+func DropTable(ctx context.Context, db *sqlx.DB, tableName string) error {
+	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
+	_, err := db.ExecContext(ctx, query)
+	return errdefs.WithStack(err)
+}

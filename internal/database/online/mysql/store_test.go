@@ -64,3 +64,7 @@ func TestPush(t *testing.T) {
 func TestPing(t *testing.T) {
 	test_impl.TestPing(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
+
+func TestCreateTable(t *testing.T) {
+	test_impl.TestCreateTable(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
+}
