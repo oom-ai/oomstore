@@ -114,7 +114,7 @@ func (s *OomStore) tableLinkImportStream(ctx context.Context, opt types.ImportSt
 	}
 
 	_, _, err = s.createRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:    tableSchema.TimeRange.MinUnixMilli,
+		Revision:    *tableSchema.TimeRange.MinUnixMilli,
 		GroupID:     group.ID,
 		CdcTable:    &dataSource.TableName,
 		Description: opt.Description,
@@ -194,9 +194,11 @@ func (s *OomStore) validateRevisions(ctx context.Context, groupID int, schema *t
 	if err != nil {
 		return err
 	}
-
-	revisionBeforeMin := revisions.Before(schema.TimeRange.MinUnixMilli)
-	revisionBeforeMax := revisions.Before(schema.TimeRange.MaxUnixMilli)
+	if schema.TimeRange.MinUnixMilli == nil || schema.TimeRange.MaxUnixMilli == nil {
+		return errdefs.Errorf("table is empty")
+	}
+	revisionBeforeMin := revisions.Before(*schema.TimeRange.MinUnixMilli)
+	revisionBeforeMax := revisions.Before(*schema.TimeRange.MaxUnixMilli)
 	if revisionBeforeMax != revisionBeforeMin {
 		return errdefs.Errorf("data table crosses with another offline table %s", revisionBeforeMax.CdcTable)
 	}
@@ -208,7 +210,7 @@ func (s *OomStore) validateRevisions(ctx context.Context, groupID int, schema *t
 		if err != nil {
 			return err
 		}
-		if beforeTableSchema.TimeRange.MaxUnixMilli >= schema.TimeRange.MinUnixMilli {
+		if beforeTableSchema.TimeRange.MaxUnixMilli != nil && *beforeTableSchema.TimeRange.MaxUnixMilli >= *schema.TimeRange.MinUnixMilli {
 			return errdefs.Errorf("data table crosses with another offline table %s", revisionBeforeMin.CdcTable)
 		}
 	}
