@@ -43,10 +43,6 @@ func (db *DB) Ping(ctx context.Context) error {
 	return errdefs.WithStack(err)
 }
 
-func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
-	return nil
-}
-
 func (db *DB) CreateTable(ctx context.Context, opt online.CreateTableOpt) error {
 	return nil
 }

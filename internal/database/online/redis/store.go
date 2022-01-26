@@ -34,10 +34,6 @@ func Open(opt *types.RedisOpt) *DB {
 	return &DB{redis.NewClient(&redisOpt)}
 }
 
-func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
-	return nil
-}
-
 func (db *DB) CreateTable(ctx context.Context, opt online.CreateTableOpt) error {
 	return nil
 }
