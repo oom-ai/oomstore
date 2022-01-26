@@ -1,9 +1,17 @@
 package errdefs
 
+import (
+	"fmt"
+)
+
 type errNotFound struct{ error }
 
 func (e errNotFound) Unwrap() error {
 	return e.error
+}
+
+func (e errNotFound) Error() string {
+	return fmt.Sprintf("%+v", e.error)
 }
 
 func NotFound(err error) error {
@@ -17,6 +25,10 @@ type errInvalidAttribute struct{ error }
 
 func (e errInvalidAttribute) Unwrap() error {
 	return e.error
+}
+
+func (e errInvalidAttribute) Error() string {
+	return fmt.Sprintf("%+v", e.error)
 }
 
 func InvalidAttribute(err error) error {
