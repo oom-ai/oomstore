@@ -3,6 +3,8 @@ package tikv
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 
@@ -13,8 +15,14 @@ const BatchSize = 100
 
 func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	var seq int64
+	var err error
+	var serializedRevisionID, serializedGroupID string
 
-	serializedRevisionID, err := dbutil.SerializeByValue(*opt.RevisionID, Backend)
+	if opt.Group.Category == types.CategoryBatch {
+		serializedRevisionID, err = dbutil.SerializeByValue(*opt.RevisionID, Backend)
+	} else {
+		serializedGroupID, err = dbutil.SerializeByValue(opt.Group.ID, Backend)
+	}
 	if err != nil {
 		return err
 	}
@@ -54,8 +62,11 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			if err != nil {
 				return err
 			}
-
-			putKeys = append(putKeys, getKeyOfBatchFeature(serializedRevisionID, serializedEntityKey, serializedFeatureIDs[i]))
+			if opt.Group.Category == types.CategoryBatch {
+				putKeys = append(putKeys, getKeyOfBatchFeature(serializedRevisionID, serializedEntityKey, serializedFeatureIDs[i]))
+			} else {
+				putKeys = append(putKeys, getKeyOfStreamFeature(serializedGroupID, serializedEntityKey, serializedFeatureIDs[i]))
+			}
 			putVals = append(putVals, []byte(serializedFeatureValue.(string)))
 		}
 
