@@ -4,6 +4,8 @@ import (
 	"context"
 	"io"
 
+	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cast"
 	"gopkg.in/yaml.v3"
@@ -108,7 +110,7 @@ func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup
 			return nil, err
 		}
 
-		id, err := tx.CreateGroup(ctx, metadata.CreateGroupOpt{
+		_, err = tx.CreateGroup(ctx, metadata.CreateGroupOpt{
 			GroupName:        newGroup.Name,
 			EntityID:         entity.ID,
 			Category:         newGroup.Category,
@@ -119,14 +121,6 @@ func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup
 			return nil, err
 		}
 
-		if newGroup.Category == types.CategoryStream {
-			return func() error {
-				return s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-					EntityName: entity.Name,
-					GroupID:    id,
-				})
-			}, nil
-		}
 		return nil, nil
 	}
 
@@ -181,7 +175,7 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 		if err != nil {
 			return nil, err
 		}
-		id, err := tx.CreateFeature(ctx, metadata.CreateFeatureOpt{
+		_, err = tx.CreateFeature(ctx, metadata.CreateFeatureOpt{
 			FeatureName: newFeature.Name,
 			GroupID:     group.ID,
 			Description: newFeature.Description,
@@ -192,15 +186,17 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 		}
 
 		if group.Category == types.CategoryStream {
-			feature, err := tx.GetFeature(ctx, id)
+			features, err := tx.ListFeature(ctx, metadata.ListFeatureOpt{
+				GroupID: &group.ID,
+			})
 			if err != nil {
 				return nil, err
 			}
 			return func() error {
-				return s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+				return s.online.CreateTable(ctx, online.CreateTableOpt{
 					EntityName: group.Entity.Name,
-					GroupID:    group.ID,
-					Feature:    feature,
+					TableName:  sqlutil.OnlineStreamTableName(group.ID),
+					Features:   features,
 				})
 			}, nil
 		}

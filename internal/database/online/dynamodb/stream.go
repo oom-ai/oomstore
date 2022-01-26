@@ -5,7 +5,6 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
@@ -14,36 +13,6 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
 )
-
-func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTableOpt) error {
-	// dynamodb has no "column", so we do nothing to "add column". see https://stackoverflow.com/a/25610645/16428442
-	if opt.Feature != nil {
-		return nil
-	}
-
-	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
-
-	_, err := db.Client.CreateTable(ctx, &dynamodb.CreateTableInput{
-		TableName: aws.String(tableName),
-		KeySchema: []types.KeySchemaElement{
-			{
-				AttributeName: aws.String(opt.EntityName),
-				KeyType:       types.KeyTypeHash,
-			},
-		},
-		AttributeDefinitions: []types.AttributeDefinition{
-			{
-				AttributeName: aws.String(opt.EntityName),
-				AttributeType: types.ScalarAttributeTypeS,
-			},
-		},
-		ProvisionedThroughput: &types.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(10),
-			WriteCapacityUnits: aws.Int64(10),
-		},
-	})
-	return errdefs.WithStack(err)
-}
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	var (

@@ -3,6 +3,8 @@ package test_impl
 import (
 	"testing"
 
+	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/assert"
@@ -19,15 +21,10 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 	feature1 := SampleStream.Features[0]
 	feature2 := SampleStream.Features[1]
 
-	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+	assert.NoError(t, store.CreateTable(ctx, online.CreateTableOpt{
 		EntityName: entity.Name,
-		GroupID:    group.ID,
-	}))
-
-	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-		EntityName: entity.Name,
-		GroupID:    group.ID,
-		Feature:    feature1,
+		TableName:  sqlutil.OnlineStreamTableName(group.ID),
+		Features:   SampleStream.Features,
 	}))
 
 	assert.NoError(t, store.Push(ctx, online.PushOpt{
@@ -65,12 +62,6 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 	assert.Equal(t, map[string]interface{}{
 		feature1.FullName(): int64(2),
 	}, rs)
-
-	assert.NoError(t, store.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
-		EntityName: entity.Name,
-		GroupID:    group.ID,
-		Feature:    feature2,
-	}))
 
 	assert.NoError(t, store.Push(ctx, online.PushOpt{
 		EntityName:    entity.Name,
