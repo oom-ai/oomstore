@@ -11,6 +11,7 @@ type Store interface {
 	Get(ctx context.Context, opt GetOpt) (dbutil.RowMap, error)
 	MultiGet(ctx context.Context, opt MultiGetOpt) (map[string]dbutil.RowMap, error)
 	Purge(ctx context.Context, revisionID int) error
+	CreateTable(ctx context.Context, opt CreateTableOpt) error
 
 	// Import batch / streaming features to online store
 	Import(ctx context.Context, opt ImportOpt) error

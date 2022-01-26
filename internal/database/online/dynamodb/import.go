@@ -38,7 +38,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	}
 	// Step 1: create table
 	entity := opt.Group.Entity
-	_, err := db.CreateTable(ctx, &dynamodb.CreateTableInput{
+	_, err := db.Client.CreateTable(ctx, &dynamodb.CreateTableInput{
 		TableName: aws.String(tableName),
 		KeySchema: []types.KeySchemaElement{
 			{

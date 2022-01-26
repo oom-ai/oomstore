@@ -55,3 +55,8 @@ func (db *DB) Ping(ctx context.Context) error {
 func (db *DB) Close() error {
 	return nil
 }
+
+func (db *DB) CreateTable(ctx context.Context, opt online.CreateTableOpt) error {
+	//TODO implement me
+	panic("implement me")
+}
