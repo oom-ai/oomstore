@@ -24,9 +24,14 @@ func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult,
 	doJoinOpt := sqlutil.DoJoinOpt{
 		JoinOpt:             opt,
 		QueryResults:        bigqueryQueryResults,
+		QueryTableTimeRange: bigqueryQueryTimeRange,
 		ReadJoinResultQuery: READ_JOIN_RESULT_QUERY,
 	}
 	return sqlutil.DoJoin(ctx, dbOpt, doJoinOpt)
+}
+
+func bigqueryQueryTimeRange(ctx context.Context, dbOpt dbutil.DBOpt, tableName string) (*types.DataTableTimeRange, error) {
+	return getTableTimeRange(ctx, dbOpt, tableName)
 }
 
 func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, header dbutil.ColumnList, dropTableNames []string, backendType types.BackendType) (*types.JoinResult, error) {
