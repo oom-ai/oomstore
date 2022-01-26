@@ -27,14 +27,16 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	}
 
 	// Step 1: create online table
-	entity := opt.Group.Entity
-	columns := append([]string{entity.Name}, opt.Features.Names()...)
-	schema := dbutil.BuildTableSchema(tableName, entity.Name, false, opt.Features, []string{entity.Name}, Backend)
-	if err := db.Query(schema).Exec(); err != nil {
-		return errdefs.WithStack(err)
+	if err := db.CreateTable(ctx, online.CreateTableOpt{
+		EntityName: opt.Group.Entity.Name,
+		TableName:  tableName,
+		Features:   opt.Features,
+	}); err != nil {
+		return err
 	}
 
 	// Step 2: insert records to the online table
+	columns := append([]string{opt.Group.Entity.Name}, opt.Features.Names()...)
 	insertStmt := buildInsertStatement(tableName, columns)
 	batch := db.NewBatch(gocql.LoggedBatch)
 	for record := range opt.ExportStream {
