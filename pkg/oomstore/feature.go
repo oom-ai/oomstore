@@ -3,6 +3,8 @@ package oomstore
 import (
 	"context"
 
+	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -10,12 +12,12 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
 
-// Get metadata of a feature by ID.
+// GetFeature gets metadata of a feature by ID.
 func (s *OomStore) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	return s.metadata.GetFeature(ctx, id)
 }
 
-// Get metadata of a feature by full name.
+// GetFeatureByFullName gets metadata of a feature by full name.
 func (s *OomStore) GetFeatureByFullName(ctx context.Context, fullName string) (*types.Feature, error) {
 	groupName, featureName, err := util.SplitFullFeatureName(fullName)
 	if err != nil {
@@ -24,12 +26,12 @@ func (s *OomStore) GetFeatureByFullName(ctx context.Context, fullName string) (*
 	return s.GetFeatureByName(ctx, groupName, featureName)
 }
 
-// Get metadata of a feature by group name and feature name.
+// GetFeatureByName gets metadata of a feature by group name and feature name.
 func (s *OomStore) GetFeatureByName(ctx context.Context, groupName string, featureName string) (*types.Feature, error) {
 	return s.metadata.GetFeatureByName(ctx, groupName, featureName)
 }
 
-// List metadata of features meeting particular criteria.
+// ListFeature lists metadata of features meeting particular criteria.
 func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
 	metadataOpt := metadata.ListFeatureOpt{}
 	if opt.EntityName != nil {
@@ -56,7 +58,7 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 	return features, nil
 }
 
-// Update metadata of a feature.
+// UpdateFeature updates metadata of a feature.
 func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt) error {
 	if err := util.ValidateFullFeatureNames(opt.FeatureName); err != nil {
 		return err
@@ -71,7 +73,7 @@ func (s *OomStore) UpdateFeature(ctx context.Context, opt types.UpdateFeatureOpt
 	})
 }
 
-// Create metadata of a feature.
+// CreateFeature creates metadata of a feature.
 func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt) (int, error) {
 	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
@@ -97,14 +99,16 @@ func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt
 	}
 
 	if group.Category == types.CategoryStream {
-		feature, err := s.metadata.GetFeature(ctx, id)
+		features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+			GroupID: &group.ID,
+		})
 		if err != nil {
 			return 0, err
 		}
-		if err = s.online.PrepareStreamTable(ctx, online.PrepareStreamTableOpt{
+		if err = s.online.CreateTable(ctx, online.CreateTableOpt{
 			EntityName: group.Entity.Name,
-			GroupID:    group.ID,
-			Feature:    feature,
+			TableName:  sqlutil.OnlineStreamTableName(group.ID),
+			Features:   features,
 		}); err != nil {
 			return 0, err
 		}
