@@ -16,9 +16,9 @@ import (
 func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.BackendType) (dbutil.RowMap, error) {
 	var tableName string
 	if opt.Group.Category == types.CategoryBatch {
-		tableName = OnlineBatchTableName(*opt.RevisionID)
+		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
 	} else {
-		tableName = OnlineStreamTableName(opt.Group.ID)
+		tableName = dbutil.OnlineStreamTableName(opt.Group.ID)
 	}
 
 	entityName := opt.Group.Entity.Name
@@ -45,9 +45,9 @@ func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.Back
 func MultiGet(ctx context.Context, db *sqlx.DB, opt online.MultiGetOpt, backend types.BackendType) (map[string]dbutil.RowMap, error) {
 	var tableName string
 	if opt.Group.Category == types.CategoryBatch {
-		tableName = OnlineBatchTableName(*opt.RevisionID)
+		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
 	} else {
-		tableName = OnlineStreamTableName(opt.Group.ID)
+		tableName = dbutil.OnlineStreamTableName(opt.Group.ID)
 	}
 
 	entityName := opt.Group.Entity.Name

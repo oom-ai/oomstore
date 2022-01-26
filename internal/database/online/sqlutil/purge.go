@@ -13,7 +13,7 @@ import (
 
 func Purge(ctx context.Context, db *sqlx.DB, revisionID int, backend types.BackendType) error {
 	qt := dbutil.QuoteFn(backend)
-	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, qt(OnlineBatchTableName(revisionID)))
+	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, qt(dbutil.OnlineBatchTableName(revisionID)))
 	_, err := db.ExecContext(ctx, query)
 	return errdefs.WithStack(err)
 }

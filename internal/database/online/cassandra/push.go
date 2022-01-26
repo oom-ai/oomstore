@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 )
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
+	tableName := dbutil.OnlineStreamTableName(opt.GroupID)
 
 	cond := sqlutil.BuildPushCondition(opt, Backend)
 	// cassandra's `insert` is equivalent to `insert_or_update`.

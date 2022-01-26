@@ -18,7 +18,7 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 	if opt.Group.Category == types.CategoryStream {
 		tableName = dbutil.TempTable("online_stream")
 	} else {
-		tableName = OnlineBatchTableName(*opt.RevisionID)
+		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
 	}
 	entity := opt.Group.Entity
 	columns := append([]string{entity.Name}, opt.Features.Names()...)
@@ -52,7 +52,7 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 			return <-opt.ExportError
 		}
 		if opt.Group.Category == types.CategoryStream {
-			streamTableName := OnlineStreamTableName(opt.Group.ID)
+			streamTableName := dbutil.OnlineStreamTableName(opt.Group.ID)
 			if err = PurgeTx(ctx, tx, streamTableName, backend); err != nil {
 				return err
 			}

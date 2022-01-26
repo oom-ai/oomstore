@@ -11,7 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	oomTypes "github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -24,9 +23,9 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	// Step 0: clean up existing table for streaming feature
 	var tableName string
 	if opt.Group.Category == oomTypes.CategoryBatch {
-		tableName = sqlutil.OnlineBatchTableName(*opt.RevisionID)
+		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
 	} else {
-		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
+		tableName = dbutil.OnlineStreamTableName(opt.Group.ID)
 		_, err := db.DeleteTable(ctx, &dynamodb.DeleteTableInput{
 			TableName: aws.String(tableName),
 		})

@@ -3,7 +3,7 @@ package test_impl
 import (
 	"testing"
 
-	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -23,7 +23,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 
 	assert.NoError(t, store.CreateTable(ctx, online.CreateTableOpt{
 		EntityName: entity.Name,
-		TableName:  sqlutil.OnlineStreamTableName(group.ID),
+		TableName:  dbutil.OnlineStreamTableName(group.ID),
 		Features:   SampleStream.Features,
 	}))
 

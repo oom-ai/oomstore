@@ -51,7 +51,7 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 
 // TODO: refactor with text/template
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
+	tableName := dbutil.OnlineStreamTableName(opt.GroupID)
 
 	cond := sqlutil.BuildPushCondition(opt, Backend)
 	query := fmt.Sprintf(`INSERT INTO %s (%s) VALUES(%s) ON DUPLICATE KEY UPDATE %s`,

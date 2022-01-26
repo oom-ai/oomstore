@@ -9,7 +9,6 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -18,9 +17,9 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	// Step 0: drop existing table for streaming feature
 	var tableName string
 	if opt.Group.Category == types.CategoryBatch {
-		tableName = sqlutil.OnlineBatchTableName(*opt.RevisionID)
+		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
 	} else {
-		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
+		tableName = dbutil.OnlineStreamTableName(opt.Group.ID)
 		if err := db.Query(fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)).Exec(); err != nil {
 			return errdefs.WithStack(err)
 		}

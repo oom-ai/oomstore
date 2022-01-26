@@ -11,12 +11,11 @@ import (
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
 )
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	var (
-		tableName = sqlutil.OnlineStreamTableName(opt.GroupID)
+		tableName = dbutil.OnlineStreamTableName(opt.GroupID)
 		item      = make(map[string]types.AttributeValue)
 	)
 

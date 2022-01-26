@@ -50,7 +50,7 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 }
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	tableName := sqlutil.OnlineStreamTableName(opt.GroupID)
+	tableName := dbutil.OnlineStreamTableName(opt.GroupID)
 
 	cond := sqlutil.BuildPushCondition(opt, Backend)
 
