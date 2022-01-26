@@ -11,7 +11,6 @@ import (
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	oomTypes "github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -23,9 +22,9 @@ const (
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
 	var tableName string
 	if opt.Group.Category == oomTypes.CategoryBatch {
-		tableName = sqlutil.OnlineBatchTableName(*opt.RevisionID)
+		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
 	} else {
-		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
+		tableName = dbutil.OnlineStreamTableName(opt.Group.ID)
 	}
 
 	entityKeyValue, err := attributevalue.Marshal(opt.EntityKey)
@@ -51,9 +50,9 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
 	var tableName string
 	if opt.Group.Category == oomTypes.CategoryBatch {
-		tableName = sqlutil.OnlineBatchTableName(*opt.RevisionID)
+		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
 	} else {
-		tableName = sqlutil.OnlineStreamTableName(opt.Group.ID)
+		tableName = dbutil.OnlineStreamTableName(opt.Group.ID)
 	}
 
 	entityName := opt.Group.Entity.Name

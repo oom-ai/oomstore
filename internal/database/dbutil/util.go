@@ -50,3 +50,11 @@ func OfflineStreamSnapshotTableName(groupID int, revision int64) string {
 func OfflineStreamCdcTableName(groupID int, revision int64) string {
 	return fmt.Sprintf("offline_stream_cdc_%d_%d", groupID, revision)
 }
+
+func OnlineBatchTableName(revisionID int) string {
+	return fmt.Sprintf("online_batch_%d", revisionID)
+}
+
+func OnlineStreamTableName(groupID int) string {
+	return fmt.Sprintf("online_stream_%d", groupID)
+}

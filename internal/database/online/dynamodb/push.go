@@ -11,12 +11,11 @@ import (
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
 )
 
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	var (
-		tableName = sqlutil.OnlineStreamTableName(opt.GroupID)
+		tableName = dbutil.OnlineStreamTableName(opt.GroupID)
 		item      = make(map[string]types.AttributeValue)
 	)
 
@@ -31,11 +30,11 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 		if err != nil {
 			return err
 		}
-		attributevalue, err := attributevalue.Marshal(value)
+		attributeValue, err := attributevalue.Marshal(value)
 		if err != nil {
 			return errdefs.WithStack(err)
 		}
-		item[feature.Name] = attributevalue
+		item[feature.Name] = attributeValue
 	}
 
 	_, err = db.Client.PutItem(ctx, &dynamodb.PutItemInput{

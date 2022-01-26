@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cast"
@@ -195,7 +195,7 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 			return func() error {
 				return s.online.CreateTable(ctx, online.CreateTableOpt{
 					EntityName: group.Entity.Name,
-					TableName:  sqlutil.OnlineStreamTableName(group.ID),
+					TableName:  dbutil.OnlineStreamTableName(group.ID),
 					Features:   features,
 				})
 			}, nil

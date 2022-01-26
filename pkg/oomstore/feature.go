@@ -3,7 +3,7 @@ package oomstore
 import (
 	"context"
 
-	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/online"
@@ -107,7 +107,7 @@ func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt
 		}
 		if err = s.online.CreateTable(ctx, online.CreateTableOpt{
 			EntityName: group.Entity.Name,
-			TableName:  sqlutil.OnlineStreamTableName(group.ID),
+			TableName:  dbutil.OnlineStreamTableName(group.ID),
 			Features:   features,
 		}); err != nil {
 			return 0, err
