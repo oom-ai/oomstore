@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gocql/gocql"
+
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/spf13/cast"
 
@@ -22,6 +24,9 @@ type DBOpt struct {
 	// BigQuery
 	BigQueryDB *bigquery.Client
 	DatasetID  *string
+
+	// Cassandra
+	CassandraDB *gocql.Session
 }
 
 func (d *DBOpt) ExecContext(ctx context.Context, query string, args []interface{}) error {
@@ -31,6 +36,9 @@ func (d *DBOpt) ExecContext(ctx context.Context, query string, args []interface{
 			query = strings.Replace(query, "?", cast.ToString(arg), 1)
 		}
 		_, err := d.BigQueryDB.Query(query).Read(ctx)
+		return errdefs.WithStack(err)
+	case types.BackendCassandra:
+		err := d.CassandraDB.Query(query).Exec()
 		return errdefs.WithStack(err)
 	default:
 		_, err := d.SqlxDB.ExecContext(ctx, d.SqlxDB.Rebind(query), args...)
