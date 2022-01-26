@@ -35,7 +35,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		EntityKey:     "user1",
 		GroupID:       group.ID,
 		Features:      types.FeatureList{feature1},
-		FeatureValues: []interface{}{1},
+		FeatureValues: []interface{}{int64(1)},
 	}))
 	rs, err := store.Get(ctx, online.GetOpt{
 		EntityKey:  "user1",
@@ -53,7 +53,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		EntityKey:     "user1",
 		GroupID:       group.ID,
 		Features:      types.FeatureList{feature1},
-		FeatureValues: []interface{}{2},
+		FeatureValues: []interface{}{int64(2)},
 	}))
 	rs, err = store.Get(ctx, online.GetOpt{
 		EntityKey:  "user1",
@@ -77,7 +77,7 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		EntityKey:     "user1",
 		GroupID:       group.ID,
 		Features:      types.FeatureList{feature1, feature2},
-		FeatureValues: []interface{}{3, "post2"},
+		FeatureValues: []interface{}{int64(3), "post2"},
 	}))
 	rs, err = store.Get(ctx, online.GetOpt{
 		EntityKey:  "user1",

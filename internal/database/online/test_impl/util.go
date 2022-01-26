@@ -36,7 +36,6 @@ func init() {
 	group1 := types.Group{ID: 1, Category: types.CategoryBatch, Entity: &entity}
 	group2 := types.Group{ID: 2, Category: types.CategoryBatch, Entity: &entity}
 	group3 := types.Group{ID: 3, Name: "user_clicks", Category: types.CategoryStream, Entity: &entity}
-	//group4 := types.Group{ID:4,Name: "user_reads",Category: types.CategoryStream,Entity:&entity}
 
 	SampleSmall = Sample{
 		Entity: entity,
@@ -134,6 +133,12 @@ func init() {
 				Group:     &group3,
 			},
 		},
+		Data: []types.ExportRecord{
+			[]interface{}{"3215", int64(1), "1,2,3,4"},
+			[]interface{}{"3216", int64(2), "2,3,4,5"},
+			[]interface{}{"3217", int64(3), "3,4,5,6"},
+			[]interface{}{"3218", int64(4), "4,5,6,7"},
+		},
 	}
 }
 
@@ -147,12 +152,15 @@ func importSample(t *testing.T, ctx context.Context, store online.Store, samples
 			}
 		}(sample)
 
-		err := store.Import(ctx, online.ImportOpt{
+		opt := online.ImportOpt{
 			Group:        sample.Group,
 			Features:     sample.Features,
-			RevisionID:   &sample.Revision.ID,
 			ExportStream: stream,
-		})
+		}
+		if sample.Group.Category == types.CategoryBatch {
+			opt.RevisionID = &sample.Revision.ID
+		}
+		err := store.Import(ctx, opt)
 		require.NoError(t, err)
 	}
 }
