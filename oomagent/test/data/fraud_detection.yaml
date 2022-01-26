@@ -22,3 +22,10 @@ groups:
     value-type: int64
   - name: transaction_count_30d
     value-type: int64
+- name: user_fake_stream
+  category: stream
+  snapshot-interval: 1s
+  description: ~
+  features:
+  - name: f1
+    value-type: int64
