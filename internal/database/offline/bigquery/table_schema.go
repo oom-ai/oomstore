@@ -56,9 +56,9 @@ func (db *DB) TableSchema(ctx context.Context, opt offline.TableSchemaOpt) (*typ
 func getTableTimeRange(ctx context.Context, dbOpt dbutil.DBOpt, tableName string) (*types.DataTableTimeRange, error) {
 	q := fmt.Sprintf(`
 		SELECT
-			MIN(%s) AS %s,
-			MAX(%s) AS %s
-		FROM %s.%s`, "unix_milli", "min_unix_milli", "unix_milli", "max_unix_milli", *dbOpt.DatasetID, tableName)
+			MIN(unix_milli) AS min_unix_milli,
+			MAX(unix_milli) AS max_unix_milli
+		FROM %s.%s`, *dbOpt.DatasetID, tableName)
 	rows, err := dbOpt.BigQueryDB.Query(q).Read(ctx)
 	if err != nil {
 		return nil, errdefs.WithStack(err)
