@@ -13,6 +13,7 @@ import (
 )
 
 type QueryResults func(ctx context.Context, dbOpt dbutil.DBOpt, query string, header dbutil.ColumnList, dropTableNames []string, backendType types.BackendType) (*types.JoinResult, error)
+type QueryTableTimeRange func(ctx context.Context, dbOpt dbutil.DBOpt, tableName string) (*types.DataTableTimeRange, error)
 
 func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType types.BackendType) (*types.JoinResult, error) {
 	dbOpt := dbutil.DBOpt{
@@ -22,6 +23,7 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType typ
 	doJoinOpt := DoJoinOpt{
 		JoinOpt:             opt,
 		QueryResults:        sqlxQueryResults,
+		QueryTableTimeRange: sqlxQueryTableTimeRange,
 		ReadJoinResultQuery: READ_JOIN_RESULT_QUERY,
 	}
 	return DoJoin(ctx, dbOpt, doJoinOpt)
@@ -30,6 +32,7 @@ func Join(ctx context.Context, db *sqlx.DB, opt offline.JoinOpt, backendType typ
 type DoJoinOpt struct {
 	offline.JoinOpt
 	QueryResults        QueryResults
+	QueryTableTimeRange QueryTableTimeRange
 	ReadJoinResultQuery string
 }
 
@@ -55,6 +58,15 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 	if err != nil {
 		return nil, err
 	}
+	timeRange, err := opt.QueryTableTimeRange(ctx, dbOpt, entityRowsTableName)
+	if err != nil {
+		return nil, err
+	}
+	if timeRange.MinUnixMilli == nil || timeRange.MaxUnixMilli == nil {
+		data := make(chan []interface{})
+		defer close(data)
+		return &types.JoinResult{Data: data}, nil
+	}
 
 	// Step 2: process features by group, insert result to table joined
 	tableNames := make([]string, 0)
@@ -79,6 +91,7 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 			Features:            featureList,
 			RevisionRanges:      revisionRanges,
 			EntityRowsTableName: entityRowsTableName,
+			TimeRange:           *timeRange,
 		})
 		if err != nil {
 			return nil, err
@@ -112,6 +125,7 @@ type joinOneGroupOpt struct {
 	EntityName          string
 	EntityRowsTableName string
 	ValueNames          []string
+	TimeRange           types.DataTableTimeRange
 }
 
 func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt joinOneGroupOpt) ([]string, error) {
@@ -128,6 +142,9 @@ func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt joinOneGroupOpt) 
 	// Step 2: iterate each table range, join entity_rows table and each data tables
 	columns := append(opt.ValueNames, opt.Features.Names()...)
 	for _, r := range opt.RevisionRanges {
+		if *opt.TimeRange.MaxUnixMilli < r.MinRevision || *opt.TimeRange.MinUnixMilli > r.MaxRevision {
+			continue
+		}
 		query, err := buildJoinQuery(joinQueryParams{
 			TableName:           snapshotJoinedTableName,
 			EntityName:          opt.EntityName,
@@ -321,4 +338,8 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 		Header: header.Names(),
 		Data:   data,
 	}, dropErr
+}
+
+func sqlxQueryTableTimeRange(ctx context.Context, dbOpt dbutil.DBOpt, tableName string) (*types.DataTableTimeRange, error) {
+	return getCdcTimeRange(ctx, dbOpt.SqlxDB, tableName, dbOpt.Backend)
 }
