@@ -72,3 +72,7 @@ func TestPrepareStreamTable(t *testing.T) {
 func TestPush(t *testing.T) {
 	test_impl.TestPush(t, prepareStore, destroyStore(t))
 }
+
+func TestCreateTable(t *testing.T) {
+	test_impl.TestCreateTable(t, prepareStore, destroyStore(t))
+}
