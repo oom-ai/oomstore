@@ -48,6 +48,5 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 }
 
 func (db *DB) CreateTable(ctx context.Context, opt online.CreateTableOpt) error {
-	//TODO implement me
-	panic("implement me")
+	return nil
 }
