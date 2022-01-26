@@ -2,6 +2,7 @@ package dynamodb
 
 import (
 	"context"
+	"errors"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 
@@ -30,7 +31,9 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			TableName: aws.String(tableName),
 		})
 		if err != nil {
-			return errdefs.WithStack(err)
+			if apiErr := new(types.ResourceNotFoundException); !errors.As(err, &apiErr) {
+				return errdefs.WithStack(err)
+			}
 		}
 	}
 	// Step 1: create table
