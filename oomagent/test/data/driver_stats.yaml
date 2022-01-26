@@ -1,9 +1,9 @@
----
 kind: Entity
 name: driver
 groups:
   - name: driver_stats
     category: batch
+    description: ~
     features:
       - name: conv_rate
         value-type: float64
@@ -14,5 +14,11 @@ groups:
       - name: avg_daily_trips
         value-type: int64
         description: ~
+  - name: fake_stream
+    category: stream
+    snapshot-interval: 1s
     description: ~
+    features:
+      - name: f1
+        value-type: int64
 description: ~
