@@ -53,10 +53,6 @@ func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
 	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }
 
-func TestPrepareStreamTable(t *testing.T) {
-	test_impl.TestPrepareStreamTable(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
-}
-
 func TestPush(t *testing.T) {
 	test_impl.TestPush(t, prepareStore, runtime_mysql.DestroyStore(DATABASE))
 }

@@ -65,10 +65,6 @@ func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
 	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore, destroyStore(t))
 }
 
-func TestPrepareStreamTable(t *testing.T) {
-	test_impl.TestPrepareStreamTable(t, prepareStore, destroyStore(t))
-}
-
 func TestPush(t *testing.T) {
 	test_impl.TestPush(t, prepareStore, destroyStore(t))
 }
