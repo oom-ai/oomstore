@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/oom-ai/oomstore/internal/database/offline/test_impl"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
@@ -53,25 +55,25 @@ func destroyStore(database string) func() {
 	}
 }
 
-//func TestPing(t *testing.T) {
-//	test_impl.TestPing(t, prepareStore, destroyStore(DATABASE))
-//}
-//
-//func TestExport(t *testing.T) {
-//	test_impl.TestExport(t, prepareStore, destroyStore(DATABASE))
-//}
-//
-//func TestImport(t *testing.T) {
-//	test_impl.TestImport(t, prepareStore, destroyStore(DATABASE))
-//}
-//
-//func TestJoin(t *testing.T) {
-//	test_impl.TestJoin(t, prepareStore, destroyStore(DATABASE))
-//}
-//
-//func TestSnapshot(t *testing.T) {
-//	test_impl.TestSnapshot(t, prepareStore, destroyStore(DATABASE))
-//}
+func TestPing(t *testing.T) {
+	test_impl.TestPing(t, prepareStore, destroyStore(DATABASE))
+}
+
+func TestExport(t *testing.T) {
+	test_impl.TestExport(t, prepareStore, destroyStore(DATABASE))
+}
+
+func TestImport(t *testing.T) {
+	test_impl.TestImport(t, prepareStore, destroyStore(DATABASE))
+}
+
+func TestJoin(t *testing.T) {
+	test_impl.TestJoin(t, prepareStore, destroyStore(DATABASE))
+}
+
+func TestSnapshot(t *testing.T) {
+	test_impl.TestSnapshot(t, prepareStore, destroyStore(DATABASE))
+}
 
 // We don't use test_impl.TestTableSchema because snowflake cannot be
 // accessed by two different sessions.
@@ -112,8 +114,8 @@ func TestTableSchema(t *testing.T) {
 			},
 		},
 		TimeRange: types.DataTableTimeRange{
-			MinUnixMilli: 1,
-			MaxUnixMilli: 100,
+			MinUnixMilli: int64Ptr(1),
+			MaxUnixMilli: int64Ptr(100),
 		},
 	}
 	require.ElementsMatch(t, expected.Fields, actual.Fields)
@@ -121,6 +123,10 @@ func TestTableSchema(t *testing.T) {
 
 }
 
-//func TestCreateTable(t *testing.T) {
-//	test_impl.TestCreateTable(t, prepareStore, destroyStore(DATABASE))
-//}
+func int64Ptr(i int64) *int64 {
+	return &i
+}
+
+func TestCreateTable(t *testing.T) {
+	test_impl.TestCreateTable(t, prepareStore, destroyStore(DATABASE))
+}
