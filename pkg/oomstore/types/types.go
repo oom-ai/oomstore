@@ -67,8 +67,8 @@ func (e *ExportResult) GetErrorChannel() <-chan error {
 }
 
 type DataTableTimeRange struct {
-	MinUnixMilli int64 `db:"min_unix_milli"`
-	MaxUnixMilli int64 `db:"max_unix_milli"`
+	MinUnixMilli *int64 `db:"min_unix_milli"`
+	MaxUnixMilli *int64 `db:"max_unix_milli"`
 }
 
 type DataTableSchema struct {

@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/oom-ai/oomstore/internal/database/offline"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -41,9 +43,14 @@ func TestTableSchema(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 			},
 		},
 		TimeRange: types.DataTableTimeRange{
-			MinUnixMilli: 10,
-			MaxUnixMilli: 100,
+			MinUnixMilli: int64Ptr(1),
+			MaxUnixMilli: int64Ptr(100),
 		},
 	}
-	require.ElementsMatch(t, expected.Fields, actual.Fields)
+	assert.ElementsMatch(t, expected.Fields, actual.Fields)
+	assert.Equal(t, expected.TimeRange, actual.TimeRange)
+}
+
+func int64Ptr(i int64) *int64 {
+	return &i
 }
