@@ -71,5 +71,9 @@ func (db *DB) PrepareStreamTable(ctx context.Context, opt online.PrepareStreamTa
 }
 
 func (db *DB) CreateTable(ctx context.Context, opt online.CreateTableOpt) error {
-	return sqlutil.CreateTable(ctx, db.DB, opt, Backend)
+	dbOpt := dbutil.DBOpt{
+		Backend: Backend,
+		SqlxDB:  db.DB,
+	}
+	return sqlutil.CreateTable(ctx, dbOpt, opt)
 }

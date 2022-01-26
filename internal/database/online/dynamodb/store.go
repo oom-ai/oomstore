@@ -7,9 +7,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -54,9 +54,4 @@ func (db *DB) Ping(ctx context.Context) error {
 // dynamodb is serverless so Close won't do anything
 func (db *DB) Close() error {
 	return nil
-}
-
-func (db *DB) CreateTable(ctx context.Context, opt online.CreateTableOpt) error {
-	//TODO implement me
-	panic("implement me")
 }

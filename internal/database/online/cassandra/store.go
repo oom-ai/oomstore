@@ -4,6 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
+
 	"github.com/gocql/gocql"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 
@@ -52,6 +55,9 @@ func Open(option *types.CassandraOpt) (*DB, error) {
 }
 
 func (db *DB) CreateTable(ctx context.Context, opt online.CreateTableOpt) error {
-	//TODO implement me
-	panic("implement me")
+	dbOpt := dbutil.DBOpt{
+		Backend:     Backend,
+		CassandraDB: db.Session,
+	}
+	return sqlutil.CreateTable(ctx, dbOpt, opt)
 }

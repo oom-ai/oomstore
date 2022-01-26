@@ -37,27 +37,10 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		}
 	}
 	// Step 1: create table
-	entity := opt.Group.Entity
-	_, err := db.Client.CreateTable(ctx, &dynamodb.CreateTableInput{
-		TableName: aws.String(tableName),
-		KeySchema: []types.KeySchemaElement{
-			{
-				AttributeName: aws.String(entity.Name),
-				KeyType:       types.KeyTypeHash,
-			},
-		},
-		AttributeDefinitions: []types.AttributeDefinition{
-			{
-				AttributeName: aws.String(entity.Name),
-				AttributeType: types.ScalarAttributeTypeS,
-			},
-		},
-		ProvisionedThroughput: &types.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(10),
-			WriteCapacityUnits: aws.Int64(10),
-		},
-	})
-	if err != nil {
+	if err := db.CreateTable(ctx, online.CreateTableOpt{
+		TableName:  tableName,
+		EntityName: opt.Group.Entity.Name,
+	}); err != nil {
 		return errdefs.WithStack(err)
 	}
 
@@ -80,7 +63,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			items = make([]types.WriteRequest, 0, BatchWriteItemCapacity)
 		}
 	}
-	if err = batchWrite(ctx, db, tableName, items); err != nil {
+	if err := batchWrite(ctx, db, tableName, items); err != nil {
 		return err
 	}
 
