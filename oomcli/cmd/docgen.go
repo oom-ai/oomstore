@@ -20,6 +20,9 @@ var docgenCmd = &cobra.Command{
 func init() {
 	// So that it doesn't docgen 'completion' command
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
+	// Hide the command for non-dev users
+	docgenCmd.Hidden = true
+
 	rootCmd.AddCommand(docgenCmd)
 }
 
