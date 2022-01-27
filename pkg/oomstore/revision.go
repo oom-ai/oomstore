@@ -25,9 +25,8 @@ func (s *OomStore) GetRevisionBy(ctx context.Context, groupID int, revision int6
 	return s.metadata.GetRevisionBy(ctx, groupID, revision)
 }
 
-func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
+func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, error) {
 	var revisionID int
-	var snapshotTable string
 	var dummyRevision *types.Revision
 
 	if err := s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
@@ -37,7 +36,7 @@ func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisi
 				return err
 			}
 
-			if _, _, err = tx.CreateRevision(ctx, metadata.CreateRevisionOpt{
+			if _, err = tx.CreateRevision(ctx, metadata.CreateRevisionOpt{
 				Revision:    0,
 				GroupID:     opt.GroupID,
 				Description: "dummy revision will be used at Join and Export",
@@ -51,19 +50,19 @@ func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisi
 			}
 		}
 
-		revisionID, snapshotTable, err = tx.CreateRevision(ctx, opt)
+		revisionID, err = tx.CreateRevision(ctx, opt)
 		return err
 	}); err != nil {
-		return 0, "", err
+		return 0, err
 	}
 
 	if dummyRevision != nil {
 		if err := s.createSnapshotAndCdcTable(ctx, dummyRevision); err != nil {
-			return 0, "", err
+			return 0, err
 		}
 	}
 
-	return revisionID, snapshotTable, nil
+	return revisionID, nil
 }
 
 func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *types.Revision) error {
