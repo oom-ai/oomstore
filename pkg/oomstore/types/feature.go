@@ -43,13 +43,6 @@ func (f *Feature) Entity() *Entity {
 	return f.Group.Entity
 }
 
-func (f *Feature) OnlineRevisionID() *int {
-	if f.Group.Category == CategoryStream {
-		return nil
-	}
-	return f.Group.OnlineRevisionID
-}
-
 func (f *Feature) DBFullName(backend BackendType) string {
 	if backend != BackendBigQuery {
 		return f.FullName()

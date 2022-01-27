@@ -46,7 +46,7 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 			EntityKey:  opt.EntityKey,
 			Group:      *featureList[0].Group,
 			Features:   featureList,
-			RevisionID: featureList[0].OnlineRevisionID(),
+			RevisionID: featureList[0].Group.OnlineRevisionID,
 		})
 		if err != nil {
 			return nil, err
@@ -112,7 +112,7 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 			EntityKeys: entityKeys,
 			Group:      *features[0].Group,
 			Features:   features,
-			RevisionID: features[0].OnlineRevisionID(),
+			RevisionID: features[0].Group.OnlineRevisionID,
 		})
 		if err != nil {
 			return nil, err
