@@ -40,7 +40,7 @@ type DBStore interface {
 	ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error)
 
 	// revision
-	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int, string, error)
+	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int, error)
 	UpdateRevision(ctx context.Context, opt UpdateRevisionOpt) error
 	GetRevision(ctx context.Context, id int) (*types.Revision, error)
 	GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error)

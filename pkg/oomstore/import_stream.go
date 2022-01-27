@@ -113,7 +113,7 @@ func (s *OomStore) tableLinkImportStream(ctx context.Context, opt types.ImportSt
 		return err
 	}
 
-	_, _, err = s.createRevision(ctx, metadata.CreateRevisionOpt{
+	_, err = s.createRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:    *tableSchema.TimeRange.MinUnixMilli,
 		GroupID:     group.ID,
 		CdcTable:    &dataSource.TableName,

@@ -10,7 +10,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
-func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateRevisionOpt) (int, string, error) {
+func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.CreateRevisionOpt) (int, error) {
 	var snapshotTable, cdcTable string
 	if opt.SnapshotTable != nil {
 		snapshotTable = *opt.SnapshotTable
@@ -24,15 +24,15 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 	if err != nil {
 		if sqliteErr, ok := err.(*sqlite.Error); ok {
 			if sqliteErr.Code() == sqlite3.SQLITE_CONSTRAINT_UNIQUE {
-				return 0, "", errdefs.Errorf("revision already exists: groupID=%d, revision=%d", opt.GroupID, opt.Revision)
+				return 0, errdefs.Errorf("revision already exists: groupID=%d, revision=%d", opt.GroupID, opt.Revision)
 			}
 		}
-		return 0, "", errdefs.WithStack(err)
+		return 0, errdefs.WithStack(err)
 	}
 	revisionID, err := res.LastInsertId()
 	if err != nil {
-		return 0, "", errdefs.WithStack(err)
+		return 0, errdefs.WithStack(err)
 	}
 
-	return int(revisionID), snapshotTable, nil
+	return int(revisionID), nil
 }
