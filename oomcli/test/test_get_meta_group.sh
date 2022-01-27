@@ -40,12 +40,12 @@ entity-name: device
 category: batch
 description: phone
 features:
-    - name: price
-      value-type: int64
-      description: price
-    - name: model
-      value-type: string
-      description: model
+  - name: price
+    value-type: int64
+    description: price
+  - name: model
+    value-type: string
+    description: model
 '
 
 actual=$(oomcli get meta group phone -o yaml)
@@ -54,46 +54,46 @@ assert_eq "$case" "$expected" "$actual"
 case='oomcli get meta group -o yaml: multiple groups'
 expected='
 items:
-    - kind: Group
-      name: phone
-      entity-name: device
-      category: batch
-      description: phone
-      features:
-        - name: price
-          value-type: int64
-          description: price
-        - name: model
-          value-type: string
-          description: model
-    - kind: Group
-      name: student
-      entity-name: user
-      category: batch
-      description: student
-      features:
-        - name: name
-          value-type: string
-          description: name
-        - name: gender
-          value-type: string
-          description: gender
-        - name: age
-          value-type: int64
-          description: age
-    - kind: Group
-      name: user-click
-      entity-name: user
-      category: stream
-      snapshot-interval: 1s
-      description: user click post feature
-      features:
-        - name: last_5_click_posts
-          value-type: string
-          description: user last 5 click posts
-        - name: number_of_user_starred_posts
-          value-type: int64
-          description: number of posts that users starred today
+  - kind: Group
+    name: phone
+    entity-name: device
+    category: batch
+    description: phone
+    features:
+      - name: price
+        value-type: int64
+        description: price
+      - name: model
+        value-type: string
+        description: model
+  - kind: Group
+    name: student
+    entity-name: user
+    category: batch
+    description: student
+    features:
+      - name: name
+        value-type: string
+        description: name
+      - name: gender
+        value-type: string
+        description: gender
+      - name: age
+        value-type: int64
+        description: age
+  - kind: Group
+    name: user-click
+    entity-name: user
+    category: stream
+    snapshot-interval: 1s
+    description: user click post feature
+    features:
+      - name: last_5_click_posts
+        value-type: string
+        description: user last 5 click posts
+      - name: number_of_user_starred_posts
+        value-type: int64
+        description: number of posts that users starred today
 '
 actual=$(oomcli get meta group -o yaml)
 assert_eq "$case" "$expected" "$actual"
