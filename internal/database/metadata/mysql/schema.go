@@ -56,7 +56,7 @@ var META_TABLE_SCHEMAS = map[string]string{
 var META_TABLE_FOREIGN_KEYS = []string{
 	"ALTER TABLE feature ADD FOREIGN KEY (group_id) REFERENCES feature_group(id)",
 	// On TiDB, if not explicitly given a name, the following 2 foreign key constraints will share the same name
-	// So we given them different names to avoid 'ERROR 1826: Duplicate foreign key constraint name'
+	// So we give them different names to avoid 'ERROR 1826: Duplicate foreign key constraint name'
 	"ALTER TABLE feature_group ADD CONSTRAINT FK_feature_group_entity_id FOREIGN KEY (entity_id) REFERENCES entity(id)",
 	"ALTER TABLE feature_group ADD CONSTRAINT FK_feature_group_online_revision_id FOREIGN KEY (online_revision_id) REFERENCES feature_group_revision(id)",
 	"ALTER TABLE feature_group_revision ADD FOREIGN KEY (group_id) REFERENCES feature_group(id)",
