@@ -66,7 +66,12 @@ func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisi
 }
 
 func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *types.Revision) error {
-	snapshotTable := dbutil.OfflineStreamSnapshotTableName(revision.GroupID, revision.Revision)
+	var snapshotTableName string
+	if revision.Group.Category == types.CategoryStream {
+		snapshotTableName = dbutil.OfflineStreamSnapshotTableName(revision.GroupID, revision.Revision)
+	} else {
+		snapshotTableName = dbutil.OfflineBatchTableName(revision.GroupID, int64(revision.ID))
+	}
 
 	// Create snapshot table in offline store
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
@@ -77,7 +82,7 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *type
 	}
 
 	if err = s.offline.CreateTable(ctx, offline.CreateTableOpt{
-		TableName:  snapshotTable,
+		TableName:  snapshotTableName,
 		EntityName: revision.Group.Entity.Name,
 		Features:   features,
 		TableType:  types.TableStreamSnapshot,
@@ -102,7 +107,7 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *type
 	// Update snapshot_table in feature_group_revision table
 	return s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
 		RevisionID:       revision.ID,
-		NewSnapshotTable: &snapshotTable,
+		NewSnapshotTable: &snapshotTableName,
 		NewCdcTable:      cdcTable,
 	})
 }
