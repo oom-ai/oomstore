@@ -171,6 +171,7 @@ func parseRecords(tokens []TokenList, wide, truncate bool) ([][]string, error) {
 
 func serializeInYaml(w io.Writer, items interface{}) error {
 	encoder := yaml.NewEncoder(w)
+	encoder.SetIndent(2)
 	defer encoder.Close()
 
 	slice := reflect.ValueOf(items).Field(0)
