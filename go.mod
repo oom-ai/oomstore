@@ -22,6 +22,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pingcap/log v0.0.0-20211215031037-e024ba4eb0ee
 	github.com/pkg/errors v0.9.1
+	github.com/qri-io/jsonschema v0.2.1
 	github.com/snowflakedb/gosnowflake v1.6.5
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.3.0
@@ -100,6 +101,7 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
+	github.com/qri-io/jsonpointer v0.1.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
