@@ -59,41 +59,41 @@ assert_eq "$case" "$expected" "$actual"
 case='oomcli get meta feature: multiple features'
 expected='
 items:
-    - kind: Feature
-      name: price
-      group-name: phone
-      value-type: int64
-      description: price
-    - kind: Feature
-      name: model
-      group-name: phone
-      value-type: string
-      description: model
-    - kind: Feature
-      name: name
-      group-name: student
-      value-type: string
-      description: name
-    - kind: Feature
-      name: gender
-      group-name: student
-      value-type: string
-      description: gender
-    - kind: Feature
-      name: age
-      group-name: student
-      value-type: int64
-      description: age
-    - kind: Feature
-      name: last_5_click_posts
-      group-name: user-click
-      value-type: string
-      description: user last 5 click posts
-    - kind: Feature
-      name: number_of_user_starred_posts
-      group-name: user-click
-      value-type: int64
-      description: number of posts that users starred today
+  - kind: Feature
+    name: price
+    group-name: phone
+    value-type: int64
+    description: price
+  - kind: Feature
+    name: model
+    group-name: phone
+    value-type: string
+    description: model
+  - kind: Feature
+    name: name
+    group-name: student
+    value-type: string
+    description: name
+  - kind: Feature
+    name: gender
+    group-name: student
+    value-type: string
+    description: gender
+  - kind: Feature
+    name: age
+    group-name: student
+    value-type: int64
+    description: age
+  - kind: Feature
+    name: last_5_click_posts
+    group-name: user-click
+    value-type: string
+    description: user last 5 click posts
+  - kind: Feature
+    name: number_of_user_starred_posts
+    group-name: user-click
+    value-type: int64
+    description: number of posts that users starred today
 '
 
 actual=$(oomcli get meta feature -o yaml)
