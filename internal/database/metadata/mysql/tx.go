@@ -72,7 +72,7 @@ func (tx *Tx) GetFeatureByName(ctx context.Context, groupName string, featureNam
 	return sqlutil.GetFeatureByName(ctx, tx, groupName, featureName)
 }
 
-func (tx *Tx) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
+func (tx *Tx) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, error) {
 	return createRevision(ctx, tx, opt)
 }
 

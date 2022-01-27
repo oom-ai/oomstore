@@ -93,17 +93,16 @@ func (db *DB) GetFeatureByName(ctx context.Context, groupName string, featureNam
 	return sqlutil.GetFeatureByName(ctx, db, groupName, featureName)
 }
 
-func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
+func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, error) {
 	var (
-		revisionID    int
-		snapshotTable string
-		err           error
+		revisionID int
+		err        error
 	)
 	err = db.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
-		revisionID, snapshotTable, err = tx.CreateRevision(ctx, opt)
+		revisionID, err = tx.CreateRevision(ctx, opt)
 		return err
 	})
-	return revisionID, snapshotTable, err
+	return revisionID, err
 }
 
 func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {

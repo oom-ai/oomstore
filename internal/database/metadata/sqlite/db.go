@@ -94,17 +94,16 @@ func (db *DB) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (ty
 	return sqlutil.ListGroup(ctx, db, entityID, groupIDs)
 }
 
-func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
+func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, error) {
 	var (
-		revisionID    int
-		snapshotTable string
-		err           error
+		revisionID int
+		err        error
 	)
 	err = db.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
-		revisionID, snapshotTable, err = tx.CreateRevision(c, opt)
+		revisionID, err = tx.CreateRevision(c, opt)
 		return err
 	})
-	return revisionID, snapshotTable, err
+	return revisionID, err
 }
 
 func (db *DB) UpdateRevision(ctx context.Context, opt metadata.UpdateRevisionOpt) error {
