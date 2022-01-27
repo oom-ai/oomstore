@@ -1,0 +1,36 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$title": "apply group json schema",
+    "description": "apply group json schema",
+    "type": "object",
+    "properties": {
+        "kind": {
+            "description": "must be group",
+            "enum": ["Group"]
+        },
+        "name": {
+            "description": "name of the group",
+            "type": "string",
+            "minLength": 1
+        },
+        "category": {
+            "description": "group category, which can only be batch or stream",
+            "enum": ["batch", "stream"]
+        },
+        "entity-name": {
+            "description": "the name of the entity to which this group belongs",
+            "type": "string",
+            "minLength": 1
+        },
+        "snapshot-interval": {
+            "description": "stream group snapshot interval",
+            "type": "integer",
+            "format": "duration"
+        },
+        "description": {
+            "description": "the group description",
+            "type": "string"
+        }
+    },
+    "required": ["kind", "name", "category", "entity-name"]
+}
