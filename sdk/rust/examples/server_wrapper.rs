@@ -1,9 +1,9 @@
-use oomclient::EmbeddedAgent;
+use oomclient::ServerWrapper;
 use std::time::Duration;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let agent = EmbeddedAgent::default().await?;
+    let agent = ServerWrapper::default().await?;
 
     println!("{:?}", agent.address());
 

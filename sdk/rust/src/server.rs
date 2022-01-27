@@ -10,12 +10,12 @@ use tokio_stream::StreamExt;
 
 use crate::Result;
 
-pub struct EmbeddedAgent {
+pub struct ServerWrapper {
     addr:   SocketAddr,
     handle: Handle,
 }
 
-impl EmbeddedAgent {
+impl ServerWrapper {
     pub async fn new<P1, P2>(cmd_path: Option<P1>, cfg_path: Option<P2>, port: Option<u16>) -> Result<Self>
     where
         P1: AsRef<Path>,
@@ -68,7 +68,7 @@ impl EmbeddedAgent {
     }
 }
 
-impl Drop for EmbeddedAgent {
+impl Drop for ServerWrapper {
     fn drop(&mut self) {
         self.handle.close();
     }
