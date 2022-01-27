@@ -40,7 +40,7 @@ func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisi
 			if _, _, err = tx.CreateRevision(ctx, metadata.CreateRevisionOpt{
 				Revision:    0,
 				GroupID:     opt.GroupID,
-				Description: "dummy revision will be used at Join and Export",
+				Description: "dummy revision",
 			}); err != nil {
 				return err
 			}
