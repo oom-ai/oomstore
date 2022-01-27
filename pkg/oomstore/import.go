@@ -57,7 +57,7 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 		return 0, err
 	}
 
-	newRevisionID, snapshotTableName, err := s.createRevision(ctx, metadata.CreateRevisionOpt{
+	newRevisionID, _, err := s.createRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:      time.Now().UnixMilli(),
 		GroupID:       opt.group.ID,
 		SnapshotTable: nil,
@@ -67,7 +67,7 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 	if err != nil {
 		return 0, err
 	}
-
+	snapshotTableName := dbutil.OfflineBatchSnapshotTableName(opt.group.ID, int64(newRevisionID))
 	revision, err := s.offline.Import(ctx, offline.ImportOpt{
 		EntityName:        opt.entityName,
 		Features:          opt.features,
@@ -83,9 +83,10 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 	if opt.Revision != nil {
 		revision = *opt.Revision
 	}
-	if err := s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
-		RevisionID:  newRevisionID,
-		NewRevision: &revision,
+	if err = s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
+		RevisionID:       newRevisionID,
+		NewRevision:      &revision,
+		NewSnapshotTable: &snapshotTableName,
 	}); err != nil {
 		return 0, err
 	}
