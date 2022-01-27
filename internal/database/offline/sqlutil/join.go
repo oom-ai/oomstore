@@ -37,20 +37,10 @@ type DoJoinOpt struct {
 }
 
 func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.JoinResult, error) {
-	{
-		empty := true
-		for _, features := range opt.FeatureMap {
-			if len(features) > 0 {
-				empty = false
-				break
-			}
-		}
-		if empty {
-			data := make(chan []interface{})
-			defer close(data)
-			return &types.JoinResult{Data: data}, nil
-		}
-
+	if err := validateJoinOpt(opt); err != nil {
+		data := make(chan []interface{})
+		defer close(data)
+		return &types.JoinResult{Data: data}, nil
 	}
 
 	// Step 1: prepare temporary table entity_rows
@@ -115,6 +105,19 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 		ReadJoinResultQuery: opt.ReadJoinResultQuery,
 		BackendType:         dbOpt.Backend,
 	})
+}
+
+func validateJoinOpt(opt DoJoinOpt) error {
+	for groupName, features := range opt.FeatureMap {
+		if len(features) == 0 {
+			delete(opt.FeatureMap, groupName)
+			delete(opt.RevisionRangeMap, groupName)
+		}
+	}
+	if len(opt.FeatureMap) == 0 || len(opt.RevisionRangeMap) == 0 {
+		return errdefs.Errorf("empty feature map")
+	}
+	return nil
 }
 
 type joinOneGroupOpt struct {
