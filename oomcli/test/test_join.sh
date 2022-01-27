@@ -11,7 +11,7 @@ trap 'command rm -rf entity_rows.csv entity_rows_with_values.csv' EXIT INT TERM 
 # push stream feature
 t0=$(perl -MTime::HiRes -e 'printf("%.0f\n",Time::HiRes::time()*1000)')
 
-oomcli push --entity-key 1 --group user-click --features last_5_click_posts=0,1,2,3,4 --features number_of_user_starred_posts=10 >> /dev/null 2>&1
+oomcli push --entity-key 1 --group user-click --feature last_5_click_posts=0,1,2,3,4 --feature number_of_user_starred_posts=10 >> /dev/null 2>&1
 t1=$(perl -MTime::HiRes -e 'printf("%.0f\n",Time::HiRes::time()*1000)')
 sleep 1
 
@@ -20,15 +20,15 @@ import_student_sample
 t2=$(perl -MTime::HiRes -e 'printf("%.0f\n",Time::HiRes::time()*1000)')
 sleep 1
 
-oomcli push --entity-key 1 --group user-click --features last_5_click_posts=1,2,3,4,5 --features number_of_user_starred_posts=10 >> /dev/null 2>&1
+oomcli push --entity-key 1 --group user-click --feature last_5_click_posts=1,2,3,4,5 --feature number_of_user_starred_posts=10 >> /dev/null 2>&1
 t3=$(perl -MTime::HiRes -e 'printf("%.0f\n",Time::HiRes::time()*1000)')
 sleep 1
 
-oomcli push --entity-key 2 --group user-click --features last_5_click_posts=2,3,4,5,6 --features number_of_user_starred_posts=11 >> /dev/null 2>&1
+oomcli push --entity-key 2 --group user-click --feature last_5_click_posts=2,3,4,5,6 --feature number_of_user_starred_posts=11 >> /dev/null 2>&1
 t4=$(perl -MTime::HiRes -e 'printf("%.0f\n",Time::HiRes::time()*1000)')
 sleep 1
 
-oomcli push --entity-key 3 --group user-click --features last_5_click_posts=3,4,5,6,7 --features number_of_user_starred_posts=12 >> /dev/null 2>&1
+oomcli push --entity-key 3 --group user-click --feature last_5_click_posts=3,4,5,6,7 --feature number_of_user_starred_posts=12 >> /dev/null 2>&1
 t5=$(perl -MTime::HiRes -e 'printf("%.0f\n",Time::HiRes::time()*1000)')
 
 oomcli snapshot user-click

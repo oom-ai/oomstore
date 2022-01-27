@@ -11,7 +11,7 @@ for i in {1..5}; do
     import_sample driver_stats "./data/driver_stats_revision_$i.csv" "$i"
 done
 
-oomcli push --entity-key 1 --group fake_stream --features f1=10
+oomcli push --entity-key 1 --group fake_stream --feature f1=10
 t1=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
 oomcli snapshot fake_stream
 

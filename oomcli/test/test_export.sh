@@ -7,16 +7,16 @@ init_store
 register_features
 
 t0=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
-oomcli push --entity-key 1 --group user-click --features last_5_click_posts=1,2,3,4,5 --features number_of_user_starred_posts=10
+oomcli push --entity-key 1 --group user-click --feature last_5_click_posts=1,2,3,4,5 --feature number_of_user_starred_posts=10
 t1=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
 
-oomcli push --entity-key 1 --group user-click --features last_5_click_posts=2,3,4,5,6 --features number_of_user_starred_posts=11
+oomcli push --entity-key 1 --group user-click --feature last_5_click_posts=2,3,4,5,6 --feature number_of_user_starred_posts=11
 t2=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
 
 import_student_sample
 t3=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
 
-oomcli push --entity-key 2 --group user-click --features last_5_click_posts=1,2,3,4,5 --features number_of_user_starred_posts=10
+oomcli push --entity-key 2 --group user-click --feature last_5_click_posts=1,2,3,4,5 --feature number_of_user_starred_posts=10
 t4=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
 
 oomcli_export_push_feature() {

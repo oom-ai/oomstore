@@ -6,7 +6,7 @@ prepare_store
 prepare_oomagent
 
 import_sample account "./data/account_10.csv"
-oomcli push --entity-key 1 --group user_fake_stream --features f1=10
+oomcli push --entity-key 1 --group user_fake_stream --feature f1=10
 oomcli snapshot user_fake_stream
 
 unix_milli=${3:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
