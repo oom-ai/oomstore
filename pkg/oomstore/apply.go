@@ -124,6 +124,10 @@ func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup
 		return nil, nil
 	}
 
+	if group.Entity.Name != newGroup.EntityName || group.Category != newGroup.Category {
+		return nil, errdefs.Errorf("group %+v conflicts with already existing group %+v", newGroup, group)
+	}
+
 	opt := metadata.UpdateGroupOpt{
 		GroupID: group.ID,
 	}
