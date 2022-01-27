@@ -27,12 +27,13 @@ use crate::{
 };
 use async_stream::stream;
 use futures_core::stream::Stream;
-use std::{collections::HashMap, path::Path};
+use std::{collections::HashMap, path::Path, sync::Arc};
 use tonic::{codegen::StdError, transport, Request};
 
 #[derive(Debug, Clone)]
 pub struct Client {
-    inner: OomAgentClient<transport::Channel>,
+    client: OomAgentClient<transport::Channel>,
+    _agent: Option<Arc<ServerWrapper>>,
 }
 
 // TODO: Add a Builder to create the client
@@ -42,7 +43,7 @@ impl Client {
         D: std::convert::TryInto<tonic::transport::Endpoint>,
         D::Error: Into<StdError>,
     {
-        Ok(Self { inner: OomAgentClient::connect(dst).await? })
+        Ok(Self { client: OomAgentClient::connect(dst).await?, _agent: None })
     }
 
     pub async fn with_embedded_oomagent<P1, P2>(bin_path: Option<P1>, cfg_path: Option<P2>) -> Result<Self>
@@ -50,17 +51,19 @@ impl Client {
         P1: AsRef<Path>,
         P2: AsRef<Path>,
     {
-        let oomagent = ServerWrapper::new(bin_path, cfg_path, None).await?;
-        Self::connect(oomagent.address().to_string()).await
+        let agent = ServerWrapper::new(bin_path, cfg_path, None).await?;
+        Ok(Self {
+            client: OomAgentClient::connect(format!("http://{}", agent.address())).await?,
+            _agent: Some(Arc::new(agent)),
+        })
     }
 
     pub async fn with_default_embedded_oomagent() -> Result<Self> {
-        let oomagent = ServerWrapper::default().await?;
-        Self::connect(format!("http://{}", oomagent.address())).await
+        Self::with_embedded_oomagent(None::<String>, None::<String>).await
     }
 
     pub async fn health_check(&mut self) -> Result<()> {
-        Ok(self.inner.health_check(HealthCheckRequest {}).await.map(|_| ())?)
+        Ok(self.client.health_check(HealthCheckRequest {}).await.map(|_| ())?)
     }
 
     pub async fn online_get_raw(
@@ -69,7 +72,7 @@ impl Client {
         features: Vec<String>,
     ) -> Result<FeatureValueMap> {
         let res = self
-            .inner
+            .client
             .online_get(OnlineGetRequest { entity_key: entity_key.into(), features })
             .await?
             .into_inner();
@@ -94,7 +97,7 @@ impl Client {
         features: Vec<String>,
     ) -> Result<HashMap<String, FeatureValueMap>> {
         let res = self
-            .inner
+            .client
             .online_multi_get(OnlineMultiGetRequest { entity_keys, features })
             .await?
             .into_inner();
@@ -119,7 +122,9 @@ impl Client {
         let group = group.into();
         let revision_id = revision_id.into().map(i32::try_from).transpose()?;
         let purge_delay = i32::try_from(purge_delay)?;
-        self.inner.sync(SyncRequest { revision_id, group, purge_delay }).await?;
+        self.client
+            .sync(SyncRequest { revision_id, group, purge_delay })
+            .await?;
         Ok(())
     }
 
@@ -138,7 +143,7 @@ impl Client {
                 yield ChannelImportRequest{group: group.take(), description: description.take(), revision: revision.take(), row};
             }
         };
-        let res = self.inner.channel_import(Request::new(inbound)).await?.into_inner();
+        let res = self.client.channel_import(Request::new(inbound)).await?.into_inner();
         Ok(res.revision_id as u32)
     }
 
@@ -151,7 +156,7 @@ impl Client {
         delimiter: impl Into<Option<char>>,
     ) -> Result<u32> {
         let res = self
-            .inner
+            .client
             .import(ImportRequest {
                 group:       group.into(),
                 description: description.into(),
@@ -174,7 +179,7 @@ impl Client {
             .into_iter()
             .map(|(k, v)| (k, oomagent::Value { value: Some(v) }))
             .collect();
-        self.inner
+        self.client
             .push(PushRequest {
                 entity_key:     entity_key.into(),
                 group:          group.into(),
@@ -207,7 +212,7 @@ impl Client {
             }
         };
 
-        let mut outbound = self.inner.channel_join(Request::new(inbound)).await?.into_inner();
+        let mut outbound = self.client.channel_join(Request::new(inbound)).await?.into_inner();
 
         let ChannelJoinResponse { header, joined_row } = outbound
             .message()
@@ -231,7 +236,7 @@ impl Client {
         input_file: impl AsRef<Path>,
         output_file: impl AsRef<Path>,
     ) -> Result<()> {
-        self.inner
+        self.client
             .join(JoinRequest {
                 features,
                 input_file: input_file.as_ref().display().to_string(),
@@ -250,7 +255,7 @@ impl Client {
         let unix_milli = unix_milli.try_into()?;
         let limit = limit.into().map(|n| n.try_into()).transpose()?;
         let mut outbound = self
-            .inner
+            .client
             .channel_export(ChannelExportRequest { features, unix_milli, limit })
             .await?
             .into_inner();
@@ -280,14 +285,14 @@ impl Client {
         let unix_milli = unix_milli.try_into()?;
         let limit = limit.into().map(|n| n.try_into()).transpose()?;
         let output_file = output_file.as_ref().display().to_string();
-        self.inner
+        self.client
             .export(ExportRequest { features, unix_milli, output_file, limit })
             .await?;
         Ok(())
     }
 
     pub async fn snapshot(&mut self, group: impl Into<String>) -> Result<()> {
-        self.inner.snapshot(SnapshotRequest { group: group.into() }).await?;
+        self.client.snapshot(SnapshotRequest { group: group.into() }).await?;
         Ok(())
     }
 }

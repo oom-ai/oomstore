@@ -10,6 +10,7 @@ use tokio_stream::StreamExt;
 
 use crate::Result;
 
+#[derive(Debug, Clone)]
 pub struct ServerWrapper {
     addr:   SocketAddr,
     handle: Handle,
