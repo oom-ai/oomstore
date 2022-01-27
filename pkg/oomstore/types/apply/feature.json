@@ -1,0 +1,31 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$title": "apply feature json schema",
+    "description": "apply feature json schema",
+    "type": "object",
+    "properties": {
+        "kind": {
+            "description": "must be Feature",
+            "enum": ["Feature"]
+        },
+        "name": {
+            "description": "name of the feature",
+            "type": "string",
+            "minLength": 1
+        },
+        "group-name": {
+            "description": "the name of the group to which this feature belongs",
+            "type": "string",
+            "minLength": 1
+        },
+        "value-type": {
+            "description": "feature value type",
+            "enum": ["string","int64","float64","bool","time","bytes"]
+        },
+        "description": {
+            "description": "the feature description",
+            "type": "string"
+        }
+    },
+    "required": ["kind", "name", "group-name", "value-type"]
+}
