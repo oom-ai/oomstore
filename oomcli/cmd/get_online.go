@@ -15,6 +15,7 @@ import (
 )
 
 var multiGetOpt types.OnlineMultiGetOpt
+var getOnlineOutput *string
 
 var getOnlineCmd = &cobra.Command{
 	Use:   "online",
@@ -29,7 +30,7 @@ var getOnlineCmd = &cobra.Command{
 			exitf("failed getting online features: %+v", err)
 		}
 
-		if err := printOnlineFeatures(featureValues, *getOutput); err != nil {
+		if err := printOnlineFeatures(featureValues, *getOnlineOutput); err != nil {
 			exitf("failed printing online feature values, error %+v\n", err)
 		}
 	},
@@ -45,6 +46,8 @@ func init() {
 
 	flags.StringSliceVar(&multiGetOpt.FeatureNames, "feature", nil, "feature full names")
 	_ = getOnlineCmd.MarkFlagRequired("feature")
+
+	getOnlineOutput = flags.StringP("output", "o", ASCIITable, "output format [csv,ascii_table]")
 }
 
 func printOnlineFeatures(featureValues map[string]*types.FeatureValues, output string) error {
