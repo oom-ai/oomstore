@@ -41,8 +41,8 @@ func init() {
 
 	flags := getOnlineCmd.Flags()
 
-	flags.StringSliceVarP(&multiGetOpt.EntityKeys, "entity-keys", "k", nil, "entity keys")
-	_ = getOnlineCmd.MarkFlagRequired("entity-keys")
+	flags.StringSliceVarP(&multiGetOpt.EntityKeys, "entity-key", "k", nil, "entity keys")
+	_ = getOnlineCmd.MarkFlagRequired("entity-key")
 
 	flags.StringSliceVar(&multiGetOpt.FeatureNames, "feature", nil, "feature full names")
 	_ = getOnlineCmd.MarkFlagRequired("feature")
