@@ -97,13 +97,12 @@ func (mr *MockStoreMockRecorder) CreateGroup(ctx, opt interface{}) *gomock.Call 
 }
 
 // CreateRevision mocks base method.
-func (m *MockStore) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
+func (m *MockStore) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRevision", ctx, opt)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(string)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CreateRevision indicates an expected call of CreateRevision.
@@ -488,13 +487,12 @@ func (mr *MockDBStoreMockRecorder) CreateGroup(ctx, opt interface{}) *gomock.Cal
 }
 
 // CreateRevision mocks base method.
-func (m *MockDBStore) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, string, error) {
+func (m *MockDBStore) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRevision", ctx, opt)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(string)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CreateRevision indicates an expected call of CreateRevision.
