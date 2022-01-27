@@ -7,7 +7,6 @@ import (
 	"github.com/lib/pq"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
@@ -29,21 +28,6 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 			}
 		}
 		return 0, "", errdefs.WithStack(err)
-	}
-	if opt.SnapshotTable == nil {
-		updateQuery := "UPDATE feature_group_revision SET snapshot_table = $1 WHERE id = $2"
-		snapshotTable = dbutil.OfflineBatchTableName(opt.GroupID, int64(revisionID))
-		result, err := sqlxCtx.ExecContext(ctx, updateQuery, snapshotTable, revisionID)
-		if err != nil {
-			return 0, "", errdefs.WithStack(err)
-		}
-		rowsAffected, err := result.RowsAffected()
-		if err != nil {
-			return 0, "", errdefs.WithStack(err)
-		}
-		if rowsAffected != 1 {
-			return 0, "", errdefs.Errorf("failed to update revision %d: revision not found", revisionID)
-		}
 	}
 
 	return revisionID, snapshotTable, nil

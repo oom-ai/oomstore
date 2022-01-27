@@ -7,7 +7,6 @@ import (
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 )
 
@@ -35,20 +34,5 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 		return 0, "", errdefs.WithStack(err)
 	}
 
-	if opt.SnapshotTable == nil {
-		updateQuery := "UPDATE feature_group_revision SET snapshot_table = ? WHERE id = ?"
-		snapshotTable = dbutil.OfflineBatchTableName(opt.GroupID, revisionID)
-		result, err := sqlxCtx.ExecContext(ctx, sqlxCtx.Rebind(updateQuery), snapshotTable, revisionID)
-		if err != nil {
-			return 0, "", errdefs.WithStack(err)
-		}
-		rowsAffected, err := result.RowsAffected()
-		if err != nil {
-			return 0, "", errdefs.WithStack(err)
-		}
-		if rowsAffected != 1 {
-			return 0, "", errdefs.Errorf("failed to update revision %d: revision not found", revisionID)
-		}
-	}
 	return int(revisionID), snapshotTable, nil
 }

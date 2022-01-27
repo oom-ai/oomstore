@@ -30,14 +30,14 @@ func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisi
 	var snapshotTable string
 	var dummyRevision *types.Revision
 
-	if err := s.metadata.WithTransaction(ctx, func(c context.Context, db metadata.DBStore) error {
-		_, err := s.metadata.GetRevisionBy(ctx, opt.GroupID, 0)
+	if err := s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
+		_, err := tx.GetRevisionBy(ctx, opt.GroupID, 0)
 		if err != nil {
 			if !errdefs.IsNotFound(err) {
 				return err
 			}
 
-			if _, _, err = s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
+			if _, _, err = tx.CreateRevision(ctx, metadata.CreateRevisionOpt{
 				Revision:    0,
 				GroupID:     opt.GroupID,
 				Description: "dummy revision will be used at Join and Export",
@@ -45,12 +45,13 @@ func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisi
 				return err
 			}
 
-			if dummyRevision, err = s.metadata.GetRevisionBy(ctx, opt.GroupID, 0); err != nil {
+			dummyRevision, err = tx.GetRevisionBy(ctx, opt.GroupID, 0)
+			if err != nil {
 				return err
 			}
 		}
 
-		revisionID, snapshotTable, err = s.metadata.CreateRevision(ctx, opt)
+		revisionID, snapshotTable, err = tx.CreateRevision(ctx, opt)
 		return err
 	}); err != nil {
 		return 0, "", err
@@ -66,7 +67,12 @@ func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisi
 }
 
 func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *types.Revision) error {
-	snapshotTable := dbutil.OfflineStreamSnapshotTableName(revision.GroupID, revision.Revision)
+	var snapshotTableName string
+	if revision.Group.Category == types.CategoryStream {
+		snapshotTableName = dbutil.OfflineStreamSnapshotTableName(revision.GroupID, revision.Revision)
+	} else {
+		snapshotTableName = dbutil.OfflineBatchSnapshotTableName(revision.GroupID, int64(revision.ID))
+	}
 
 	// Create snapshot table in offline store
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
@@ -77,7 +83,7 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *type
 	}
 
 	if err = s.offline.CreateTable(ctx, offline.CreateTableOpt{
-		TableName:  snapshotTable,
+		TableName:  snapshotTableName,
 		EntityName: revision.Group.Entity.Name,
 		Features:   features,
 		TableType:  types.TableStreamSnapshot,
@@ -102,7 +108,7 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *type
 	// Update snapshot_table in feature_group_revision table
 	return s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
 		RevisionID:       revision.ID,
-		NewSnapshotTable: &snapshotTable,
+		NewSnapshotTable: &snapshotTableName,
 		NewCdcTable:      cdcTable,
 	})
 }
