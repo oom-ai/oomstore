@@ -1,4 +1,4 @@
-use std::num;
+use std::{io, net::AddrParseError, num};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -11,6 +11,12 @@ pub enum OomError {
 
     #[error("a checked integral type conversion fails.")]
     IntConversionError(#[from] num::TryFromIntError),
+
+    #[error(transparent)]
+    IoError(#[from] io::Error),
+
+    #[error(transparent)]
+    AddrParseError(#[from] AddrParseError),
 
     #[error("unknown error")]
     Unknown(String),

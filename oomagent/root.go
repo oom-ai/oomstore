@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/adrg/xdg"
 	"github.com/spf13/cobra"
@@ -43,6 +44,16 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("failed to listen: %v", err)
 		}
+
+		// write the listening address
+		tmpdir := filepath.Join(os.TempDir(), "oomagent", strconv.Itoa(os.Getpid()))
+		if err := os.MkdirAll(tmpdir, 0755); err != nil {
+			log.Fatalf("failed to create temp directory: %v", err)
+		}
+		if err := os.WriteFile(filepath.Join(tmpdir, "address"), []byte(lis.Addr().String()), 0644); err != nil {
+			log.Fatalf("failed to write listen address: %v", err)
+		}
+
 		grpcServer := grpc.NewServer()
 		codegen.RegisterOomAgentServer(grpcServer, &server{oomstore: oomStore})
 		if err := grpcServer.Serve(lis); err != nil {
