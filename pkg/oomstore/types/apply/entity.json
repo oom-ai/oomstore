@@ -1,0 +1,22 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$title": "apply entity json schema",
+    "description": "apply entity json schema",
+    "type": "object",
+    "properties": {
+        "kind": {
+            "description": "must be Entity",
+            "enum": ["Entity"]
+        },
+        "name": {
+            "description": "name of the entity",
+            "type": "string",
+            "minLength": 1
+        },
+        "description": {
+            "description": "the entity description",
+            "type": "string"
+        }
+    },
+    "required": ["kind","name"]
+}
