@@ -4,7 +4,6 @@ import (
 	"io"
 	"time"
 
-	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -27,21 +26,11 @@ func NewApplyStage() *ApplyStage {
 }
 
 type Feature struct {
-	Kind        string `mapstructure:"kind" yaml:"kind,omitempty"`
-	Name        string `mapstructure:"name" yaml:"name"`
-	GroupName   string `mapstructure:"group-name" yaml:"group-name,omitempty"`
-	ValueType   string `mapstructure:"value-type" yaml:"value-type"`
-	Description string `mapstructure:"description" yaml:"description"`
-}
-
-func (f *Feature) Validate() error {
-	if f.Name == "" {
-		return errdefs.InvalidAttribute(errdefs.Errorf("the name of feature should not be empty"))
-	}
-	if f.ValueType == "" {
-		return errdefs.InvalidAttribute(errdefs.Errorf("the value type of feature should not be empty"))
-	}
-	return nil
+	Kind        string `mapstructure:"kind" yaml:"kind,omitempty" json:"kind,omitempty"`
+	Name        string `mapstructure:"name" yaml:"name" json:"name"`
+	GroupName   string `mapstructure:"group-name" yaml:"group-name,omitempty" json:"group-name,omitempty"`
+	ValueType   string `mapstructure:"value-type" yaml:"value-type" json:"value-type"`
+	Description string `mapstructure:"description" yaml:"description" json:"description"`
 }
 
 type FeatureItems struct {
@@ -73,13 +62,13 @@ func FromFeatureList(features types.FeatureList) FeatureItems {
 }
 
 type Group struct {
-	Kind             string         `mapstructure:"kind" yaml:"kind,omitempty"`
-	Name             string         `mapstructure:"name" yaml:"name,omitempty"`
-	EntityName       string         `mapstructure:"entity-name" yaml:"entity-name,omitempty"`
-	Category         types.Category `mapstructure:"category" yaml:"category,omitempty"`
-	SnapshotInterval time.Duration  `mapstructure:"snapshot-interval" yaml:"snapshot-interval,omitempty"`
-	Description      string         `mapstructure:"description" yaml:"description"`
-	Features         []Feature      `mapstructure:"features" yaml:"features,omitempty"`
+	Kind             string         `mapstructure:"kind" yaml:"kind,omitempty" json:"kind,omitempty"`
+	Name             string         `mapstructure:"name" yaml:"name,omitempty" json:"name"`
+	EntityName       string         `mapstructure:"entity-name" yaml:"entity-name,omitempty" json:"entity-name,omitempty"`
+	Category         types.Category `mapstructure:"category" yaml:"category,omitempty" json:"category,omitempty"`
+	SnapshotInterval time.Duration  `mapstructure:"snapshot-interval" yaml:"snapshot-interval,omitempty" json:"snapshot-interval,omitempty"`
+	Description      string         `mapstructure:"description" yaml:"description" json:"description"`
+	Features         []Feature      `mapstructure:"features" yaml:"features,omitempty" json:"features,omitempty"`
 }
 
 type GroupItems struct {
@@ -128,26 +117,12 @@ func FromGroupList(groups types.GroupList, features types.FeatureList) *GroupIte
 	return items
 }
 
-func (g *Group) Validate() error {
-	if g.Name == "" {
-		return errdefs.InvalidAttribute(errdefs.Errorf("the name of group should not be empty"))
-	}
-	return nil
-}
-
 type Entity struct {
-	Kind        string `mapstructure:"kind" yaml:"kind"`
-	Name        string `mapstructure:"name" yaml:"name"`
-	Description string `mapstructure:"description" yaml:"description"`
+	Kind        string `mapstructure:"kind" yaml:"kind" json:"kind"`
+	Name        string `mapstructure:"name" yaml:"name" json:"name"`
+	Description string `mapstructure:"description" yaml:"description" json:"description"`
 
 	Groups []Group `mapstructure:"groups" yaml:"groups,omitempty"`
-}
-
-func (e *Entity) Validate() error {
-	if e.Name == "" {
-		return errdefs.InvalidAttribute(errdefs.Errorf("the name of entity should not be empty"))
-	}
-	return nil
 }
 
 type EntityItems struct {
