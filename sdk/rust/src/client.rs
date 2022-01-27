@@ -19,6 +19,7 @@ use crate::{
         SnapshotRequest,
         SyncRequest,
     },
+    server::ServerWrapper,
     util::{parse_raw_feature_values, parse_raw_values},
     EntityRow,
     Result,
@@ -34,6 +35,7 @@ pub struct Client {
     inner: OomAgentClient<transport::Channel>,
 }
 
+// TODO: Add a Builder to create the client
 impl Client {
     pub async fn connect<D>(dst: D) -> Result<Self>
     where
@@ -41,6 +43,20 @@ impl Client {
         D::Error: Into<StdError>,
     {
         Ok(Self { inner: OomAgentClient::connect(dst).await? })
+    }
+
+    pub async fn with_embedded_oomagent<P1, P2>(bin_path: Option<P1>, cfg_path: Option<P2>) -> Result<Self>
+    where
+        P1: AsRef<Path>,
+        P2: AsRef<Path>,
+    {
+        let oomagent = ServerWrapper::new(bin_path, cfg_path, None).await?;
+        Self::connect(oomagent.address().to_string()).await
+    }
+
+    pub async fn with_default_embedded_oomagent() -> Result<Self> {
+        let oomagent = ServerWrapper::default().await?;
+        Self::connect(format!("http://{}", oomagent.address())).await
     }
 
     pub async fn health_check(&mut self) -> Result<()> {

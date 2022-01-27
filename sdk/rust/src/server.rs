@@ -15,20 +15,21 @@ pub struct ServerWrapper {
     handle: Handle,
 }
 
+// TODO: Add a Builder to create the server wrapper
 impl ServerWrapper {
-    pub async fn new<P1, P2>(cmd_path: Option<P1>, cfg_path: Option<P2>, port: Option<u16>) -> Result<Self>
+    pub async fn new<P1, P2>(bin_path: Option<P1>, cfg_path: Option<P2>, port: Option<u16>) -> Result<Self>
     where
         P1: AsRef<Path>,
         P2: AsRef<Path>,
     {
-        let cmd_path = cmd_path.map(|p| p.as_ref().to_owned());
+        let bin_path = bin_path.map(|p| p.as_ref().to_owned());
         let cfg_path = cfg_path.map(|p| p.as_ref().to_owned());
         let port = port.unwrap_or(0);
 
         let mut signals = Signals::new(&[SIGHUP, SIGTERM, SIGINT, SIGQUIT])?;
         let handle = signals.handle();
 
-        let mut oomagent = Command::new(cmd_path.clone().unwrap_or_else(|| "oomagent".into()));
+        let mut oomagent = Command::new(bin_path.clone().unwrap_or_else(|| "oomagent".into()));
         oomagent.arg("--port").arg(port.to_string());
         if let Some(cfg_path) = cfg_path.clone() {
             oomagent.arg("--config").arg(cfg_path);
