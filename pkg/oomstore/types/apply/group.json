@@ -32,5 +32,14 @@
             "type": "string"
         }
     },
-    "required": ["kind", "name", "category", "entity-name"]
+    "required": ["kind", "name", "category", "entity-name"],
+    "if": {
+        "properties": { "category": { "const": "stream" } }
+    },
+    "then": {
+        "properties": { "snapshot-interval": { "exclusiveMinimum": 0 } }
+    },
+    "else": {
+        "properties": { "snapshot-interval": { "const": 0 } }
+    }
 }

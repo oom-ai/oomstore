@@ -66,7 +66,7 @@ type Group struct {
 	Name             string         `mapstructure:"name" yaml:"name,omitempty" json:"name"`
 	EntityName       string         `mapstructure:"entity-name" yaml:"entity-name,omitempty" json:"entity-name,omitempty"`
 	Category         types.Category `mapstructure:"category" yaml:"category,omitempty" json:"category,omitempty"`
-	SnapshotInterval time.Duration  `mapstructure:"snapshot-interval" yaml:"snapshot-interval,omitempty" json:"snapshot-interval,omitempty"`
+	SnapshotInterval time.Duration  `mapstructure:"snapshot-interval" yaml:"snapshot-interval,omitempty" json:"snapshot-interval"`
 	Description      string         `mapstructure:"description" yaml:"description" json:"description"`
 	Features         []Feature      `mapstructure:"features" yaml:"features,omitempty" json:"features,omitempty"`
 }
