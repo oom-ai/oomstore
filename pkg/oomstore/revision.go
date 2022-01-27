@@ -70,7 +70,7 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *type
 	if revision.Group.Category == types.CategoryStream {
 		snapshotTableName = dbutil.OfflineStreamSnapshotTableName(revision.GroupID, revision.Revision)
 	} else {
-		snapshotTableName = dbutil.OfflineBatchTableName(revision.GroupID, int64(revision.ID))
+		snapshotTableName = dbutil.OfflineBatchSnapshotTableName(revision.GroupID, int64(revision.ID))
 	}
 
 	// Create snapshot table in offline store

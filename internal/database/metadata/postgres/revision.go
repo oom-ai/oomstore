@@ -32,7 +32,7 @@ func createRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metad
 	}
 	if opt.SnapshotTable == nil {
 		updateQuery := "UPDATE feature_group_revision SET snapshot_table = $1 WHERE id = $2"
-		snapshotTable = dbutil.OfflineBatchTableName(opt.GroupID, int64(revisionID))
+		snapshotTable = dbutil.OfflineBatchSnapshotTableName(opt.GroupID, int64(revisionID))
 		result, err := sqlxCtx.ExecContext(ctx, updateQuery, snapshotTable, revisionID)
 		if err != nil {
 			return 0, "", errdefs.WithStack(err)
