@@ -18,12 +18,11 @@ type editEntityOption struct {
 var editEntityOpt editEntityOption
 
 var editEntityCmd = &cobra.Command{
-	Use:   "entity",
+	Use:   "entity [entity_name]",
 	Short: "Edit entity resources",
+	Args:  cobra.MaximumNArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
-		if len(args) > 1 {
-			exitf("argument at most one, got %d", len(args))
-		} else if len(args) == 1 {
+		if len(args) == 1 {
 			editEntityOpt.entityName = &args[0]
 		}
 	},

@@ -16,18 +16,15 @@ type getRevisionOption struct {
 var getRevisionOpt getRevisionOption
 
 var getMetaRevisionCmd = &cobra.Command{
-	Use:   "revision",
+	Use:   "revision [revision_id]",
 	Short: "Get existing revision given specific conditions",
+	Args:  cobra.MaximumNArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("group") {
 			getRevisionOpt.groupName = nil
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 1 {
-			exitf("argument at most one, got %d", len(args))
-		}
-
 		ctx := context.Background()
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()

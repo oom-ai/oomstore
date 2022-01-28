@@ -19,16 +19,14 @@ type editGroupOption struct {
 var editGroupOpt editGroupOption
 
 var editGroupCmd = &cobra.Command{
-	Use:   "group",
+	Use:   "group [group_name]",
 	Short: "Edit group resources",
+	Args:  cobra.MaximumNArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
 			editGroupOpt.entityName = nil
 		}
-
-		if len(args) > 1 {
-			exitf("argument at most one, got %d", len(args))
-		} else if len(args) == 1 {
+		if len(args) == 1 {
 			editGroupOpt.groupName = &args[0]
 		}
 	},

@@ -20,16 +20,14 @@ type getMetaGroupOption struct {
 var getMetaGroupOpt getMetaGroupOption
 
 var getMetaGroupCmd = &cobra.Command{
-	Use:   "group",
+	Use:   "group [group_name]",
 	Short: "Get existing group given specific conditions",
+	Args:  cobra.MaximumNArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
 			getMetaGroupOpt.entityName = nil
 		}
-
-		if len(args) > 1 {
-			exitf("argument at most one, got %d", len(args))
-		} else if len(args) == 1 {
+		if len(args) == 1 {
 			getMetaGroupOpt.groupName = &args[0]
 		}
 	},
