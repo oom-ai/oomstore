@@ -116,7 +116,7 @@ func (s *OomStore) pushStreamingRecords(ctx context.Context, records []types.Str
 				return err
 			}
 
-			if err = s.newRevisionForStream(ctx, group.ID, revision); err != nil {
+			if err = s.createRevisionAndCdcTable(ctx, group.ID, revision); err != nil {
 				return err
 			}
 			// push data to new offline stream cdc table

@@ -7,9 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -144,34 +142,6 @@ func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID 
 	b.lastPush = time.Now()
 	p.buffer.Store(groupID, b)
 	return err
-}
-
-func (s *OomStore) newRevisionForStream(ctx context.Context, groupID int, revision int64) error {
-	features := s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
-		GroupID: &groupID,
-	})
-	entity := features[0].Entity()
-
-	if err := s.offline.CreateTable(ctx, offline.CreateTableOpt{
-		TableName:  dbutil.OfflineStreamCdcTableName(groupID, revision),
-		EntityName: entity.Name,
-		Features:   features,
-		TableType:  types.TableStreamCdc,
-	}); err != nil {
-		return err
-	}
-
-	snapshotTable := ""
-	cdcTable := dbutil.OfflineStreamCdcTableName(groupID, revision)
-	if _, err := s.createRevision(ctx, metadata.CreateRevisionOpt{
-		GroupID:       groupID,
-		Revision:      revision,
-		SnapshotTable: &snapshotTable,
-		CdcTable:      &cdcTable,
-	}); err != nil {
-		return err
-	}
-	return nil
 }
 
 func lastRevisionForStream(snapshotInterval int64, unixMill int64) int64 {
