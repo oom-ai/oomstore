@@ -34,13 +34,3 @@ type CsvFileDataSource struct {
 type TableLinkDataSource struct {
 	TableName string
 }
-
-type ImportStreamOpt struct {
-	GroupName   string
-	Description string
-
-	DataSourceType      DataSourceType
-	CsvFileDataSource   *CsvFileDataSource
-	CsvReaderDataSource *CsvReaderDataSource
-	TableLinkDataSource *TableLinkDataSource
-}

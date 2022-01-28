@@ -30,20 +30,33 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 			return 0, err
 		}
 		defer file.Close()
-		return s.csvReaderImport(ctx, importOpt, &types.CsvReaderDataSource{
+		source := &types.CsvReaderDataSource{
 			Reader:    file,
 			Delimiter: src.Delimiter,
-		})
+		}
+		if importOpt.group.Category == types.CategoryStream {
+			return 0, s.csvReaderImportStream(ctx, importOpt, source)
+		} else {
+			return s.csvReaderImportBatch(ctx, importOpt, source)
+		}
 	case types.CSV_READER:
-		return s.csvReaderImport(ctx, importOpt, opt.CsvReaderDataSource)
+		if importOpt.group.Category == types.CategoryStream {
+			return 0, s.csvReaderImportStream(ctx, importOpt, opt.CsvReaderDataSource)
+		} else {
+			return s.csvReaderImportBatch(ctx, importOpt, opt.CsvReaderDataSource)
+		}
 	case types.TABLE_LINK:
-		return s.tableLinkImport(ctx, importOpt, opt.TableLinkDataSource)
+		if importOpt.group.Category == types.CategoryStream {
+			return 0, s.tableLinkImportStream(ctx, importOpt, opt.TableLinkDataSource)
+		} else {
+			return s.tableLinkImportBatch(ctx, importOpt, opt.TableLinkDataSource)
+		}
 	default:
 		return 0, errdefs.Errorf("unsupported data source: %v", opt.DataSourceType)
 	}
 }
 
-func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) (int, error) {
+func (s *OomStore) csvReaderImportBatch(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) (int, error) {
 	//make sure csv data source has all defined columns
 	reader := bufio.NewReader(dataSource.Reader)
 	source := &offline.CSVSource{
@@ -96,7 +109,7 @@ func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSour
 	return newRevisionID, nil
 }
 
-func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt, dataSource *types.TableLinkDataSource) (int, error) {
+func (s *OomStore) tableLinkImportBatch(ctx context.Context, opt *importOpt, dataSource *types.TableLinkDataSource) (int, error) {
 	// Make sure all features existing with correct value type
 	tableSchema, err := s.offline.TableSchema(ctx, offline.TableSchemaOpt{
 		TableName: dataSource.TableName,

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"io"
-	"os"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 
@@ -22,29 +21,7 @@ const (
 	ImportStreamBatchSize = 100
 )
 
-func (s *OomStore) ImportStream(ctx context.Context, opt types.ImportStreamOpt) error {
-	switch opt.DataSourceType {
-	case types.CSV_FILE:
-		src := opt.CsvFileDataSource
-		file, err := os.Open(src.InputFilePath)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		return s.csvReaderImportStream(ctx, opt, &types.CsvReaderDataSource{
-			Reader:    file,
-			Delimiter: src.Delimiter,
-		})
-	case types.CSV_READER:
-		return s.csvReaderImportStream(ctx, opt, opt.CsvReaderDataSource)
-	case types.TABLE_LINK:
-		return s.tableLinkImportStream(ctx, opt, opt.TableLinkDataSource)
-	default:
-		return errdefs.Errorf("unsupported data source: %v", opt.DataSourceType)
-	}
-}
-
-func (s *OomStore) csvReaderImportStream(ctx context.Context, opt types.ImportStreamOpt, dataSource *types.CsvReaderDataSource) error {
+func (s *OomStore) csvReaderImportStream(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) error {
 	// get group information
 	entity, group, features, err := s.getGroupInfo(ctx, opt.GroupName)
 	if err != nil {
@@ -91,7 +68,7 @@ func (s *OomStore) csvReaderImportStream(ctx context.Context, opt types.ImportSt
 	return s.pushStreamingRecords(ctx, records, entity.Name, group, features)
 }
 
-func (s *OomStore) tableLinkImportStream(ctx context.Context, opt types.ImportStreamOpt, dataSource *types.TableLinkDataSource) error {
+func (s *OomStore) tableLinkImportStream(ctx context.Context, opt *importOpt, dataSource *types.TableLinkDataSource) error {
 	// get group information
 	_, group, features, err := s.getGroupInfo(ctx, opt.GroupName)
 	if err != nil {
