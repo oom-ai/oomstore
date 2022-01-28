@@ -118,7 +118,7 @@ func FromGroupList(groups types.GroupList, features types.FeatureList) *GroupIte
 }
 
 type Entity struct {
-	Kind        string `mapstructure:"kind" yaml:"kind" json:"kind"`
+	Kind        string `mapstructure:"kind" yaml:"kind" json:"kind,omitempty"`
 	Name        string `mapstructure:"name" yaml:"name" json:"name"`
 	Description string `mapstructure:"description" yaml:"description" json:"description"`
 

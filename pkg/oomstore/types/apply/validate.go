@@ -44,20 +44,7 @@ func (e *Entity) Validate() error {
 		return errdefs.WithStack(err)
 	}
 
-	errs, err := entityValidate.ValidateBytes(context.Background(), data)
-	if err != nil {
-		return errdefs.WithStack(err)
-	}
-
-	if len(errs) > 0 {
-		err = fmt.Errorf("Entity Validate: %v", errs[0])
-		for i := 1; i < len(errs); i++ {
-			err = fmt.Errorf("%v\n%v", err, errs[i])
-		}
-		return errdefs.WithStack(err)
-	}
-	return nil
-
+	return validate(fmt.Sprintf("Entity %s", e.Name), data, &entityValidate)
 }
 
 func (g *Group) Validate() error {
@@ -66,19 +53,7 @@ func (g *Group) Validate() error {
 		return errdefs.WithStack(err)
 	}
 
-	errs, err := groupValidate.ValidateBytes(context.Background(), data)
-	if err != nil {
-		return errdefs.WithStack(err)
-	}
-
-	if len(errs) > 0 {
-		err = fmt.Errorf("Group Validate: %v", errs[0])
-		for i := 1; i < len(errs); i++ {
-			err = fmt.Errorf("%v\n%v", err, errs[i])
-		}
-		return errdefs.WithStack(err)
-	}
-	return nil
+	return validate(fmt.Sprintf("Group %s", g.Name), data, &groupValidate)
 }
 
 func (f *Feature) Validate() error {
@@ -87,13 +62,17 @@ func (f *Feature) Validate() error {
 		return err
 	}
 
-	errs, err := featureValidate.ValidateBytes(context.Background(), data)
+	return validate(fmt.Sprintf("Feature %s", f.Name), data, &featureValidate)
+}
+
+func validate(errPrefix string, data []byte, schema *jsonschema.Schema) error {
+	errs, err := schema.ValidateBytes(context.Background(), data)
 	if err != nil {
 		return errdefs.WithStack(err)
 	}
 
 	if len(errs) > 0 {
-		err = fmt.Errorf("Feature Validate: %v", errs[0])
+		err := fmt.Errorf("%s: %v", errPrefix, errs[0])
 		for i := 1; i < len(errs); i++ {
 			err = fmt.Errorf("%v\n%v", err, errs[i])
 		}
