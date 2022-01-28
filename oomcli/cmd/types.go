@@ -86,7 +86,7 @@ func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenL
 				Category:         e.Group.Category,
 				ValueType:        e.ValueType,
 				Description:      e.Description,
-				OnlineRevisionID: e.OnlineRevisionID(),
+				OnlineRevisionID: e.Group.OnlineRevisionID,
 				CreateTime:       e.CreateTime,
 				ModifyTime:       e.ModifyTime,
 			})
