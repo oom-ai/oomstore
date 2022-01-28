@@ -15,8 +15,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-// Import data into the offline feature store as a new revision.
-// In the future we want to support more diverse data sources.
+// Import data into the offline feature store
 func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
 	importOpt, err := s.parseImportOpt(ctx, opt)
 	if err != nil {
@@ -159,6 +158,7 @@ func validateTableSchema(schema *types.DataTableSchema, features types.FeatureLi
 	}
 	return nil
 }
+
 func hasDup(a []string) bool {
 	s := make(map[string]bool)
 	for _, e := range a {
@@ -208,9 +208,25 @@ func stringSliceEqual(a, b []string) bool {
 }
 
 func (s *OomStore) parseImportOpt(ctx context.Context, opt types.ImportOpt) (*importOpt, error) {
-	entity, group, features, err := s.getGroupInfo(ctx, opt.GroupName)
+	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
 		return nil, err
+	}
+
+	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+		GroupID: &group.ID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if features == nil {
+		err = errdefs.Errorf("no features under group: %s", opt.GroupName)
+		return nil, err
+	}
+
+	entity := group.Entity
+	if entity == nil {
+		return nil, errdefs.Errorf("no entity found by group: %s", opt.GroupName)
 	}
 	return &importOpt{
 		ImportOpt:  &opt,
@@ -218,30 +234,6 @@ func (s *OomStore) parseImportOpt(ctx context.Context, opt types.ImportOpt) (*im
 		group:      group,
 		features:   features,
 	}, nil
-}
-
-func (s *OomStore) getGroupInfo(ctx context.Context, groupName string) (*types.Entity, *types.Group, types.FeatureList, error) {
-	group, err := s.metadata.GetGroupByName(ctx, groupName)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
-		GroupID: &group.ID,
-	})
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	if features == nil {
-		err = errdefs.Errorf("no features under group: %s", groupName)
-		return nil, nil, nil, err
-	}
-
-	entity := group.Entity
-	if entity == nil {
-		return nil, nil, nil, errdefs.Errorf("no entity found by group: %s", groupName)
-	}
-	return entity, group, features, nil
 }
 
 type importOpt struct {
