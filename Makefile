@@ -23,7 +23,7 @@ mockgen:
 	@mockgen -source internal/database/offline/store.go  -destination internal/database/offline/mock_offline/store.go
 
 .PHONY: grpc
-grpc: grpc-go grpc-python
+grpc: grpc-go
 
 .PHONY: grpc-go
 grpc-go:
@@ -33,16 +33,6 @@ grpc-go:
 		--go_out=oomagent \
 		--go-grpc_out=oomagent \
 		proto/oomagent.proto
-
-.PHONY: grpc-python
-grpc-python:
-	@docker run --rm -v $$(pwd):/oomstore -w /oomstore rvolosatovs/protoc \
-		--experimental_allow_proto3_optional \
-		-I=proto \
-		--python_out=sdk/python/src/oomstore/codegen \
-		--grpc-python_out=sdk/python/src/oomstore/codegen \
-		proto/oomagent.proto
-	@perl -pi -e s,"import oomagent_pb2","from . import oomagent_pb2",g sdk/python/src/oomstore/codegen/oomagent_pb2_grpc.py
 
 .PHONY: build
 build: oomcli oomagent
