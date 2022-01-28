@@ -122,6 +122,17 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) 
 	sort.Slice(revisions, func(i, j int) bool {
 		return revisions[i].Revision < revisions[j].Revision
 	})
+	for _, revision := range revisions {
+		if revision.SnapshotTable == "" {
+			if err = s.Snapshot(ctx, group.Name); err != nil {
+				return nil, err
+			}
+		}
+	}
+	revisions, err = s.metadata.ListRevision(ctx, &group.ID)
+	if err != nil {
+		return nil, err
+	}
 
 	var ranges []*offline.RevisionRange
 	for i := 1; i < len(revisions); i++ {
