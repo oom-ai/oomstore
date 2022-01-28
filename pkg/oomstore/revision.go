@@ -25,47 +25,40 @@ func (s *OomStore) GetRevisionBy(ctx context.Context, groupID int, revision int6
 	return s.metadata.GetRevisionBy(ctx, groupID, revision)
 }
 
+// createRevision creates a new revision without snapshot table or cdc table.
 func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, error) {
-	var revisionID int
-	var dummyRevision *types.Revision
-
-	if err := s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
-		_, err := tx.GetRevisionBy(ctx, opt.GroupID, 0)
-		if err != nil {
-			if !errdefs.IsNotFound(err) {
-				return err
-			}
-
-			if _, err = tx.CreateRevision(ctx, metadata.CreateRevisionOpt{
-				Revision:    0,
-				GroupID:     opt.GroupID,
-				Description: "dummy revision",
-			}); err != nil {
-				return err
-			}
-
-			dummyRevision, err = tx.GetRevisionBy(ctx, opt.GroupID, 0)
-			if err != nil {
-				return err
-			}
-		}
-
-		revisionID, err = tx.CreateRevision(ctx, opt)
-		return err
-	}); err != nil {
+	if err := s.createDummyRevisionAndTables(ctx, opt.GroupID); err != nil {
 		return 0, err
 	}
 
-	if dummyRevision != nil {
-		if err := s.createSnapshotAndCdcTable(ctx, dummyRevision); err != nil {
-			return 0, err
-		}
-	}
-
-	return revisionID, nil
+	return s.metadata.CreateRevision(ctx, opt)
 }
 
-func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revision *types.Revision) error {
+func (s *OomStore) createDummyRevisionAndTables(ctx context.Context, groupID int) error {
+	_, err := s.GetRevisionBy(ctx, groupID, 0)
+	if err == nil {
+		return nil
+	}
+	if !errdefs.IsNotFound(err) {
+		return err
+	}
+
+	revisionID, err := s.metadata.CreateRevision(ctx, metadata.CreateRevisionOpt{
+		Revision:    0,
+		GroupID:     groupID,
+		Description: "dummy revision",
+	})
+	if err != nil {
+		return err
+	}
+	return s.createSnapshotAndCdcTable(ctx, revisionID)
+}
+
+func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revisionID int) error {
+	revision, err := s.GetRevision(ctx, revisionID)
+	if err != nil {
+		return err
+	}
 	var snapshotTableName string
 	if revision.Group.Category == types.CategoryStream {
 		snapshotTableName = dbutil.OfflineStreamSnapshotTableName(revision.GroupID, revision.Revision)
