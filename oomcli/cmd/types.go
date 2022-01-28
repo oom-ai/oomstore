@@ -122,6 +122,7 @@ func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenL
 				Revision:      e.Revision,
 				Group:         e.Group.Name,
 				SnapshotTable: e.SnapshotTable,
+				CdcTable:      e.CdcTable,
 				Description:   e.Description,
 				Anchored:      e.Anchored,
 				CreateTime:    e.CreateTime,

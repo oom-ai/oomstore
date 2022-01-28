@@ -44,7 +44,7 @@ var getMetaRevisionCmd = &cobra.Command{
 
 		revisions, err := oomStore.ListRevision(ctx, groupID)
 		if err != nil {
-			exitf("failed geting revisions, error %+v\n", err)
+			exitf("failed getting revisions, error %+v\n", err)
 		}
 
 		if len(args) > 0 {
@@ -56,7 +56,7 @@ var getMetaRevisionCmd = &cobra.Command{
 		}
 
 		if err := serializeMetadata(os.Stdout, revisions, *getMetaOutput, *getMetaWide); err != nil {
-			exitf("failed printing entities, error %+v\n", err)
+			exitf("failed printing revisions, error %+v\n", err)
 		}
 	},
 }
