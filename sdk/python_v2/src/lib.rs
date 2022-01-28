@@ -27,6 +27,22 @@ impl Client {
         })
     }
 
+    #[classmethod]
+    pub fn with_embedded_oomagent<'p>(
+        _cls: &PyType,
+        py: Python<'p>,
+        bin_path: Option<String>,
+        cfg_path: Option<String>,
+    ) -> PyResult<&'p PyAny> {
+        future_into_py(py, async {
+            let inner = OomClient::with_embedded_oomagent(bin_path, cfg_path)
+                .await
+                .map_err(err_to_py)?;
+            let client = Client { inner };
+            Python::with_gil(|py| PyCell::new(py, client).map(|py_cell| py_cell.to_object(py)))
+        })
+    }
+
     pub fn health_check<'p>(&self, py: Python<'p>) -> PyResult<&'p PyAny> {
         // Don't panic, it's cheap:
         // https://github.com/hyperium/tonic/issues/285#issuecomment-595880400
