@@ -12,7 +12,7 @@ var exportOpt types.ChannelExportOpt
 
 var exportCmd = &cobra.Command{
 	Use:   "export",
-	Short: "ExportBatch historical features in a group",
+	Short: "Export historical features by group",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("limit") {
 			exportOpt.Limit = nil
