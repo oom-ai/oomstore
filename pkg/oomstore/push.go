@@ -24,6 +24,9 @@ func (s *OomStore) Push(ctx context.Context, opt types.PushOpt) error {
 
 	entity := features[0].Entity()
 	group := features[0].Group
+	if group.Category != types.CategoryStream {
+		return errdefs.Errorf("Push API is for streaming features only")
+	}
 	if !stringSliceEqual(features.Names(), featureNames) {
 		return errdefs.Errorf("FeatureNames %v does not match with group's features %v", featureNames, features.Names())
 	}
