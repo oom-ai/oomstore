@@ -34,6 +34,34 @@ func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisi
 	return s.metadata.CreateRevision(ctx, opt)
 }
 
+func (s *OomStore) createRevisionAndCdcTable(ctx context.Context, groupID int, revision int64) error {
+	features := s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
+		GroupID: &groupID,
+	})
+	entity := features[0].Entity()
+
+	if err := s.offline.CreateTable(ctx, offline.CreateTableOpt{
+		TableName:  dbutil.OfflineStreamCdcTableName(groupID, revision),
+		EntityName: entity.Name,
+		Features:   features,
+		TableType:  types.TableStreamCdc,
+	}); err != nil {
+		return err
+	}
+
+	snapshotTable := ""
+	cdcTable := dbutil.OfflineStreamCdcTableName(groupID, revision)
+	if _, err := s.createRevision(ctx, metadata.CreateRevisionOpt{
+		GroupID:       groupID,
+		Revision:      revision,
+		SnapshotTable: &snapshotTable,
+		CdcTable:      &cdcTable,
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *OomStore) createDummyRevisionAndTables(ctx context.Context, groupID int) error {
 	_, err := s.GetRevisionBy(ctx, groupID, 0)
 	if err == nil {
