@@ -38,8 +38,6 @@ Please see our [docs](https://oom.ai/docs) for more details.
 
 ## Features
 
-oomstore's edges:
-
 - 🍼 Simple. Being serverless and CLI-friendly, users can be productive in hours, not months.
 - 🔌 Composable. We support your preferred [databases of choice](https://oom.ai/docs/supported-databases).
 - ⚡ Fast. [Benchmark](https://oom.ai/docs/benchmark) shows oomstore performs QPS > 50k and latency < 0.3 ms with Redis.
@@ -51,7 +49,7 @@ oomstore's edges:
   <img src="https://oom.ai/images/architecture/architecture.svg" alt="Architecture">
 </p>
 
-You can interact with oomstore with CLI, Go API or Python API. See [Architecture](https://oom.ai/docs/architecture) for more details.
+See [Architecture](https://oom.ai/docs/architecture) for more details.
 
 ## Quickstart
 
@@ -73,7 +71,7 @@ metadata-store:
     db-file: /tmp/oomstore.db
 ```
 
-3. `oomcli apply -f config.yaml` to register metadata. See config.yaml below.
+3. `oomcli apply -f metadata.yaml` to register metadata. See metadata.yaml below.
 
 ```yaml
 kind: Entity
@@ -82,7 +80,7 @@ description: 'user ID'
 groups:
 - name: account
   category: batch
-  description: 'user account info'
+  description: 'user account'
   features:
   - name: state
     value-type: string
@@ -90,19 +88,26 @@ groups:
     value-type: int64
   - name: account_age_days
     value-type: int64
-  - name: has_2fa_installed
+  - name: 2fa_installed
     value-type: bool
-- name: transaction_stats
+- name: txn_stats
   category: batch
-  description: 'user transaction statistics'
+  description: 'user txn stats'
   features:
-  - name: transaction_count_7d
+  - name: count_7d
     value-type: int64
-  - name: transaction_count_30d
+  - name: count_30d
+    value-type: int64
+- name: recent_txn_stats
+  category: stream
+  snapshot-interval: 24h
+  description: 'user recent txn stats'
+  features:
+  - name: count_10min
     value-type: int64
 ```
 
-4. Import CSV data to Offline Store.
+4. Import CSV data to Offline Store, then sync from Offline to Online Store
 
 ```bash
 oomcli import \
@@ -110,16 +115,17 @@ oomcli import \
   --input-file account.csv \
   --description 'sample account data'
 oomcli import \
-  --group transaction_stats \
-  --input-file transaction_stats.csv \
-  --description 'sample transaction stat data'
+  --group txn_stats \
+  --input-file txn_stats.csv \
+  --description 'sample txn stats data'
+oomcli sync --group-name account --revision-id 2
+oomcli sync --group-name txn_stats --revision-id 4
 ```
 
-5. Sync data from Offline Store to Online Store.
+5. Push stream data to both Online and Offline Store.
 
 ```bash
-oomcli sync --revision-id 1
-oomcli sync --revision-id 2
+oomcli push --group recent_txn_stats --entity-key 1006 --feature count_10min=1
 ```
 
 6. Fetch features by key.
@@ -127,39 +133,39 @@ oomcli sync --revision-id 2
 ```bash
 oomcli get online \
   --entity-key 1006 \
-  --feature account.state,account.credit_score,account.account_age_days,account.has_2fa_installed,transaction_stats.transaction_count_7d,transaction_stats.transaction_count_30d
+  --feature account.state,account.credit_score,account.account_age_days,account.2fa_installed,txn_stats.count_7d,txn_stats.count_30d,recent_txn_stats.count_10min
 ```
 
 ```text
-+------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
-| user | account.state | account.credit_score | account.account_age_days | account.has_2fa_installed | transaction_stats.transaction_count_7d | transaction_stats.transaction_count_30d |
-+------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
-| 1006 | Louisiana     |                  710 |                       32 | false                     |                                      8 |                                      22 |
-+------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
++------+---------------+----------------------+--------------------------+-----------------------+--------------------+---------------------+------------------------------+
+| user | account.state | account.credit_score | account.account_age_days | account.2fa_installed | txn_stats.count_7d | txn_stats.count_30d | recent_txn_stats.count_10min |
++------+---------------+----------------------+--------------------------+-----------------------+--------------------+---------------------+------------------------------+
+| 1006 | Louisiana     |                  710 |                       32 | false                 |                  8 |                  22 |                            1 |
++------+---------------+----------------------+--------------------------+-----------------------+--------------------+---------------------+------------------------------+
 ```
 
-7. Generate training datasets via point-in-time join.
+7. Generate training datasets via Point-in-Time Join.
 
 ```sh
 oomcli join \
-	--feature account.state,account.credit_score,account.account_age_days,account.has_2fa_installed,transaction_stats.transaction_count_7d,transaction_stats.transaction_count_30d \
+	--feature account.state,account.credit_score,account.account_age_days,account.2fa_installed,txn_stats.count_7d,txn_stats.count_30d,recent_txn_stats.count_10min \
 	--input-file label.csv
 ```
 
 ```text
-+------------+------------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
-| entity_key | unix_milli | account.state | account.credit_score | account.account_age_days | account.has_2fa_installed | transaction_stats.transaction_count_7d | transaction_stats.transaction_count_30d |
-+------------+------------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
-|       1002 | 1950236233 | Hawaii        |                  625 |                      861 | true                      |                                     11 |                                      36 |
-|       1003 | 1950411318 | Arkansas      |                  730 |                      958 | false                     |                                      0 |                                      16 |
-|       1004 | 1950653614 | Louisiana     |                  610 |                     1570 | false                     |                                     12 |                                      26 |
-|       1005 | 1950166137 | South Dakota  |                  635 |                     1953 | false                     |                                      7 |                                      30 |
-|       1006 | 1950403162 | Louisiana     |                  710 |                       32 | false                     |                                      8 |                                      22 |
-|       1007 | 1950160030 | New Mexico    |                  645 |                       37 | true                      |                                      5 |                                      40 |
-|       1008 | 1950274859 | Nevada        |                  735 |                     1627 | false                     |                                     12 |                                      51 |
-|       1009 | 1949958846 | Kentucky      |                  650 |                       88 | true                      |                                     11 |                                      23 |
-|       1010 | 1949920686 | Delaware      |                  680 |                     1687 | false                     |                                      2 |                                      39 |
-+------------+------------+---------------+----------------------+--------------------------+---------------------------+----------------------------------------+-----------------------------------------+
++------------+---------------+---------------+----------------------+--------------------------+-----------------------+--------------------+---------------------+------------------------------+
+| entity_key |  unix_milli   | account.state | account.credit_score | account.account_age_days | account.2fa_installed | txn_stats.count_7d | txn_stats.count_30d | recent_txn_stats.count_10min |
++------------+---------------+---------------+----------------------+--------------------------+-----------------------+--------------------+---------------------+------------------------------+
+|       1002 | 1950236233000 | Hawaii        |                  625 |                      861 | true                  |                 11 |                  36 |                              |
+|       1003 | 1950411318000 | Arkansas      |                  730 |                      958 | false                 |                  0 |                  16 |                              |
+|       1004 | 1950653614000 | Louisiana     |                  610 |                     1570 | false                 |                 12 |                  26 |                              |
+|       1005 | 1950166137000 | South Dakota  |                  635 |                     1953 | false                 |                  7 |                  30 |                              |
+|       1006 | 1950403162000 | Louisiana     |                  710 |                       32 | false                 |                  8 |                  22 |                            1 |
+|       1007 | 1950160030000 | New Mexico    |                  645 |                       37 | true                  |                  5 |                  40 |                              |
+|       1008 | 1950274859000 | Nevada        |                  735 |                     1627 | false                 |                 12 |                  51 |                              |
+|       1009 | 1949958846000 | Kentucky      |                  650 |                       88 | true                  |                 11 |                  23 |                              |
+|       1010 | 1949920686000 | Delaware      |                  680 |                     1687 | false                 |                  2 |                  39 |                              |
++------------+---------------+---------------+----------------------+--------------------------+-----------------------+--------------------+---------------------+------------------------------+
 ```
 
 See [Quickstart](https://oom.ai/docs/quickstart) for more complete details.
@@ -196,4 +202,4 @@ See [Quickstart](https://oom.ai/docs/quickstart) for more complete details.
 
 ## Community
 
-Feel free to [join the community](https://oom.ai/slack) for questions and requests!
+Feel free to [join the community](https://oom.ai/docs/community) for questions and feature requests!
