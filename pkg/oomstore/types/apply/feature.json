@@ -1,12 +1,13 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "$title": "apply feature json schema",
     "description": "apply feature json schema",
     "type": "object",
     "properties": {
         "kind": {
-            "description": "must be Feature",
-            "enum": ["Feature"]
+            "description": "must equal Feature",
+            "type": "string",
+            "const": "Feature"
         },
         "name": {
             "description": "name of the feature",
