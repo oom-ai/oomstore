@@ -8,9 +8,9 @@ import (
 
 var snapshotGroupName string
 var snapshotCmd = &cobra.Command{
-	Use:   "snapshot",
+	Use:   "snapshot [group_name]",
 	Short: "Generate snapshots for the group",
-	Args:  cobra.RangeArgs(0, 1),
+	Args:  cobra.MaximumNArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if len(args) == 1 {
 			snapshotGroupName = args[0]

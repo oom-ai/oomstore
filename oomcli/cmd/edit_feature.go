@@ -17,8 +17,9 @@ type editFeatureOption struct {
 var editFeatureOpt editFeatureOption
 
 var editFeatureCmd = &cobra.Command{
-	Use:   "feature",
+	Use:   "feature [feature_name]",
 	Short: "Edit feature resources",
+	Args:  cobra.MaximumNArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if !cmd.Flags().Changed("entity") {
 			editFeatureOpt.EntityName = nil
@@ -27,12 +28,9 @@ var editFeatureCmd = &cobra.Command{
 			editFeatureOpt.GroupName = nil
 		}
 
-		if len(args) > 1 {
-			exitf("argument at most one, got %d", len(args))
-		} else if len(args) == 1 {
+		if len(args) == 1 {
 			editFeatureOpt.FeatureNames = &[]string{args[0]}
 		}
-
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()

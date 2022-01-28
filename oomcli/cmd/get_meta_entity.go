@@ -19,12 +19,11 @@ type getMetaEntityOption struct {
 var getMetaEntityOpt getMetaEntityOption
 
 var getMetaEntityCmd = &cobra.Command{
-	Use:   "entity",
+	Use:   "entity [entity_name]",
 	Short: "Get existing entity given specific conditions",
+	Args:  cobra.MaximumNArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
-		if len(args) > 1 {
-			exitf("argument at most one, got %d", len(args))
-		} else if len(args) == 1 {
+		if len(args) == 1 {
 			getMetaEntityOpt.entityName = &args[0]
 		}
 	},
