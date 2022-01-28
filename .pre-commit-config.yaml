@@ -36,6 +36,5 @@ repos:
         always_run: true
         entry: >
           sh -c '
-            make codegen &&
-            git add oomagent/codegen sdk/python/src/oomstore/codegen
+            make codegen && git add oomagent/codegen
           '
