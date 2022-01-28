@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"io"
-	"os"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 
@@ -22,41 +21,14 @@ const (
 	ImportStreamBatchSize = 100
 )
 
-func (s *OomStore) ImportStream(ctx context.Context, opt types.ImportStreamOpt) error {
-	switch opt.DataSourceType {
-	case types.CSV_FILE:
-		src := opt.CsvFileDataSource
-		file, err := os.Open(src.InputFilePath)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		return s.csvReaderImportStream(ctx, opt, &types.CsvReaderDataSource{
-			Reader:    file,
-			Delimiter: src.Delimiter,
-		})
-	case types.CSV_READER:
-		return s.csvReaderImportStream(ctx, opt, opt.CsvReaderDataSource)
-	case types.TABLE_LINK:
-		return s.tableLinkImportStream(ctx, opt, opt.TableLinkDataSource)
-	default:
-		return errdefs.Errorf("unsupported data source: %v", opt.DataSourceType)
-	}
-}
-
-func (s *OomStore) csvReaderImportStream(ctx context.Context, opt types.ImportStreamOpt, dataSource *types.CsvReaderDataSource) error {
-	// get group information
-	entity, group, features, err := s.getGroupInfo(ctx, opt.GroupName)
-	if err != nil {
-		return err
-	}
+func (s *OomStore) csvReaderImportStream(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) error {
 	// read header
 	reader := bufio.NewReader(dataSource.Reader)
 	source := &offline.CSVSource{
 		Reader:    reader,
 		Delimiter: dataSource.Delimiter,
 	}
-	columnNames := append([]string{entity.Name, "unix_milli"}, features.Names()...)
+	columnNames := append([]string{opt.entityName, "unix_milli"}, opt.features.Names()...)
 	header, err := readHeader(source, columnNames)
 	if err != nil {
 		return err
@@ -67,9 +39,9 @@ func (s *OomStore) csvReaderImportStream(ctx context.Context, opt types.ImportSt
 	for {
 		line, err := dbutil.ReadLine(dbutil.ReadLineOpt{
 			Source:     source,
-			EntityName: entity.Name,
+			EntityName: opt.entityName,
 			Header:     header,
-			Features:   features,
+			Features:   opt.features,
 		})
 		if errdefs.Cause(err) == io.EOF {
 			break
@@ -80,23 +52,18 @@ func (s *OomStore) csvReaderImportStream(ctx context.Context, opt types.ImportSt
 		if len(line) != len(header) {
 			continue
 		}
-		records = append(records, generateStreamRecord(line, header, group, features))
+		records = append(records, generateStreamRecord(line, header, opt.group, opt.features))
 		if len(records) == ImportStreamBatchSize {
-			if err := s.pushStreamingRecords(ctx, records, entity.Name, group, features); err != nil {
+			if err := s.pushStreamingRecords(ctx, records, opt.entityName, opt.group, opt.features); err != nil {
 				return err
 			}
 			records = make([]types.StreamRecord, 0, ImportStreamBatchSize)
 		}
 	}
-	return s.pushStreamingRecords(ctx, records, entity.Name, group, features)
+	return s.pushStreamingRecords(ctx, records, opt.entityName, opt.group, opt.features)
 }
 
-func (s *OomStore) tableLinkImportStream(ctx context.Context, opt types.ImportStreamOpt, dataSource *types.TableLinkDataSource) error {
-	// get group information
-	_, group, features, err := s.getGroupInfo(ctx, opt.GroupName)
-	if err != nil {
-		return err
-	}
+func (s *OomStore) tableLinkImportStream(ctx context.Context, opt *importOpt, dataSource *types.TableLinkDataSource) error {
 	// get linked table schema
 	tableSchema, err := s.offline.TableSchema(ctx, offline.TableSchemaOpt{
 		TableName:      dataSource.TableName,
@@ -106,16 +73,16 @@ func (s *OomStore) tableLinkImportStream(ctx context.Context, opt types.ImportSt
 		return err
 	}
 	// validation
-	if err = validateTableSchema(tableSchema, features); err != nil {
+	if err = validateTableSchema(tableSchema, opt.features); err != nil {
 		return err
 	}
-	if err = s.validateRevisions(ctx, group.ID, tableSchema); err != nil {
+	if err = s.validateRevisions(ctx, opt.group.ID, tableSchema); err != nil {
 		return err
 	}
 
 	_, err = s.createRevision(ctx, metadata.CreateRevisionOpt{
 		Revision:    *tableSchema.TimeRange.MinUnixMilli,
-		GroupID:     group.ID,
+		GroupID:     opt.group.ID,
 		CdcTable:    &dataSource.TableName,
 		Description: opt.Description,
 		Anchored:    true,

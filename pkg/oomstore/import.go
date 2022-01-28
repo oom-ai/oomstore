@@ -1,10 +1,8 @@
 package oomstore
 
 import (
-	"bufio"
 	"context"
 	"os"
-	"time"
 
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/spf13/cast"
@@ -15,8 +13,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-// Import data into the offline feature store as a new revision.
-// In the future we want to support more diverse data sources.
+// Import data into the offline feature store
 func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
 	importOpt, err := s.parseImportOpt(ctx, opt)
 	if err != nil {
@@ -30,101 +27,66 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 			return 0, err
 		}
 		defer file.Close()
-		return s.csvReaderImport(ctx, importOpt, &types.CsvReaderDataSource{
+		source := &types.CsvReaderDataSource{
 			Reader:    file,
 			Delimiter: src.Delimiter,
-		})
+		}
+		if importOpt.group.Category == types.CategoryStream {
+			return 0, s.csvReaderImportStream(ctx, importOpt, source)
+		} else {
+			return s.csvReaderImportBatch(ctx, importOpt, source)
+		}
 	case types.CSV_READER:
-		return s.csvReaderImport(ctx, importOpt, opt.CsvReaderDataSource)
+		if importOpt.group.Category == types.CategoryStream {
+			return 0, s.csvReaderImportStream(ctx, importOpt, opt.CsvReaderDataSource)
+		} else {
+			return s.csvReaderImportBatch(ctx, importOpt, opt.CsvReaderDataSource)
+		}
 	case types.TABLE_LINK:
-		return s.tableLinkImport(ctx, importOpt, opt.TableLinkDataSource)
+		if importOpt.group.Category == types.CategoryStream {
+			return 0, s.tableLinkImportStream(ctx, importOpt, opt.TableLinkDataSource)
+		} else {
+			return s.tableLinkImportBatch(ctx, importOpt, opt.TableLinkDataSource)
+		}
 	default:
 		return 0, errdefs.Errorf("unsupported data source: %v", opt.DataSourceType)
 	}
 }
 
-func (s *OomStore) csvReaderImport(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) (int, error) {
-	//make sure csv data source has all defined columns
-	reader := bufio.NewReader(dataSource.Reader)
-	source := &offline.CSVSource{
-		Reader:    reader,
-		Delimiter: dataSource.Delimiter,
-	}
-	// read header
-	columnNames := append([]string{opt.entityName}, opt.features.Names()...)
-	header, err := readHeader(source, columnNames)
-	if err != nil {
-		return 0, err
-	}
-
-	newRevisionID, err := s.createRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:      time.Now().UnixMilli(),
-		GroupID:       opt.group.ID,
-		SnapshotTable: nil,
-		Description:   opt.Description,
-		Anchored:      opt.Revision != nil,
-	})
-	if err != nil {
-		return 0, err
-	}
-	snapshotTableName := dbutil.OfflineBatchSnapshotTableName(opt.group.ID, int64(newRevisionID))
-	revision, err := s.offline.Import(ctx, offline.ImportOpt{
-		EntityName:        opt.entityName,
-		Features:          opt.features,
-		Header:            cast.ToStringSlice(header),
-		Revision:          opt.Revision,
-		SnapshotTableName: snapshotTableName,
-		Source:            source,
-	})
-	if err != nil {
-		return 0, err
-	}
-
-	if opt.Revision != nil {
-		revision = *opt.Revision
-	}
-	if err = s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
-		RevisionID:       newRevisionID,
-		NewRevision:      &revision,
-		NewSnapshotTable: &snapshotTableName,
-	}); err != nil {
-		return 0, err
-	}
-
-	// TODO: clean up revision and data_table if import failed
-
-	return newRevisionID, nil
+type importOpt struct {
+	*types.ImportOpt
+	entityName string
+	group      *types.Group
+	features   types.FeatureList
 }
 
-func (s *OomStore) tableLinkImport(ctx context.Context, opt *importOpt, dataSource *types.TableLinkDataSource) (int, error) {
-	// Make sure all features existing with correct value type
-	tableSchema, err := s.offline.TableSchema(ctx, offline.TableSchemaOpt{
-		TableName: dataSource.TableName,
-	})
+func (s *OomStore) parseImportOpt(ctx context.Context, opt types.ImportOpt) (*importOpt, error) {
+	group, err := s.metadata.GetGroupByName(ctx, opt.GroupName)
 	if err != nil {
-		return 0, err
-	}
-	if err = validateTableSchema(tableSchema, opt.features); err != nil {
-		return 0, err
-	}
-	var revision int64
-	if opt.Revision == nil {
-		revision = time.Now().UnixMilli()
-	} else {
-		revision = *opt.Revision
-	}
-	newRevisionID, err := s.createRevision(ctx, metadata.CreateRevisionOpt{
-		Revision:      revision,
-		GroupID:       opt.group.ID,
-		SnapshotTable: &dataSource.TableName,
-		Description:   opt.Description,
-		Anchored:      opt.Revision != nil,
-	})
-	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return newRevisionID, nil
+	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
+		GroupID: &group.ID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if features == nil {
+		err = errdefs.Errorf("no features under group: %s", opt.GroupName)
+		return nil, err
+	}
+
+	entity := group.Entity
+	if entity == nil {
+		return nil, errdefs.Errorf("no entity found by group: %s", opt.GroupName)
+	}
+	return &importOpt{
+		ImportOpt:  &opt,
+		entityName: entity.Name,
+		group:      group,
+		features:   features,
+	}, nil
 }
 
 func validateTableSchema(schema *types.DataTableSchema, features types.FeatureList) error {
@@ -146,6 +108,7 @@ func validateTableSchema(schema *types.DataTableSchema, features types.FeatureLi
 	}
 	return nil
 }
+
 func hasDup(a []string) bool {
 	s := make(map[string]bool)
 	for _, e := range a {
@@ -192,48 +155,4 @@ func stringSliceEqual(a, b []string) bool {
 		}
 	}
 	return true
-}
-
-func (s *OomStore) parseImportOpt(ctx context.Context, opt types.ImportOpt) (*importOpt, error) {
-	entity, group, features, err := s.getGroupInfo(ctx, opt.GroupName)
-	if err != nil {
-		return nil, err
-	}
-	return &importOpt{
-		ImportOpt:  &opt,
-		entityName: entity.Name,
-		group:      group,
-		features:   features,
-	}, nil
-}
-
-func (s *OomStore) getGroupInfo(ctx context.Context, groupName string) (*types.Entity, *types.Group, types.FeatureList, error) {
-	group, err := s.metadata.GetGroupByName(ctx, groupName)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
-		GroupID: &group.ID,
-	})
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	if features == nil {
-		err = errdefs.Errorf("no features under group: %s", groupName)
-		return nil, nil, nil, err
-	}
-
-	entity := group.Entity
-	if entity == nil {
-		return nil, nil, nil, errdefs.Errorf("no entity found by group: %s", groupName)
-	}
-	return entity, group, features, nil
-}
-
-type importOpt struct {
-	*types.ImportOpt
-	entityName string
-	group      *types.Group
-	features   types.FeatureList
 }
