@@ -6,4 +6,24 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "someone star!"
+      # uncomment below to view payload
+      # - uses: hmarr/debug-action@v2
+      - name: Send data to Slack workflow
+        id: slack
+        uses: slackapi/slack-github-action@v1.18.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "⭐ ${{github.event.repository.stargazers_count}} by <${{github.event.sender.html_url}}|${{github.event.sender.login}}>!"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_COMMUNITY_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
