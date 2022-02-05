@@ -1,0 +1,9 @@
+name: starbot
+on:
+  watch:
+    types: [started]
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "someone star!"
