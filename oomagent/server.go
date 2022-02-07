@@ -195,10 +195,13 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 	// We need to read the first request to get the feature names and value names
 	firstReq, err := stream.Recv()
 	if err != nil {
+		if err == io.EOF {
+			return status.Error(codes.InvalidArgument, "invalid request: empty feature")
+		}
 		return wrapErr(err)
 	}
 	if firstReq.GetEntityRow() == nil {
-		return wrapErr(err)
+		return nil
 	}
 
 	// This channel receives requests from the client.

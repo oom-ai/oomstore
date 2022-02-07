@@ -102,6 +102,35 @@ ERROR:
 EOF
 )
   assert_eq "$case" "$expected" "$actual"
+
+  case="empty entity rows"
+  arg=$(cat <<-EOF
+{
+  "join_features": [
+    "driver_stats.conv_rate"
+  ]
+}
+EOF
+)
+  actual=$(testgrpc ChannelJoin <<<"$arg" 2>&1 || flag=true)
+  expected=$(cat <<-EOF
+EOF
+)
+  assert_eq "$case" "$expected" "$actual"
+
+
+   case="invalid request"
+  arg=$(cat <<-EOF
+EOF
+)
+  actual=$(testgrpc ChannelJoin <<<"$arg" 2>&1 || flag=true)
+  expected=$(cat <<-EOF
+ERROR:
+  Code: InvalidArgument
+  Message: invalid request: empty feature
+EOF
+)
+  assert_eq "$case" "$expected" "$actual"
 }
 
 main() {
