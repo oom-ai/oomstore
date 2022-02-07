@@ -224,6 +224,7 @@ func insertEntityRows(ctx context.Context,
 	if dbOpt.Backend == types.BackendBigQuery {
 		format = `"%s"`
 	}
+
 	for entityRow := range entityRows {
 		record := []interface{}{fmt.Sprintf(format, entityRow.EntityKey), entityRow.UnixMilli}
 		for _, v := range entityRow.Values {
@@ -231,17 +232,13 @@ func insertEntityRows(ctx context.Context,
 		}
 		records = append(records, record)
 		if len(records) == InsertBatchSize {
-
 			if err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, records, columns); err != nil {
 				return err
 			}
 			records = make([]interface{}, 0, InsertBatchSize)
 		}
 	}
-	if err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, records, columns); err != nil {
-		return err
-	}
-	return nil
+	return dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, records, columns)
 }
 
 func dropTemporaryTables(ctx context.Context, db *sqlx.DB, tableNames []string) error {
