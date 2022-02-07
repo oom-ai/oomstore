@@ -36,11 +36,11 @@ var allValueTypeStrings = map[string]ValueType{
 	"bytes":   Bytes,
 }
 
-func (t ValueType) String() string {
-	if s, ok := allValueTypes[t]; ok {
+func (v ValueType) String() string {
+	if s, ok := allValueTypes[v]; ok {
 		return s
 	} else {
-		return "Unknown(" + strconv.Itoa(int(t)) + ")"
+		return "Unknown(" + strconv.Itoa(int(v)) + ")"
 	}
 }
 
