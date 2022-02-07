@@ -38,15 +38,21 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 
 	featureMap := groupFeaturesByGroupID(features)
 
-	for _, featureList := range featureMap {
-		if len(featureList) == 0 {
+	for _, features := range featureMap {
+		if len(features) == 0 {
 			continue
 		}
+
+		group := features[0].Group
+		if group.Category == types.CategoryBatch && group.OnlineRevisionID == nil {
+			return nil, errdefs.Errorf("group %s has nil,please make sure you have already sync", group.Name)
+		}
+
 		featureValues, err := s.online.Get(ctx, online.GetOpt{
 			EntityKey:  opt.EntityKey,
-			Group:      *featureList[0].Group,
-			Features:   featureList,
-			RevisionID: featureList[0].Group.OnlineRevisionID,
+			Group:      *group,
+			Features:   features,
+			RevisionID: group.OnlineRevisionID,
 		})
 		if err != nil {
 			return nil, err
@@ -108,11 +114,17 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 		if len(features) == 0 {
 			continue
 		}
+
+		group := features[0].Group
+		if group.Category == types.CategoryBatch && group.OnlineRevisionID == nil {
+			return nil, errdefs.Errorf("group %s has nil,please make sure you have already sync", group.Name)
+		}
+
 		featureValues, err := s.online.MultiGet(ctx, online.MultiGetOpt{
 			EntityKeys: entityKeys,
-			Group:      *features[0].Group,
+			Group:      *group,
 			Features:   features,
-			RevisionID: features[0].Group.OnlineRevisionID,
+			RevisionID: group.OnlineRevisionID,
 		})
 		if err != nil {
 			return nil, err
