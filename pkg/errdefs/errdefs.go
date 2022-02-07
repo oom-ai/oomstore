@@ -1,6 +1,7 @@
 package errdefs
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -36,4 +37,8 @@ func InvalidAttribute(err error) error {
 		return err
 	}
 	return errInvalidAttribute{err}
+}
+
+func Is(err, target error) bool {
+	return errors.Is(err, target)
 }
