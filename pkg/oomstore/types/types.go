@@ -29,6 +29,7 @@ type EntityRow struct {
 	EntityKey string
 	UnixMilli int64
 	Values    []string
+	Error     error
 }
 
 type JoinResult struct {
