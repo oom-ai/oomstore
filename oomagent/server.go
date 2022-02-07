@@ -189,26 +189,31 @@ func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codeg
 }
 
 func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	// We need to read the first request to get the feature names and value names
 	firstReq, err := stream.Recv()
 	if err != nil {
-		return internalError(err.Error())
+		return wrapErr(err)
 	}
-
-	// A global error
-	var globalErr error
-
-	// This channel indicates when the the ChannelJoin oomstore operation is finished, whether succeeded or failed.
-	done := make(chan struct{}, 1)
+	if firstReq.GetEntityRow() == nil {
+		return wrapErr(err)
+	}
 
 	// This channel receives requests from the client.
 	entityRows := make(chan types.EntityRow, 1)
+	// A global error
+	var globalErr error
 
 	go func() {
-		defer func() {
-			close(entityRows)
-		}()
+		defer close(entityRows)
 
+		entityRows <- types.EntityRow{
+			EntityKey: firstReq.EntityRow.EntityKey,
+			UnixMilli: firstReq.EntityRow.UnixMilli,
+			Values:    firstReq.EntityRow.Values,
+		}
 		for {
 			req, err := stream.Recv()
 			if err == io.EOF {
@@ -218,67 +223,54 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 				globalErr = err
 				return
 			}
-			if globalErr != nil {
-				return
-			}
 			if req.GetEntityRow() == nil {
-				globalErr = errdefs.Errorf("cannot process nil entity row")
+				globalErr = internalError("cannot process nil entity row")
 				return
 			}
 
 			select {
-			case <-done:
+			case entityRows <- types.EntityRow{
+				EntityKey: req.EntityRow.EntityKey,
+				UnixMilli: req.EntityRow.UnixMilli,
+				Values:    req.EntityRow.Values,
+			}:
+				// nothing todo
+			case <-ctx.Done():
 				return
-			default:
-				entityRows <- types.EntityRow{
-					EntityKey: req.EntityRow.EntityKey,
-					UnixMilli: req.EntityRow.UnixMilli,
-					Values:    req.EntityRow.Values,
-				}
 			}
 		}
 	}()
 
-	// DO NOT move it before the goroutine starts,
-	// otherwise it blocks since the channel `entityRows` is not being consumed
-	entityRows <- types.EntityRow{
-		EntityKey: firstReq.EntityRow.EntityKey,
-		UnixMilli: firstReq.EntityRow.UnixMilli,
-		Values:    firstReq.EntityRow.Values,
-	}
-
 	// This goroutine runs the join operation, and send whatever joined as the response
-	joinResult, err := s.oomstore.ChannelJoin(context.Background(), types.ChannelJoinOpt{
+	joinResult, err := s.oomstore.ChannelJoin(ctx, types.ChannelJoinOpt{
 		JoinFeatureNames:    firstReq.JoinFeatures,
 		EntityRows:          entityRows,
 		ExistedFeatureNames: firstReq.ExistedFeatures,
 	})
 	if err != nil {
-		globalErr = err
-	} else {
-		header := joinResult.Header
-		for row := range joinResult.Data {
-			joinedRow, err := convertJoinedRow(row)
-			if err != nil {
-				globalErr = err
-				break
-			}
-			resp := &codegen.ChannelJoinResponse{
-				Header:    header,
-				JoinedRow: joinedRow,
-			}
-			if err = stream.Send(resp); err != nil {
-				globalErr = err
-				break
-			}
-			// Only need to send header upon the first response
-			header = nil
+		if errdefs.Is(err, context.Canceled) {
+			return wrapErr(globalErr)
 		}
+		return wrapErr(err)
 	}
 
-	// send a notification to the data receiving goroutine that ChannelJoin has done
-	done <- struct{}{}
-	return globalErr
+	header := joinResult.Header
+	for row := range joinResult.Data {
+		joinedRow, err := convertJoinedRow(row)
+		if err != nil {
+			return wrapErr(err)
+		}
+		resp := &codegen.ChannelJoinResponse{
+			Header:    header,
+			JoinedRow: joinedRow,
+		}
+		if err = stream.Send(resp); err != nil {
+			return wrapErr(err)
+		}
+		// Only need to send header upon the first response
+		header = nil
+	}
+	return wrapErr(globalErr)
 }
 
 func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.JoinResponse, error) {
@@ -457,4 +449,11 @@ func convertValueToInterface(i *codegen.Value) interface{} {
 
 func internalError(msg string) error {
 	return status.Errorf(codes.Internal, msg)
+}
+
+func wrapErr(err error) error {
+	if err == nil {
+		return nil
+	}
+	return status.Errorf(codes.Internal, err.Error())
 }
