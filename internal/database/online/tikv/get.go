@@ -16,6 +16,10 @@ type input struct {
 }
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
 	// Proxy to MultiGet
 	res, err := db.MultiGet(ctx, online.MultiGetOpt{
 		EntityKeys: []string{opt.EntityKey},
