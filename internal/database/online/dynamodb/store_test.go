@@ -49,6 +49,10 @@ func TestGetExisted(t *testing.T) {
 	test_impl.TestGetExisted(t, prepareStore, destroyStore(t))
 }
 
+func TestGetNoRevision(t *testing.T) {
+	test_impl.TestGetNoRevision(t, prepareStore, destroyStore(t))
+}
+
 func TestGetNotExistedEntityKey(t *testing.T) {
 	test_impl.TestGetNotExistedEntityKey(t, prepareStore, destroyStore(t))
 }

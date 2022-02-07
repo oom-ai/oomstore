@@ -11,6 +11,10 @@ import (
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
 	var (
 		key string
 		err error
@@ -55,6 +59,10 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
 	res := make(map[string]dbutil.RowMap)
 	for _, entityKey := range opt.EntityKeys {
 		rowMap, err := db.Get(ctx, online.GetOpt{

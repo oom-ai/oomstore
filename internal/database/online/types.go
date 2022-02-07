@@ -1,21 +1,40 @@
 package online
 
 import (
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 type GetOpt struct {
-	EntityKey  string
-	Group      types.Group
-	Features   types.FeatureList
+	EntityKey string
+	Group     types.Group
+	Features  types.FeatureList
+
+	// Only works when get batch features, it should be nil when get stream features
 	RevisionID *int
+}
+
+func (g *GetOpt) Validate() error {
+	if g.Group.Category == types.CategoryBatch && g.RevisionID == nil {
+		return errdefs.Errorf("invalid GetOpt: the revisionID of get batch feature cannot be null")
+	}
+	return nil
 }
 
 type MultiGetOpt struct {
 	EntityKeys []string
 	Group      types.Group
 	Features   types.FeatureList
+
+	// Only works when get batch features, it should be nil when get stream features
 	RevisionID *int
+}
+
+func (m *MultiGetOpt) Validate() error {
+	if m.Group.Category == types.CategoryBatch && m.RevisionID == nil {
+		return errdefs.Errorf("invalid MultiGetOpt: the revisionID of get batch feature cannot be null")
+	}
+	return nil
 }
 
 type ImportOpt struct {

@@ -3,10 +3,9 @@ package test_impl
 import (
 	"testing"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/stretchr/testify/require"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
@@ -19,12 +18,10 @@ func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn, destroyStore Dest
 
 		for _, target := range s.Data {
 			opt := online.GetOpt{
-				EntityKey: target.EntityKey(),
-				Group:     s.Group,
-				Features:  s.Features,
-			}
-			if s.Group.Category == types.CategoryBatch {
-				opt.RevisionID = &s.Revision.ID
+				EntityKey:  target.EntityKey(),
+				Group:      s.Group,
+				Features:   s.Features,
+				RevisionID: &s.Revision.ID,
 			}
 			rs, err := store.Get(ctx, opt)
 			require.NoError(t, err)
@@ -34,6 +31,40 @@ func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn, destroyStore Dest
 			}
 		}
 	}
+}
+
+func TestGetNoRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	t.Run("get", func(t *testing.T) {
+		rs, err := store.Get(ctx, online.GetOpt{
+			EntityKey: SampleSmall.Entity.Name,
+			Group:     SampleSmall.Group,
+			Features:  SampleSmall.Features,
+		})
+		require.EqualError(t, err, "invalid GetOpt: the revisionID of get batch feature cannot be null")
+		require.Nil(t, rs)
+	})
+
+	t.Run("multi get", func(t *testing.T) {
+		for _, s := range []*Sample{&SampleSmall, &SampleMedium} {
+			keys := []string{"not-existed-key"}
+			for _, r := range s.Data {
+				keys = append(keys, r.EntityKey())
+			}
+			rs, err := store.MultiGet(ctx, online.MultiGetOpt{
+				EntityKeys: keys,
+				Group:      s.Group,
+				Features:   s.Features,
+			})
+			require.EqualError(t, err, "invalid MultiGetOpt: the revisionID of get batch feature cannot be null")
+			require.Nil(t, rs)
+		}
+
+	})
+
 }
 
 func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreFn, destroystore DestroyStoreFn) {

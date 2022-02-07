@@ -37,6 +37,10 @@ func TestGetExisted(t *testing.T) {
 	test_impl.TestGetExisted(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }
 
+func TestGetNoRevision(t *testing.T) {
+	test_impl.TestGetNoRevision(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
+}
+
 func TestGetNotExistedEntityKey(t *testing.T) {
 	test_impl.TestGetNotExistedEntityKey(t, prepareStore, runtime_pg.DestroyStore(DATABASE))
 }

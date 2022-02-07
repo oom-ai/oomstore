@@ -35,10 +35,9 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		FeatureValues: []interface{}{int64(1)},
 	}))
 	rs, err := store.Get(ctx, online.GetOpt{
-		EntityKey:  "user1",
-		Group:      group,
-		Features:   types.FeatureList{feature1},
-		RevisionID: nil,
+		EntityKey: "user1",
+		Group:     group,
+		Features:  types.FeatureList{feature1},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{
@@ -53,10 +52,9 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		FeatureValues: []interface{}{int64(2)},
 	}))
 	rs, err = store.Get(ctx, online.GetOpt{
-		EntityKey:  "user1",
-		Group:      group,
-		Features:   types.FeatureList{feature1},
-		RevisionID: nil,
+		EntityKey: "user1",
+		Group:     group,
+		Features:  types.FeatureList{feature1},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{
@@ -71,10 +69,9 @@ func TestPush(t *testing.T, prepareStore PrepareStoreFn, destoryStore DestroySto
 		FeatureValues: []interface{}{int64(3), "post2"},
 	}))
 	rs, err = store.Get(ctx, online.GetOpt{
-		EntityKey:  "user1",
-		Group:      group,
-		Features:   types.FeatureList{feature1, feature2},
-		RevisionID: nil,
+		EntityKey: "user1",
+		Group:     group,
+		Features:  types.FeatureList{feature1, feature2},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{

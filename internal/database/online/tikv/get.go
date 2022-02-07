@@ -34,6 +34,10 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 }
 
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
 	var (
 		serializedPrefixKey string
 		err                 error

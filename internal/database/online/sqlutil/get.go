@@ -14,6 +14,10 @@ import (
 )
 
 func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.BackendType) (dbutil.RowMap, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
 	var tableName string
 	if opt.Group.Category == types.CategoryBatch {
 		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
@@ -43,6 +47,10 @@ func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.Back
 
 // response: map[entity_key]map[feature_name]feature_value
 func MultiGet(ctx context.Context, db *sqlx.DB, opt online.MultiGetOpt, backend types.BackendType) (map[string]dbutil.RowMap, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
 	var tableName string
 	if opt.Group.Category == types.CategoryBatch {
 		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
@@ -53,14 +61,16 @@ func MultiGet(ctx context.Context, db *sqlx.DB, opt online.MultiGetOpt, backend 
 	entityName := opt.Group.Entity.Name
 	featureNames := opt.Features.Names()
 	qt := dbutil.QuoteFn(backend)
-	query := fmt.Sprintf(`SELECT %s, %s FROM %s WHERE %s in (?);`, qt(entityName), qt(featureNames...), qt(tableName), qt(entityName))
-	sql, args, err := sqlx.In(query, opt.EntityKeys)
+	query, args, err := sqlx.In(fmt.Sprintf(`SELECT %s, %s FROM %s WHERE %s in (?);`, qt(entityName), qt(featureNames...), qt(tableName), qt(entityName)), opt.EntityKeys)
 	if err != nil {
 		return nil, errdefs.WithStack(err)
 	}
 
-	rows, err := db.QueryxContext(ctx, db.Rebind(sql), args...)
+	rows, err := db.QueryxContext(ctx, db.Rebind(query), args...)
 	if err != nil {
+		if err == sql.ErrNoRows || dbutil.IsTableNotFoundError(err, backend) {
+			return make(map[string]dbutil.RowMap), nil
+		}
 		return nil, errdefs.WithStack(err)
 	}
 	defer rows.Close()
