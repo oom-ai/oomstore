@@ -53,7 +53,7 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 		return nil, err
 	}
 	if opt.FeatureNames != nil {
-		features = features.FilterFullnames(*opt.FeatureNames)
+		features = features.FilterFullNames(*opt.FeatureNames)
 	}
 	return features, nil
 }

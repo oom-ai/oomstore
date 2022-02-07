@@ -95,10 +95,10 @@ func (l FeatureList) Filter(filter func(*Feature) bool) (rs FeatureList) {
 	return
 }
 
-func (l FeatureList) FilterFullnames(fullnames []string) (rs FeatureList) {
+func (l FeatureList) FilterFullNames(fullNames []string) (rs FeatureList) {
 	return l.Filter(func(f *Feature) bool {
-		for _, fullname := range fullnames {
-			if f.FullName() == fullname {
+		for _, fullName := range fullNames {
+			if f.FullName() == fullName {
 				return true
 			}
 		}
