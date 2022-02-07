@@ -20,6 +20,10 @@ const (
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
 	var tableName string
 	if opt.Group.Category == oomTypes.CategoryBatch {
 		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
@@ -48,6 +52,10 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
 	var tableName string
 	if opt.Group.Category == oomTypes.CategoryBatch {
 		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
@@ -91,6 +99,10 @@ func batchGetItem(ctx context.Context, db *DB, keys []map[string]types.Attribute
 		if apiErr := new(types.ResourceNotFoundException); !errors.As(err, &apiErr) {
 			return errdefs.WithStack(err)
 		}
+	}
+
+	if result == nil {
+		return nil
 	}
 
 	for _, item := range result.Responses[tableName] {
