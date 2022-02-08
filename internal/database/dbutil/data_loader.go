@@ -73,6 +73,8 @@ func ReadLine(opt ReadLineOpt) ([]interface{}, error) {
 	// so here we use csv.Reader to read data directly.
 	// If there are other data formats in the future, we need to choose different decoders according to the different formats.
 	reader := csv.NewReader(opt.Source.Reader)
+	reader.Comma = opt.Source.Delimiter
+
 	row, err := reader.Read()
 	if err != nil {
 		return nil, err
