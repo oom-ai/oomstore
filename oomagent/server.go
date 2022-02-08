@@ -97,11 +97,11 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 	if firstReq.Group == nil {
 		return status.Errorf(codes.InvalidArgument, "group is required in first request")
 	}
-	if firstReq.Description == nil {
-		empty := ""
-		firstReq.Description = &empty
+	var description, delimiter string
+	if firstReq.Description != nil {
+		description = *firstReq.Description
 	}
-
+	delimiter = ","
 	reader, writer := io.Pipe()
 
 	go func() {
@@ -131,11 +131,11 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 	revisionID, err := s.oomstore.Import(context.Background(), types.ImportOpt{
 		GroupName:      *firstReq.Group,
 		Revision:       firstReq.Revision,
-		Description:    *firstReq.Description,
+		Description:    description,
 		DataSourceType: types.CSV_READER,
 		CsvReaderDataSource: &types.CsvReaderDataSource{
 			Reader:    reader,
-			Delimiter: ",",
+			Delimiter: delimiter,
 		},
 	})
 	if err != nil {
@@ -165,9 +165,14 @@ func (s *server) Snapshot(ctx context.Context, re *codegen.SnapshotRequest) (*co
 }
 
 func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codegen.ImportResponse, error) {
-	var description string
-	if req.Description == nil {
-		description = ""
+	var description, delimiter string
+	if req.Description != nil {
+		description = *req.Description
+	}
+	if req.Delimiter != nil {
+		delimiter = *req.Delimiter
+	} else {
+		delimiter = ","
 	}
 	revisionID, err := s.oomstore.Import(ctx, types.ImportOpt{
 		GroupName:      req.Group,
@@ -176,7 +181,7 @@ func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codeg
 		DataSourceType: types.CSV_FILE,
 		CsvFileDataSource: &types.CsvFileDataSource{
 			InputFilePath: req.InputFile,
-			Delimiter:     ",",
+			Delimiter:     delimiter,
 		},
 	})
 	if err != nil {
