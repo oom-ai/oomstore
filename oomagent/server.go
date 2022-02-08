@@ -97,11 +97,12 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 	if firstReq.Group == nil {
 		return status.Errorf(codes.InvalidArgument, "group is required in first request")
 	}
-	var description, delimiter string
+	var description string
+	var delimiter rune
 	if firstReq.Description != nil {
 		description = *firstReq.Description
 	}
-	delimiter = ","
+	delimiter = ','
 	reader, writer := io.Pipe()
 
 	go func() {
@@ -165,14 +166,16 @@ func (s *server) Snapshot(ctx context.Context, re *codegen.SnapshotRequest) (*co
 }
 
 func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codegen.ImportResponse, error) {
-	var description, delimiter string
+	var description string
+	var delimiter rune
+
 	if req.Description != nil {
 		description = *req.Description
 	}
 	if req.Delimiter != nil {
-		delimiter = *req.Delimiter
+		delimiter = []rune(*req.Delimiter)[0]
 	} else {
-		delimiter = ","
+		delimiter = ','
 	}
 	revisionID, err := s.oomstore.Import(ctx, types.ImportOpt{
 		GroupName:      req.Group,

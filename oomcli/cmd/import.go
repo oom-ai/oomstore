@@ -12,11 +12,14 @@ import (
 var importOpt types.ImportOpt
 var importCSVFileDataSource types.CsvFileDataSource
 var importTableLinkDataSource types.TableLinkDataSource
+var delimitre string
 
 var importCmd = &cobra.Command{
 	Use:   "import",
 	Short: "Import feature data from a data source",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
+		importCSVFileDataSource.Delimiter = []rune(delimitre)[0]
+
 		if !cmd.Flags().Changed("revision") {
 			importOpt.Revision = nil
 		}
@@ -61,6 +64,6 @@ func init() {
 	flags.StringVar(&importCSVFileDataSource.InputFilePath, "input-file", "", "input csv file")
 	flags.StringVar(&importTableLinkDataSource.TableName, "table-link", "", "link to a existing data table")
 
-	flags.StringVar(&importCSVFileDataSource.Delimiter, "delimiter", ",", "specify field delimiter")
+	flags.StringVar(&delimitre, "delimiter", ",", "specify field delimiter")
 	importOpt.Revision = flags.Int64P("revision", "r", 0, "user-defined revision")
 }
