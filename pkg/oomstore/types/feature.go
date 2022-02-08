@@ -129,11 +129,30 @@ func (l FeatureList) GroupIDs() (ids []int) {
 	return groupIDs
 }
 
+func (l FeatureList) GroupNames() []string {
+	groupNameMap := make(map[string]struct{})
+	groupNames := make([]string, 0, l.Len())
+	for _, r := range l {
+		if _, ok := groupNameMap[r.Group.Name]; !ok {
+			groupNameMap[r.Group.Name] = struct{}{}
+			groupNames = append(groupNames, r.Group.Name)
+		}
+	}
+	return groupNames
+}
+
 func (l FeatureList) GroupByGroupID() map[int]FeatureList {
 	featureMap := make(map[int]FeatureList)
 	for _, f := range l {
-		id := f.GroupID
-		featureMap[id] = append(featureMap[id], f)
+		featureMap[f.GroupID] = append(featureMap[f.GroupID], f)
+	}
+	return featureMap
+}
+
+func (l FeatureList) GroupByGroupName() map[string]FeatureList {
+	featureMap := make(map[string]FeatureList)
+	for _, f := range l {
+		featureMap[f.Group.Name] = append(featureMap[f.Group.Name], f)
 	}
 	return featureMap
 }
