@@ -36,7 +36,7 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 	}
 	rs.EntityName = entity.Name
 
-	featureMap := groupFeaturesByGroupID(features)
+	featureMap := features.GroupByGroupID()
 
 	for _, features := range featureMap {
 		if len(features) == 0 {
@@ -84,7 +84,7 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 	if entity == nil {
 		return nil, errdefs.Errorf("failed to get shared entity")
 	}
-	featureMap := groupFeaturesByGroupID(features)
+	featureMap := features.GroupByGroupID()
 
 	// entity_key -> feature_name -> feature_value
 	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, featureMap, entity)
@@ -139,15 +139,6 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 		}
 	}
 	return featureValueMap, nil
-}
-
-func groupFeaturesByGroupID(features types.FeatureList) map[int]types.FeatureList {
-	featureMap := make(map[int]types.FeatureList)
-	for _, f := range features {
-		id := f.GroupID
-		featureMap[id] = append(featureMap[id], f)
-	}
-	return featureMap
 }
 
 func getSharedEntity(features types.FeatureList) (*types.Entity, error) {

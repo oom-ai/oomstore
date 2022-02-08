@@ -126,3 +126,12 @@ func (l FeatureList) GroupIDs() (ids []int) {
 	}
 	return groupIDs
 }
+
+func (l FeatureList) GroupByGroupID() map[int]FeatureList {
+	featureMap := make(map[int]FeatureList)
+	for _, f := range l {
+		id := f.GroupID
+		featureMap[id] = append(featureMap[id], f)
+	}
+	return featureMap
+}

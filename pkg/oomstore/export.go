@@ -53,7 +53,7 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 		return nil, errdefs.Errorf("invalid feature names %s", invalid)
 	}
 
-	featureMap := buildGroupIDToFeaturesMap(features)
+	featureMap := features.GroupByGroupID()
 	snapshotTables := make(map[int]string)
 	cdcTables := make(map[int]string)
 	for _, featureList := range featureMap {
@@ -125,16 +125,4 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
 		}
 	}
 	return exportResult.CheckStreamError()
-}
-
-// key: group_Id, value: slice of features
-func buildGroupIDToFeaturesMap(features types.FeatureList) map[int]types.FeatureList {
-	groups := make(map[int]types.FeatureList)
-	for _, f := range features {
-		if _, ok := groups[f.Group.ID]; !ok {
-			groups[f.Group.ID] = types.FeatureList{}
-		}
-		groups[f.Group.ID] = append(groups[f.Group.ID], f)
-	}
-	return groups
 }
