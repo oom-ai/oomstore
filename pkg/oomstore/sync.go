@@ -25,6 +25,11 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 	if group.Category == types.CategoryStream {
 		return s.syncStream(ctx, opt)
 	}
+	return s.syncBatch(ctx, opt, group, revision)
+}
+
+// syncBatch syncs batch feature group from offline store to online store.
+func (s *OomStore) syncBatch(ctx context.Context, opt types.SyncOpt, group *types.Group, revision *types.Revision) error {
 	prevOnlineRevisionID := group.OnlineRevisionID
 	if prevOnlineRevisionID != nil && *prevOnlineRevisionID == revision.ID {
 		return errdefs.Errorf("the specific revision was synced to the online store, won't do it again this time")
@@ -89,10 +94,10 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 		}
 		return s.online.Purge(ctx, *prevOnlineRevisionID)
 	}
-
 	return nil
 }
 
+// syncStream syncs stream feature group from offline store to online store.
 func (s *OomStore) syncStream(ctx context.Context, opt types.SyncOpt) error {
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
 		GroupName: &opt.GroupName,
