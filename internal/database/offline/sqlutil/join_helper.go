@@ -226,6 +226,10 @@ func insertEntityRows(ctx context.Context,
 	}
 
 	for entityRow := range entityRows {
+		if entityRow.Error != nil {
+			return entityRow.Error
+		}
+
 		record := []interface{}{fmt.Sprintf(format, entityRow.EntityKey), entityRow.UnixMilli}
 		for _, v := range entityRow.Values {
 			record = append(record, fmt.Sprintf(format, v))

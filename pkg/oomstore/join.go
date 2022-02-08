@@ -76,10 +76,14 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 // Input File should contain header, the first two columns of Input File should be
 // entity_key, unix_milli, then followed by other real-time feature values.
 func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
 		return err
 	}
-	entityRows, header, err := GetEntityRowsFromInputFile(opt.InputFilePath)
+
+	entityRows, header, err := GetEntityRowsFromInputFile(ctx, opt.InputFilePath)
 	if err != nil {
 		return err
 	}
@@ -152,7 +156,7 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) 
 	return ranges, nil
 }
 
-func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, []string, error) {
+func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-chan types.EntityRow, []string, error) {
 	input, err := os.Open(inputFilePath)
 	if err != nil {
 		return nil, nil, errdefs.WithStack(err)
@@ -162,41 +166,59 @@ func GetEntityRowsFromInputFile(inputFilePath string) (<-chan types.EntityRow, [
 	if err != nil {
 		return nil, nil, errdefs.WithStack(err)
 	}
+
 	entityRows := make(chan types.EntityRow)
-	var readErr error
-	i := 1
 	go func() {
 		defer close(entityRows)
 		defer input.Close()
-		for {
+
+		for i := 1; ; i++ {
 			line, err := reader.Read()
-			if err == io.EOF {
-				break
-			}
 			if err != nil {
-				readErr = errdefs.WithStack(err)
-				return
+				if err == io.EOF {
+					return
+				}
+
+				select {
+				case entityRows <- types.EntityRow{Error: errdefs.WithStack(err)}:
+					return
+				case <-ctx.Done():
+					return
+				}
 			}
+
 			if len(line) < 2 {
-				readErr = errdefs.Errorf("at least 2 values per row, got %d value(s) at row %d", len(line), i)
-				return
+				select {
+				case entityRows <- types.EntityRow{Error: errdefs.Errorf("at least 2 values per row, got %d value(s) at row %d", len(line), i)}:
+					return
+				case <-ctx.Done():
+					return
+				}
 			}
+
 			unixMilli, err := strconv.Atoi(line[1])
 			if err != nil {
-				readErr = errdefs.WithStack(err)
-				return
+				select {
+				case entityRows <- types.EntityRow{Error: errdefs.WithStack(err)}:
+					return
+				case <-ctx.Done():
+					return
+				}
 			}
-			entityRows <- types.EntityRow{
+
+			select {
+			case entityRows <- types.EntityRow{
 				EntityKey: line[0],
 				UnixMilli: int64(unixMilli),
 				Values:    line[2:],
+				Error:     nil,
+			}:
+				// nothing to do
+			case <-ctx.Done():
+				return
 			}
-			i++
 		}
 	}()
-	if readErr != nil {
-		return nil, nil, readErr
-	}
 	return entityRows, header, nil
 }
 

@@ -19,7 +19,10 @@ type JoinOpt struct {
 }
 
 func join(ctx context.Context, store *oomstore.OomStore, opt JoinOpt, output string) error {
-	entityRows, header, err := oomstore.GetEntityRowsFromInputFile(opt.InputFilePath)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	entityRows, header, err := oomstore.GetEntityRowsFromInputFile(ctx, opt.InputFilePath)
 	if err != nil {
 		return err
 	}
@@ -33,11 +36,7 @@ func join(ctx context.Context, store *oomstore.OomStore, opt JoinOpt, output str
 		return err
 	}
 
-	if err := printJoinResult(joinResult, output); err != nil {
-		return err
-	}
-
-	return nil
+	return printJoinResult(joinResult, output)
 }
 
 func printJoinResult(joinResult *types.JoinResult, output string) error {
