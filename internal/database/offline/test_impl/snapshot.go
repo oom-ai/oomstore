@@ -33,7 +33,7 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 1235,apple,200,5
 1236,oneplus,155,8
 `)),
-		Delimiter: ",",
+		Delimiter: ',',
 	})
 
 	buildTestSnapshotTable(ctx, t, store, append(features, unixMilli), 2, "offline_stream_cdc_1_2", &offline.CSVSource{
@@ -43,7 +43,7 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 1237,pixel,200,11
 1235,apple-1,113,15
 `)),
-		Delimiter: ",",
+		Delimiter: ',',
 	})
 
 	err := store.Snapshot(ctx, offline.SnapshotOpt{

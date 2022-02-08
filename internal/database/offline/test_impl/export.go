@@ -29,7 +29,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 1236,huawei,300
 1237,oneplus,240
 `)),
-		Delimiter: ",",
+		Delimiter: ',',
 	})
 	buildTestSnapshotTable(ctx, t, store, streamFeatures, 1, streamSnapshotTable, &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,1000,true
@@ -37,7 +37,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 1236,1560,true
 1237,4000,false
 `)),
-		Delimiter: ",",
+		Delimiter: ',',
 	})
 	buildTestSnapshotTable(ctx, t, store, append(streamFeatures, unixMilli), 1, streamCdcTable, &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,1200,true,2
@@ -46,7 +46,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 1238,1500,true,11
 1239,2700,false,12
 `)),
-		Delimiter: ",",
+		Delimiter: ',',
 	})
 
 	testCases := []struct {
