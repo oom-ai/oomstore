@@ -17,6 +17,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 )
 
+// Apply registers entity, feature group, feature to metadata store.
 func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 	stage, err := buildApplyStage(ctx, opt)
 	if err != nil {

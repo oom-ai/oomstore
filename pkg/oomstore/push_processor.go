@@ -33,6 +33,7 @@ type PushProcessor struct {
 	buffer sync.Map // GroupID -> GroupBuffer
 }
 
+// InitPushProcessor inits a push processor.
 func (s *OomStore) InitPushProcessor(ctx context.Context, cfg *types.PushProcessorConfig) {
 	if cfg == nil {
 		cfg = &defaultPushProcessorCfg
@@ -104,6 +105,7 @@ func (s *OomStore) InitPushProcessor(ctx context.Context, cfg *types.PushProcess
 	}()
 }
 
+// Close push processor.
 func (p *PushProcessor) Close() error {
 	p.ticker.Stop()
 	p.notifyQuit <- struct{}{}
@@ -112,6 +114,7 @@ func (p *PushProcessor) Close() error {
 	return nil
 }
 
+// Push stream record to push processor.
 func (p *PushProcessor) Push(record types.StreamRecord) {
 	if _, ok := p.buffer.Load(record.GroupID); !ok {
 		p.buffer.Store(record.GroupID, GroupBuffer{
@@ -122,6 +125,7 @@ func (p *PushProcessor) Push(record types.StreamRecord) {
 	p.ch <- record
 }
 
+// pushToOffline pushes a batch of records to offline store.
 func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID int) error {
 	features := s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
 		GroupID: &groupID,
@@ -144,6 +148,7 @@ func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID 
 	return err
 }
 
+// lastRevisionForStream returns the latest revision before unixMill.
 func lastRevisionForStream(snapshotInterval int64, unixMill int64) int64 {
 	return (unixMill / snapshotInterval) * snapshotInterval
 }

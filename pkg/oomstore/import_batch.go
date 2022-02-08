@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cast"
 )
 
+// csvReaderImportBatch imports batch feature from external data source to offline store through csv reader.
 func (s *OomStore) csvReaderImportBatch(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) (int, error) {
 	//make sure csv data source has all defined columns
 	reader := bufio.NewReader(dataSource.Reader)
@@ -65,6 +66,7 @@ func (s *OomStore) csvReaderImportBatch(ctx context.Context, opt *importOpt, dat
 	return newRevisionID, nil
 }
 
+// tableLinkImportBatch links external data source to offline store for batch feature.
 func (s *OomStore) tableLinkImportBatch(ctx context.Context, opt *importOpt, dataSource *types.TableLinkDataSource) (int, error) {
 	// Make sure all features existing with correct value type
 	tableSchema, err := s.offline.TableSchema(ctx, offline.TableSchemaOpt{

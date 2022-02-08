@@ -21,6 +21,7 @@ const (
 	ImportStreamBatchSize = 100
 )
 
+// csvReaderImportStream imports stream feature from external data source to offline store through csv reader.
 func (s *OomStore) csvReaderImportStream(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) error {
 	// read header
 	reader := bufio.NewReader(dataSource.Reader)
@@ -63,6 +64,7 @@ func (s *OomStore) csvReaderImportStream(ctx context.Context, opt *importOpt, da
 	return s.pushStreamingRecords(ctx, records, opt.entityName, opt.group, opt.features)
 }
 
+// tableLinkImportStream links external data source to offline store for stream feature.
 func (s *OomStore) tableLinkImportStream(ctx context.Context, opt *importOpt, dataSource *types.TableLinkDataSource) error {
 	// get linked table schema
 	tableSchema, err := s.offline.TableSchema(ctx, offline.TableSchemaOpt{
@@ -93,6 +95,7 @@ func (s *OomStore) tableLinkImportStream(ctx context.Context, opt *importOpt, da
 	return nil
 }
 
+// pushStreamingRecords pushes stream feature records to offline store and online store.
 func (s *OomStore) pushStreamingRecords(ctx context.Context, records []types.StreamRecord, entityName string, group *types.Group, features types.FeatureList) error {
 	buckets := make(map[int64][]types.StreamRecord)
 	for _, record := range records {
