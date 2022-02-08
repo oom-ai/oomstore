@@ -51,7 +51,7 @@ type PushOpt struct {
 
 type CSVSource struct {
 	Reader    *bufio.Reader
-	Delimiter string
+	Delimiter rune
 }
 
 type SnapshotOpt struct {
