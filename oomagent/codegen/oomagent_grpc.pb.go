@@ -18,17 +18,29 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OomAgentClient interface {
+	// Get online features for an entity.
 	OnlineGet(ctx context.Context, in *OnlineGetRequest, opts ...grpc.CallOption) (*OnlineGetResponse, error)
+	// Get online features for multiple entities.
 	OnlineMultiGet(ctx context.Context, in *OnlineMultiGetRequest, opts ...grpc.CallOption) (*OnlineMultiGetResponse, error)
+	// Sync a certain revision of batch features from offline to online store.
 	Sync(ctx context.Context, in *SyncRequest, opts ...grpc.CallOption) (*SyncResponse, error)
+	// Import features from external (batch and stream) data sources to offline store through channels.
 	ChannelImport(ctx context.Context, opts ...grpc.CallOption) (OomAgent_ChannelImportClient, error)
+	// Import features from external (batch and stream) data sources to offline store through files.
 	Import(ctx context.Context, in *ImportRequest, opts ...grpc.CallOption) (*ImportResponse, error)
+	// Push stream features from stream data source to both offline and online stores.
 	Push(ctx context.Context, in *PushRequest, opts ...grpc.CallOption) (*PushResponse, error)
+	// Take snapshot for a stream feature group in offline store.
 	Snapshot(ctx context.Context, in *SnapshotRequest, opts ...grpc.CallOption) (*SnapshotResponse, error)
+	// Point-in-Time Join features against labeled entity rows through channels.
 	ChannelJoin(ctx context.Context, opts ...grpc.CallOption) (OomAgent_ChannelJoinClient, error)
+	// Point-in-Time Join features against labeled entity rows through files.
 	Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error)
+	// Export certain features to a channel.
 	ChannelExport(ctx context.Context, in *ChannelExportRequest, opts ...grpc.CallOption) (OomAgent_ChannelExportClient, error)
+	// Export certain features to a file.
 	Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (*ExportResponse, error)
+	// Check if oomagent is ready to serve requests.
 	HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
 }
 
@@ -222,17 +234,29 @@ func (c *oomAgentClient) HealthCheck(ctx context.Context, in *HealthCheckRequest
 // All implementations must embed UnimplementedOomAgentServer
 // for forward compatibility
 type OomAgentServer interface {
+	// Get online features for an entity.
 	OnlineGet(context.Context, *OnlineGetRequest) (*OnlineGetResponse, error)
+	// Get online features for multiple entities.
 	OnlineMultiGet(context.Context, *OnlineMultiGetRequest) (*OnlineMultiGetResponse, error)
+	// Sync a certain revision of batch features from offline to online store.
 	Sync(context.Context, *SyncRequest) (*SyncResponse, error)
+	// Import features from external (batch and stream) data sources to offline store through channels.
 	ChannelImport(OomAgent_ChannelImportServer) error
+	// Import features from external (batch and stream) data sources to offline store through files.
 	Import(context.Context, *ImportRequest) (*ImportResponse, error)
+	// Push stream features from stream data source to both offline and online stores.
 	Push(context.Context, *PushRequest) (*PushResponse, error)
+	// Take snapshot for a stream feature group in offline store.
 	Snapshot(context.Context, *SnapshotRequest) (*SnapshotResponse, error)
+	// Point-in-Time Join features against labeled entity rows through channels.
 	ChannelJoin(OomAgent_ChannelJoinServer) error
+	// Point-in-Time Join features against labeled entity rows through files.
 	Join(context.Context, *JoinRequest) (*JoinResponse, error)
+	// Export certain features to a channel.
 	ChannelExport(*ChannelExportRequest, OomAgent_ChannelExportServer) error
+	// Export certain features to a file.
 	Export(context.Context, *ExportRequest) (*ExportResponse, error)
+	// Check if oomagent is ready to serve requests.
 	HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
 	mustEmbedUnimplementedOomAgentServer()
 }
