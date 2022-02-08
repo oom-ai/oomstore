@@ -102,7 +102,7 @@ func (s *OomStore) syncStream(ctx context.Context, opt types.SyncOpt) error {
 	}
 	group := features[0].Group
 	exportResult, err := s.ChannelExport(ctx, types.ChannelExportOpt{
-		FeatureNames: features.Names(),
+		FeatureNames: features.FullNames(),
 		UnixMilli:    time.Now().UnixMilli(),
 	})
 	if err != nil {
