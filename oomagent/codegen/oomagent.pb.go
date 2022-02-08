@@ -20,6 +20,10 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// `Value` represents a dynamically typed value which can be either
+//  a int64, a double, a string, a bool, a unix milliseconds, or a
+// bytes. A producer of value is expected to set one of these
+// variants.
 type Value struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -162,13 +166,18 @@ func (*Value_UnixMilli) isValue_Value() {}
 
 func (*Value_Bytes) isValue_Value() {}
 
+// `OnlineGetRequest` is a request for `OnlineGet` API.
 type OnlineGetRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	EntityKey string   `protobuf:"bytes,1,opt,name=entity_key,json=entityKey,proto3" json:"entity_key,omitempty"`
-	Features  []string `protobuf:"bytes,2,rep,name=features,proto3" json:"features,omitempty"`
+	// An entity identifier, could be device ID, user ID, etc.
+	EntityKey string `protobuf:"bytes,1,opt,name=entity_key,json=entityKey,proto3" json:"entity_key,omitempty"`
+	// A list of feature full names.
+	// A feature full name has the following format: <feature_group_name>.<feature_name>,
+	// for example, txn_stats.count_7d
+	Features []string `protobuf:"bytes,2,rep,name=features,proto3" json:"features,omitempty"`
 }
 
 func (x *OnlineGetRequest) Reset() {
@@ -217,6 +226,7 @@ func (x *OnlineGetRequest) GetFeatures() []string {
 	return nil
 }
 
+// `FeatureValueMap` maps feature full name to feature value.
 type FeatureValueMap struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -264,11 +274,13 @@ func (x *FeatureValueMap) GetMap() map[string]*Value {
 	return nil
 }
 
+// `OnlineGetRequest` is a response for `OnlineGet` API.
 type OnlineGetResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The result of `OnlineGet`.
 	Result *FeatureValueMap `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
 }
 
@@ -311,13 +323,18 @@ func (x *OnlineGetResponse) GetResult() *FeatureValueMap {
 	return nil
 }
 
+// `OnlineMultiGetRequest` is a request for `OnlineMultiGet` API.
 type OnlineMultiGetRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// A list of entity identifiers, could be device IDs, user IDs, etc.
 	EntityKeys []string `protobuf:"bytes,1,rep,name=entity_keys,json=entityKeys,proto3" json:"entity_keys,omitempty"`
-	Features   []string `protobuf:"bytes,2,rep,name=features,proto3" json:"features,omitempty"`
+	// A list of feature full names.
+	// A feature full name has the following format: <feature_group_name>.<feature_name>,
+	// for example, txn_stats.count_7d
+	Features []string `protobuf:"bytes,2,rep,name=features,proto3" json:"features,omitempty"`
 }
 
 func (x *OnlineMultiGetRequest) Reset() {
@@ -366,11 +383,13 @@ func (x *OnlineMultiGetRequest) GetFeatures() []string {
 	return nil
 }
 
+// `OnlineMultiGetResponse` is a response for `OnlineMultiGet` API.
 type OnlineMultiGetResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The result of `OnlineMultiGet`, mapping entity key to FeatureValueMap.
 	Result map[string]*FeatureValueMap `protobuf:"bytes,1,rep,name=result,proto3" json:"result,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -413,14 +432,24 @@ func (x *OnlineMultiGetResponse) GetResult() map[string]*FeatureValueMap {
 	return nil
 }
 
+// `SyncRequest` is a request for `Sync` API.
 type SyncRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Group      string `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
+	// The group to sync from offline store to online store.
+	Group string `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
+	// The revision to sync, it only applies to batch feature.
+	// For batch feature: if null, will sync the latest revision;
+	// otherwise, sync the designated revision.
+	// For streaming feature, revision ID is not required, will always
+	// sync the latest values.
 	RevisionId *int32 `protobuf:"varint,2,opt,name=revision_id,json=revisionId,proto3,oneof" json:"revision_id,omitempty"`
-	PurgeDelay int32  `protobuf:"varint,3,opt,name=purge_delay,json=purgeDelay,proto3" json:"purge_delay,omitempty"`
+	// PurgeDelay represents the seconds to sleep before purging
+	// the previous revision in online store.
+	// It only applies to batch feature group.
+	PurgeDelay int32 `protobuf:"varint,3,opt,name=purge_delay,json=purgeDelay,proto3" json:"purge_delay,omitempty"`
 }
 
 func (x *SyncRequest) Reset() {
@@ -476,6 +505,7 @@ func (x *SyncRequest) GetPurgeDelay() int32 {
 	return 0
 }
 
+// `SyncResponse` is a response for `Sync` API.
 type SyncResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -514,18 +544,27 @@ func (*SyncResponse) Descriptor() ([]byte, []int) {
 	return file_oomagent_proto_rawDescGZIP(), []int{7}
 }
 
+// `ChannelImportRequest` is a request for `ChannelImport` API.
 type ChannelImportRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// only takes effect (and required) on the first request
+	// The group to be imported from data source to offline store.
+	// It only takes effect (and required) on the first request.
 	Group *string `protobuf:"bytes,1,opt,name=group,proto3,oneof" json:"group,omitempty"`
-	// only takes effect on the first request
+	// The revision of the imported data, it only applies to
+	// batch feature (not required).
+	// For batch features, if revision is null, will use the
+	// timestamp when it starts serving in online store; otherwise,
+	// use the designated revision.
+	// It only takes effect on the first request.
 	Revision *int64 `protobuf:"varint,2,opt,name=revision,proto3,oneof" json:"revision,omitempty"`
-	// only takes effect on the first request
+	// Description of this import.
+	// It only takes effect on the first request.
 	Description *string `protobuf:"bytes,3,opt,name=description,proto3,oneof" json:"description,omitempty"`
-	Row         []byte  `protobuf:"bytes,4,opt,name=row,proto3" json:"row,omitempty"`
+	// A single row of channel import.
+	Row []byte `protobuf:"bytes,4,opt,name=row,proto3" json:"row,omitempty"`
 }
 
 func (x *ChannelImportRequest) Reset() {
@@ -588,11 +627,13 @@ func (x *ChannelImportRequest) GetRow() []byte {
 	return nil
 }
 
+// `ImportResponse` is a response for `ChannelImport` and `Import` API.
 type ImportResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The revision ID of this import, it only applies to batch feature.
 	RevisionId int32 `protobuf:"varint,1,opt,name=revision_id,json=revisionId,proto3" json:"revision_id,omitempty"`
 }
 
@@ -635,16 +676,26 @@ func (x *ImportResponse) GetRevisionId() int32 {
 	return 0
 }
 
+// `ImportRequest` is a request for `Import` API.
 type ImportRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Group       string  `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
-	Revision    *int64  `protobuf:"varint,2,opt,name=revision,proto3,oneof" json:"revision,omitempty"`
+	// The group to be imported from data source to offline store.
+	Group string `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
+	// The revision of the imported data, it only applies to
+	// batch feature (not required).
+	// For batch features, if revision is null, will use the
+	// timestamp when it starts serving in online store; otherwise,
+	// use the designated revision.
+	Revision *int64 `protobuf:"varint,2,opt,name=revision,proto3,oneof" json:"revision,omitempty"`
+	// Description of this import.
 	Description *string `protobuf:"bytes,3,opt,name=description,proto3,oneof" json:"description,omitempty"`
-	InputFile   string  `protobuf:"bytes,4,opt,name=input_file,json=inputFile,proto3" json:"input_file,omitempty"`
-	Delimiter   *string `protobuf:"bytes,5,opt,name=delimiter,proto3,oneof" json:"delimiter,omitempty"`
+	// The path of data source.
+	InputFile string `protobuf:"bytes,4,opt,name=input_file,json=inputFile,proto3" json:"input_file,omitempty"`
+	// Delimiter of data source
+	Delimiter *string `protobuf:"bytes,5,opt,name=delimiter,proto3,oneof" json:"delimiter,omitempty"`
 }
 
 func (x *ImportRequest) Reset() {
@@ -714,58 +765,24 @@ func (x *ImportRequest) GetDelimiter() string {
 	return ""
 }
 
-type PushResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *PushResponse) Reset() {
-	*x = PushResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_oomagent_proto_msgTypes[11]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *PushResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PushResponse) ProtoMessage() {}
-
-func (x *PushResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_oomagent_proto_msgTypes[11]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PushResponse.ProtoReflect.Descriptor instead.
-func (*PushResponse) Descriptor() ([]byte, []int) {
-	return file_oomagent_proto_rawDescGZIP(), []int{11}
-}
-
+// `PushRequest` is a request for `Push` API.
 type PushRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	EntityKey     string            `protobuf:"bytes,1,opt,name=entity_key,json=entityKey,proto3" json:"entity_key,omitempty"`
-	Group         string            `protobuf:"bytes,2,opt,name=group,proto3" json:"group,omitempty"`
+	// An entity identifier.
+	EntityKey string `protobuf:"bytes,1,opt,name=entity_key,json=entityKey,proto3" json:"entity_key,omitempty"`
+	// A streaming feature group.
+	Group string `protobuf:"bytes,2,opt,name=group,proto3" json:"group,omitempty"`
+	// Feature values maps feature name to feature value.
 	FeatureValues map[string]*Value `protobuf:"bytes,3,rep,name=feature_values,json=featureValues,proto3" json:"feature_values,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (x *PushRequest) Reset() {
 	*x = PushRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_oomagent_proto_msgTypes[12]
+		mi := &file_oomagent_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -778,7 +795,7 @@ func (x *PushRequest) String() string {
 func (*PushRequest) ProtoMessage() {}
 
 func (x *PushRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_oomagent_proto_msgTypes[12]
+	mi := &file_oomagent_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -791,7 +808,7 @@ func (x *PushRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PushRequest.ProtoReflect.Descriptor instead.
 func (*PushRequest) Descriptor() ([]byte, []int) {
-	return file_oomagent_proto_rawDescGZIP(), []int{12}
+	return file_oomagent_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *PushRequest) GetEntityKey() string {
@@ -815,29 +832,30 @@ func (x *PushRequest) GetFeatureValues() map[string]*Value {
 	return nil
 }
 
-type SnapshotResponse struct {
+// `PushResponse` is a response for `Push` API.
+type PushResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *SnapshotResponse) Reset() {
-	*x = SnapshotResponse{}
+func (x *PushResponse) Reset() {
+	*x = PushResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_oomagent_proto_msgTypes[13]
+		mi := &file_oomagent_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *SnapshotResponse) String() string {
+func (x *PushResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SnapshotResponse) ProtoMessage() {}
+func (*PushResponse) ProtoMessage() {}
 
-func (x *SnapshotResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_oomagent_proto_msgTypes[13]
+func (x *PushResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_oomagent_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -848,23 +866,25 @@ func (x *SnapshotResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SnapshotResponse.ProtoReflect.Descriptor instead.
-func (*SnapshotResponse) Descriptor() ([]byte, []int) {
-	return file_oomagent_proto_rawDescGZIP(), []int{13}
+// Deprecated: Use PushResponse.ProtoReflect.Descriptor instead.
+func (*PushResponse) Descriptor() ([]byte, []int) {
+	return file_oomagent_proto_rawDescGZIP(), []int{12}
 }
 
+// `SnapshotRequest` is a request for `Snapshot` API.
 type SnapshotRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// A streaming feature group.
 	Group string `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
 }
 
 func (x *SnapshotRequest) Reset() {
 	*x = SnapshotRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_oomagent_proto_msgTypes[14]
+		mi := &file_oomagent_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -877,7 +897,7 @@ func (x *SnapshotRequest) String() string {
 func (*SnapshotRequest) ProtoMessage() {}
 
 func (x *SnapshotRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_oomagent_proto_msgTypes[14]
+	mi := &file_oomagent_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -890,7 +910,7 @@ func (x *SnapshotRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SnapshotRequest.ProtoReflect.Descriptor instead.
 func (*SnapshotRequest) Descriptor() ([]byte, []int) {
-	return file_oomagent_proto_rawDescGZIP(), []int{14}
+	return file_oomagent_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *SnapshotRequest) GetGroup() string {
@@ -900,14 +920,57 @@ func (x *SnapshotRequest) GetGroup() string {
 	return ""
 }
 
+// `SnapshotResponse` is a response for `Snapshot` API.
+type SnapshotResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *SnapshotResponse) Reset() {
+	*x = SnapshotResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_oomagent_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SnapshotResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SnapshotResponse) ProtoMessage() {}
+
+func (x *SnapshotResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_oomagent_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SnapshotResponse.ProtoReflect.Descriptor instead.
+func (*SnapshotResponse) Descriptor() ([]byte, []int) {
+	return file_oomagent_proto_rawDescGZIP(), []int{14}
+}
+
+// `EntityRow` represents a row in `Join` request.
 type EntityRow struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	EntityKey string   `protobuf:"bytes,1,opt,name=entity_key,json=entityKey,proto3" json:"entity_key,omitempty"`
-	UnixMilli int64    `protobuf:"varint,2,opt,name=unix_milli,json=unixMilli,proto3" json:"unix_milli,omitempty"`
-	Values    []string `protobuf:"bytes,3,rep,name=values,proto3" json:"values,omitempty"`
+	// An entity identifier, could represents device ID, user ID, etc.
+	EntityKey string `protobuf:"bytes,1,opt,name=entity_key,json=entityKey,proto3" json:"entity_key,omitempty"`
+	// A unix milliseconds, represents the record timestamp.
+	UnixMilli int64 `protobuf:"varint,2,opt,name=unix_milli,json=unixMilli,proto3" json:"unix_milli,omitempty"`
+	// A list of existing values, could be label or real-time features.
+	Values []string `protobuf:"bytes,3,rep,name=values,proto3" json:"values,omitempty"`
 }
 
 func (x *EntityRow) Reset() {
@@ -963,16 +1026,22 @@ func (x *EntityRow) GetValues() []string {
 	return nil
 }
 
+// `ChannelJoinRequest` is a request for `ChannelJoin` API.
 type ChannelJoinRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// only takes effect (and required) on the first request
+	// A list of feature full names, their feature values will be
+	// joined and fetched from offline store.
+	// It only takes effect (and required) on the first request.
 	JoinFeatures []string `protobuf:"bytes,1,rep,name=join_features,json=joinFeatures,proto3" json:"join_features,omitempty"`
-	// only takes effect (and required) on the first request
-	ExistedFeatures []string   `protobuf:"bytes,2,rep,name=existed_features,json=existedFeatures,proto3" json:"existed_features,omitempty"`
-	EntityRow       *EntityRow `protobuf:"bytes,3,opt,name=entity_row,json=entityRow,proto3" json:"entity_row,omitempty"`
+	// A list of names, could be label name or real-time feature names.
+	// Those feature values will be passed from entity row.
+	// It only takes effect (and required) on the first request.
+	ExistedFeatures []string `protobuf:"bytes,2,rep,name=existed_features,json=existedFeatures,proto3" json:"existed_features,omitempty"`
+	// An entity row.
+	EntityRow *EntityRow `protobuf:"bytes,3,opt,name=entity_row,json=entityRow,proto3" json:"entity_row,omitempty"`
 }
 
 func (x *ChannelJoinRequest) Reset() {
@@ -1028,13 +1097,16 @@ func (x *ChannelJoinRequest) GetEntityRow() *EntityRow {
 	return nil
 }
 
+// `ChannelJoinResponse` is a response for `ChannelJoin` API.
 type ChannelJoinResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// only appears in the first request
-	Header    []string `protobuf:"bytes,1,rep,name=header,proto3" json:"header,omitempty"`
+	// Header of the `Join` response.
+	// It only appears in the first request.
+	Header []string `protobuf:"bytes,1,rep,name=header,proto3" json:"header,omitempty"`
+	// A single row of joined results.
 	JoinedRow []*Value `protobuf:"bytes,2,rep,name=joined_row,json=joinedRow,proto3" json:"joined_row,omitempty"`
 }
 
@@ -1084,14 +1156,19 @@ func (x *ChannelJoinResponse) GetJoinedRow() []*Value {
 	return nil
 }
 
+// `JoinRequest` is a request for `Join` API.
 type JoinRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Features   []string `protobuf:"bytes,1,rep,name=features,proto3" json:"features,omitempty"`
-	InputFile  string   `protobuf:"bytes,2,opt,name=input_file,json=inputFile,proto3" json:"input_file,omitempty"`
-	OutputFile string   `protobuf:"bytes,3,opt,name=output_file,json=outputFile,proto3" json:"output_file,omitempty"`
+	// A list of feature full names, their feature values will be
+	// joined and fetched from offline store.
+	Features []string `protobuf:"bytes,1,rep,name=features,proto3" json:"features,omitempty"`
+	// File path of entity rows.
+	InputFile string `protobuf:"bytes,2,opt,name=input_file,json=inputFile,proto3" json:"input_file,omitempty"`
+	// File path of joined result.
+	OutputFile string `protobuf:"bytes,3,opt,name=output_file,json=outputFile,proto3" json:"output_file,omitempty"`
 }
 
 func (x *JoinRequest) Reset() {
@@ -1147,6 +1224,7 @@ func (x *JoinRequest) GetOutputFile() string {
 	return ""
 }
 
+// `JoinResponse` is a response for `Join` API.
 type JoinResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1185,14 +1263,18 @@ func (*JoinResponse) Descriptor() ([]byte, []int) {
 	return file_oomagent_proto_rawDescGZIP(), []int{19}
 }
 
+// `ChannelExportRequest` is a request for `ChannelExport` API.
 type ChannelExportRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Features  []string `protobuf:"bytes,1,rep,name=features,proto3" json:"features,omitempty"`
-	UnixMilli int64    `protobuf:"varint,2,opt,name=unix_milli,json=unixMilli,proto3" json:"unix_milli,omitempty"`
-	Limit     *uint64  `protobuf:"varint,3,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
+	// A list of feature full names.
+	Features []string `protobuf:"bytes,1,rep,name=features,proto3" json:"features,omitempty"`
+	// A unix milliseconds, export the feature value before this timestamp.
+	UnixMilli int64 `protobuf:"varint,2,opt,name=unix_milli,json=unixMilli,proto3" json:"unix_milli,omitempty"`
+	// Limit the size of export data.
+	Limit *uint64 `protobuf:"varint,3,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
 }
 
 func (x *ChannelExportRequest) Reset() {
@@ -1248,14 +1330,17 @@ func (x *ChannelExportRequest) GetLimit() uint64 {
 	return 0
 }
 
+// `ChannelExportResponse` is a response for `ChannelExport` API.
 type ChannelExportResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// only appears in the first request
+	// Header of export result.
+	// It only appears in the first request.
 	Header []string `protobuf:"bytes,1,rep,name=header,proto3" json:"header,omitempty"`
-	Row    []*Value `protobuf:"bytes,2,rep,name=row,proto3" json:"row,omitempty"`
+	// A single row of export result.
+	Row []*Value `protobuf:"bytes,2,rep,name=row,proto3" json:"row,omitempty"`
 }
 
 func (x *ChannelExportResponse) Reset() {
@@ -1304,15 +1389,20 @@ func (x *ChannelExportResponse) GetRow() []*Value {
 	return nil
 }
 
+// `ExportRequest` is a request for `Export` API.
 type ExportRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Features   []string `protobuf:"bytes,1,rep,name=features,proto3" json:"features,omitempty"`
-	UnixMilli  int64    `protobuf:"varint,2,opt,name=unix_milli,json=unixMilli,proto3" json:"unix_milli,omitempty"`
-	OutputFile string   `protobuf:"bytes,3,opt,name=output_file,json=outputFile,proto3" json:"output_file,omitempty"`
-	Limit      *uint64  `protobuf:"varint,4,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
+	// A list of feature full names.
+	Features []string `protobuf:"bytes,1,rep,name=features,proto3" json:"features,omitempty"`
+	// A unix milliseconds, export the feature value before this timestamp.
+	UnixMilli int64 `protobuf:"varint,2,opt,name=unix_milli,json=unixMilli,proto3" json:"unix_milli,omitempty"`
+	// File path of export result.
+	OutputFile string `protobuf:"bytes,3,opt,name=output_file,json=outputFile,proto3" json:"output_file,omitempty"`
+	// Limit the size of export data.
+	Limit *uint64 `protobuf:"varint,4,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
 }
 
 func (x *ExportRequest) Reset() {
@@ -1375,6 +1465,7 @@ func (x *ExportRequest) GetLimit() uint64 {
 	return 0
 }
 
+// `ExportResponse` is a response for `Export` API.
 type ExportResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1413,6 +1504,7 @@ func (*ExportResponse) Descriptor() ([]byte, []int) {
 	return file_oomagent_proto_rawDescGZIP(), []int{23}
 }
 
+// `HealthCheckRequesst` is a request for `HealthCheck` API.
 type HealthCheckRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1451,6 +1543,7 @@ func (*HealthCheckRequest) Descriptor() ([]byte, []int) {
 	return file_oomagent_proto_rawDescGZIP(), []int{24}
 }
 
+// `HealthCheckResponse` is a response for `HealthCheck` API.
 type HealthCheckResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1577,7 +1670,6 @@ var file_oomagent_proto_rawDesc = []byte{
 	0x65, 0x72, 0x88, 0x01, 0x01, 0x42, 0x0b, 0x0a, 0x09, 0x5f, 0x72, 0x65, 0x76, 0x69, 0x73, 0x69,
 	0x6f, 0x6e, 0x42, 0x0e, 0x0a, 0x0c, 0x5f, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69,
 	0x6f, 0x6e, 0x42, 0x0c, 0x0a, 0x0a, 0x5f, 0x64, 0x65, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x65, 0x72,
-	0x22, 0x0e, 0x0a, 0x0c, 0x50, 0x75, 0x73, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
 	0x22, 0xe6, 0x01, 0x0a, 0x0b, 0x50, 0x75, 0x73, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
 	0x12, 0x1d, 0x0a, 0x0a, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x4b, 0x65, 0x79, 0x12,
@@ -1592,11 +1684,12 @@ var file_oomagent_proto_rawDesc = []byte{
 	0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x25,
 	0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e,
 	0x6f, 0x6f, 0x6d, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2e, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x05,
-	0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x12, 0x0a, 0x10, 0x53, 0x6e, 0x61,
-	0x70, 0x73, 0x68, 0x6f, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x27, 0x0a,
-	0x0f, 0x53, 0x6e, 0x61, 0x70, 0x73, 0x68, 0x6f, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x12, 0x14, 0x0a, 0x05, 0x67, 0x72, 0x6f, 0x75, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x05, 0x67, 0x72, 0x6f, 0x75, 0x70, 0x22, 0x61, 0x0a, 0x09, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79,
+	0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x0e, 0x0a, 0x0c, 0x50, 0x75, 0x73,
+	0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x27, 0x0a, 0x0f, 0x53, 0x6e, 0x61,
+	0x70, 0x73, 0x68, 0x6f, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05,
+	0x67, 0x72, 0x6f, 0x75, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x67, 0x72, 0x6f,
+	0x75, 0x70, 0x22, 0x12, 0x0a, 0x10, 0x53, 0x6e, 0x61, 0x70, 0x73, 0x68, 0x6f, 0x74, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x61, 0x0a, 0x09, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79,
 	0x52, 0x6f, 0x77, 0x12, 0x1d, 0x0a, 0x0a, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x5f, 0x6b, 0x65,
 	0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x4b,
 	0x65, 0x79, 0x12, 0x1d, 0x0a, 0x0a, 0x75, 0x6e, 0x69, 0x78, 0x5f, 0x6d, 0x69, 0x6c, 0x6c, 0x69,
@@ -1734,10 +1827,10 @@ var file_oomagent_proto_goTypes = []interface{}{
 	(*ChannelImportRequest)(nil),   // 8: oomagent.ChannelImportRequest
 	(*ImportResponse)(nil),         // 9: oomagent.ImportResponse
 	(*ImportRequest)(nil),          // 10: oomagent.ImportRequest
-	(*PushResponse)(nil),           // 11: oomagent.PushResponse
-	(*PushRequest)(nil),            // 12: oomagent.PushRequest
-	(*SnapshotResponse)(nil),       // 13: oomagent.SnapshotResponse
-	(*SnapshotRequest)(nil),        // 14: oomagent.SnapshotRequest
+	(*PushRequest)(nil),            // 11: oomagent.PushRequest
+	(*PushResponse)(nil),           // 12: oomagent.PushResponse
+	(*SnapshotRequest)(nil),        // 13: oomagent.SnapshotRequest
+	(*SnapshotResponse)(nil),       // 14: oomagent.SnapshotResponse
 	(*EntityRow)(nil),              // 15: oomagent.EntityRow
 	(*ChannelJoinRequest)(nil),     // 16: oomagent.ChannelJoinRequest
 	(*ChannelJoinResponse)(nil),    // 17: oomagent.ChannelJoinResponse
@@ -1769,8 +1862,8 @@ var file_oomagent_proto_depIdxs = []int32{
 	6,  // 12: oomagent.OomAgent.Sync:input_type -> oomagent.SyncRequest
 	8,  // 13: oomagent.OomAgent.ChannelImport:input_type -> oomagent.ChannelImportRequest
 	10, // 14: oomagent.OomAgent.Import:input_type -> oomagent.ImportRequest
-	12, // 15: oomagent.OomAgent.Push:input_type -> oomagent.PushRequest
-	14, // 16: oomagent.OomAgent.Snapshot:input_type -> oomagent.SnapshotRequest
+	11, // 15: oomagent.OomAgent.Push:input_type -> oomagent.PushRequest
+	13, // 16: oomagent.OomAgent.Snapshot:input_type -> oomagent.SnapshotRequest
 	16, // 17: oomagent.OomAgent.ChannelJoin:input_type -> oomagent.ChannelJoinRequest
 	18, // 18: oomagent.OomAgent.Join:input_type -> oomagent.JoinRequest
 	20, // 19: oomagent.OomAgent.ChannelExport:input_type -> oomagent.ChannelExportRequest
@@ -1781,8 +1874,8 @@ var file_oomagent_proto_depIdxs = []int32{
 	7,  // 24: oomagent.OomAgent.Sync:output_type -> oomagent.SyncResponse
 	9,  // 25: oomagent.OomAgent.ChannelImport:output_type -> oomagent.ImportResponse
 	9,  // 26: oomagent.OomAgent.Import:output_type -> oomagent.ImportResponse
-	11, // 27: oomagent.OomAgent.Push:output_type -> oomagent.PushResponse
-	13, // 28: oomagent.OomAgent.Snapshot:output_type -> oomagent.SnapshotResponse
+	12, // 27: oomagent.OomAgent.Push:output_type -> oomagent.PushResponse
+	14, // 28: oomagent.OomAgent.Snapshot:output_type -> oomagent.SnapshotResponse
 	17, // 29: oomagent.OomAgent.ChannelJoin:output_type -> oomagent.ChannelJoinResponse
 	19, // 30: oomagent.OomAgent.Join:output_type -> oomagent.JoinResponse
 	21, // 31: oomagent.OomAgent.ChannelExport:output_type -> oomagent.ChannelExportResponse
@@ -1934,18 +2027,6 @@ func file_oomagent_proto_init() {
 			}
 		}
 		file_oomagent_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PushResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_oomagent_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PushRequest); i {
 			case 0:
 				return &v.state
@@ -1957,8 +2038,20 @@ func file_oomagent_proto_init() {
 				return nil
 			}
 		}
+		file_oomagent_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PushResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 		file_oomagent_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SnapshotResponse); i {
+			switch v := v.(*SnapshotRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1970,7 +2063,7 @@ func file_oomagent_proto_init() {
 			}
 		}
 		file_oomagent_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SnapshotRequest); i {
+			switch v := v.(*SnapshotResponse); i {
 			case 0:
 				return &v.state
 			case 1:
