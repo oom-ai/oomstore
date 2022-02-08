@@ -9,6 +9,9 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/offline"
 )
 
+// Snapshot generates snapshots for a specified group based on user-defined
+// snapshot interval.
+// This API only applies to stream features.
 func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 	group, err := s.metadata.GetGroupByName(ctx, groupName)
 	if err != nil {

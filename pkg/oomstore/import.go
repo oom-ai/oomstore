@@ -13,7 +13,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-// Import data into the offline feature store
+// Import API imports data from external data source to offline store.
 func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error) {
 	importOpt, err := s.parseImportOpt(ctx, opt)
 	if err != nil {

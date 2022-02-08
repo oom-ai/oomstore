@@ -10,17 +10,17 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-// List metadata of revisions of a same group.
+// ListRevision lists metadata of revisions of a same group.
 func (s *OomStore) ListRevision(ctx context.Context, groupID *int) (types.RevisionList, error) {
 	return s.metadata.ListRevision(ctx, groupID)
 }
 
-// Get metadata of a revision by ID.
+// GetRevision gets metadata of a revision by ID.
 func (s *OomStore) GetRevision(ctx context.Context, id int) (*types.Revision, error) {
 	return s.metadata.GetRevision(ctx, id)
 }
 
-// Get metadata of a revision by group ID and revision.
+// GetRevisionBy gets metadata of a revision by group ID and revision.
 func (s *OomStore) GetRevisionBy(ctx context.Context, groupID int, revision int64) (*types.Revision, error) {
 	return s.metadata.GetRevisionBy(ctx, groupID, revision)
 }
@@ -34,6 +34,7 @@ func (s *OomStore) createRevision(ctx context.Context, opt metadata.CreateRevisi
 	return s.metadata.CreateRevision(ctx, opt)
 }
 
+// createRevisionAndCdcTable creates a new revision with cdc table.
 func (s *OomStore) createRevisionAndCdcTable(ctx context.Context, groupID int, revision int64) error {
 	features := s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
 		GroupID: &groupID,
@@ -62,6 +63,7 @@ func (s *OomStore) createRevisionAndCdcTable(ctx context.Context, groupID int, r
 	return nil
 }
 
+// createDummyRevisionAndTables creates dummy revision (revision = 0) with snapshot table and cdc table.
 func (s *OomStore) createDummyRevisionAndTables(ctx context.Context, groupID int) error {
 	_, err := s.GetRevisionBy(ctx, groupID, 0)
 	if err == nil {
@@ -82,6 +84,7 @@ func (s *OomStore) createDummyRevisionAndTables(ctx context.Context, groupID int
 	return s.createSnapshotAndCdcTable(ctx, revisionID)
 }
 
+// createSnapshotAndCdcTable creates snapshot table and cdc table for a specified revision.
 func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revisionID int) error {
 	revision, err := s.GetRevision(ctx, revisionID)
 	if err != nil {
@@ -133,6 +136,7 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revisionID int
 	})
 }
 
+// createFirstSnapshotTable creates the first snapshot table for a specified group.
 func (s *OomStore) createFirstSnapshotTable(ctx context.Context, revision *types.Revision) error {
 	snapshotTable := dbutil.OfflineStreamSnapshotTableName(revision.GroupID, revision.Revision)
 
