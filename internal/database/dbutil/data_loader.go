@@ -2,8 +2,8 @@ package dbutil
 
 import (
 	"context"
+	"encoding/csv"
 	"io"
-	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -67,14 +67,19 @@ type ReadLineOpt struct {
 	Features   types.FeatureList
 }
 
+// ReadLine read a line from data source
 func ReadLine(opt ReadLineOpt) ([]interface{}, error) {
-	row, err := opt.Source.Reader.ReadString('\n')
+	// Currently, oomstore only supports csv format data source,
+	// so here we use csv.Reader to read data directly.
+	// If there are other data formats in the future, we need to choose different decoders according to the different formats.
+	reader := csv.NewReader(opt.Source.Reader)
+	row, err := reader.Read()
 	if err != nil {
-		return nil, errdefs.WithStack(err)
+		return nil, err
 	}
-	rowSlice := strings.Split(strings.Trim(row, "\n"), opt.Source.Delimiter)
-	line := make([]interface{}, 0, len(rowSlice))
-	for i, ele := range rowSlice {
+
+	line := make([]interface{}, 0, len(row))
+	for i, ele := range row {
 		if len(opt.Header) == 0 || len(opt.Features) == 0 || opt.Header[i] == opt.EntityName {
 			// entity_key doesn't need to change type
 			line = append(line, ele)
