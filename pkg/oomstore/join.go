@@ -37,7 +37,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 		return &types.JoinResult{Data: data}, nil
 	}
 
-	entity, err := getSharedEntity(features)
+	entity, err := features.GetSharedEntity()
 	if err != nil {
 		return nil, err
 	}

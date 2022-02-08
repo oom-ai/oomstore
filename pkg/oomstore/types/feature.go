@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+
 	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
 
@@ -134,4 +136,19 @@ func (l FeatureList) GroupByGroupID() map[int]FeatureList {
 		featureMap[id] = append(featureMap[id], f)
 	}
 	return featureMap
+}
+
+func (l FeatureList) GetSharedEntity() (*Entity, error) {
+	m := make(map[int]*Entity)
+	for _, f := range l {
+		m[f.Group.EntityID] = f.Group.Entity
+	}
+	if len(m) != 1 {
+		return nil, errdefs.Errorf("expected 1 entity, got %d entities", len(m))
+	}
+
+	for _, entity := range m {
+		return entity, nil
+	}
+	return nil, errdefs.Errorf("expected 1 entity, got 0")
 }

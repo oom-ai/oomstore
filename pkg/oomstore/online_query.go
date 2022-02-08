@@ -30,7 +30,7 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 		return &rs, nil
 	}
 
-	entity, err := getSharedEntity(features)
+	entity, err := features.GetSharedEntity()
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 		return result, nil
 	}
 
-	entity, err := getSharedEntity(features)
+	entity, err := features.GetSharedEntity()
 	if err != nil {
 		return nil, err
 	}
@@ -139,19 +139,4 @@ func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, 
 		}
 	}
 	return featureValueMap, nil
-}
-
-func getSharedEntity(features types.FeatureList) (*types.Entity, error) {
-	m := make(map[int]*types.Entity)
-	for _, f := range features {
-		m[f.Group.EntityID] = f.Group.Entity
-	}
-	if len(m) != 1 {
-		return nil, errdefs.Errorf("expected 1 entity, got %d entities", len(m))
-	}
-
-	for _, entity := range m {
-		return entity, nil
-	}
-	return nil, errdefs.Errorf("expected 1 entity, got 0")
 }
