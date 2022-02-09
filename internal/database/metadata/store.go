@@ -37,7 +37,7 @@ type DBStore interface {
 	UpdateGroup(ctx context.Context, opt UpdateGroupOpt) error
 	GetGroup(ctx context.Context, id int) (*types.Group, error)
 	GetGroupByName(ctx context.Context, name string) (*types.Group, error)
-	ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error)
+	ListGroup(ctx context.Context, opt ListGroupOpt) (types.GroupList, error)
 
 	// revision
 	CreateRevision(ctx context.Context, opt CreateRevisionOpt) (int, error)

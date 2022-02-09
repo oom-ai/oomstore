@@ -48,8 +48,8 @@ func (tx *Tx) GetGroupByName(ctx context.Context, name string) (*types.Group, er
 	return sqlutil.GetGroupByName(ctx, tx, name)
 }
 
-func (tx *Tx) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
-	return sqlutil.ListGroup(ctx, tx, entityID, groupIDs)
+func (tx *Tx) ListGroup(ctx context.Context, opt metadata.ListGroupOpt) (types.GroupList, error) {
+	return sqlutil.ListGroup(ctx, tx, opt)
 }
 
 func (tx *Tx) CreateFeature(ctx context.Context, opt metadata.CreateFeatureOpt) (int, error) {

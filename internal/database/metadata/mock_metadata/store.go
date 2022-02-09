@@ -291,18 +291,18 @@ func (mr *MockStoreMockRecorder) ListFeature(ctx, opt interface{}) *gomock.Call 
 }
 
 // ListGroup mocks base method.
-func (m *MockStore) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
+func (m *MockStore) ListGroup(ctx context.Context, opt metadata.ListGroupOpt) (types.GroupList, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListGroup", ctx, entityID, groupIDs)
+	ret := m.ctrl.Call(m, "ListGroup", ctx, opt)
 	ret0, _ := ret[0].(types.GroupList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListGroup indicates an expected call of ListGroup.
-func (mr *MockStoreMockRecorder) ListGroup(ctx, entityID, groupIDs interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) ListGroup(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockStore)(nil).ListGroup), ctx, entityID, groupIDs)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockStore)(nil).ListGroup), ctx, opt)
 }
 
 // ListRevision mocks base method.
@@ -652,18 +652,18 @@ func (mr *MockDBStoreMockRecorder) ListFeature(ctx, opt interface{}) *gomock.Cal
 }
 
 // ListGroup mocks base method.
-func (m *MockDBStore) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
+func (m *MockDBStore) ListGroup(ctx context.Context, opt metadata.ListGroupOpt) (types.GroupList, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListGroup", ctx, entityID, groupIDs)
+	ret := m.ctrl.Call(m, "ListGroup", ctx, opt)
 	ret0, _ := ret[0].(types.GroupList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListGroup indicates an expected call of ListGroup.
-func (mr *MockDBStoreMockRecorder) ListGroup(ctx, entityID, groupIDs interface{}) *gomock.Call {
+func (mr *MockDBStoreMockRecorder) ListGroup(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockDBStore)(nil).ListGroup), ctx, entityID, groupIDs)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockDBStore)(nil).ListGroup), ctx, opt)
 }
 
 // ListRevision mocks base method.
