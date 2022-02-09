@@ -91,8 +91,8 @@ func (g GroupItems) Walk(walkFunc func(Group) Group) (rs GroupItems) {
 	return
 }
 
-func BuildGroupItems(groups types.GroupList, features types.FeatureList) *GroupItems {
-	items := &GroupItems{
+func BuildGroupItems(groups types.GroupList, features types.FeatureList) GroupItems {
+	items := GroupItems{
 		Items: make([]Group, 0, groups.Len()),
 	}
 
@@ -129,7 +129,7 @@ type EntityItems struct {
 	Items []Entity `yaml:"items"`
 }
 
-func BuildEntityItems(entities types.EntityList, groups *GroupItems) (items EntityItems) {
+func BuildEntityItems(entities types.EntityList, groups GroupItems) (items EntityItems) {
 	for _, entity := range entities {
 		items.Items = append(items.Items, Entity{
 			Kind:        "Entity",
