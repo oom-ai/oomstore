@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -42,7 +41,10 @@ var getMetaFeatureCmd = &cobra.Command{
 			exit(err)
 		}
 
-		if err := outputFeature(os.Stdout, features, *getMetaOutput); err != nil {
+		if err := outputFeature(features, outputParams{
+			writer:    os.Stdout,
+			outputOpt: *getMetaOutput,
+		}); err != nil {
 			exitf("failed printing features: %+v\n", err)
 		}
 	},
@@ -69,11 +71,11 @@ func queryFeatures(ctx context.Context, oomStore *oomstore.OomStore, opt types.L
 	return features, nil
 }
 
-func outputFeature(w io.Writer, features types.FeatureList, outputOpt string) error {
-	switch outputOpt {
+func outputFeature(features types.FeatureList, params outputParams) error {
+	switch params.outputOpt {
 	case YAML:
-		return serializeInYaml(w, apply.BuildFeatureItems(features))
+		return serializeInYaml(params.writer, apply.BuildFeatureItems(features))
 	default:
-		return serializeMetadata(w, features, outputOpt, *getMetaWide)
+		return serializeMetadata(params.writer, features, params.outputOpt, *getMetaWide)
 	}
 }

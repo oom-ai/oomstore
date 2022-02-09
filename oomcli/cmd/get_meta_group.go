@@ -2,12 +2,10 @@ package cmd
 
 import (
 	"context"
-	"io"
 	"os"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
@@ -48,7 +46,11 @@ var getMetaGroupCmd = &cobra.Command{
 			exitf("%+v", err)
 		}
 
-		if err = outputGroup(ctx, os.Stdout, oomStore, groups, *getMetaOutput); err != nil {
+		if err = outputGroup(ctx, groups, outputParams{
+			writer:    os.Stdout,
+			oomStore:  oomStore,
+			outputOpt: *getMetaOutput,
+		}); err != nil {
 			exitf("%+v", err)
 		}
 	},
@@ -62,16 +64,11 @@ func init() {
 	getMetaGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func outputGroup(
-	ctx context.Context,
-	w io.Writer,
-	oomStore *oomstore.OomStore,
-	groups types.GroupList,
-	outputOpt string) error {
-	switch outputOpt {
+func outputGroup(ctx context.Context, groups types.GroupList, params outputParams) error {
+	switch params.outputOpt {
 	case YAML:
 		groupNames := groups.Names()
-		features, err := oomStore.ListFeature(ctx, types.ListFeatureOpt{
+		features, err := params.oomStore.ListFeature(ctx, types.ListFeatureOpt{
 			GroupNames: &groupNames,
 		})
 		if err != nil {
@@ -81,8 +78,8 @@ func outputGroup(
 		if err != nil {
 			return err
 		}
-		return serializeInYaml(w, groupItems)
+		return serializeInYaml(params.writer, groupItems)
 	default:
-		return serializeMetadata(w, groups, outputOpt, *getMetaWide)
+		return serializeMetadata(params.writer, groups, params.outputOpt, *getMetaWide)
 	}
 }
