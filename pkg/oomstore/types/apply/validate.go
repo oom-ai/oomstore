@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	entityValidate  jsonschema.Schema
-	groupValidate   jsonschema.Schema
-	featureValidate jsonschema.Schema
+	entityValidator  jsonschema.Schema
+	groupValidator   jsonschema.Schema
+	featureValidator jsonschema.Schema
 
 	//go:embed entity.json
 	entitySchema string
@@ -25,15 +25,15 @@ var (
 )
 
 func init() {
-	if err := json.Unmarshal([]byte(entitySchema), &entityValidate); err != nil {
+	if err := json.Unmarshal([]byte(entitySchema), &entityValidator); err != nil {
 		panic(err)
 	}
 
-	if err := json.Unmarshal([]byte(groupSchema), &groupValidate); err != nil {
+	if err := json.Unmarshal([]byte(groupSchema), &groupValidator); err != nil {
 		panic(err)
 	}
 
-	if err := json.Unmarshal([]byte(featureSchema), &featureValidate); err != nil {
+	if err := json.Unmarshal([]byte(featureSchema), &featureValidator); err != nil {
 		panic(err)
 	}
 }
@@ -44,7 +44,7 @@ func (e *Entity) Validate() error {
 		return errdefs.WithStack(err)
 	}
 
-	return validate(fmt.Sprintf("Entity %s", e.Name), data, &entityValidate)
+	return validate(fmt.Sprintf("Entity %s", e.Name), data, &entityValidator)
 }
 
 func (g *Group) Validate() error {
@@ -53,7 +53,7 @@ func (g *Group) Validate() error {
 		return errdefs.WithStack(err)
 	}
 
-	return validate(fmt.Sprintf("Group %s", g.Name), data, &groupValidate)
+	return validate(fmt.Sprintf("Group %s", g.Name), data, &groupValidator)
 }
 
 func (f *Feature) Validate() error {
@@ -62,7 +62,7 @@ func (f *Feature) Validate() error {
 		return err
 	}
 
-	return validate(fmt.Sprintf("Feature %s", f.Name), data, &featureValidate)
+	return validate(fmt.Sprintf("Feature %s", f.Name), data, &featureValidator)
 }
 
 func validate(errPrefix string, data []byte, schema *jsonschema.Schema) error {
