@@ -39,26 +39,31 @@ EOF
 assert_eq "$case" "$expected" "$actual"
 
 case="query multiple features 1"
-expected='
+expected=$(cat <<-EOF
 device,phone.model,phone.price
 6,apple-iphone11,4999
-'
+EOF
+)
+
 actual=$(oomcli get online --feature phone.model,phone.price -k 6 -o csv)
 assert_eq "$case" "$expected" "$actual"
 
 case="query multiple features 2"
-expected='
+expected=$(cat <<-EOF
 device,phone.price,phone.model
 6,4999,apple-iphone11
-'
+EOF
+)
+
 actual=$(oomcli get online --feature phone.price,phone.model -k 6 -o csv)
 assert_eq "$case" "$expected" "$actual"
 
 case="query multiple entity and features"
-expected='
+expected=$(cat <<-EOF
 device,phone.price,phone.model
 1,3999,xiaomi-mix3
 6,4999,apple-iphone11
-'
+EOF
+)
 actual=$(oomcli get online --feature phone.price,phone.model -k 1,6 -o csv)
 assert_eq "$case" "$expected" "$actual"
