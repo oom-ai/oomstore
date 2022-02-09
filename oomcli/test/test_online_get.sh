@@ -15,6 +15,28 @@ device,phone.model
 actual=$(oomcli get online --feature phone.model -k 1 -o csv)
 assert_eq "$case" "$expected" "$actual"
 
+case="sync stream feature with no import"
+actual=$(oomcli sync --group-name user-click 2>&1 || true)
+expected=$(cat <<-EOF
+syncing features ...
+Error: failed sync features: group user-click doesn't have any revision
+EOF
+)
+assert_eq "$case" "$expected" "$actual"
+
+import_user_click
+case="sync stream feature"
+oomcli sync --group-name user-click
+
+case="query stream feature"
+actual=$(oomcli get online -k 1,2 --feature user-click.last_5_click_posts,user-click.number_of_user_starred_posts -o csv)
+expected=$(cat <<-EOF
+user,user-click.last_5_click_posts,user-click.number_of_user_starred_posts
+1,"1,2",10
+2,"2,3",10
+EOF
+)
+assert_eq "$case" "$expected" "$actual"
 
 case="query multiple features 1"
 expected='
