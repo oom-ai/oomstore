@@ -19,7 +19,7 @@ func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 	}
 
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
-		GroupID: &group.ID,
+		GroupIDs: &[]int{group.ID},
 	})
 	if err != nil {
 		return err

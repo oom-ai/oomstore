@@ -192,7 +192,7 @@ func (s *OomStore) applyFeature(ctx context.Context, tx metadata.DBStore, newFea
 
 		if group.Category == types.CategoryStream {
 			features, err := tx.ListFeature(ctx, metadata.ListFeatureOpt{
-				GroupID: &group.ID,
+				GroupIDs: &[]int{group.ID},
 			})
 			if err != nil {
 				return nil, err

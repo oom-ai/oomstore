@@ -39,14 +39,14 @@ func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (t
 		if err != nil {
 			return nil, err
 		}
-		metadataOpt.EntityID = &entity.ID
+		metadataOpt.EntityIDs = &[]int{entity.ID}
 	}
 	if opt.GroupName != nil {
 		group, err := s.metadata.GetGroupByName(ctx, *opt.GroupName)
 		if err != nil {
 			return nil, err
 		}
-		metadataOpt.GroupID = &group.ID
+		metadataOpt.GroupIDs = &[]int{group.ID}
 	}
 	features, err := s.metadata.ListFeature(ctx, metadataOpt)
 	if err != nil {
@@ -100,7 +100,7 @@ func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt
 
 	if group.Category == types.CategoryStream {
 		features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
-			GroupID: &group.ID,
+			GroupIDs: &[]int{group.ID},
 		})
 		if err != nil {
 			return 0, err
