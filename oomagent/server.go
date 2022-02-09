@@ -311,7 +311,11 @@ func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen
 
 	header := exportResult.Header
 	for row := range exportResult.Data {
-		valueRow, err := convertToValueSlice(row)
+		if row.Error != nil {
+			return row.Error
+		}
+
+		valueRow, err := convertToValueSlice(row.Record)
 		if err != nil {
 			return internalError(err.Error())
 		}
@@ -323,9 +327,6 @@ func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen
 		}
 		// Only need to send header upon the first response
 		header = nil
-	}
-	if err := exportResult.CheckStreamError(); err != nil {
-		return internalError(err.Error())
 	}
 	return nil
 }
