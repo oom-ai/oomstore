@@ -38,13 +38,32 @@ func (s *OomStore) GetGroupByName(ctx context.Context, name string) (*types.Grou
 	return s.metadata.GetGroupByName(ctx, name)
 }
 
-// ListGroup lists metadata of feature groups under the same entity.
-func (s *OomStore) ListGroup(ctx context.Context, entityID *int) (types.GroupList, error) {
-	opt := metadata.ListGroupOpt{}
-	if entityID != nil {
-		opt.EntityIDs = &[]int{*entityID}
+// ListGroup lists metadata of feature groups meeting particular criteria.
+func (s *OomStore) ListGroup(ctx context.Context, opt types.ListGroupOpt) (types.GroupList, error) {
+	metadataOpt := metadata.ListGroupOpt{}
+	if opt.EntityNames != nil {
+		entities, err := s.ListEntity(ctx, opt.EntityNames)
+		if err != nil {
+			return nil, err
+		}
+		entityIDs := entities.IDs()
+		metadataOpt.EntityIDs = &entityIDs
 	}
-	return s.metadata.ListGroup(ctx, opt)
+	groups, err := s.metadata.ListGroup(ctx, metadataOpt)
+	if err != nil {
+		return nil, err
+	}
+	if opt.GroupNames != nil {
+		groups = groups.Filter(func(g *types.Group) bool {
+			for _, name := range *opt.GroupNames {
+				if g.Name == name {
+					return true
+				}
+			}
+			return false
+		})
+	}
+	return groups, nil
 }
 
 // UpdateGroup updates metadata of a feature group.

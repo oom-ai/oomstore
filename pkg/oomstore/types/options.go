@@ -35,6 +35,11 @@ type CreateGroupOpt struct {
 	Description      string
 }
 
+type ListGroupOpt struct {
+	EntityNames *[]string
+	GroupNames  *[]string
+}
+
 type ChannelExportOpt struct {
 	FeatureNames []string
 	UnixMilli    int64
