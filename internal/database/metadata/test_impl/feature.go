@@ -233,7 +233,7 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 
 	// case 4: list features by EntityID and FeatureIDs
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
-		EntityID:   intPtr(entityID + 1),
+		EntityIDs:  &[]int{entityID + 1},
 		FeatureIDs: &[]int{featureID},
 	})
 	assert.NoError(t, err)
@@ -241,7 +241,7 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 
 	// case 5: list features by GroupID and FeatureIDs
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
-		GroupID:    intPtr(groupID + 1),
+		GroupIDs:   &[]int{groupID + 1},
 		FeatureIDs: &[]int{featureID},
 	})
 	assert.NoError(t, err)
@@ -249,18 +249,32 @@ func TestListFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 
 	// case 6: list features by EntityID and empty FeatureIDs, return no feature
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
-		EntityID:   &entityID,
+		EntityIDs:  &[]int{entityID},
 		FeatureIDs: &[]int{},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(features))
 
-	// case 7: list features by EntityID
+	// case 7: list features by EntityIDs
 	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
-		EntityID: &entityID,
+		EntityIDs: &[]int{entityID, entityID + 1},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(features))
+
+	// case 8: list features by empty EntityIDs
+	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
+		EntityIDs: &[]int{},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(features))
+
+	// case 9: list features by empty GroupIDs
+	features, err = store.ListFeature(ctx, metadata.ListFeatureOpt{
+		GroupIDs: &[]int{},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(features))
 }
 
 func TestUpdateFeature(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
