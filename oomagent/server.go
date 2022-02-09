@@ -242,7 +242,7 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 				UnixMilli: req.EntityRow.UnixMilli,
 				Values:    req.EntityRow.Values,
 			}:
-				// nothing todo
+				// nothing to do
 			case <-ctx.Done():
 				return
 			}
