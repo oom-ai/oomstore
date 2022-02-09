@@ -50,6 +50,27 @@ assert_eq() {
   fi
 }
 
+assert_contains() {
+  local case expected actual
+  case="case - $1"
+  expected="$(trim "$2")"
+  actual="$(trim "$3")"
+
+  if [[ "$actual" == *"$expected"* ]]; then
+      info "${BLD}${GRN}Passed $case${RST}"
+      return 0
+  else
+      erro "${BLD}${GRN}Failed $case${RST}"
+      echo "${BLD}${YLW}=> expected contains:${RST}"
+      echo "$expected"
+      echo "${BLD}${YLW}=> actual:${RST}"
+      echo "$actual"
+      echo "${BLD}${YLW}=> diff:${RST}"
+      diff --color=auto <(echo "$expected" ) <(echo "$actual")
+      return 1
+  fi
+}
+
 # register features for the sample data
 register_features() {
     oomcli register entity device --description "device"
