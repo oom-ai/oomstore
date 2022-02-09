@@ -38,8 +38,8 @@ func (l EntityList) Len() int {
 	return len(l)
 }
 
-func (l *EntityList) Find(find func(*Entity) bool) *Entity {
-	for _, e := range *l {
+func (l EntityList) Find(find func(*Entity) bool) *Entity {
+	for _, e := range l {
 		if find(e) {
 			return e
 		}
@@ -47,11 +47,25 @@ func (l *EntityList) Find(find func(*Entity) bool) *Entity {
 	return nil
 }
 
-func (l *EntityList) Filter(filter func(*Entity) bool) (rs EntityList) {
-	for _, e := range *l {
+func (l EntityList) Filter(filter func(*Entity) bool) (rs EntityList) {
+	for _, e := range l {
 		if filter(e) {
 			rs = append(rs, e)
 		}
+	}
+	return
+}
+
+func (l EntityList) IDs() (ids []int) {
+	for _, entity := range l {
+		ids = append(ids, entity.ID)
+	}
+	return
+}
+
+func (l EntityList) Names() (names []string) {
+	for _, entity := range l {
+		names = append(names, entity.Name)
 	}
 	return
 }
