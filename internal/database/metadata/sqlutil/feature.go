@@ -99,7 +99,9 @@ func ListFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 
 	// enrich group
 	groupIDs := features.GroupIDs()
-	groups, err := ListGroup(ctx, sqlxCtx, nil, &groupIDs)
+	groups, err := ListGroup(ctx, sqlxCtx, metadata.ListGroupOpt{
+		GroupIDs: &groupIDs,
+	})
 	if err != nil {
 		return nil, err
 	}

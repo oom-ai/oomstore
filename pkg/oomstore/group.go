@@ -40,7 +40,11 @@ func (s *OomStore) GetGroupByName(ctx context.Context, name string) (*types.Grou
 
 // ListGroup lists metadata of feature groups under the same entity.
 func (s *OomStore) ListGroup(ctx context.Context, entityID *int) (types.GroupList, error) {
-	return s.metadata.ListGroup(ctx, entityID, nil)
+	opt := metadata.ListGroupOpt{}
+	if entityID != nil {
+		opt.EntityIDs = &[]int{*entityID}
+	}
+	return s.metadata.ListGroup(ctx, opt)
 }
 
 // UpdateGroup updates metadata of a feature group.

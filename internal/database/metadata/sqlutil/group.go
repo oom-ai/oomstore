@@ -85,8 +85,8 @@ func GetGroupByName(ctx context.Context, sqlxCtx metadata.SqlxContext, name stri
 	return &group, nil
 }
 
-func ListGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, entityID *int, groupIDs *[]int) (types.GroupList, error) {
-	cond, args, err := buildListGroupCond(entityID, groupIDs)
+func ListGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.ListGroupOpt) (types.GroupList, error) {
+	cond, args, err := buildListGroupCond(opt)
 	if err != nil {
 		return nil, errdefs.WithStack(err)
 	}
@@ -107,19 +107,26 @@ func ListGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, entityID *int,
 	return groups, nil
 }
 
-func buildListGroupCond(entityID *int, groupIDs *[]int) (string, []interface{}, error) {
+func buildListGroupCond(opt metadata.ListGroupOpt) (string, []interface{}, error) {
 	args := make([]interface{}, 0)
 	cond := make([]string, 0)
 
-	if entityID != nil {
-		cond = append(cond, "entity_id = ?")
-		args = append(args, *entityID)
-	}
-	if groupIDs != nil {
-		if len(*groupIDs) == 0 {
+	if opt.EntityIDs != nil {
+		if len(*opt.EntityIDs) == 0 {
 			return "false", args, nil
 		}
-		s, inArgs, err := sqlx.In("id IN (?)", *groupIDs)
+		s, inArgs, err := sqlx.In("entity_id IN (?)", *opt.EntityIDs)
+		if err != nil {
+			return "", nil, errdefs.WithStack(err)
+		}
+		cond = append(cond, s)
+		args = append(args, inArgs...)
+	}
+	if opt.GroupIDs != nil {
+		if len(*opt.GroupIDs) == 0 {
+			return "false", args, nil
+		}
+		s, inArgs, err := sqlx.In("id IN (?)", *opt.GroupIDs)
 		if err != nil {
 			return "", nil, errdefs.WithStack(err)
 		}

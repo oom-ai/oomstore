@@ -109,7 +109,9 @@ func ListRevision(ctx context.Context, sqlxCtx metadata.SqlxContext, groupID *in
 
 func enrichRevisions(ctx context.Context, sqlxCtx metadata.SqlxContext, revisions types.RevisionList) error {
 	groupIDs := revisions.GroupIDs()
-	groups, err := ListGroup(ctx, sqlxCtx, nil, &groupIDs)
+	groups, err := ListGroup(ctx, sqlxCtx, metadata.ListGroupOpt{
+		GroupIDs: &groupIDs,
+	})
 	if err != nil {
 		return err
 	}
