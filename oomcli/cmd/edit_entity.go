@@ -31,7 +31,11 @@ var editEntityCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		entities, err := queryEntities(ctx, oomStore, editEntityOpt.entityName)
+		var listEntityOpt types.ListEntityOpt
+		if editEntityOpt.entityName != nil {
+			listEntityOpt.EntityNames = &[]string{*editEntityOpt.entityName}
+		}
+		entities, err := oomStore.ListEntity(ctx, listEntityOpt)
 		if err != nil {
 			exit(err)
 		}

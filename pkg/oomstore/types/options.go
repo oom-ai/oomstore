@@ -23,12 +23,21 @@ type CreateEntityOpt struct {
 	Description string
 }
 
+type ListEntityOpt struct {
+	EntityNames *[]string
+}
+
 type CreateGroupOpt struct {
 	GroupName        string
 	EntityName       string
 	Category         Category
 	SnapshotInterval int
 	Description      string
+}
+
+type ListGroupOpt struct {
+	EntityNames *[]string
+	GroupNames  *[]string
 }
 
 type ChannelExportOpt struct {

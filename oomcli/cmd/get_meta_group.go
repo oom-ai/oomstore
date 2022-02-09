@@ -2,11 +2,9 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 
-	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
@@ -36,7 +34,14 @@ var getMetaGroupCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		groups, err := queryGroups(ctx, oomStore, getMetaGroupOpt.entityName, getMetaGroupOpt.groupName)
+		listGroupOpt := types.ListGroupOpt{}
+		if getMetaGroupOpt.entityName != nil {
+			listGroupOpt.EntityNames = &[]string{*getMetaGroupOpt.entityName}
+		}
+		if getMetaGroupOpt.groupName != nil {
+			listGroupOpt.GroupNames = &[]string{*getMetaGroupOpt.groupName}
+		}
+		groups, err := oomStore.ListGroup(ctx, listGroupOpt)
 		if err != nil {
 			exitf("%+v", err)
 		}
@@ -53,32 +58,6 @@ func init() {
 	flags := getMetaGroupCmd.Flags()
 
 	getMetaGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
-}
-
-func queryGroups(ctx context.Context, oomStore *oomstore.OomStore, entityName, groupName *string) (types.GroupList, error) {
-	var entityID *int
-
-	if groupName != nil {
-		group, err := oomStore.GetGroupByName(ctx, *groupName)
-		if err != nil {
-			return nil, err
-		}
-
-		if entityName != nil && group.Entity.Name != *entityName {
-			return nil, errdefs.Errorf("group '%s' entityName is '%s' not '%s'", *groupName, group.Entity.Name, *entityName)
-		}
-		return types.GroupList{group}, err
-	}
-
-	if entityName != nil {
-		entity, err := oomStore.GetEntityByName(ctx, *entityName)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get entity name='%s': %v", *entityName, err)
-		}
-		entityID = &entity.ID
-	}
-
-	return oomStore.ListGroup(ctx, entityID)
 }
 
 func serializeGroupToWriter(ctx context.Context, w io.Writer, oomStore *oomstore.OomStore,

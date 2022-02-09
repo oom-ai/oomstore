@@ -32,7 +32,11 @@ var getMetaEntityCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		entities, err := queryEntities(ctx, oomStore, getMetaEntityOpt.entityName)
+		var listEntityOpt types.ListEntityOpt
+		if getMetaEntityOpt.entityName != nil {
+			listEntityOpt.EntityNames = &[]string{*getMetaEntityOpt.entityName}
+		}
+		entities, err := oomStore.ListEntity(ctx, listEntityOpt)
 		if err != nil {
 			exit(err)
 		}
@@ -47,21 +51,18 @@ func init() {
 	getMetaCmd.AddCommand(getMetaEntityCmd)
 }
 
-func queryEntities(ctx context.Context, oomStore *oomstore.OomStore, entityName *string) (types.EntityList, error) {
-	if entityName != nil {
-		entity, err := oomStore.GetEntityByName(ctx, *entityName)
-		return types.EntityList{entity}, err
-	}
-	return oomStore.ListEntity(ctx)
-}
-
-func serializeEntitiesToWriter(ctx context.Context, w io.Writer, oomStore *oomstore.OomStore,
-	entities types.EntityList, outputOpt string) error {
-
+func serializeEntitiesToWriter(
+	ctx context.Context,
+	w io.Writer,
+	oomStore *oomstore.OomStore,
+	entities types.EntityList,
+	outputOpt string) error {
 	switch outputOpt {
 	case YAML:
-		// TODO: Use entity ids to filter, rather than taking them all out
-		groups, err := oomStore.ListGroup(ctx, nil)
+		entityNames := entities.Names()
+		groups, err := oomStore.ListGroup(ctx, types.ListGroupOpt{
+			EntityNames: &entityNames,
+		})
 		if err != nil {
 			return err
 		}
