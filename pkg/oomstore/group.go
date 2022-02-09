@@ -42,7 +42,9 @@ func (s *OomStore) GetGroupByName(ctx context.Context, name string) (*types.Grou
 func (s *OomStore) ListGroup(ctx context.Context, opt types.ListGroupOpt) (types.GroupList, error) {
 	metadataOpt := metadata.ListGroupOpt{}
 	if opt.EntityNames != nil {
-		entities, err := s.ListEntity(ctx, opt.EntityNames)
+		entities, err := s.ListEntity(ctx, types.ListEntityOpt{
+			EntityNames: opt.EntityNames,
+		})
 		if err != nil {
 			return nil, err
 		}

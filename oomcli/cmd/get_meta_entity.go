@@ -51,13 +51,18 @@ func init() {
 	getMetaCmd.AddCommand(getMetaEntityCmd)
 }
 
-func serializeEntitiesToWriter(ctx context.Context, w io.Writer, oomStore *oomstore.OomStore,
-	entities types.EntityList, outputOpt string) error {
-
+func serializeEntitiesToWriter(
+	ctx context.Context,
+	w io.Writer,
+	oomStore *oomstore.OomStore,
+	entities types.EntityList,
+	outputOpt string) error {
 	switch outputOpt {
 	case YAML:
-		// TODO: Use entity ids to filter, rather than taking them all out
-		groups, err := oomStore.ListGroup(ctx, nil)
+		entityNames := entities.Names()
+		groups, err := oomStore.ListGroup(ctx, types.ListGroupOpt{
+			EntityNames: &entityNames,
+		})
 		if err != nil {
 			return err
 		}

@@ -35,7 +35,14 @@ var editGroupCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		groups, err := queryGroups(ctx, oomStore, editGroupOpt.entityName, editGroupOpt.groupName)
+		listGroupOpt := types.ListGroupOpt{}
+		if getMetaGroupOpt.entityName != nil {
+			listGroupOpt.EntityNames = &[]string{*getMetaGroupOpt.entityName}
+		}
+		if getMetaGroupOpt.groupName != nil {
+			listGroupOpt.GroupNames = &[]string{*getMetaGroupOpt.groupName}
+		}
+		groups, err := oomStore.ListGroup(ctx, listGroupOpt)
 		if err != nil {
 			exit(err)
 		}
