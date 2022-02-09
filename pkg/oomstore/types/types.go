@@ -15,14 +15,17 @@ const (
 	TableStreamCdc      TableType = "stream_cdc"
 )
 
-type ExportRecord []interface{}
+type ExportRecord struct {
+	Record []interface{}
+	Error  error
+}
 
 func (r ExportRecord) EntityKey() string {
-	return r[0].(string)
+	return r.Record[0].(string)
 }
 
 func (r ExportRecord) ValueAt(i int) interface{} {
-	return r[i+1]
+	return r.Record[i+1]
 }
 
 type EntityRow struct {
@@ -40,31 +43,13 @@ type JoinResult struct {
 type ExportResult struct {
 	Header []string
 	Data   <-chan ExportRecord
-	error  <-chan error
 }
 
-func NewExportResult(header []string, data <-chan ExportRecord, error <-chan error) *ExportResult {
+func NewExportResult(header []string, data <-chan ExportRecord) *ExportResult {
 	return &ExportResult{
 		Header: header,
 		Data:   data,
-		error:  error,
 	}
-}
-
-// ATTENTION: call this method only after you consume all elements
-// from Data channel; otherwise, it will block the Data channel.
-func (e *ExportResult) CheckStreamError() error {
-	if e == nil {
-		return nil
-	}
-	if e.error != nil {
-		return <-e.error
-	}
-	return nil
-}
-
-func (e *ExportResult) GetErrorChannel() <-chan error {
-	return e.error
 }
 
 type DataTableTimeRange struct {

@@ -41,11 +41,15 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	var putVals [][]byte
 
 	for record := range opt.ExportStream {
-		if len(record) != len(opt.Features)+1 {
-			return errdefs.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
+		if record.Error != nil {
+			return record.Error
 		}
 
-		entityKey, featureValues := record[0], record[1:]
+		if len(record.Record) != len(opt.Features)+1 {
+			return errdefs.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record.Record))
+		}
+
+		entityKey, featureValues := record.Record[0], record.Record[1:]
 
 		serializedEntityKey, err := dbutil.SerializeByValue(entityKey, Backend)
 		if err != nil {
@@ -85,15 +89,6 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		// We don't expire keys using TTL
 		if err := db.BatchPut(ctx, putKeys, putVals, []uint64{}); err != nil {
 			return errdefs.WithStack(err)
-		}
-	}
-
-	if opt.ExportError != nil {
-		select {
-		case err := <-opt.ExportError:
-			return err
-		default:
-			return nil
 		}
 	}
 	return nil

@@ -45,11 +45,15 @@ func printExportResultInCSV(exportResult *types.ExportResult) error {
 	}
 
 	for row := range exportResult.Data {
-		if err := w.Write(cast.ToStringSlice([]interface{}(row))); err != nil {
+		if row.Error != nil {
+			return row.Error
+		}
+
+		if err := w.Write(cast.ToStringSlice([]interface{}(row.Record))); err != nil {
 			return err
 		}
 	}
-	return exportResult.CheckStreamError()
+	return nil
 }
 
 func printExportResultInASCIITable(exportResult *types.ExportResult) error {
@@ -58,9 +62,13 @@ func printExportResultInASCIITable(exportResult *types.ExportResult) error {
 	table.SetAutoFormatHeaders(false)
 
 	for row := range exportResult.Data {
-		table.Append(cast.ToStringSlice([]interface{}(row)))
+		if row.Error != nil {
+			return row.Error
+		}
+
+		table.Append(cast.ToStringSlice([]interface{}(row.Record)))
 	}
 
 	table.Render()
-	return exportResult.CheckStreamError()
+	return nil
 }

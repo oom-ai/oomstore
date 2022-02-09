@@ -120,9 +120,13 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
 		return err
 	}
 	for row := range exportResult.Data {
-		if err := w.Write(cast.ToStringSlice([]interface{}(row))); err != nil {
+		if row.Error != nil {
+			return row.Error
+		}
+
+		if err := w.Write(cast.ToStringSlice([]interface{}(row.Record))); err != nil {
 			return err
 		}
 	}
-	return exportResult.CheckStreamError()
+	return nil
 }

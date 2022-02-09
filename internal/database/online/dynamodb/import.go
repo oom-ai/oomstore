@@ -46,6 +46,10 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	// Step 2: import items to the table
 	items := make([]types.WriteRequest, 0, BatchWriteItemCapacity)
 	for record := range opt.ExportStream {
+		if record.Error != nil {
+			return record.Error
+		}
+
 		item, err := buildItem(record, opt)
 		if err != nil {
 			return err
@@ -66,14 +70,6 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 		return err
 	}
 
-	if opt.ExportError != nil {
-		select {
-		case err := <-opt.ExportError:
-			return err
-		default:
-			return nil
-		}
-	}
 	return nil
 }
 

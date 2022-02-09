@@ -83,16 +83,22 @@ func init() {
 			Group:   &group1,
 		},
 		Data: []types.ExportRecord{
-			[]interface{}{"3215", int64(18), "F", 1.1, true, time.Now()},
-			[]interface{}{"3216", int64(29), nil, 2.0, false, time.Now()},
-			[]interface{}{"3217", int64(44), "M", 3.1, true, time.Now()},
+			{
+				Record: []interface{}{"3215", int64(18), "F", 1.1, true, time.Now()},
+			},
+			{
+				Record: []interface{}{"3216", int64(29), nil, 2.0, false, time.Now()},
+			},
+			{
+				Record: []interface{}{"3217", int64(44), "M", 3.1, true, time.Now()},
+			},
 		},
 	}
 
 	var data []types.ExportRecord
 	for i := 0; i < 100; i++ {
 		record := []interface{}{dbutil.RandString(10), rand.Float64()}
-		data = append(data, record)
+		data = append(data, types.ExportRecord{Record: record, Error: nil})
 	}
 	SampleMedium = Sample{
 		Entity: entity,
@@ -134,10 +140,18 @@ func init() {
 			},
 		},
 		Data: []types.ExportRecord{
-			[]interface{}{"3215", int64(1), "1,2,3,4"},
-			[]interface{}{"3216", int64(2), "2,3,4,5"},
-			[]interface{}{"3217", int64(3), "3,4,5,6"},
-			[]interface{}{"3218", int64(4), "4,5,6,7"},
+			{
+				Record: []interface{}{"3215", int64(1), "1,2,3,4"},
+			},
+			{
+				Record: []interface{}{"3216", int64(2), "2,3,4,5"},
+			},
+			{
+				Record: []interface{}{"3217", int64(3), "3,4,5,6"},
+			},
+			{
+				Record: []interface{}{"3218", int64(4), "4,5,6,7"},
+			},
 		},
 	}
 }
