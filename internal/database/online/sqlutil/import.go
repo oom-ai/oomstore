@@ -22,7 +22,8 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 	}
 	entity := opt.Group.Entity
 	columns := append([]string{entity.Name}, opt.Features.Names()...)
-	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+
+	return dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
 		schema := dbutil.BuildTableSchema(tableName, entity.Name, false, opt.Features, []string{entity.Name}, backend)
 		_, err := tx.ExecContext(ctx, schema)
@@ -49,8 +50,15 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 			return err
 		}
 		if opt.ExportError != nil {
-			return <-opt.ExportError
+			select {
+			case err := <-opt.ExportError:
+				if err != nil {
+					return err
+				}
+			default:
+			}
 		}
+
 		if opt.Group.Category == types.CategoryStream {
 			streamTableName := dbutil.OnlineStreamTableName(opt.Group.ID)
 			if err = PurgeTx(ctx, tx, streamTableName, backend); err != nil {
@@ -63,5 +71,4 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 		}
 		return nil
 	})
-	return err
 }
