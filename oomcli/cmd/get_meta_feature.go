@@ -72,7 +72,7 @@ func queryFeatures(ctx context.Context, oomStore *oomstore.OomStore, opt types.L
 func outputFeature(w io.Writer, features types.FeatureList, outputOpt string) error {
 	switch outputOpt {
 	case YAML:
-		return serializeInYaml(w, apply.FromFeatureList(features))
+		return serializeInYaml(w, apply.BuildFeatureItems(features))
 	default:
 		return serializeMetadata(w, features, outputOpt, *getMetaWide)
 	}

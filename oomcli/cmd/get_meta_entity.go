@@ -72,8 +72,8 @@ func outputEntity(
 		if err != nil {
 			return err
 		}
-		groupItems := apply.FromGroupList(groups, features)
-		entityItems := apply.FromEntityList(entities, groupItems)
+		groupItems := apply.BuildGroupItems(groups, features)
+		entityItems := apply.BuildEntityItems(entities, groupItems)
 		return serializeInYaml(w, entityItems)
 	default:
 		return serializeMetadata(w, entities, outputOpt, *getMetaWide)

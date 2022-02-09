@@ -77,7 +77,7 @@ func outputGroup(
 		if err != nil {
 			return err
 		}
-		groupItems := apply.FromGroupList(groups, features)
+		groupItems := apply.BuildGroupItems(groups, features)
 		if err != nil {
 			return err
 		}
