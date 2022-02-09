@@ -5,6 +5,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
+
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
@@ -60,16 +62,26 @@ func init() {
 	getMetaGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func serializeGroupToWriter(ctx context.Context, w io.Writer, oomStore *oomstore.OomStore,
-	groups types.GroupList, outputOpt string) error {
-
+func serializeGroupToWriter(
+	ctx context.Context,
+	w io.Writer,
+	oomStore *oomstore.OomStore,
+	groups types.GroupList,
+	outputOpt string) error {
 	switch outputOpt {
 	case YAML:
-		if items, err := groupsToApplyGroupItems(ctx, oomStore, groups); err != nil {
+		groupNames := groups.Names()
+		features, err := oomStore.ListFeature(ctx, types.ListFeatureOpt{
+			GroupNames: &groupNames,
+		})
+		if err != nil {
 			return err
-		} else {
-			return serializeInYaml(w, *items)
 		}
+		groupItems := apply.FromGroupList(groups, features)
+		if err != nil {
+			return err
+		}
+		return serializeInYaml(w, groupItems)
 	default:
 		return serializeMetadata(w, groups, outputOpt, *getMetaWide)
 	}

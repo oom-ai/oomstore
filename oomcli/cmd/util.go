@@ -7,7 +7,6 @@ import (
 
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types/apply"
 )
 
 const (
@@ -31,17 +30,6 @@ func mustOpenOomStore(ctx context.Context, opt types.OomStoreConfig) *oomstore.O
 
 func stringPtr(s string) *string {
 	return &s
-}
-
-func groupsToApplyGroupItems(ctx context.Context, store *oomstore.OomStore, groups types.GroupList) (*apply.GroupItems, error) {
-	groupNames := groups.Names()
-	features, err := store.ListFeature(ctx, types.ListFeatureOpt{
-		GroupNames: &groupNames,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return apply.FromGroupList(groups, features), nil
 }
 
 func exitf(format string, a ...interface{}) {

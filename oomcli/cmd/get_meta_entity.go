@@ -66,13 +66,15 @@ func serializeEntitiesToWriter(
 		if err != nil {
 			return err
 		}
-
-		groupItems, err := groupsToApplyGroupItems(ctx, oomStore, groups)
+		features, err := oomStore.ListFeature(ctx, types.ListFeatureOpt{
+			EntityNames: &entityNames,
+		})
 		if err != nil {
 			return err
 		}
-
-		return serializeInYaml(w, apply.FromEntityList(entities, groupItems))
+		groupItems := apply.FromGroupList(groups, features)
+		entityItems := apply.FromEntityList(entities, groupItems)
+		return serializeInYaml(w, entityItems)
 	default:
 		return serializeMetadata(w, entities, outputOpt, *getMetaWide)
 	}
