@@ -34,19 +34,25 @@ func (s *OomStore) GetFeatureByName(ctx context.Context, groupName string, featu
 // ListFeature lists metadata of features meeting particular criteria.
 func (s *OomStore) ListFeature(ctx context.Context, opt types.ListFeatureOpt) (types.FeatureList, error) {
 	metadataOpt := metadata.ListFeatureOpt{}
-	if opt.EntityName != nil {
-		entity, err := s.metadata.GetEntityByName(ctx, *opt.EntityName)
+	if opt.EntityNames != nil {
+		entities, err := s.ListEntity(ctx, types.ListEntityOpt{
+			EntityNames: opt.EntityNames,
+		})
 		if err != nil {
 			return nil, err
 		}
-		metadataOpt.EntityIDs = &[]int{entity.ID}
+		entityIDs := entities.IDs()
+		metadataOpt.EntityIDs = &entityIDs
 	}
-	if opt.GroupName != nil {
-		group, err := s.metadata.GetGroupByName(ctx, *opt.GroupName)
+	if opt.GroupNames != nil {
+		groups, err := s.ListGroup(ctx, types.ListGroupOpt{
+			GroupNames: opt.GroupNames,
+		})
 		if err != nil {
 			return nil, err
 		}
-		metadataOpt.GroupIDs = &[]int{group.ID}
+		groupIDs := groups.IDs()
+		metadataOpt.GroupIDs = &groupIDs
 	}
 	features, err := s.metadata.ListFeature(ctx, metadataOpt)
 	if err != nil {

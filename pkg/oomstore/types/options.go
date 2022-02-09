@@ -8,8 +8,8 @@ type CreateFeatureOpt struct {
 }
 
 type ListFeatureOpt struct {
-	EntityName   *string
-	GroupName    *string
+	EntityNames  *[]string
+	GroupNames   *[]string
 	FeatureNames *[]string
 }
 
