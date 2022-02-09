@@ -48,7 +48,7 @@ var getMetaGroupCmd = &cobra.Command{
 			exitf("%+v", err)
 		}
 
-		if err = serializeGroupToWriter(ctx, os.Stdout, oomStore, groups, *getMetaOutput); err != nil {
+		if err = outputGroup(ctx, os.Stdout, oomStore, groups, *getMetaOutput); err != nil {
 			exitf("%+v", err)
 		}
 	},
@@ -62,7 +62,7 @@ func init() {
 	getMetaGroupOpt.entityName = flags.StringP("entity", "", "", "use to filter groups")
 }
 
-func serializeGroupToWriter(
+func outputGroup(
 	ctx context.Context,
 	w io.Writer,
 	oomStore *oomstore.OomStore,

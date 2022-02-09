@@ -70,7 +70,7 @@ func writeFeaturesToTempFile(ctx context.Context, oomStore *oomstore.OomStore, f
 	}
 	defer tempFile.Close()
 
-	if err = serializeFeatureToWriter(tempFile, features, YAML); err != nil {
+	if err = outputFeature(tempFile, features, YAML); err != nil {
 		return "", err
 	}
 	return tempFile.Name(), nil

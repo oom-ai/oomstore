@@ -42,7 +42,7 @@ var getMetaFeatureCmd = &cobra.Command{
 			exit(err)
 		}
 
-		if err := serializeFeatureToWriter(os.Stdout, features, *getMetaOutput); err != nil {
+		if err := outputFeature(os.Stdout, features, *getMetaOutput); err != nil {
 			exitf("failed printing features: %+v\n", err)
 		}
 	},
@@ -69,7 +69,7 @@ func queryFeatures(ctx context.Context, oomStore *oomstore.OomStore, opt types.L
 	return features, nil
 }
 
-func serializeFeatureToWriter(w io.Writer, features types.FeatureList, outputOpt string) error {
+func outputFeature(w io.Writer, features types.FeatureList, outputOpt string) error {
 	switch outputOpt {
 	case YAML:
 		return serializeInYaml(w, apply.FromFeatureList(features))

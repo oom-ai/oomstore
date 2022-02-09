@@ -41,7 +41,7 @@ var getMetaEntityCmd = &cobra.Command{
 			exit(err)
 		}
 
-		if err = serializeEntitiesToWriter(ctx, os.Stdout, oomStore, entities, *getMetaOutput); err != nil {
+		if err = outputEntity(ctx, os.Stdout, oomStore, entities, *getMetaOutput); err != nil {
 			exitf("failed printing entities, error: %+v\n", err)
 		}
 	},
@@ -51,7 +51,7 @@ func init() {
 	getMetaCmd.AddCommand(getMetaEntityCmd)
 }
 
-func serializeEntitiesToWriter(
+func outputEntity(
 	ctx context.Context,
 	w io.Writer,
 	oomStore *oomstore.OomStore,
