@@ -34,8 +34,10 @@ func stringPtr(s string) *string {
 }
 
 func groupsToApplyGroupItems(ctx context.Context, store *oomstore.OomStore, groups types.GroupList) (*apply.GroupItems, error) {
-	// TODO: Use group ids to filter, rather than taking them all out
-	features, err := store.ListFeature(ctx, types.ListFeatureOpt{})
+	groupNames := groups.Names()
+	features, err := store.ListFeature(ctx, types.ListFeatureOpt{
+		GroupNames: &groupNames,
+	})
 	if err != nil {
 		return nil, err
 	}

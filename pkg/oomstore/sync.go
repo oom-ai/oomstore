@@ -36,7 +36,7 @@ func (s *OomStore) syncBatch(ctx context.Context, opt types.SyncOpt, group *type
 	}
 
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
-		GroupName: &group.Name,
+		GroupNames: &[]string{group.Name},
 	})
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func (s *OomStore) syncBatch(ctx context.Context, opt types.SyncOpt, group *type
 // syncStream syncs stream feature group from offline store to online store.
 func (s *OomStore) syncStream(ctx context.Context, opt types.SyncOpt) error {
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
-		GroupName: &opt.GroupName,
+		GroupNames: &[]string{opt.GroupName},
 	})
 	if err != nil {
 		return err
