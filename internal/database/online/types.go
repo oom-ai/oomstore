@@ -41,7 +41,6 @@ type ImportOpt struct {
 	Group        types.Group
 	Features     types.FeatureList
 	ExportStream <-chan types.ExportRecord
-	ExportError  <-chan error
 	RevisionID   *int
 }
 
