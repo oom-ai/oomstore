@@ -17,13 +17,17 @@ func (s *OomStore) Push(ctx context.Context, opt types.PushOpt) error {
 	features := s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
 		GroupName: &opt.GroupName,
 	})
+	if len(features) == 0 {
+		return errdefs.Errorf("Feature group is empty or does not exist")
+	}
+	entity := features[0].Entity()
+	group := features[0].Group
+
 	var featureNames []string
 	for name := range opt.FeatureValues {
 		featureNames = append(featureNames, name)
 	}
 
-	entity := features[0].Entity()
-	group := features[0].Group
 	if group.Category != types.CategoryStream {
 		return errdefs.Errorf("Push API is for streaming features only")
 	}
