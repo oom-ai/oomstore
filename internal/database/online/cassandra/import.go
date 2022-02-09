@@ -39,11 +39,15 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	insertStmt := buildInsertStatement(tableName, columns)
 	batch := db.NewBatch(gocql.LoggedBatch)
 	for record := range opt.ExportStream {
-		if len(record) != len(opt.Features)+1 {
-			return errdefs.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
+		if record.Error != nil {
+			return record.Error
+		}
+
+		if len(record.Record) != len(opt.Features)+1 {
+			return errdefs.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record.Record))
 		}
 		if batch.Size() != BatchSize {
-			batch.Query(insertStmt, record...)
+			batch.Query(insertStmt, record.Record...)
 		} else {
 			if err := db.ExecuteBatch(batch); err != nil {
 				return errdefs.WithStack(err)

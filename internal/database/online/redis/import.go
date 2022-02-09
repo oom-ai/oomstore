@@ -16,11 +16,14 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	defer pipe.Close()
 
 	for record := range opt.ExportStream {
-		if len(record) != len(opt.Features)+1 {
-			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
+		if record.Error != nil {
+			return record.Error
+		}
+		if len(record.Record) != len(opt.Features)+1 {
+			return fmt.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record.Record))
 		}
 
-		entityKey, values := record[0], record[1:]
+		entityKey, values := record.Record[0], record.Record[1:]
 		var key string
 		var err error
 		if opt.Group.Category == types.CategoryBatch {
@@ -63,15 +66,6 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	if seq%PipelineBatchSize != 0 {
 		if _, err := pipe.Exec(ctx); err != nil {
 			return errdefs.WithStack(err)
-		}
-	}
-
-	if opt.ExportError != nil {
-		select {
-		case err := <-opt.ExportError:
-			return err
-		default:
-			return nil
 		}
 	}
 	return nil

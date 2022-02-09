@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -34,10 +35,14 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 		// populate the data table
 		records := make([]interface{}, 0, importBatchSize)
 		for record := range opt.ExportStream {
-			if len(record) != len(opt.Features)+1 {
-				return errdefs.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record))
+			if record.Error != nil {
+				return record.Error
 			}
-			records = append(records, record)
+
+			if len(record.Record) != len(opt.Features)+1 {
+				return errdefs.Errorf("field count not matched, expected %d, got %d", len(opt.Features)+1, len(record.Record))
+			}
+			records = append(records, record.Record)
 
 			if len(records) == importBatchSize {
 				if err = dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, backend); err != nil {
@@ -48,15 +53,6 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 		}
 		if err = dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, backend); err != nil {
 			return err
-		}
-		if opt.ExportError != nil {
-			select {
-			case err := <-opt.ExportError:
-				if err != nil {
-					return err
-				}
-			default:
-			}
 		}
 
 		if opt.Group.Category == types.CategoryStream {
