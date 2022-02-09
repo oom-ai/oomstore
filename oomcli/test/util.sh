@@ -125,6 +125,14 @@ import_student_sample() {
     --description 'test data' | grep -o '[0-9]\+'
 }
 
+import_user_click() {
+    info "import user click sample data to offline store..."
+    oomcli import \
+    --group user-click \
+    --input-file "$(pwd)/user_click.csv" \
+    --description 'test data' > /dev/null
+}
+
 # sync feature values from offline store to online store
 sync() {
     info "sync sample data to online store"
