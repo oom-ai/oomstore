@@ -67,7 +67,7 @@ func (s *OomStore) parseImportOpt(ctx context.Context, opt types.ImportOpt) (*im
 	}
 
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
-		GroupID: &group.ID,
+		GroupIDs: &[]int{group.ID},
 	})
 	if err != nil {
 		return nil, err

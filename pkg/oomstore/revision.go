@@ -99,7 +99,7 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revisionID int
 
 	// Create snapshot table in offline store
 	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
-		GroupID: &revision.GroupID,
+		GroupIDs: &[]int{revision.GroupID},
 	})
 	if err != nil {
 		return err
