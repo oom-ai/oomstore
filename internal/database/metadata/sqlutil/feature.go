@@ -114,9 +114,14 @@ func ListFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 	}
 
 	// filter by entity
-	if opt.EntityID != nil {
+	if opt.EntityIDs != nil {
 		features = features.Filter(func(f *types.Feature) bool {
-			return f.Group.EntityID == *opt.EntityID
+			for _, id := range *opt.EntityIDs {
+				if f.Group.EntityID == id {
+					return true
+				}
+			}
+			return false
 		})
 	}
 	return features, nil
@@ -126,8 +131,11 @@ func buildListFeatureCond(opt metadata.ListFeatureOpt) ([]string, []interface{},
 	in := make(map[string]interface{})
 	and := make(map[string]interface{})
 
-	if opt.GroupID != nil {
-		and["group_id"] = *opt.GroupID
+	if opt.GroupIDs != nil {
+		if len(*opt.GroupIDs) == 0 {
+			return []string{"false"}, nil, nil
+		}
+		in["group_id"] = *opt.GroupIDs
 	}
 
 	if opt.FeatureIDs != nil {
