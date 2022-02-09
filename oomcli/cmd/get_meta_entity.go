@@ -32,7 +32,11 @@ var getMetaEntityCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		entities, err := queryEntities(ctx, oomStore, getMetaEntityOpt.entityName)
+		var listEntityOpt types.ListEntityOpt
+		if getMetaEntityOpt.entityName != nil {
+			listEntityOpt.EntityNames = &[]string{*getMetaEntityOpt.entityName}
+		}
+		entities, err := oomStore.ListEntity(ctx, listEntityOpt)
 		if err != nil {
 			exit(err)
 		}
@@ -45,14 +49,6 @@ var getMetaEntityCmd = &cobra.Command{
 
 func init() {
 	getMetaCmd.AddCommand(getMetaEntityCmd)
-}
-
-func queryEntities(ctx context.Context, oomStore *oomstore.OomStore, entityName *string) (types.EntityList, error) {
-	if entityName != nil {
-		entity, err := oomStore.GetEntityByName(ctx, *entityName)
-		return types.EntityList{entity}, err
-	}
-	return oomStore.ListEntity(ctx)
 }
 
 func serializeEntitiesToWriter(ctx context.Context, w io.Writer, oomStore *oomstore.OomStore,
