@@ -67,7 +67,12 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 	}
 
 	if opt.ExportError != nil {
-		return <-opt.ExportError
+		select {
+		case err := <-opt.ExportError:
+			return err
+		default:
+			return nil
+		}
 	}
 	return nil
 }
