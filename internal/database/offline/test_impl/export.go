@@ -50,10 +50,9 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 	})
 
 	testCases := []struct {
-		description   string
-		opt           offline.ExportOpt
-		expected      [][]interface{}
-		expectedError error
+		description string
+		opt         offline.ExportOpt
+		expected    [][]interface{}
 	}{
 		{
 			description: "one group, batch features",
@@ -94,15 +93,11 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 			result, err := store.Export(ctx, tc.opt)
 			values := make([][]interface{}, 0)
 			for row := range result.Data {
-				values = append(values, row)
+				assert.NoError(t, row.Error)
+				values = append(values, row.Record)
 			}
-			if tc.expectedError != nil {
-				assert.EqualError(t, err, tc.expectedError.Error())
-			} else {
-				assert.ElementsMatch(t, tc.expected, values)
-				assert.NoError(t, err)
-				assert.NoError(t, result.CheckStreamError())
-			}
+			assert.ElementsMatch(t, tc.expected, values)
+			assert.NoError(t, err)
 		})
 	}
 }

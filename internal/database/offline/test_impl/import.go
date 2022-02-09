@@ -68,10 +68,10 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 		})
 		records := make([][]interface{}, 0)
 		for row := range result.Data {
-			records = append(records, row)
+			assert.NoError(t, row.Error)
+			records = append(records, row.Record)
 		}
 		assert.NoError(t, err)
-		assert.NoError(t, result.CheckStreamError())
 		sort.Slice(records, func(i, j int) bool {
 			return cast.ToString(records[i][0]) < cast.ToString(records[j][0])
 		})

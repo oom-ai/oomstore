@@ -61,7 +61,8 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 	})
 	values := make([][]interface{}, 0)
 	for row := range result.Data {
-		values = append(values, row)
+		assert.NoError(t, err)
+		values = append(values, row.Record)
 	}
 	sort.Slice(values, func(i, j int) bool {
 		return cast.ToInt64(values[i][0]) < cast.ToInt64(values[j][0])
@@ -73,6 +74,5 @@ func TestSnapshot(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destro
 		{"1237", "pixel", int64(200), int64(11)},
 	}
 	assert.Equal(t, expected, values)
-	assert.NoError(t, result.CheckStreamError())
 	assert.NoError(t, err)
 }
