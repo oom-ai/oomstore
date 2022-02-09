@@ -30,6 +30,9 @@ func (s *OomStore) Sync(ctx context.Context, opt types.SyncOpt) error {
 
 // syncBatch syncs batch feature group from offline store to online store.
 func (s *OomStore) syncBatch(ctx context.Context, opt types.SyncOpt, group *types.Group, revision *types.Revision) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	prevOnlineRevisionID := group.OnlineRevisionID
 	if prevOnlineRevisionID != nil && *prevOnlineRevisionID == revision.ID {
 		return errdefs.Errorf("the specific revision was synced to the online store, won't do it again this time")
@@ -98,6 +101,9 @@ func (s *OomStore) syncBatch(ctx context.Context, opt types.SyncOpt, group *type
 
 // syncStream syncs stream feature group from offline store to online store.
 func (s *OomStore) syncStream(ctx context.Context, opt types.SyncOpt) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
 		GroupName: &opt.GroupName,
 	})

@@ -36,27 +36,41 @@ func bigqueryQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt off
 
 	go func() {
 		defer close(stream)
+
 		rows, err := dbOpt.BigQueryDB.Query(query).Read(ctx)
 		if err != nil {
-			stream <- types.ExportRecord{Error: err}
-			return
+			select {
+			case stream <- types.ExportRecord{Error: err}:
+				return
+			case <-ctx.Done():
+				return
+			}
 		}
 		for {
 			recordMap := make(map[string]bigquery.Value)
 			err = rows.Next(&recordMap)
 			if err == iterator.Done {
-				break
+				return
 			}
 			if err != nil {
-				stream <- types.ExportRecord{Error: errdefs.Errorf("failed at rows.Next, err=%v", err)}
-				return
+				select {
+				case stream <- types.ExportRecord{Error: errdefs.Errorf("failed at rows.Next, err=%v", err)}:
+					return
+				case <-ctx.Done():
+					return
+				}
 			}
 			record := make([]interface{}, 0, len(recordMap))
 			record = append(record, recordMap[opt.EntityName])
 			for _, feature := range features {
 				record = append(record, recordMap[feature.DBFullName(Backend)])
 			}
-			stream <- types.ExportRecord{Record: record}
+			select {
+			case stream <- types.ExportRecord{Record: record}:
+				// nothing to do
+			case <-ctx.Done():
+				return
+			}
 		}
 	}()
 	header := append([]string{opt.EntityName}, features.FullNames()...)
