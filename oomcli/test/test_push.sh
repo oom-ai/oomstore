@@ -25,5 +25,5 @@ actual=$(oomcli get online --feature user-click.last_5_click_posts,user-click.nu
 assert_eq "$case" "$expected" "$actual"
 
 case="push stream feature with non-existent group name"
-(oomcli push --entity-key 1 --group non-existent-group --feature f1=foo --feature f2=bar 2>&1 || true) |
-    grep 'group is empty or does not exist' >/dev/null
+actual=$(oomcli push --entity-key 1 --group non-existent-group --feature f1=foo --feature f2=bar 2>&1 || true)
+assert_contains "$case" "group is empty or does not exist" "$actual"
