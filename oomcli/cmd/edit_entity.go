@@ -63,7 +63,7 @@ func writeEntitiesToTempFile(ctx context.Context, oomStore *oomstore.OomStore, e
 	}
 	defer tempFile.Close()
 
-	if err := serializeEntitiesToWriter(ctx, tempFile, oomStore, entities, YAML); err != nil {
+	if err := outputEntity(ctx, tempFile, oomStore, entities, YAML); err != nil {
 		return "", err
 	}
 

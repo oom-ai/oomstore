@@ -15,17 +15,18 @@ import (
 )
 
 var getMetaFeatureOpt types.ListFeatureOpt
+var getMetaFeatureEntityName, getMetaFeatureGroupName *string
 
 var getMetaFeatureCmd = &cobra.Command{
 	Use:   "feature [feature_name]",
 	Short: "Get existing features given specific conditions",
 	Args:  cobra.MaximumNArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
-		if !cmd.Flags().Changed("entity") {
-			getMetaFeatureOpt.EntityName = nil
+		if cmd.Flags().Changed("entity") {
+			getMetaFeatureOpt.EntityNames = &[]string{*getMetaFeatureEntityName}
 		}
-		if !cmd.Flags().Changed("group") {
-			getMetaFeatureOpt.GroupName = nil
+		if cmd.Flags().Changed("group") {
+			getMetaFeatureOpt.GroupNames = &[]string{*getMetaFeatureGroupName}
 		}
 		if len(args) == 1 {
 			getMetaFeatureOpt.FeatureNames = &[]string{args[0]}
@@ -41,7 +42,7 @@ var getMetaFeatureCmd = &cobra.Command{
 			exit(err)
 		}
 
-		if err := serializeFeatureToWriter(os.Stdout, features, *getMetaOutput); err != nil {
+		if err := outputFeature(os.Stdout, features, *getMetaOutput); err != nil {
 			exitf("failed printing features: %+v\n", err)
 		}
 	},
@@ -51,8 +52,8 @@ func init() {
 	getMetaCmd.AddCommand(getMetaFeatureCmd)
 
 	flags := getMetaFeatureCmd.Flags()
-	getMetaFeatureOpt.EntityName = flags.StringP("entity", "e", "", "entity")
-	getMetaFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
+	getMetaFeatureEntityName = flags.StringP("entity", "e", "", "entity")
+	getMetaFeatureGroupName = flags.StringP("group", "g", "", "feature group")
 }
 
 func queryFeatures(ctx context.Context, oomStore *oomstore.OomStore, opt types.ListFeatureOpt) (types.FeatureList, error) {
@@ -68,10 +69,10 @@ func queryFeatures(ctx context.Context, oomStore *oomstore.OomStore, opt types.L
 	return features, nil
 }
 
-func serializeFeatureToWriter(w io.Writer, features types.FeatureList, outputOpt string) error {
+func outputFeature(w io.Writer, features types.FeatureList, outputOpt string) error {
 	switch outputOpt {
 	case YAML:
-		return serializeInYaml(w, apply.FromFeatureList(features))
+		return serializeInYaml(w, apply.BuildFeatureItems(features))
 	default:
 		return serializeMetadata(w, features, outputOpt, *getMetaWide)
 	}

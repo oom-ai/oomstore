@@ -44,7 +44,7 @@ func (f FeatureItems) Walk(walkFunc func(Feature) Feature) (rs FeatureItems) {
 	return
 }
 
-func FromFeatureList(features types.FeatureList) FeatureItems {
+func BuildFeatureItems(features types.FeatureList) FeatureItems {
 	items := FeatureItems{
 		Items: make([]Feature, 0, features.Len()),
 	}
@@ -91,8 +91,8 @@ func (g GroupItems) Walk(walkFunc func(Group) Group) (rs GroupItems) {
 	return
 }
 
-func FromGroupList(groups types.GroupList, features types.FeatureList) *GroupItems {
-	items := &GroupItems{
+func BuildGroupItems(groups types.GroupList, features types.FeatureList) GroupItems {
+	items := GroupItems{
 		Items: make([]Group, 0, groups.Len()),
 	}
 
@@ -104,7 +104,7 @@ func FromGroupList(groups types.GroupList, features types.FeatureList) *GroupIte
 			Category:         group.Category,
 			SnapshotInterval: time.Duration(group.SnapshotInterval) * time.Second,
 			Description:      group.Description,
-			Features: FromFeatureList(features.Filter(func(f *types.Feature) bool {
+			Features: BuildFeatureItems(features.Filter(func(f *types.Feature) bool {
 				return f.Group.Name == group.Name
 			})).Walk(func(f Feature) Feature {
 				f.Kind = ""
@@ -129,7 +129,7 @@ type EntityItems struct {
 	Items []Entity `yaml:"items"`
 }
 
-func FromEntityList(entities types.EntityList, groups *GroupItems) (items EntityItems) {
+func BuildEntityItems(entities types.EntityList, groups GroupItems) (items EntityItems) {
 	for _, entity := range entities {
 		items.Items = append(items.Items, Entity{
 			Kind:        "Entity",

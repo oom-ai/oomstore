@@ -15,17 +15,18 @@ type editFeatureOption struct {
 }
 
 var editFeatureOpt editFeatureOption
+var editFeatureEntityName, editFeatureGroupName *string
 
 var editFeatureCmd = &cobra.Command{
 	Use:   "feature [feature_name]",
 	Short: "Edit feature resources",
 	Args:  cobra.MaximumNArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
-		if !cmd.Flags().Changed("entity") {
-			editFeatureOpt.EntityName = nil
+		if cmd.Flags().Changed("entity") {
+			editFeatureOpt.EntityNames = &[]string{*editFeatureEntityName}
 		}
-		if !cmd.Flags().Changed("group") {
-			editFeatureOpt.GroupName = nil
+		if cmd.Flags().Changed("group") {
+			editFeatureOpt.GroupNames = &[]string{*editFeatureGroupName}
 		}
 
 		if len(args) == 1 {
@@ -58,8 +59,8 @@ func init() {
 	editCmd.AddCommand(editFeatureCmd)
 
 	flags := editFeatureCmd.Flags()
-	editFeatureOpt.EntityName = flags.StringP("entity", "e", "", "entity")
-	editFeatureOpt.GroupName = flags.StringP("group", "g", "", "feature group")
+	editFeatureEntityName = flags.StringP("entity", "e", "", "entity")
+	editFeatureGroupName = flags.StringP("group", "g", "", "feature group")
 }
 
 func writeFeaturesToTempFile(ctx context.Context, oomStore *oomstore.OomStore, features types.FeatureList) (string, error) {
@@ -69,7 +70,7 @@ func writeFeaturesToTempFile(ctx context.Context, oomStore *oomstore.OomStore, f
 	}
 	defer tempFile.Close()
 
-	if err = serializeFeatureToWriter(tempFile, features, YAML); err != nil {
+	if err = outputFeature(tempFile, features, YAML); err != nil {
 		return "", err
 	}
 	return tempFile.Name(), nil

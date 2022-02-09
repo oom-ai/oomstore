@@ -21,11 +21,11 @@ type Group struct {
 	Entity *Entity
 }
 
-func (fg *Group) Copy() *Group {
-	if fg == nil {
+func (g *Group) Copy() *Group {
+	if g == nil {
 		return nil
 	}
-	copied := *fg
+	copied := *g
 
 	if copied.OnlineRevisionID != nil {
 		id := *copied.OnlineRevisionID
@@ -38,8 +38,8 @@ func (fg *Group) Copy() *Group {
 
 type GroupList []*Group
 
-func (l *GroupList) Len() int {
-	return len(*l)
+func (l GroupList) Len() int {
+	return len(l)
 }
 
 func (l GroupList) Copy() GroupList {
@@ -81,4 +81,18 @@ func (l GroupList) EntityIDs() []int {
 		entityIDs = append(entityIDs, id)
 	}
 	return entityIDs
+}
+
+func (l GroupList) IDs() (ids []int) {
+	for _, group := range l {
+		ids = append(ids, group.ID)
+	}
+	return
+}
+
+func (l GroupList) Names() (names []string) {
+	for _, group := range l {
+		names = append(names, group.Name)
+	}
+	return
 }

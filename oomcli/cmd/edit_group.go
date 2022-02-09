@@ -73,7 +73,7 @@ func writeGroupsToTempFile(ctx context.Context, oomStore *oomstore.OomStore, gro
 	}
 	defer tempFile.Close()
 
-	if err = serializeGroupToWriter(ctx, tempFile, oomStore, groups, YAML); err != nil {
+	if err = outputGroup(ctx, tempFile, oomStore, groups, YAML); err != nil {
 		return "", err
 	}
 	return tempFile.Name(), nil

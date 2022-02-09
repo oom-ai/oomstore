@@ -41,7 +41,7 @@ var getMetaEntityCmd = &cobra.Command{
 			exit(err)
 		}
 
-		if err = serializeEntitiesToWriter(ctx, os.Stdout, oomStore, entities, *getMetaOutput); err != nil {
+		if err = outputEntity(ctx, os.Stdout, oomStore, entities, *getMetaOutput); err != nil {
 			exitf("failed printing entities, error: %+v\n", err)
 		}
 	},
@@ -51,7 +51,7 @@ func init() {
 	getMetaCmd.AddCommand(getMetaEntityCmd)
 }
 
-func serializeEntitiesToWriter(
+func outputEntity(
 	ctx context.Context,
 	w io.Writer,
 	oomStore *oomstore.OomStore,
@@ -66,13 +66,15 @@ func serializeEntitiesToWriter(
 		if err != nil {
 			return err
 		}
-
-		groupItems, err := groupsToApplyGroupItems(ctx, oomStore, groups)
+		features, err := oomStore.ListFeature(ctx, types.ListFeatureOpt{
+			EntityNames: &entityNames,
+		})
 		if err != nil {
 			return err
 		}
-
-		return serializeInYaml(w, apply.FromEntityList(entities, groupItems))
+		groupItems := apply.BuildGroupItems(groups, features)
+		entityItems := apply.BuildEntityItems(entities, groupItems)
+		return serializeInYaml(w, entityItems)
 	default:
 		return serializeMetadata(w, entities, outputOpt, *getMetaWide)
 	}

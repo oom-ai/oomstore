@@ -18,7 +18,7 @@ func TestEntityValidate(t *testing.T) {
 		wantError   error
 	}{
 		{
-			description: "invaid kind: spelling error",
+			description: "invalid kind: spelling error",
 			entity: &apply.Entity{
 				Kind:        "Entit",
 				Name:        "user",
