@@ -36,17 +36,6 @@ func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 	sort.Slice(revisions, func(i, j int) bool {
 		return revisions[i].Revision < revisions[j].Revision
 	})
-	if revisions[0].SnapshotTable == "" {
-		if err = s.createFirstSnapshotTable(ctx, revisions[0]); err != nil {
-			return err
-		}
-	}
-
-	// re-fetch revision
-	revisions, err = s.metadata.ListRevision(ctx, &group.ID)
-	if err != nil {
-		return err
-	}
 	for i, revision := range revisions {
 		if revision.SnapshotTable != "" {
 			continue
