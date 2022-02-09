@@ -124,27 +124,27 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.
 
 func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList) (*types.ExportResult, error) {
 	stream := make(chan types.ExportRecord)
-	errs := make(chan error, 1) // at most 1 error
 
 	go func() {
 		defer close(stream)
-		defer close(errs)
 		stmt, err := dbOpt.SqlxDB.Preparex(dbOpt.SqlxDB.Rebind(query))
 		if err != nil {
-			errs <- errdefs.WithStack(err)
+			stream <- types.ExportRecord{Error: errdefs.WithStack(err)}
 			return
 		}
 		defer stmt.Close()
+
 		rows, err := stmt.Queryx(args...)
 		if err != nil {
-			errs <- errdefs.WithStack(err)
+			stream <- types.ExportRecord{Error: errdefs.WithStack(err)}
 			return
 		}
 		defer rows.Close()
+
 		for rows.Next() {
 			record, err := rows.SliceScan()
 			if err != nil {
-				errs <- errdefs.Errorf("failed at rows.SliceScan, err=%v", err)
+				stream <- types.ExportRecord{Error: errdefs.Errorf("failed at rows.SliceScan, err=%v", err)}
 				return
 			}
 			record[0] = cast.ToString(record[0])
@@ -154,14 +154,14 @@ func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline
 				}
 				deserializedValue, err := dbutil.DeserializeByValueType(record[i+1], f.ValueType, dbOpt.Backend)
 				if err != nil {
-					errs <- err
+					stream <- types.ExportRecord{Error: err}
 					return
 				}
 				record[i+1] = deserializedValue
 			}
-			stream <- record
+			stream <- types.ExportRecord{Record: record, Error: nil}
 		}
 	}()
 	header := append([]string{opt.EntityName}, features.FullNames()...)
-	return types.NewExportResult(header, stream, errs), nil
+	return types.NewExportResult(header, stream), nil
 }
