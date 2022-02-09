@@ -56,7 +56,6 @@ func (s *OomStore) syncBatch(ctx context.Context, opt types.SyncOpt, group *type
 		Group:        *group,
 		Features:     features,
 		ExportStream: exportResult.Data,
-		ExportError:  exportResult.GetErrorChannel(),
 		RevisionID:   &revision.ID,
 	}); err != nil {
 		return err
@@ -118,7 +117,6 @@ func (s *OomStore) syncStream(ctx context.Context, opt types.SyncOpt) error {
 		Group:        *group,
 		Features:     features,
 		ExportStream: exportResult.Data,
-		ExportError:  exportResult.GetErrorChannel(),
 	})
 }
 
