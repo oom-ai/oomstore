@@ -90,8 +90,8 @@ func (db *DB) GetGroupByName(ctx context.Context, name string) (*types.Group, er
 	return sqlutil.GetGroupByName(ctx, db, name)
 }
 
-func (db *DB) ListGroup(ctx context.Context, entityID *int, groupIDs *[]int) (types.GroupList, error) {
-	return sqlutil.ListGroup(ctx, db, entityID, groupIDs)
+func (db *DB) ListGroup(ctx context.Context, opt metadata.ListGroupOpt) (types.GroupList, error) {
+	return sqlutil.ListGroup(ctx, db, opt)
 }
 
 func (db *DB) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, error) {

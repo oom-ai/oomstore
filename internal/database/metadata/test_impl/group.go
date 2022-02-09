@@ -95,34 +95,62 @@ func TestListGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore Destr
 	_, err = store.CreateGroup(ctx, userBehaviorOpt)
 	require.NoError(t, err)
 
-	groups, err := store.ListGroup(ctx, nil, &[]int{})
+	groups, err := store.ListGroup(ctx, metadata.ListGroupOpt{
+		EntityIDs: nil,
+		GroupIDs:  &[]int{},
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(groups))
 
-	groups, err = store.ListGroup(ctx, &deviceGroupID, nil)
+	groups, err = store.ListGroup(ctx, metadata.ListGroupOpt{
+		EntityIDs: &[]int{deviceGroupID},
+		GroupIDs:  nil,
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(groups))
 
-	groups, err = store.ListGroup(ctx, &userGroupID, nil)
+	groups, err = store.ListGroup(ctx, metadata.ListGroupOpt{
+		EntityIDs: &[]int{userGroupID},
+		GroupIDs:  nil,
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(groups))
 
-	groups, err = store.ListGroup(ctx, nil, nil)
+	groups, err = store.ListGroup(ctx, metadata.ListGroupOpt{
+		EntityIDs: nil,
+		GroupIDs:  nil,
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(groups))
 
-	groups, err = store.ListGroup(ctx, intPtr(0), nil)
+	groups, err = store.ListGroup(ctx, metadata.ListGroupOpt{
+		EntityIDs: &[]int{0},
+		GroupIDs:  nil,
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(groups))
 
 	ids := []int{deviceGroupID, userGroupID}
-	groups, err = store.ListGroup(ctx, nil, &ids)
+	groups, err = store.ListGroup(ctx, metadata.ListGroupOpt{
+		EntityIDs: nil,
+		GroupIDs:  &ids,
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(groups))
 
-	groups, err = store.ListGroup(ctx, &userEntityID, &ids)
+	groups, err = store.ListGroup(ctx, metadata.ListGroupOpt{
+		EntityIDs: &[]int{userEntityID},
+		GroupIDs:  &ids,
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(groups))
+
+	groups, err = store.ListGroup(ctx, metadata.ListGroupOpt{
+		EntityIDs: &[]int{userEntityID, deviceEntityID},
+		GroupIDs:  nil,
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, 3, len(groups))
 }
 
 func TestCreateGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {

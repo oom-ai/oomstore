@@ -66,6 +66,11 @@ type ListFeatureOpt struct {
 	FeatureIDs *[]int
 }
 
+type ListGroupOpt struct {
+	EntityIDs *[]int
+	GroupIDs  *[]int
+}
+
 type ListCachedFeatureOpt struct {
 	FullNames *[]string
 	GroupName *string
