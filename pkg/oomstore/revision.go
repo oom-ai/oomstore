@@ -135,35 +135,3 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revisionID int
 		NewCdcTable:      cdcTable,
 	})
 }
-
-// createFirstSnapshotTable creates the first snapshot table for a specified group.
-func (s *OomStore) createFirstSnapshotTable(ctx context.Context, revision *types.Revision) error {
-	snapshotTable := dbutil.OfflineStreamSnapshotTableName(revision.GroupID, revision.Revision)
-
-	// Update snapshot_table in feature_group_revision table
-	err := s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
-		RevisionID:       revision.ID,
-		NewSnapshotTable: &snapshotTable,
-	})
-	if err != nil {
-		return err
-	}
-
-	// Create snapshot table in offline store
-	features, err := s.metadata.ListFeature(ctx, metadata.ListFeatureOpt{
-		GroupID: &revision.GroupID,
-	})
-	if err != nil {
-		return err
-	}
-	if err = s.offline.CreateTable(ctx, offline.CreateTableOpt{
-		TableName:  snapshotTable,
-		EntityName: revision.Group.Entity.Name,
-		Features:   features,
-		TableType:  types.TableStreamSnapshot,
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
