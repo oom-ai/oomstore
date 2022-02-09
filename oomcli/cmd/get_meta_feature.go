@@ -64,8 +64,9 @@ func queryFeatures(ctx context.Context, oomStore *oomstore.OomStore, opt types.L
 		return nil, fmt.Errorf("failed getting features, error %v\n", err)
 	}
 
-	if opt.FeatureNames != nil && len(features) == 0 {
-		return nil, errdefs.Errorf("feature '%s' not found", (*opt.FeatureNames)[0])
+	if opt.FeatureNames != nil && len(*opt.FeatureNames) != len(features) {
+		missing := features.FindMissingFeatures(*opt.FeatureNames)
+		return nil, errdefs.Errorf("feature '%s' not found", missing)
 	}
 
 	return features, nil
