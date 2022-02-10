@@ -12,19 +12,19 @@ func ComposeFullFeatureName(groupName string, featureName string) string {
 	return groupName + SepFullFeatureName + featureName
 }
 
-func SplitFullFeatureName(fullname string) (string, string, error) {
-	parts := strings.SplitN(fullname, SepFullFeatureName, 2)
+func SplitFullFeatureName(fullName string) (string, string, error) {
+	parts := strings.SplitN(fullName, SepFullFeatureName, 2)
 	if len(parts) != 2 {
-		return "", "", errdefs.Errorf("invalid full feature name: '%s'", fullname)
+		return "", "", errdefs.Errorf("invalid full feature name: '%s'", fullName)
 	}
 	return parts[0], parts[1], nil
 }
 
-func ValidateFullFeatureNames(fullnames ...string) error {
-	for _, fullname := range fullnames {
-		nameSlice := strings.Split(fullname, SepFullFeatureName)
+func ValidateFullFeatureNames(fullNames ...string) error {
+	for _, fullName := range fullNames {
+		nameSlice := strings.Split(fullName, SepFullFeatureName)
 		if len(nameSlice) != 2 {
-			return errdefs.Errorf("invalid full feature name: '%s'", fullname)
+			return errdefs.Errorf("invalid full feature name: '%s'", fullName)
 		}
 	}
 	return nil
