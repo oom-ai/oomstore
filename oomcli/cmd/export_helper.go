@@ -15,6 +15,9 @@ import (
 )
 
 func export(ctx context.Context, store *oomstore.OomStore, opt types.ChannelExportOpt, output string) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	exportResult, err := store.ChannelExport(ctx, opt)
 	if err != nil {
 		return err

@@ -34,13 +34,6 @@ type DoExportOpt struct {
 }
 
 func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.ExportResult, error) {
-	var (
-		emptyStream = make(chan types.ExportRecord)
-		errs        = make(chan error, 1) // at most 1 error
-	)
-	defer close(emptyStream)
-	defer close(errs)
-
 	// Step 0: prepare variables
 	var (
 		snapshotTables = make([]string, 0, len(opt.SnapshotTables))
@@ -129,23 +122,35 @@ func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline
 		defer close(stream)
 		stmt, err := dbOpt.SqlxDB.Preparex(dbOpt.SqlxDB.Rebind(query))
 		if err != nil {
-			stream <- types.ExportRecord{Error: errdefs.WithStack(err)}
-			return
+			select {
+			case stream <- types.ExportRecord{Error: errdefs.WithStack(err)}:
+				return
+			case <-ctx.Done():
+				return
+			}
 		}
 		defer stmt.Close()
 
 		rows, err := stmt.Queryx(args...)
 		if err != nil {
-			stream <- types.ExportRecord{Error: errdefs.WithStack(err)}
-			return
+			select {
+			case stream <- types.ExportRecord{Error: errdefs.WithStack(err)}:
+				return
+			case <-ctx.Done():
+				return
+			}
 		}
 		defer rows.Close()
 
 		for rows.Next() {
 			record, err := rows.SliceScan()
 			if err != nil {
-				stream <- types.ExportRecord{Error: errdefs.Errorf("failed at rows.SliceScan, err=%v", err)}
-				return
+				select {
+				case stream <- types.ExportRecord{Error: errdefs.Errorf("failed at rows.SliceScan, err=%v", err)}:
+					return
+				case <-ctx.Done():
+					return
+				}
 			}
 			record[0] = cast.ToString(record[0])
 			for i, f := range features {
@@ -154,12 +159,21 @@ func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline
 				}
 				deserializedValue, err := dbutil.DeserializeByValueType(record[i+1], f.ValueType, dbOpt.Backend)
 				if err != nil {
-					stream <- types.ExportRecord{Error: err}
-					return
+					select {
+					case stream <- types.ExportRecord{Error: err}:
+						return
+					case <-ctx.Done():
+						return
+					}
 				}
 				record[i+1] = deserializedValue
 			}
-			stream <- types.ExportRecord{Record: record, Error: nil}
+			select {
+			case stream <- types.ExportRecord{Record: record, Error: nil}:
+				// nothing to do
+			case <-ctx.Done():
+				return
+			}
 		}
 	}()
 	header := append([]string{opt.EntityName}, features.FullNames()...)

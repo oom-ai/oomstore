@@ -99,6 +99,9 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 // Export exports the latest feature value up to the given timestamp, it outputs
 // feature values to the given file path.
 func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	exportResult, err := s.ChannelExport(ctx, types.ChannelExportOpt{
 		FeatureNames: opt.FeatureNames,
 		UnixMilli:    opt.UnixMilli,

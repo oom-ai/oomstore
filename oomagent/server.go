@@ -299,7 +299,9 @@ func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen
 		return nil
 	}
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	exportResult, err := s.oomstore.ChannelExport(ctx, types.ChannelExportOpt{
 		FeatureNames: req.Features,
 		UnixMilli:    req.UnixMilli,
