@@ -35,19 +35,19 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 		Reader: bufio.NewReader(strings.NewReader(`1234,xiaomi,100
 1235,apple,200
 `)),
-		Delimiter: ",",
+		Delimiter: ',',
 	})
 	buildTestSnapshotTable(ctx, t, store, oneGroupFeatures, 2, "offline_snapshot_1_2", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,galaxy,300
 1235,oneplus,240
 `)),
-		Delimiter: ",",
+		Delimiter: ',',
 	})
 	buildTestSnapshotTable(ctx, t, store, twoGroupFeatures[2:], 1, "offline_snapshot_2_1", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,1
 1235,0
 `)),
-		Delimiter: ",",
+		Delimiter: ',',
 	})
 
 	buildTestSnapshotTable(ctx, t, store, append(oneGroupFeatures, unixMilli), 1, "offline_cdc_1_1", &offline.CSVSource{
@@ -55,12 +55,12 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 1235,apple-2,115,14
 1234,xiaomi-1,130,10
 `)),
-		Delimiter: ",",
+		Delimiter: ',',
 	})
 	buildTestSnapshotTable(ctx, t, store, append(oneGroupFeatures, unixMilli), 2, "offline_cdc_1_2", &offline.CSVSource{
 		Reader: bufio.NewReader(strings.NewReader(`1234,galaxy-1,320,18
 `)),
-		Delimiter: ",",
+		Delimiter: ',',
 	})
 
 	testCases := []struct {

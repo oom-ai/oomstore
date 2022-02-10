@@ -37,7 +37,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 1236,huawei,5999
 1237,oneplus,3999
 `)),
-			Delimiter: ",",
+			Delimiter: ',',
 		},
 	}
 

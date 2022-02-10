@@ -23,12 +23,12 @@ type ImportOpt struct {
 
 type CsvReaderDataSource struct {
 	Reader    io.Reader
-	Delimiter string
+	Delimiter rune
 }
 
 type CsvFileDataSource struct {
 	InputFilePath string
-	Delimiter     string
+	Delimiter     rune
 }
 
 type TableLinkDataSource struct {
