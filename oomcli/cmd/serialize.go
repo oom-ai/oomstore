@@ -127,6 +127,7 @@ func serializeInCSV(w io.Writer, header []string, records [][]string) error {
 
 func serializeInASCIITable(w io.Writer, header []string, records [][]string, border bool) error {
 	table := tablewriter.NewWriter(os.Stdout)
+	table.SetAutoWrapText(false)
 	table.SetHeader(header)
 	table.SetAutoFormatHeaders(false)
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
