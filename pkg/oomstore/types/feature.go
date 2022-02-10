@@ -171,3 +171,16 @@ func (l FeatureList) GetSharedEntity() (*Entity, error) {
 	}
 	return nil, errdefs.Errorf("expected 1 entity, got 0")
 }
+
+func (l FeatureList) FindMissingFeatures(featureNames []string) []string {
+	missing := make([]string, 0)
+	for _, name := range featureNames {
+		f := l.Find(func(feature *Feature) bool {
+			return feature.FullName() == name
+		})
+		if f == nil {
+			missing = append(missing, name)
+		}
+	}
+	return missing
+}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/spf13/cobra"
 )
@@ -43,7 +42,7 @@ var editFeatureCmd = &cobra.Command{
 			exit(err)
 		}
 
-		fileName, err := writeFeaturesToTempFile(ctx, oomStore, features)
+		fileName, err := writeFeaturesToTempFile(features)
 		if err != nil {
 			exit(err)
 		}
@@ -63,14 +62,17 @@ func init() {
 	editFeatureGroupName = flags.StringP("group", "g", "", "feature group")
 }
 
-func writeFeaturesToTempFile(ctx context.Context, oomStore *oomstore.OomStore, features types.FeatureList) (string, error) {
+func writeFeaturesToTempFile(features types.FeatureList) (string, error) {
 	tempFile, err := getTempFile()
 	if err != nil {
 		return "", err
 	}
 	defer tempFile.Close()
 
-	if err = outputFeature(tempFile, features, YAML); err != nil {
+	if err = outputFeature(features, outputParams{
+		writer:    tempFile,
+		outputOpt: YAML,
+	}); err != nil {
 		return "", err
 	}
 	return tempFile.Name(), nil

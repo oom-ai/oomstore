@@ -63,7 +63,11 @@ func writeEntitiesToTempFile(ctx context.Context, oomStore *oomstore.OomStore, e
 	}
 	defer tempFile.Close()
 
-	if err := outputEntity(ctx, tempFile, oomStore, entities, YAML); err != nil {
+	if err = outputEntity(ctx, entities, outputParams{
+		writer:    tempFile,
+		oomStore:  oomStore,
+		outputOpt: YAML,
+	}); err != nil {
 		return "", err
 	}
 
