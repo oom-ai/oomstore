@@ -13,23 +13,33 @@ func CreateTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.CreateTabl
 	if !supportIndex(dbOpt.Backend) {
 		return createTableNoIndex(ctx, dbOpt, opt)
 	}
+	params := dbutil.BuildTableSchemaParams{
+		TableName:  opt.TableName,
+		EntityName: opt.EntityName,
+		Features:   opt.Features,
+		Backend:    dbOpt.Backend,
+	}
 	switch opt.TableType {
 	case types.TableBatchSnapshot:
 		// Create primary key (entity_key) on batch snapshot table
-		pkFields := []string{opt.EntityName}
-		schema := dbutil.BuildTableSchema(opt.TableName, opt.EntityName, false, opt.Features, pkFields, dbOpt.Backend)
+		params.PrimaryKeys = []string{opt.EntityName}
+		params.HasUnixMilli = false
+		schema := dbutil.BuildTableSchema(params)
 		if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
 			return err
 		}
 	case types.TableStreamSnapshot:
 		// Create primary key (entity_key) on stream snapshot table
-		pkFields := []string{opt.EntityName}
-		schema := dbutil.BuildTableSchema(opt.TableName, opt.EntityName, true, opt.Features, pkFields, dbOpt.Backend)
+		params.PrimaryKeys = []string{opt.EntityName}
+		params.HasUnixMilli = true
+		schema := dbutil.BuildTableSchema(params)
 		if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
 			return err
 		}
 	case types.TableStreamCdc:
-		schema := dbutil.BuildTableSchema(opt.TableName, opt.EntityName, true, opt.Features, nil, dbOpt.Backend)
+		params.PrimaryKeys = nil
+		params.HasUnixMilli = true
+		schema := dbutil.BuildTableSchema(params)
 		if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
 			return err
 		}
@@ -58,9 +68,16 @@ func createTableNoIndex(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.Cre
 
 	tableName := opt.TableName
 	if dbOpt.Backend == types.BackendBigQuery {
-		tableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, tableName)
+		tableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, opt.TableName)
 	}
-	schema := dbutil.BuildTableSchema(tableName, opt.EntityName, hasUnixMilli, opt.Features, nil, dbOpt.Backend)
+	schema := dbutil.BuildTableSchema(dbutil.BuildTableSchemaParams{
+		TableName:    tableName,
+		EntityName:   opt.EntityName,
+		HasUnixMilli: hasUnixMilli,
+		Features:     opt.Features,
+		PrimaryKeys:  nil,
+		Backend:      dbOpt.Backend,
+	})
 	if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
 		return err
 	}
