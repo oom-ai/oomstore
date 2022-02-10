@@ -38,7 +38,7 @@ type ImportOpt struct {
 	Features          types.FeatureList
 	Revision          *int64
 	Source            *CSVSource
-	NoPK              bool // TODO: to import cdc data temporarily for testing
+	Category          types.Category
 }
 
 type PushOpt struct {

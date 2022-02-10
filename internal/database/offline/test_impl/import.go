@@ -39,6 +39,7 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 `)),
 			Delimiter: ',',
 		},
+		Category: types.CategoryBatch,
 	}
 
 	t.Run("normal import call", func(t *testing.T) {

@@ -45,6 +45,7 @@ func (s *OomStore) csvReaderImportBatch(ctx context.Context, opt *importOpt, dat
 		Revision:          opt.Revision,
 		SnapshotTableName: snapshotTableName,
 		Source:            source,
+		Category:          types.CategoryBatch,
 	})
 	if err != nil {
 		return 0, err
