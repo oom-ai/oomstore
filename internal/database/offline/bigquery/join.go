@@ -111,8 +111,10 @@ func dropTemporaryTables(ctx context.Context, db *bigquery.Client, tableNames []
 
 func dropTable(ctx context.Context, db *bigquery.Client, tableName string) error {
 	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
-	_, err := db.Query(query).Read(ctx)
-	return errdefs.WithStack(err)
+	if _, err := db.Query(query).Read(ctx); err != nil {
+		return errdefs.WithStack(err)
+	}
+	return nil
 }
 
 const READ_JOIN_RESULT_QUERY = `
