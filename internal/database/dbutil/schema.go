@@ -23,16 +23,18 @@ func (c ColumnList) Names() []string {
 	return names
 }
 
-func BuildTableSchema(
-	tableName string,
-	entityName string,
-	hasUnixMilli bool,
-	features types.FeatureList,
-	pkFields []string,
-	backend types.BackendType,
-) string {
-	columns := parseColumns(entityName, hasUnixMilli, features, backend)
-	return createTableDDL(tableName, columns, pkFields, backend)
+type BuildTableSchemaParams struct {
+	TableName    string
+	EntityName   string
+	HasUnixMilli bool
+	Features     types.FeatureList
+	PrimaryKeys  []string
+	Backend      types.BackendType
+}
+
+func BuildTableSchema(params BuildTableSchemaParams) string {
+	columns := parseColumns(params.EntityName, params.HasUnixMilli, params.Features, params.Backend)
+	return createTableDDL(params.TableName, columns, params.PrimaryKeys, params.Backend)
 }
 
 func createTableDDL(tableName string, columns ColumnList, pkFields []string, backend types.BackendType) string {
