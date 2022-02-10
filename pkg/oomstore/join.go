@@ -222,7 +222,7 @@ func writeJoinResultToFile(outputFilePath string, joinResult *types.JoinResult) 
 	}
 	for row := range joinResult.Data {
 		if row.Error != nil {
-			return err
+			return row.Error
 		}
 		if err := w.Write(joinRecord(row.Record)); err != nil {
 			return err
