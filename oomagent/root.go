@@ -7,8 +7,10 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strconv"
+	"syscall"
 
 	"github.com/adrg/xdg"
 	"github.com/spf13/cobra"
@@ -34,11 +36,11 @@ var rootCmd = &cobra.Command{
 	Version: version.String(),
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		oomStore, err := oomstore.Open(ctx, oomStoreCfg)
+		oomstore, err := oomstore.Open(ctx, oomStoreCfg)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer oomStore.Close()
+		defer oomstore.Close()
 
 		lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
 		if err != nil {
@@ -55,7 +57,17 @@ var rootCmd = &cobra.Command{
 		}
 
 		grpcServer := grpc.NewServer()
-		codegen.RegisterOomAgentServer(grpcServer, &server{oomstore: oomStore})
+		codegen.RegisterOomAgentServer(grpcServer, &server{oomstore: oomstore})
+
+		exit := make(chan os.Signal, 1)
+		signal.Notify(exit, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)
+		go func() {
+			<-exit
+			grpcServer.GracefulStop()
+			oomstore.Close()
+			os.Exit(0)
+		}()
+
 		if err := grpcServer.Serve(lis); err != nil {
 			panic(err)
 		}
