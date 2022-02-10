@@ -18,7 +18,15 @@ pub struct Client {
 
 #[pymethods]
 impl Client {
+    /// Connect to an oomagent instance running on the given endpoint.
+    ///
+    /// Args:
+    ///     endpoint (str): The endpoint to connect to.
+    ///
+    /// Returns:
+    ///     The client instance.
     #[classmethod]
+    #[pyo3(text_signature = "(endpoint)")]
     pub fn connect<'p>(_cls: &PyType, py: Python<'p>, endpoint: String) -> PyResult<&'p PyAny> {
         future_into_py(py, async {
             let inner = OomClient::connect(endpoint).await.map_err(err_to_py)?;
@@ -27,7 +35,16 @@ impl Client {
         })
     }
 
+    /// Connect to an embedded oomagent instance.
+    ///
+    /// Args:
+    ///     bin_path (str): The path to the oomagent binary.
+    ///     cfg_path (str): The path to the oomstore configuration file.
+    ///
+    /// Returns:
+    ///    The client instance.
     #[classmethod]
+    #[pyo3(text_signature = "(bin_path, cfg_path)")]
     pub fn with_embedded_oomagent<'p>(
         _cls: &PyType,
         py: Python<'p>,
@@ -43,6 +60,8 @@ impl Client {
         })
     }
 
+    /// Check if oomagent is ready to serve requests.
+    #[pyo3(text_signature = "()")]
     pub fn health_check<'p>(&self, py: Python<'p>) -> PyResult<&'p PyAny> {
         // Don't panic, it's cheap:
         // https://github.com/hyperium/tonic/issues/285#issuecomment-595880400
@@ -50,6 +69,17 @@ impl Client {
         future_into_py(py, async move { inner.health_check().await.map_err(err_to_py) })
     }
 
+    /// Get online features for an entity.
+    ///
+    /// Args:
+    ///     entity_key (str): An entity identifier, could be device ID, user ID, etc.
+    ///     features: A list of feature full names.
+    ///       A feature full name has the following format: <feature_group_name>.<feature_name>,
+    ///       for example, txn_stats.count_7d.
+    ///
+    /// Returns:
+    ///     A dict mapping feature full names to feature values.
+    #[pyo3(text_signature = "(entity_key, features)")]
     pub fn online_get<'p>(&self, py: Python<'p>, entity_key: String, features: Vec<String>) -> PyResult<&'p PyAny> {
         let mut inner = OomClient::clone(&self.inner);
         future_into_py(py, async move {
@@ -61,6 +91,17 @@ impl Client {
         })
     }
 
+    /// Get online features for multiple entities.
+    ///
+    /// Args:
+    ///     entity_keys: A list of entity identifiers, could be device IDs, user IDs, etc.
+    ///     features: A list of feature full names.
+    ///       A feature full name has the following format: <feature_group_name>.<feature_name>,
+    ///       for example, txn_stats.count_7d.
+    ///
+    /// Returns:
+    ///     A dict mapping entity keys to a dict, that maps feature full names to feature values.
+    #[pyo3(text_signature = "(entity_keys, features)")]
     pub fn online_multi_get<'p>(
         &self,
         py: Python<'p>,
@@ -83,6 +124,22 @@ impl Client {
         })
     }
 
+    /// Sync a certain revision of batch features from offline to online store.
+    ///
+    /// Args:
+    ///     group: The group to sync from offline store to online store.
+    ///     revision_id: The revision to sync, it only applies to batch feature.
+    ///       For batch feature: if null, will sync the latest revision;
+    ///       otherwise, sync the designated revision.
+    ///       For streaming feature, revision ID is not required, will always
+    ///       sync the latest values.
+    ///     purge_delay: PurgeDelay represents the seconds to sleep before purging
+    ///       the previous revision in online store.
+    ///       It only applies to batch feature group.
+    ///
+    /// Returns:
+    ///     None
+    #[pyo3(text_signature = "(group, revision_id, purge_delay)")]
     pub fn sync<'p>(
         &mut self,
         py: Python<'p>,
@@ -96,7 +153,23 @@ impl Client {
         })
     }
 
+    /// Import features from external (batch and stream) data sources to offline store through files.
+    ///
+    /// Args:
+    ///     group: The group to be imported from data source to offline store.
+    ///     revision: The revision of the imported data, it only applies to
+    ///       batch feature (not required).
+    ///       For batch features, if revision is null, will use the
+    ///       timestamp when it starts serving in online store; otherwise,
+    ///       use the designated revision.
+    ///     description: Description of this import.
+    ///     input_file: The path of data source.
+    ///     delimiter: Delimiter of data source.
+    ///
+    /// Returns:
+    ///     revision_id: The revision ID of this import, it only applies to batch feature.
     #[pyo3(name = "import_")]
+    #[pyo3(text_signature = "(group, revision, description, input_file, delimiter)")]
     pub fn import<'p>(
         &mut self,
         py: Python<'p>,
@@ -125,6 +198,16 @@ impl Client {
         })
     }
 
+    /// Push stream features from stream data source to both offline and online stores.
+    ///
+    /// Args:
+    ///     group: The group to be pushed from data source to offline store.
+    ///     entity_key: An entity identifier.
+    ///     kv_pairs: Feature values maps feature name to feature value.
+    ///
+    /// Returns:
+    ///     None
+    #[pyo3(text_signature = "(group, entity_key, kv_pairs)")]
     pub fn push<'p>(
         &mut self,
         py: Python<'p>,
@@ -142,6 +225,17 @@ impl Client {
         })
     }
 
+    /// Point-in-Time Join features against labeled entity rows through files.
+    ///
+    /// Args:
+    ///     features: A list of feature full names, their feature values will be
+    ///       joined and fetched from offline store.
+    ///     input_file: File path of entity rows.
+    ///     output_file: File path of joined result.
+    ///
+    /// Returns:
+    ///     None
+    #[pyo3(text_signature = "(features, input_file, output_file)")]
     pub fn join<'p>(
         &mut self,
         py: Python<'p>,
@@ -155,6 +249,17 @@ impl Client {
         })
     }
 
+    /// Export certain features to a file.
+    ///
+    /// Args:
+    ///     features: A list of feature full names.
+    ///     unix_milli: A unix milliseconds, export the feature value before this timestamp.
+    ///     output_file: File path of export result.
+    ///     limit: Limit the size of export data.
+    ///
+    /// Returns:
+    ///     None
+    #[pyo3(text_signature = "(features, unix_milli, output_file, limit)")]
     pub fn export<'p>(
         &mut self,
         py: Python<'p>,
@@ -172,6 +277,14 @@ impl Client {
         })
     }
 
+    /// Take snapshot for a stream feature group in offline store.
+    ///
+    /// Args:
+    ///     group: A streaming feature group.
+    ///
+    /// Returns:
+    ///     None
+    #[pyo3(text_signature = "(group)")]
     pub fn snapshot<'p>(&mut self, py: Python<'p>, group: String) -> PyResult<&'p PyAny> {
         let mut inner = OomClient::clone(&self.inner);
         future_into_py(py, async move { inner.snapshot(group).await.map_err(err_to_py) })
