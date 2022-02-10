@@ -1,3 +1,6 @@
+//! This crate provides an easy-to-use python client for [oomstore](https://github.com/oom-ai/oomstore), a
+//! lightweight and fast feature store powered by go.
+
 mod convert;
 mod error;
 
@@ -11,6 +14,8 @@ use pyo3::{
 use pyo3_asyncio::tokio::future_into_py;
 use std::collections::HashMap;
 
+/// A python client for [oomstore](https://github.com/oom-ai/oomstore),
+/// using the grpc protocol to communicate with oomagent under the hood.
 #[pyclass]
 pub struct Client {
     inner: OomClient,
@@ -35,7 +40,7 @@ impl Client {
         })
     }
 
-    /// Connect to an embedded oomagent instance.
+    /// Connect to an oomagent instance embedded with the client.
     ///
     /// Args:
     ///     bin_path (str): The path to the oomagent binary.
