@@ -21,8 +21,14 @@ func Push(ctx context.Context, dbOpt dbutil.DBOpt, pushOpt offline.PushOpt) erro
 	}
 
 	err := dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, rows, columns)
-	if err != nil && dbutil.IsTableNotFoundError(err, dbOpt.Backend) {
-		return errdefs.NotFound(errdefs.WithStack(err))
+	if err != nil {
+		tableNotFound, notFoundErr := dbutil.IsTableNotFoundError(err, dbOpt.Backend)
+		if notFoundErr != nil {
+			return notFoundErr
+		}
+		if tableNotFound {
+			return errdefs.NotFound(errdefs.WithStack(err))
+		}
 	}
 	return errdefs.WithStack(err)
 }
