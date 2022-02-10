@@ -18,9 +18,10 @@ func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData Lo
 	var revision int64
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
 		// create the data table
-		pkFields := []string{opt.EntityName}
-		if opt.NoPK {
-			pkFields = nil
+		var pkFields []string
+		if opt.Category == types.CategoryBatch {
+			// streaming snapshot table doesn't have primary key
+			pkFields = []string{opt.EntityName}
 		}
 		schema := dbutil.BuildTableSchema(opt.SnapshotTableName, opt.EntityName, false, opt.Features, pkFields, backend)
 		_, err := tx.ExecContext(ctx, schema)
