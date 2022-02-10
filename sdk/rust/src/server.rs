@@ -14,6 +14,7 @@ use tokio_stream::StreamExt;
 
 use crate::Result;
 
+/// A rust oomagent server wrapper, mainly for [oomclient](crate::Client) with embedded oomagent server.
 #[derive(Debug, Clone)]
 pub struct ServerWrapper {
     addr:   SocketAddr,
@@ -21,8 +22,8 @@ pub struct ServerWrapper {
     pid:    u32,
 }
 
-// TODO: Add a Builder to create the server wrapper
 impl ServerWrapper {
+    // TODO: Add a Builder to create the server wrapper
     pub async fn new<P1, P2>(bin_path: Option<P1>, cfg_path: Option<P2>, port: Option<u16>) -> Result<Self>
     where
         P1: AsRef<Path>,

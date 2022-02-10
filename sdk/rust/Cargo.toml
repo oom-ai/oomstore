@@ -1,6 +1,6 @@
 [package]
 name = "oomclient"
-version = "0.1.0-rc.8"
+version = "0.1.0-rc.9"
 edition = "2021"
 authors = ["Wenxuan Zhang <wenxuangm@gmail.com>"]
 description = "oomstore client for rust"

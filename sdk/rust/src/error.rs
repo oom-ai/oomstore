@@ -1,6 +1,7 @@
 use std::{io, net::AddrParseError, num};
 use thiserror::Error;
 
+/// An error originating from the oomclient or it's dependencies.
 #[derive(Error, Debug)]
 pub enum OomError {
     #[error("a grpc status describing the result of an rpc call")]

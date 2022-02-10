@@ -30,6 +30,8 @@ use futures_core::stream::Stream;
 use std::{collections::HashMap, path::Path, sync::Arc};
 use tonic::{codegen::StdError, transport, Request};
 
+/// A rust client for [oomstore](https://github.com/oom-ai/oomstore),
+/// using the grpc protocol to communicate with oomagent server under the hood.
 #[derive(Debug, Clone)]
 pub struct Client {
     client: OomAgentClient<transport::Channel>,
@@ -38,6 +40,7 @@ pub struct Client {
 
 // TODO: Add a Builder to create the client
 impl Client {
+    /// Connect to an oomagent instance running on the given endpoint.
     pub async fn connect<D>(dst: D) -> Result<Self>
     where
         D: std::convert::TryInto<tonic::transport::Endpoint>,
@@ -46,6 +49,7 @@ impl Client {
         Ok(Self { client: OomAgentClient::connect(dst).await?, _agent: None })
     }
 
+    /// Connect to an oomagent instance embedded with the client.
     pub async fn with_embedded_oomagent<P1, P2>(bin_path: Option<P1>, cfg_path: Option<P2>) -> Result<Self>
     where
         P1: AsRef<Path>,
@@ -58,14 +62,17 @@ impl Client {
         })
     }
 
+    /// Connect to an embedded oomagent instance with default config.
     pub async fn with_default_embedded_oomagent() -> Result<Self> {
         Self::with_embedded_oomagent(None::<String>, None::<String>).await
     }
 
+    /// Check if oomagent is ready to serve requests.
     pub async fn health_check(&mut self) -> Result<()> {
         Ok(self.client.health_check(HealthCheckRequest {}).await.map(|_| ())?)
     }
 
+    /// Get online features for an entity without further conversion.
     pub async fn online_get_raw(
         &mut self,
         entity_key: impl Into<String>,
@@ -82,6 +89,7 @@ impl Client {
         })
     }
 
+    /// Get online features for an entity.
     pub async fn online_get(
         &mut self,
         key: impl Into<String>,
@@ -91,6 +99,7 @@ impl Client {
         Ok(parse_raw_feature_values(rs))
     }
 
+    /// Get online features for multiple entities without further conversion.
     pub async fn online_multi_get_raw(
         &mut self,
         entity_keys: Vec<String>,
@@ -104,6 +113,7 @@ impl Client {
         Ok(res.result)
     }
 
+    /// Get online features for multiple entities.
     pub async fn online_multi_get(
         &mut self,
         keys: Vec<String>,
@@ -113,6 +123,7 @@ impl Client {
         Ok(rs.into_iter().map(|(k, v)| (k, parse_raw_feature_values(v))).collect())
     }
 
+    /// Sync a certain revision of batch features from offline to online store.
     pub async fn sync(
         &mut self,
         group: impl Into<String>,
@@ -128,6 +139,7 @@ impl Client {
         Ok(())
     }
 
+    /// Import features from external (batch and stream) data sources to offline store through channels.
     pub async fn channel_import(
         &mut self,
         group: impl Into<String>,
@@ -147,6 +159,7 @@ impl Client {
         Ok(res.revision_id as u32)
     }
 
+    /// Import features from external (batch and stream) data sources to offline store through files.
     pub async fn import(
         &mut self,
         group: impl Into<String>,
@@ -169,6 +182,7 @@ impl Client {
         Ok(res.revision_id as u32)
     }
 
+    /// Push stream features from stream data source to both offline and online stores.
     pub async fn push(
         &mut self,
         entity_key: impl Into<String>,
@@ -190,6 +204,7 @@ impl Client {
         Ok(())
     }
 
+    /// Point-in-Time Join features against labeled entity rows through channels.
     pub async fn channel_join(
         &mut self,
         join_features: Vec<String>,
@@ -230,6 +245,7 @@ impl Client {
         Ok((header, outbound))
     }
 
+    /// Point-in-Time Join features against labeled entity rows through files.
     pub async fn join(
         &mut self,
         features: Vec<String>,
@@ -246,6 +262,7 @@ impl Client {
         Ok(())
     }
 
+    /// Export certain features to a channel.
     pub async fn channel_export(
         &mut self,
         features: Vec<String>,
@@ -275,6 +292,7 @@ impl Client {
         Ok((header, outbound))
     }
 
+    /// Export certain features to a file.
     pub async fn export(
         &mut self,
         features: Vec<String>,
@@ -291,6 +309,7 @@ impl Client {
         Ok(())
     }
 
+    /// Take snapshot for a stream feature group in offline store.
     pub async fn snapshot(&mut self, group: impl Into<String>) -> Result<()> {
         self.client.snapshot(SnapshotRequest { group: group.into() }).await?;
         Ok(())
