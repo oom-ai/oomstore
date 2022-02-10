@@ -50,7 +50,7 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 				default:
 				}
 			}
-			defer close(data)
+			close(data)
 		}()
 
 		for {

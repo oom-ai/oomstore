@@ -32,7 +32,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 	}
 	if len(features) == 0 {
 		data := make(chan types.JoinRecord)
-		defer close(data)
+		close(data)
 
 		return &types.JoinResult{Data: data}, nil
 	}
