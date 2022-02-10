@@ -139,8 +139,8 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 			require.NoError(t, err)
 
 			assert.ElementsMatch(t, tc.expected.Header, actual.Header)
-			expectedValues := extractValues(tc.expected.Data)
-			actualValues := extractValues(actual.Data)
+			expectedValues := extractValues(t, tc.expected.Data)
+			actualValues := extractValues(t, actual.Data)
 			for i := range expectedValues {
 				assert.ElementsMatch(t, expectedValues[i], actualValues[i])
 			}
@@ -291,7 +291,7 @@ func prepareResult(oneGroup bool, withValue bool, values []map[string]interface{
 		}
 	}
 
-	data := make(chan []interface{})
+	data := make(chan types.JoinRecord)
 	go func() {
 		defer close(data)
 		for _, item := range values {
@@ -299,7 +299,7 @@ func prepareResult(oneGroup bool, withValue bool, values []map[string]interface{
 			for _, h := range header {
 				record = append(record, item[h])
 			}
-			data <- record
+			data <- types.JoinRecord{Record: record}
 		}
 	}()
 	return &types.JoinResult{
@@ -309,7 +309,7 @@ func prepareResult(oneGroup bool, withValue bool, values []map[string]interface{
 }
 
 func prepareEmptyResult() *types.JoinResult {
-	data := make(chan []interface{})
+	data := make(chan types.JoinRecord)
 	defer close(data)
 	return &types.JoinResult{
 		Data: data,
@@ -416,10 +416,11 @@ func prepareBatchResultValues() []map[string]interface{} {
 	}
 }
 
-func extractValues(stream <-chan []interface{}) [][]interface{} {
+func extractValues(t *testing.T, stream <-chan types.JoinRecord) [][]interface{} {
 	values := make([][]interface{}, 0)
 	for item := range stream {
-		values = append(values, item)
+		assert.NoError(t, item.Error)
+		values = append(values, item.Record)
 	}
 	sort.Slice(values, func(i, j int) bool {
 		if cast.ToString(values[i][0]) == cast.ToString(values[j][0]) {

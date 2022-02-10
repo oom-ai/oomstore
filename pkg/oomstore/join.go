@@ -31,7 +31,7 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 		return nil, err
 	}
 	if len(features) == 0 {
-		data := make(chan []interface{})
+		data := make(chan types.JoinRecord)
 		defer close(data)
 
 		return &types.JoinResult{Data: data}, nil
@@ -221,7 +221,10 @@ func writeJoinResultToFile(outputFilePath string, joinResult *types.JoinResult) 
 		return err
 	}
 	for row := range joinResult.Data {
-		if err := w.Write(joinRecord(row)); err != nil {
+		if row.Error != nil {
+			return row.Error
+		}
+		if err := w.Write(joinRecord(row.Record)); err != nil {
 			return err
 		}
 	}

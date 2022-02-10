@@ -57,7 +57,10 @@ func printJoinResultInCSV(joinResult *types.JoinResult) error {
 		return err
 	}
 	for row := range joinResult.Data {
-		if err := w.Write(joinRecord(row)); err != nil {
+		if row.Error != nil {
+			return row.Error
+		}
+		if err := w.Write(joinRecord(row.Record)); err != nil {
 			return err
 		}
 	}
@@ -70,7 +73,10 @@ func printJoinResultInASCIITable(joinResult *types.JoinResult) error {
 	table.SetAutoFormatHeaders(false)
 
 	for row := range joinResult.Data {
-		table.Append(joinRecord(row))
+		if row.Error != nil {
+			return row.Error
+		}
+		table.Append(joinRecord(row.Record))
 	}
 	table.Render()
 	return nil

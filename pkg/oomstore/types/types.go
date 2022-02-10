@@ -28,18 +28,6 @@ func (r ExportRecord) ValueAt(i int) interface{} {
 	return r.Record[i+1]
 }
 
-type EntityRow struct {
-	EntityKey string
-	UnixMilli int64
-	Values    []string
-	Error     error
-}
-
-type JoinResult struct {
-	Header []string
-	Data   <-chan []interface{}
-}
-
 type ExportResult struct {
 	Header []string
 	Data   <-chan ExportRecord
@@ -50,6 +38,23 @@ func NewExportResult(header []string, data <-chan ExportRecord) *ExportResult {
 		Header: header,
 		Data:   data,
 	}
+}
+
+type EntityRow struct {
+	EntityKey string
+	UnixMilli int64
+	Values    []string
+	Error     error
+}
+
+type JoinRecord struct {
+	Record []interface{}
+	Error  error
+}
+
+type JoinResult struct {
+	Header []string
+	Data   <-chan JoinRecord
 }
 
 type DataTableTimeRange struct {

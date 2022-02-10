@@ -169,6 +169,18 @@ type prepareTableSchemaParams struct {
 	hasUnixMilli bool
 }
 
+func buildTableName(dbOpt dbutil.DBOpt, tableName string) string {
+	qt := dbutil.QuoteFn(dbOpt.Backend)
+	switch dbOpt.Backend {
+	case types.BackendBigQuery:
+		return fmt.Sprintf("%s.%s", *dbOpt.DatasetID, qt(tableName))
+	case types.BackendSnowflake:
+		return fmt.Sprintf("PUBLIC.%s", qt(tableName))
+	default:
+		return qt(tableName)
+	}
+}
+
 func prepareTableSchema(dbOpt dbutil.DBOpt, params prepareTableSchemaParams) (string, []string, error) {
 	columnFormat, err := dbutil.GetColumnFormat(dbOpt.Backend)
 	if err != nil {
@@ -177,24 +189,20 @@ func prepareTableSchema(dbOpt dbutil.DBOpt, params prepareTableSchemaParams) (st
 	qt := dbutil.QuoteFn(dbOpt.Backend)
 
 	// TODO: infer db_type from value_type
-	var entityType, valueType, qtTableName string
+	var entityType, valueType string
 	switch dbOpt.Backend {
 	case types.BackendBigQuery:
 		entityType = "STRING"
 		valueType = "STRING"
-		qtTableName = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, qt(params.tableName))
 	case types.BackendMySQL:
 		entityType = "VARCHAR(255)"
 		valueType = "TEXT"
-		qtTableName = qt(params.tableName)
 	case types.BackendSnowflake:
 		entityType = "TEXT"
 		valueType = "TEXT"
-		qtTableName = fmt.Sprintf("PUBLIC.%s", qt(params.tableName))
 	default:
 		entityType = "TEXT"
 		valueType = "TEXT"
-		qtTableName = qt(params.tableName)
 	}
 
 	columnDefs := []string{
@@ -207,7 +215,7 @@ func prepareTableSchema(dbOpt dbutil.DBOpt, params prepareTableSchemaParams) (st
 		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, valueType))
 	}
 
-	return qtTableName, columnDefs, nil
+	return buildTableName(dbOpt, params.tableName), columnDefs, nil
 }
 
 func insertEntityRows(ctx context.Context,

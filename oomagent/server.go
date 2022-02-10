@@ -267,7 +267,10 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 
 	header := joinResult.Header
 	for row := range joinResult.Data {
-		joinedRow, err := convertJoinedRow(row)
+		if row.Error != nil {
+			return row.Error
+		}
+		joinedRow, err := convertJoinedRow(row.Record)
 		if err != nil {
 			return wrapErr(err)
 		}
