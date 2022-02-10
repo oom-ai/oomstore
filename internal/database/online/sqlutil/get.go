@@ -32,7 +32,11 @@ func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.Back
 
 	record, err := db.QueryRowxContext(ctx, db.Rebind(query), opt.EntityKey).SliceScan()
 	if err != nil {
-		if err == sql.ErrNoRows || dbutil.IsTableNotFoundError(err, backend) {
+		tableNotFound, notFoundErr := dbutil.IsTableNotFoundError(err, backend)
+		if notFoundErr != nil {
+			return nil, notFoundErr
+		}
+		if err == sql.ErrNoRows || tableNotFound {
 			return make(dbutil.RowMap), nil
 		}
 		return nil, errdefs.WithStack(err)
@@ -68,7 +72,11 @@ func MultiGet(ctx context.Context, db *sqlx.DB, opt online.MultiGetOpt, backend 
 
 	rows, err := db.QueryxContext(ctx, db.Rebind(query), args...)
 	if err != nil {
-		if err == sql.ErrNoRows || dbutil.IsTableNotFoundError(err, backend) {
+		tableNotFound, notFoundErr := dbutil.IsTableNotFoundError(err, backend)
+		if notFoundErr != nil {
+			return nil, notFoundErr
+		}
+		if err == sql.ErrNoRows || tableNotFound {
 			return make(map[string]dbutil.RowMap), nil
 		}
 		return nil, errdefs.WithStack(err)
