@@ -11,7 +11,7 @@ import (
 
 func CreateTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.CreateTableOpt) error {
 	if !supportIndex(dbOpt.Backend) {
-		return CreateTableNoIndex(ctx, dbOpt, opt)
+		return createTableNoIndex(ctx, dbOpt, opt)
 	}
 	switch opt.TableType {
 	case types.TableBatchSnapshot:
@@ -45,7 +45,7 @@ func CreateTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.CreateTabl
 	return nil
 }
 
-func CreateTableNoIndex(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.CreateTableOpt) error {
+func createTableNoIndex(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.CreateTableOpt) error {
 	var hasUnixMilli bool
 	switch opt.TableType {
 	case types.TableBatchSnapshot:
