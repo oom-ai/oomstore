@@ -39,7 +39,7 @@ type DoJoinOpt struct {
 func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.JoinResult, error) {
 	if err := validateJoinOpt(opt); err != nil {
 		data := make(chan types.JoinRecord)
-		defer close(data)
+		close(data)
 		return &types.JoinResult{Data: data}, nil
 	}
 
@@ -54,7 +54,7 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 	}
 	if timeRange.MinUnixMilli == nil || timeRange.MaxUnixMilli == nil {
 		data := make(chan types.JoinRecord)
-		defer close(data)
+		close(data)
 		return &types.JoinResult{Data: data}, nil
 	}
 
@@ -212,7 +212,7 @@ type readJoinedTableOpt struct {
 func readJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt readJoinedTableOpt) (*types.JoinResult, error) {
 	if len(opt.TableNames) == 0 {
 		data := make(chan types.JoinRecord)
-		defer close(data)
+		close(data)
 		return &types.JoinResult{Data: data}, nil
 	}
 
@@ -316,8 +316,8 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 				}
 			}
 
-			defer rows.Close()
-			defer close(data)
+			rows.Close()
+			close(data)
 		}()
 
 		for rows.Next() {
