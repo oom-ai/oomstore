@@ -74,7 +74,7 @@ impl Client {
     /// Args:
     ///     entity_key (str): An entity identifier, could be device ID, user ID, etc.
     ///     features: A list of feature full names.
-    ///       A feature full name has the following format: <feature_group_name>.<feature_name>,
+    ///       A feature full name has the following format: &lt;group_name&gt;.&lt;feature_name&gt;,
     ///       for example, txn_stats.count_7d.
     ///
     /// Returns:
@@ -96,7 +96,7 @@ impl Client {
     /// Args:
     ///     entity_keys: A list of entity identifiers, could be device IDs, user IDs, etc.
     ///     features: A list of feature full names.
-    ///       A feature full name has the following format: <feature_group_name>.<feature_name>,
+    ///       A feature full name has the following format: &lt;group_name&gt;.&lt;feature_name&gt;,
     ///       for example, txn_stats.count_7d.
     ///
     /// Returns:
