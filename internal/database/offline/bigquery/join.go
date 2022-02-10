@@ -54,7 +54,7 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 			recordMap := make(map[string]bigquery.Value)
 			err = rows.Next(&recordMap)
 			if err == iterator.Done {
-				break
+				return
 			}
 			if err != nil {
 				scanErr = errdefs.WithStack(err)
@@ -70,7 +70,13 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 				}
 				record = append(record, deserializedValue)
 			}
-			data <- record
+
+			select {
+			case data <- record:
+				// nothing to do
+			case <-ctx.Done():
+				return
+			}
 		}
 	}()
 

@@ -329,7 +329,13 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 				}
 				deserializedRecord = append(deserializedRecord, deserializedValue)
 			}
-			data <- deserializedRecord
+
+			select {
+			case data <- deserializedRecord:
+				// nothing to do
+			case <-ctx.Done():
+				return
+			}
 		}
 	}()
 
