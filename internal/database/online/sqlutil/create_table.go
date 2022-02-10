@@ -15,7 +15,14 @@ func CreateTable(ctx context.Context, dbOpt dbutil.DBOpt, opt online.CreateTable
 		return err
 	}
 	// Step 2: create new table
-	schema := dbutil.BuildTableSchema(opt.TableName, opt.EntityName, false, opt.Features, []string{opt.EntityName}, dbOpt.Backend)
+	schema := dbutil.BuildTableSchema(dbutil.BuildTableSchemaParams{
+		TableName:    opt.TableName,
+		EntityName:   opt.EntityName,
+		HasUnixMilli: false,
+		Features:     opt.Features,
+		PrimaryKeys:  []string{opt.EntityName},
+		Backend:      dbOpt.Backend,
+	})
 	err := dbOpt.ExecContext(ctx, schema, nil)
 	if err != nil {
 		return errdefs.WithStack(err)

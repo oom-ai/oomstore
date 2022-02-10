@@ -16,14 +16,19 @@ type LoadData func(tx *sqlx.Tx, ctx context.Context, opt dbutil.LoadDataFromSour
 
 func Import(ctx context.Context, db *sqlx.DB, opt offline.ImportOpt, loadData LoadData, backend types.BackendType) (int64, error) {
 	var revision int64
+	params := dbutil.BuildTableSchemaParams{
+		TableName:    opt.SnapshotTableName,
+		EntityName:   opt.EntityName,
+		HasUnixMilli: false,
+		Features:     opt.Features,
+		Backend:      backend,
+	}
 	err := dbutil.WithTransaction(db, ctx, func(ctx context.Context, tx *sqlx.Tx) error {
-		// create the data table
-		var pkFields []string
+		// create the data table: streaming snapshot table doesn't have primary key
 		if opt.Category == types.CategoryBatch {
-			// streaming snapshot table doesn't have primary key
-			pkFields = []string{opt.EntityName}
+			params.PrimaryKeys = []string{opt.EntityName}
 		}
-		schema := dbutil.BuildTableSchema(opt.SnapshotTableName, opt.EntityName, false, opt.Features, pkFields, backend)
+		schema := dbutil.BuildTableSchema(params)
 		_, err := tx.ExecContext(ctx, schema)
 		if err != nil {
 			return errdefs.WithStack(err)
