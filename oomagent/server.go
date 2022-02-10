@@ -214,8 +214,6 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 
 	// This channel receives requests from the client.
 	entityRows := make(chan types.EntityRow, 1)
-	// A global error
-	var globalErr error
 
 	go func() {
 		defer close(entityRows)
@@ -231,12 +229,20 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 				return
 			}
 			if err != nil {
-				globalErr = err
-				return
+				select {
+				case entityRows <- types.EntityRow{Error: err}:
+					return
+				case <-ctx.Done():
+					return
+				}
 			}
 			if req.GetEntityRow() == nil {
-				globalErr = internalError("cannot process nil entity row")
-				return
+				select {
+				case entityRows <- types.EntityRow{Error: internalError("cannot process nil entity row")}:
+					return
+				case <-ctx.Done():
+					return
+				}
 			}
 
 			select {
@@ -244,6 +250,7 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 				EntityKey: req.EntityRow.EntityKey,
 				UnixMilli: req.EntityRow.UnixMilli,
 				Values:    req.EntityRow.Values,
+				Error:     nil,
 			}:
 				// nothing to do
 			case <-ctx.Done():
@@ -259,9 +266,6 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 		ExistedFeatureNames: firstReq.ExistedFeatures,
 	})
 	if err != nil {
-		if errdefs.Is(err, context.Canceled) {
-			return wrapErr(globalErr)
-		}
 		return wrapErr(err)
 	}
 
@@ -284,7 +288,7 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 		// Only need to send header upon the first response
 		header = nil
 	}
-	return wrapErr(globalErr)
+	return nil
 }
 
 func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.JoinResponse, error) {
