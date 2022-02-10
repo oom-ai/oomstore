@@ -38,7 +38,7 @@ type DoJoinOpt struct {
 
 func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.JoinResult, error) {
 	if err := validateJoinOpt(opt); err != nil {
-		data := make(chan []interface{})
+		data := make(chan types.JoinRecord)
 		defer close(data)
 		return &types.JoinResult{Data: data}, nil
 	}
@@ -53,7 +53,7 @@ func DoJoin(ctx context.Context, dbOpt dbutil.DBOpt, opt DoJoinOpt) (*types.Join
 		return nil, err
 	}
 	if timeRange.MinUnixMilli == nil || timeRange.MaxUnixMilli == nil {
-		data := make(chan []interface{})
+		data := make(chan types.JoinRecord)
 		defer close(data)
 		return &types.JoinResult{Data: data}, nil
 	}
@@ -211,12 +211,9 @@ type readJoinedTableOpt struct {
 
 func readJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt readJoinedTableOpt) (*types.JoinResult, error) {
 	if len(opt.TableNames) == 0 {
-		data := make(chan []interface{})
+		data := make(chan types.JoinRecord)
 		defer close(data)
-		emptyResult := &types.JoinResult{
-			Data: data,
-		}
-		return emptyResult, nil
+		return &types.JoinResult{Data: data}, nil
 	}
 
 	qt := dbutil.QuoteFn(dbOpt.Backend)
@@ -305,33 +302,39 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 		return nil, errdefs.WithStack(err)
 	}
 
-	data := make(chan []interface{})
-	var scanErr, dropErr error
+	data := make(chan types.JoinRecord)
 	go func() {
 		defer func() {
 			if err := dropTemporaryTables(ctx, dbOpt.SqlxDB, dropTableNames); err != nil {
-				dropErr = err
+				select {
+				case data <- types.JoinRecord{Error: err}:
+					// nothing to do
+				default:
+				}
 			}
+
 			defer rows.Close()
 			defer close(data)
 		}()
+
 		for rows.Next() {
 			record, err := rows.SliceScan()
 			if err != nil {
-				scanErr = errdefs.WithStack(err)
+				data <- types.JoinRecord{Error: errdefs.WithStack(err)}
 				continue
 			}
+
 			deserializedRecord := make([]interface{}, 0, len(record))
 			for i, r := range record {
 				deserializedValue, err := dbutil.DeserializeByValueType(r, header[i].ValueType, backendType)
 				if err != nil {
-					scanErr = err
+					data <- types.JoinRecord{Error: err}
 				}
 				deserializedRecord = append(deserializedRecord, deserializedValue)
 			}
 
 			select {
-			case data <- deserializedRecord:
+			case data <- types.JoinRecord{Record: deserializedRecord, Error: nil}:
 				// nothing to do
 			case <-ctx.Done():
 				return
@@ -339,14 +342,10 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 		}
 	}()
 
-	// TODO: return errors through channel
-	if scanErr != nil {
-		return nil, scanErr
-	}
 	return &types.JoinResult{
 		Header: header.Names(),
 		Data:   data,
-	}, dropErr
+	}, nil
 }
 
 func sqlxQueryTableTimeRange(ctx context.Context, dbOpt dbutil.DBOpt, tableName string) (*types.DataTableTimeRange, error) {

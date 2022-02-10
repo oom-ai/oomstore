@@ -6,12 +6,12 @@ import (
 	"strings"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"google.golang.org/api/iterator"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -40,16 +40,19 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 		return nil, errdefs.WithStack(err)
 	}
 
-	data := make(chan []interface{})
-	var scanErr, dropErr error
-
+	data := make(chan types.JoinRecord)
 	go func() {
 		defer func() {
 			if err = dropTemporaryTables(ctx, dbOpt.BigQueryDB, dropTableNames); err != nil {
-				dropErr = err
+				select {
+				case data <- types.JoinRecord{Error: err}:
+					// nothing to do
+				default:
+				}
 			}
 			defer close(data)
 		}()
+
 		for {
 			recordMap := make(map[string]bigquery.Value)
 			err = rows.Next(&recordMap)
@@ -57,7 +60,12 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 				return
 			}
 			if err != nil {
-				scanErr = errdefs.WithStack(err)
+				select {
+				case data <- types.JoinRecord{Error: errdefs.WithStack(err)}:
+					// nothing to do
+				case <-ctx.Done():
+					return
+				}
 				continue
 			}
 			record := make([]interface{}, 0, len(recordMap))
@@ -65,14 +73,19 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 				column := strings.Split(header[i].Name, ".")
 				deserializedValue, err := dbutil.DeserializeByValueType(recordMap[column[len(column)-1]], header[i].ValueType, backendType)
 				if err != nil {
-					scanErr = err
+					select {
+					case data <- types.JoinRecord{Error: err}:
+						// nothing to do
+					case <-ctx.Done():
+						return
+					}
 					continue
 				}
 				record = append(record, deserializedValue)
 			}
 
 			select {
-			case data <- record:
+			case data <- types.JoinRecord{Record: record, Error: nil}:
 				// nothing to do
 			case <-ctx.Done():
 				return
@@ -80,15 +93,10 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 		}
 	}()
 
-	// TODO: return errors through channel
-	if scanErr != nil {
-		return nil, scanErr
-	}
-
 	return &types.JoinResult{
 		Header: header.Names(),
 		Data:   data,
-	}, dropErr
+	}, nil
 }
 
 func dropTemporaryTables(ctx context.Context, db *bigquery.Client, tableNames []string) error {
