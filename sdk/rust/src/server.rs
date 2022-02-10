@@ -1,3 +1,7 @@
+use nix::{
+    sys::signal::{self, Signal},
+    unistd::Pid,
+};
 use signal_hook::{consts::signal::*, low_level::emulate_default_handler};
 use signal_hook_tokio::{Handle, Signals};
 use std::{
@@ -14,6 +18,7 @@ use crate::Result;
 pub struct ServerWrapper {
     addr:   SocketAddr,
     handle: Handle,
+    pid:    u32,
 }
 
 // TODO: Add a Builder to create the server wrapper
@@ -35,22 +40,21 @@ impl ServerWrapper {
         if let Some(cfg_path) = cfg_path.clone() {
             oomagent.arg("--config").arg(cfg_path);
         }
-        oomagent.kill_on_drop(true);
 
-        let mut child = oomagent.spawn()?;
-        let pid = child.id();
+        let child = oomagent.spawn()?;
+        let pid = child.id().expect("failed to get child pid");
 
         tokio::spawn({
             async move {
                 while let Some(signal) = signals.next().await {
-                    child.kill().await.unwrap();
-                    emulate_default_handler(signal).unwrap();
+                    graceful_kill(pid, signal);
+                    emulate_default_handler(signal).expect("failed to emulate default signal handler");
                 }
             }
         });
 
-        let addr = get_agent_address(pid.unwrap()).await?;
-        Ok(Self { handle, addr })
+        let addr = get_agent_address(pid).await?;
+        Ok(Self { addr, handle, pid })
     }
 
     pub async fn default() -> Result<Self> {
@@ -73,6 +77,7 @@ impl ServerWrapper {
 impl Drop for ServerWrapper {
     fn drop(&mut self) {
         self.handle.close();
+        graceful_kill(self.pid, SIGTERM);
     }
 }
 
@@ -93,4 +98,15 @@ async fn get_agent_address(pid: u32) -> Result<SocketAddr> {
         }
         time::sleep(Duration::from_millis(200)).await;
     }
+}
+
+fn graceful_kill(pid: u32, signal: i32) {
+    let signal = match signal {
+        SIGHUP => Signal::SIGHUP,
+        SIGTERM => Signal::SIGTERM,
+        SIGINT => Signal::SIGINT,
+        SIGQUIT => Signal::SIGQUIT,
+        _ => panic!("unexpected signal: {}", signal),
+    };
+    signal::kill(Pid::from_raw(pid as i32), signal).expect("failed to send SIGTERM signal to child process");
 }

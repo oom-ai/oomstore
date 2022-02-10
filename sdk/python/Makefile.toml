@@ -1,17 +1,25 @@
 [tasks.maturin]
+dependencies = ["pyenv"]
 script = '''
 source .env/bin/activate
 maturin develop
 '''
 
 [tasks.ipython]
+dependencies = ["pyenv"]
 script = '''
 source .env/bin/activate
 ipython
 '''
 
 [tasks.python]
+dependencies = ["pyenv"]
 script = '''
 source .env/bin/activate
 python "${@}"
+'''
+
+[tasks.pyenv]
+script = '''
+test -d .env || python -m venv .env
 '''
