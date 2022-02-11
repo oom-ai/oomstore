@@ -16,15 +16,17 @@ import (
 /*
 ChannelExport exports the latest feature value up to the given timestamp.
 Usage Example:
-	exportResult, err := store.ExportBatch(ctx, opt)
+	exportResult, err := store.ChannelExport(ctx, opt)
 	if err != nil {
 		return err
 	}
 	for row := range exportResult.Data {
-		fmt.Println(cast.ToStringSlice([]interface{}(row)))
+   		if row.Error != nil {
+			return err
+    		}
+		fmt.Println(cast.ToStringSlice([]interface{}(row.Record)))
 	}
-	// Attention: call CheckStreamError after consuming exportResult.Data channel
-	return exportResult.CheckStreamError()
+    return nil
 */
 func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt) (*types.ExportResult, error) {
 	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
@@ -74,7 +76,7 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 		}
 	}
 
-	result, err := s.offline.Export(ctx, offline.ExportOpt{
+	return s.offline.Export(ctx, offline.ExportOpt{
 		SnapshotTables: snapshotTables,
 		CdcTables:      cdcTables,
 		Features:       featureMap,
@@ -82,10 +84,6 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 		EntityName:     features[0].Group.Entity.Name,
 		Limit:          opt.Limit,
 	})
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
 }
 
 // Export exports the latest feature value up to the given timestamp, it outputs
