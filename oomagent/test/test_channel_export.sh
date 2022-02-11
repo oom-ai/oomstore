@@ -10,9 +10,44 @@ oomcli push --entity-key 1 --group user_fake_stream --feature f1=10
 oomcli snapshot user_fake_stream
 
 unix_milli=${3:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
-echo $unix_milli
 
-case1() {
+oomagent_export_no_register_feature() {
+    case="export all no register feature"
+    arg=$(cat <<-EOF
+    {
+       "features": ["a.b","a.c"],
+       "unix_milli": $unix_milli
+    }
+EOF
+)
+    actual=$(testgrpc ChannelExport <<<"$arg" 2>&1 || true)
+    expected='
+ERROR:
+  Code: Internal
+  Message: invalid feature names [a.b a.c]
+'
+    assert_eq "$case" "$expected" "$actual"
+}
+
+oomagent_export_has_no_register_feature() {
+    case="export has no register feature"
+    arg=$(cat <<-EOF
+    {
+       "features": ["account.state","account.a"],
+       "unix_milli": $unix_milli
+    }
+EOF
+)
+    actual=$(testgrpc ChannelExport <<<"$arg" 2>&1 || true)
+    expected='
+ERROR:
+  Code: Internal
+  Message: invalid feature names [account.a]
+'
+    assert_eq "$case" "$expected" "$actual"
+}
+
+oomagent_export_no_features() {
     case="export and no features"
     arg=$(cat <<-EOF
     {
@@ -26,7 +61,7 @@ EOF
     assert_json_eq "$case" "$expected" "$actual"
 }
 
-case2() {
+oomagent_export_one_features() {
     prefix="export some features"
     arg=$(cat <<-EOF
     {
@@ -59,7 +94,7 @@ EOF
     assert_json_eq "$case" "$(sort <<<"$expected_rows")" "$actual_rows"
 }
 
-case3() {
+oomagent_export_multi_features() {
     prefix="export some features"
     arg=$(cat <<-EOF
     {
@@ -92,6 +127,12 @@ EOF
     assert_json_eq "$case" "$(sort <<<"$expected_rows")" "$actual_rows"
 }
 
-case1
-case2
-case3
+main() {
+    oomagent_export_no_register_feature
+    oomagent_export_has_no_register_feature
+    oomagent_export_no_features
+    oomagent_export_one_features
+    oomagent_export_multi_features
+}
+
+main
