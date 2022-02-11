@@ -38,9 +38,6 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 	if err != nil {
 		return nil, err
 	}
-	if len(features) == 0 {
-		return nil, nil
-	}
 
 	if len(features) != len(opt.FeatureNames) {
 		invalid := features.FindMissingFeatures(opt.FeatureNames)
