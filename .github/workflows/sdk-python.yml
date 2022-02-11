@@ -1,4 +1,4 @@
-name: CI
+name: sdk-python
 
 on:
   push:
@@ -9,25 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: messense/maturin-action@v1
+    - uses: wfxr/maturin-action@v1
       with:
         manylinux: auto
         command: build
-        args: --release -o dist
-    - name: Upload wheels
-      uses: actions/upload-artifact@v2
-      with:
-        name: wheels
-        path: dist
-
-  windows:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: messense/maturin-action@v1
-      with:
-        command: build
-        args: --release --no-sdist -o dist
+        args: --release -o dist -m sdk/python/Cargo.toml
+        rustup-components: rustfmt
     - name: Upload wheels
       uses: actions/upload-artifact@v2
       with:
@@ -41,7 +28,7 @@ jobs:
     - uses: messense/maturin-action@v1
       with:
         command: build
-        args: --release --no-sdist -o dist --universal2
+        args: --release --no-sdist -o dist --universal2 -m sdk/python/Cargo.toml
     - name: Upload wheels
       uses: actions/upload-artifact@v2
       with:
@@ -52,7 +39,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     if: "startsWith(github.ref, 'refs/tags/')"
-    needs: [ macos, windows, linux ]
+    needs: [ macos, linux ]
     steps:
       - uses: actions/download-artifact@v2
         with:
