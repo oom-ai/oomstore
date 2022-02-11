@@ -19,6 +19,20 @@ t3=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
 oomcli push --entity-key 2 --group user-click --feature last_5_click_posts=1,2,3,4,5 --feature number_of_user_starred_posts=10
 t4=${1:-$(perl -MTime::HiRes=time -E 'say int(time * 1000)')}
 
+oomcli_export_no_register_feature() {
+    case="export all no register feature"
+    actual=$(oomcli export --feature a.b,a.c --unix-milli $t0 2>&1 || true)
+    expected='Error: failed exporting features: invalid feature names [a.b a.c]'
+    assert_eq "$case" "$expected" "$actual"
+}
+
+oomcli_export_has_no_register_feature() {
+    case="export has no register feature"
+    actual=$(oomcli export --feature user-click.last_5_click_posts,user-click.a --unix-milli $t0 2>&1 ||true)
+    expected='Error: failed exporting features: invalid feature names [user-click.a]'
+    assert_eq "$case" "$expected" "$actual"
+}
+
 oomcli_export_push_feature() {
     case="push feature"
     expected='user,user-click.last_5_click_posts,user-click.number_of_user_starred_posts
@@ -77,6 +91,8 @@ oomcli_export_batch_and_stream() {
 }
 
 main() {
+    oomcli_export_no_register_feature
+    oomcli_export_has_no_register_feature
     oomcli_export_push_feature
     oomcli_export_update_feature
     oomcli_export_batch
