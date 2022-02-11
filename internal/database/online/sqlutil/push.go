@@ -1,36 +1,58 @@
 package sqlutil
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
+	"text/template"
+
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-type PushCondition struct {
-	Inserts            string
+type PushQueryParams struct {
+	TableName          string
+	EntityName         string
+	Fields             string
 	InsertPlaceholders string
+	UpdatePlaceholders string
 	InsertValues       []interface{}
 	UpdateValues       []interface{}
-	UpdatePlaceholders string
+	Backend            types.BackendType
 }
 
-func BuildPushCondition(opt online.PushOpt, backend types.BackendType) *PushCondition {
+func BuildPushQueryParams(opt online.PushOpt, backend types.BackendType) PushQueryParams {
 	qt := dbutil.QuoteFn(backend)
-	cond := PushCondition{}
+	params := PushQueryParams{
+		TableName:    dbutil.OnlineStreamTableName(opt.GroupID),
+		EntityName:   opt.EntityName,
+		Fields:       qt(append([]string{opt.EntityName}, opt.Features.Names()...)...),
+		InsertValues: append([]interface{}{opt.EntityKey}, opt.FeatureValues...),
+		UpdateValues: opt.FeatureValues,
+		Backend:      backend,
+	}
 
-	cond.Inserts = qt(append([]string{opt.EntityName}, opt.Features.Names()...)...)
-	cond.InsertValues = append([]interface{}{opt.EntityKey}, opt.FeatureValues...)
-	cond.InsertPlaceholders = dbutil.Fill(len(cond.InsertValues), "?", ",")
-
+	params.InsertPlaceholders = dbutil.Fill(len(params.InsertValues), "?", ",")
 	updatePlaceholders := make([]string, 0, opt.Features.Len())
 	for _, name := range opt.Features.Names() {
 		updatePlaceholders = append(updatePlaceholders, fmt.Sprintf("%s=?", qt(name)))
 	}
-	cond.UpdatePlaceholders = strings.Join(updatePlaceholders, ",")
-	cond.UpdateValues = opt.FeatureValues
+	params.UpdatePlaceholders = strings.Join(updatePlaceholders, ",")
+	return params
+}
 
-	return &cond
+func BuildPushQuery(params PushQueryParams, queryTemplate string) (string, error) {
+	qt := dbutil.QuoteFn(params.Backend)
+	t := template.Must(template.New("push").Funcs(template.FuncMap{
+		"qt": qt,
+	}).Parse(queryTemplate))
+
+	buf := bytes.NewBuffer(nil)
+	if err := t.Execute(buf, params); err != nil {
+		return "", errdefs.WithStack(err)
+	}
+	return buf.String(), nil
 }
