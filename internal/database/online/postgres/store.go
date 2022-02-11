@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -49,20 +48,20 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 	return sqlutil.Purge(ctx, db.DB, revisionID, Backend)
 }
 
+const PUSH_QUERY = `
+INSERT INTO {{ .TableName }} ( {{ .Fields }} )
+VALUES ( {{ .InsertPlaceholders }} )
+ON CONFLICT ( {{ qt .EntityName }} )
+DO UPDATE SET {{ .UpdatePlaceholders }}
+`
+
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	tableName := dbutil.OnlineStreamTableName(opt.GroupID)
-
-	cond := sqlutil.BuildPushCondition(opt, Backend)
-
-	query := fmt.Sprintf(`INSERT INTO %s(%s) VALUES(%s) ON CONFLICT ("%s") DO UPDATE SET %s`,
-		tableName,
-		cond.Inserts,
-		cond.InsertPlaceholders,
-		opt.EntityName,
-		cond.UpdatePlaceholders,
-	)
-
-	_, err := db.ExecContext(ctx, db.Rebind(query), append(cond.InsertValues, cond.UpdateValues...)...)
+	params := sqlutil.BuildPushQueryParams(opt, Backend)
+	query, err := sqlutil.BuildPushQuery(params, PUSH_QUERY)
+	if err != nil {
+		return err
+	}
+	_, err = db.ExecContext(ctx, db.Rebind(query), append(params.InsertValues, params.UpdateValues...)...)
 	return errdefs.WithStack(err)
 }
 

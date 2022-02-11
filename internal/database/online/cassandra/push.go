@@ -2,26 +2,24 @@ package cassandra
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/internal/database/online/sqlutil"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 )
 
+const PUSH_QUERY = `
+INSERT INTO {{ .TableName }} ( {{ .Fields }} )
+VALUES ( {{ .InsertPlaceholders }} )
+`
+
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	tableName := dbutil.OnlineStreamTableName(opt.GroupID)
+	params := sqlutil.BuildPushQueryParams(opt, Backend)
+	query, err := sqlutil.BuildPushQuery(params, PUSH_QUERY)
+	if err != nil {
+		return err
+	}
 
-	cond := sqlutil.BuildPushCondition(opt, Backend)
-	// cassandra's `insert` is equivalent to `insert_or_update`.
-	// see: https://cassandra.apache.org/doc/latest/cassandra/cql/dml.html#insert-statement
-	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES(%s)",
-		tableName,
-		cond.Inserts,
-		cond.InsertPlaceholders,
-	)
-
-	err := db.Query(query, cond.InsertValues...).WithContext(ctx).Exec()
+	err = db.Query(query, params.InsertValues...).WithContext(ctx).Exec()
 	return errdefs.WithStack(err)
 }
