@@ -4,12 +4,12 @@ import (
 	"context"
 	"os"
 
-	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/spf13/cast"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -73,8 +73,7 @@ func (s *OomStore) parseImportOpt(ctx context.Context, opt types.ImportOpt) (*im
 		return nil, err
 	}
 	if features == nil {
-		err = errdefs.Errorf("no features under group: %s", opt.GroupName)
-		return nil, err
+		return nil, errdefs.Errorf("no features under group: %s", opt.GroupName)
 	}
 
 	entity := group.Entity
