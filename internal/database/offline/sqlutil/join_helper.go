@@ -188,21 +188,16 @@ func prepareTableSchema(dbOpt dbutil.DBOpt, params prepareTableSchemaParams) (st
 	}
 	qt := dbutil.QuoteFn(dbOpt.Backend)
 
-	// TODO: infer db_type from value_type
-	var entityType, valueType string
-	switch dbOpt.Backend {
-	case types.BackendBigQuery:
-		entityType = "STRING"
-		valueType = "STRING"
-	case types.BackendMySQL:
+	valueType, err := dbutil.DBValueType(dbOpt.Backend, types.String)
+	if err != nil {
+		return "", nil, err
+	}
+	entityType, err := dbutil.DBValueType(dbOpt.Backend, types.String)
+	if err != nil {
+		return "", nil, err
+	}
+	if dbOpt.Backend == types.BackendMySQL || dbOpt.Backend == types.BackendTiDB {
 		entityType = "VARCHAR(255)"
-		valueType = "TEXT"
-	case types.BackendSnowflake:
-		entityType = "TEXT"
-		valueType = "TEXT"
-	default:
-		entityType = "TEXT"
-		valueType = "TEXT"
 	}
 
 	columnDefs := []string{
