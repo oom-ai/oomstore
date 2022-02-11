@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"context"
-	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -49,19 +48,19 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 	return sqlutil.Purge(ctx, db.DB, revisionID, Backend)
 }
 
-// TODO: refactor with text/template
+const PUSH_QUERY = `
+INSERT INTO {{ .TableName }} ( {{ .Fields }} )
+VALUES ( {{ .InsertPlaceholders }} )
+ON DUPLICATE KEY UPDATE {{ .UpdatePlaceholders }}
+`
+
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	tableName := dbutil.OnlineStreamTableName(opt.GroupID)
-
-	cond := sqlutil.BuildPushCondition(opt, Backend)
-	query := fmt.Sprintf(`INSERT INTO %s (%s) VALUES(%s) ON DUPLICATE KEY UPDATE %s`,
-		tableName,
-		cond.Inserts,
-		cond.InsertPlaceholders,
-		cond.UpdatePlaceholders,
-	)
-
-	_, err := db.ExecContext(ctx, db.Rebind(query), append(cond.InsertValues, cond.UpdateValues...)...)
+	params := sqlutil.BuildPushQueryParams(opt, Backend)
+	query, err := sqlutil.BuildPushQuery(params, PUSH_QUERY)
+	if err != nil {
+		return err
+	}
+	_, err = db.ExecContext(ctx, db.Rebind(query), append(params.InsertValues, params.UpdateValues...)...)
 	return errdefs.WithStack(err)
 }
 

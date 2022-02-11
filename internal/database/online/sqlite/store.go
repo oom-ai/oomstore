@@ -2,7 +2,6 @@ package sqlite
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -48,18 +47,18 @@ func (db *DB) Purge(ctx context.Context, revisionID int) error {
 	return sqlutil.Purge(ctx, db.DB, revisionID, Backend)
 }
 
+const PUSH_QUERY = `
+REPLACE INTO {{ .TableName }} ( {{ .Fields }} )
+VALUES ( {{ .InsertPlaceholders }} )
+`
+
 func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
-	tableName := dbutil.OnlineStreamTableName(opt.GroupID)
-
-	cond := sqlutil.BuildPushCondition(opt, Backend)
-
-	query := fmt.Sprintf("REPLACE INTO %s (%s) VALUES(%s)",
-		tableName,
-		cond.Inserts,
-		cond.InsertPlaceholders,
-	)
-
-	_, err := db.ExecContext(ctx, db.Rebind(query), cond.InsertValues...)
+	params := sqlutil.BuildPushQueryParams(opt, Backend)
+	query, err := sqlutil.BuildPushQuery(params, PUSH_QUERY)
+	if err != nil {
+		return err
+	}
+	_, err = db.ExecContext(ctx, db.Rebind(query), params.InsertValues...)
 	return errdefs.WithStack(err)
 }
 
