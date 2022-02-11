@@ -32,7 +32,7 @@ jobs:
       - name: Bump Homebrew formula
         uses: mislav/bump-homebrew-formula-action@v1
         with:
-          formula-name: oomcli
+          formula-name: oomstore
           homebrew-tap: oom-ai/homebrew-oom-ai
           download-url: https://github.com/oom-ai/oomstore/releases/download/${{ env.REF_TAG }}/oomstore-${{ env.REF_TAG }}-amd64-darwin.tar.gz
         env:
