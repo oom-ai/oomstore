@@ -18,7 +18,6 @@ import (
 )
 
 // ChannelJoin gets point-in-time correct feature values for each entity row.
-// Currently, this API only supports batch features.
 func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*types.JoinResult, error) {
 	if err := util.ValidateFullFeatureNames(opt.JoinFeatureNames...); err != nil {
 		return nil, err
