@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"strings"
 
+	"cloud.google.com/go/bigquery"
 	"github.com/gocql/gocql"
-
-	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/jmoiron/sqlx"
 	"github.com/spf13/cast"
 
-	"cloud.google.com/go/bigquery"
-	"github.com/jmoiron/sqlx"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -38,8 +37,7 @@ func (d *DBOpt) ExecContext(ctx context.Context, query string, args []interface{
 		_, err := d.BigQueryDB.Query(query).Read(ctx)
 		return errdefs.WithStack(err)
 	case types.BackendCassandra:
-		err := d.CassandraDB.Query(query).Exec()
-		return errdefs.WithStack(err)
+		return errdefs.WithStack(d.CassandraDB.Query(query).Exec())
 	default:
 		_, err := d.SqlxDB.ExecContext(ctx, d.SqlxDB.Rebind(query), args...)
 		return errdefs.WithStack(err)
