@@ -544,9 +544,9 @@ checksum = "da32515d9f6e6e489d7bc9d84c71b060db7247dc035bbe44eac88cf87486d8d5"
 
 [[package]]
 name = "oomclient"
-version = "0.1.0-rc.10"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7918d91353ceb7c612f575c34c88d42e55d75139e14a517df68c315070384c90"
+checksum = "79260eab508142f45e630795b8a164f4c7acccae37041deff7d191272bbebf6e"
 dependencies = [
  "async-stream",
  "futures-core",
@@ -564,7 +564,7 @@ dependencies = [
 
 [[package]]
 name = "oomclient-py"
-version = "0.1.0-rc.1"
+version = "0.1.0"
 dependencies = [
  "oomclient",
  "pyo3",
