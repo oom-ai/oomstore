@@ -1,6 +1,6 @@
 [package]
 name = "oomclient-py"
-version = "0.1.0-rc.1"
+version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -9,7 +9,7 @@ name = "oomclient"
 crate-type = ["cdylib"]
 
 [dependencies]
-oomclient = "0.1.0-rc.10"
+oomclient = "0.1.0"
 pyo3-asyncio = { version = "0.15", features = ["tokio-runtime"] }
 pyo3 = { version = "0.15", features = ["extension-module"] }
 tokio = { version = "1.15", features = ["macros", "rt-multi-thread"] }
