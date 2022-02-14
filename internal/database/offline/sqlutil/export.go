@@ -14,7 +14,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-type QueryExportResults func(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList) (*types.ExportResult, error)
+type QueryExportResults func(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList, dropTableNames []string) (*types.ExportResult, error)
 
 func Export(ctx context.Context, db *sqlx.DB, opt offline.ExportOpt, backend types.BackendType) (*types.ExportResult, error) {
 	dbOpt := dbutil.DBOpt{
@@ -62,7 +62,7 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.
 	}
 
 	// Step 1: prepare export_entity table, which contains all entity keys from source tables
-	tableName, err := prepareEntityTable(ctx, dbOpt, opt.ExportOpt, snapshotTables, cdcTables)
+	tmpEntityTable, err := prepareEntityTable(ctx, dbOpt, opt.ExportOpt, snapshotTables, cdcTables)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.
 		}
 	}
 	query, err := buildExportQuery(exportQueryParams{
-		EntityTableName: tableName,
+		EntityTableName: tmpEntityTable,
 		EntityName:      opt.EntityName,
 		UnixMilli:       "unix_milli",
 		SnapshotTables:  snapshotTables,
@@ -112,14 +112,24 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.
 	for i := 0; i < len(opt.CdcTables)*2; i++ {
 		args = append(args, opt.UnixMilli)
 	}
-	return opt.QueryResults(ctx, dbOpt, opt.ExportOpt, query, args, featureList)
+	return opt.QueryResults(ctx, dbOpt, opt.ExportOpt, query, args, featureList, []string{tmpEntityTable})
 }
 
-func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList) (*types.ExportResult, error) {
+func sqlxQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList, dropTableNames []string) (*types.ExportResult, error) {
 	stream := make(chan types.ExportRecord)
 
 	go func() {
-		defer close(stream)
+		defer func() {
+			if err := dropTemporaryTables(ctx, dbOpt.SqlxDB, dropTableNames); err != nil {
+				select {
+				case stream <- types.ExportRecord{Error: err}:
+					return
+				default:
+				}
+			}
+			close(stream)
+		}()
+
 		stmt, err := dbOpt.SqlxDB.Preparex(dbOpt.SqlxDB.Rebind(query))
 		if err != nil {
 			select {

@@ -28,14 +28,23 @@ func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (*types.ExportR
 	return sqlutil.DoExport(ctx, dbOpt, doExportOpt)
 }
 
-func bigqueryQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList) (*types.ExportResult, error) {
+func bigqueryQueryExportResults(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, query string, args []interface{}, features types.FeatureList, dropTableNames []string) (*types.ExportResult, error) {
 	stream := make(chan types.ExportRecord)
 	for _, arg := range args {
 		query = strings.Replace(query, "?", cast.ToString(arg), 1)
 	}
 
 	go func() {
-		defer close(stream)
+		defer func() {
+			if err := dropTemporaryTables(ctx, dbOpt.BigQueryDB, dropTableNames); err != nil {
+				select {
+				case stream <- types.ExportRecord{Error: err}:
+					// nothing to do
+				default:
+				}
+			}
+			close(stream)
+		}()
 
 		rows, err := dbOpt.BigQueryDB.Query(query).Read(ctx)
 		if err != nil {
