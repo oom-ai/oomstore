@@ -14,7 +14,7 @@ func DBValueType(backend types.BackendType, valueType types.ValueType) (string, 
 		mp = valueTypeToPostgresType
 	case types.BackendSQLite:
 		mp = valueTypeToSQLiteType
-	case types.BackendMySQL:
+	case types.BackendMySQL, types.BackendTiDB:
 		mp = valueTypeToMySQLType
 	case types.BackendCassandra:
 		mp = valueTypeToCassandraType
