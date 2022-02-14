@@ -84,7 +84,11 @@ func QuoteFn(backendType types.BackendType) func(...string) string {
 	return func(fields ...string) string {
 		var rs []string
 		for _, f := range fields {
-			rs = append(rs, q+f+q)
+			if strings.HasPrefix(f, q) && strings.HasSuffix(f, q) {
+				rs = append(rs, f)
+			} else {
+				rs = append(rs, q+f+q)
+			}
 		}
 		return strings.Join(rs, ",")
 	}
