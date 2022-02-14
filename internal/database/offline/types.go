@@ -7,12 +7,18 @@ import (
 )
 
 type ExportOpt struct {
+	// the mapping of group id to snapshot table name
 	SnapshotTables map[int]string
-	CdcTables      map[int]string
-	Features       map[int]types.FeatureList
-	UnixMilli      int64
-	EntityName     string
-	Limit          *uint64
+
+	// the mapping of group id to cdc table name
+	CdcTables map[int]string
+
+	// the mapping of group id to feature list
+	Features map[int]types.FeatureList
+
+	UnixMilli  int64
+	EntityName string
+	Limit      *uint64
 }
 
 type RevisionRange struct {
