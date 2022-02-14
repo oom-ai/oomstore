@@ -47,17 +47,9 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.
 		return groupIDs[i] < groupIDs[j]
 	})
 	for _, groupID := range groupIDs {
-		snapshotTable := opt.SnapshotTables[groupID]
-		if dbOpt.Backend == types.BackendBigQuery {
-			snapshotTable = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, snapshotTable)
-		}
-		snapshotTables = append(snapshotTables, snapshotTable)
+		snapshotTables = append(snapshotTables, buildTableName(dbOpt, opt.SnapshotTables[groupID]))
 		if _, ok := opt.CdcTables[groupID]; ok {
-			table := opt.CdcTables[groupID]
-			if dbOpt.Backend == types.BackendBigQuery {
-				table = fmt.Sprintf("%s.%s", *dbOpt.DatasetID, table)
-			}
-			cdcTables = append(cdcTables, table)
+			cdcTables = append(cdcTables, buildTableName(dbOpt, opt.CdcTables[groupID]))
 		}
 	}
 
@@ -78,16 +70,14 @@ func DoExport(ctx context.Context, dbOpt dbutil.DBOpt, opt DoExportOpt) (*types.
 		features := opt.Features[groupID]
 		if features[0].Group.Category == types.CategoryBatch {
 			for _, f := range features {
-				snapshot := snapshotTables[i]
-				fields = append(fields, fmt.Sprintf("%s.%s AS %s", qt(snapshot), qt(f.Name), qt(f.DBFullName(dbOpt.Backend))))
+				fields = append(fields, fmt.Sprintf("%s.%s AS %s", snapshotTables[i], qt(f.Name), qt(f.DBFullName(dbOpt.Backend))))
 				featureList = append(featureList, f)
 			}
 		} else {
 			cdc := cdcTables[j] + "_0"
-			snapshot := snapshotTables[i]
 			j++
 			for _, f := range features {
-				fields = append(fields, fmt.Sprintf("(CASE WHEN %s.%s IS NULL THEN %s.%s ELSE %s.%s END) AS %s", qt(cdc), qt(f.Name), qt(snapshot), qt(f.Name), qt(cdc), qt(f.Name), qt(f.DBFullName(dbOpt.Backend))))
+				fields = append(fields, fmt.Sprintf("(CASE WHEN %s.%s IS NULL THEN %s.%s ELSE %s.%s END) AS %s", qt(cdc), qt(f.Name), qt(snapshotTables[i]), qt(f.Name), qt(cdc), qt(f.Name), qt(f.DBFullName(dbOpt.Backend))))
 				featureList = append(featureList, f)
 			}
 		}
