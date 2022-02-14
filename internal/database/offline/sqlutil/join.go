@@ -284,10 +284,9 @@ func readJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt readJoinedTabl
 	if err != nil {
 		return nil, err
 	}
-
-	dropTableNames := []string{buildTableName(dbOpt, opt.EntityRowsTableName)}
+	dropTableNames := []string{qt(buildTableName(dbOpt, opt.EntityRowsTableName))}
 	for _, tableName := range opt.AllTableNames {
-		dropTableNames = append(dropTableNames, buildTableName(dbOpt, tableName))
+		dropTableNames = append(dropTableNames, qt(buildTableName(dbOpt, tableName)))
 	}
 
 	// Step 2: read joined results

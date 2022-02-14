@@ -170,14 +170,13 @@ type prepareTableSchemaParams struct {
 }
 
 func buildTableName(dbOpt dbutil.DBOpt, tableName string) string {
-	qt := dbutil.QuoteFn(dbOpt.Backend)
 	switch dbOpt.Backend {
 	case types.BackendBigQuery:
-		return fmt.Sprintf("%s.%s", *dbOpt.DatasetID, qt(tableName))
+		return fmt.Sprintf("%s.%s", *dbOpt.DatasetID, tableName)
 	case types.BackendSnowflake:
-		return fmt.Sprintf("PUBLIC.%s", qt(tableName))
+		return fmt.Sprintf("PUBLIC.%s", tableName)
 	default:
-		return qt(tableName)
+		return tableName
 	}
 }
 
@@ -210,7 +209,7 @@ func prepareTableSchema(dbOpt dbutil.DBOpt, params prepareTableSchemaParams) (st
 		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, name, valueType))
 	}
 
-	return buildTableName(dbOpt, params.tableName), columnDefs, nil
+	return qt(buildTableName(dbOpt, params.tableName)), columnDefs, nil
 }
 
 func insertEntityRows(ctx context.Context,
