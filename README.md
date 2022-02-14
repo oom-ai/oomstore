@@ -203,3 +203,7 @@ See [Quickstart](https://oom.ai/docs/quickstart) for more complete details.
 ## Community
 
 Feel free to [join the community](https://oom.ai/docs/community) for questions and feature requests!
+
+## Credits
+
+oomstore is highly inspired by [Feast](https://github.com/feast-dev/feast).
