@@ -1,62 +1,50 @@
 package tidb_test
 
-import (
-	"context"
-	"strings"
-	"testing"
+// var DATABASE string
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/offline"
-	"github.com/oom-ai/oomstore/internal/database/offline/mysql"
-	"github.com/oom-ai/oomstore/internal/database/offline/test_impl"
-	"github.com/oom-ai/oomstore/internal/database/test/runtime_tidb"
-)
+// func init() {
+// 	DATABASE = strings.ToLower(dbutil.RandString(20))
+// }
 
-var DATABASE string
+// func prepareStore(t *testing.T) (context.Context, offline.Store) {
+// 	runtime_tidb.CreateDatabase(DATABASE)
 
-func init() {
-	DATABASE = strings.ToLower(dbutil.RandString(20))
-}
+// 	store, err := mysql.Open(runtime_tidb.GetOpt(DATABASE))
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-func prepareStore(t *testing.T) (context.Context, offline.Store) {
-	runtime_tidb.CreateDatabase(DATABASE)
+// 	return context.Background(), store
+// }
 
-	store, err := mysql.Open(runtime_tidb.GetOpt(DATABASE))
-	if err != nil {
-		t.Fatal(err)
-	}
+// func TestPing(t *testing.T) {
+// 	test_impl.TestPing(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-	return context.Background(), store
-}
+// func TestExport(t *testing.T) {
+// 	test_impl.TestExport(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-func TestPing(t *testing.T) {
-	test_impl.TestPing(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
+// func TestImport(t *testing.T) {
+// 	test_impl.TestImport(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-func TestExport(t *testing.T) {
-	test_impl.TestExport(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
+// func TestJoin(t *testing.T) {
+// 	test_impl.TestJoin(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-func TestImport(t *testing.T) {
-	test_impl.TestImport(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
-
-func TestJoin(t *testing.T) {
-	test_impl.TestJoin(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
-
-func TestTableSchema(t *testing.T) {
-	test_impl.TestTableSchema(t, prepareStore, runtime_tidb.DestroyStore(DATABASE), func(ctx context.Context) {
-		db, err := mysql.Open(runtime_tidb.GetOpt(DATABASE))
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer db.Close()
-		if _, err = db.ExecContext(ctx, "create table `offline_batch_1_1`(`user` varchar(16), `age` smallint, `unix_milli` int)"); err != nil {
-			t.Fatal(err)
-		}
-		if _, err = db.ExecContext(ctx, "insert into `offline_batch_1_1` VALUES ('1', 1, 1), ('2', 2, 100)"); err != nil {
-			t.Fatal(err)
-		}
-	})
-}
+// func TestTableSchema(t *testing.T) {
+// 	test_impl.TestTableSchema(t, prepareStore, runtime_tidb.DestroyStore(DATABASE), func(ctx context.Context) {
+// 		db, err := mysql.Open(runtime_tidb.GetOpt(DATABASE))
+// 		if err != nil {
+// 			t.Fatal(err)
+// 		}
+// 		defer db.Close()
+// 		if _, err = db.ExecContext(ctx, "create table `offline_batch_1_1`(`user` varchar(16), `age` smallint, `unix_milli` int)"); err != nil {
+// 			t.Fatal(err)
+// 		}
+// 		if _, err = db.ExecContext(ctx, "insert into `offline_batch_1_1` VALUES ('1', 1, 1), ('2', 2, 100)"); err != nil {
+// 			t.Fatal(err)
+// 		}
+// 	})
+// }

@@ -1,66 +1,54 @@
 package tidb_test
 
-import (
-	"context"
-	"strings"
-	"testing"
+// var DATABASE string
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
-	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/internal/database/online/mysql"
-	"github.com/oom-ai/oomstore/internal/database/online/test_impl"
-	"github.com/oom-ai/oomstore/internal/database/test/runtime_tidb"
-)
+// func init() {
+// 	DATABASE = strings.ToLower(dbutil.RandString(20))
+// }
 
-var DATABASE string
+// func prepareStore(t *testing.T) (context.Context, online.Store) {
+// 	runtime_tidb.CreateDatabase(DATABASE)
 
-func init() {
-	DATABASE = strings.ToLower(dbutil.RandString(20))
-}
+// 	store, err := mysql.Open(runtime_tidb.GetOpt(DATABASE))
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-func prepareStore(t *testing.T) (context.Context, online.Store) {
-	runtime_tidb.CreateDatabase(DATABASE)
+// 	return context.Background(), store
+// }
 
-	store, err := mysql.Open(runtime_tidb.GetOpt(DATABASE))
-	if err != nil {
-		t.Fatal(err)
-	}
+// func TestOpen(t *testing.T) {
+// 	test_impl.TestOpen(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-	return context.Background(), store
-}
+// func TestGetExisted(t *testing.T) {
+// 	test_impl.TestGetExisted(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-func TestOpen(t *testing.T) {
-	test_impl.TestOpen(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
+// func TestGetNoRevision(t *testing.T) {
+// 	test_impl.TestGetNoRevision(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-func TestGetExisted(t *testing.T) {
-	test_impl.TestGetExisted(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
+// func TestGetNotExistedEntityKey(t *testing.T) {
+// 	test_impl.TestGetNotExistedEntityKey(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-func TestGetNoRevision(t *testing.T) {
-	test_impl.TestGetNoRevision(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
+// func TestMultiGet(t *testing.T) {
+// 	test_impl.TestMultiGet(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-func TestGetNotExistedEntityKey(t *testing.T) {
-	test_impl.TestGetNotExistedEntityKey(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
+// func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
+// 	test_impl.TestPurgeRemovesSpecifiedRevision(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-func TestMultiGet(t *testing.T) {
-	test_impl.TestMultiGet(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
+// func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
+// 	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
-	test_impl.TestPurgeRemovesSpecifiedRevision(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
+// func TestPush(t *testing.T) {
+// 	test_impl.TestPush(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
 
-func TestPurgeNotRemovesOtherRevisions(t *testing.T) {
-	test_impl.TestPurgeNotRemovesOtherRevisions(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
-
-func TestPush(t *testing.T) {
-	test_impl.TestPush(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
-
-func TestPing(t *testing.T) {
-	test_impl.TestPing(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
-}
+// func TestPing(t *testing.T) {
+// 	test_impl.TestPing(t, prepareStore, runtime_tidb.DestroyStore(DATABASE))
+// }
