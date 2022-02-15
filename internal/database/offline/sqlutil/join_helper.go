@@ -7,10 +7,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/jmoiron/sqlx"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
-
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -127,6 +125,10 @@ func prepareEntityRowsTable(ctx context.Context,
 ) (string, error) {
 	// Step 1: create table entity_rows
 	tableName := dbutil.TempTable("entity_rows")
+	if err := AddTemporaryTableRecord(ctx, dbOpt, tableName); err != nil {
+		return "", err
+	}
+
 	qtTableName, columnDefs, err := prepareTableSchema(dbOpt, prepareTableSchemaParams{
 		tableName:    tableName,
 		entityName:   "entity_key",
@@ -245,22 +247,6 @@ func insertEntityRows(ctx context.Context,
 		}
 	}
 	return dbutil.InsertRecordsToTable(ctx, dbOpt, tableName, records, columns)
-}
-
-func dropTemporaryTables(ctx context.Context, db *sqlx.DB, tableNames []string) error {
-	var err error
-	for _, tableName := range tableNames {
-		if tmpErr := dropTable(ctx, db, tableName); tmpErr != nil {
-			err = tmpErr
-		}
-	}
-	return err
-}
-
-func dropTable(ctx context.Context, db *sqlx.DB, tableName string) error {
-	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
-	_, err := db.ExecContext(ctx, query)
-	return errdefs.WithStack(err)
 }
 
 func supportIndex(backendType types.BackendType) bool {
