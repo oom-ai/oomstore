@@ -6,6 +6,8 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
+const TemporaryTableRecordTable = "temporary_table_records_table"
+
 type ExportOpt struct {
 	// the mapping of group id to snapshot table name
 	SnapshotTables map[int]string
