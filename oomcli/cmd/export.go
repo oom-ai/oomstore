@@ -36,9 +36,9 @@ func init() {
 	exportOutput = flags.StringP("output", "o", ASCIITable, "output format [csv,ascii_table]")
 
 	flags.StringSliceVar(&exportOpt.FeatureNames, "feature", nil, "select feature names")
+	_ = exportCmd.MarkFlagRequired("feature")
 
 	flags.Int64VarP(&exportOpt.UnixMilli, "unix-milli", "u", 0, "max unix timestamp")
-	_ = exportCmd.MarkFlagRequired("revision-id")
 
 	exportOpt.Limit = flags.Uint64P("limit", "l", 0, "max records to export")
 }

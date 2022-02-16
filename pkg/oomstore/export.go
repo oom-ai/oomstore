@@ -32,6 +32,10 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
 		return nil, err
 	}
+	if len(opt.FeatureNames) == 0 {
+		return nil, errdefs.Errorf("feature cannot be empty")
+	}
+
 	features, err := s.ListFeature(ctx, types.ListFeatureOpt{
 		FeatureNames: &opt.FeatureNames,
 	})
