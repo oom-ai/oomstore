@@ -47,7 +47,8 @@ oomagent: codegen
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-	TEST_PLAYGROUNDS := redis postgres mysql dynamodb cassandra tidb tikv sqlite
+	#TEST_PLAYGROUNDS := redis postgres mysql dynamodb cassandra tidb tikv sqlite
+	TEST_PLAYGROUNDS := redis postgres mysql dynamodb cassandra sqlite
 else
 	TEST_PLAYGROUNDS := redis postgres mysql dynamodb cassandra tidbext tikvext sqlite
 endif
