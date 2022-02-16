@@ -56,9 +56,13 @@ oomagent_export_no_features() {
     }
 EOF
     )
-    actual=$(testgrpc ChannelExport <<<"$arg")
-    expected=''
-    assert_json_eq "$case" "$expected" "$actual"
+    actual=$(testgrpc ChannelExport <<<"$arg" 2>&1 || true)
+    expected='
+ERROR:
+  Code: Internal
+  Message: feature cannot be empty
+'
+    assert_eq "$case" "$expected" "$actual"
 }
 
 oomagent_export_one_features() {

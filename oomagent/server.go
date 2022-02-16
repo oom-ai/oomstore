@@ -305,10 +305,6 @@ func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.J
 }
 
 func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen.OomAgent_ChannelExportServer) error {
-	if len(req.Features) == 0 {
-		return nil
-	}
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
