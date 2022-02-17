@@ -9,8 +9,6 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/spf13/cast"
-
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
@@ -72,31 +70,24 @@ func (s *OomStore) ChannelJoin(ctx context.Context, opt types.ChannelJoinOpt) (*
 }
 
 // Join gets point-in-time correct feature values for each entity row.
-// The method is similar to Join, except that both input and output are files on disk.
+// The method is similar to ChannelJoin, except a input files on disk.
 // Input File should contain header, the first two columns of Input File should be
 // entity_key, unix_milli, then followed by other real-time feature values.
-func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
+func (s *OomStore) Join(ctx context.Context, opt types.JoinOpt) (*types.JoinResult, error) {
 	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
-		return err
+		return nil, err
 	}
 
-	entityRows, header, err := GetEntityRowsFromInputFile(ctx, opt.InputFilePath)
+	entityRows, header, err := getEntityRowsFromInputFile(ctx, opt.InputFilePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	joinResult, err := s.ChannelJoin(ctx, types.ChannelJoinOpt{
+	return s.ChannelJoin(ctx, types.ChannelJoinOpt{
 		JoinFeatureNames:    opt.FeatureNames,
 		EntityRows:          entityRows,
 		ExistedFeatureNames: header[2:],
 	})
-	if err != nil {
-		return err
-	}
-	return writeJoinResultToFile(opt.OutputFilePath, joinResult)
 }
 
 func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) ([]*offline.RevisionRange, error) {
@@ -141,7 +132,7 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) 
 	return ranges, nil
 }
 
-func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-chan types.EntityRow, []string, error) {
+func getEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-chan types.EntityRow, []string, error) {
 	input, err := os.Open(inputFilePath)
 	if err != nil {
 		return nil, nil, errdefs.WithStack(err)
@@ -205,35 +196,4 @@ func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-ch
 		}
 	}()
 	return entityRows, header, nil
-}
-
-func writeJoinResultToFile(outputFilePath string, joinResult *types.JoinResult) error {
-	file, err := os.Create(outputFilePath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	w := csv.NewWriter(file)
-	defer w.Flush()
-
-	if err := w.Write(joinResult.Header); err != nil {
-		return err
-	}
-	for row := range joinResult.Data {
-		if row.Error != nil {
-			return row.Error
-		}
-		if err := w.Write(joinRecord(row.Record)); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func joinRecord(row []interface{}) []string {
-	record := make([]string, 0, len(row))
-	for _, value := range row {
-		record = append(record, cast.ToString(value))
-	}
-	return record
 }

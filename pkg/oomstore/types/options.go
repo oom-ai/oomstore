@@ -70,9 +70,8 @@ type ChannelJoinOpt struct {
 }
 
 type JoinOpt struct {
-	FeatureNames   []string
-	InputFilePath  string
-	OutputFilePath string
+	FeatureNames  []string
+	InputFilePath string
 }
 
 type UpdateEntityOpt struct {

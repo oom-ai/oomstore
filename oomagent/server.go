@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/csv"
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -14,6 +16,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/spf13/cast"
 )
 
 type server struct {
@@ -292,16 +295,53 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 }
 
 func (s *server) Join(ctx context.Context, req *codegen.JoinRequest) (*codegen.JoinResponse, error) {
-	err := s.oomstore.Join(ctx, types.JoinOpt{
-		FeatureNames:   req.Features,
-		InputFilePath:  req.InputFile,
-		OutputFilePath: req.OutputFile,
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	joinResult, err := s.oomstore.Join(ctx, types.JoinOpt{
+		FeatureNames:  req.Features,
+		InputFilePath: req.InputFile,
 	})
 	if err != nil {
 		return nil, internalError(err.Error())
 	}
 
+	if err := writeJoinResultToFile(req.OutputFile, joinResult); err != nil {
+		return nil, wrapErr(err)
+	}
+
 	return &codegen.JoinResponse{}, nil
+}
+
+func writeJoinResultToFile(outputFilePath string, joinResult *types.JoinResult) error {
+	file, err := os.Create(outputFilePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	w := csv.NewWriter(file)
+	defer w.Flush()
+
+	if err := w.Write(joinResult.Header); err != nil {
+		return err
+	}
+	for row := range joinResult.Data {
+		if row.Error != nil {
+			return row.Error
+		}
+		if err := w.Write(joinRecord(row.Record)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func joinRecord(row []interface{}) []string {
+	record := make([]string, 0, len(row))
+	for _, value := range row {
+		record = append(record, cast.ToString(value))
+	}
+	return record
 }
 
 func (s *server) ChannelExport(req *codegen.ChannelExportRequest, stream codegen.OomAgent_ChannelExportServer) error {

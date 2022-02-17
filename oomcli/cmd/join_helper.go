@@ -22,15 +22,9 @@ func join(ctx context.Context, store *oomstore.OomStore, opt JoinOpt, output str
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	entityRows, header, err := oomstore.GetEntityRowsFromInputFile(ctx, opt.InputFilePath)
-	if err != nil {
-		return err
-	}
-
-	joinResult, err := store.ChannelJoin(ctx, types.ChannelJoinOpt{
-		JoinFeatureNames:    opt.FeatureNames,
-		EntityRows:          entityRows,
-		ExistedFeatureNames: header[2:],
+	joinResult, err := store.Join(ctx, types.JoinOpt{
+		FeatureNames:  opt.FeatureNames,
+		InputFilePath: opt.InputFilePath,
 	})
 	if err != nil {
 		return err
