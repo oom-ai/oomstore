@@ -90,6 +90,25 @@ func QuoteFn(backendType types.BackendType) func(...string) string {
 	}
 }
 
+func UnQuoteFn(backendType types.BackendType) func(string) string {
+	var q string
+	switch backendType {
+	case types.BackendPostgres, types.BackendSnowflake, types.BackendRedshift, types.BackendCassandra, types.BackendSQLite:
+		q = `"`
+	case types.BackendMySQL, types.BackendBigQuery:
+		q = "`"
+	default:
+		panic(fmt.Sprintf("unsupported backend type %s", backendType))
+	}
+
+	return func(s string) string {
+		if strings.HasPrefix(s, q) && strings.HasSuffix(s, q) {
+			return strings.Trim(s, q)
+		}
+		return s
+	}
+}
+
 func DropTable(ctx context.Context, dbOpt DBOpt, tableName string) error {
 	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
 	err := dbOpt.ExecContext(ctx, query)
