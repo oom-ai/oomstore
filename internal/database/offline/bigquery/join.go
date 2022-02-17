@@ -42,7 +42,9 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 	data := make(chan types.JoinRecord)
 	go func() {
 		defer func() {
-			if err := sqlutil.DropTemporaryTables(ctx, dbOpt, dropTableNames); err != nil {
+			if err := sqlutil.DropTemporaryTables(ctx, dbOpt, offline.DropTemporaryTableParams{
+				TableNames: &dropTableNames,
+			}); err != nil {
 				select {
 				case data <- types.JoinRecord{Error: err}:
 					// nothing to do

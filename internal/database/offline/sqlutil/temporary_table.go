@@ -6,8 +6,13 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/bigquery"
+	"github.com/spf13/cast"
+	"google.golang.org/api/iterator"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -51,7 +56,54 @@ CREATE TABLE IF NOT EXISTS %s (
 	return dbOpt.ExecContext(ctx, query)
 }
 
-func DropTemporaryTables(ctx context.Context, db dbutil.DBOpt, tableNames []string) error {
+func DropTemporaryTables(ctx context.Context, db dbutil.DBOpt, params offline.DropTemporaryTableParams) error {
+	var tableNames []string
+	if params.TableNames != nil {
+		tableNames = append(tableNames, *params.TableNames...)
+	}
+
+	if params.UnixMilli != nil {
+		query := fmt.Sprintf("SELECT table_name FROM %s WHERE create_time < ?",
+			buildTableName(db, offline.TemporaryTableRecordTable))
+
+		switch db.Backend {
+		case types.BackendCassandra:
+			return errdefs.Errorf("offline not support cassandra")
+		case types.BackendBigQuery:
+			query = strings.Replace(query, "?", cast.ToString(*params.UnixMilli), 1)
+			rows, err := db.BigQueryDB.Query(query).Read(ctx)
+			if err != nil {
+				return errdefs.WithStack(err)
+			}
+
+			for {
+				recordMap := make(map[string]bigquery.Value)
+				err = rows.Next(&recordMap)
+				if err == iterator.Done {
+					break
+				}
+				tableNames = append(tableNames, recordMap["table_name"].(string))
+			}
+
+		default:
+			rows, err := db.SqlxDB.QueryContext(ctx, query, *params.UnixMilli)
+			if err != nil {
+				return errdefs.WithStack(err)
+			}
+
+			for rows.Next() {
+				var tableName string
+				if err := rows.Scan(&tableName); err != nil {
+					return err
+				}
+				tableNames = append(tableNames, tableName)
+			}
+		}
+	}
+	return dropTemporaryTables(ctx, db, tableNames)
+}
+
+func dropTemporaryTables(ctx context.Context, db dbutil.DBOpt, tableNames []string) error {
 	for _, tableName := range tableNames {
 		query := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableName)
 		if err := db.ExecContext(ctx, query); err != nil {

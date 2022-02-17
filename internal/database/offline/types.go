@@ -8,6 +8,11 @@ import (
 
 const TemporaryTableRecordTable = "temporary_table_records_table"
 
+type DropTemporaryTableParams struct {
+	TableNames *[]string
+	UnixMilli  *int64
+}
+
 type ExportOpt struct {
 	SnapshotTables map[int]string
 	CdcTables      map[int]string
