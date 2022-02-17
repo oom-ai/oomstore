@@ -62,3 +62,12 @@ func (db *DB) Push(ctx context.Context, opt offline.PushOpt) error {
 	}
 	return nil
 }
+
+func (db *DB) DropTemporaryTable(ctx context.Context, unixmilli int64) error {
+	return sqlutil.DropTemporaryTables(ctx, dbutil.DBOpt{
+		BigQueryDB: db.Client,
+		Backend:    Backend,
+	}, offline.DropTemporaryTableParams{
+		UnixMilli: &unixmilli,
+	})
+}
