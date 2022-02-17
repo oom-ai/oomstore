@@ -91,7 +91,7 @@ func Snapshot(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.SnapshotOpt) 
 	if err != nil {
 		return err
 	}
-	if err = dbOpt.ExecContext(ctx, query, nil); err != nil {
+	if err = dbOpt.ExecContext(ctx, query); err != nil {
 		return err
 	}
 

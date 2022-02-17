@@ -105,7 +105,7 @@ func prepareJoinedTable(
 		);
 	`
 	schema = fmt.Sprintf(schema, qtTableName, strings.Join(columnDefs, ",\n"))
-	if err = dbOpt.ExecContext(ctx, schema, nil); err != nil {
+	if err = dbOpt.ExecContext(ctx, schema); err != nil {
 		return "", err
 	}
 
@@ -113,7 +113,7 @@ func prepareJoinedTable(
 	// Step 2: create index on table joined_
 	if supportIndex(dbOpt.Backend) {
 		index := fmt.Sprintf(`CREATE INDEX %s ON %s (unix_milli, entity_key)`, qt("idx_"+tableName), qtTableName)
-		if err = dbOpt.ExecContext(ctx, index, nil); err != nil {
+		if err = dbOpt.ExecContext(ctx, index); err != nil {
 			return "", err
 		}
 	}
@@ -142,7 +142,7 @@ func prepareEntityRowsTable(ctx context.Context,
 		);
 	`, qtTableName, strings.Join(columnDefs, ",\n"))
 
-	if err = dbOpt.ExecContext(ctx, schema, nil); err != nil {
+	if err = dbOpt.ExecContext(ctx, schema); err != nil {
 		return "", err
 	}
 
@@ -154,7 +154,7 @@ func prepareEntityRowsTable(ctx context.Context,
 	// Step 3: create index on table entity_rows
 	if supportIndex(dbOpt.Backend) {
 		index := fmt.Sprintf(`CREATE INDEX idx_%s ON %s (unix_milli, entity_key)`, tableName, tableName)
-		if err = dbOpt.ExecContext(ctx, index, nil); err != nil {
+		if err = dbOpt.ExecContext(ctx, index); err != nil {
 			return "", err
 		}
 	}

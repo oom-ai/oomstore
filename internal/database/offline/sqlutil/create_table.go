@@ -25,7 +25,7 @@ func CreateTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.CreateTabl
 		params.PrimaryKeys = []string{opt.EntityName}
 		params.HasUnixMilli = false
 		schema := dbutil.BuildTableSchema(params)
-		if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
+		if err := dbOpt.ExecContext(ctx, schema); err != nil {
 			return err
 		}
 	case types.TableStreamSnapshot:
@@ -33,20 +33,20 @@ func CreateTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.CreateTabl
 		params.PrimaryKeys = []string{opt.EntityName}
 		params.HasUnixMilli = true
 		schema := dbutil.BuildTableSchema(params)
-		if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
+		if err := dbOpt.ExecContext(ctx, schema); err != nil {
 			return err
 		}
 	case types.TableStreamCdc:
 		params.PrimaryKeys = nil
 		params.HasUnixMilli = true
 		schema := dbutil.BuildTableSchema(params)
-		if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
+		if err := dbOpt.ExecContext(ctx, schema); err != nil {
 			return err
 		}
 		// Create index (entity_key, unix_milli) on stream cdc table
 		indexFields := []string{opt.EntityName, "unix_milli"}
 		indexDDL := dbutil.BuildIndexDDL(opt.TableName, "idx", indexFields, dbOpt.Backend)
-		if err := dbOpt.ExecContext(ctx, indexDDL, nil); err != nil {
+		if err := dbOpt.ExecContext(ctx, indexDDL); err != nil {
 			return err
 		}
 	default:
@@ -78,7 +78,7 @@ func createTableNoIndex(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.Cre
 		PrimaryKeys:  nil,
 		Backend:      dbOpt.Backend,
 	})
-	if err := dbOpt.ExecContext(ctx, schema, nil); err != nil {
+	if err := dbOpt.ExecContext(ctx, schema); err != nil {
 		return err
 	}
 	return nil

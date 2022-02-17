@@ -38,7 +38,7 @@ func InsertRecordsToTable(ctx context.Context, dbOpt DBOpt, tableName string, re
 		return nil
 	}
 
-	return dbOpt.ExecContext(ctx, query, args)
+	return dbOpt.ExecContext(ctx, query, args...)
 }
 
 func InsertRecordsToTableTx(tx *sqlx.Tx, ctx context.Context, tableName string, records []interface{}, columns []string, backendType types.BackendType) error {
@@ -92,6 +92,6 @@ func QuoteFn(backendType types.BackendType) func(...string) string {
 
 func DropTable(ctx context.Context, dbOpt DBOpt, tableName string) error {
 	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
-	err := dbOpt.ExecContext(ctx, query, nil)
+	err := dbOpt.ExecContext(ctx, query)
 	return errdefs.WithStack(err)
 }

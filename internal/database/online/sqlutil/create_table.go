@@ -23,7 +23,7 @@ func CreateTable(ctx context.Context, dbOpt dbutil.DBOpt, opt online.CreateTable
 		PrimaryKeys:  []string{opt.EntityName},
 		Backend:      dbOpt.Backend,
 	})
-	err := dbOpt.ExecContext(ctx, schema, nil)
+	err := dbOpt.ExecContext(ctx, schema)
 	if err != nil {
 		return errdefs.WithStack(err)
 	}

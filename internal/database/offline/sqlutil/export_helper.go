@@ -156,7 +156,7 @@ func prepareEntityTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.Exp
 			%s
 		);
 	`, qtTableName, strings.Join(columnDefs, ",\n"))
-	if err = dbOpt.ExecContext(ctx, schema, nil); err != nil {
+	if err = dbOpt.ExecContext(ctx, schema); err != nil {
 		return "", err
 	}
 
@@ -173,7 +173,7 @@ func prepareEntityTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.Exp
 	if err != nil {
 		return "", err
 	}
-	if err = dbOpt.ExecContext(ctx, query, args); err != nil {
+	if err = dbOpt.ExecContext(ctx, query, args...); err != nil {
 		return "", err
 	}
 
@@ -181,7 +181,7 @@ func prepareEntityTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.Exp
 	if supportIndex(dbOpt.Backend) {
 		qt := dbutil.QuoteFn(dbOpt.Backend)
 		index := fmt.Sprintf(`CREATE UNIQUE INDEX idx_%s ON %s (%s)`, tableName, tableName, qt(opt.EntityName))
-		if err = dbOpt.ExecContext(ctx, index, nil); err != nil {
+		if err = dbOpt.ExecContext(ctx, index); err != nil {
 			return "", errdefs.WithStack(err)
 		}
 	}
