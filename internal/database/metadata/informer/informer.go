@@ -20,13 +20,10 @@ type Cache struct {
 	Groups   *GroupCache
 }
 
-func NewCache(
-	entities types.EntityList,
-	features types.FeatureList,
-	groups types.GroupList) *Cache {
+func NewCache(entities types.EntityList, features types.FeatureList, groups types.GroupList) *Cache {
 	return &Cache{
 		Entities: &EntityCache{entities},
-		Features: &FeatureCache{features},
+		Features: NewFeatureCache(features),
 		Groups:   &GroupCache{groups},
 	}
 }

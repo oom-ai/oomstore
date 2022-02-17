@@ -7,14 +7,24 @@ import (
 
 type FeatureCache struct {
 	types.FeatureList
+	nameIdx map[string]*types.Feature
+}
+
+func NewFeatureCache(features types.FeatureList) *FeatureCache {
+	return &FeatureCache{FeatureList: features, nameIdx: nil}
 }
 
 func (c *FeatureCache) Enrich(groupCache *GroupCache) {
+	nameIdx := make(map[string]*types.Feature)
+
 	for _, f := range c.FeatureList {
 		f.Group = groupCache.Find(func(g *types.Group) bool {
 			return g.ID == f.GroupID
 		})
+		nameIdx[f.FullName()] = f
 	}
+
+	c.nameIdx = nameIdx
 }
 
 func (c *FeatureCache) List(opt metadata.ListCachedFeatureOpt) types.FeatureList {
@@ -23,10 +33,8 @@ func (c *FeatureCache) List(opt metadata.ListCachedFeatureOpt) types.FeatureList
 	// filter featureNames
 	if opt.FullNames != nil {
 		var tmp types.FeatureList
-		for _, fullName := range *opt.FullNames {
-			if f := features.Find(func(f *types.Feature) bool {
-				return f.FullName() == fullName
-			}); f != nil {
+		for _, name := range *opt.FullNames {
+			if f, ok := c.nameIdx[name]; ok {
 				tmp = append(tmp, f)
 			}
 		}
