@@ -143,6 +143,10 @@ func buildExportQuery(params exportQueryParams) (string, error) {
 func prepareEntityTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, snapshotTables, cdcTables []string) (string, error) {
 	// Step 1: create table export_entity
 	tableName := dbutil.TempTable("export_entity")
+	if err := AddTemporaryTableRecord(ctx, dbOpt, buildTableName(dbOpt, tableName)); err != nil {
+		return "", err
+	}
+
 	qtTableName, columnDefs, err := prepareTableSchema(dbOpt, prepareTableSchemaParams{
 		tableName:    tableName,
 		entityName:   opt.EntityName,

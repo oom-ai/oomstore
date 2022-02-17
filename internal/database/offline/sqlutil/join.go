@@ -287,7 +287,11 @@ func readJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt readJoinedTabl
 
 	dropTableNames := []string{buildTableName(dbOpt, opt.EntityRowsTableName)}
 	for _, tableName := range opt.AllTableNames {
-		dropTableNames = append(dropTableNames, buildTableName(dbOpt, tableName))
+		dropTableName := buildTableName(dbOpt, tableName)
+		dropTableNames = append(dropTableNames, dropTableName)
+		if err := AddTemporaryTableRecord(ctx, dbOpt, dropTableName); err != nil {
+			return nil, err
+		}
 	}
 
 	// Step 2: read joined results
@@ -308,14 +312,13 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 	data := make(chan types.JoinRecord)
 	go func() {
 		defer func() {
-			if err := dropTemporaryTables(ctx, dbOpt.SqlxDB, dropTableNames); err != nil {
+			if err := DropTemporaryTables(ctx, dbOpt, dropTableNames); err != nil {
 				select {
 				case data <- types.JoinRecord{Error: err}:
 					// nothing to do
 				default:
 				}
 			}
-
 			rows.Close()
 			close(data)
 		}()
