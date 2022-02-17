@@ -28,7 +28,7 @@ type DBOpt struct {
 	CassandraDB *gocql.Session
 }
 
-func (d *DBOpt) ExecContext(ctx context.Context, query string, args []interface{}) error {
+func (d *DBOpt) ExecContext(ctx context.Context, query string, args ...interface{}) error {
 	switch d.Backend {
 	case types.BackendBigQuery:
 		for _, arg := range args {
