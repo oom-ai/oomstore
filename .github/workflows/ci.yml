@@ -95,8 +95,11 @@ jobs:
       matrix:
         backends:
           - { online: sqlite,   offline: sqlite,   metadata: sqlite   }
+          - { online: redis,   offline: sqlite,   metadata: sqlite   }
           - { online: mysql,    offline: mysql,    metadata: mysql    }
+          - { online: redis,    offline: mysql,    metadata: mysql    }
           - { online: postgres, offline: postgres, metadata: postgres }
+          - { online: redis, offline: postgres, metadata: postgres }
     env:
       oomplay-version: '0.6.8'
     steps:
