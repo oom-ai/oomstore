@@ -26,9 +26,16 @@ var pushCmd = &cobra.Command{
 		oomStore := mustOpenOomStore(ctx, oomStoreCfg)
 		defer oomStore.Close()
 
-		featureValues := make(map[string]interface{})
-		for k, v := range pushOpt.FeatureValues {
-			featureValues[k] = v
+		features, err := oomStore.ListFeature(ctx, types.ListFeatureOpt{
+			GroupNames: &[]string{pushOpt.GroupName},
+		})
+		if err != nil {
+			exitf("failed push features: %+v\n", err)
+		}
+
+		featureValues, err := parsePushFeatureArgument(pushOpt.FeatureValues, features)
+		if err != nil {
+			exitf("failed push features: %+v\n", err)
 		}
 
 		if err := oomStore.Push(ctx, types.PushOpt{
