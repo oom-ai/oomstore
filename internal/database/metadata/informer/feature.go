@@ -1,6 +1,8 @@
 package informer
 
 import (
+	"sort"
+
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -11,6 +13,9 @@ type FeatureCache struct {
 }
 
 func NewFeatureCache(features types.FeatureList) *FeatureCache {
+	sort.Slice(features, func(i, j int) bool {
+		return features[i].ID < features[j].ID
+	})
 	return &FeatureCache{FeatureList: features, nameIdx: nil}
 }
 
@@ -25,6 +30,17 @@ func (c *FeatureCache) Enrich(groupCache *GroupCache) {
 	}
 
 	c.nameIdx = nameIdx
+}
+
+func (c *FeatureCache) Get(featureID int) *types.Feature {
+	l := c.FeatureList
+	pos := sort.Search(len(l), func(i int) bool {
+		return l[i].ID == featureID
+	})
+	if pos >= 0 && pos < len(l) {
+		return l[pos]
+	}
+	return nil
 }
 
 func (c *FeatureCache) List(opt metadata.ListCachedFeatureOpt) types.FeatureList {
