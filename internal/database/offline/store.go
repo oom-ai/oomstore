@@ -17,6 +17,9 @@ type Store interface {
 	TableSchema(ctx context.Context, opt TableSchemaOpt) (*types.DataTableSchema, error)
 	Snapshot(ctx context.Context, opt SnapshotOpt) error
 
+	GetTemporaryTables(ctx context.Context, unixMilli int64) ([]string, error)
+	DropTemporaryTable(ctx context.Context, tableNames []string) error
+
 	Ping(ctx context.Context) error
 	io.Closer
 }
