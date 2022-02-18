@@ -21,6 +21,6 @@ user,state,credit_score,account_age_days,has_2fa_installed
 10,Idaho,693,212,true
 """.lstrip()
         f.write(rows)
-    await client.import_(group, None, None, path, None)
+    await client.import_(group, input_file=path)
 
 asyncio.run(main())

@@ -161,13 +161,14 @@ impl Client {
     ///
     /// Returns:
     ///     None
-    #[pyo3(text_signature = "(group, revision_id, purge_delay)")]
+    #[pyo3(text_signature = "(group, purge_delay, revision_id=None)")]
+    #[args(revision_id = "None")]
     pub fn sync<'p>(
         &mut self,
         py: Python<'p>,
         group: String,
-        revision_id: Option<u32>,
         purge_delay: u32,
+        revision_id: Option<u32>,
     ) -> PyResult<&'p PyAny> {
         let mut inner = OomClient::clone(&self.inner);
         future_into_py(py, async move {
@@ -184,22 +185,23 @@ impl Client {
     ///       For batch features, if revision is null, will use the
     ///       timestamp when it starts serving in online store; otherwise,
     ///       use the designated revision.
-    ///     description: Description of this import.
     ///     input_file: The path of data source.
     ///     delimiter: Delimiter of data source.
+    ///     description: Description of this import.
     ///
     /// Returns:
     ///     revision_id: The revision ID of this import, it only applies to batch feature.
     #[pyo3(name = "import_")]
-    #[pyo3(text_signature = "(group, revision, description, input_file, delimiter)")]
+    #[pyo3(text_signature = "(group, input_file, delimiter=None, revision=None, description=None)")]
+    #[args(delimiter = "None", revision = "None", description = "None")]
     pub fn import<'p>(
         &mut self,
         py: Python<'p>,
         group: String,
-        revision: Option<i64>,
-        description: Option<String>,
         input_file: String,
         delimiter: Option<String>,
+        revision: Option<i64>,
+        description: Option<String>,
     ) -> PyResult<&'p PyAny> {
         let delimiter = delimiter
             .map(|s| {
@@ -281,7 +283,8 @@ impl Client {
     ///
     /// Returns:
     ///     None
-    #[pyo3(text_signature = "(features, unix_milli, output_file, limit)")]
+    #[pyo3(text_signature = "(features, unix_milli, output_file, limit=None)")]
+    #[args(limit = "None")]
     pub fn export<'p>(
         &mut self,
         py: Python<'p>,
