@@ -2,7 +2,6 @@ package bigquery
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"cloud.google.com/go/bigquery"
@@ -43,13 +42,9 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 	data := make(chan types.JoinRecord)
 	go func() {
 		defer func() {
-			if err = dropTemporaryTables(ctx, dbOpt.BigQueryDB, dropTableNames); err != nil {
-				select {
-				case data <- types.JoinRecord{Error: err}:
-					// nothing to do
-				default:
-				}
-			}
+			// The logic of the temporary table should not affect the main process, so nil is returned here.
+			// TODO: Print log in the cloud service version of oomstore
+			_ = sqlutil.DropTemporaryTables(ctx, dbOpt, dropTableNames)
 			close(data)
 		}()
 
@@ -97,24 +92,6 @@ func bigqueryQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string,
 		Header: header.Names(),
 		Data:   data,
 	}, nil
-}
-
-func dropTemporaryTables(ctx context.Context, db *bigquery.Client, tableNames []string) error {
-	var err error
-	for _, tableName := range tableNames {
-		if tmpErr := dropTable(ctx, db, tableName); tmpErr != nil {
-			err = tmpErr
-		}
-	}
-	return err
-}
-
-func dropTable(ctx context.Context, db *bigquery.Client, tableName string) error {
-	query := fmt.Sprintf(`DROP TABLE IF EXISTS %s;`, tableName)
-	if _, err := db.Query(query).Read(ctx); err != nil {
-		return errdefs.WithStack(err)
-	}
-	return nil
 }
 
 const READ_JOIN_RESULT_QUERY = `

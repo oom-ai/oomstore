@@ -143,6 +143,11 @@ func buildExportQuery(params exportQueryParams) (string, error) {
 func prepareEntityTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.ExportOpt, snapshotTables, cdcTables []string) (string, error) {
 	// Step 1: create table export_entity
 	tableName := dbutil.TempTable("export_entity")
+
+	// The logic of the temporary table should not affect the main process, so nil is returned here.
+	// TODO: Print log in the cloud service version of oomstore
+	_ = AddTemporaryTableRecord(ctx, dbOpt, buildTableName(dbOpt, tableName))
+
 	qtTableName, columnDefs, err := prepareTableSchema(dbOpt, prepareTableSchemaParams{
 		tableName:    tableName,
 		entityName:   opt.EntityName,
