@@ -4,13 +4,13 @@
 //! ## Examples
 //!
 //! ```rust,no_run
-//! use oomclient::Client;
+//! use oomclient::{Client, OnlineGetFeatures::*};
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     let mut client = Client::connect("http://localhost:50051").await?;
 //!
-//!     let features = vec!["account.state".into(), "txn_stats.count_7d".into()];
+//!     let features = FeatureNames(vec!["account.state".into(), "txn_stats.count_7d".into()]);
 //!     let response = client.online_get_raw("48", features.clone()).await?;
 //!     println!("RESPONSE={:#?}", response);
 //!
@@ -30,7 +30,7 @@ mod oomagent {
     tonic::include_proto!("oomagent");
 }
 
-pub use client::Client;
+pub use client::{Client, OnlineGetFeatures};
 pub use error::OomError;
 pub use oomagent::EntityRow;
 pub use server::ServerWrapper;

@@ -38,6 +38,13 @@ pub struct Client {
     _agent: Option<Arc<ServerWrapper>>,
 }
 
+/// Represent the features to acquire.
+#[derive(Debug, Clone)]
+pub enum OnlineGetFeatures {
+    GroupName(String),
+    FeatureNames(Vec<String>),
+}
+
 // TODO: Add a Builder to create the client
 impl Client {
     /// Connect to an oomagent instance running on the given endpoint.
@@ -76,11 +83,15 @@ impl Client {
     pub async fn online_get_raw(
         &mut self,
         entity_key: impl Into<String>,
-        features: Vec<String>,
+        features: OnlineGetFeatures,
     ) -> Result<FeatureValueMap> {
+        let (group, features) = match features {
+            OnlineGetFeatures::GroupName(group) => (Some(group), Vec::default()),
+            OnlineGetFeatures::FeatureNames(features) => (None, features),
+        };
         let res = self
             .client
-            .online_get(OnlineGetRequest { entity_key: entity_key.into(), features })
+            .online_get(OnlineGetRequest { entity_key: entity_key.into(), features, group })
             .await?
             .into_inner();
         Ok(match res.result {
@@ -93,7 +104,7 @@ impl Client {
     pub async fn online_get(
         &mut self,
         key: impl Into<String>,
-        features: Vec<String>,
+        features: OnlineGetFeatures,
     ) -> Result<HashMap<String, Option<Value>>> {
         let rs = self.online_get_raw(key, features).await?;
         Ok(parse_raw_feature_values(rs))
