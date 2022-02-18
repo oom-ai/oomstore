@@ -47,6 +47,10 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	return rs, nil
 }
 
+func (db *DB) GetByGroup(ctx context.Context, opt online.GetByGroupOpt) (dbutil.RowMap, error) {
+	panic("TODO: implement me")
+}
+
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
 	if err := opt.Validate(); err != nil {

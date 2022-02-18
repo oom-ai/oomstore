@@ -15,16 +15,7 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 		return nil, err
 	}
 
-	var (
-		key string
-		err error
-	)
-
-	if opt.Group.Category == types.CategoryBatch {
-		key, err = serializeRedisKeyForBatchFeature(*opt.RevisionID, opt.EntityKey)
-	} else {
-		key, err = serializeRedisKeyForStreamFeature(opt.Group.ID, opt.EntityKey)
-	}
+	key, err := serializeRedisKey(opt.Group, opt.EntityKey, opt.RevisionID)
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +48,41 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	return rowMap, nil
 }
 
+func (db *DB) GetByGroup(ctx context.Context, opt online.GetByGroupOpt) (dbutil.RowMap, error) {
+
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
+	key, err := serializeRedisKey(opt.Group, opt.EntityKey, opt.RevisionID)
+	if err != nil {
+		return nil, err
+	}
+
+	values, err := db.HGetAll(ctx, key).Result()
+	if err != nil {
+		return nil, errdefs.WithStack(err)
+	}
+
+	rowMap := make(dbutil.RowMap)
+	for k, v := range values {
+		featureID, err := dbutil.DeserializeByValueType(k, types.Int64, Backend)
+		if err != nil {
+			return nil, err
+		}
+		feature, err := opt.GetFeature(int(featureID.(int64)))
+		if err != nil {
+			return nil, err
+		}
+		deserializedValue, err := dbutil.DeserializeByValueType(v, feature.ValueType, Backend)
+		if err != nil {
+			return nil, err
+		}
+		rowMap[feature.FullName()] = deserializedValue
+	}
+	return rowMap, nil
+}
+
 // response: map[entity_key]map[feature_name]feature_value
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
 	if err := opt.Validate(); err != nil {
@@ -79,4 +105,12 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 		}
 	}
 	return res, nil
+}
+
+func serializeRedisKey(group types.Group, entityKey string, revisionID *int) (string, error) {
+	if group.Category == types.CategoryBatch {
+		return serializeRedisKeyForBatchFeature(*revisionID, entityKey)
+	} else {
+		return serializeRedisKeyForStreamFeature(group.ID, entityKey)
+	}
 }

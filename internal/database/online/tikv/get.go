@@ -37,6 +37,10 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	}
 }
 
+func (db *DB) GetByGroup(ctx context.Context, opt online.GetByGroupOpt) (dbutil.RowMap, error) {
+	panic("TODO: implement me")
+}
+
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
 	if err := opt.Validate(); err != nil {
 		return nil, err

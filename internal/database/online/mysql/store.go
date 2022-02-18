@@ -36,6 +36,10 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 	return sqlutil.Get(ctx, db.DB, opt, Backend)
 }
 
+func (db *DB) GetByGroup(ctx context.Context, opt online.GetByGroupOpt) (dbutil.RowMap, error) {
+	panic("TODO: implement me")
+}
+
 func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]dbutil.RowMap, error) {
 	return sqlutil.MultiGet(ctx, db.DB, opt, Backend)
 }

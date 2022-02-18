@@ -79,6 +79,21 @@ func (mr *MockStoreMockRecorder) Get(ctx, opt interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockStore)(nil).Get), ctx, opt)
 }
 
+// GetByGroup mocks base method.
+func (m *MockStore) GetByGroup(ctx context.Context, opt online.GetByGroupOpt) (dbutil.RowMap, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByGroup", ctx, opt)
+	ret0, _ := ret[0].(dbutil.RowMap)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByGroup indicates an expected call of GetByGroup.
+func (mr *MockStoreMockRecorder) GetByGroup(ctx, opt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByGroup", reflect.TypeOf((*MockStore)(nil).GetByGroup), ctx, opt)
+}
+
 // Import mocks base method.
 func (m *MockStore) Import(ctx context.Context, opt online.ImportOpt) error {
 	m.ctrl.T.Helper()
