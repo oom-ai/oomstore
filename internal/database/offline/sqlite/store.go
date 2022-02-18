@@ -78,3 +78,12 @@ func (db *DB) Push(ctx context.Context, opt offline.PushOpt) error {
 	}
 	return nil
 }
+
+func (db *DB) DropTemporaryTable(ctx context.Context, tableNames []string) error {
+	dbOpt := dbutil.DBOpt{Backend: Backend, SqlxDB: db.DB}
+	return sqlutil.DropTemporaryTables(ctx, dbOpt, tableNames)
+}
+
+func (db *DB) GetTemporaryTables(ctx context.Context, unixMilli int64) ([]string, error) {
+	return sqlutil.GetTemporaryTables(ctx, db.DB, Backend, unixMilli)
+}

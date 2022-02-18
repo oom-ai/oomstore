@@ -2,17 +2,19 @@ package dbutil
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/snowflakedb/gosnowflake"
 	"google.golang.org/api/googleapi"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
+
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 const (
@@ -72,7 +74,7 @@ func IsTableNotFoundError(err error, backend types.BackendType) (bool, error) {
 		}
 	case types.BackendSnowflake:
 		if e2, ok := err.(*gosnowflake.SnowflakeError); ok {
-			return e2.Number == gosnowflake.ErrObjectNotExistOrAuthorized, nil
+			return strings.Contains(e2.Error(), "does not exist or not authorized"), nil
 		}
 	// https://cloud.google.com/bigquery/docs/error-messages
 	case types.BackendBigQuery:
