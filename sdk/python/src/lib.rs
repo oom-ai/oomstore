@@ -6,8 +6,9 @@ mod error;
 
 use convert::{err_to_py, py_to_value, value_map_to_py};
 use error::Error;
-use oomclient::Client as OomClient;
+use oomclient::{Client as OomClient, OnlineGetFeatures};
 use pyo3::{
+    exceptions::PyException,
     prelude::*,
     types::{PyDict, PyType},
 };
@@ -81,11 +82,27 @@ impl Client {
     ///     features: A list of feature full names.
     ///       A feature full name has the following format: &lt;group_name&gt;.&lt;feature_name&gt;,
     ///       for example, txn_stats.count_7d.
+    ///     group: All features of the group will be acquired if set. Conflict with `features` argument.
     ///
     /// Returns:
     ///     A dict mapping feature full names to feature values.
-    #[pyo3(text_signature = "(entity_key, features)")]
-    pub fn online_get<'p>(&self, py: Python<'p>, entity_key: String, features: Vec<String>) -> PyResult<&'p PyAny> {
+    #[pyo3(text_signature = "(entity_key, features=None, group=None)")]
+    #[args(features = "None", group = "None")]
+    pub fn online_get<'p>(
+        &self,
+        py: Python<'p>,
+        entity_key: String,
+        features: Option<Vec<String>>,
+        group: Option<String>,
+    ) -> PyResult<&'p PyAny> {
+        let features = match (features, group) {
+            (Some(features), None) => OnlineGetFeatures::FeatureNames(features),
+            (None, Some(group)) => OnlineGetFeatures::GroupName(group),
+            _ =>
+                return Err(PyException::new_err(
+                    "features and group cannot exist or absent at the same time",
+                )),
+        };
         let mut inner = OomClient::clone(&self.inner);
         future_into_py(py, async move {
             inner
