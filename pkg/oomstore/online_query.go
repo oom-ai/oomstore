@@ -15,16 +15,55 @@ import (
 
 // OnlineGet gets online features of a particular entity instance.
 func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*types.FeatureValues, error) {
-	if err := util.ValidateFullFeatureNames(opt.FeatureNames...); err != nil {
+	if err := opt.Validate(); err != nil {
 		return nil, err
 	}
+	if opt.FeatureNames != nil {
+		return s.OnlineGetByFeatures(ctx, opt.FeatureNames, opt.EntityKey)
+	} else {
+		return s.OnlineGetByGroup(ctx, *opt.GroupName, opt.EntityKey)
+	}
+}
+
+func (s *OomStore) OnlineGetByGroup(ctx context.Context, groupName string, entityKey string) (*types.FeatureValues, error) {
+	group, err := s.metadata.GetGroupByName(ctx, groupName)
+	if err != nil {
+		return nil, err
+	}
+	featureValues, err := s.online.GetByGroup(ctx, online.GetByGroupOpt{
+		EntityKey: entityKey,
+		Group:     *group,
+		GetFeature: func(id int) (*types.Feature, error) {
+			return s.metadata.GetFeature(ctx, id)
+		},
+		RevisionID: group.OnlineRevisionID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	featureNames := make([]string, len(featureValues))
+	featureValueMap := make(map[string]interface{})
+	for featureName, featureValue := range featureValues {
+		featureNames = append(featureNames, featureName)
+		featureValueMap[featureName] = featureValue
+	}
+	return &types.FeatureValues{
+		EntityName:      group.Entity.Name,
+		EntityKey:       entityKey,
+		FeatureNames:    featureNames,
+		FeatureValueMap: featureValueMap,
+	}, nil
+}
+
+func (s *OomStore) OnlineGetByFeatures(ctx context.Context, featureNames []string, entityKey string) (*types.FeatureValues, error) {
 	rs := types.FeatureValues{
-		EntityKey:       opt.EntityKey,
-		FeatureNames:    opt.FeatureNames,
+		EntityKey:       entityKey,
+		FeatureNames:    featureNames,
 		FeatureValueMap: make(map[string]interface{}),
 	}
 	features := s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
-		FullNames: &opt.FeatureNames,
+		FullNames: &featureNames,
 	})
 	if len(features) == 0 {
 		return &rs, nil
@@ -49,7 +88,7 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 		}
 
 		featureValues, err := s.online.Get(ctx, online.GetOpt{
-			EntityKey:  opt.EntityKey,
+			EntityKey:  entityKey,
 			Group:      *group,
 			Features:   features,
 			RevisionID: group.OnlineRevisionID,
