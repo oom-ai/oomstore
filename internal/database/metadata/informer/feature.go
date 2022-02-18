@@ -1,8 +1,6 @@
 package informer
 
 import (
-	"sort"
-
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
@@ -10,37 +8,31 @@ import (
 type FeatureCache struct {
 	types.FeatureList
 	nameIdx map[string]*types.Feature
+	idIdx   map[int]*types.Feature
 }
 
 func NewFeatureCache(features types.FeatureList) *FeatureCache {
-	sort.Slice(features, func(i, j int) bool {
-		return features[i].ID < features[j].ID
-	})
-	return &FeatureCache{FeatureList: features, nameIdx: nil}
+	return &FeatureCache{FeatureList: features, nameIdx: nil, idIdx: nil}
 }
 
 func (c *FeatureCache) Enrich(groupCache *GroupCache) {
 	nameIdx := make(map[string]*types.Feature)
+	idIdx := make(map[int]*types.Feature)
 
 	for _, f := range c.FeatureList {
 		f.Group = groupCache.Find(func(g *types.Group) bool {
 			return g.ID == f.GroupID
 		})
 		nameIdx[f.FullName()] = f
+		idIdx[f.ID] = f
 	}
 
 	c.nameIdx = nameIdx
+	c.idIdx = idIdx
 }
 
 func (c *FeatureCache) Get(featureID int) *types.Feature {
-	l := c.FeatureList
-	pos := sort.Search(len(l), func(i int) bool {
-		return l[i].ID == featureID
-	})
-	if pos >= 0 && pos < len(l) {
-		return l[pos]
-	}
-	return nil
+	return c.idIdx[featureID]
 }
 
 func (c *FeatureCache) List(opt metadata.ListCachedFeatureOpt) types.FeatureList {
