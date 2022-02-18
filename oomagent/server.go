@@ -31,6 +31,7 @@ func (s *server) HealthCheck(ctx context.Context, req *codegen.HealthCheckReques
 
 func (s *server) OnlineGet(ctx context.Context, req *codegen.OnlineGetRequest) (*codegen.OnlineGetResponse, error) {
 	result, err := s.oomstore.OnlineGet(ctx, types.OnlineGetOpt{
+		GroupName:    req.Group,
 		FeatureNames: req.Features,
 		EntityKey:    req.EntityKey,
 	})
