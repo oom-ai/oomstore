@@ -99,6 +99,14 @@ func (f *Informer) GetCachedGroup(ctx context.Context, groupID int) (*types.Grou
 	return group, nil
 }
 
+func (f *Informer) GetCachedGroupByName(ctx context.Context, groupName string) (*types.Group, error) {
+	group := f.Cache().Groups.GetByName(groupName).Copy()
+	if group == nil {
+		return nil, errdefs.NotFound(errdefs.Errorf("group %s not found", groupName))
+	}
+	return group, nil
+}
+
 func (f *Informer) GetCachedFeature(ctx context.Context, featureID int) (*types.Feature, error) {
 	feature := f.Cache().Features.Get(featureID).Copy()
 	if feature == nil {

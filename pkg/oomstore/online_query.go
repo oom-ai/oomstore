@@ -26,7 +26,7 @@ func (s *OomStore) OnlineGet(ctx context.Context, opt types.OnlineGetOpt) (*type
 }
 
 func (s *OomStore) OnlineGetByGroup(ctx context.Context, groupName string, entityKey string) (*types.FeatureValues, error) {
-	group, err := s.metadata.GetGroupByName(ctx, groupName)
+	group, err := s.metadata.GetCachedGroupByName(ctx, groupName)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (s *OomStore) OnlineGetByGroup(ctx context.Context, groupName string, entit
 		EntityKey: entityKey,
 		Group:     *group,
 		GetFeature: func(id int) (*types.Feature, error) {
-			return s.metadata.GetFeature(ctx, id)
+			return s.metadata.GetCachedFeature(ctx, id)
 		},
 		RevisionID: group.OnlineRevisionID,
 	})

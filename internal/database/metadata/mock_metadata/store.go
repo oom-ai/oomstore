@@ -141,6 +141,21 @@ func (mr *MockStoreMockRecorder) GetCachedGroup(ctx, id interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCachedGroup", reflect.TypeOf((*MockStore)(nil).GetCachedGroup), ctx, id)
 }
 
+// GetCachedGroupByName mocks base method.
+func (m *MockStore) GetCachedGroupByName(ctx context.Context, name string) (*types.Group, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCachedGroupByName", ctx, name)
+	ret0, _ := ret[0].(*types.Group)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCachedGroupByName indicates an expected call of GetCachedGroupByName.
+func (mr *MockStoreMockRecorder) GetCachedGroupByName(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCachedGroupByName", reflect.TypeOf((*MockStore)(nil).GetCachedGroupByName), ctx, name)
+}
+
 // GetEntity mocks base method.
 func (m *MockStore) GetEntity(ctx context.Context, id int) (*types.Entity, error) {
 	m.ctrl.T.Helper()
@@ -817,6 +832,21 @@ func (m *MockCacheStore) GetCachedGroup(ctx context.Context, id int) (*types.Gro
 func (mr *MockCacheStoreMockRecorder) GetCachedGroup(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCachedGroup", reflect.TypeOf((*MockCacheStore)(nil).GetCachedGroup), ctx, id)
+}
+
+// GetCachedGroupByName mocks base method.
+func (m *MockCacheStore) GetCachedGroupByName(ctx context.Context, name string) (*types.Group, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCachedGroupByName", ctx, name)
+	ret0, _ := ret[0].(*types.Group)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCachedGroupByName indicates an expected call of GetCachedGroupByName.
+func (mr *MockCacheStoreMockRecorder) GetCachedGroupByName(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCachedGroupByName", reflect.TypeOf((*MockCacheStore)(nil).GetCachedGroupByName), ctx, name)
 }
 
 // ListCachedFeature mocks base method.
