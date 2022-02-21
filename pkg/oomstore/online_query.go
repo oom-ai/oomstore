@@ -33,8 +33,10 @@ func (s *OomStore) OnlineGetByGroup(ctx context.Context, groupName string, entit
 	featureValues, err := s.online.GetByGroup(ctx, online.GetByGroupOpt{
 		EntityKey: entityKey,
 		Group:     *group,
-		GetFeature: func(id int) (*types.Feature, error) {
-			return s.metadata.GetCachedFeature(ctx, id)
+		ListFeature: func(groupID int) types.FeatureList {
+			return s.metadata.ListCachedFeature(ctx, metadata.ListCachedFeatureOpt{
+				GroupID: &groupID,
+			})
 		},
 		RevisionID: group.OnlineRevisionID,
 	})

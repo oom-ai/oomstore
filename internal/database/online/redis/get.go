@@ -64,16 +64,24 @@ func (db *DB) GetByGroup(ctx context.Context, opt online.GetByGroupOpt) (dbutil.
 		return nil, errdefs.WithStack(err)
 	}
 
+	features := opt.ListFeature(opt.Group.ID)
+	featureMp := make(map[int]*types.Feature, features.Len())
+	for _, feature := range features {
+		featureMp[feature.ID] = feature
+	}
+
 	rowMap := make(dbutil.RowMap)
 	for k, v := range values {
 		featureID, err := dbutil.DeserializeByValueType(k, types.Int64, Backend)
 		if err != nil {
 			return nil, err
 		}
-		feature, err := opt.GetFeature(int(featureID.(int64)))
-		if err != nil {
-			return nil, err
+
+		feature, ok := featureMp[int(featureID.(int64))]
+		if !ok {
+			return nil, errdefs.NotFound(errdefs.Errorf("feature %d not found", featureID))
 		}
+
 		deserializedValue, err := dbutil.DeserializeByValueType(v, feature.ValueType, Backend)
 		if err != nil {
 			return nil, err

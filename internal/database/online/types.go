@@ -22,9 +22,9 @@ func (g *GetOpt) Validate() error {
 }
 
 type GetByGroupOpt struct {
-	EntityKey  string
-	Group      types.Group
-	GetFeature func(featureID int) (*types.Feature, error)
+	EntityKey   string
+	Group       types.Group
+	ListFeature func(groupID int) types.FeatureList
 
 	// Only works when get batch features, it should be nil when get stream features
 	RevisionID *int
@@ -34,8 +34,8 @@ func (g *GetByGroupOpt) Validate() error {
 	if g.Group.Category == types.CategoryBatch && g.RevisionID == nil {
 		return errdefs.Errorf("invalid GetByGroupOpt: the revisionID of get batch feature cannot be null")
 	}
-	if g.GetFeature == nil {
-		return errdefs.Errorf("invalid GetByGroupOpt: the GetFeature function cannot be null")
+	if g.ListFeature == nil {
+		return errdefs.Errorf("invalid GetByGroupOpt: the ListCachedFeature function cannot be null")
 	}
 	return nil
 }

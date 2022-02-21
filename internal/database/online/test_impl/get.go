@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -130,13 +129,8 @@ func TestGetByGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore Dest
 			actual, err := store.GetByGroup(ctx, online.GetByGroupOpt{
 				EntityKey: r.EntityKey(),
 				Group:     s.Group,
-				GetFeature: func(featureID int) (*types.Feature, error) {
-					for _, feature := range s.Features {
-						if feature.ID == featureID {
-							return feature, nil
-						}
-					}
-					return nil, errdefs.NotFound(errdefs.Errorf("feature %d not found", featureID))
+				ListFeature: func(groupID int) types.FeatureList {
+					return s.Features
 				},
 				RevisionID: &s.Revision.ID,
 			})
