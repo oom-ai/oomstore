@@ -65,10 +65,10 @@ func (db *DB) GetByGroup(ctx context.Context, opt online.GetByGroupOpt) (dbutil.
 	}
 
 	features := opt.ListFeature(opt.Group.ID)
-	featureMp := make(map[int]*types.Feature, features.Len())
-	for _, feature := range features {
-		featureMp[feature.ID] = feature
-	}
+	// featureMp := make(map[int]*types.Feature, features.Len())
+	// for _, feature := range features {
+	// 	featureMp[feature.ID] = feature
+	// }
 
 	rowMap := make(dbutil.RowMap)
 	for k, v := range values {
@@ -77,8 +77,11 @@ func (db *DB) GetByGroup(ctx context.Context, opt online.GetByGroupOpt) (dbutil.
 			return nil, err
 		}
 
-		feature, ok := featureMp[int(featureID.(int64))]
-		if !ok {
+		featureIDInt := int(featureID.(int64))
+		feature := features.Find(func(f *types.Feature) bool {
+			return f.ID == featureIDInt
+		})
+		if feature == nil {
 			return nil, errdefs.NotFound(errdefs.Errorf("feature %d not found", featureID))
 		}
 
