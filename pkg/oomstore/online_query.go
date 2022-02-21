@@ -33,8 +33,14 @@ func (s *OomStore) OnlineGetByGroup(ctx context.Context, groupName string, entit
 	featureValues, err := s.online.GetByGroup(ctx, online.GetByGroupOpt{
 		EntityKey: entityKey,
 		Group:     *group,
-		GetFeature: func(id int) (*types.Feature, error) {
-			return s.metadata.GetCachedFeature(ctx, id)
+		GetFeature: func(id *int, fullName *string) (*types.Feature, error) {
+			if id != nil {
+				return s.metadata.GetCachedFeature(ctx, *id)
+			}
+			if fullName != nil {
+				return s.metadata.GetCachedFeatureByName(ctx, *fullName)
+			}
+			return nil, errdefs.Errorf("FeatureID and featureFullName must have one that is not null")
 		},
 		RevisionID: group.OnlineRevisionID,
 	})

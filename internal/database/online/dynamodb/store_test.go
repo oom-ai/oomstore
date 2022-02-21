@@ -61,6 +61,10 @@ func TestMultiGet(t *testing.T) {
 	test_impl.TestMultiGet(t, prepareStore, destroyStore(t))
 }
 
+func TestGetByGroup(t *testing.T) {
+	test_impl.TestGetByGroup(t, prepareStore, destroyStore(t))
+}
+
 func TestPurgeRemovesSpecifiedRevision(t *testing.T) {
 	test_impl.TestPurgeRemovesSpecifiedRevision(t, prepareStore, destroyStore(t))
 }

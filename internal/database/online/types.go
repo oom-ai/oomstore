@@ -22,9 +22,13 @@ func (g *GetOpt) Validate() error {
 }
 
 type GetByGroupOpt struct {
-	EntityKey  string
-	Group      types.Group
-	GetFeature func(featureID int) (*types.Feature, error)
+	EntityKey string
+	Group     types.Group
+
+	// One of featureID and featureFullName must be nil and one must not be nil.
+	// If featureID is not nil, then use featureID to query the feature
+	// If featureFullName is not nil, then featureFullName is used to query feature
+	GetFeature func(featureID *int, featureFullName *string) (*types.Feature, error)
 
 	// Only works when get batch features, it should be nil when get stream features
 	RevisionID *int

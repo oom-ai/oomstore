@@ -11,6 +11,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
 
 func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error) {
@@ -48,7 +49,49 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 }
 
 func (db *DB) GetByGroup(ctx context.Context, opt online.GetByGroupOpt) (dbutil.RowMap, error) {
-	panic("TODO: implement me")
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
+	var tableName string
+	if opt.Group.Category == types.CategoryBatch {
+		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
+	} else {
+		tableName = dbutil.OnlineStreamTableName(opt.Group.ID)
+	}
+
+	query := fmt.Sprintf(`SELECT * FROM %s WHERE %s = ?`,
+		tableName,
+		opt.Group.Entity.Name,
+	)
+
+	scan := make(map[string]interface{})
+	if err := db.Query(query, opt.EntityKey).WithContext(ctx).MapScan(scan); err != nil {
+		if err == gocql.ErrNotFound || isTableNotFoundError(err, tableName) {
+			return scan, nil
+		}
+		return nil, errdefs.WithStack(err)
+	}
+
+	rs := map[string]interface{}{}
+	for k, v := range scan {
+		if k == opt.Group.Entity.Name {
+			continue
+		}
+
+		featureFullName := util.ComposeFullFeatureName(opt.Group.Name, k)
+		feature, err := opt.GetFeature(nil, &featureFullName)
+		if err != nil {
+			return nil, err
+		}
+		deserializedValue, err := dbutil.DeserializeByValueType(v, feature.ValueType, Backend)
+		if err != nil {
+			return nil, err
+		}
+
+		rs[featureFullName] = deserializedValue
+	}
+	return rs, nil
 }
 
 // response: map[entity_key]map[feature_name]feature_value

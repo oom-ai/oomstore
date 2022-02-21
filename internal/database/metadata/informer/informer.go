@@ -6,9 +6,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/oom-ai/oomstore/pkg/errdefs"
-
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -111,6 +110,15 @@ func (f *Informer) GetCachedFeature(ctx context.Context, featureID int) (*types.
 	feature := f.Cache().Features.Get(featureID).Copy()
 	if feature == nil {
 		return nil, errdefs.NotFound(errdefs.Errorf("feature %d not found", featureID))
+	}
+	return feature, nil
+}
+
+func (f *Informer) GetCachedFeatureByName(ctx context.Context, fullName string) (*types.Feature, error) {
+	feature := f.Cache().Features.GetByName(fullName).Copy()
+
+	if feature == nil {
+		return nil, errdefs.NotFound(errdefs.Errorf("feature %s not found", fullName))
 	}
 	return feature, nil
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	oomTypes "github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
 
 const (
@@ -51,7 +52,57 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 }
 
 func (db *DB) GetByGroup(ctx context.Context, opt online.GetByGroupOpt) (dbutil.RowMap, error) {
-	panic("TODO: implement me")
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
+	var tableName string
+	if opt.Group.Category == oomTypes.CategoryBatch {
+		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
+	} else {
+		tableName = dbutil.OnlineStreamTableName(opt.Group.ID)
+	}
+	entityKeyValue, err := attributevalue.Marshal(opt.EntityKey)
+	if err != nil {
+		return nil, errdefs.WithStack(err)
+	}
+
+	result, err := db.GetItem(ctx, &dynamodb.GetItemInput{
+		TableName: aws.String(tableName),
+		Key: map[string]types.AttributeValue{
+			opt.Group.Entity.Name: entityKeyValue,
+		},
+	})
+	if err != nil {
+		if apiErr := new(types.ResourceNotFoundException); errors.As(err, &apiErr) {
+			return make(dbutil.RowMap), nil
+		}
+		return nil, errdefs.WithStack(err)
+	}
+
+	rs := map[string]interface{}{}
+	var value interface{}
+	for k, v := range result.Item {
+		if k == opt.Group.Entity.Name {
+			continue
+		}
+
+		if err := attributevalue.Unmarshal(v, &value); err != nil {
+			return nil, errdefs.WithStack(err)
+		}
+
+		featureFullName := util.ComposeFullFeatureName(opt.Group.Name, k)
+		feature, err := opt.GetFeature(nil, &featureFullName)
+		if err != nil {
+			return nil, err
+		}
+		deserializedValue, err := dbutil.DeserializeByValueType(value, feature.ValueType, oomTypes.BackendDynamoDB)
+		if err != nil {
+			return nil, err
+		}
+		rs[featureFullName] = deserializedValue
+	}
+	return rs, nil
 }
 
 // response: map[entity_key]map[feature_name]feature_value

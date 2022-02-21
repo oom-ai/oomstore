@@ -35,6 +35,10 @@ func (c *FeatureCache) Get(featureID int) *types.Feature {
 	return c.idIdx[featureID]
 }
 
+func (c *FeatureCache) GetByName(fullName string) *types.Feature {
+	return c.nameIdx[fullName]
+}
+
 func (c *FeatureCache) List(opt metadata.ListCachedFeatureOpt) types.FeatureList {
 	features := c.FeatureList
 

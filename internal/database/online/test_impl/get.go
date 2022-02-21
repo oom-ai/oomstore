@@ -130,9 +130,12 @@ func TestGetByGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore Dest
 			actual, err := store.GetByGroup(ctx, online.GetByGroupOpt{
 				EntityKey: r.EntityKey(),
 				Group:     s.Group,
-				GetFeature: func(featureID int) (*types.Feature, error) {
+				GetFeature: func(featureID *int, featureFullName *string) (*types.Feature, error) {
 					for _, feature := range s.Features {
-						if feature.ID == featureID {
+						if featureID != nil && feature.ID == *featureID {
+							return feature, nil
+						}
+						if featureFullName != nil && feature.FullName() == *featureFullName {
 							return feature, nil
 						}
 					}
