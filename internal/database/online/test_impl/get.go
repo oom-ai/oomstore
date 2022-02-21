@@ -6,6 +6,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func TestGetExisted(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
@@ -111,5 +113,38 @@ func TestMultiGet(t *testing.T, prepareStore PrepareStoreFn, destroystore Destro
 			}
 		}
 		require.Equal(t, len(s.Data), len(rs), "actual: %+v", rs)
+	}
+}
+
+func TestGetByGroup(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
+	t.Cleanup(destroyStore)
+	ctx, store := prepareStore(t)
+	defer store.Close()
+
+	importSample(t, ctx, store, &SampleSmall)
+	importSample(t, ctx, store, &SampleMedium)
+	importSample(t, ctx, store, &SampleStream)
+
+	for _, s := range []*Sample{&SampleSmall, &SampleMedium, &SampleStream} {
+		for _, r := range s.Data {
+			actual, err := store.GetByGroup(ctx, online.GetByGroupOpt{
+				EntityKey: r.EntityKey(),
+				Group:     s.Group,
+				GetFeature: func(featureID int) (*types.Feature, error) {
+					for _, feature := range s.Features {
+						if feature.ID == featureID {
+							return feature, nil
+						}
+					}
+					return nil, errdefs.NotFound(errdefs.Errorf("feature %d not found", featureID))
+				},
+				RevisionID: &s.Revision.ID,
+			})
+			require.NoError(t, err)
+
+			for i, feature := range s.Features {
+				compareFeatureValue(t, r.ValueAt(i), actual[feature.FullName()], feature.ValueType)
+			}
+		}
 	}
 }

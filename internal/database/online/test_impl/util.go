@@ -33,8 +33,8 @@ var SampleStream Sample
 func init() {
 	rand.Seed(time.Now().UnixNano())
 	entity := types.Entity{ID: 1, Name: "user"}
-	group1 := types.Group{ID: 1, Category: types.CategoryBatch, Entity: &entity}
-	group2 := types.Group{ID: 2, Category: types.CategoryBatch, Entity: &entity}
+	group1 := types.Group{ID: 1, Name: "group1", Category: types.CategoryBatch, Entity: &entity}
+	group2 := types.Group{ID: 2, Name: "group2", Category: types.CategoryBatch, Entity: &entity}
 	group3 := types.Group{ID: 3, Name: "user_clicks", Category: types.CategoryStream, Entity: &entity}
 
 	SampleSmall = Sample{
