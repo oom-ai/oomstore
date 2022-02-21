@@ -70,7 +70,8 @@ func (db *DB) GetByGroup(ctx context.Context, opt online.GetByGroupOpt) (dbutil.
 		if err != nil {
 			return nil, err
 		}
-		feature, err := opt.GetFeature(int(featureID.(int64)))
+		featureIDInt := int(featureID.(int64))
+		feature, err := opt.GetFeature(&featureIDInt, nil)
 		if err != nil {
 			return nil, err
 		}

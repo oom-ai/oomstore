@@ -56,6 +56,7 @@ type CacheStore interface {
 	GetCachedGroup(ctx context.Context, id int) (*types.Group, error)
 	GetCachedGroupByName(ctx context.Context, name string) (*types.Group, error)
 	GetCachedFeature(ctx context.Context, id int) (*types.Feature, error)
+	GetCachedFeatureByName(ctx context.Context, name string) (*types.Feature, error)
 
 	// Refresh pulls data from database and update cache.
 	Refresh() error

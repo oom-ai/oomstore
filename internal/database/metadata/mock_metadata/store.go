@@ -126,6 +126,21 @@ func (mr *MockStoreMockRecorder) GetCachedFeature(ctx, id interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCachedFeature", reflect.TypeOf((*MockStore)(nil).GetCachedFeature), ctx, id)
 }
 
+// GetCachedFeatureByName mocks base method.
+func (m *MockStore) GetCachedFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCachedFeatureByName", ctx, name)
+	ret0, _ := ret[0].(*types.Feature)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCachedFeatureByName indicates an expected call of GetCachedFeatureByName.
+func (mr *MockStoreMockRecorder) GetCachedFeatureByName(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCachedFeatureByName", reflect.TypeOf((*MockStore)(nil).GetCachedFeatureByName), ctx, name)
+}
+
 // GetCachedGroup mocks base method.
 func (m *MockStore) GetCachedGroup(ctx context.Context, id int) (*types.Group, error) {
 	m.ctrl.T.Helper()
@@ -817,6 +832,21 @@ func (m *MockCacheStore) GetCachedFeature(ctx context.Context, id int) (*types.F
 func (mr *MockCacheStoreMockRecorder) GetCachedFeature(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCachedFeature", reflect.TypeOf((*MockCacheStore)(nil).GetCachedFeature), ctx, id)
+}
+
+// GetCachedFeatureByName mocks base method.
+func (m *MockCacheStore) GetCachedFeatureByName(ctx context.Context, name string) (*types.Feature, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCachedFeatureByName", ctx, name)
+	ret0, _ := ret[0].(*types.Feature)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCachedFeatureByName indicates an expected call of GetCachedFeatureByName.
+func (mr *MockCacheStoreMockRecorder) GetCachedFeatureByName(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCachedFeatureByName", reflect.TypeOf((*MockCacheStore)(nil).GetCachedFeatureByName), ctx, name)
 }
 
 // GetCachedGroup mocks base method.
