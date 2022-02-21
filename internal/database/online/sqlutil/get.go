@@ -6,12 +6,61 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
+	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
+
+func GetByGroup(ctx context.Context, db *sqlx.DB, opt online.GetByGroupOpt, backend types.BackendType) (dbutil.RowMap, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
+
+	var tableName string
+	if opt.Group.Category == types.CategoryBatch {
+		tableName = dbutil.OnlineBatchTableName(*opt.RevisionID)
+	} else {
+		tableName = dbutil.OnlineStreamTableName(opt.Group.ID)
+	}
+
+	qt := dbutil.QuoteFn(backend)
+	query := fmt.Sprintf(`SELECT * FROM %s WHERE %s = ?`, qt(tableName), qt(opt.Group.Entity.Name))
+
+	result := make(map[string]interface{})
+	if err := db.QueryRowxContext(ctx, db.Rebind(query), opt.EntityKey).MapScan(result); err != nil {
+		tableNotFound, notFoundErr := dbutil.IsTableNotFoundError(err, backend)
+		if notFoundErr != nil {
+			return nil, notFoundErr
+		}
+		if err == sql.ErrNoRows || tableNotFound {
+			return make(dbutil.RowMap), nil
+		}
+		return nil, errdefs.WithStack(err)
+	}
+
+	rs := map[string]interface{}{}
+	for k, v := range result {
+		if k == opt.Group.Entity.Name {
+			continue
+		}
+
+		featureFullName := util.ComposeFullFeatureName(opt.Group.Name, k)
+		feature, err := opt.GetFeature(nil, &featureFullName)
+		if err != nil {
+			return nil, err
+		}
+		deserializedValue, err := dbutil.DeserializeByValueType(v, feature.ValueType, backend)
+		if err != nil {
+			return nil, err
+		}
+
+		rs[featureFullName] = deserializedValue
+	}
+	return rs, nil
+}
 
 func Get(ctx context.Context, db *sqlx.DB, opt online.GetOpt, backend types.BackendType) (dbutil.RowMap, error) {
 	if err := opt.Validate(); err != nil {
