@@ -29,9 +29,9 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 
 	var serializedFeatureIDs []string
 	for _, feature := range opt.Features {
-		serializedFeatureID, err := dbutil.SerializeByValue(feature.ID, Backend)
-		if err != nil {
-			return err
+		serializedFeatureID, err2 := dbutil.SerializeByValue(feature.ID, Backend)
+		if err2 != nil {
+			return err2
 		}
 		serializedFeatureIDs = append(serializedFeatureIDs, serializedFeatureID)
 	}
@@ -62,8 +62,8 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 				continue
 			}
 
-			serializedFeatureValue, err := dbutil.SerializeByValueType(featureValues[i], opt.Features[i].ValueType, Backend)
-			if err != nil {
+			serializedFeatureValue, err2 := dbutil.SerializeByValueType(featureValues[i], opt.Features[i].ValueType, Backend)
+			if err2 != nil {
 				return err
 			}
 			if opt.Group.Category == types.CategoryBatch {

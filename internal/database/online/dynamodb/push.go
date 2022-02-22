@@ -26,13 +26,13 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 	item[opt.EntityName] = entityKeyValue
 
 	for i, feature := range opt.Features {
-		value, err := dbutil.SerializeByValueType(opt.FeatureValues[i], feature.ValueType, Backend)
-		if err != nil {
-			return err
+		value, err2 := dbutil.SerializeByValueType(opt.FeatureValues[i], feature.ValueType, Backend)
+		if err2 != nil {
+			return err2
 		}
-		attributeValue, err := attributevalue.Marshal(value)
-		if err != nil {
-			return errdefs.WithStack(err)
+		attributeValue, err2 := attributevalue.Marshal(value)
+		if err2 != nil {
+			return errdefs.WithStack(err2)
 		}
 		item[feature.Name] = attributeValue
 	}

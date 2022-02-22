@@ -148,7 +148,8 @@ func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt joinOneGroupOpt) 
 		if *opt.TimeRange.MaxUnixMilli < r.MinRevision || *opt.TimeRange.MinUnixMilli > r.MaxRevision {
 			continue
 		}
-		query, err := buildJoinQuery(joinQueryParams{
+		var query string
+		query, err = buildJoinQuery(joinQueryParams{
 			TableName:           snapshotJoinedTableName,
 			EntityName:          opt.EntityName,
 			EntityKey:           "entity_key",

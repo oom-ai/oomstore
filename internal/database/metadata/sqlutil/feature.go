@@ -40,7 +40,7 @@ func GetFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*typ
 	)
 
 	query := `SELECT * FROM feature WHERE id = ?`
-	if err := sqlxCtx.GetContext(ctx, &feature, sqlxCtx.Rebind(query), id); err != nil {
+	if err = sqlxCtx.GetContext(ctx, &feature, sqlxCtx.Rebind(query), id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errdefs.NotFound(errdefs.Errorf("feature %d not found", id))
 		}
@@ -93,7 +93,7 @@ func ListFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 		query = fmt.Sprintf("%s WHERE %s", query, strings.Join(cond, " AND "))
 	}
 	query = fmt.Sprintf("%s ORDER BY id ASC", query)
-	if err := sqlxCtx.SelectContext(ctx, &features, sqlxCtx.Rebind(query), args...); err != nil {
+	if err = sqlxCtx.SelectContext(ctx, &features, sqlxCtx.Rebind(query), args...); err != nil {
 		return nil, errdefs.WithStack(err)
 	}
 

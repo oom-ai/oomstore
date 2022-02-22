@@ -31,9 +31,9 @@ func (db *DB) Get(ctx context.Context, opt online.GetOpt) (dbutil.RowMap, error)
 
 	featureIDs := []string{}
 	for _, f := range opt.Features {
-		id, err := dbutil.SerializeByValue(f.ID, Backend)
-		if err != nil {
-			return nil, err
+		id, err2 := dbutil.SerializeByValue(f.ID, Backend)
+		if err2 != nil {
+			return nil, err2
 		}
 		featureIDs = append(featureIDs, id)
 	}

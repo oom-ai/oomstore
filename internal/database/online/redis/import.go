@@ -41,14 +41,14 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			if values[i] == nil {
 				continue
 			}
-			featureValue, err := dbutil.SerializeByValueType(values[i], opt.Features[i].ValueType, Backend)
-			if err != nil {
-				return err
+			featureValue, err2 := dbutil.SerializeByValueType(values[i], opt.Features[i].ValueType, Backend)
+			if err2 != nil {
+				return err2
 			}
 
-			featureID, err := dbutil.SerializeByValue(opt.Features[i].ID, Backend)
-			if err != nil {
-				return err
+			featureID, err2 := dbutil.SerializeByValue(opt.Features[i].ID, Backend)
+			if err2 != nil {
+				return err2
 			}
 			featureValues[featureID] = featureValue.(string)
 		}

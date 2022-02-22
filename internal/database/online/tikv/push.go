@@ -28,14 +28,14 @@ func (db *DB) Push(ctx context.Context, opt online.PushOpt) error {
 			continue
 		}
 
-		serializedFeatureID, err := dbutil.SerializeByValue(opt.Features[i].ID, Backend)
-		if err != nil {
-			return err
+		serializedFeatureID, err2 := dbutil.SerializeByValue(opt.Features[i].ID, Backend)
+		if err2 != nil {
+			return err2
 		}
 
-		serializedFeatureValue, err := dbutil.SerializeByValueType(value, opt.Features[i].ValueType, Backend)
-		if err != nil {
-			return err
+		serializedFeatureValue, err2 := dbutil.SerializeByValueType(value, opt.Features[i].ValueType, Backend)
+		if err2 != nil {
+			return err2
 		}
 
 		putKeys = append(putKeys, getKeyOfStreamFeature(serializedGroupID, serializedEntityKey, serializedFeatureID))

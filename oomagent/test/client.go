@@ -78,16 +78,16 @@ func Import() {
 	groupName := "please input your group name"
 	description := "please input you description"
 	for fileScanner.Scan() {
-		if err := importClient.Send(&codegen.ChannelImportRequest{
+		if err2 := importClient.Send(&codegen.ChannelImportRequest{
 			Group:       &groupName,
 			Description: &description,
 			Row:         fileScanner.Bytes(),
-		}); err != nil {
-			log.Fatal(err)
+		}); err2 != nil {
+			log.Fatal(err2)
 		}
 	}
 
-	if err := fileScanner.Err(); err != nil {
+	if err = fileScanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 

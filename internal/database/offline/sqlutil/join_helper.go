@@ -92,9 +92,9 @@ func prepareJoinedTable(
 		return "", err
 	}
 	for _, f := range features {
-		dbValueType, err := dbutil.DBValueType(dbOpt.Backend, f.ValueType)
-		if err != nil {
-			return "", err
+		dbValueType, err2 := dbutil.DBValueType(dbOpt.Backend, f.ValueType)
+		if err2 != nil {
+			return "", err2
 		}
 		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, f.Name, dbValueType))
 

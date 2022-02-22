@@ -66,11 +66,11 @@ func (s *OomStore) syncBatch(ctx context.Context, opt types.SyncOpt, group *type
 
 	if err = s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
 		// Update the online revision id of the feature group upon sync success
-		if err := tx.UpdateGroup(c, metadata.UpdateGroupOpt{
+		if err2 := tx.UpdateGroup(c, metadata.UpdateGroupOpt{
 			GroupID:             group.ID,
 			NewOnlineRevisionID: &revision.ID,
-		}); err != nil {
-			return err
+		}); err2 != nil {
+			return err2
 		}
 		if !revision.Anchored {
 			newRevision := time.Now().UnixMilli()
