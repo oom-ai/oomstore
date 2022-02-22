@@ -61,7 +61,9 @@ func writeEntitiesToTempFile(ctx context.Context, oomStore *oomstore.OomStore, e
 	if err != nil {
 		exit(err)
 	}
-	defer tempFile.Close()
+	defer func() {
+		_ = tempFile.Close()
+	}()
 
 	if err = outputEntity(ctx, entities, outputParams{
 		writer:    tempFile,

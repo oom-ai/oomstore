@@ -26,7 +26,10 @@ func (s *OomStore) Import(ctx context.Context, opt types.ImportOpt) (int, error)
 		if err != nil {
 			return 0, err
 		}
-		defer file.Close()
+		defer func() {
+			_ = file.Close()
+		}()
+
 		source := &types.CsvReaderDataSource{
 			Reader:    file,
 			Delimiter: src.Delimiter,

@@ -49,10 +49,10 @@ var rootCmd = &cobra.Command{
 
 		// write the listening address
 		tmpdir := filepath.Join(os.TempDir(), "oomagent", strconv.Itoa(os.Getpid()))
-		if err := os.MkdirAll(tmpdir, 0755); err != nil {
+		if err := os.MkdirAll(tmpdir, 0750); err != nil {
 			log.Fatalf("failed to create temp directory: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(tmpdir, "address"), []byte(lis.Addr().String()), 0644); err != nil {
+		if err := os.WriteFile(filepath.Join(tmpdir, "address"), []byte(lis.Addr().String()), 0600); err != nil {
 			log.Fatalf("failed to write listen address: %v", err)
 		}
 
@@ -64,7 +64,7 @@ var rootCmd = &cobra.Command{
 		go func() {
 			<-exit
 			grpcServer.GracefulStop()
-			oomstore.Close()
+			_ = oomstore.Close()
 			os.Exit(0)
 		}()
 
@@ -102,7 +102,7 @@ func initConfig() {
 	if envCfgFile := os.Getenv("OOMAGENT_CONFIG"); envCfgFile != "" {
 		cfgFile = envCfgFile
 	}
-	cfgContent, err := ioutil.ReadFile(cfgFile)
+	cfgContent, err := ioutil.ReadFile(filepath.Clean(cfgFile))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed reading config file: %v\n", err)
 		os.Exit(1)

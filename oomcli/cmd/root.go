@@ -52,7 +52,7 @@ func initConfig() {
 	if envCfgFile := os.Getenv("OOMCLI_CONFIG"); envCfgFile != "" {
 		cfgFile = envCfgFile
 	}
-	cfgContent, err := ioutil.ReadFile(cfgFile)
+	cfgContent, err := ioutil.ReadFile(filepath.Clean(cfgFile))
 	if err != nil {
 		exitf("failed reading config file: %v\n", err)
 	}

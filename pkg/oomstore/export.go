@@ -106,7 +106,9 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 	w := csv.NewWriter(file)
 	defer w.Flush()
 

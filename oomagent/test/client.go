@@ -8,8 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/oom-ai/oomstore/oomagent/codegen"
 	"google.golang.org/grpc"
+
+	"github.com/oom-ai/oomstore/oomagent/codegen"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
@@ -66,7 +67,12 @@ func Import() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+	defer func() {
+		if err = file.Close(); err != nil {
+			log.Fatal(err)
+		}
+
+	}()
 	fileScanner := bufio.NewScanner(file)
 
 	groupName := "please input your group name"
@@ -97,5 +103,9 @@ func prepareOomAgentClient(addr string) (c codegen.OomAgentClient, cancel func()
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	return codegen.NewOomAgentClient(conn), func() { conn.Close() }
+	return codegen.NewOomAgentClient(conn), func() {
+		if err := conn.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}
 }

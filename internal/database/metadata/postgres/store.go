@@ -38,7 +38,7 @@ func Open(ctx context.Context, option *types.PostgresOpt) (*DB, error) {
 		return sqlutil.ListMetadata(ctx, db)
 	})
 	if err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, err
 	}
 	return &DB{

@@ -6,6 +6,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 
@@ -142,7 +143,7 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) 
 }
 
 func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-chan types.EntityRow, []string, error) {
-	input, err := os.Open(inputFilePath)
+	input, err := os.Open(filepath.Clean(inputFilePath))
 	if err != nil {
 		return nil, nil, errdefs.WithStack(err)
 	}
@@ -154,8 +155,10 @@ func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-ch
 
 	entityRows := make(chan types.EntityRow)
 	go func() {
-		defer close(entityRows)
-		defer input.Close()
+		defer func() {
+			_ = input.Close()
+			close(entityRows)
+		}()
 
 		for i := 1; ; i++ {
 			line, err := reader.Read()
@@ -208,11 +211,14 @@ func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-ch
 }
 
 func writeJoinResultToFile(outputFilePath string, joinResult *types.JoinResult) error {
-	file, err := os.Create(outputFilePath)
+	file, err := os.Create(filepath.Clean(outputFilePath))
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
+
 	w := csv.NewWriter(file)
 	defer w.Flush()
 

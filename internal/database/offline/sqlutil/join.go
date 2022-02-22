@@ -316,7 +316,7 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 				}
 			}
 
-			rows.Close()
+			_ = rows.Close()
 			close(data)
 		}()
 
