@@ -71,7 +71,6 @@ func Import() {
 		if err = file.Close(); err != nil {
 			log.Fatal(err)
 		}
-
 	}()
 	fileScanner := bufio.NewScanner(file)
 

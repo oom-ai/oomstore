@@ -70,7 +70,6 @@ func (tx *Tx) ListFeature(ctx context.Context, opt metadata.ListFeatureOpt) (typ
 
 func (tx *Tx) GetFeatureByName(ctx context.Context, groupName string, featureName string) (*types.Feature, error) {
 	return sqlutil.GetFeatureByName(ctx, tx, groupName, featureName)
-
 }
 
 func (tx *Tx) CreateRevision(ctx context.Context, opt metadata.CreateRevisionOpt) (int, error) {

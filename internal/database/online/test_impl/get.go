@@ -62,9 +62,7 @@ func TestGetNoRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore D
 			require.EqualError(t, err, "invalid MultiGetOpt: the revisionID of get batch feature cannot be null")
 			require.Nil(t, rs)
 		}
-
 	})
-
 }
 
 func TestGetNotExistedEntityKey(t *testing.T, prepareStore PrepareStoreFn, destroystore DestroyStoreFn) {

@@ -33,7 +33,6 @@ func destroyStore() {
 	if err := os.RemoveAll(DATABASE); err != nil {
 		panic(err)
 	}
-
 }
 
 func TestPing(t *testing.T) {

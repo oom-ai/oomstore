@@ -64,7 +64,6 @@ func destroyStore(datasetID string) func() {
 		if err := db.Dataset(DATASET_ID).DeleteWithContents(context.Background()); err != nil {
 			panic(err)
 		}
-
 	}
 }
 

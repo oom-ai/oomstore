@@ -97,7 +97,6 @@ func prepareJoinedTable(
 			return "", err2
 		}
 		columnDefs = append(columnDefs, fmt.Sprintf(columnFormat, f.Name, dbValueType))
-
 	}
 	schema := `
 		CREATE TABLE %s (
