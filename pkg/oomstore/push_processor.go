@@ -149,6 +149,6 @@ func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID 
 }
 
 // lastRevisionForStream returns the latest revision before unixMill.
-func lastRevisionForStream(snapshotInterval int64, unixMill int64) int64 {
+func lastRevisionForStream(snapshotInterval, unixMill int64) int64 {
 	return (unixMill / snapshotInterval) * snapshotInterval
 }

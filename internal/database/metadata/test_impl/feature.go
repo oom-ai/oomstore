@@ -12,7 +12,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Store) (entityID int, groupID int) {
+func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Store) (entityID, groupID int) {
 	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "device",

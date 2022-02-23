@@ -102,7 +102,7 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 	}
 }
 
-func prepareFeaturesForExport() (batchFeatures types.FeatureList, streamFeatures types.FeatureList) {
+func prepareFeaturesForExport() (batchFeatures, streamFeatures types.FeatureList) {
 	batchGroup := &types.Group{
 		ID:       1,
 		Name:     "device",

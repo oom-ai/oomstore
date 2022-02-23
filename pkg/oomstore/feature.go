@@ -27,7 +27,7 @@ func (s *OomStore) GetFeatureByFullName(ctx context.Context, fullName string) (*
 }
 
 // GetFeatureByName gets metadata of a feature by group name and feature name.
-func (s *OomStore) GetFeatureByName(ctx context.Context, groupName string, featureName string) (*types.Feature, error) {
+func (s *OomStore) GetFeatureByName(ctx context.Context, groupName, featureName string) (*types.Feature, error) {
 	return s.metadata.GetFeatureByName(ctx, groupName, featureName)
 }
 

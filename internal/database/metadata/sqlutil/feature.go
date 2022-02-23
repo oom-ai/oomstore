@@ -55,7 +55,7 @@ func GetFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*typ
 	return &feature, nil
 }
 
-func GetFeatureByName(ctx context.Context, sqlxCtx metadata.SqlxContext, groupName string, featureName string) (*types.Feature, error) {
+func GetFeatureByName(ctx context.Context, sqlxCtx metadata.SqlxContext, groupName, featureName string) (*types.Feature, error) {
 	var (
 		feature types.Feature
 		group   *types.Group

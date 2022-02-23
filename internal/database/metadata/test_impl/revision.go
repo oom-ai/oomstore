@@ -374,7 +374,7 @@ func ignoreCreateAndModifyTime(revision *types.Revision) {
 	revision.ModifyTime = time.Time{}
 }
 
-func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (entityID int, groupID int, revisionIDs []int, revisions types.RevisionList) {
+func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (entityID, groupID int, revisionIDs []int, revisions types.RevisionList) {
 	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "device",
