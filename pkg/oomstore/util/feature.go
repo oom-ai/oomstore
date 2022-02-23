@@ -12,7 +12,7 @@ func ComposeFullFeatureName(groupName string, featureName string) string {
 	return groupName + SepFullFeatureName + featureName
 }
 
-func SplitFullFeatureName(fullName string) (string, string, error) {
+func SplitFullFeatureName(fullName string) (groupName string, featureName string, err error) {
 	parts := strings.SplitN(fullName, SepFullFeatureName, 2)
 	if len(parts) != 2 {
 		return "", "", errdefs.Errorf("invalid full feature name: '%s'", fullName)

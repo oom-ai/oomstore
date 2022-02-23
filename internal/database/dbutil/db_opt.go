@@ -44,7 +44,7 @@ func (d *DBOpt) ExecContext(ctx context.Context, query string, args ...interface
 	}
 }
 
-func (d *DBOpt) BuildInsertQuery(tableName string, records []interface{}, columns []string) (string, []interface{}, error) {
+func (d *DBOpt) BuildInsertQuery(tableName string, records []interface{}, columns []string) (query string, args []interface{}, err error) {
 	if len(records) == 0 {
 		return "", nil, nil
 	}
@@ -60,7 +60,7 @@ func (d *DBOpt) BuildInsertQuery(tableName string, records []interface{}, column
 	if d.Backend == types.BackendBigQuery {
 		tableName = fmt.Sprintf("%s.%s", *d.DatasetID, tableName)
 	}
-	query, args, err := sqlx.In(
+	query, args, err = sqlx.In(
 		fmt.Sprintf(`INSERT INTO %s (%s) VALUES %s`, tableName, columnStr, strings.Join(valueFlags, ",")),
 		records...)
 	return query, args, errdefs.WithStack(err)

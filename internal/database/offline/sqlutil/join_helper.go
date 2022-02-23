@@ -180,7 +180,7 @@ func buildTableName(dbOpt dbutil.DBOpt, tableName string) string {
 	}
 }
 
-func prepareTableSchema(dbOpt dbutil.DBOpt, params prepareTableSchemaParams) (string, []string, error) {
+func prepareTableSchema(dbOpt dbutil.DBOpt, params prepareTableSchemaParams) (tableName string, columnDefs []string, err error) {
 	columnFormat, err := dbutil.GetColumnFormat(dbOpt.Backend)
 	if err != nil {
 		return "", nil, err
@@ -199,7 +199,7 @@ func prepareTableSchema(dbOpt dbutil.DBOpt, params prepareTableSchemaParams) (st
 		entityType = "VARCHAR(255)"
 	}
 
-	columnDefs := []string{
+	columnDefs = []string{
 		fmt.Sprintf(`%s %s NOT NULL`, qt(params.entityName), entityType),
 	}
 	if params.hasUnixMilli {

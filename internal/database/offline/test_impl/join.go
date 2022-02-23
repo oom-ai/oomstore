@@ -148,7 +148,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 	}
 }
 
-func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.FeatureList, []string) {
+func prepareFeatures(oneGroup bool) (features types.FeatureList, featureMap map[string]types.FeatureList, groupNames []string) {
 	groupBasic := &types.Group{
 		ID:       1,
 		Name:     "device_basic",

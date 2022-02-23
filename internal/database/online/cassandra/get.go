@@ -90,15 +90,13 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 	return rs, nil
 }
 
-func deserializeIntoRowMap(values map[string]interface{}, entityName string, features types.FeatureList) (string, dbutil.RowMap) {
-	entityKey := values[entityName].(string)
-
-	rs := make(dbutil.RowMap)
+func deserializeIntoRowMap(values map[string]interface{}, entityName string, features types.FeatureList) (entityKey string, rs dbutil.RowMap) {
+	rs = make(dbutil.RowMap)
 	for _, feature := range features {
 		deserializedValue, _ := dbutil.DeserializeByValueType(values[feature.Name], feature.ValueType, types.BackendCassandra)
 		rs[feature.FullName()] = deserializedValue
 	}
-	return entityKey, rs
+	return values[entityName].(string), rs
 }
 
 func isTableNotFoundError(err error, tableName string) bool {

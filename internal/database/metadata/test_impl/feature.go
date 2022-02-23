@@ -12,7 +12,7 @@ import (
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
-func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Store) (int, int) {
+func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Store) (entityID int, groupID int) {
 	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "device",
@@ -21,7 +21,7 @@ func prepareEntityAndGroup(t *testing.T, ctx context.Context, store metadata.Sto
 	})
 	require.NoError(t, err)
 
-	groupID, err := store.CreateGroup(ctx, metadata.CreateGroupOpt{
+	groupID, err = store.CreateGroup(ctx, metadata.CreateGroupOpt{
 		GroupName:   "device_info",
 		EntityID:    entityID,
 		Description: "description",

@@ -127,7 +127,7 @@ func ListFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 	return features, nil
 }
 
-func buildListFeatureCond(opt metadata.ListFeatureOpt) ([]string, []interface{}, error) {
+func buildListFeatureCond(opt metadata.ListFeatureOpt) (cond []string, args []interface{}, err error) {
 	in := make(map[string]interface{})
 	and := make(map[string]interface{})
 

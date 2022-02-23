@@ -142,13 +142,13 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) 
 	return ranges, nil
 }
 
-func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-chan types.EntityRow, []string, error) {
+func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (readOnleEntityRows <-chan types.EntityRow, header []string, err error) {
 	input, err := os.Open(filepath.Clean(inputFilePath))
 	if err != nil {
 		return nil, nil, errdefs.WithStack(err)
 	}
 	reader := csv.NewReader(input)
-	header, err := reader.Read()
+	header, err = reader.Read()
 	if err != nil {
 		return nil, nil, errdefs.WithStack(err)
 	}
