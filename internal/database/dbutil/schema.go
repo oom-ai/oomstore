@@ -114,5 +114,5 @@ func parseColumns(entityName string, hasUnixMilli bool, features types.FeatureLi
 			rs = append(rs, Column{Name: f.Name, DbType: dbType, ValueType: f.ValueType})
 		}
 	}
-	return
+	return rs
 }
