@@ -62,7 +62,7 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 			return nil, errdefs.Errorf("group %s no feature values up to %d, use a later timestamp", group.Name, opt.UnixMilli)
 		} else {
 			if revision.SnapshotTable == "" {
-				if err = s.Snapshot(ctx, group.Name); err != nil {
+				if err := s.Snapshot(ctx, group.Name); err != nil {
 					return nil, err
 				}
 			}

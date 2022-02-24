@@ -41,7 +41,7 @@ func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 			continue
 		}
 		tableName := dbutil.OfflineStreamSnapshotTableName(group.ID, revision.Revision)
-		if err = s.offline.Snapshot(ctx, offline.SnapshotOpt{
+		if err := s.offline.Snapshot(ctx, offline.SnapshotOpt{
 			Group:        *group,
 			Features:     features,
 			Revision:     revisions[i].Revision,
@@ -49,7 +49,7 @@ func (s *OomStore) Snapshot(ctx context.Context, groupName string) error {
 		}); err != nil {
 			return err
 		}
-		if err = s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
+		if err := s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
 			RevisionID:       revision.ID,
 			NewSnapshotTable: &tableName,
 		}); err != nil {

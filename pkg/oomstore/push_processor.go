@@ -138,7 +138,7 @@ func (p *PushProcessor) pushToOffline(ctx context.Context, s *OomStore, groupID 
 	if err != nil {
 		return err
 	}
-	if err = s.pushStreamingRecords(ctx, b.records, entity.Name, group, features); err != nil {
+	if err := s.pushStreamingRecords(ctx, b.records, entity.Name, group, features); err != nil {
 		return err
 	}
 

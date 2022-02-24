@@ -60,7 +60,7 @@ func (db *DB) Import(ctx context.Context, opt online.ImportOpt) error {
 			},
 		})
 		if len(items) == BatchWriteItemCapacity {
-			if err = batchWrite(ctx, db, tableName, items); err != nil {
+			if err := batchWrite(ctx, db, tableName, items); err != nil {
 				return err
 			}
 			items = make([]types.WriteRequest, 0, BatchWriteItemCapacity)

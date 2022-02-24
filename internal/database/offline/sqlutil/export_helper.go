@@ -156,7 +156,7 @@ func prepareEntityTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.Exp
 			%s
 		);
 	`, qtTableName, strings.Join(columnDefs, ",\n"))
-	if err = dbOpt.ExecContext(ctx, schema); err != nil {
+	if err := dbOpt.ExecContext(ctx, schema); err != nil {
 		return "", err
 	}
 
@@ -173,7 +173,7 @@ func prepareEntityTable(ctx context.Context, dbOpt dbutil.DBOpt, opt offline.Exp
 	if err != nil {
 		return "", err
 	}
-	if err = dbOpt.ExecContext(ctx, query, args...); err != nil {
+	if err := dbOpt.ExecContext(ctx, query, args...); err != nil {
 		return "", err
 	}
 

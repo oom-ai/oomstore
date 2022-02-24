@@ -75,7 +75,7 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 			entityName: entityKeyValue,
 		})
 		if len(keys) == BatchGetItemCapacity {
-			if err = batchGetItem(ctx, db, keys, tableName, entityName, opt.Features, res); err != nil {
+			if err := batchGetItem(ctx, db, keys, tableName, entityName, opt.Features, res); err != nil {
 				return nil, err
 			}
 			keys = make([]map[string]types.AttributeValue, 0, BatchGetItemCapacity)

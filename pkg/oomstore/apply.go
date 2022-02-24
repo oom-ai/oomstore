@@ -24,7 +24,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 	}
 
 	onlineJobs := make([]func() error, 0)
-	if err = s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
+	if err := s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
 		// apply entity
 		for _, entity := range stage.NewEntities {
 			if err2 := s.applyEntity(c, tx, entity); err2 != nil {
@@ -59,7 +59,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 	}
 
 	for _, job := range onlineJobs {
-		if err = job(); err != nil {
+		if err := job(); err != nil {
 			return err
 		}
 	}

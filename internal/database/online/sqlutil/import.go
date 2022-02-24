@@ -52,19 +52,19 @@ func Import(ctx context.Context, db *sqlx.DB, opt online.ImportOpt, backend type
 			records = append(records, record.Record)
 
 			if len(records) == importBatchSize {
-				if err = dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, backend); err != nil {
+				if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, backend); err != nil {
 					return err
 				}
 				records = make([]interface{}, 0, importBatchSize)
 			}
 		}
-		if err = dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, backend); err != nil {
+		if err := dbutil.InsertRecordsToTableTx(tx, ctx, tableName, records, columns, backend); err != nil {
 			return err
 		}
 
 		if opt.Group.Category == types.CategoryStream {
 			streamTableName := dbutil.OnlineStreamTableName(opt.Group.ID)
-			if err = PurgeTx(ctx, tx, streamTableName, backend); err != nil {
+			if err := PurgeTx(ctx, tx, streamTableName, backend); err != nil {
 				return err
 			}
 			query := fmt.Sprintf(`ALTER TABLE %s RENAME TO %s;`, tableName, streamTableName)

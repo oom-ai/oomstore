@@ -114,7 +114,7 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) 
 	})
 	for _, revision := range revisions {
 		if revision.SnapshotTable == "" {
-			if err = s.Snapshot(ctx, group.Name); err != nil {
+			if err := s.Snapshot(ctx, group.Name); err != nil {
 				return nil, err
 			}
 		}

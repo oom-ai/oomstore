@@ -105,7 +105,7 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revisionID int
 		return err
 	}
 
-	if err = s.offline.CreateTable(ctx, offline.CreateTableOpt{
+	if err := s.offline.CreateTable(ctx, offline.CreateTableOpt{
 		TableName:  snapshotTableName,
 		EntityName: revision.Group.Entity.Name,
 		Features:   features,
@@ -117,7 +117,7 @@ func (s *OomStore) createSnapshotAndCdcTable(ctx context.Context, revisionID int
 	var cdcTable *string
 	if revision.Group.Category == types.CategoryStream {
 		tableName := dbutil.OfflineStreamCdcTableName(revision.GroupID, revision.Revision)
-		if err = s.offline.CreateTable(ctx, offline.CreateTableOpt{
+		if err := s.offline.CreateTable(ctx, offline.CreateTableOpt{
 			TableName:  tableName,
 			EntityName: revision.Group.Entity.Name,
 			Features:   features,

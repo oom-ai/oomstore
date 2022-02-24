@@ -71,7 +71,7 @@ func writeFeaturesToTempFile(features types.FeatureList) (string, error) {
 		_ = tempFile.Close()
 	}()
 
-	if err = outputFeature(features, outputParams{
+	if err := outputFeature(features, outputParams{
 		writer:    tempFile,
 		outputOpt: YAML,
 	}); err != nil {

@@ -163,7 +163,7 @@ func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt joinOneGroupOpt) 
 		if err != nil {
 			return nil, err
 		}
-		if err = dbOpt.ExecContext(ctx, query, r.MinRevision, r.MaxRevision); err != nil {
+		if err := dbOpt.ExecContext(ctx, query, r.MinRevision, r.MaxRevision); err != nil {
 			return nil, err
 		}
 	}
@@ -192,7 +192,7 @@ func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt joinOneGroupOpt) 
 		if err != nil {
 			return nil, err
 		}
-		if err = dbOpt.ExecContext(ctx, query, r.MinRevision, r.MaxRevision); err != nil {
+		if err := dbOpt.ExecContext(ctx, query, r.MinRevision, r.MaxRevision); err != nil {
 			return nil, err
 		}
 	}

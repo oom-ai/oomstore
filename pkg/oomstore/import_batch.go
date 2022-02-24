@@ -55,7 +55,7 @@ func (s *OomStore) csvReaderImportBatch(ctx context.Context, opt *importOpt, dat
 	if opt.Revision != nil {
 		revision = *opt.Revision
 	}
-	if err = s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
+	if err := s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
 		RevisionID:       newRevisionID,
 		NewRevision:      &revision,
 		NewSnapshotTable: &snapshotTableName,
@@ -77,7 +77,7 @@ func (s *OomStore) tableLinkImportBatch(ctx context.Context, opt *importOpt, dat
 	if err != nil {
 		return 0, err
 	}
-	if err = validateTableSchema(tableSchema, opt.features); err != nil {
+	if err := validateTableSchema(tableSchema, opt.features); err != nil {
 		return 0, err
 	}
 	var revision int64

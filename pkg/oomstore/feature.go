@@ -111,7 +111,7 @@ func (s *OomStore) CreateFeature(ctx context.Context, opt types.CreateFeatureOpt
 		if err != nil {
 			return 0, err
 		}
-		if err = s.online.CreateTable(ctx, online.CreateTableOpt{
+		if err := s.online.CreateTable(ctx, online.CreateTableOpt{
 			EntityName: group.Entity.Name,
 			TableName:  dbutil.OnlineStreamTableName(group.ID),
 			Features:   features,
