@@ -37,7 +37,7 @@ func Open(ctx context.Context, opt *types.SQLiteOpt) (*DB, error) {
 		return sqlutil.ListMetadata(ctx, db)
 	})
 	if err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, err
 	}
 	return &DB{

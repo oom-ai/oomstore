@@ -148,7 +148,7 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 	}
 }
 
-func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.FeatureList, []string) {
+func prepareFeatures(oneGroup bool) (features types.FeatureList, featureMap map[string]types.FeatureList, groupNames []string) {
 	groupBasic := &types.Group{
 		ID:       1,
 		Name:     "device_basic",
@@ -196,7 +196,7 @@ func prepareFeatures(oneGroup bool) (types.FeatureList, map[string]types.Feature
 	}
 }
 
-func prepareRevisionRanges(oneGroup bool, stream bool) map[string][]*offline.RevisionRange {
+func prepareRevisionRanges(oneGroup, stream bool) map[string][]*offline.RevisionRange {
 	basic := []*offline.RevisionRange{
 		{
 			MinRevision:   5,
@@ -232,7 +232,7 @@ func prepareRevisionRanges(oneGroup bool, stream bool) map[string][]*offline.Rev
 	}
 }
 
-func prepareEntityRows(isEmpty bool, withValue bool) <-chan types.EntityRow {
+func prepareEntityRows(isEmpty, withValue bool) <-chan types.EntityRow {
 	entityRows := make(chan types.EntityRow)
 	rows := []types.EntityRow{
 		{
@@ -276,7 +276,7 @@ func prepareEntityRows(isEmpty bool, withValue bool) <-chan types.EntityRow {
 	return entityRows
 }
 
-func prepareResult(oneGroup bool, withValue bool, values []map[string]interface{}) *types.JoinResult {
+func prepareResult(oneGroup, withValue bool, values []map[string]interface{}) *types.JoinResult {
 	header := []string{"entity_key", "unix_milli", "device_basic.model", "device_basic.price", "device_advanced.is_active"}
 	if withValue {
 		header = []string{"entity_key", "unix_milli", "value_1", "value_2", "device_basic.model", "device_basic.price", "device_advanced.is_active"}

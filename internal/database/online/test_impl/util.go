@@ -2,7 +2,8 @@ package test_impl
 
 import (
 	"context"
-	"math/rand"
+	"crypto/rand"
+	"math/big"
 	"testing"
 	"time"
 
@@ -31,7 +32,6 @@ var SampleMedium Sample
 var SampleStream Sample
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
 	entity := types.Entity{ID: 1, Name: "user"}
 	group1 := types.Group{ID: 1, Category: types.CategoryBatch, Entity: &entity}
 	group2 := types.Group{ID: 2, Category: types.CategoryBatch, Entity: &entity}
@@ -97,7 +97,11 @@ func init() {
 
 	var data []types.ExportRecord
 	for i := 0; i < 100; i++ {
-		record := []interface{}{dbutil.RandString(10), rand.Float64()}
+		n, err := rand.Int(rand.Reader, big.NewInt(1000))
+		if err != nil {
+			panic(err)
+		}
+		record := []interface{}{dbutil.RandString(10), float64(n.Int64())}
 		data = append(data, types.ExportRecord{Record: record, Error: nil})
 	}
 	SampleMedium = Sample{

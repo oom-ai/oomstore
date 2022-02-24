@@ -75,10 +75,10 @@ func (s *OomStore) tableLinkImportStream(ctx context.Context, opt *importOpt, da
 		return err
 	}
 	// validation
-	if err = validateTableSchema(tableSchema, opt.features); err != nil {
+	if err := validateTableSchema(tableSchema, opt.features); err != nil {
 		return err
 	}
-	if err = s.validateRevisions(ctx, opt.group.ID, tableSchema); err != nil {
+	if err := s.validateRevisions(ctx, opt.group.ID, tableSchema); err != nil {
 		return err
 	}
 
@@ -119,11 +119,11 @@ func (s *OomStore) pushStreamingRecords(ctx context.Context, records []types.Str
 				return err
 			}
 
-			if err = s.createRevisionAndCdcTable(ctx, group.ID, revision); err != nil {
+			if err := s.createRevisionAndCdcTable(ctx, group.ID, revision); err != nil {
 				return err
 			}
 			// push data to new offline stream cdc table
-			if err = s.offline.Push(ctx, pushOpt); err != nil {
+			if err := s.offline.Push(ctx, pushOpt); err != nil {
 				return err
 			}
 		}

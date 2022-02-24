@@ -28,7 +28,9 @@ var applyCmd = &cobra.Command{
 		if err != nil {
 			exit(err)
 		}
-		defer file.Close()
+		defer func() {
+			_ = file.Close()
+		}()
 
 		if err := oomStore.Apply(ctx, apply.ApplyOpt{R: file}); err != nil {
 			exitf("apply failed: %+v", err)

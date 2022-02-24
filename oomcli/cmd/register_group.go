@@ -59,5 +59,4 @@ func init() {
 	flags.StringVarP(&registerGroupOpt.snapshotInterval, "snapshot_interval", "s", "24h", "stream group snapshot interval")
 
 	flags.StringVarP(&registerGroupOpt.Description, "description", "d", "", "group description")
-
 }

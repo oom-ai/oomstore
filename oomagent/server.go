@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"time"
+	"unicode/utf8"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -110,20 +111,26 @@ func (s *server) ChannelImport(stream codegen.OomAgent_ChannelImportServer) erro
 			_ = writer.Close()
 		}()
 
-		if _, err := writer.Write(firstReq.Row); err != nil {
+		if _, err2 := writer.Write(firstReq.Row); err2 != nil {
+			if err2 != io.ErrClosedPipe {
+				log.Println(err2)
+			}
 			return
 		}
 
 		for {
-			req, err := stream.Recv()
-			if err == io.EOF {
+			req, err2 := stream.Recv()
+			if err2 != nil {
+				if err2 != io.EOF {
+					log.Println(err2)
+				}
 				break
 			}
-			if err != nil {
-				log.Println(err)
-				break
-			}
-			if _, err := writer.Write(req.Row); err != nil {
+
+			if _, err2 := writer.Write(req.Row); err2 != nil {
+				if err2 != io.ErrClosedPipe {
+					log.Println(err2)
+				}
 				return
 			}
 		}
@@ -173,7 +180,7 @@ func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codeg
 		description = *req.Description
 	}
 	if req.Delimiter != nil {
-		delimiter = []rune(*req.Delimiter)[0]
+		delimiter, _ = utf8.DecodeRuneInString(*req.Delimiter)
 	} else {
 		delimiter = ','
 	}
@@ -224,13 +231,13 @@ func (s *server) ChannelJoin(stream codegen.OomAgent_ChannelJoinServer) error {
 			Values:    firstReq.EntityRow.Values,
 		}
 		for {
-			req, err := stream.Recv()
-			if err == io.EOF {
+			req, err2 := stream.Recv()
+			if err2 == io.EOF {
 				return
 			}
-			if err != nil {
+			if err2 != nil {
 				select {
-				case entityRows <- types.EntityRow{Error: err}:
+				case entityRows <- types.EntityRow{Error: err2}:
 					return
 				case <-ctx.Done():
 					return

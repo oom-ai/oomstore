@@ -148,7 +148,8 @@ func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt joinOneGroupOpt) 
 		if *opt.TimeRange.MaxUnixMilli < r.MinRevision || *opt.TimeRange.MinUnixMilli > r.MaxRevision {
 			continue
 		}
-		query, err := buildJoinQuery(joinQueryParams{
+		var query string
+		query, err = buildJoinQuery(joinQueryParams{
 			TableName:           snapshotJoinedTableName,
 			EntityName:          opt.EntityName,
 			EntityKey:           "entity_key",
@@ -162,7 +163,7 @@ func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt joinOneGroupOpt) 
 		if err != nil {
 			return nil, err
 		}
-		if err = dbOpt.ExecContext(ctx, query, r.MinRevision, r.MaxRevision); err != nil {
+		if err := dbOpt.ExecContext(ctx, query, r.MinRevision, r.MaxRevision); err != nil {
 			return nil, err
 		}
 	}
@@ -191,7 +192,7 @@ func joinOneGroup(ctx context.Context, dbOpt dbutil.DBOpt, opt joinOneGroupOpt) 
 		if err != nil {
 			return nil, err
 		}
-		if err = dbOpt.ExecContext(ctx, query, r.MinRevision, r.MaxRevision); err != nil {
+		if err := dbOpt.ExecContext(ctx, query, r.MinRevision, r.MaxRevision); err != nil {
 			return nil, err
 		}
 	}
@@ -316,7 +317,7 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 				}
 			}
 
-			rows.Close()
+			_ = rows.Close()
 			close(data)
 		}()
 

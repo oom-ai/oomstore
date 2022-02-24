@@ -76,7 +76,7 @@ func (db *DB) GetFeature(ctx context.Context, id int) (*types.Feature, error) {
 	return sqlutil.GetFeature(ctx, db, id)
 }
 
-func (db *DB) GetFeatureByName(ctx context.Context, groupName string, featureName string) (*types.Feature, error) {
+func (db *DB) GetFeatureByName(ctx context.Context, groupName, featureName string) (*types.Feature, error) {
 	return sqlutil.GetFeatureByName(ctx, db, groupName, featureName)
 }
 

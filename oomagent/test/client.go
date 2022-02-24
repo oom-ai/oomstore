@@ -8,8 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/oom-ai/oomstore/oomagent/codegen"
 	"google.golang.org/grpc"
+
+	"github.com/oom-ai/oomstore/oomagent/codegen"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
@@ -66,22 +67,26 @@ func Import() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+	defer func() {
+		if err = file.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
 	fileScanner := bufio.NewScanner(file)
 
 	groupName := "please input your group name"
 	description := "please input you description"
 	for fileScanner.Scan() {
-		if err := importClient.Send(&codegen.ChannelImportRequest{
+		if err2 := importClient.Send(&codegen.ChannelImportRequest{
 			Group:       &groupName,
 			Description: &description,
 			Row:         fileScanner.Bytes(),
-		}); err != nil {
-			log.Fatal(err)
+		}); err2 != nil {
+			log.Fatal(err2)
 		}
 	}
 
-	if err := fileScanner.Err(); err != nil {
+	if err = fileScanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -97,5 +102,9 @@ func prepareOomAgentClient(addr string) (c codegen.OomAgentClient, cancel func()
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	return codegen.NewOomAgentClient(conn), func() { conn.Close() }
+	return codegen.NewOomAgentClient(conn), func() {
+		if err := conn.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}
 }

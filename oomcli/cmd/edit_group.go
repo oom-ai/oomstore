@@ -71,9 +71,11 @@ func writeGroupsToTempFile(ctx context.Context, oomStore *oomstore.OomStore, gro
 	if err != nil {
 		return "", err
 	}
-	defer tempFile.Close()
+	defer func() {
+		_ = tempFile.Close()
+	}()
 
-	if err = outputGroup(ctx, groups, outputParams{
+	if err := outputGroup(ctx, groups, outputParams{
 		writer:    tempFile,
 		oomStore:  oomStore,
 		outputOpt: YAML,

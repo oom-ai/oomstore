@@ -36,7 +36,6 @@ func (db *DB) Import(ctx context.Context, opt offline.ImportOpt) (int64, error) 
 
 func (db *DB) Export(ctx context.Context, opt offline.ExportOpt) (*types.ExportResult, error) {
 	return sqlutil.Export(ctx, db.DB, opt, Backend)
-
 }
 
 func (db *DB) Join(ctx context.Context, opt offline.JoinOpt) (*types.JoinResult, error) {

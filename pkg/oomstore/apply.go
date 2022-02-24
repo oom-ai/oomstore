@@ -4,12 +4,11 @@ import (
 	"context"
 	"io"
 
-	"github.com/oom-ai/oomstore/internal/database/dbutil"
-
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cast"
 	"gopkg.in/yaml.v3"
 
+	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/online"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
@@ -28,16 +27,16 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 	if err := s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
 		// apply entity
 		for _, entity := range stage.NewEntities {
-			if err := s.applyEntity(c, tx, entity); err != nil {
-				return err
+			if err2 := s.applyEntity(c, tx, entity); err2 != nil {
+				return err2
 			}
 		}
 
 		// apply group
 		for _, group := range stage.NewGroups {
-			onlineJob, err := s.applyGroup(c, tx, group)
-			if err != nil {
-				return err
+			onlineJob, err2 := s.applyGroup(c, tx, group)
+			if err2 != nil {
+				return err2
 			}
 			if onlineJob != nil {
 				onlineJobs = append(onlineJobs, onlineJob)
@@ -46,9 +45,9 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 
 		// apply feature
 		for _, feature := range stage.NewFeatures {
-			onlineJob, err := s.applyFeature(c, tx, feature)
-			if err != nil {
-				return err
+			onlineJob, err2 := s.applyFeature(c, tx, feature)
+			if err2 != nil {
+				return err2
 			}
 			if onlineJob != nil {
 				onlineJobs = append(onlineJobs, onlineJob)
@@ -60,7 +59,7 @@ func (s *OomStore) Apply(ctx context.Context, opt apply.ApplyOpt) error {
 	}
 
 	for _, job := range onlineJobs {
-		if err = job(); err != nil {
+		if err := job(); err != nil {
 			return err
 		}
 	}
@@ -146,7 +145,6 @@ func (s *OomStore) applyGroup(ctx context.Context, tx metadata.DBStore, newGroup
 			NewSnapshotInterval: opt.NewSnapshotInterval,
 			NewDescription:      &newGroup.Description,
 		})
-
 	}
 
 	return nil, nil

@@ -66,7 +66,7 @@ func createTableDDL(tableName string, columns ColumnList, pkFields []string, bac
 	return fmt.Sprintf("CREATE TABLE %s (\n%s\n)", tableName, tableDef)
 }
 
-func BuildIndexDDL(tableName string, indexName string, fields []string, backend types.BackendType) string {
+func BuildIndexDDL(tableName, indexName string, fields []string, backend types.BackendType) string {
 	qt := QuoteFn(backend)
 
 	// Some db like postgres, sqlite index must be database unique,
@@ -114,5 +114,5 @@ func parseColumns(entityName string, hasUnixMilli bool, features types.FeatureLi
 			rs = append(rs, Column{Name: f.Name, DbType: dbType, ValueType: f.ValueType})
 		}
 	}
-	return
+	return rs
 }

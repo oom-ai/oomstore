@@ -107,9 +107,8 @@ func ListGroup(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata.L
 	return groups, nil
 }
 
-func buildListGroupCond(opt metadata.ListGroupOpt) (string, []interface{}, error) {
-	args := make([]interface{}, 0)
-	cond := make([]string, 0)
+func buildListGroupCond(opt metadata.ListGroupOpt) (cond string, args []interface{}, err error) {
+	conds := make([]string, 0)
 
 	if opt.EntityIDs != nil {
 		if len(*opt.EntityIDs) == 0 {
@@ -119,7 +118,7 @@ func buildListGroupCond(opt metadata.ListGroupOpt) (string, []interface{}, error
 		if err != nil {
 			return "", nil, errdefs.WithStack(err)
 		}
-		cond = append(cond, s)
+		conds = append(conds, s)
 		args = append(args, inArgs...)
 	}
 	if opt.GroupIDs != nil {
@@ -130,10 +129,10 @@ func buildListGroupCond(opt metadata.ListGroupOpt) (string, []interface{}, error
 		if err != nil {
 			return "", nil, errdefs.WithStack(err)
 		}
-		cond = append(cond, s)
+		conds = append(conds, s)
 		args = append(args, inArgs...)
 	}
-	return strings.Join(cond, " AND "), args, nil
+	return strings.Join(conds, " AND "), args, nil
 }
 
 func enrichGroups(ctx context.Context, sqlxCtx metadata.SqlxContext, groups types.GroupList) error {

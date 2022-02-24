@@ -3,12 +3,10 @@ package oomstore
 import (
 	"context"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-
-	"github.com/oom-ai/oomstore/pkg/errdefs"
-
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
+	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/online"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/oom-ai/oomstore/pkg/oomstore/util"
 )
@@ -87,7 +85,7 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 	featureMap := features.GroupByGroupID()
 
 	// entity_key -> feature_name -> feature_value
-	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, featureMap, entity)
+	featureValueMap, err := s.getFeatureValueMap(ctx, opt.EntityKeys, featureMap)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +104,7 @@ func (s *OomStore) OnlineMultiGet(ctx context.Context, opt types.OnlineMultiGetO
 	return result, nil
 }
 
-func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int]types.FeatureList, entity *types.Entity) (map[string]dbutil.RowMap, error) {
+func (s *OomStore) getFeatureValueMap(ctx context.Context, entityKeys []string, featureMap map[int]types.FeatureList) (map[string]dbutil.RowMap, error) {
 	// entity_key -> types.RecordMap
 	featureValueMap := make(map[string]dbutil.RowMap)
 

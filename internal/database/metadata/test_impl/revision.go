@@ -6,10 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/oom-ai/oomstore/internal/database/metadata"
-	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
 func TestCreateRevision(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
@@ -373,7 +374,7 @@ func ignoreCreateAndModifyTime(revision *types.Revision) {
 	revision.ModifyTime = time.Time{}
 }
 
-func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (int, int, []int, types.RevisionList) {
+func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (entityID, groupID int, revisionIDs []int, revisions types.RevisionList) {
 	entityID, err := store.CreateEntity(ctx, metadata.CreateEntityOpt{
 		CreateEntityOpt: types.CreateEntityOpt{
 			EntityName:  "device",
@@ -382,7 +383,7 @@ func prepareRevisions(t *testing.T, ctx context.Context, store metadata.Store) (
 	})
 	require.NoError(t, err)
 
-	groupID, err := store.CreateGroup(ctx, metadata.CreateGroupOpt{
+	groupID, err = store.CreateGroup(ctx, metadata.CreateGroupOpt{
 		GroupName:   "device_info",
 		EntityID:    entityID,
 		Description: "description",

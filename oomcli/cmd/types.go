@@ -71,7 +71,7 @@ func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenL
 				ModifyTime:  e.ModifyTime,
 			})
 			if err != nil {
-				return
+				return nil, nil, err
 			}
 			dataTokens = append(dataTokens, tokens)
 		}
@@ -91,7 +91,7 @@ func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenL
 				ModifyTime:       e.ModifyTime,
 			})
 			if err != nil {
-				return
+				return nil, nil, err
 			}
 			dataTokens = append(dataTokens, tokens)
 		}
@@ -110,7 +110,7 @@ func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenL
 				ModifyTime:       e.ModifyTime,
 			})
 			if err != nil {
-				return
+				return nil, nil, err
 			}
 			dataTokens = append(dataTokens, tokens)
 		}
@@ -138,7 +138,7 @@ func parseTokenLists(i interface{}) (headerTokens TokenList, dataTokens []TokenL
 	}
 	headerTokens, err = parseTokens(element)
 	if err != nil {
-		return
+		return nil, nil, err
 	}
-	return
+	return headerTokens, dataTokens, nil
 }

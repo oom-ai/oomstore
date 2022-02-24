@@ -76,13 +76,13 @@ func genMarkdown(cmd *cobra.Command, w io.Writer) error {
 		buf.WriteString(fmt.Sprintf("```\n%s\n```\n\n", cmd.Example))
 	}
 
-	printOptions(buf, cmd, name)
+	printOptions(buf, cmd)
 
 	_, err := buf.WriteTo(w)
 	return err
 }
 
-func printOptions(buf *bytes.Buffer, cmd *cobra.Command, name string) {
+func printOptions(buf *bytes.Buffer, cmd *cobra.Command) {
 	flags := cmd.NonInheritedFlags()
 	flags.SetOutput(buf)
 	if flags.HasAvailableFlags() {

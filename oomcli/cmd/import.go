@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"unicode/utf8"
+
+	"github.com/spf13/cobra"
 
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/spf13/cobra"
 )
 
 var importOpt types.ImportOpt
@@ -18,7 +20,7 @@ var importCmd = &cobra.Command{
 	Use:   "import",
 	Short: "Import feature data from a data source",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		importCSVFileDataSource.Delimiter = []rune(delimitre)[0]
+		importCSVFileDataSource.Delimiter, _ = utf8.DecodeRuneInString(delimitre)
 
 		if !cmd.Flags().Changed("revision") {
 			importOpt.Revision = nil

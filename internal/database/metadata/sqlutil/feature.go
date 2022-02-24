@@ -40,7 +40,7 @@ func GetFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*typ
 	)
 
 	query := `SELECT * FROM feature WHERE id = ?`
-	if err := sqlxCtx.GetContext(ctx, &feature, sqlxCtx.Rebind(query), id); err != nil {
+	if err = sqlxCtx.GetContext(ctx, &feature, sqlxCtx.Rebind(query), id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errdefs.NotFound(errdefs.Errorf("feature %d not found", id))
 		}
@@ -55,7 +55,7 @@ func GetFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, id int) (*typ
 	return &feature, nil
 }
 
-func GetFeatureByName(ctx context.Context, sqlxCtx metadata.SqlxContext, groupName string, featureName string) (*types.Feature, error) {
+func GetFeatureByName(ctx context.Context, sqlxCtx metadata.SqlxContext, groupName, featureName string) (*types.Feature, error) {
 	var (
 		feature types.Feature
 		group   *types.Group
@@ -93,7 +93,7 @@ func ListFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 		query = fmt.Sprintf("%s WHERE %s", query, strings.Join(cond, " AND "))
 	}
 	query = fmt.Sprintf("%s ORDER BY id ASC", query)
-	if err := sqlxCtx.SelectContext(ctx, &features, sqlxCtx.Rebind(query), args...); err != nil {
+	if err = sqlxCtx.SelectContext(ctx, &features, sqlxCtx.Rebind(query), args...); err != nil {
 		return nil, errdefs.WithStack(err)
 	}
 
@@ -127,7 +127,7 @@ func ListFeature(ctx context.Context, sqlxCtx metadata.SqlxContext, opt metadata
 	return features, nil
 }
 
-func buildListFeatureCond(opt metadata.ListFeatureOpt) ([]string, []interface{}, error) {
+func buildListFeatureCond(opt metadata.ListFeatureOpt) (cond []string, args []interface{}, err error) {
 	in := make(map[string]interface{})
 	and := make(map[string]interface{})
 

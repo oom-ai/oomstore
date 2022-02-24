@@ -6,6 +6,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 
@@ -113,7 +114,7 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) 
 	})
 	for _, revision := range revisions {
 		if revision.SnapshotTable == "" {
-			if err = s.Snapshot(ctx, group.Name); err != nil {
+			if err := s.Snapshot(ctx, group.Name); err != nil {
 				return nil, err
 			}
 		}
@@ -141,21 +142,23 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) 
 	return ranges, nil
 }
 
-func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-chan types.EntityRow, []string, error) {
-	input, err := os.Open(inputFilePath)
+func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (readOnleEntityRows <-chan types.EntityRow, header []string, err error) {
+	input, err := os.Open(filepath.Clean(inputFilePath))
 	if err != nil {
 		return nil, nil, errdefs.WithStack(err)
 	}
 	reader := csv.NewReader(input)
-	header, err := reader.Read()
+	header, err = reader.Read()
 	if err != nil {
 		return nil, nil, errdefs.WithStack(err)
 	}
 
 	entityRows := make(chan types.EntityRow)
 	go func() {
-		defer close(entityRows)
-		defer input.Close()
+		defer func() {
+			_ = input.Close()
+			close(entityRows)
+		}()
 
 		for i := 1; ; i++ {
 			line, err := reader.Read()
@@ -208,11 +211,14 @@ func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-ch
 }
 
 func writeJoinResultToFile(outputFilePath string, joinResult *types.JoinResult) error {
-	file, err := os.Create(outputFilePath)
+	file, err := os.Create(filepath.Clean(outputFilePath))
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
+
 	w := csv.NewWriter(file)
 	defer w.Flush()
 

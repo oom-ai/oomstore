@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/spf13/cobra"
@@ -59,13 +60,13 @@ func edit(ctx context.Context, oomStore *oomstore.OomStore, fileName string) err
 		return err
 	}
 
-	file, err := os.OpenFile(fileName, os.O_RDONLY, 0666)
+	file, err := os.OpenFile(filepath.Clean(fileName), os.O_RDONLY, 0600)
 	if err != nil {
 		return err
 	}
 	defer func() {
-		file.Close()
-		os.Remove(file.Name())
+		_ = file.Close()
+		_ = os.Remove(file.Name())
 	}()
 
 	if err := oomStore.Apply(ctx, apply.ApplyOpt{R: file}); err != nil {

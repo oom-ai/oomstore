@@ -62,7 +62,7 @@ func (s *OomStore) ChannelExport(ctx context.Context, opt types.ChannelExportOpt
 			return nil, errdefs.Errorf("group %s no feature values up to %d, use a later timestamp", group.Name, opt.UnixMilli)
 		} else {
 			if revision.SnapshotTable == "" {
-				if err = s.Snapshot(ctx, group.Name); err != nil {
+				if err := s.Snapshot(ctx, group.Name); err != nil {
 					return nil, err
 				}
 			}
@@ -106,7 +106,9 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 	w := csv.NewWriter(file)
 	defer w.Flush()
 
@@ -118,7 +120,7 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
 			return row.Error
 		}
 
-		if err := w.Write(cast.ToStringSlice([]interface{}(row.Record))); err != nil {
+		if err := w.Write(cast.ToStringSlice(row.Record)); err != nil {
 			return err
 		}
 	}

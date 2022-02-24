@@ -55,7 +55,7 @@ func (s *OomStore) syncBatch(ctx context.Context, opt types.SyncOpt, group *type
 		return err
 	}
 
-	if err = s.online.Import(ctx, online.ImportOpt{
+	if err := s.online.Import(ctx, online.ImportOpt{
 		Group:        *group,
 		Features:     features,
 		ExportStream: exportResult.Data,
@@ -64,7 +64,7 @@ func (s *OomStore) syncBatch(ctx context.Context, opt types.SyncOpt, group *type
 		return err
 	}
 
-	if err = s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
+	if err := s.metadata.WithTransaction(ctx, func(c context.Context, tx metadata.DBStore) error {
 		// Update the online revision id of the feature group upon sync success
 		if err := tx.UpdateGroup(c, metadata.UpdateGroupOpt{
 			GroupID:             group.ID,
@@ -76,7 +76,7 @@ func (s *OomStore) syncBatch(ctx context.Context, opt types.SyncOpt, group *type
 			newRevision := time.Now().UnixMilli()
 			newChored := true
 			// Update revision timestamp using current timestamp
-			if err = tx.UpdateRevision(c, metadata.UpdateRevisionOpt{
+			if err := tx.UpdateRevision(c, metadata.UpdateRevisionOpt{
 				RevisionID:  revision.ID,
 				NewRevision: &newRevision,
 				NewAnchored: &newChored,

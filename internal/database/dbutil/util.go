@@ -1,17 +1,12 @@
 package dbutil
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"strings"
 	"time"
 )
-
-var random *rand.Rand
-
-func init() {
-	random = rand.New(rand.NewSource(time.Now().UnixNano()))
-}
 
 type RowMap = map[string]interface{}
 
@@ -21,15 +16,20 @@ func TempTable(prefix string) string {
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
+func randInt(size int) int {
+	n, _ := rand.Int(rand.Reader, big.NewInt(int64(size)))
+	return int(n.Int64())
+}
+
 func RandString(n int) string {
 	b := make([]rune, n)
 	for i := range b {
-		b[i] = letterRunes[random.Intn(len(letterRunes))]
+		b[i] = letterRunes[randInt(len(letterRunes))]
 	}
 	return string(b)
 }
 
-func Fill(size int, elem string, sep string) string {
+func Fill(size int, elem, sep string) string {
 	r := make([]string, 0, size)
 
 	for i := 0; i < size; i++ {

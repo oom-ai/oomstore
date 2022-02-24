@@ -11,5 +11,5 @@ func TestOpen(t *testing.T, prepareStore PrepareStoreFn, destroystore DestroySto
 
 	_, store := prepareStore(t)
 	assert.NotNil(t, store)
-	store.Close()
+	assert.NoError(t, store.Close())
 }

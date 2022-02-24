@@ -5,16 +5,17 @@ import (
 	"context"
 	"time"
 
+	"github.com/spf13/cast"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/metadata"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/spf13/cast"
 )
 
 // csvReaderImportBatch imports batch feature from external data source to offline store through csv reader.
 func (s *OomStore) csvReaderImportBatch(ctx context.Context, opt *importOpt, dataSource *types.CsvReaderDataSource) (int, error) {
-	//make sure csv data source has all defined columns
+	// make sure csv data source has all defined columns
 	reader := bufio.NewReader(dataSource.Reader)
 	source := &offline.CSVSource{
 		Reader:    reader,
@@ -54,7 +55,7 @@ func (s *OomStore) csvReaderImportBatch(ctx context.Context, opt *importOpt, dat
 	if opt.Revision != nil {
 		revision = *opt.Revision
 	}
-	if err = s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
+	if err := s.metadata.UpdateRevision(ctx, metadata.UpdateRevisionOpt{
 		RevisionID:       newRevisionID,
 		NewRevision:      &revision,
 		NewSnapshotTable: &snapshotTableName,
@@ -76,7 +77,7 @@ func (s *OomStore) tableLinkImportBatch(ctx context.Context, opt *importOpt, dat
 	if err != nil {
 		return 0, err
 	}
-	if err = validateTableSchema(tableSchema, opt.features); err != nil {
+	if err := validateTableSchema(tableSchema, opt.features); err != nil {
 		return 0, err
 	}
 	var revision int64

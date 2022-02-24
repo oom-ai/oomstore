@@ -58,18 +58,18 @@ func (db *DB) MultiGet(ctx context.Context, opt online.MultiGetOpt) (map[string]
 
 	var serializedEntityKeys []string
 	for _, entityKey := range opt.EntityKeys {
-		serializedEntityKey, err := dbutil.SerializeByValue(entityKey, Backend)
-		if err != nil {
-			return nil, err
+		serializedEntityKey, err2 := dbutil.SerializeByValue(entityKey, Backend)
+		if err2 != nil {
+			return nil, err2
 		}
 		serializedEntityKeys = append(serializedEntityKeys, serializedEntityKey)
 	}
 
 	var serializedFeatureIDs []string
 	for _, feature := range opt.Features {
-		serializedFeatureID, err := dbutil.SerializeByValue(feature.ID, Backend)
-		if err != nil {
-			return nil, err
+		serializedFeatureID, err2 := dbutil.SerializeByValue(feature.ID, Backend)
+		if err2 != nil {
+			return nil, err2
 		}
 		serializedFeatureIDs = append(serializedFeatureIDs, serializedFeatureID)
 	}

@@ -120,7 +120,6 @@ func TestTableSchema(t *testing.T) {
 	}
 	require.ElementsMatch(t, expected.Fields, actual.Fields)
 	require.Equal(t, expected.TimeRange, actual.TimeRange)
-
 }
 
 func int64Ptr(i int64) *int64 {
