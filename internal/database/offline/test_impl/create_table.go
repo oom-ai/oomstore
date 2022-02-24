@@ -3,9 +3,10 @@ package test_impl
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/stretchr/testify/require"
 )
 
 func TestCreateTable(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
@@ -28,12 +29,12 @@ func TestCreateTable(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 	}
 
 	testCases := []struct {
-		describtion   string
+		description   string
 		opt           offline.CreateTableOpt
 		expectedError error
 	}{
 		{
-			describtion: "cdc table (with unix_milli)",
+			description: "cdc table (with unix_milli)",
 			opt: offline.CreateTableOpt{
 				TableName:  tableName + "_0",
 				EntityName: entity.Name,
@@ -42,7 +43,7 @@ func TestCreateTable(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 			},
 		},
 		{
-			describtion: "stream snapshot table (with unix_milli)",
+			description: "stream snapshot table (with unix_milli)",
 			opt: offline.CreateTableOpt{
 				TableName:  tableName + "_1",
 				EntityName: entity.Name,
@@ -51,7 +52,7 @@ func TestCreateTable(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 			},
 		},
 		{
-			describtion: "batch snapshot table (without unix_milli)",
+			description: "batch snapshot table (without unix_milli)",
 			opt: offline.CreateTableOpt{
 				TableName:  tableName + "_2",
 				EntityName: entity.Name,
@@ -62,7 +63,7 @@ func TestCreateTable(t *testing.T, prepareStore PrepareStoreFn, destroyStore Des
 	}
 
 	for _, testCase := range testCases {
-		t.Run(testCase.describtion, func(t *testing.T) {
+		t.Run(testCase.description, func(t *testing.T) {
 			err := store.CreateTable(ctx, testCase.opt)
 			require.NoError(t, err)
 		})
