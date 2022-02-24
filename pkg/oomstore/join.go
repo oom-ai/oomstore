@@ -6,6 +6,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 
@@ -142,7 +143,7 @@ func (s *OomStore) buildRevisionRanges(ctx context.Context, group *types.Group) 
 }
 
 func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-chan types.EntityRow, []string, error) {
-	input, err := os.Open(inputFilePath)
+	input, err := os.Open(filepath.Clean(inputFilePath))
 	if err != nil {
 		return nil, nil, errdefs.WithStack(err)
 	}
@@ -208,7 +209,7 @@ func GetEntityRowsFromInputFile(ctx context.Context, inputFilePath string) (<-ch
 }
 
 func writeJoinResultToFile(outputFilePath string, joinResult *types.JoinResult) error {
-	file, err := os.Create(outputFilePath)
+	file, err := os.Create(filepath.Clean(outputFilePath))
 	if err != nil {
 		return err
 	}
