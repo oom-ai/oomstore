@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -102,7 +101,7 @@ func initConfig() {
 	if envCfgFile := os.Getenv("OOMAGENT_CONFIG"); envCfgFile != "" {
 		cfgFile = envCfgFile
 	}
-	cfgContent, err := ioutil.ReadFile(filepath.Clean(cfgFile))
+	cfgContent, err := os.ReadFile(filepath.Clean(cfgFile))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed reading config file: %v\n", err)
 		os.Exit(1)
