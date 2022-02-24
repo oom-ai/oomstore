@@ -58,9 +58,8 @@ func rdbDeserializer(i interface{}, valueType types.ValueType) (interface{}, err
 }
 
 func cassandraDeserializer(i interface{}, valueType types.ValueType) (interface{}, error) {
-	switch i.(type) {
-	case string:
-		if i == "" {
+	if v, ok := i.(string); ok {
+		if v == "" {
 			return nil, nil
 		}
 	}
