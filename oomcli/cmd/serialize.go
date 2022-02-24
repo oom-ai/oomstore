@@ -3,7 +3,6 @@ package cmd
 import (
 	"encoding/csv"
 	"io"
-	"os"
 	"reflect"
 	"time"
 
@@ -126,7 +125,7 @@ func serializeInCSV(w io.Writer, header []string, records [][]string) error {
 }
 
 func serializeInASCIITable(w io.Writer, header []string, records [][]string, border bool) error {
-	table := tablewriter.NewWriter(os.Stdout)
+	table := tablewriter.NewWriter(w)
 	table.SetAutoWrapText(false)
 	table.SetHeader(header)
 	table.SetAutoFormatHeaders(false)
