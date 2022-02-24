@@ -45,7 +45,7 @@ func kvSerializerByValueType(i interface{}, valueType types.ValueType) (s interf
 	case types.String:
 		return i.(string), nil
 	case types.Int64:
-		return strconv.FormatInt(int64(i.(int64)), serializeIntBase), nil
+		return strconv.FormatInt(i.(int64), serializeIntBase), nil
 	case types.Float64:
 		return strconv.FormatFloat(i.(float64), 'f', -1, 64), nil
 	case types.Bool:
@@ -108,7 +108,7 @@ func kvSerializerByValue(i interface{}) (string, error) {
 	case int:
 		return strconv.FormatInt(int64(s), serializeIntBase), nil
 	case int64:
-		return strconv.FormatInt(int64(s), serializeIntBase), nil
+		return strconv.FormatInt(s, serializeIntBase), nil
 	case int32:
 		return strconv.FormatInt(int64(s), serializeIntBase), nil
 	case int16:
@@ -124,7 +124,7 @@ func kvSerializerByValue(i interface{}) (string, error) {
 	case uint:
 		return strconv.FormatUint(uint64(s), serializeIntBase), nil
 	case uint64:
-		return strconv.FormatUint(uint64(s), serializeIntBase), nil
+		return strconv.FormatUint(s, serializeIntBase), nil
 	case uint32:
 		return strconv.FormatUint(uint64(s), serializeIntBase), nil
 	case uint16:

@@ -52,7 +52,7 @@ func printExportResultInCSV(exportResult *types.ExportResult) error {
 			return row.Error
 		}
 
-		if err := w.Write(cast.ToStringSlice([]interface{}(row.Record))); err != nil {
+		if err := w.Write(cast.ToStringSlice(row.Record)); err != nil {
 			return err
 		}
 	}
@@ -69,7 +69,7 @@ func printExportResultInASCIITable(exportResult *types.ExportResult) error {
 			return row.Error
 		}
 
-		table.Append(cast.ToStringSlice([]interface{}(row.Record)))
+		table.Append(cast.ToStringSlice(row.Record))
 	}
 
 	table.Render()
