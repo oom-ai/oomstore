@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"time"
+	"unicode/utf8"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -179,7 +180,7 @@ func (s *server) Import(ctx context.Context, req *codegen.ImportRequest) (*codeg
 		description = *req.Description
 	}
 	if req.Delimiter != nil {
-		delimiter = []rune(*req.Delimiter)[0]
+		delimiter, _ = utf8.DecodeRuneInString(*req.Delimiter)
 	} else {
 		delimiter = ','
 	}
