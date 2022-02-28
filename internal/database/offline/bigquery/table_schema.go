@@ -5,16 +5,17 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/spf13/cast"
+	"google.golang.org/api/iterator"
+
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/spf13/cast"
-	"google.golang.org/api/iterator"
 )
 
 func (db *DB) TableSchema(ctx context.Context, opt offline.TableSchemaOpt) (*types.DataTableSchema, error) {
-	q := fmt.Sprintf(`SELECT column_name, data_type FROM %s.INFORMATION_SCHEMA.COLUMNS WHERE table_name = "%s"`, db.datasetID, opt.TableName)
+	q := fmt.Sprintf(`SELECT column_name, data_type FROM %s.INFORMATION_SCHEMA.COLUMNS WHERE table_name = %q`, db.datasetID, opt.TableName)
 	rows, err := db.Query(q).Read(ctx)
 	if err != nil {
 		return nil, errdefs.WithStack(err)
