@@ -48,10 +48,10 @@ var rootCmd = &cobra.Command{
 
 		// write the listening address
 		tmpdir := filepath.Join(os.TempDir(), "oomagent", strconv.Itoa(os.Getpid()))
-		if err := os.MkdirAll(tmpdir, 0755); err != nil {
+		if err := os.MkdirAll(tmpdir, 0750); err != nil {
 			log.Fatalf("failed to create temp directory: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(tmpdir, "address"), []byte(lis.Addr().String()), 0644); err != nil {
+		if err := os.WriteFile(filepath.Join(tmpdir, "address"), []byte(lis.Addr().String()), 0600); err != nil {
 			log.Fatalf("failed to write listen address: %v", err)
 		}
 

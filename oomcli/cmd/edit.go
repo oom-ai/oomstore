@@ -60,7 +60,7 @@ func edit(ctx context.Context, oomStore *oomstore.OomStore, fileName string) err
 		return err
 	}
 
-	file, err := os.OpenFile(filepath.Clean(fileName), os.O_RDONLY, 0666)
+	file, err := os.OpenFile(filepath.Clean(fileName), os.O_RDONLY, 0600)
 	if err != nil {
 		return err
 	}
