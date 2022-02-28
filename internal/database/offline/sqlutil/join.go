@@ -299,15 +299,17 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 	if err != nil {
 		return nil, err
 	}
-	defer stmt.Close()
 	rows, err := stmt.Queryx()
 	if err != nil {
+		stmt.Close()
 		return nil, errdefs.WithStack(err)
 	}
 
 	data := make(chan types.JoinRecord)
 	go func() {
 		defer func() {
+			stmt.Close()
+			rows.Close()
 			if err := dropTemporaryTables(ctx, dbOpt.SqlxDB, dropTableNames); err != nil {
 				select {
 				case data <- types.JoinRecord{Error: err}:
@@ -316,7 +318,6 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 				}
 			}
 
-			rows.Close()
 			close(data)
 		}()
 
