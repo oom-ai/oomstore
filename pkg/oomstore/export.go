@@ -118,7 +118,7 @@ func (s *OomStore) Export(ctx context.Context, opt types.ExportOpt) error {
 			return row.Error
 		}
 
-		if err := w.Write(cast.ToStringSlice([]interface{}(row.Record))); err != nil {
+		if err := w.Write(cast.ToStringSlice(row.Record)); err != nil {
 			return err
 		}
 	}
