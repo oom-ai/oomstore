@@ -287,7 +287,12 @@ func readJoinedTable(ctx context.Context, dbOpt dbutil.DBOpt, opt readJoinedTabl
 
 	dropTableNames := []string{buildTableName(dbOpt, opt.EntityRowsTableName)}
 	for _, tableName := range opt.AllTableNames {
-		dropTableNames = append(dropTableNames, buildTableName(dbOpt, tableName))
+		dropTableName := buildTableName(dbOpt, tableName)
+		dropTableNames = append(dropTableNames, dropTableName)
+
+		// The logic of the temporary table should not affect the main process, so nil is returned here.
+		// TODO: Print log in the cloud service version of oomstore
+		_ = AddTemporaryTableRecord(ctx, dbOpt, dropTableName)
 	}
 
 	// Step 2: read joined results
@@ -308,14 +313,9 @@ func sqlxQueryResults(ctx context.Context, dbOpt dbutil.DBOpt, query string, hea
 	data := make(chan types.JoinRecord)
 	go func() {
 		defer func() {
-			if err := dropTemporaryTables(ctx, dbOpt.SqlxDB, dropTableNames); err != nil {
-				select {
-				case data <- types.JoinRecord{Error: err}:
-					// nothing to do
-				default:
-				}
-			}
-
+			// The logic of the temporary table should not affect the main process, so nil is returned here.
+			// TODO: Print log in the cloud service version of oomstore
+			_ = DropTemporaryTables(ctx, dbOpt, dropTableNames)
 			rows.Close()
 			close(data)
 		}()

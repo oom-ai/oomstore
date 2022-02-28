@@ -64,6 +64,20 @@ func (mr *MockStoreMockRecorder) CreateTable(ctx, opt interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTable", reflect.TypeOf((*MockStore)(nil).CreateTable), ctx, opt)
 }
 
+// DropTemporaryTable mocks base method.
+func (m *MockStore) DropTemporaryTable(ctx context.Context, tableNames []string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropTemporaryTable", ctx, tableNames)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropTemporaryTable indicates an expected call of DropTemporaryTable.
+func (mr *MockStoreMockRecorder) DropTemporaryTable(ctx, tableNames interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropTemporaryTable", reflect.TypeOf((*MockStore)(nil).DropTemporaryTable), ctx, tableNames)
+}
+
 // Export mocks base method.
 func (m *MockStore) Export(ctx context.Context, opt offline.ExportOpt) (*types.ExportResult, error) {
 	m.ctrl.T.Helper()
@@ -77,6 +91,21 @@ func (m *MockStore) Export(ctx context.Context, opt offline.ExportOpt) (*types.E
 func (mr *MockStoreMockRecorder) Export(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Export", reflect.TypeOf((*MockStore)(nil).Export), ctx, opt)
+}
+
+// GetTemporaryTables mocks base method.
+func (m *MockStore) GetTemporaryTables(ctx context.Context, unixMilli int64) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTemporaryTables", ctx, unixMilli)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTemporaryTables indicates an expected call of GetTemporaryTables.
+func (mr *MockStoreMockRecorder) GetTemporaryTables(ctx, unixMilli interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTemporaryTables", reflect.TypeOf((*MockStore)(nil).GetTemporaryTables), ctx, unixMilli)
 }
 
 // Import mocks base method.

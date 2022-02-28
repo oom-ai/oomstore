@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/spf13/cast"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
@@ -67,6 +67,8 @@ func TestImport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 					{Name: "price", ValueType: types.Int64, Group: group},
 				}},
 		})
+		assert.NoError(t, err)
+
 		records := make([][]interface{}, 0)
 		for row := range result.Data {
 			assert.NoError(t, row.Error)

@@ -4,10 +4,12 @@ import (
 	"bufio"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyStoreFn) {
@@ -88,9 +90,12 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 		},
 	}
 
-	for _, tc := range testCases {
+	t0 := time.Now().UnixMilli()
+	for i, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			result, err := store.Export(ctx, tc.opt)
+			assert.NoError(t, err)
+
 			values := make([][]interface{}, 0)
 			for row := range result.Data {
 				assert.NoError(t, row.Error)
@@ -98,8 +103,28 @@ func TestExport(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroyS
 			}
 			assert.ElementsMatch(t, tc.expected, values)
 			assert.NoError(t, err)
+
+			tempTables, err := store.GetTemporaryTables(ctx, t0)
+			assert.NoError(t, err)
+			assert.Equal(t, 0, len(tempTables))
+
+			tempTables, err = store.GetTemporaryTables(ctx, time.Now().UnixMilli())
+			assert.NoError(t, err)
+			assert.Equal(t, i+1, len(tempTables))
 		})
 	}
+
+	t.Run("drop temporary table", func(t *testing.T) {
+		tempTables, err := store.GetTemporaryTables(ctx, time.Now().UnixMilli())
+		assert.NoError(t, err)
+		assert.Equal(t, len(tempTables), len(tempTables))
+
+		assert.NoError(t, store.DropTemporaryTable(ctx, tempTables))
+
+		tempTables, err = store.GetTemporaryTables(ctx, time.Now().UnixMilli())
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(tempTables))
+	})
 }
 
 func prepareFeaturesForExport() (batchFeatures types.FeatureList, streamFeatures types.FeatureList) {

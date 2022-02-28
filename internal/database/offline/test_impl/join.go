@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/spf13/cast"
 
@@ -144,6 +145,10 @@ func TestJoin(t *testing.T, prepareStore PrepareStoreFn, destroyStore DestroySto
 			for i := range expectedValues {
 				assert.ElementsMatch(t, expectedValues[i], actualValues[i])
 			}
+
+			tempTables, err := store.GetTemporaryTables(ctx, time.Now().UnixMilli())
+			assert.NoError(t, err)
+			assert.Equal(t, 0, len(tempTables))
 		})
 	}
 }

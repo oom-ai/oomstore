@@ -2,14 +2,17 @@ package bigquery
 
 import (
 	"context"
+	"fmt"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/spf13/cast"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
 	"github.com/oom-ai/oomstore/internal/database/dbutil"
 	"github.com/oom-ai/oomstore/internal/database/offline"
 	"github.com/oom-ai/oomstore/internal/database/offline/sqlutil"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -61,4 +64,38 @@ func (db *DB) Push(ctx context.Context, opt offline.PushOpt) error {
 		return err
 	}
 	return nil
+}
+
+func (db *DB) DropTemporaryTable(ctx context.Context, tableNames []string) error {
+	dbOpt := dbutil.DBOpt{Backend: Backend, BigQueryDB: db.Client, DatasetID: &db.datasetID}
+	return sqlutil.DropTemporaryTables(ctx, dbOpt, tableNames)
+}
+
+func (db *DB) GetTemporaryTables(ctx context.Context, unixMilli int64) ([]string, error) {
+	qt := dbutil.QuoteFn(Backend)
+	query := fmt.Sprintf("SELECT table_name FROM %s.%s WHERE create_time < %s",
+		db.datasetID, qt(offline.TemporaryTableRecordTable), cast.ToString(unixMilli))
+
+	rows, err := db.Query(query).Read(ctx)
+	if err != nil {
+		tableNotFound, notFoundErr := dbutil.IsTableNotFoundError(err, Backend)
+		if notFoundErr != nil {
+			return nil, notFoundErr
+		}
+		if tableNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	var tableNames []string
+	for {
+		recordMap := make(map[string]bigquery.Value)
+		err = rows.Next(&recordMap)
+		if err == iterator.Done {
+			break
+		}
+		tableNames = append(tableNames, recordMap["table_name"].(string))
+	}
+	return tableNames, nil
 }
