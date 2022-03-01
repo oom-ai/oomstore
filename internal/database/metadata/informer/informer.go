@@ -6,9 +6,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/oom-ai/oomstore/pkg/errdefs"
-
 	"github.com/oom-ai/oomstore/internal/database/metadata"
+	"github.com/oom-ai/oomstore/pkg/errdefs"
 	"github.com/oom-ai/oomstore/pkg/oomstore/types"
 )
 
@@ -97,4 +96,29 @@ func (f *Informer) GetCachedGroup(ctx context.Context, groupID int) (*types.Grou
 		return nil, errdefs.NotFound(errdefs.Errorf("group %d not found", groupID))
 	}
 	return group, nil
+}
+
+func (f *Informer) GetCachedGroupByName(ctx context.Context, groupName string) (*types.Group, error) {
+	group := f.Cache().Groups.GetByName(groupName).Copy()
+	if group == nil {
+		return nil, errdefs.NotFound(errdefs.Errorf("group %s not found", groupName))
+	}
+	return group, nil
+}
+
+func (f *Informer) GetCachedFeature(ctx context.Context, featureID int) (*types.Feature, error) {
+	feature := f.Cache().Features.Get(featureID).Copy()
+	if feature == nil {
+		return nil, errdefs.NotFound(errdefs.Errorf("feature %d not found", featureID))
+	}
+	return feature, nil
+}
+
+func (f *Informer) GetCachedFeatureByName(ctx context.Context, fullName string) (*types.Feature, error) {
+	feature := f.Cache().Features.GetByName(fullName).Copy()
+
+	if feature == nil {
+		return nil, errdefs.NotFound(errdefs.Errorf("feature %s not found", fullName))
+	}
+	return feature, nil
 }

@@ -34,3 +34,13 @@ func (c *GroupCache) Get(groupID int) *types.Group {
 	}
 	return groups[0]
 }
+
+func (c *GroupCache) GetByName(groupName string) *types.Group {
+	groups := c.GroupList.Filter(func(g *types.Group) bool {
+		return g.Name == groupName
+	})
+	if len(groups) == 0 {
+		return nil
+	}
+	return groups[0]
+}

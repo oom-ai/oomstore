@@ -58,6 +58,8 @@ message OnlineGetRequest {
   // A feature full name has the following format: <feature_group_name>.<feature_name>,
   // for example, txn_stats.count_7d
   repeated string features = 2;
+  // All features of the group will be acquired if not null. Conflict with `features` argument.
+  optional string group = 3;
 }
 
 // `FeatureValueMap` maps feature full name to feature value.

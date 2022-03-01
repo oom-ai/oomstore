@@ -1,5 +1,10 @@
 package types
 
+import (
+	"github.com/oom-ai/oomstore/pkg/errdefs"
+	"github.com/oom-ai/oomstore/pkg/oomstore/util"
+)
+
 type CreateFeatureOpt struct {
 	FeatureName string
 	GroupName   string
@@ -55,7 +60,18 @@ type ExportOpt struct {
 
 type OnlineGetOpt struct {
 	FeatureNames []string
+	GroupName    *string
 	EntityKey    string
+}
+
+func (o *OnlineGetOpt) Validate() error {
+	if (len(o.FeatureNames) == 0) == (o.GroupName == nil || *o.GroupName == "") {
+		return errdefs.Errorf("Invalid OnlineGetOpt: Exactly one of FeatureNames and GroupName should not be null or empty")
+	}
+	if err := util.ValidateFullFeatureNames(o.FeatureNames...); err != nil {
+		return err
+	}
+	return nil
 }
 
 type OnlineMultiGetOpt struct {
